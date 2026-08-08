@@ -15,7 +15,7 @@ import type {
 import { appendFileSync } from 'node:fs';
 import type { ContentGenerator } from './contentGenerator.js';
 import type { FakeResponse } from './fakeContentGenerator.js';
-import type { UserTierId } from '../code_assist/types.js';
+import type { UserTierId } from '../userTier.js';
 import { safeJsonStringify } from '../utils/safeJsonStringify.js';
 import type { LlmRole } from '../telemetry/types.js';
 

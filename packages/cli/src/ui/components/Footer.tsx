@@ -5,7 +5,6 @@
  */
 
 import type React from 'react';
-import { useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import {
@@ -13,8 +12,6 @@ import {
   tildeifyPath,
   getDisplayString,
   checkExhaustive,
-  AuthType,
-  UserAccountManager,
 } from '@google/gemini-cli-core';
 import { ConsoleSummaryDisplay } from './ConsoleSummaryDisplay.js';
 import process from 'node:process';
@@ -185,16 +182,6 @@ export const Footer: React.FC = () => {
   const { vimEnabled, vimMode } = useVimMode();
 
   const authType = config.getContentGeneratorConfig()?.authType;
-  const [email, setEmail] = useState<string | undefined>();
-
-  useEffect(() => {
-    if (authType) {
-      const userAccountManager = new UserAccountManager();
-      setEmail(userAccountManager.getCachedGoogleAccount() ?? undefined);
-    } else {
-      setEmail(undefined);
-    }
-  }, [authType]);
 
   const {
     model,
@@ -401,10 +388,7 @@ export const Footer: React.FC = () => {
       case 'auth': {
         if (!settings.merged.ui.showUserIdentity) break;
         if (!authType) break;
-        const displayStr =
-          authType === AuthType.LOGIN_WITH_GOOGLE
-            ? (email ?? 'google')
-            : authType;
+        const displayStr = authType;
         addCol(
           id,
           header,

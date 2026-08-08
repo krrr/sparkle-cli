@@ -250,11 +250,6 @@ captures a screenshot and sends it to the vision model for analysis. The model
 returns coordinates and element descriptions that the browser agent uses with
 the `click_at` tool for precise, coordinate-based interactions.
 
-<!-- prettier-ignore -->
-> [!NOTE]
-> The visual agent requires API key or Vertex AI authentication. It is
-> not available when using "Sign in with Google".
-
 #### Sandbox support
 
 The browser agent adjusts its behavior automatically when running inside a

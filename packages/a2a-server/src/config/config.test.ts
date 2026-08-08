@@ -6,18 +6,15 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as path from 'node:path';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
 import { loadConfig } from './config.js';
 import type { Settings } from './settings.js';
 import {
   type ExtensionLoader,
-  getCodeAssistServer,
   Config,
-  ExperimentFlags,
-  fetchAdminControlsOnce,
-  type FetchAdminControlsResponse,
   AuthType,
   isHeadlessMode,
-  FatalAuthenticationError,
   PolicyDecision,
   ApprovalMode,
   PRIORITY_YOLO_ALLOW_ALL,
@@ -25,12 +22,16 @@ import {
 } from '@google/gemini-cli-core';
 import type { AgentSettings } from '../types.js';
 
+// Isolate environment loading from the user's real ~/.gemini/.env file.
+const mockHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-home-'));
+
 // Mock dependencies
 vi.mock('@google/gemini-cli-core', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('@google/gemini-cli-core')>();
   return {
     ...actual,
+    homedir: () => mockHomeDir,
     PRIORITY_YOLO_ALLOW_ALL: 998,
     Config: vi.fn().mockImplementation((params) => {
       const mockConfig = {
@@ -39,11 +40,7 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
         waitForMcpInit: vi.fn(),
         refreshAuth: vi.fn(),
         getExperiments: vi.fn().mockReturnValue({
-          flags: {
-            [actual.ExperimentFlags.ENABLE_ADMIN_CONTROLS]: {
-              boolValue: false,
-            },
-          },
+          flags: {},
         }),
         getRemoteAdminSettings: vi.fn(),
         setRemoteAdminSettings: vi.fn(),
@@ -54,8 +51,6 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
       flush: vi.fn(),
     },
     isHeadlessMode: vi.fn().mockReturnValue(false),
-    getCodeAssistServer: vi.fn(),
-    fetchAdminControlsOnce: vi.fn(),
     createPolicyEngineConfig: vi
       .fn()
       .mockImplementation(
@@ -111,11 +106,6 @@ describe('loadConfig', () => {
   });
 
   describe('admin settings overrides', () => {
-    it('should not fetch admin controls if experiment is disabled', async () => {
-      await loadConfig(mockSettings, mockExtensionLoader, taskId);
-      expect(fetchAdminControlsOnce).not.toHaveBeenCalled();
-    });
-
     it('should pass clientName as a2a-server to Config', async () => {
       await loadConfig(mockSettings, mockExtensionLoader, taskId);
       expect(Config).toHaveBeenCalledWith(
@@ -123,115 +113,6 @@ describe('loadConfig', () => {
           clientName: 'a2a-server',
         }),
       );
-    });
-
-    describe('when admin controls experiment is enabled', () => {
-      beforeEach(() => {
-        // We need to cast to any here to modify the mock implementation
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Config as any).mockImplementation((params: unknown) => {
-          const mockConfig = {
-            ...(params as object),
-            initialize: vi.fn(),
-            waitForMcpInit: vi.fn(),
-            refreshAuth: vi.fn(),
-            getExperiments: vi.fn().mockReturnValue({
-              flags: {
-                [ExperimentFlags.ENABLE_ADMIN_CONTROLS]: {
-                  boolValue: true,
-                },
-              },
-            }),
-            getRemoteAdminSettings: vi.fn().mockReturnValue({}),
-            setRemoteAdminSettings: vi.fn(),
-          };
-          return mockConfig;
-        });
-      });
-
-      it('should fetch admin controls and apply them', async () => {
-        const mockAdminSettings: FetchAdminControlsResponse = {
-          mcpSetting: {
-            mcpEnabled: false,
-          },
-          cliFeatureSetting: {
-            extensionsSetting: {
-              extensionsEnabled: false,
-            },
-          },
-          strictModeDisabled: false,
-        };
-        vi.mocked(fetchAdminControlsOnce).mockResolvedValue(mockAdminSettings);
-
-        await loadConfig(mockSettings, mockExtensionLoader, taskId);
-
-        expect(Config).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            disableYoloMode: !mockAdminSettings.strictModeDisabled,
-            mcpEnabled: mockAdminSettings.mcpSetting?.mcpEnabled,
-            extensionsEnabled:
-              mockAdminSettings.cliFeatureSetting?.extensionsSetting
-                ?.extensionsEnabled,
-          }),
-        );
-      });
-
-      it('should treat unset admin settings as false when admin settings are passed', async () => {
-        const mockAdminSettings: FetchAdminControlsResponse = {
-          mcpSetting: {
-            mcpEnabled: true,
-          },
-        };
-        vi.mocked(fetchAdminControlsOnce).mockResolvedValue(mockAdminSettings);
-
-        await loadConfig(mockSettings, mockExtensionLoader, taskId);
-
-        expect(Config).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            disableYoloMode: !false,
-            mcpEnabled: mockAdminSettings.mcpSetting?.mcpEnabled,
-            extensionsEnabled: undefined,
-          }),
-        );
-      });
-
-      it('should not pass default unset admin settings when no admin settings are present', async () => {
-        const mockAdminSettings: FetchAdminControlsResponse = {};
-        vi.mocked(fetchAdminControlsOnce).mockResolvedValue(mockAdminSettings);
-
-        await loadConfig(mockSettings, mockExtensionLoader, taskId);
-
-        expect(Config).toHaveBeenLastCalledWith(expect.objectContaining({}));
-      });
-
-      it('should fetch admin controls using the code assist server when available', async () => {
-        const mockAdminSettings: FetchAdminControlsResponse = {
-          mcpSetting: {
-            mcpEnabled: true,
-          },
-          strictModeDisabled: true,
-        };
-        const mockCodeAssistServer = { projectId: 'test-project' };
-        vi.mocked(getCodeAssistServer).mockReturnValue(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          mockCodeAssistServer as any,
-        );
-        vi.mocked(fetchAdminControlsOnce).mockResolvedValue(mockAdminSettings);
-
-        await loadConfig(mockSettings, mockExtensionLoader, taskId);
-
-        expect(fetchAdminControlsOnce).toHaveBeenCalledWith(
-          mockCodeAssistServer,
-          true,
-        );
-        expect(Config).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            disableYoloMode: !mockAdminSettings.strictModeDisabled,
-            mcpEnabled: mockAdminSettings.mcpSetting?.mcpEnabled,
-            extensionsEnabled: undefined,
-          }),
-        );
-      });
     });
   });
 
@@ -458,7 +339,6 @@ describe('loadConfig', () => {
       };
 
       beforeEach(() => {
-        vi.stubEnv('USE_CCPA', 'true');
         vi.stubEnv('GEMINI_API_KEY', '');
       });
 
@@ -466,77 +346,27 @@ describe('loadConfig', () => {
         vi.unstubAllEnvs();
       });
 
-      it('should attempt COMPUTE_ADC by default and bypass LOGIN_WITH_GOOGLE if successful', async () => {
+      it('should use Gemini API key when GEMINI_API_KEY is set', async () => {
+        vi.stubEnv('GEMINI_API_KEY', 'test-key');
         const refreshAuthMock = vi.fn().mockResolvedValue(undefined);
         setupConfigMock(refreshAuthMock);
 
         await loadConfig(mockSettings, mockExtensionLoader, taskId);
 
-        expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.COMPUTE_ADC);
-        expect(refreshAuthMock).not.toHaveBeenCalledWith(
-          AuthType.LOGIN_WITH_GOOGLE,
-        );
-      });
-
-      it('should fallback to LOGIN_WITH_GOOGLE if COMPUTE_ADC fails and interactive mode is available', async () => {
-        vi.mocked(isHeadlessMode).mockReturnValue(false);
-        const refreshAuthMock = vi.fn().mockImplementation((authType) => {
-          if (authType === AuthType.COMPUTE_ADC) {
-            return Promise.reject(new Error('ADC failed'));
-          }
-          return Promise.resolve();
-        });
-        setupConfigMock(refreshAuthMock);
-
-        await loadConfig(mockSettings, mockExtensionLoader, taskId);
-
-        expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.COMPUTE_ADC);
         expect(refreshAuthMock).toHaveBeenCalledWith(
-          AuthType.LOGIN_WITH_GOOGLE,
+          AuthType.USE_GEMINI,
+          'test-key',
         );
       });
 
-      it('should throw FatalAuthenticationError in headless mode if COMPUTE_ADC fails', async () => {
-        vi.mocked(isHeadlessMode).mockReturnValue(true);
-
-        const refreshAuthMock = vi.fn().mockImplementation((authType) => {
-          if (authType === AuthType.COMPUTE_ADC) {
-            return Promise.reject(new Error('ADC not found'));
-          }
-          return Promise.resolve();
-        });
+      it('should throw an error when no auth method is available', async () => {
+        const refreshAuthMock = vi.fn().mockResolvedValue(undefined);
         setupConfigMock(refreshAuthMock);
 
         await expect(
           loadConfig(mockSettings, mockExtensionLoader, taskId),
         ).rejects.toThrow(
-          'COMPUTE_ADC failed: ADC not found. (LOGIN_WITH_GOOGLE fallback skipped due to headless mode. Run in an interactive terminal to use OAuth.)',
-        );
-
-        expect(refreshAuthMock).toHaveBeenCalledWith(AuthType.COMPUTE_ADC);
-        expect(refreshAuthMock).not.toHaveBeenCalledWith(
-          AuthType.LOGIN_WITH_GOOGLE,
-        );
-      });
-
-      it('should include both original and fallback error when LOGIN_WITH_GOOGLE fallback fails', async () => {
-        vi.mocked(isHeadlessMode).mockReturnValue(false);
-
-        const refreshAuthMock = vi.fn().mockImplementation((authType) => {
-          if (authType === AuthType.COMPUTE_ADC) {
-            throw new Error('ADC failed');
-          }
-          if (authType === AuthType.LOGIN_WITH_GOOGLE) {
-            throw new FatalAuthenticationError('OAuth failed');
-          }
-          return Promise.resolve();
-        });
-        setupConfigMock(refreshAuthMock);
-
-        await expect(
-          loadConfig(mockSettings, mockExtensionLoader, taskId),
-        ).rejects.toThrow(
-          'OAuth failed. The initial COMPUTE_ADC attempt also failed: ADC failed',
+          'Unable to set GeneratorConfig. Please provide a GEMINI_API_KEY.',
         );
       });
     });

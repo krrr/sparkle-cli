@@ -15,7 +15,6 @@ import type { GeminiClient } from '../core/client.js';
 import type { Config } from '../config/config.js';
 import type { ToolCallRequestInfo } from '../scheduler/types.js';
 import { Scheduler } from '../scheduler/scheduler.js';
-import { recordToolCallInteractions } from '../code_assist/telemetry.js';
 import { ToolErrorType, isFatalToolError } from '../tools/tool-error.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import type { EditorType } from '../utils/editor.js';
@@ -295,7 +294,6 @@ export class LegacyAgentProtocol implements AgentProtocol {
         this._client
           .getChat()
           .recordCompletedToolCalls(currentModel, completedToolCalls);
-        await recordToolCallInteractions(this._config, completedToolCalls);
       } catch (error) {
         debugLogger.error(
           `Error recording completed tool call information: ${error}`,

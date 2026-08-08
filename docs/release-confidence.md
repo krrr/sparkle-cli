@@ -79,10 +79,8 @@ manually run through this checklist.
 
 - **Authentication:**
 
-  - [ ] In interactive mode run `/auth` and verify all sign in flows work:
-    - [ ] Sign in with Google
+  - [ ] In interactive mode run `/auth` and verify the sign in flow works:
     - [ ] API Key
-    - [ ] Vertex AI
 
 - **Basic prompting:**
 

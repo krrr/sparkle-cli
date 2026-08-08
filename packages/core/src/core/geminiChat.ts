@@ -23,7 +23,7 @@ export { AgentChatHistory, type HistoryTurn } from './agentChatHistory.js';
 import { AgentChatHistory, type HistoryTurn } from './agentChatHistory.js';
 
 import { randomUUID } from 'node:crypto';
-import { toParts } from '../code_assist/converter.js';
+import { toParts } from './partUtils.js';
 import {
   retryWithBackoff,
   isRetryableError,

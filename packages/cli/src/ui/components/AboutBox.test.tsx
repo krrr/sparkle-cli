@@ -19,8 +19,7 @@ describe('AboutBox', () => {
     osVersion: 'macOS',
     sandboxEnv: 'default',
     modelVersion: 'gemini-pro',
-    selectedAuthType: 'oauth',
-    gcpProject: '',
+    selectedAuthType: 'gemini-api-key',
     ideClient: '',
   };
 
@@ -35,12 +34,11 @@ describe('AboutBox', () => {
     expect(output).toContain('gemini-pro');
     expect(output).toContain('default');
     expect(output).toContain('macOS');
-    expect(output).toContain('Signed in with Google');
+    expect(output).toContain('gemini-api-key');
     unmount();
   });
 
   it.each([
-    ['gcpProject', 'my-project', 'GCP Project'],
     ['ideClient', 'vscode', 'IDE Client'],
     ['tier', 'Enterprise', 'Tier'],
   ])('renders optional prop %s', async (prop, value, label) => {
@@ -51,16 +49,6 @@ describe('AboutBox', () => {
     const output = lastFrame();
     expect(output).toContain(label);
     expect(output).toContain(value);
-    unmount();
-  });
-
-  it('renders Auth Method with email when userEmail is provided', async () => {
-    const props = { ...defaultProps, userEmail: 'test@example.com' };
-    const { lastFrame, unmount } = await renderWithProviders(
-      <AboutBox {...props} />,
-    );
-    const output = lastFrame();
-    expect(output).toContain('Signed in with Google (test@example.com)');
     unmount();
   });
 

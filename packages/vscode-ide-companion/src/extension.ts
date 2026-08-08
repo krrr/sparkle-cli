@@ -24,7 +24,6 @@ export const DIFF_SCHEME = 'gemini-diff';
  */
 const MANAGED_EXTENSION_SURFACES: ReadonlySet<IdeInfo['name']> = new Set([
   IDE_DEFINITIONS.firebasestudio.name,
-  IDE_DEFINITIONS.cloudshell.name,
 ]);
 
 let ideServer: IDEServer;

@@ -5,7 +5,6 @@
  */
 
 import {
-  AuthType,
   type Config,
   type FallbackModelHandler,
   type FallbackIntent,
@@ -74,8 +73,6 @@ export function useQuotaAndFallback({
       fallbackModel,
       error,
     ): Promise<FallbackIntent | null> => {
-      const contentGeneratorConfig = config.getContentGeneratorConfig();
-
       let message: string;
       let isTerminalQuotaError = false;
       let isModelNotFoundError = false;
@@ -128,27 +125,11 @@ export function useQuotaAndFallback({
             : null,
           `/stats model for usage details`,
           `/model to switch models.`,
-          contentGeneratorConfig?.authType === AuthType.LOGIN_WITH_GOOGLE
-            ? `/auth to switch to API key.`
-            : null,
         ].filter(Boolean);
         message = messageLines.join('\n');
       } else if (error instanceof ModelNotFoundError) {
         isModelNotFoundError = true;
-        if (
-          contentGeneratorConfig?.authType === AuthType.USE_VERTEX_AI &&
-          VALID_GEMINI_MODELS.has(failedModel)
-        ) {
-          const location =
-            process.env['GOOGLE_CLOUD_LOCATION'] || 'your configured region';
-          const messageLines = [
-            `Model "${failedModel}" is not available in region "${location}".`,
-            `To see which models are available in this region, please visit:`,
-            `https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations`,
-            `/model to switch models.`,
-          ];
-          message = messageLines.join('\n');
-        } else if (VALID_GEMINI_MODELS.has(failedModel)) {
+        if (VALID_GEMINI_MODELS.has(failedModel)) {
           const messageLines = [
             `It seems like you don't have access to ${getDisplayString(failedModel)}.`,
             `Your admin might have disabled the access. Contact them to enable the Preview Release Channel.`,
@@ -197,7 +178,6 @@ export function useQuotaAndFallback({
             message,
             isTerminalQuotaError,
             isModelNotFoundError,
-            authType: contentGeneratorConfig?.authType,
           });
         },
       );

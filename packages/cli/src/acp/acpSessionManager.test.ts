@@ -115,7 +115,7 @@ describe('AcpSessionManager', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: AuthType.LOGIN_WITH_GOOGLE },
+          auth: { selectedType: AuthType.USE_GEMINI },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},

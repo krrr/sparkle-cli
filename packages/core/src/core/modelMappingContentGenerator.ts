@@ -14,7 +14,7 @@ import {
 } from '@google/genai';
 import { type ContentGenerator } from './contentGenerator.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
-import type { UserTierId, GeminiUserTier } from '../code_assist/types.js';
+import type { UserTierId, GeminiUserTier } from '../userTier.js';
 import { normalizeModelId } from '../utils/modelUtils.js';
 
 export class ModelMappingContentGenerator implements ContentGenerator {

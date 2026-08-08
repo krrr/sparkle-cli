@@ -40,7 +40,7 @@ import {
   estimateContextBreakdown,
 } from './loggingContentGenerator.js';
 import type { Config } from '../config/config.js';
-import { UserTierId } from '../code_assist/types.js';
+import { UserTierId } from '../userTier.js';
 import { ApiRequestEvent, LlmRole } from '../telemetry/types.js';
 import { FatalAuthenticationError } from '../utils/errors.js';
 import {

@@ -57,15 +57,13 @@ export * from './routing/modelRouterService.js';
 export * from './fallback/types.js';
 export * from './fallback/handler.js';
 
-export * from './code_assist/codeAssist.js';
-export * from './code_assist/oauth2.js';
-export * from './code_assist/server.js';
-export * from './code_assist/setup.js';
-export * from './code_assist/types.js';
-export * from './code_assist/telemetry.js';
-export * from './code_assist/admin/admin_controls.js';
-export * from './code_assist/admin/mcpUtils.js';
 export * from './core/apiKeyCredentialStorage.js';
+export * from './userTier.js';
+export * from './experiments/experiments.js';
+export * from './experiments/flagNames.js';
+export * from './admin-controls/types.js';
+export * from './admin-controls/admin-controls.js';
+export * from './admin-controls/mcp-utils.js';
 
 // Export utilities
 export * from './utils/fetch.js';
@@ -159,11 +157,7 @@ export * from './skills/skillLoader.js';
 export * from './ide/ide-client.js';
 export * from './ide/ideContext.js';
 export * from './ide/ide-installer.js';
-export {
-  IDE_DEFINITIONS,
-  type IdeInfo,
-  isCloudShell,
-} from './ide/detect-ide.js';
+export { IDE_DEFINITIONS, type IdeInfo } from './ide/detect-ide.js';
 export * from './ide/constants.js';
 export * from './ide/types.js';
 

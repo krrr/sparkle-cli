@@ -204,12 +204,7 @@ describe('activate', () => {
       expect(showInformationMessageMock).not.toHaveBeenCalled();
     });
 
-    it.each([
-      {
-        ide: IDE_DEFINITIONS.cloudshell,
-      },
-      { ide: IDE_DEFINITIONS.firebasestudio },
-    ])(
+    it.each([{ ide: IDE_DEFINITIONS.firebasestudio }])(
       'does not show install or update messages for $ide.name',
       async ({ ide }) => {
         vi.mocked(detectIdeFromEnv).mockReturnValue(ide);

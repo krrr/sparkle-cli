@@ -8,7 +8,6 @@ export const IDE_DEFINITIONS = {
   devin: { name: 'devin', displayName: 'Devin' },
   replit: { name: 'replit', displayName: 'Replit' },
   cursor: { name: 'cursor', displayName: 'Cursor' },
-  cloudshell: { name: 'cloudshell', displayName: 'Cloud Shell' },
   codespaces: { name: 'codespaces', displayName: 'GitHub Codespaces' },
   firebasestudio: { name: 'firebasestudio', displayName: 'Firebase Studio' },
   trae: { name: 'trae', displayName: 'Trae' },
@@ -36,10 +35,6 @@ export interface IdeInfo {
   displayName: string;
 }
 
-export function isCloudShell(): boolean {
-  return !!(process.env['EDITOR_IN_CLOUD_SHELL'] || process.env['CLOUD_SHELL']);
-}
-
 function isJetBrains(): boolean {
   return !!process.env['TERMINAL_EMULATOR']
     ?.toLowerCase()
@@ -61,9 +56,6 @@ export function detectIdeFromEnv(): IdeInfo {
   }
   if (process.env['CODESPACES']) {
     return IDE_DEFINITIONS.codespaces;
-  }
-  if (isCloudShell()) {
-    return IDE_DEFINITIONS.cloudshell;
   }
   if (process.env['TERM_PRODUCT'] === 'Trae') {
     return IDE_DEFINITIONS.trae;

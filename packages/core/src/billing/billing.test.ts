@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import type { GeminiUserTier } from '../code_assist/types.js';
+import type { GeminiUserTier } from '../userTier.js';
 import {
   buildG1Url,
   getG1CreditBalance,

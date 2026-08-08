@@ -63,7 +63,6 @@ export class StartSessionEvent implements BaseTelemetryEvent {
   core_tools_enabled: string;
   approval_mode: string;
   api_key_enabled: boolean;
-  vertex_ai_enabled: boolean;
   debug_enabled: boolean;
   mcp_servers: string;
   telemetry_enabled: boolean;
@@ -85,10 +84,8 @@ export class StartSessionEvent implements BaseTelemetryEvent {
       config.getMcpClientManager()?.getMcpServers() ?? config.getMcpServers();
 
     let useGemini = false;
-    let useVertex = false;
     if (generatorConfig && generatorConfig.authType) {
       useGemini = generatorConfig.authType === AuthType.USE_GEMINI;
-      useVertex = generatorConfig.authType === AuthType.USE_VERTEX_AI;
     }
 
     this['event.name'] = 'cli_config';
@@ -99,8 +96,7 @@ export class StartSessionEvent implements BaseTelemetryEvent {
       typeof config.getSandbox() === 'string' || !!config.getSandbox();
     this.core_tools_enabled = (config.getCoreTools() ?? []).join(',');
     this.approval_mode = config.getApprovalMode();
-    this.api_key_enabled = useGemini || useVertex;
-    this.vertex_ai_enabled = useVertex;
+    this.api_key_enabled = useGemini;
     this.debug_enabled = config.getDebugMode();
     this.mcp_servers = mcpServers ? Object.keys(mcpServers).join(',') : '';
     this.telemetry_enabled = config.getTelemetryEnabled();
@@ -136,7 +132,6 @@ export class StartSessionEvent implements BaseTelemetryEvent {
       core_tools_enabled: this.core_tools_enabled,
       approval_mode: this.approval_mode,
       api_key_enabled: this.api_key_enabled,
-      vertex_ai_enabled: this.vertex_ai_enabled,
       log_user_prompts_enabled: this.telemetry_log_user_prompts_enabled,
       file_filtering_respect_git_ignore: this.file_filtering_respect_git_ignore,
       debug_mode: this.debug_enabled,

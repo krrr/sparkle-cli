@@ -11,9 +11,6 @@ npm install -g @google/gemini-cli
 
 ## Highlights
 
-- **Caretaker Services:** Introduced a new caretaker triage worker including
-  core foundational modules, main worker execution loops, egress action
-  publishers, and octokit GitHub Action handlers.
 - **Robust File Editing:** Core tools like `write_file` and `replace` now bypass
   LLM corrections for JSON and IPYNB files to ensure accurate and direct file
   modifications.
@@ -28,11 +25,6 @@ npm install -g @google/gemini-cli
 - Refactor: exclude transient CI configuration files from workspace context by
   @DavidAPierce in
   [#28216](https://github.com/google-gemini/gemini-cli/pull/28216)
-- feat(caretaker-triage): add triage worker core foundational modules by
-  @chadd28 in [#28163](https://github.com/google-gemini/gemini-cli/pull/28163)
-- feat(caretaker-egress): implement octokit github action handler for egress
-  service by @chadd28 in
-  [#28303](https://github.com/google-gemini/gemini-cli/pull/28303)
 - chore(release): bump version to 0.52.0-nightly.20260707.g27a3da3e8 by
   @gemini-cli-robot in
   [#28323](https://github.com/google-gemini/gemini-cli/pull/28323)
@@ -45,9 +37,6 @@ npm install -g @google/gemini-cli
   [#28223](https://github.com/google-gemini/gemini-cli/pull/28223)
 - fix(core): use unambiguous previous intent label in fallback summary by
   @amelidev in [#28343](https://github.com/google-gemini/gemini-cli/pull/28343)
-- feat(caretaker-triage): implement main worker execution loop and egress action
-  publisher by @chadd28 in
-  [#28306](https://github.com/google-gemini/gemini-cli/pull/28306)
 - fix(privacy): show a clear message when the account has no Code Assist tier by
   @ompatel-aiml in
   [#28304](https://github.com/google-gemini/gemini-cli/pull/28304)

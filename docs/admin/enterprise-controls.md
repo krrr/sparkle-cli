@@ -129,7 +129,6 @@ local configuration.
     "internal-registry": {
       "url": "https://registry.corp/mcp",
       "type": "sse",
-      "authProviderType": "google_credentials",
       "oauth": {
         "scopes": ["https://www.googleapis.com/auth/scope"]
       }
@@ -145,13 +144,9 @@ local configuration.
 - `trust`: (Optional) If set to `true`, tool execution will not require user
   approval. Defaults to `true` for required servers.
 - `description`: (Optional) Human-readable description of the server.
-- `authProviderType`: (Optional) Authentication provider (`dynamic_discovery`,
-  `google_credentials`, or `service_account_impersonation`).
+- `authProviderType`: (Optional) Authentication provider (`dynamic_discovery`).
 - `oauth`: (Optional) OAuth configuration including `scopes`, `clientId`, and
   `clientSecret`.
-- `targetAudience`: (Optional) OAuth target audience for service-to-service
-  auth.
-- `targetServiceAccount`: (Optional) Service account email to impersonate.
 - `headers`: (Optional) Additional HTTP headers to send with requests.
 - `includeTools` / `excludeTools`: (Optional) Tool filtering lists.
 - `timeout`: (Optional) Timeout in milliseconds for MCP requests.

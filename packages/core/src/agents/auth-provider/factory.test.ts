@@ -191,9 +191,10 @@ describe('A2AAuthProviderFactory', () => {
         );
       });
 
-      it('should match google-credentials with http Bearer scheme', () => {
+      it('should not match apiKey config with http Bearer scheme', () => {
         const authConfig: A2AAuthConfig = {
-          type: 'google-credentials',
+          type: 'apiKey',
+          key: 'my-key',
         };
         const securitySchemes: Record<string, SecurityScheme> = {
           bearerAuth: {
@@ -207,7 +208,10 @@ describe('A2AAuthProviderFactory', () => {
           securitySchemes,
         );
 
-        expect(result).toEqual({ valid: true });
+        expect(result.valid).toBe(false);
+        expect(result.diff?.missingConfig).toContain(
+          "Scheme 'bearerAuth' requires HTTP Bearer authentication",
+        );
       });
     });
 
@@ -278,9 +282,10 @@ describe('A2AAuthProviderFactory', () => {
         expect(result).toEqual({ valid: true });
       });
 
-      it('should not match google-credentials for openIdConnect scheme', () => {
+      it('should not match apiKey config for openIdConnect scheme', () => {
         const authConfig: A2AAuthConfig = {
-          type: 'google-credentials',
+          type: 'apiKey',
+          key: 'my-key',
         };
         const securitySchemes: Record<string, SecurityScheme> = {
           oidcAuth: {

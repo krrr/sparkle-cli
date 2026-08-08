@@ -21,7 +21,7 @@ import {
 } from './config.js';
 import { createMockSandboxConfig } from '@google/gemini-cli-test-utils';
 import { DEFAULT_MAX_ATTEMPTS } from '../utils/retry.js';
-import { ExperimentFlags } from '../code_assist/experiments/flagNames.js';
+import { ExperimentFlags } from '../experiments/flagNames.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents } from '../utils/events.js';
 import { ApprovalMode } from '../policy/types.js';
@@ -252,11 +252,9 @@ vi.mock('../context/memoryContextManager.js', () => ({
 
 import { BaseLlmClient } from '../core/baseLlmClient.js';
 import { tokenLimit } from '../core/tokenLimits.js';
-import { getCodeAssistServer } from '../code_assist/codeAssist.js';
-import { getExperiments } from '../code_assist/experiments/experiments.js';
-import type { CodeAssistServer } from '../code_assist/server.js';
+import { getExperiments } from '../experiments/experiments.js';
 import { MemoryContextManager } from '../context/memoryContextManager.js';
-import { UserTierId } from '../code_assist/types.js';
+import { UserTierId } from '../userTier.js';
 import type {
   ModelConfigService,
   ModelConfigServiceConfig,
@@ -268,8 +266,7 @@ vi.mock('../core/localLiteRtLmClient.js');
 vi.mock('../core/tokenLimits.js', () => ({
   tokenLimit: vi.fn(),
 }));
-vi.mock('../code_assist/codeAssist.js');
-vi.mock('../code_assist/experiments/experiments.js');
+vi.mock('../experiments/experiments.js');
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -683,7 +680,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     describe('getGemini31LaunchedSync', () => {
-      it.each([AuthType.USE_GEMINI, AuthType.USE_VERTEX_AI, AuthType.GATEWAY])(
+      it.each([AuthType.USE_GEMINI, AuthType.GATEWAY])(
         'should return true for %s',
         async (authType) => {
           const config = new Config(baseParams);
@@ -694,64 +691,9 @@ describe('Server Config (config.ts)', () => {
           expect(config.getGemini31LaunchedSync()).toBe(true);
         },
       );
-
-      it('should fallback to experiments for other auth types', async () => {
-        vi.mocked(getExperiments).mockResolvedValue({
-          experimentIds: [],
-          flags: {
-            [ExperimentFlags.GEMINI_3_1_PRO_LAUNCHED]: {
-              flagId: ExperimentFlags.GEMINI_3_1_PRO_LAUNCHED,
-              boolValue: true,
-            },
-          },
-        });
-
-        const config = new Config(baseParams);
-
-        vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-          authType: AuthType.LOGIN_WITH_GOOGLE,
-        });
-
-        await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
-        expect(config.getGemini31LaunchedSync()).toBe(true);
-      });
     });
 
     describe('getProModelNoAccessSync', () => {
-      it('should return experiment value for AuthType.LOGIN_WITH_GOOGLE', async () => {
-        vi.mocked(getExperiments).mockResolvedValue({
-          experimentIds: [],
-          flags: {
-            [ExperimentFlags.PRO_MODEL_NO_ACCESS]: {
-              boolValue: true,
-            },
-          },
-        });
-        const config = new Config(baseParams);
-        vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-          authType: AuthType.LOGIN_WITH_GOOGLE,
-        });
-        await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
-        expect(config.getProModelNoAccessSync()).toBe(true);
-      });
-
-      it('should return experiment value for AuthType.COMPUTE_ADC', async () => {
-        vi.mocked(getExperiments).mockResolvedValue({
-          experimentIds: [],
-          flags: {
-            [ExperimentFlags.PRO_MODEL_NO_ACCESS]: {
-              boolValue: true,
-            },
-          },
-        });
-        const config = new Config(baseParams);
-        vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-          authType: AuthType.COMPUTE_ADC,
-        });
-        await config.refreshAuth(AuthType.COMPUTE_ADC);
-        expect(config.getProModelNoAccessSync()).toBe(true);
-      });
-
       it('should return false for other auth types even if experiment is true', async () => {
         vi.mocked(getExperiments).mockResolvedValue({
           experimentIds: [],
@@ -843,7 +785,6 @@ describe('Server Config (config.ts)', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
       );
       // Verify that contentGeneratorConfig is updated
       expect(config.getContentGeneratorConfig()).toEqual(mockContentConfig);
@@ -858,30 +799,6 @@ describe('Server Config (config.ts)', () => {
       await config.refreshAuth(AuthType.USE_GEMINI);
 
       expect(config.getFallbackOverride('failed-model')).toBeUndefined();
-    });
-
-    it('should pass Vertex AI routing settings when refreshing auth', async () => {
-      const vertexAiRouting = {
-        requestType: 'shared' as const,
-        sharedRequestType: 'priority' as const,
-      };
-      const config = new Config({
-        ...baseParams,
-        vertexAiRouting,
-      });
-
-      vi.mocked(createContentGeneratorConfig).mockResolvedValue({});
-
-      await config.refreshAuth(AuthType.USE_VERTEX_AI);
-
-      expect(createContentGeneratorConfig).toHaveBeenCalledWith(
-        config,
-        AuthType.USE_VERTEX_AI,
-        undefined,
-        undefined,
-        undefined,
-        vertexAiRouting,
-      );
     });
 
     it('should reset model availability status', async () => {
@@ -901,7 +818,7 @@ describe('Server Config (config.ts)', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('should strip thoughts when switching from GenAI to Vertex', async () => {
+    it('should strip thoughts when switching from GenAI to GATEWAY', async () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
@@ -913,7 +830,7 @@ describe('Server Config (config.ts)', () => {
 
       await config.refreshAuth(AuthType.USE_GEMINI);
 
-      await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
+      await config.refreshAuth(AuthType.GATEWAY);
 
       const loopContext: AgentLoopContext = config;
       expect(
@@ -921,7 +838,7 @@ describe('Server Config (config.ts)', () => {
       ).toHaveBeenCalledWith();
     });
 
-    it('should strip thoughts when switching from GenAI to Vertex AI', async () => {
+    it('should not strip thoughts when switching from GATEWAY to GenAI', async () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
@@ -931,27 +848,7 @@ describe('Server Config (config.ts)', () => {
           }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
       );
 
-      await config.refreshAuth(AuthType.USE_GEMINI);
-
-      await config.refreshAuth(AuthType.USE_VERTEX_AI);
-
-      const loopContext: AgentLoopContext = config;
-      expect(
-        loopContext.geminiClient.stripThoughtsFromHistory,
-      ).toHaveBeenCalledWith();
-    });
-
-    it('should not strip thoughts when switching from Vertex to GenAI', async () => {
-      const config = new Config(baseParams);
-
-      vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: AuthType | undefined) =>
-          ({
-            authType,
-          }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
-      );
-
-      await config.refreshAuth(AuthType.USE_VERTEX_AI);
+      await config.refreshAuth(AuthType.GATEWAY);
 
       await config.refreshAuth(AuthType.USE_GEMINI);
 
@@ -976,7 +873,7 @@ describe('Server Config (config.ts)', () => {
         model: PREVIEW_GEMINI_MODEL_AUTO,
       });
 
-      await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
+      await config.refreshAuth(AuthType.GATEWAY);
       await config.getExperimentsAsync();
 
       await vi.waitFor(() => {
@@ -999,7 +896,7 @@ describe('Server Config (config.ts)', () => {
         model: PREVIEW_GEMINI_MODEL_AUTO,
       });
 
-      await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
+      await config.refreshAuth(AuthType.GATEWAY);
 
       expect(config.getModel()).toBe(PREVIEW_GEMINI_MODEL_AUTO);
     });
@@ -3118,10 +3015,6 @@ describe('Hooks configuration', () => {
 
 describe('Config Quota & Preview Model Access', () => {
   let config: Config;
-  let mockCodeAssistServer: {
-    projectId: string;
-    retrieveUserQuota: Mock;
-  };
 
   const baseParams: ConfigParameters = {
     cwd: '/tmp',
@@ -3142,220 +3035,30 @@ describe('Config Quota & Preview Model Access', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCodeAssistServer = {
-      projectId: 'test-project',
-      retrieveUserQuota: vi.fn(),
-    };
-    vi.mocked(getCodeAssistServer).mockReturnValue(
-      mockCodeAssistServer as Partial<CodeAssistServer> as CodeAssistServer,
-    );
     config = new Config(baseParams);
   });
 
   describe('refreshUserQuota', () => {
-    it('should update hasAccessToPreviewModel to true if quota includes preview model', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-3-pro-preview',
-            remainingAmount: '100',
-            remainingFraction: 1.0,
-          },
-        ],
-      });
-
-      await config.refreshUserQuota();
-      expect(config.getHasAccessToPreviewModel()).toBe(true);
-    });
-
-    it('should update hasAccessToPreviewModel to true if quota includes Gemini 3.1 preview model', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-3.1-pro-preview',
-            remainingAmount: '100',
-            remainingFraction: 1.0,
-          },
-        ],
-      });
-
-      await config.refreshUserQuota();
-      expect(config.getHasAccessToPreviewModel()).toBe(true);
-    });
-
-    it('should update hasAccessToPreviewModel to false if quota does not include preview model', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'some-other-model',
-            remainingAmount: '10',
-            remainingFraction: 0.1,
-          },
-        ],
-      });
-
-      await config.refreshUserQuota();
+    it('should return undefined without a Code Assist server', async () => {
+      const result = await config.refreshUserQuota();
+      expect(result).toBeUndefined();
+      // Never set => stays null (unknown); getter returns false by default
       expect(config.getHasAccessToPreviewModel()).toBe(false);
     });
 
-    it('should calculate pooled quota correctly for auto models', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-2.5-pro',
-            remainingAmount: '10',
-            remainingFraction: 0.2,
-          },
-          {
-            modelId: 'gemini-2.5-flash',
-            remainingAmount: '80',
-            remainingFraction: 0.8,
-          },
-        ],
-      });
-
-      config.setModel('auto-gemini-2.5');
-      await config.refreshUserQuota();
-
-      const pooled = (
-        config as Partial<Config> as {
-          getPooledQuota: () => {
-            remaining?: number;
-            limit?: number;
-            resetTime?: string;
-          };
-        }
-      ).getPooledQuota();
-      // Pro: 10 / 0.2 = 50 total.
-      // Flash: 80 / 0.8 = 100 total.
-      // Pooled: (10 + 80) / (50 + 100) = 90 / 150 = 0.6
-      expect(pooled?.remaining).toBe(90);
-      expect(pooled?.limit).toBe(150);
-      expect((pooled?.remaining ?? 0) / (pooled?.limit ?? 1)).toBeCloseTo(0.6);
+    it('should return undefined from refreshUserQuotaIfStale', async () => {
+      const result = await config.refreshUserQuotaIfStale();
+      expect(result).toBeUndefined();
     });
 
-    it('should return undefined pooled quota for non-auto models', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-2.5-pro',
-            remainingAmount: '10',
-            remainingFraction: 0.2,
-          },
-        ],
-      });
+    it('should return undefined from getLastRetrievedQuota', async () => {
+      expect(config.getLastRetrievedQuota()).toBeUndefined();
+    });
 
-      config.setModel('gemini-2.5-pro');
-      await config.refreshUserQuota();
-
+    it('should return undefined remaining quota for models', async () => {
       expect(
-        (
-          config as Partial<Config> as {
-            getPooledQuota: () => {
-              remaining?: number;
-              limit?: number;
-              resetTime?: string;
-            };
-          }
-        ).getPooledQuota(),
-      ).toEqual({});
-    });
-
-    it('should update hasAccessToPreviewModel to false if buckets are undefined', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({});
-
-      await config.refreshUserQuota();
-      expect(config.getHasAccessToPreviewModel()).toBe(false);
-    });
-
-    it('should return undefined and not update if codeAssistServer is missing', async () => {
-      vi.mocked(getCodeAssistServer).mockReturnValue(undefined);
-      const result = await config.refreshUserQuota();
-      expect(result).toBeUndefined();
-      // Never set => stays null (unknown); getter returns false by default
-      expect(config.getHasAccessToPreviewModel()).toBe(false);
-    });
-
-    it('should return undefined if retrieveUserQuota fails', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockRejectedValue(
-        new Error('Network error'),
-      );
-      const result = await config.refreshUserQuota();
-      expect(result).toBeUndefined();
-      // Never set => stays null (unknown); getter returns false by default
-      expect(config.getHasAccessToPreviewModel()).toBe(false);
-    });
-    it('should derive quota from remainingFraction when remainingAmount is missing', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-3-flash-preview',
-            remainingFraction: 0.96,
-          },
-        ],
-      });
-
-      config.setModel('gemini-3-flash-preview');
-      mockCoreEvents.emitQuotaChanged.mockClear();
-      await config.refreshUserQuota();
-
-      // Normalized: limit=100, remaining=96
-      expect(mockCoreEvents.emitQuotaChanged).toHaveBeenCalledWith(
-        96,
-        100,
-        undefined,
-      );
-      expect(config.getQuotaRemaining()).toBe(96);
-      expect(config.getQuotaLimit()).toBe(100);
-    });
-
-    it('should store quota from remainingFraction when remainingFraction is 0', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-3-pro-preview',
-            remainingFraction: 0,
-          },
-        ],
-      });
-
-      config.setModel('gemini-3-pro-preview');
-      mockCoreEvents.emitQuotaChanged.mockClear();
-      await config.refreshUserQuota();
-
-      // remaining=0, limit=100 but limit>0 check still passes
-      // however remaining=0 means 0% remaining = 100% used
-      expect(config.getQuotaRemaining()).toBe(0);
-      expect(config.getQuotaLimit()).toBe(100);
-    });
-
-    it('should emit QuotaChanged when model is switched via setModel', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [
-          {
-            modelId: 'gemini-2.5-pro',
-            remainingAmount: '10',
-            remainingFraction: 0.2,
-          },
-          {
-            modelId: 'gemini-2.5-flash',
-            remainingAmount: '80',
-            remainingFraction: 0.8,
-          },
-        ],
-      });
-
-      config.setModel('auto-gemini-2.5');
-      await config.refreshUserQuota();
-      mockCoreEvents.emitQuotaChanged.mockClear();
-
-      // Switch to a specific model — should re-emit quota for that model
-      config.setModel('gemini-2.5-pro');
-      expect(mockCoreEvents.emitQuotaChanged).toHaveBeenCalledWith(
-        10,
-        50,
-        undefined,
-      );
+        config.getRemainingQuotaForModel('gemini-2.5-pro'),
+      ).toBeUndefined();
     });
   });
 
@@ -3369,60 +3072,9 @@ describe('Config Quota & Preview Model Access', () => {
       vi.useRealTimers();
     });
 
-    it('should refresh quota if stale', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [],
-      });
-
-      // First call to initialize lastQuotaFetchTime
-      await config.refreshUserQuota();
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(1);
-
-      // Advance time by 31 seconds (default TTL is 30s)
-      vi.setSystemTime(Date.now() + 31_000);
-
-      await config.refreshUserQuotaIfStale();
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(2);
-    });
-
-    it('should not refresh quota if fresh', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [],
-      });
-
-      // First call
-      await config.refreshUserQuota();
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(1);
-
-      // Advance time by only 10 seconds
-      vi.setSystemTime(Date.now() + 10_000);
-
-      await config.refreshUserQuotaIfStale();
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(1);
-    });
-
-    it('should respect custom staleMs', async () => {
-      mockCodeAssistServer.retrieveUserQuota.mockResolvedValue({
-        buckets: [],
-      });
-
-      // First call
-      await config.refreshUserQuota();
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(1);
-
-      // Advance time by 5 seconds
-      vi.setSystemTime(Date.now() + 5_000);
-
-      // Refresh with 2s staleMs -> should refresh
-      await config.refreshUserQuotaIfStale(2_000);
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(2);
-
-      // Advance by another 5 seconds
-      vi.setSystemTime(Date.now() + 5_000);
-
-      // Refresh with 10s staleMs -> should NOT refresh
-      await config.refreshUserQuotaIfStale(10_000);
-      expect(mockCodeAssistServer.retrieveUserQuota).toHaveBeenCalledTimes(2);
+    it('should return undefined and not refresh (no server)', async () => {
+      const result = await config.refreshUserQuotaIfStale();
+      expect(result).toBeUndefined();
     });
   });
 
@@ -3445,7 +3097,7 @@ describe('Config Quota & Preview Model Access', () => {
       vi.mocked(createContentGenerator).mockResolvedValue({
         userTier: mockTier,
         userTierName: mockTierName,
-      } as Partial<CodeAssistServer> as CodeAssistServer);
+      } as Partial<ContentGenerator> as ContentGenerator);
 
       await config.refreshAuth(AuthType.USE_GEMINI);
 
@@ -4213,9 +3865,9 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     model: PREVIEW_GEMINI_3_1_MODEL, // User saved preview model
   };
 
-  it('should NOT reset preview model for CodeAssist auth when refreshUserQuota is not called (no projectId)', async () => {
+  it('should NOT reset preview model for GATEWAY auth when refreshUserQuota is not called (no projectId)', async () => {
     const mockContentConfig = {
-      authType: AuthType.LOGIN_WITH_GOOGLE,
+      authType: AuthType.GATEWAY,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
 
     const mockContentGenerator = {
@@ -4233,8 +3885,8 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     // Verify initial model is the preview model
     expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
 
-    // Call refreshAuth to simulate restart (CodeAssist auth, no projectId)
-    await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
+    // Call refreshAuth to simulate restart (GATEWAY auth, no projectId)
+    await config.refreshAuth(AuthType.GATEWAY);
 
     // Verify the model was NOT reset (bug fix)
     expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
@@ -4381,7 +4033,7 @@ describe('hasGemini35FlashGAAccess model setting', () => {
 
   it('should set DEFAULT_GEMINI_FLASH_MODEL and PREVIEW_GEMINI_FLASH_MODEL to gemini-3.5-flash if hasGemini35FlashGAAccess returns true and authType is not USE_GEMINI', () => {
     const config = new Config(baseParams);
-    config['contentGeneratorConfig'] = { authType: AuthType.LOGIN_WITH_GOOGLE };
+    config['contentGeneratorConfig'] = { authType: AuthType.GATEWAY };
 
     // Set experiment to return true for GEMINI_3_5_FLASH_GA_LAUNCHED
     config.setExperiments({

@@ -29,7 +29,6 @@ import {
   type RemoteAgentDefinition,
   type SubagentProgress,
   SubagentState,
-  getRemoteAgentTargetUrl,
   getAgentCardLoadOptions,
 } from './types.js';
 import { A2AResultReassembler, extractIdsFromResponse } from './a2aUtils.js';
@@ -291,11 +290,9 @@ class RemoteSubagentProtocol implements AgentProtocol {
     if (this.authHandler) return this.authHandler;
     if (!this.definition.auth) return undefined;
 
-    const targetUrl = getRemoteAgentTargetUrl(this.definition);
     const provider = await A2AAuthProviderFactory.create({
       authConfig: this.definition.auth,
       agentName: this.definition.name,
-      targetUrl,
       agentCardUrl: this.definition.agentCardUrl,
     });
     if (!provider) {

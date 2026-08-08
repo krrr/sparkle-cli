@@ -61,7 +61,6 @@ import {
   getErrorMessage,
   getAllGeminiMdFilenames,
   AuthType,
-  clearCachedCredentialFile,
   type ResumedSessionData,
   recordExitFail,
   ShellExecutionService,
@@ -72,7 +71,6 @@ import {
   CoreEvent,
   flattenMemory,
   type MemoryChangedPayload,
-  writeToStdout,
   disableMouseEvents,
   enterAlternateScreen,
   enableMouseEvents,
@@ -85,7 +83,6 @@ import {
   type ConsentRequestPayload,
   type AgentsDiscoveredPayload,
   ChangeAuthRequestedError,
-  ProjectIdRequiredError,
   buildUserSteeringHintPrompt,
   logBillingEvent,
   ApiKeyUpdatedEvent,
@@ -802,12 +799,7 @@ export const AppContainer = (props: AppContainerProps) => {
       if (authType) {
         const previousAuthType =
           config.getContentGeneratorConfig()?.authType ?? 'unknown';
-        if (authType === AuthType.LOGIN_WITH_GOOGLE) {
-          setAuthContext({ requiresRestart: true });
-        } else {
-          setAuthContext({});
-        }
-        await clearCachedCredentialFile();
+        setAuthContext({});
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
         try {
@@ -822,28 +814,10 @@ export const AppContainer = (props: AppContainerProps) => {
           if (e instanceof ChangeAuthRequestedError) {
             return;
           }
-          if (e instanceof ProjectIdRequiredError) {
-            // OAuth succeeded but account setup requires project ID
-            // Show the error message directly without "Failed to authenticate" prefix
-            onAuthError(getErrorMessage(e));
-            return;
-          }
           onAuthError(
             `Failed to authenticate: ${e instanceof Error ? e.message : String(e)}`,
           );
           return;
-        }
-
-        if (
-          authType === AuthType.LOGIN_WITH_GOOGLE &&
-          config.isBrowserLaunchSuppressed()
-        ) {
-          writeToStdout(`
-----------------------------------------------------------------
-Logging in with Google... Restarting Gemini CLI to continue.
-----------------------------------------------------------------
-          `);
-          await relaunchApp();
         }
       }
       setAuthState(AuthState.Authenticated);
@@ -2170,10 +2144,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
   const nightly = props.version.includes('nightly');
 
   const isAwaitingLoginRestart = authState === AuthState.AwaitingLoginRestart;
-  const loginRestartMessage =
-    settings.merged.security.auth.selectedType === AuthType.USE_VERTEX_AI
-      ? 'Authenticating to Vertex AI in Cloud Shell requires a restart to apply project settings.'
-      : undefined;
+  const loginRestartMessage: string | undefined = undefined;
 
   const dialogsVisible =
     shouldShowIdePrompt ||

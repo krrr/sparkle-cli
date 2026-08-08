@@ -142,7 +142,6 @@ describe('<HistoryItemDisplay />', () => {
       sandboxEnv: 'test-env',
       modelVersion: 'test-model',
       selectedAuthType: 'test-auth',
-      gcpProject: 'test-project',
       ideClient: 'test-ide',
     };
     const { lastFrame, unmount } = await renderWithProviders(

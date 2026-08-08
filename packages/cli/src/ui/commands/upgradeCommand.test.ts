@@ -9,7 +9,6 @@ import { upgradeCommand } from './upgradeCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import {
-  AuthType,
   openBrowserSecurely,
   shouldLaunchBrowser,
   UPGRADE_URL_PAGE,
@@ -35,9 +34,6 @@ describe('upgradeCommand', () => {
       services: {
         agentContext: {
           config: {
-            getContentGeneratorConfig: vi.fn().mockReturnValue({
-              authType: AuthType.LOGIN_WITH_GOOGLE,
-            }),
             getUserTierName: vi.fn().mockReturnValue(undefined),
           },
         },
@@ -52,7 +48,7 @@ describe('upgradeCommand', () => {
     );
   });
 
-  it('should call openBrowserSecurely with UPGRADE_URL_PAGE when logged in with Google', async () => {
+  it('should call openBrowserSecurely with UPGRADE_URL_PAGE', async () => {
     if (!upgradeCommand.action) {
       throw new Error('The upgrade command must have an action.');
     }
@@ -60,28 +56,6 @@ describe('upgradeCommand', () => {
     await upgradeCommand.action(mockContext, '');
 
     expect(openBrowserSecurely).toHaveBeenCalledWith(UPGRADE_URL_PAGE);
-  });
-
-  it('should return an error message when NOT logged in with Google', async () => {
-    vi.mocked(
-      mockContext.services.agentContext!.config.getContentGeneratorConfig,
-    ).mockReturnValue({
-      authType: AuthType.USE_GEMINI,
-    });
-
-    if (!upgradeCommand.action) {
-      throw new Error('The upgrade command must have an action.');
-    }
-
-    const result = await upgradeCommand.action(mockContext, '');
-
-    expect(result).toEqual({
-      type: 'message',
-      messageType: 'error',
-      content:
-        'The /upgrade command is only available when logged in with Google.',
-    });
-    expect(openBrowserSecurely).not.toHaveBeenCalled();
   });
 
   it('should return an error message if openBrowserSecurely fails', async () => {

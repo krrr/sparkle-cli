@@ -83,11 +83,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Force interactive mode to enable fallback handler in BaseLlmClient
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(
-      fakeGenerator,
-      config,
-      AuthType.LOGIN_WITH_GOOGLE,
-    );
+    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;
@@ -165,7 +161,7 @@ describe('Auto Routing Fallback Integration', () => {
     const clientNonAuto = new BaseLlmClient(
       fakeGenerator,
       configNonAuto,
-      AuthType.LOGIN_WITH_GOOGLE,
+      AuthType.USE_GEMINI,
     );
 
     let attemptsPro = 0;
@@ -246,7 +242,7 @@ describe('Auto Routing Fallback Integration', () => {
     const clientDynamic = new BaseLlmClient(
       fakeGenerator,
       configDynamic,
-      AuthType.LOGIN_WITH_GOOGLE,
+      AuthType.USE_GEMINI,
     );
 
     let attemptsPro = 0;
@@ -321,11 +317,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Force interactive mode to enable fallback handler in BaseLlmClient
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(
-      fakeGenerator,
-      config,
-      AuthType.LOGIN_WITH_GOOGLE,
-    );
+    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;
@@ -427,11 +419,7 @@ describe('Auto Routing Fallback Integration', () => {
 
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(
-      fakeGenerator,
-      config,
-      AuthType.LOGIN_WITH_GOOGLE,
-    );
+    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;

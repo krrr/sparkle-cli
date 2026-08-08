@@ -112,7 +112,7 @@ export class GeminiCliSession {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const authType = getAuthTypeFromEnv() || AuthType.COMPUTE_ADC;
+    const authType = getAuthTypeFromEnv() || AuthType.USE_GEMINI;
 
     await this.config.refreshAuth(authType);
     await this.config.initialize();

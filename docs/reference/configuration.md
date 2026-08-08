@@ -514,21 +514,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `"ask"`
   - **Values:** `"ask"`, `"always"`, `"never"`
 
-- **`billing.vertexAi.requestType`** (enum):
-
-  - **Description:** Sets the X-Vertex-AI-LLM-Request-Type header for Vertex AI
-    requests.
-  - **Default:** `undefined`
-  - **Values:** `"dedicated"`, `"shared"`
-  - **Requires restart:** Yes
-
-- **`billing.vertexAi.sharedRequestType`** (enum):
-  - **Description:** Sets the X-Vertex-AI-LLM-Shared-Request-Type header for
-    Vertex AI requests.
-  - **Default:** `undefined`
-  - **Values:** `"priority"`, `"flex"`
-  - **Requires restart:** Yes
-
 #### `model`
 
 - **`model.name`** (string):
@@ -2483,7 +2468,7 @@ see [Telemetry](../cli/telemetry.md).
   - **`traces`** (boolean): Whether detailed traces with large attributes (like
     tool outputs and file reads) are captured. Defaults to `false`.
   - **`target`** (string): The destination for collected telemetry. Supported
-    values are `local` and `gcp`.
+    values are `local` (and optionally any OTLP endpoint via `otlpEndpoint`).
   - **`otlpEndpoint`** (string): The endpoint for the OTLP Exporter.
   - **`otlpProtocol`** (string): The protocol for the OTLP Exporter (`grpc` or
     `http`).
@@ -2638,30 +2623,6 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
     channels.
   - Example: `export GEMINI_CLI_SURFACE="my-custom-tool"` (Windows PowerShell:
     `$env:GEMINI_CLI_SURFACE="my-custom-tool"`)
-- **`GOOGLE_API_KEY`**:
-  - Your Google Cloud API key.
-  - Required for using Vertex AI in express mode.
-  - Ensure you have the necessary permissions.
-  - Example: `export GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"` (Windows PowerShell:
-    `$env:GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"`).
-- **`GOOGLE_CLOUD_PROJECT`**:
-  - Your Google Cloud Project ID.
-  - Required for using Code Assist or Vertex AI.
-  - If using Vertex AI, ensure you have the necessary permissions in this
-    project.
-  - **Cloud Shell note:** When running in a Cloud Shell environment, this
-    variable defaults to a special project allocated for Cloud Shell users. If
-    you have `GOOGLE_CLOUD_PROJECT` set in your global environment in Cloud
-    Shell, it will be overridden by this default. To use a different project in
-    Cloud Shell, you must define `GOOGLE_CLOUD_PROJECT` in a `.env` file.
-  - Example: `export GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"` (Windows
-    PowerShell: `$env:GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"`).
-- **`GOOGLE_APPLICATION_CREDENTIALS`** (string):
-  - **Description:** The path to your Google Application Credentials JSON file.
-  - **Example:**
-    `export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/credentials.json"`
-    (Windows PowerShell:
-    `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\your\credentials.json"`)
 - **`GOOGLE_GENAI_API_VERSION`**:
   - Specifies the API version to use for Gemini API requests.
   - When set, overrides the default API version used by the SDK.
@@ -2674,18 +2635,6 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
     `localhost` (or `127.0.0.1` / `[::1]`).
   - Example: `export GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"` (Windows
     PowerShell: `$env:GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"`)
-- **`GOOGLE_VERTEX_BASE_URL`**:
-  - Overrides the default base URL for Vertex AI API requests (when using
-    `vertex-ai` authentication).
-  - Must be a valid URL. For security, it must use HTTPS unless pointing to
-    `localhost` (or `127.0.0.1` / `[::1]`).
-  - Example: `export GOOGLE_VERTEX_BASE_URL="https://my-vertex-proxy.com"`
-    (Windows PowerShell:
-    `$env:GOOGLE_VERTEX_BASE_URL="https://my-vertex-proxy.com"`)
-- **`OTLP_GOOGLE_CLOUD_PROJECT`**:
-  - Your Google Cloud Project ID for Telemetry in Google Cloud
-  - Example: `export OTLP_GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"` (Windows
-    PowerShell: `$env:OTLP_GOOGLE_CLOUD_PROJECT="YOUR_PROJECT_ID"`).
 - **`GEMINI_TELEMETRY_ENABLED`**:
   - Set to `true` or `1` to enable telemetry. Any other value is treated as
     disabling it.
@@ -2695,7 +2644,7 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
     other value is treated as disabling it.
   - Overrides the `telemetry.traces` setting.
 - **`GEMINI_TELEMETRY_TARGET`**:
-  - Sets the telemetry target (`local` or `gcp`).
+  - Sets the telemetry target (`local`).
   - Overrides the `telemetry.target` setting.
 - **`GEMINI_TELEMETRY_OTLP_ENDPOINT`**:
   - Sets the OTLP endpoint for telemetry.
@@ -2714,11 +2663,6 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Set to `true` or `1` to enable or disable using an external OTLP collector.
     Any other value is treated as disabling it.
   - Overrides the `telemetry.useCollector` setting.
-- **`GOOGLE_CLOUD_LOCATION`**:
-  - Your Google Cloud Project Location (for example, us-central1).
-  - Required for using Vertex AI in non-express mode.
-  - Example: `export GOOGLE_CLOUD_LOCATION="YOUR_PROJECT_LOCATION"` (Windows
-    PowerShell: `$env:GOOGLE_CLOUD_LOCATION="YOUR_PROJECT_LOCATION"`).
 - **`GEMINI_SANDBOX`**:
   - Alternative to the `sandbox` setting in `settings.json`.
   - Accepts `true`, `false`, `docker`, `podman`, or a custom command string.
@@ -2758,9 +2702,6 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Set to any value to disable all color output in the CLI.
 - **`CLI_TITLE`**:
   - Set to a string to customize the title of the CLI.
-- **`CODE_ASSIST_ENDPOINT`**:
-  - Specifies the endpoint for the code assist server.
-  - This is useful for development and testing.
 
 ### Environment variable redaction
 

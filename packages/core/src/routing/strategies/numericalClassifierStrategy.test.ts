@@ -70,7 +70,7 @@ describe('NumericalClassifierStrategy', () => {
         return launched && authType === AuthType.USE_GEMINI;
       }),
       getContentGeneratorConfig: vi.fn().mockReturnValue({
-        authType: AuthType.LOGIN_WITH_GOOGLE,
+        authType: AuthType.USE_GEMINI,
       }),
       getModelAvailabilityService: vi
         .fn()
@@ -833,6 +833,9 @@ describe('NumericalClassifierStrategy', () => {
   describe('Gemini 3.1 and Custom Tools Routing', () => {
     it('should route to PREVIEW_GEMINI_3_1_MODEL when Gemini 3.1 is launched', async () => {
       vi.mocked(mockConfig.getGemini31Launched).mockResolvedValue(true);
+      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
+        authType: AuthType.GATEWAY,
+      });
       const mockApiResponse = {
         complexity_reasoning: 'Complex task',
         complexity_score: 95,
@@ -873,10 +876,10 @@ describe('NumericalClassifierStrategy', () => {
       expect(decision?.model).toBe(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL);
     });
 
-    it('should NOT route to custom tools model when auth is USE_VERTEX_AI', async () => {
+    it('should NOT route to custom tools model when auth is GATEWAY', async () => {
       vi.mocked(mockConfig.getGemini31Launched).mockResolvedValue(true);
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.USE_VERTEX_AI,
+        authType: AuthType.GATEWAY,
       });
       const mockApiResponse = {
         complexity_reasoning: 'Complex task',

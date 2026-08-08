@@ -7,7 +7,6 @@
 import {
   type AgentLoopContext,
   AuthType,
-  clearCachedCredentialFile,
   getVersion,
 } from '@google/gemini-cli-core';
 import * as acp from '@agentclientprotocol/sdk';
@@ -46,11 +45,6 @@ export class GeminiAgent {
 
     const authMethods = [
       {
-        id: AuthType.LOGIN_WITH_GOOGLE,
-        name: 'Log in with Google',
-        description: 'Log in with your Google account',
-      },
-      {
         id: AuthType.USE_GEMINI,
         name: 'Gemini API key',
         description: 'Use an API key with Gemini Developer API',
@@ -59,11 +53,6 @@ export class GeminiAgent {
             provider: 'google',
           },
         },
-      },
-      {
-        id: AuthType.USE_VERTEX_AI,
-        name: 'Vertex AI',
-        description: 'Use an API key with Vertex AI GenAI API',
       },
       {
         id: AuthType.GATEWAY,
@@ -106,12 +95,7 @@ export class GeminiAgent {
   async authenticate(req: acp.AuthenticateRequest): Promise<void> {
     const { methodId } = req;
     const method = z.nativeEnum(AuthType).parse(methodId);
-    const selectedAuthType = this.settings.merged.security.auth.selectedType;
 
-    // Only clear credentials when switching to a different auth method
-    if (selectedAuthType && selectedAuthType !== method) {
-      await clearCachedCredentialFile();
-    }
     // Check for api-key in _meta
     const meta = hasMeta(req) ? req._meta : undefined;
     const apiKey =

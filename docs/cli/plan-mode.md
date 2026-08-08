@@ -319,11 +319,11 @@ Hooks such as `BeforeTool` or `AfterTool` can be configured to intercept the
 > ensure the transition is initiated by the agent (for example, by asking "start
 > a plan for...").
 
-#### Example: Archive approved plans to GCS (`AfterTool`)
+#### Example: Archive approved plans to a local archive (`AfterTool`)
 
 If your organizational policy requires a record of all execution plans, you can
-use an `AfterTool` hook to securely copy the plan artifact to Google Cloud
-Storage whenever Gemini CLI exits Plan Mode to start the implementation.
+use an `AfterTool` hook to securely copy the plan artifact to a local archive
+directory whenever Gemini CLI exits Plan Mode to start the implementation.
 
 **`.gemini/hooks/archive-plan.sh`:**
 
@@ -339,8 +339,8 @@ if [ -f "$plan_path" ]; then
   # Generate a unique filename using a timestamp
   filename="$(date +%s)_$(basename "$plan_path")"
 
-  # Upload the plan to GCS in the background so it doesn't block the CLI
-  gsutil cp "$plan_path" "gs://my-audit-bucket/gemini-plans/$filename" > /dev/null 2>&1 &
+  # Copy the plan to the archive directory in the background so it doesn't block the CLI
+  mkdir -p "$HOME/.gemini/plan-archive" && cp "$plan_path" "$HOME/.gemini/plan-archive/$filename" > /dev/null 2>&1 &
 fi
 
 # AfterTool hooks should generally allow the flow to continue

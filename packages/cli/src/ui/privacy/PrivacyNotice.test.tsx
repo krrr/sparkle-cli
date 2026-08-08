@@ -21,13 +21,6 @@ vi.mock('./GeminiPrivacyNotice.js', async () => {
   };
 });
 
-vi.mock('./CloudPaidPrivacyNotice.js', async () => {
-  const { Text } = await import('ink');
-  return {
-    CloudPaidPrivacyNotice: () => <Text>CloudPaidPrivacyNotice</Text>,
-  };
-});
-
 vi.mock('./CloudFreePrivacyNotice.js', async () => {
   const { Text } = await import('ink');
   return {
@@ -51,11 +44,7 @@ describe('PrivacyNotice', () => {
       expectedComponent: 'GeminiPrivacyNotice',
     },
     {
-      authType: 'vertex-ai' as AuthType,
-      expectedComponent: 'CloudPaidPrivacyNotice',
-    },
-    {
-      authType: 'oauth-personal' as AuthType,
+      authType: 'gateway' as AuthType,
       expectedComponent: 'CloudFreePrivacyNotice',
     },
     {

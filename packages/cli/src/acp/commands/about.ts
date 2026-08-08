@@ -37,7 +37,6 @@ export class AboutCommand implements Command {
     const cliVersion = await getVersion();
     const selectedAuthType =
       context.settings.merged?.security?.auth?.selectedType ?? '';
-    const gcpProject = process.env['GOOGLE_CLOUD_PROJECT'] || '';
     const ideClient = await getIdeClientName(context);
 
     const userAccountManager = new UserAccountManager();
@@ -52,7 +51,6 @@ export class AboutCommand implements Command {
       `- Sandbox: ${sandboxEnv}`,
       `- Model: ${modelVersion}`,
       `- Auth Type: ${selectedAuthType}`,
-      `- GCP Project: ${gcpProject}`,
       `- IDE Client: ${ideClient}`,
       `- User Email: ${userEmail}`,
       `- Tier: ${tier}`,

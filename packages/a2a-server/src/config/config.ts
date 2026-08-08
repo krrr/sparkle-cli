@@ -20,11 +20,7 @@ import {
   homedir,
   tmpdir,
   GitService,
-  fetchAdminControlsOnce,
-  getCodeAssistServer,
-  ExperimentFlags,
   isHeadlessMode,
-  FatalAuthenticationError,
   createPolicyEngineConfig,
   type PolicySettings,
   type TelemetryTarget,
@@ -356,43 +352,9 @@ export async function loadConfig(
     enableAgents: settings.experimental?.enableAgents ?? true,
   };
 
-  // Set an initial config to use to get a code assist server.
-  // This is needed to fetch admin controls.
-  const initialConfig = new Config({
+  const config = new Config({
     ...configParams,
   });
-
-  const codeAssistServer = getCodeAssistServer(initialConfig);
-
-  const adminControlsEnabled =
-    initialConfig.getExperiments()?.flags[ExperimentFlags.ENABLE_ADMIN_CONTROLS]
-      ?.boolValue ?? false;
-
-  // Initialize final config parameters to the previous parameters.
-  // If no admin controls are needed, these will be used as-is for the final
-  // config.
-  const finalConfigParams = { ...configParams };
-  if (adminControlsEnabled) {
-    const adminSettings = await fetchAdminControlsOnce(
-      codeAssistServer,
-      adminControlsEnabled,
-    );
-
-    // Admin settings are able to be undefined if unset, but if any are present,
-    // we should initialize them all.
-    // If any are present, undefined settings should be treated as if they were
-    // set to false.
-    // If NONE are present, disregard admin settings entirely, and pass the
-    // final config as is.
-    if (Object.keys(adminSettings).length !== 0) {
-      finalConfigParams.disableYoloMode = !adminSettings.strictModeDisabled;
-      finalConfigParams.mcpEnabled = adminSettings.mcpSetting?.mcpEnabled;
-      finalConfigParams.extensionsEnabled =
-        adminSettings.cliFeatureSetting?.extensionsSetting?.extensionsEnabled;
-    }
-  }
-
-  const config = new Config(finalConfigParams);
 
   // Needed to initialize ToolRegistry, and git checkpointing if enabled
   await config.initialize();
@@ -597,60 +559,14 @@ async function refreshAuthentication(
 ): Promise<void> {
   const getEnvLocal = (key: string) => envVars[key];
 
-  if (getEnvLocal('USE_CCPA')) {
-    logger.info(`[${logPrefix}] Using CCPA Auth:`);
-
-    logger.info(`[${logPrefix}] Attempting COMPUTE_ADC first.`);
-    try {
-      await config.refreshAuth(AuthType.COMPUTE_ADC);
-      logger.info(`[${logPrefix}] COMPUTE_ADC successful.`);
-    } catch (adcError) {
-      const adcMessage =
-        adcError instanceof Error ? adcError.message : String(adcError);
-      logger.info(
-        `[${logPrefix}] COMPUTE_ADC failed or not available: ${adcMessage}`,
-      );
-
-      const useComputeAdc =
-        getEnvLocal('GEMINI_CLI_USE_COMPUTE_ADC') === 'true';
-      const isHeadless = isHeadlessMode();
-
-      if (isHeadless || useComputeAdc) {
-        const reason = isHeadless
-          ? 'headless mode'
-          : 'GEMINI_CLI_USE_COMPUTE_ADC=true';
-        throw new FatalAuthenticationError(
-          `COMPUTE_ADC failed: ${adcMessage}. (LOGIN_WITH_GOOGLE fallback skipped due to ${reason}. Run in an interactive terminal to use OAuth.)`,
-        );
-      }
-
-      logger.info(
-        `[${logPrefix}] COMPUTE_ADC failed, falling back to LOGIN_WITH_GOOGLE.`,
-      );
-      try {
-        await config.refreshAuth(AuthType.LOGIN_WITH_GOOGLE);
-      } catch (e) {
-        if (e instanceof FatalAuthenticationError) {
-          const originalMessage = e instanceof Error ? e.message : String(e);
-          throw new FatalAuthenticationError(
-            `${originalMessage}. The initial COMPUTE_ADC attempt also failed: ${adcMessage}`,
-          );
-        }
-        throw e;
-      }
-    }
-
-    logger.info(
-      `[${logPrefix}] GOOGLE_CLOUD_PROJECT: ${getEnvLocal('GOOGLE_CLOUD_PROJECT')}`,
-    );
-  } else if (getEnvLocal('GEMINI_API_KEY')) {
+  if (getEnvLocal('GEMINI_API_KEY')) {
     logger.info(`[${logPrefix}] Using Gemini API Key`);
     await config.refreshAuth(
       AuthType.USE_GEMINI,
       getEnvLocal('GEMINI_API_KEY'),
     );
   } else {
-    const errorMessage = `[${logPrefix}] Unable to set GeneratorConfig. Please provide a GEMINI_API_KEY or set USE_CCPA.`;
+    const errorMessage = `[${logPrefix}] Unable to set GeneratorConfig. Please provide a GEMINI_API_KEY.`;
     logger.error(errorMessage);
     throw new Error(errorMessage);
   }

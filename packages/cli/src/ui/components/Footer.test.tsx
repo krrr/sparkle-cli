@@ -8,11 +8,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { Footer } from './Footer.js';
 import { createMockSettings } from '../../test-utils/settings.js';
-import {
-  type Config,
-  UserAccountManager,
-  AuthType,
-} from '@google/gemini-cli-core';
+import { type Config, AuthType } from '@google/gemini-cli-core';
 import path from 'node:path';
 
 // Normalize paths to POSIX slashes for stable cross-platform snapshots.
@@ -689,16 +685,13 @@ describe('<Footer />', () => {
   });
 
   describe('Footer Custom Items', () => {
-    it('renders auth item with email', async () => {
+    it('renders auth item with auth type', async () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.LOGIN_WITH_GOOGLE,
+          authType: AuthType.USE_GEMINI,
         }),
       } as unknown as Config;
-      const getCachedAccountSpy = vi
-        .spyOn(UserAccountManager.prototype, 'getCachedGoogleAccount')
-        .mockReturnValue('test@example.com');
 
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: authConfig,
@@ -717,21 +710,17 @@ describe('<Footer />', () => {
       });
 
       expect(lastFrame()).toContain('auth');
-      expect(lastFrame()).toContain('test@example.com');
+      expect(lastFrame()).toContain(AuthType.USE_GEMINI);
       unmount();
-      getCachedAccountSpy.mockRestore();
     });
 
     it('does NOT render auth item when showUserIdentity is false', async () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.LOGIN_WITH_GOOGLE,
+          authType: AuthType.USE_GEMINI,
         }),
       } as unknown as Config;
-      const getCachedAccountSpy = vi
-        .spyOn(UserAccountManager.prototype, 'getCachedGoogleAccount')
-        .mockReturnValue('test@example.com');
 
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: authConfig,
@@ -755,7 +744,6 @@ describe('<Footer />', () => {
       expect(output).not.toContain('auth');
       expect(output).not.toContain('test@example.com');
       unmount();
-      getCachedAccountSpy.mockRestore();
     });
 
     it('renders items in the specified order', async () => {

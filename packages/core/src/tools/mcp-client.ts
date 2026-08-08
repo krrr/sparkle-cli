@@ -41,13 +41,10 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { parse } from 'shell-quote';
 import {
-  AuthProviderType,
   type Config,
   type MCPServerConfig,
   type GeminiCLIExtension,
 } from '../config/config.js';
-import { GoogleCredentialProvider } from '../mcp/google-auth-provider.js';
-import { ServiceAccountImpersonationProvider } from '../mcp/sa-impersonation-provider.js';
 import { DiscoveredMCPTool } from './mcp-tool.js';
 import { McpComplianceTransport } from './mcp-compliance-transport.js';
 
@@ -1009,27 +1006,6 @@ function createTransportRequestInit(
   };
 }
 
-/**
- * Create an AuthProvider for the MCP Transport.
- *
- * @param mcpServerConfig The MCP server configuration
- */
-function createAuthProvider(
-  mcpServerConfig: MCPServerConfig,
-): McpAuthProvider | undefined {
-  if (
-    mcpServerConfig.authProviderType ===
-    AuthProviderType.SERVICE_ACCOUNT_IMPERSONATION
-  ) {
-    return new ServiceAccountImpersonationProvider(mcpServerConfig);
-  }
-  if (
-    mcpServerConfig.authProviderType === AuthProviderType.GOOGLE_CREDENTIALS
-  ) {
-    return new GoogleCredentialProvider(mcpServerConfig);
-  }
-  return undefined;
-}
 /**
  * Creates an OAuth token provider for transports so token lookup/refresh happens
  * at request/auth time instead of freezing a single token at transport creation.
@@ -2268,27 +2244,12 @@ export async function createTransport(
   cliConfig: McpContext,
 ): Promise<Transport> {
   const noUrl = !mcpServerConfig.url && !mcpServerConfig.httpUrl;
-  if (noUrl) {
-    if (
-      mcpServerConfig.authProviderType === AuthProviderType.GOOGLE_CREDENTIALS
-    ) {
-      throw new Error(
-        `URL must be provided in the config for Google Credentials provider`,
-      );
-    }
-    if (
-      mcpServerConfig.authProviderType ===
-      AuthProviderType.SERVICE_ACCOUNT_IMPERSONATION
-    ) {
-      throw new Error(
-        `No URL configured for ServiceAccountImpersonation MCP Server`,
-      );
-    }
+  if (noUrl && !mcpServerConfig.command) {
+    throw new Error(`No URL configured for MCP server '${mcpServerName}'`);
   }
   if (mcpServerConfig.httpUrl || mcpServerConfig.url) {
-    let authProvider = createAuthProvider(mcpServerConfig);
-    const headers: Record<string, string> =
-      (await authProvider?.getRequestHeaders?.()) ?? {};
+    let authProvider: McpAuthProvider | undefined = undefined;
+    const headers: Record<string, string> = {};
 
     if (authProvider === undefined) {
       const tokenStorage = new MCPOAuthTokenStorage();

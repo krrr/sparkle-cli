@@ -8,11 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { useAuthCommand, validateAuthMethodWithSettings } from './useAuth.js';
-import {
-  AuthType,
-  type Config,
-  ProjectIdRequiredError,
-} from '@google/gemini-cli-core';
+import { AuthType, type Config } from '@google/gemini-cli-core';
 import { AuthState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 
@@ -36,6 +32,7 @@ vi.mock('../../config/auth.js', () => ({
 describe('useAuth', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockLoadApiKey.mockResolvedValue('test-key');
     delete process.env['GEMINI_API_KEY'];
     delete process.env['GEMINI_DEFAULT_AUTH_TYPE'];
   });
@@ -50,17 +47,17 @@ describe('useAuth', () => {
         merged: {
           security: {
             auth: {
-              enforcedType: AuthType.LOGIN_WITH_GOOGLE,
+              enforcedType: AuthType.USE_GEMINI,
             },
           },
         },
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        AuthType.USE_GEMINI,
+        AuthType.GATEWAY,
         settings,
       );
-      expect(error).toContain('Authentication is enforced to be oauth');
+      expect(error).toContain('Authentication is enforced to be');
     });
 
     it('should return null if useExternal is true', async () => {
@@ -75,7 +72,7 @@ describe('useAuth', () => {
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        AuthType.LOGIN_WITH_GOOGLE,
+        AuthType.GATEWAY,
         settings,
       );
       expect(error).toBeNull();
@@ -108,13 +105,11 @@ describe('useAuth', () => {
 
       mockValidateAuthMethod.mockResolvedValue('Validation Error');
       const error = await validateAuthMethodWithSettings(
-        AuthType.LOGIN_WITH_GOOGLE,
+        AuthType.GATEWAY,
         settings,
       );
       expect(error).toBe('Validation Error');
-      expect(mockValidateAuthMethod).toHaveBeenCalledWith(
-        AuthType.LOGIN_WITH_GOOGLE,
-      );
+      expect(mockValidateAuthMethod).toHaveBeenCalledWith(AuthType.GATEWAY);
     });
   });
 
@@ -150,7 +145,7 @@ describe('useAuth', () => {
 
     it('should initialize with Unauthenticated state', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
+        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
       );
       // Because we defer refreshAuth, the initial state is safely caught here
       expect(result.current.authState).toBe(AuthState.Unauthenticated);
@@ -267,7 +262,7 @@ describe('useAuth', () => {
     it('should set error if validation fails', async () => {
       mockValidateAuthMethod.mockResolvedValue('Validation Failed');
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
+        useAuthCommand(createSettings(AuthType.GATEWAY), mockConfig),
       );
 
       expect(result.current.authError).toBe('Validation Failed');
@@ -277,7 +272,7 @@ describe('useAuth', () => {
     it('should set error if GEMINI_DEFAULT_AUTH_TYPE is invalid', async () => {
       process.env['GEMINI_DEFAULT_AUTH_TYPE'] = 'INVALID_TYPE';
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
+        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
       );
 
       expect(result.current.authError).toContain(
@@ -288,23 +283,21 @@ describe('useAuth', () => {
 
     it('should authenticate successfully for valid auth type', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
+        useAuthCommand(createSettings(AuthType.GATEWAY), mockConfig),
       );
 
       await act(async () => {
         deferredRefreshAuth.resolve();
       });
 
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.LOGIN_WITH_GOOGLE,
-      );
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.GATEWAY);
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.authError).toBeNull();
     });
 
     it('should handle refreshAuth failure', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
+        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {
@@ -312,23 +305,6 @@ describe('useAuth', () => {
       });
 
       expect(result.current.authError).toContain('Failed to sign in');
-      expect(result.current.authState).toBe(AuthState.Updating);
-    });
-
-    it('should handle ProjectIdRequiredError without "Failed to login" prefix', async () => {
-      const projectIdError = new ProjectIdRequiredError();
-      const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.LOGIN_WITH_GOOGLE), mockConfig),
-      );
-
-      await act(async () => {
-        deferredRefreshAuth.reject(projectIdError);
-      });
-
-      expect(result.current.authError).toBe(
-        'This account requires setting the GOOGLE_CLOUD_PROJECT or GOOGLE_CLOUD_PROJECT_ID env var. See https://goo.gle/gemini-cli-auth-docs#workspace-gca',
-      );
-      expect(result.current.authError).not.toContain('Failed to login');
       expect(result.current.authState).toBe(AuthState.Updating);
     });
   });

@@ -107,7 +107,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: AuthType.LOGIN_WITH_GOOGLE },
+          auth: { selectedType: AuthType.USE_GEMINI },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},
@@ -125,7 +125,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     });
 
     expect(response.protocolVersion).toBe(acp.PROTOCOL_VERSION);
-    expect(response.authMethods).toHaveLength(4);
+    expect(response.authMethods).toHaveLength(2);
     const gatewayAuth = response.authMethods?.find(
       (m) => m.id === AuthType.GATEWAY,
     );
@@ -148,11 +148,11 @@ describe('GeminiAgent - RPC Dispatcher', () => {
 
   it('should authenticate correctly', async () => {
     await agent.authenticate({
-      methodId: AuthType.LOGIN_WITH_GOOGLE,
+      methodId: AuthType.USE_GEMINI,
     });
 
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.LOGIN_WITH_GOOGLE,
+      AuthType.USE_GEMINI,
       undefined,
       undefined,
       undefined,
@@ -160,7 +160,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     expect(mockSettings.setValue).toHaveBeenCalledWith(
       SettingScope.User,
       'security.auth.selectedType',
-      AuthType.LOGIN_WITH_GOOGLE,
+      AuthType.USE_GEMINI,
     );
   });
 

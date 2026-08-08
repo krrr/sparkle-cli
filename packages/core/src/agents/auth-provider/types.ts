@@ -13,7 +13,6 @@
 import type { AuthenticationHandler } from '@a2a-js/sdk/client';
 
 export type A2AAuthProviderType =
-  | 'google-credentials'
   | 'apiKey'
   | 'http'
   | 'oauth2'
@@ -26,12 +25,6 @@ export interface A2AAuthProvider extends AuthenticationHandler {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BaseAuthConfig {}
-
-/** Client config for google-credentials (not in A2A spec, Gemini-specific). */
-export interface GoogleCredentialsAuthConfig extends BaseAuthConfig {
-  type: 'google-credentials';
-  scopes?: string[];
-}
 
 /** Client config corresponding to APIKeySecurityScheme. Only header location is supported. */
 // TODO: Add 'query' and 'cookie' location support if needed.
@@ -95,7 +88,6 @@ export interface OpenIdConnectAuthConfig extends BaseAuthConfig {
 }
 
 export type A2AAuthConfig =
-  | GoogleCredentialsAuthConfig
   | ApiKeyAuthConfig
   | HttpAuthConfig
   | OAuth2AuthConfig

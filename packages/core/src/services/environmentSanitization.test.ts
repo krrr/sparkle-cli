@@ -401,15 +401,13 @@ describe('getSecureSanitizationConfig', () => {
 
   it('should filter out variables from allowed list that match NEVER_ALLOWED_ENVIRONMENT_VARIABLES', () => {
     const requestedConfig = {
-      allowedEnvironmentVariables: ['SAFE_VAR', 'GOOGLE_CLOUD_PROJECT'],
+      allowedEnvironmentVariables: ['SAFE_VAR', 'GOOGLE_API_KEY'],
     };
 
     const config = getSecureSanitizationConfig(requestedConfig);
 
     expect(config.allowedEnvironmentVariables).toContain('SAFE_VAR');
-    expect(config.allowedEnvironmentVariables).not.toContain(
-      'GOOGLE_CLOUD_PROJECT',
-    );
+    expect(config.allowedEnvironmentVariables).not.toContain('GOOGLE_API_KEY');
   });
 
   it('should filter out variables from allowed list that match NEVER_ALLOWED_NAME_PATTERNS', () => {

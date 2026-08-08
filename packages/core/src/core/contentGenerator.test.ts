@@ -12,21 +12,16 @@ import {
   getAuthTypeFromEnv,
   type ContentGenerator,
 } from './contentGenerator.js';
-import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
 import { GoogleGenAI } from '@google/genai';
-import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import type { Config } from '../config/config.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
-import { ModelMappingContentGenerator } from './modelMappingContentGenerator.js';
-import { CCPA_AI_MODEL_MAPPINGS } from '../config/models.js';
 import { loadApiKey } from './apiKeyCredentialStorage.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { resetVersionCache } from '../utils/version.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
 
-vi.mock('../code_assist/codeAssist.js');
 vi.mock('@google/genai');
 vi.mock('./apiKeyCredentialStorage.js', () => ({
   loadApiKey: vi.fn(),
@@ -58,16 +53,6 @@ describe('getAuthTypeFromEnv', () => {
     vi.unstubAllEnvs();
   });
 
-  it('should detect LOGIN_WITH_GOOGLE when GOOGLE_GENAI_USE_GCA is true', () => {
-    vi.stubEnv('GOOGLE_GENAI_USE_GCA', 'true');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.LOGIN_WITH_GOOGLE);
-  });
-
-  it('should detect USE_VERTEX_AI when GOOGLE_GENAI_USE_VERTEXAI is true', () => {
-    vi.stubEnv('GOOGLE_GENAI_USE_VERTEXAI', 'true');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.USE_VERTEX_AI);
-  });
-
   it('should detect GATEWAY when GOOGLE_GEMINI_BASE_URL is present', () => {
     vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gateway.example.com');
     expect(getAuthTypeFromEnv()).toBe(AuthType.GATEWAY);
@@ -76,11 +61,6 @@ describe('getAuthTypeFromEnv', () => {
   it('should detect USE_GEMINI when GEMINI_API_KEY is present', () => {
     vi.stubEnv('GEMINI_API_KEY', 'fake-key');
     expect(getAuthTypeFromEnv()).toBe(AuthType.USE_GEMINI);
-  });
-
-  it('should detect COMPUTE_ADC when CLOUD_SHELL is true', () => {
-    vi.stubEnv('CLOUD_SHELL', 'true');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.COMPUTE_ADC);
   });
 
   it('should return undefined when no matching env variables are set', () => {
@@ -93,7 +73,6 @@ describe('createContentGenerator', () => {
     resetVersionCache();
     vi.clearAllMocks();
     vi.stubEnv('ANTIGRAVITY_CLI_ALIAS', '');
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', '');
   });
 
   afterEach(() => {
@@ -141,46 +120,6 @@ describe('createContentGenerator', () => {
     expect(generator).toBeInstanceOf(RecordingContentGenerator);
   });
 
-  it('should create a CodeAssistContentGenerator when AuthType is LOGIN_WITH_GOOGLE', async () => {
-    const mockGenerator = {} as unknown as ContentGenerator;
-    vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
-      mockGenerator as never,
-    );
-    const generator = await createContentGenerator(
-      {
-        authType: AuthType.LOGIN_WITH_GOOGLE,
-      },
-      mockConfig,
-    );
-    expect(createCodeAssistContentGenerator).toHaveBeenCalled();
-    expect(generator).toEqual(
-      new LoggingContentGenerator(
-        new ModelMappingContentGenerator(mockGenerator, CCPA_AI_MODEL_MAPPINGS),
-        mockConfig,
-      ),
-    );
-  });
-
-  it('should create a CodeAssistContentGenerator when AuthType is COMPUTE_ADC', async () => {
-    const mockGenerator = {} as unknown as ContentGenerator;
-    vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
-      mockGenerator as never,
-    );
-    const generator = await createContentGenerator(
-      {
-        authType: AuthType.COMPUTE_ADC,
-      },
-      mockConfig,
-    );
-    expect(createCodeAssistContentGenerator).toHaveBeenCalled();
-    expect(generator).toEqual(
-      new LoggingContentGenerator(
-        new ModelMappingContentGenerator(mockGenerator, CCPA_AI_MODEL_MAPPINGS),
-        mockConfig,
-      ),
-    );
-  });
-
   it('should create a GoogleGenAI content generator', async () => {
     const mockConfig = {
       getModel: vi.fn().mockReturnValue('gemini-pro'),
@@ -209,7 +148,6 @@ describe('createContentGenerator', () => {
     );
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.stringMatching(
@@ -368,37 +306,6 @@ describe('createContentGenerator', () => {
     );
   });
 
-  it('should include custom headers from GEMINI_CLI_CUSTOM_HEADERS for Code Assist requests', async () => {
-    const mockGenerator = {} as unknown as ContentGenerator;
-    vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
-      mockGenerator as never,
-    );
-    vi.stubEnv(
-      'GEMINI_CLI_CUSTOM_HEADERS',
-      'X-Test-Header: test-value, Another-Header: another value',
-    );
-
-    await createContentGenerator(
-      {
-        authType: AuthType.LOGIN_WITH_GOOGLE,
-      },
-      mockConfig,
-    );
-
-    expect(createCodeAssistContentGenerator).toHaveBeenCalledWith(
-      {
-        headers: expect.objectContaining({
-          'User-Agent': expect.any(String),
-          'X-Test-Header': 'test-value',
-          'Another-Header': 'another value',
-        }),
-      },
-      AuthType.LOGIN_WITH_GOOGLE,
-      mockConfig,
-      undefined,
-    );
-  });
-
   it('should include custom headers from GEMINI_CLI_CUSTOM_HEADERS for GoogleGenAI requests without inferring auth mechanism', async () => {
     const mockConfig = {
       getModel: vi.fn().mockReturnValue('gemini-pro'),
@@ -426,7 +333,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -441,120 +347,6 @@ describe('createContentGenerator', () => {
           headers: expect.objectContaining({
             Authorization: expect.any(String),
           }),
-        }),
-      }),
-    );
-  });
-
-  it('should include Vertex AI routing headers for Vertex AI requests', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-
-    await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
-        vertexAiRouting: {
-          requestType: 'shared',
-          sharedRequestType: 'priority',
-        },
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        httpOptions: expect.objectContaining({
-          headers: expect.objectContaining({
-            'X-Vertex-AI-LLM-Request-Type': 'shared',
-            'X-Vertex-AI-LLM-Shared-Request-Type': 'priority',
-          }),
-        }),
-      }),
-    );
-  });
-
-  it('should use US REP endpoint for Vertex AI when location is us and no baseUrl is provided', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'us');
-
-    await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        googleAuthOptions: expect.objectContaining({
-          clientOptions: expect.objectContaining({
-            apiEndpoint: 'https://aiplatform.us.rep.googleapis.com',
-          }),
-        }),
-        httpOptions: expect.objectContaining({
-          baseUrl: 'https://aiplatform.us.rep.googleapis.com',
-        }),
-      }),
-    );
-  });
-
-  it('should use EU REP endpoint for Vertex AI when location is eu and no baseUrl is provided', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'eu');
-
-    await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        googleAuthOptions: expect.objectContaining({
-          clientOptions: expect.objectContaining({
-            apiEndpoint: 'https://aiplatform.eu.rep.googleapis.com',
-          }),
-        }),
-        httpOptions: expect.objectContaining({
-          baseUrl: 'https://aiplatform.eu.rep.googleapis.com',
         }),
       }),
     );
@@ -576,8 +368,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
+        authType: AuthType.USE_GEMINI,
         proxy: 'https://proxy.example.com:8080',
       },
       mockConfigWithProxy,
@@ -612,8 +403,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
+        authType: AuthType.USE_GEMINI,
         proxy: 'http://proxy.example.com:8080',
       },
       mockConfigWithProxy,
@@ -625,44 +415,6 @@ describe('createContentGenerator', () => {
           clientOptions: expect.objectContaining({
             transporterOptions: expect.objectContaining({
               agent: expect.any(HttpsProxyAgent),
-            }),
-          }),
-        }),
-      }),
-    );
-  });
-
-  it('should inject HttpProxyAgent when destination baseUrl uses http://', async () => {
-    const mockConfigWithProxy = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue('http://proxy.example.com:8080'),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator);
-
-    vi.stubEnv('GOOGLE_VERTEX_BASE_URL', 'http://localhost:9999');
-
-    await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
-        proxy: 'http://proxy.example.com:8080',
-      },
-      mockConfigWithProxy,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        googleAuthOptions: expect.objectContaining({
-          clientOptions: expect.objectContaining({
-            transporterOptions: expect.objectContaining({
-              agent: expect.any(HttpProxyAgent),
             }),
           }),
         }),
@@ -686,8 +438,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
+        authType: AuthType.USE_GEMINI,
         proxy: '  https://proxy.example.com:8080  ',
       },
       mockConfigWithProxy,
@@ -715,8 +466,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
+        authType: AuthType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -752,7 +502,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -786,7 +535,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -824,7 +572,6 @@ describe('createContentGenerator', () => {
     );
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: {
           'User-Agent': expect.any(String),
@@ -860,7 +607,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -893,7 +639,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -932,7 +677,6 @@ describe('createContentGenerator', () => {
 
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
-      vertexai: false,
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.any(String),
@@ -945,41 +689,6 @@ describe('createContentGenerator', () => {
         apiVersion: expect.any(String),
       }),
     );
-  });
-
-  it('should pass apiVersion for Vertex AI when GOOGLE_GENAI_API_VERSION is set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    vi.stubEnv('GOOGLE_GENAI_API_VERSION', 'v1alpha');
-
-    await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        vertexai: true,
-        authType: AuthType.USE_VERTEX_AI,
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith({
-      apiKey: 'test-api-key',
-      vertexai: true,
-      httpOptions: expect.objectContaining({
-        headers: expect.objectContaining({
-          'User-Agent': expect.any(String),
-        }),
-      }),
-      apiVersion: 'v1alpha',
-    });
   });
 
   it('should pass baseUrl to GoogleGenAI when GOOGLE_GEMINI_BASE_URL is set', async () => {
@@ -1006,107 +715,8 @@ describe('createContentGenerator', () => {
     expect(GoogleGenAI).toHaveBeenCalledWith(
       expect.objectContaining({
         apiKey: 'test-api-key',
-        vertexai: false,
         httpOptions: expect.objectContaining({
           baseUrl: 'https://gemini.test.local',
-        }),
-      }),
-    );
-  });
-
-  it('should pass baseUrl to GoogleGenAI when GOOGLE_VERTEX_BASE_URL is set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    vi.stubEnv('GOOGLE_VERTEX_BASE_URL', 'https://vertex.test.local');
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', 'my-project');
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'us-central1');
-
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      AuthType.USE_VERTEX_AI,
-    );
-    await createContentGenerator(config, mockConfig);
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        apiKey: undefined,
-        vertexai: true,
-        httpOptions: expect.objectContaining({
-          baseUrl: 'https://vertex.test.local',
-        }),
-      }),
-    );
-  });
-
-  it('should prefer GOOGLE_VERTEX_BASE_URL when authType is USE_VERTEX_AI without inferred vertex credentials', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gemini.test.local');
-    vi.stubEnv('GOOGLE_VERTEX_BASE_URL', 'https://vertex.test.local');
-
-    await createContentGenerator(
-      {
-        authType: AuthType.USE_VERTEX_AI,
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        apiKey: undefined,
-        vertexai: true,
-        httpOptions: expect.objectContaining({
-          baseUrl: 'https://vertex.test.local',
-        }),
-      }),
-    );
-  });
-
-  it('should inject apiEndpoint into googleAuthOptions.clientOptions when GOOGLE_VERTEX_BASE_URL is set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
-
-    const mockGenerator = {
-      models: {},
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    vi.stubEnv('GOOGLE_VERTEX_BASE_URL', 'https://vertex.test.local');
-
-    await createContentGenerator(
-      {
-        authType: AuthType.USE_VERTEX_AI,
-      },
-      mockConfig,
-    );
-
-    expect(GoogleGenAI).toHaveBeenCalledWith(
-      expect.objectContaining({
-        googleAuthOptions: expect.objectContaining({
-          clientOptions: expect.objectContaining({
-            apiEndpoint: 'https://vertex.test.local',
-          }),
         }),
       }),
     );
@@ -1222,42 +832,6 @@ describe('createContentGenerator', () => {
     );
   });
 
-  it('should not apply model mapping for Vertex AI', async () => {
-    const mockModels = {
-      generateContent: vi.fn().mockResolvedValue({}),
-    };
-    const mockGenerator = {
-      models: mockModels,
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-
-    const generator = await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        authType: AuthType.USE_VERTEX_AI,
-        vertexai: true,
-      },
-      mockConfig,
-    );
-
-    await generator.generateContent(
-      {
-        model: 'gemini-3-flash',
-        contents: [],
-      },
-      'prompt-id',
-      'user' as LlmRole,
-    );
-
-    expect(mockModels.generateContent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: 'gemini-3-flash',
-      }),
-      'prompt-id',
-      'user',
-    );
-  });
-
   it('should not apply model mapping for Gemini API', async () => {
     const mockModels = {
       generateContent: vi.fn().mockResolvedValue({}),
@@ -1327,72 +901,6 @@ describe('createContentGenerator', () => {
       'user',
     );
   });
-
-  it('should apply model mapping for LOGIN_WITH_GOOGLE', async () => {
-    const mockInnerGenerator = {
-      generateContent: vi.fn().mockResolvedValue({}),
-    } as unknown as ContentGenerator;
-    vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
-      mockInnerGenerator as never,
-    );
-
-    const generator = await createContentGenerator(
-      {
-        authType: AuthType.LOGIN_WITH_GOOGLE,
-      },
-      mockConfig,
-    );
-
-    await generator.generateContent(
-      {
-        model: 'gemini-3.5-flash',
-        contents: [],
-      },
-      'prompt-id',
-      'user' as LlmRole,
-    );
-
-    expect(mockInnerGenerator.generateContent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: 'gemini-3-flash',
-      }),
-      'prompt-id',
-      'user',
-    );
-  });
-
-  it('should apply model mapping for COMPUTE_ADC', async () => {
-    const mockInnerGenerator = {
-      generateContent: vi.fn().mockResolvedValue({}),
-    } as unknown as ContentGenerator;
-    vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
-      mockInnerGenerator as never,
-    );
-
-    const generator = await createContentGenerator(
-      {
-        authType: AuthType.COMPUTE_ADC,
-      },
-      mockConfig,
-    );
-
-    await generator.generateContent(
-      {
-        model: 'gemini-3.5-flash',
-        contents: [],
-      },
-      'prompt-id',
-      'user' as LlmRole,
-    );
-
-    expect(mockInnerGenerator.generateContent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: 'gemini-3-flash',
-      }),
-      'prompt-id',
-      'user',
-    );
-  });
 });
 
 describe('createContentGeneratorConfig', () => {
@@ -1421,7 +929,6 @@ describe('createContentGeneratorConfig', () => {
       AuthType.USE_GEMINI,
     );
     expect(config.apiKey).toBe('env-gemini-key');
-    expect(config.vertexai).toBe(false);
   });
 
   it('should not configure for Gemini if GEMINI_API_KEY is empty', async () => {
@@ -1431,7 +938,6 @@ describe('createContentGeneratorConfig', () => {
       AuthType.USE_GEMINI,
     );
     expect(config.apiKey).toBeUndefined();
-    expect(config.vertexai).toBeUndefined();
   });
 
   it('should not configure for Gemini if GEMINI_API_KEY is not set and storage is empty', async () => {
@@ -1442,61 +948,8 @@ describe('createContentGeneratorConfig', () => {
       AuthType.USE_GEMINI,
     );
     expect(config.apiKey).toBeUndefined();
-    expect(config.vertexai).toBeUndefined();
   });
 
-  it('should configure for Vertex AI using GOOGLE_API_KEY when set', async () => {
-    vi.stubEnv('GOOGLE_API_KEY', 'env-google-key');
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      AuthType.USE_VERTEX_AI,
-    );
-    expect(config.apiKey).toBe('env-google-key');
-    expect(config.vertexai).toBe(true);
-  });
-
-  it('should include Vertex AI routing settings in content generator config', async () => {
-    vi.stubEnv('GOOGLE_API_KEY', 'env-google-key');
-    const vertexAiRouting = {
-      requestType: 'shared' as const,
-      sharedRequestType: 'priority' as const,
-    };
-
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      AuthType.USE_VERTEX_AI,
-      undefined,
-      undefined,
-      undefined,
-      vertexAiRouting,
-    );
-
-    expect(config.vertexAiRouting).toEqual(vertexAiRouting);
-  });
-
-  it('should configure for Vertex AI using GCP project and location when set', async () => {
-    vi.stubEnv('GOOGLE_API_KEY', undefined);
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', 'env-gcp-project');
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', 'env-gcp-location');
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      AuthType.USE_VERTEX_AI,
-    );
-    expect(config.vertexai).toBe(true);
-    expect(config.apiKey).toBeUndefined();
-  });
-
-  it('should not configure for Vertex AI if required env vars are empty', async () => {
-    vi.stubEnv('GOOGLE_API_KEY', '');
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', '');
-    vi.stubEnv('GOOGLE_CLOUD_LOCATION', '');
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      AuthType.USE_VERTEX_AI,
-    );
-    expect(config.apiKey).toBeUndefined();
-    expect(config.vertexai).toBeUndefined();
-  });
   it('should configure for GATEWAY using provided apiKey if available', async () => {
     const config = await createContentGeneratorConfig(
       mockConfig,
@@ -1504,7 +957,6 @@ describe('createContentGeneratorConfig', () => {
       'custom-gateway-key',
     );
     expect(config.apiKey).toBe('custom-gateway-key');
-    expect(config.vertexai).toBe(false);
   });
 
   it('should configure for GATEWAY using GEMINI_API_KEY from environment if set', async () => {
@@ -1514,7 +966,6 @@ describe('createContentGeneratorConfig', () => {
       AuthType.GATEWAY,
     );
     expect(config.apiKey).toBe('env-gateway-key');
-    expect(config.vertexai).toBe(false);
   });
 
   it('should configure for GATEWAY using empty string if no apiKey is provided', async () => {
@@ -1524,6 +975,5 @@ describe('createContentGeneratorConfig', () => {
       AuthType.GATEWAY,
     );
     expect(config.apiKey).toBe('');
-    expect(config.vertexai).toBe(false);
   });
 });

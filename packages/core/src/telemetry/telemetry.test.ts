@@ -12,26 +12,16 @@ import {
 } from './sdk.js';
 import { Config } from '../config/config.js';
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { GoogleAuth } from 'google-auth-library';
 
 vi.mock('@opentelemetry/sdk-node');
 vi.mock('../config/config.js');
-vi.mock('google-auth-library');
 
 describe('telemetry', () => {
   let mockConfig: Config;
   let mockNodeSdk: NodeSDK;
-  const mockGetApplicationDefault = vi.fn();
 
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(GoogleAuth).mockImplementation(
-      () =>
-        ({
-          getApplicationDefault: mockGetApplicationDefault,
-        }) as unknown as GoogleAuth,
-    );
-    mockGetApplicationDefault.mockResolvedValue(undefined); // Simulate ADC available
 
     mockConfig = new Config({
       sessionId: 'test-session-id',

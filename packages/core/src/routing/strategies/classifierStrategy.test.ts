@@ -66,7 +66,7 @@ describe('ClassifierStrategy', () => {
         return launched && authType === AuthType.USE_GEMINI;
       }),
       getContentGeneratorConfig: vi.fn().mockReturnValue({
-        authType: AuthType.LOGIN_WITH_GOOGLE,
+        authType: AuthType.USE_GEMINI,
       }),
       getModelAvailabilityService: vi
         .fn()
@@ -481,6 +481,9 @@ describe('ClassifierStrategy', () => {
     it('should route to PREVIEW_GEMINI_3_1_MODEL when Gemini 3.1 is launched', async () => {
       vi.mocked(mockConfig.getGemini31Launched).mockResolvedValue(true);
       vi.mocked(mockConfig.getModel).mockReturnValue(PREVIEW_GEMINI_MODEL_AUTO);
+      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
+        authType: AuthType.GATEWAY,
+      });
       const mockApiResponse = {
         reasoning: 'Complex task',
         model_choice: 'pro',

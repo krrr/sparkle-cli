@@ -20,7 +20,6 @@ import {
   UserPromptEvent,
   coreEvents,
   CoreEvent,
-  getOauthClient,
   patchStdio,
   writeToStdout,
   writeToStderr,
@@ -29,7 +28,6 @@ import {
   ExitCodes,
   SessionStartSource,
   SessionEndReason,
-  ValidationCancelledError,
   ValidationRequiredError,
   type AdminControlsSettings,
   debugLogger,
@@ -479,21 +477,13 @@ export async function main() {
     validateDnsResolutionOrder(settings.merged.advanced.dnsResolutionOrder),
   );
 
-  // Set a default auth type if one isn't set or is set to a legacy type
-  if (
-    !settings.merged.security.auth.selectedType ||
-    settings.merged.security.auth.selectedType === AuthType.LEGACY_CLOUD_SHELL
-  ) {
-    if (
-      process.env['CLOUD_SHELL'] === 'true' ||
-      process.env['GEMINI_CLI_USE_COMPUTE_ADC'] === 'true'
-    ) {
-      settings.setValue(
-        SettingScope.User,
-        'security.auth.selectedType',
-        AuthType.COMPUTE_ADC,
-      );
-    }
+  // Set a default auth type if one isn't set
+  if (!settings.merged.security.auth.selectedType) {
+    settings.setValue(
+      SettingScope.User,
+      'security.auth.selectedType',
+      AuthType.USE_GEMINI,
+    );
   }
 
   const partialConfig = await loadCliConfig(settings.merged, sessionId, argv, {
@@ -534,12 +524,6 @@ export async function main() {
         await partialConfig.refreshAuth(authType);
       }
     } catch (err) {
-      if (err instanceof ValidationCancelledError) {
-        // User cancelled verification, exit immediately.
-        await runExitCleanup();
-        process.exit(ExitCodes.SUCCESS);
-      }
-
       // If validation is required, we don't treat it as a fatal failure.
       // We allow the app to start, and the React-based ValidationDialog
       // will handle it.
@@ -745,15 +729,6 @@ export async function main() {
         });
       })
       .catch((e) => debugLogger.warn('LiteRT auto-start import failed:', e));
-
-    if (
-      settings.merged.security.auth.selectedType ===
-        AuthType.LOGIN_WITH_GOOGLE &&
-      config.isBrowserLaunchSuppressed()
-    ) {
-      // Do oauth before app renders to make copying the link possible.
-      await getOauthClient(settings.merged.security.auth.selectedType, config);
-    }
 
     if (config.getAcpMode()) {
       return runAcpClient(config, settings, argv);

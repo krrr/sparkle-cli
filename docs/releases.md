@@ -368,10 +368,8 @@ gh workflow run release-patch-3-release.yml --ref main \
 
 ### Docker
 
-We also run a Google cloud build called
-[release-docker.yml](../.gcp/release-docker.yml). Which publishes the sandbox
-docker to match your release. This will also be moved to GH and combined with
-the main release file once service account permissions are sorted out.
+We publish the sandbox docker image to match your release as part of the main
+release pipeline.
 
 ## Release validation
 

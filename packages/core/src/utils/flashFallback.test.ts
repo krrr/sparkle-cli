@@ -95,12 +95,12 @@ describe('Retry Utility Fallback Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 10,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.LOGIN_WITH_GOOGLE,
+      authType: AuthType.USE_GEMINI,
     });
 
     expect(fallbackCalled).toBe(true);
     expect(mockPersistent429Callback).toHaveBeenCalledWith(
-      AuthType.LOGIN_WITH_GOOGLE,
+      AuthType.USE_GEMINI,
       expect.any(TerminalQuotaError),
     );
     expect(result).toBe('success after fallback');
@@ -127,7 +127,7 @@ describe('Retry Utility Fallback Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 10,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.LOGIN_WITH_GOOGLE,
+      authType: AuthType.USE_GEMINI,
     });
 
     await expect(promise).rejects.toThrow('Simulated 499 error');

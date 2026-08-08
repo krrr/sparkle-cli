@@ -18,7 +18,6 @@ import {
   Storage,
   coreEvents,
   homedir,
-  AuthType,
   type AdminControlsSettings,
   createCache,
 } from '@google/gemini-cli-core';
@@ -86,12 +85,7 @@ export const DEFAULT_EXCLUDED_ENV_VARS = [
   'GEMINI_CLI_IDE_SERVER_STDIO_ARGS',
 ];
 
-const AUTH_ENV_VAR_WHITELIST = [
-  'GEMINI_API_KEY',
-  'GOOGLE_API_KEY',
-  'GOOGLE_CLOUD_PROJECT',
-  'GOOGLE_CLOUD_LOCATION',
-];
+const AUTH_ENV_VAR_WHITELIST = ['GEMINI_API_KEY', 'GOOGLE_API_KEY'];
 
 /**
  * Sanitizes an environment variable value to prevent shell injection.
@@ -595,61 +589,6 @@ function findEnvFile(
   }
 }
 
-// Internal env var used to preserve the user's original GOOGLE_CLOUD_PROJECT
-// across process restarts in Cloud Shell. This survives relaunch because child
-// processes inherit the parent's environment.
-const USER_GCP_PROJECT = '_GEMINI_USER_GCP_PROJECT';
-
-export function setUpCloudShellEnvironment(
-  envFilePath: string | null,
-  isTrusted: boolean,
-  isSandboxed: boolean,
-  selectedAuthType?: string,
-): void {
-  // Special handling for GOOGLE_CLOUD_PROJECT in Cloud Shell:
-  // Because GOOGLE_CLOUD_PROJECT in Cloud Shell tracks the project
-  // set by the user using "gcloud config set project" we do not want to
-  // use its value. So, unless the user overrides GOOGLE_CLOUD_PROJECT in
-  // one of the .env files, we set the Cloud Shell-specific default here.
-  //
-  // However, if the user has explicitly selected Vertex AI auth, they intend
-  // to use their own GCP project, so we restore the original value and skip
-  // the Cloud Shell override to respect their .env settings.
-
-  // Save the user's original value before overwriting, so it can be restored
-  // if the user later switches to Vertex AI (even after a process restart).
-  if (!process.env[USER_GCP_PROJECT]) {
-    const current = process.env['GOOGLE_CLOUD_PROJECT'];
-    if (current && current !== 'cloudshell-gca') {
-      process.env[USER_GCP_PROJECT] = current;
-    }
-  }
-
-  let value: string | undefined = 'cloudshell-gca';
-
-  if (selectedAuthType === AuthType.USE_VERTEX_AI) {
-    value = process.env[USER_GCP_PROJECT];
-  }
-
-  if (envFilePath && fs.existsSync(envFilePath)) {
-    const envFileContent = fs.readFileSync(envFilePath);
-    const parsedEnv = dotenv.parse(envFileContent);
-    if (parsedEnv['GOOGLE_CLOUD_PROJECT']) {
-      // .env file takes precedence in Cloud Shell
-      value = parsedEnv['GOOGLE_CLOUD_PROJECT'];
-      if (!isTrusted && isSandboxed) {
-        value = sanitizeEnvVar(value);
-      }
-    }
-  }
-
-  if (value !== undefined) {
-    process.env['GOOGLE_CLOUD_PROJECT'] = value;
-  } else if (process.env['GOOGLE_CLOUD_PROJECT'] === 'cloudshell-gca') {
-    delete process.env['GOOGLE_CLOUD_PROJECT'];
-  }
-}
-
 export function loadEnvironment(
   settings: Settings,
   workspaceDir: string,
@@ -660,35 +599,17 @@ export function loadEnvironment(
 
   // Check settings OR check process.argv directly since this might be called
   // before arguments are fully parsed. This is a best-effort sniffing approach
-  // that happens early in the CLI lifecycle. It is designed to detect the
-  // sandbox flag before the full command-line parser is initialized to ensure
-  // security constraints are applied when loading environment variables.
+  // that happens early in the CLI lifecycle.
   const args = process.argv.slice(2);
   const doubleDashIndex = args.indexOf('--');
   const relevantArgs =
     doubleDashIndex === -1 ? args : args.slice(0, doubleDashIndex);
-
-  const isSandboxed =
-    !!settings.tools?.sandbox ||
-    relevantArgs.includes('-s') ||
-    relevantArgs.includes('--sandbox');
 
   const shouldIgnoreEnv =
     !!settings.advanced?.ignoreLocalEnv ||
     relevantArgs.includes('--ignore-env');
 
   const envFilePath = findEnvFile(workspaceDir, isTrusted, shouldIgnoreEnv);
-
-  // Cloud Shell environment variable handling
-  if (process.env['CLOUD_SHELL'] === 'true') {
-    const selectedAuthType = settings.security?.auth?.selectedType;
-    setUpCloudShellEnvironment(
-      envFilePath,
-      isTrusted,
-      isSandboxed,
-      selectedAuthType,
-    );
-  }
 
   if (envFilePath) {
     // Manually parse and load environment variables to handle exclusions correctly.

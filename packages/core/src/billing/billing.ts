@@ -8,7 +8,7 @@ import type {
   AvailableCredits,
   CreditType,
   GeminiUserTier,
-} from '../code_assist/types.js';
+} from '../userTier.js';
 import {
   PREVIEW_GEMINI_MODEL,
   PREVIEW_GEMINI_3_1_MODEL,

@@ -39,7 +39,8 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/auth`
 
-- **Description:** Open a dialog that lets you change the authentication method.
+- **Description:** Open a dialog that lets you change the authentication method
+  (for example, signing in with a Gemini API key).
 
 ### `/bug`
 
@@ -468,12 +469,6 @@ Slash commands provide meta-level control over the CLI itself.
       tool's name with its full description as provided to the model.
   - **`nodesc`** or **`nodescriptions`**:
     - **Description:** Hide tool descriptions, showing only the tool names.
-
-### `/upgrade`
-
-- **Description:** Open the Gemini Code Assist upgrade page in your browser.
-  This lets you upgrade your tier for higher usage limits.
-- **Note:** This command is only available when logged in with Google.
 
 ### `/vim`
 

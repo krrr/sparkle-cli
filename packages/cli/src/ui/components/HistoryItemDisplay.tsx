@@ -143,9 +143,7 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
           sandboxEnv={itemForDisplay.sandboxEnv}
           modelVersion={itemForDisplay.modelVersion}
           selectedAuthType={itemForDisplay.selectedAuthType}
-          gcpProject={itemForDisplay.gcpProject}
           ideClient={itemForDisplay.ideClient}
-          userEmail={itemForDisplay.userEmail}
           tier={itemForDisplay.tier}
         />
       )}

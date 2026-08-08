@@ -5,7 +5,6 @@
  */
 
 import {
-  AuthType,
   openBrowserSecurely,
   shouldLaunchBrowser,
   UPGRADE_URL_PAGE,
@@ -15,7 +14,6 @@ import { CommandKind, type SlashCommand } from './types.js';
 
 /**
  * Command to open the upgrade page for Gemini Code Assist.
- * Only intended to be shown/available when the user is logged in with Google.
  */
 export const upgradeCommand: SlashCommand = {
   name: 'upgrade',
@@ -24,17 +22,6 @@ export const upgradeCommand: SlashCommand = {
   autoExecute: true,
   action: async (context) => {
     const config = context.services.agentContext?.config;
-    const authType = config?.getContentGeneratorConfig()?.authType;
-    if (authType !== AuthType.LOGIN_WITH_GOOGLE) {
-      // This command should ideally be hidden if not logged in with Google,
-      // but we add a safety check here just in case.
-      return {
-        type: 'message',
-        messageType: 'error',
-        content:
-          'The /upgrade command is only available when logged in with Google.',
-      };
-    }
 
     const tierName = config?.getUserTierName();
     if (isUltraTier(tierName)) {

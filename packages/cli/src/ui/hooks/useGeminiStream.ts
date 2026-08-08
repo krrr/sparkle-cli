@@ -30,7 +30,6 @@ import {
   SHELL_TOOL_NAME,
   hasRedirection,
   processRestorableToolCalls,
-  recordToolCallInteractions,
   ToolErrorType,
   ValidationRequiredError,
   coreEvents,
@@ -360,11 +359,6 @@ export const useGeminiStream = (
               currentModel,
               completedToolCallsFromScheduler,
             );
-
-          await recordToolCallInteractions(
-            config,
-            completedToolCallsFromScheduler,
-          );
         } catch (error) {
           debugLogger.warn(
             `Error recording completed tool call information: ${error}`,

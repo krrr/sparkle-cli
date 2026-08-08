@@ -12,7 +12,6 @@ import {
   loadApiKey,
   debugLogger,
   isAccountSuspendedError,
-  ProjectIdRequiredError,
 } from '@google/gemini-cli-core';
 import { getErrorMessage } from '@google/gemini-cli-core';
 import { AuthState } from '../types.js';
@@ -148,10 +147,6 @@ export const useAuthCommand = (
             appealUrl: suspendedError.appealUrl,
             appealLinkText: suspendedError.appealLinkText,
           });
-        } else if (e instanceof ProjectIdRequiredError) {
-          // OAuth succeeded but account setup requires project ID
-          // Show the error message directly without "Failed to login" prefix
-          onAuthError(getErrorMessage(e));
         } else {
           onAuthError(`Failed to sign in. Message: ${getErrorMessage(e)}`);
         }

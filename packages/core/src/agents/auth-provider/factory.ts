@@ -12,15 +12,12 @@ import type {
 } from './types.js';
 import { ApiKeyAuthProvider } from './api-key-provider.js';
 import { HttpAuthProvider } from './http-provider.js';
-import { GoogleCredentialsAuthProvider } from './google-credentials-provider.js';
 
 export interface CreateAuthProviderOptions {
   /** Required for OAuth/OIDC token storage. */
   agentName?: string;
   authConfig?: A2AAuthConfig;
   agentCard?: AgentCard;
-  /** Required by some providers (like google-credentials) to determine token audience. */
-  targetUrl?: string;
   /** URL to fetch the agent card from, used for OAuth2 URL discovery. */
   agentCardUrl?: string;
 }
@@ -46,15 +43,6 @@ export class A2AAuthProviderFactory {
     }
 
     switch (authConfig.type) {
-      case 'google-credentials': {
-        const provider = new GoogleCredentialsAuthProvider(
-          authConfig,
-          options.targetUrl,
-        );
-        await provider.initialize();
-        return provider;
-      }
-
       case 'apiKey': {
         const provider = new ApiKeyAuthProvider(authConfig);
         await provider.initialize();
@@ -68,9 +56,6 @@ export class A2AAuthProviderFactory {
       }
 
       case 'oauth2': {
-        // Dynamic import to avoid pulling MCPOAuthTokenStorage into the
-        // factory's static module graph, which causes initialization
-        // conflicts with code_assist/oauth-credential-storage.ts.
         const { OAuth2AuthProvider } = await import('./oauth2-provider.js');
         const provider = new OAuth2AuthProvider(
           authConfig,
@@ -180,11 +165,6 @@ export class A2AAuthProviderFactory {
             missingConfig.push(
               `Scheme '${schemeName}' requires HTTP ${scheme.scheme} authentication, but ${authConfig.scheme} was configured`,
             );
-          } else if (
-            authConfig.type === 'google-credentials' &&
-            scheme.scheme.toLowerCase() === 'bearer'
-          ) {
-            return { matched: true, missingConfig: [] };
           } else {
             missingConfig.push(
               `Scheme '${schemeName}' requires HTTP ${scheme.scheme} authentication`,

@@ -20,11 +20,6 @@ on GitHub.
 
 ## Announcements: v0.52.0 - 2026-07-22
 
-- **Caretaker Triage & Egress Services:** Implemented the core triage worker
-  foundational modules, main worker execution loops, and egress action
-  publishers alongside the octokit GitHub Action handler for egress services
-  ([#28163](https://github.com/google-gemini/gemini-cli/pull/28163),
-  [#28306](https://github.com/google-gemini/gemini-cli/pull/28306) by @chadd28).
 - **Core Tool Enhancements:** Bypassed LLM correction for JSON and IPYNB files
   in `write_file` and `replace` tools, and simplified plan mode write policy to
   support relative paths

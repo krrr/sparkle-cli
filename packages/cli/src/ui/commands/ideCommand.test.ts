@@ -22,7 +22,6 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
   const original = await importOriginal<typeof core>();
   return {
     ...original,
-    getOauthClient: vi.fn(original.getOauthClient),
     getIdeInstaller: vi.fn(original.getIdeInstaller),
     IdeClient: {
       getInstance: vi.fn(),

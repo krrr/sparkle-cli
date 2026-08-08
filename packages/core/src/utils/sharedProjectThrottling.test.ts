@@ -78,7 +78,7 @@ describe('Shared Project Throttling Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 5,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.LOGIN_WITH_GOOGLE,
+      authType: AuthType.USE_GEMINI,
     });
 
     await expect(promise).rejects.toThrow(
@@ -88,82 +88,5 @@ describe('Shared Project Throttling Integration', () => {
     // Check that both models were tried and both failed due to the shared project limits
     expect(modelsAttempted).toEqual(['gemini-2.5-pro', 'gemini-2.5-flash']);
     expect(mockPersistent429Callback).toHaveBeenCalledTimes(2);
-  });
-
-  it('appends helpful troubleshooting hint when no user project is configured and auth is LOGIN_WITH_GOOGLE', async () => {
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', '');
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT_ID', '');
-
-    const mockApiCall = vi
-      .fn()
-      .mockRejectedValue(
-        new TerminalQuotaError('Daily limit reached', mockGoogleApiError),
-      );
-
-    const promise = retryWithBackoff(mockApiCall, {
-      maxAttempts: 1,
-      initialDelayMs: 1,
-      maxDelayMs: 5,
-      authType: AuthType.LOGIN_WITH_GOOGLE,
-    });
-
-    let caughtError: Error | undefined;
-    try {
-      await promise;
-    } catch (e) {
-      caughtError = e instanceof Error ? e : new Error(String(e));
-    }
-
-    expect(caughtError).toBeDefined();
-    expect(caughtError?.message).toContain(
-      '💡 Tip: The shared Google Cloud project is experiencing high traffic',
-    );
-    expect(caughtError?.message).toContain(
-      'gcloud config set project [PROJECT_ID]',
-    );
-  });
-
-  it('does not append troubleshooting hint if a dedicated user project is set in environment', async () => {
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', 'my-dedicated-project-123');
-
-    const mockApiCall = vi
-      .fn()
-      .mockRejectedValue(
-        new TerminalQuotaError('Daily limit reached', mockGoogleApiError),
-      );
-
-    const promise = retryWithBackoff(mockApiCall, {
-      maxAttempts: 1,
-      initialDelayMs: 1,
-      maxDelayMs: 5,
-      authType: AuthType.LOGIN_WITH_GOOGLE,
-    });
-
-    const caughtError = await promise.catch((e) => e);
-    const errorMsg =
-      caughtError instanceof Error ? caughtError.message : String(caughtError);
-    expect(errorMsg).not.toContain('💡 Tip:');
-  });
-
-  it('does not append troubleshooting hint for non-Google/ADC auth types', async () => {
-    vi.stubEnv('GOOGLE_CLOUD_PROJECT', '');
-
-    const mockApiCall = vi
-      .fn()
-      .mockRejectedValue(
-        new TerminalQuotaError('Daily limit reached', mockGoogleApiError),
-      );
-
-    const promise = retryWithBackoff(mockApiCall, {
-      maxAttempts: 1,
-      initialDelayMs: 1,
-      maxDelayMs: 5,
-      authType: AuthType.USE_GEMINI, // API Key auth type
-    });
-
-    const caughtError = await promise.catch((e) => e);
-    const errorMsg =
-      caughtError instanceof Error ? caughtError.message : String(caughtError);
-    expect(errorMsg).not.toContain('💡 Tip:');
   });
 });

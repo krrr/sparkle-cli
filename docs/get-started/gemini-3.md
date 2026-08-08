@@ -82,39 +82,6 @@ manage your usage limits:
 To learn more about selecting a model and routing, refer to
 [Gemini CLI Model Selection](../cli/model.md).
 
-## How to enable Gemini 3 with Gemini CLI on Gemini Code Assist
-
-If you're using Gemini Code Assist Standard or Gemini Code Assist Enterprise,
-enabling Gemini 3 Pro on Gemini CLI requires configuring your release channels.
-Using Gemini 3 Pro will require two steps: administrative enablement and user
-enablement.
-
-To learn more about these settings, refer to
-[Configure Gemini Code Assist release channels](https://developers.google.com/gemini-code-assist/docs/configure-release-channels).
-
-### Administrator instructions
-
-An administrator with **Google Cloud Settings Admin** permissions must follow
-these directions:
-
-- Navigate to the Google Cloud Project you're using with Gemini CLI for Code
-  Assist.
-- Go to **Admin for Gemini** > **Settings**.
-- Under **Release channels for Gemini Code Assist in local IDEs** select
-  **Preview**.
-- Click **Save changes**.
-
-### User instructions
-
-Wait for two to three minutes after your administrator has enabled **Preview**,
-then:
-
-- Open Gemini CLI.
-- Use the `/settings` command.
-- Set **Preview Features** to `true`.
-
-Restart Gemini CLI and you should have access to Gemini 3.
-
 ## Next steps
 
 If you need help, we recommend searching for an existing

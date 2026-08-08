@@ -59,20 +59,13 @@ export const CloudFreePrivacyNotice = ({
     return (
       <Box flexDirection="column" marginY={1}>
         <Text bold color={theme.text.accent}>
-          Gemini Code Assist Privacy Notice
+          Gemini CLI Privacy Notice
         </Text>
         <Newline />
         <Text color={theme.text.primary}>
           The data collection opt-in isn&apos;t available for this account
           because it doesn&apos;t have a Gemini Code Assist for Individuals
           (free) tier.
-        </Text>
-        <Newline />
-        <Text color={theme.text.primary}>
-          If you&apos;re on a Google Workspace or enterprise account, use the
-          Vertex AI / Google Cloud path instead by setting the
-          GOOGLE_CLOUD_PROJECT environment variable to your Google Cloud
-          project.
         </Text>
         <Newline />
         <Text color={theme.text.primary}>

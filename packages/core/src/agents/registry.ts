@@ -13,7 +13,7 @@ import {
   type LocalAgentDefinition,
   type AgentReloadSummary,
 } from './types.js';
-import { getAgentCardLoadOptions, getRemoteAgentTargetUrl } from './types.js';
+import { getAgentCardLoadOptions } from './types.js';
 import { loadAgentsFromDirectory } from './agentLoader.js';
 import { CodebaseInvestigatorAgent } from './codebase-investigator.js';
 import { CliHelpAgent } from './cli-help-agent.js';
@@ -497,13 +497,11 @@ export class AgentRegistry {
         );
         return;
       }
-      const targetUrl = getRemoteAgentTargetUrl(remoteDef);
       let authHandler: AuthenticationHandler | undefined;
       if (definition.auth) {
         const provider = await A2AAuthProviderFactory.create({
           authConfig: definition.auth,
           agentName: definition.name,
-          targetUrl,
           agentCardUrl: remoteDef.agentCardUrl,
         });
         if (!provider) {

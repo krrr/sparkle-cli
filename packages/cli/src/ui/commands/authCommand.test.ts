@@ -15,7 +15,7 @@ vi.mock('@google/gemini-cli-core', async () => {
   const actual = await vi.importActual('@google/gemini-cli-core');
   return {
     ...actual,
-    clearCachedCredentialFile: vi.fn().mockResolvedValue(undefined),
+    clearApiKey: vi.fn().mockResolvedValue(undefined),
   };
 });
 
@@ -78,13 +78,11 @@ describe('authCommand', () => {
       const logoutCommand = authCommand.subCommands?.[1];
       expect(logoutCommand?.name).toBe('signout');
 
-      const { clearCachedCredentialFile } = await import(
-        '@google/gemini-cli-core'
-      );
+      const { clearApiKey } = await import('@google/gemini-cli-core');
 
       await logoutCommand!.action!(mockContext, '');
 
-      expect(clearCachedCredentialFile).toHaveBeenCalledOnce();
+      expect(clearApiKey).toHaveBeenCalledOnce();
     });
 
     it('should clear selectedAuthType setting', async () => {

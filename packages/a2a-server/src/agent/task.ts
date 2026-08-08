@@ -996,55 +996,38 @@ export class Task {
       `[Task] Handling tool confirmation for callId: ${callId} with outcome: ${outcomeString}`,
     );
     try {
-      // Temporarily unset GCP environment variables so they do not leak into
-      // tool calls.
-      const gcpProject = process.env['GOOGLE_CLOUD_PROJECT'];
-      const gcpCreds = process.env['GOOGLE_APPLICATION_CREDENTIALS'];
+      // This will trigger the scheduler to continue or cancel the specific tool.
+      // The scheduler's onToolCallsUpdate will then reflect the new state (e.g., executing or cancelled).
+
+      // If `edit` tool call, pass updated payload if present
+      const newContent = part.data['newContent'];
+      const payload =
+        confirmationDetails?.type === 'edit' && typeof newContent === 'string'
+          ? ({ newContent } as ToolConfirmationPayload)
+          : undefined;
+      this.skipFinalTrueAfterInlineEdit = !!payload;
+
       try {
-        delete process.env['GOOGLE_CLOUD_PROJECT'];
-        delete process.env['GOOGLE_APPLICATION_CREDENTIALS'];
-
-        // This will trigger the scheduler to continue or cancel the specific tool.
-        // The scheduler's onToolCallsUpdate will then reflect the new state (e.g., executing or cancelled).
-
-        // If `edit` tool call, pass updated payload if present
-        const newContent = part.data['newContent'];
-        const payload =
-          confirmationDetails?.type === 'edit' && typeof newContent === 'string'
-            ? ({ newContent } as ToolConfirmationPayload)
-            : undefined;
-        this.skipFinalTrueAfterInlineEdit = !!payload;
-
-        try {
-          if (correlationId) {
-            const loopContext: AgentLoopContext = this.config;
-            await loopContext.messageBus.publish({
-              type: MessageBusType.TOOL_CONFIRMATION_RESPONSE,
-              correlationId,
-              confirmed:
-                confirmationOutcome !== ToolConfirmationOutcome.Cancel &&
-                confirmationOutcome !==
-                  ToolConfirmationOutcome.ModifyWithEditor,
-              outcome: confirmationOutcome,
-              payload,
-            });
-          } else if (confirmationDetails?.onConfirm) {
-            // Fallback for legacy callback-based confirmation
-            await confirmationDetails.onConfirm(confirmationOutcome, payload);
-          }
-        } finally {
-          // Once confirmation payload is sent or callback finishes,
-          // reset skipFinalTrueAfterInlineEdit so that external callers receive
-          // their call has been completed.
-          this.skipFinalTrueAfterInlineEdit = false;
+        if (correlationId) {
+          const loopContext: AgentLoopContext = this.config;
+          await loopContext.messageBus.publish({
+            type: MessageBusType.TOOL_CONFIRMATION_RESPONSE,
+            correlationId,
+            confirmed:
+              confirmationOutcome !== ToolConfirmationOutcome.Cancel &&
+              confirmationOutcome !== ToolConfirmationOutcome.ModifyWithEditor,
+            outcome: confirmationOutcome,
+            payload,
+          });
+        } else if (confirmationDetails?.onConfirm) {
+          // Fallback for legacy callback-based confirmation
+          await confirmationDetails.onConfirm(confirmationOutcome, payload);
         }
       } finally {
-        if (gcpProject) {
-          process.env['GOOGLE_CLOUD_PROJECT'] = gcpProject;
-        }
-        if (gcpCreds) {
-          process.env['GOOGLE_APPLICATION_CREDENTIALS'] = gcpCreds;
-        }
+        // Once confirmation payload is sent or callback finishes,
+        // reset skipFinalTrueAfterInlineEdit so that external callers receive
+        // their call has been completed.
+        this.skipFinalTrueAfterInlineEdit = false;
       }
 
       // Do not delete if modifying, a subsequent tool confirmation for the same

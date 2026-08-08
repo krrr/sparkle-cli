@@ -234,11 +234,7 @@ export async function createBrowserAgentDefinition(
         };
       }
       const authType = config.getContentGeneratorConfig()?.authType;
-      const blockedAuthTypes = new Set([
-        AuthType.LOGIN_WITH_GOOGLE,
-        AuthType.LEGACY_CLOUD_SHELL,
-        AuthType.COMPUTE_ADC,
-      ]);
+      const blockedAuthTypes = new Set([AuthType.GATEWAY]);
       if (authType && blockedAuthTypes.has(authType)) {
         return {
           code: 'blocked_auth_type',

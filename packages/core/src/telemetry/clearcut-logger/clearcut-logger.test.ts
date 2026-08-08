@@ -491,16 +491,6 @@ describe('ClearcutLogger', () => {
         expected: 'GitHub',
       },
       {
-        name: 'Cloud Shell via EDITOR_IN_CLOUD_SHELL',
-        env: { EDITOR_IN_CLOUD_SHELL: 'true' },
-        expected: 'cloudshell',
-      },
-      {
-        name: 'Cloud Shell via CLOUD_SHELL',
-        env: { CLOUD_SHELL: 'true' },
-        expected: 'cloudshell',
-      },
-      {
         name: 'VSCode via TERM_PROGRAM',
         env: {
           TERM_PROGRAM: 'vscode',

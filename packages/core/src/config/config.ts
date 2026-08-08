@@ -23,7 +23,6 @@ import {
   createContentGeneratorConfig,
   type ContentGenerator,
   type ContentGeneratorConfig,
-  type VertexAiRoutingConfig,
 } from '../core/contentGenerator.js';
 import type { OverageStrategy } from '../billing/billing.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
@@ -159,24 +158,22 @@ import type {
   UserTierId,
   GeminiUserTier,
   RetrieveUserQuotaResponse,
-  AdminControlsSettings,
-} from '../code_assist/types.js';
+} from '../userTier.js';
+import type { AdminControlsSettings } from '../admin-controls/types.js';
 import type { HierarchicalMemory } from './memory.js';
-import { getCodeAssistServer } from '../code_assist/codeAssist.js';
 import {
   getExperiments,
   type Experiments,
-} from '../code_assist/experiments/experiments.js';
+} from '../experiments/experiments.js';
 import { AgentRegistry } from '../agents/registry.js';
 import { AcknowledgedAgentsService } from '../agents/acknowledgedAgents.js';
 import { setGlobalProxy, updateGlobalFetchTimeouts } from '../utils/fetch.js';
-import { ExperimentFlags } from '../code_assist/experiments/flagNames.js';
+import { ExperimentFlags } from '../experiments/flagNames.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { ragLogger } from '../utils/ragLogger.js';
 import { SkillManager, type SkillDefinition } from '../skills/skillManager.js';
 import { startupProfiler } from '../telemetry/startupProfiler.js';
 import type { AgentDefinition } from '../agents/types.js';
-import { fetchAdminControls } from '../code_assist/admin/admin_controls.js';
 import { isSubpath, resolveToRealPath } from '../utils/paths.js';
 import { validatePath } from '../utils/path-validator.js';
 import { InjectionService } from './injectionService.js';
@@ -516,8 +513,6 @@ export class MCPServerConfig {
 
 export enum AuthProviderType {
   DYNAMIC_DISCOVERY = 'dynamic_discovery',
-  GOOGLE_CREDENTIALS = 'google_credentials',
-  SERVICE_ACCOUNT_IMPERSONATION = 'service_account_impersonation',
 }
 
 export interface SandboxConfig {
@@ -744,7 +739,6 @@ export interface ConfigParameters {
   billing?: {
     overageStrategy?: OverageStrategy;
   };
-  vertexAiRouting?: VertexAiRoutingConfig;
   logRagSnippets?: boolean;
 }
 
@@ -958,7 +952,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly billing: {
     overageStrategy: OverageStrategy;
   };
-  private readonly vertexAiRouting: VertexAiRoutingConfig | undefined;
 
   private readonly enableAgents: boolean;
   private agents: AgentSettings;
@@ -1395,7 +1388,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.billing = {
       overageStrategy: params.billing?.overageStrategy ?? 'ask',
     };
-    this.vertexAiRouting = params.vertexAiRouting;
 
     if (params.contextFileName) {
       setGeminiMdFilename(params.contextFileName);
@@ -1601,7 +1593,6 @@ export class Config implements McpContext, AgentLoopContext {
       apiKey,
       baseUrl,
       customHeaders,
-      this.vertexAiRouting,
     );
     this.contentGenerator = await createContentGenerator(
       newContentGeneratorConfig,
@@ -1611,12 +1602,9 @@ export class Config implements McpContext, AgentLoopContext {
     // Only assign to instance properties after successful initialization
     this.contentGeneratorConfig = newContentGeneratorConfig;
 
-    const codeAssistServer = getCodeAssistServer(this);
-    const quotaPromise = codeAssistServer?.projectId
-      ? this.refreshUserQuota()
-      : Promise.resolve();
+    const quotaPromise: Promise<void> = Promise.resolve();
 
-    this.experimentsPromise = getExperiments(codeAssistServer)
+    this.experimentsPromise = getExperiments()
       .then((experiments) => {
         this.setExperiments(experiments);
         return experiments;
@@ -1626,7 +1614,7 @@ export class Config implements McpContext, AgentLoopContext {
         return undefined;
       });
 
-    const [experiments] = await Promise.all([
+    await Promise.all([
       this.experimentsPromise,
       quotaPromise.catch((e) => {
         debugLogger.error('Failed to fetch user quota', e);
@@ -1642,10 +1630,7 @@ export class Config implements McpContext, AgentLoopContext {
     this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
 
     const authType = this.contentGeneratorConfig.authType;
-    if (
-      authType === AuthType.USE_GEMINI ||
-      authType === AuthType.USE_VERTEX_AI
-    ) {
+    if (authType === AuthType.USE_GEMINI) {
       this.setHasAccessToPreviewModel(true);
     }
 
@@ -1658,26 +1643,10 @@ export class Config implements McpContext, AgentLoopContext {
       this.setModel(DEFAULT_GEMINI_MODEL_AUTO);
     }
 
-    const adminControlsEnabled =
-      experiments?.flags[ExperimentFlags.ENABLE_ADMIN_CONTROLS]?.boolValue ??
-      false;
-
-    try {
-      const adminControls = await fetchAdminControls(
-        codeAssistServer,
-        this.getRemoteAdminSettings(),
-        adminControlsEnabled,
-        (newSettings: AdminControlsSettings) => {
-          this.setRemoteAdminSettings(newSettings);
-          coreEvents.emitAdminSettingsChanged();
-        },
-      );
-      this.setRemoteAdminSettings(adminControls);
-    } catch (e) {
-      debugLogger.error('Failed to fetch admin controls', e);
-    }
-
     if ((await this.getProModelNoAccess()) && isAutoModel(this.model)) {
+      // Resolve the flash model constants for the current backend before
+      // switching, so the downgrade lands on the correct flash model.
+      this.hasGemini35FlashGAAccess();
       this.setModel(PREVIEW_GEMINI_FLASH_MODEL);
     }
   }
@@ -1686,8 +1655,7 @@ export class Config implements McpContext, AgentLoopContext {
     if (this.experiments) {
       return this.experiments;
     }
-    const codeAssistServer = getCodeAssistServer(this);
-    return getExperiments(codeAssistServer);
+    return getExperiments();
   }
 
   getUserTier(): UserTierId | undefined {
@@ -2286,77 +2254,11 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   async refreshAvailableCredits(): Promise<void> {
-    const codeAssistServer = getCodeAssistServer(this);
-    if (!codeAssistServer) {
-      return;
-    }
-    try {
-      await codeAssistServer.refreshAvailableCredits();
-    } catch {
-      // Non-fatal: proceed even if refresh fails.
-      // The actual credit balance will be verified server-side.
-    }
+    return;
   }
 
   async refreshUserQuota(): Promise<RetrieveUserQuotaResponse | undefined> {
-    const codeAssistServer = getCodeAssistServer(this);
-    if (!codeAssistServer || !codeAssistServer.projectId) {
-      return undefined;
-    }
-    try {
-      const quota = await codeAssistServer.retrieveUserQuota({
-        project: codeAssistServer.projectId,
-      });
-
-      if (quota.buckets) {
-        this.lastRetrievedQuota = quota;
-        this.lastQuotaFetchTime = Date.now();
-
-        for (const bucket of quota.buckets) {
-          if (!bucket.modelId || bucket.remainingFraction == null) {
-            continue;
-          }
-
-          let remaining: number;
-          let limit: number;
-
-          if (bucket.remainingAmount) {
-            remaining = parseInt(bucket.remainingAmount, 10);
-            limit =
-              bucket.remainingFraction > 0
-                ? Math.round(remaining / bucket.remainingFraction)
-                : (this.modelQuotas.get(bucket.modelId)?.limit ?? 0);
-          } else {
-            // Server only sent remainingFraction — use a normalized scale.
-            limit = 100;
-            remaining = Math.round(bucket.remainingFraction * limit);
-          }
-
-          if (!isNaN(remaining) && Number.isFinite(limit) && limit > 0) {
-            this.modelQuotas.set(bucket.modelId, {
-              remaining,
-              limit,
-              resetTime: bucket.resetTime,
-            });
-          }
-        }
-      }
-
-      const hasAccess =
-        quota.buckets?.some(
-          (b) => b.modelId && isPreviewModel(b.modelId, this),
-        ) ?? false;
-      this.setHasAccessToPreviewModel(hasAccess);
-
-      if (quota.buckets) {
-        this.emitQuotaChangedEvent();
-      }
-
-      return quota;
-    } catch (e) {
-      debugLogger.debug('Failed to retrieve user quota', e);
-      return undefined;
-    }
+    return undefined;
   }
 
   async refreshUserQuotaIfStale(
@@ -3500,10 +3402,7 @@ export class Config implements McpContext, AgentLoopContext {
    * Note: This method should only be called after startup, once experiments have been loaded.
    */
   getProModelNoAccessSync(): boolean {
-    if (
-      this.contentGeneratorConfig?.authType !== AuthType.LOGIN_WITH_GOOGLE &&
-      this.contentGeneratorConfig?.authType !== AuthType.COMPUTE_ADC
-    ) {
+    if (this.contentGeneratorConfig?.authType !== AuthType.GATEWAY) {
       return false;
     }
     return (
@@ -3542,11 +3441,7 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   private isGemini31LaunchedForAuthType(authType?: AuthType): boolean {
-    return (
-      authType === AuthType.USE_GEMINI ||
-      authType === AuthType.USE_VERTEX_AI ||
-      authType === AuthType.GATEWAY
-    );
+    return authType === AuthType.USE_GEMINI || authType === AuthType.GATEWAY;
   }
 
   /**

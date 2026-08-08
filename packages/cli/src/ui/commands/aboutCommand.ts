@@ -39,7 +39,6 @@ export const aboutCommand: SlashCommand = {
     const cliVersion = await getVersion();
     const selectedAuthType =
       context.services.settings.merged.security.auth.selectedType || '';
-    const gcpProject = process.env['GOOGLE_CLOUD_PROJECT'] || '';
     const ideClient = await getIdeClientName(context);
 
     const userAccountManager = new UserAccountManager();
@@ -58,7 +57,6 @@ export const aboutCommand: SlashCommand = {
       sandboxEnv,
       modelVersion,
       selectedAuthType,
-      gcpProject,
       ideClient,
       userEmail,
       tier,

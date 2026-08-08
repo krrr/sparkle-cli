@@ -164,7 +164,6 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
     parseAndFormatApiError: mockParseAndFormatApiError,
     tokenLimit: vi.fn().mockReturnValue(100), // Mock tokenLimit
     recordToolCallInteractions: vi.fn().mockResolvedValue(undefined),
-    getCodeAssistServer: vi.fn().mockReturnValue(undefined),
     runInDevTraceSpan: mockRunInDevTraceSpan,
   };
 });
@@ -2465,7 +2464,7 @@ describe('useGeminiStream', () => {
     it('should call parseAndFormatApiError with the correct authType on stream initialization failure', async () => {
       // 1. Setup
       const mockError = new Error('Rate limit exceeded');
-      const mockAuthType = AuthType.LOGIN_WITH_GOOGLE;
+      const mockAuthType = AuthType.USE_GEMINI;
       mockParseAndFormatApiError.mockClear();
       mockSendMessageStream.mockReturnValue(
         (async function* () {

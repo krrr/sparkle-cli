@@ -491,7 +491,7 @@ events. For more information, see the [telemetry documentation](./telemetry.md).
 {
   "telemetry": {
     "enabled": true,
-    "target": "gcp",
+    "target": "local",
     "logPrompts": false
   }
 }
@@ -509,13 +509,13 @@ You can enforce a specific authentication method for all users by setting the
 prevents users from choosing a different authentication method. See the
 [Authentication docs](../get-started/authentication.mdx) for more details.
 
-**Example:** Enforce the use of Google login for all users.
+**Example:** Enforce the use of a Gemini API key for all users.
 
 ```json
 {
   "security": {
     "auth": {
-      "enforcedType": "oauth-personal"
+      "enforcedType": "gemini-api-key"
     }
   }
 }
@@ -525,38 +525,6 @@ If a user has a different authentication method configured, they will be
 prompted to switch to the enforced method. In non-interactive mode, the CLI will
 exit with an error if the configured authentication method does not match the
 enforced one.
-
-### Restricting logins to corporate domains
-
-For enterprises using Google Workspace, you can enforce that users only
-authenticate with their corporate Google accounts. This is a network-level
-control that is configured on a proxy server, not within Gemini CLI itself. It
-works by intercepting authentication requests to Google and adding a special
-HTTP header.
-
-This policy prevents users from logging in with personal Gmail accounts or other
-non-corporate Google accounts.
-
-For detailed instructions, see the Google Workspace Admin Help article on
-[blocking access to consumer accounts](https://support.google.com/a/answer/1668854?hl=en#zippy=%2Cstep-choose-a-web-proxy-server%2Cstep-configure-the-network-to-block-certain-accounts).
-
-The general steps are as follows:
-
-1.  **Intercept Requests**: Configure your web proxy to intercept all requests
-    to `google.com`.
-2.  **Add HTTP Header**: For each intercepted request, add the
-    `X-GoogApps-Allowed-Domains` HTTP header.
-3.  **Specify Domains**: The value of the header should be a comma-separated
-    list of your approved Google Workspace domain names.
-
-**Example header:**
-
-```
-X-GoogApps-Allowed-Domains: my-corporate-domain.com, secondary-domain.com
-```
-
-When this header is present, Google's authentication service will only allow
-logins from accounts belonging to the specified domains.
 
 ## Putting it all together: example system `settings.json`
 
@@ -587,7 +555,7 @@ CLI.
   },
   "telemetry": {
     "enabled": true,
-    "target": "gcp",
+    "target": "local",
     "otlpEndpoint": "https://telemetry-prod.example.com:4317",
     "logPrompts": false
   },

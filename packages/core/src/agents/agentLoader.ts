@@ -17,11 +17,7 @@ import {
   DEFAULT_MAX_TIME_MINUTES,
 } from './types.js';
 import type { A2AAuthConfig } from './auth-provider/types.js';
-import {
-  MCPServerConfig,
-  AuthProviderType,
-  type MCPOAuthConfig,
-} from '../config/config.js';
+import { MCPServerConfig, type MCPOAuthConfig } from '../config/config.js';
 import { isValidToolName } from '../tools/tool-names.js';
 import { FRONTMATTER_REGEX } from '../skills/skillLoader.js';
 import { getErrorMessage } from '../utils/errors.js';
@@ -67,25 +63,19 @@ const mcpServerSchema = z.object({
   include_tools: z.array(z.string()).optional(),
   exclude_tools: z.array(z.string()).optional(),
   auth: z
-    .union([
-      z.object({
-        type: z.literal('google-credentials'),
-        scopes: z.array(z.string()).optional(),
-      }),
-      z.object({
-        type: z.literal('oauth'),
-        client_id: z.string().optional(),
-        client_secret: z.string().optional(),
-        scopes: z.array(z.string()).optional(),
-        authorization_url: z.string().url().optional(),
-        token_url: z.string().url().optional(),
-        issuer: z.string().url().optional(),
-        audiences: z.array(z.string()).optional(),
-        redirect_uri: z.string().url().optional(),
-        token_param_name: z.string().optional(),
-        registration_url: z.string().url().optional(),
-      }),
-    ])
+    .object({
+      type: z.literal('oauth'),
+      client_id: z.string().optional(),
+      client_secret: z.string().optional(),
+      scopes: z.array(z.string()).optional(),
+      authorization_url: z.string().url().optional(),
+      token_url: z.string().url().optional(),
+      issuer: z.string().url().optional(),
+      audiences: z.array(z.string()).optional(),
+      redirect_uri: z.string().url().optional(),
+      token_param_name: z.string().optional(),
+      registration_url: z.string().url().optional(),
+    })
     .optional(),
 });
 
@@ -139,12 +129,6 @@ const httpAuthSchema = z.object({
   value: z.string().min(1).optional(),
 });
 
-const googleCredentialsAuthSchema = z.object({
-  ...baseAuthFields,
-  type: z.literal('google-credentials'),
-  scopes: z.array(z.string()).optional(),
-});
-
 const oauth2AuthSchema = z.object({
   ...baseAuthFields,
   type: z.literal('oauth'),
@@ -164,7 +148,6 @@ const authConfigSchema = z
   .discriminatedUnion('type', [
     apiKeyAuthSchema,
     httpAuthSchema,
-    googleCredentialsAuthSchema,
     oauth2AuthSchema,
   ])
   .superRefine((data, ctx) => {
@@ -426,12 +409,6 @@ function convertFrontmatterAuthToConfig(
         name: frontmatter.name,
       };
 
-    case 'google-credentials':
-      return {
-        type: 'google-credentials',
-        scopes: frontmatter.scopes,
-      };
-
     case 'http':
       if (frontmatter.value) {
         return {
@@ -549,17 +526,10 @@ export function markdownToAgentDefinition(
   const mcpServers: Record<string, MCPServerConfig> = {};
   if (markdown.mcp_servers) {
     for (const [name, config] of Object.entries(markdown.mcp_servers)) {
-      let authProviderType: AuthProviderType | undefined = undefined;
       let oauth: MCPOAuthConfig | undefined = undefined;
 
       if (config.auth) {
-        if (config.auth.type === 'google-credentials') {
-          authProviderType = AuthProviderType.GOOGLE_CREDENTIALS;
-          oauth = {
-            enabled: true,
-            scopes: config.auth.scopes,
-          };
-        } else if (config.auth.type === 'oauth') {
+        if (config.auth.type === 'oauth') {
           oauth = {
             enabled: true,
             clientId: config.auth.client_id,
@@ -593,7 +563,7 @@ export function markdownToAgentDefinition(
         config.exclude_tools,
         undefined, // extension
         oauth,
-        authProviderType,
+        undefined, // authProviderType
       );
     }
   }

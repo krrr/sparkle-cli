@@ -379,27 +379,6 @@ export async function start_sandbox(
       );
     }
 
-    // mount gcloud config directory if it exists
-    const gcloudConfigDir = path.join(homedir(), '.config', 'gcloud');
-    if (fs.existsSync(gcloudConfigDir)) {
-      args.push(
-        '--volume',
-        `${gcloudConfigDir}:${getContainerPath(gcloudConfigDir)}:ro`,
-      );
-    }
-
-    // mount ADC file if GOOGLE_APPLICATION_CREDENTIALS is set
-    if (process.env['GOOGLE_APPLICATION_CREDENTIALS']) {
-      const adcFile = process.env['GOOGLE_APPLICATION_CREDENTIALS'];
-      if (fs.existsSync(adcFile)) {
-        args.push('--volume', `${adcFile}:${getContainerPath(adcFile)}:ro`);
-        args.push(
-          '--env',
-          `GOOGLE_APPLICATION_CREDENTIALS=${getContainerPath(adcFile)}`,
-        );
-      }
-    }
-
     // mount paths listed in SANDBOX_MOUNTS
     if (process.env['SANDBOX_MOUNTS']) {
       for (let mount of process.env['SANDBOX_MOUNTS'].split(',')) {
@@ -538,38 +517,6 @@ export async function start_sandbox(
       args.push(
         '--env',
         `GOOGLE_VERTEX_BASE_URL=${process.env['GOOGLE_VERTEX_BASE_URL']}`,
-      );
-    }
-
-    // copy GOOGLE_GENAI_USE_VERTEXAI
-    if (process.env['GOOGLE_GENAI_USE_VERTEXAI']) {
-      args.push(
-        '--env',
-        `GOOGLE_GENAI_USE_VERTEXAI=${process.env['GOOGLE_GENAI_USE_VERTEXAI']}`,
-      );
-    }
-
-    // copy GOOGLE_GENAI_USE_GCA
-    if (process.env['GOOGLE_GENAI_USE_GCA']) {
-      args.push(
-        '--env',
-        `GOOGLE_GENAI_USE_GCA=${process.env['GOOGLE_GENAI_USE_GCA']}`,
-      );
-    }
-
-    // copy GOOGLE_CLOUD_PROJECT
-    if (process.env['GOOGLE_CLOUD_PROJECT']) {
-      args.push(
-        '--env',
-        `GOOGLE_CLOUD_PROJECT=${process.env['GOOGLE_CLOUD_PROJECT']}`,
-      );
-    }
-
-    // copy GOOGLE_CLOUD_LOCATION
-    if (process.env['GOOGLE_CLOUD_LOCATION']) {
-      args.push(
-        '--env',
-        `GOOGLE_CLOUD_LOCATION=${process.env['GOOGLE_CLOUD_LOCATION']}`,
       );
     }
 
@@ -988,10 +935,6 @@ async function start_lxc_sandbox(
       GOOGLE_API_KEY: process.env['GOOGLE_API_KEY'],
       GOOGLE_GEMINI_BASE_URL: process.env['GOOGLE_GEMINI_BASE_URL'],
       GOOGLE_VERTEX_BASE_URL: process.env['GOOGLE_VERTEX_BASE_URL'],
-      GOOGLE_GENAI_USE_VERTEXAI: process.env['GOOGLE_GENAI_USE_VERTEXAI'],
-      GOOGLE_GENAI_USE_GCA: process.env['GOOGLE_GENAI_USE_GCA'],
-      GOOGLE_CLOUD_PROJECT: process.env['GOOGLE_CLOUD_PROJECT'],
-      GOOGLE_CLOUD_LOCATION: process.env['GOOGLE_CLOUD_LOCATION'],
       GEMINI_MODEL: process.env['GEMINI_MODEL'],
       TERM: process.env['TERM'],
       COLORTERM: process.env['COLORTERM'],

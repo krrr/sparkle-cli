@@ -50,7 +50,7 @@ describe('ApprovalModeStrategy', () => {
         return launched && authType === AuthType.USE_GEMINI;
       }),
       getContentGeneratorConfig: vi.fn().mockReturnValue({
-        authType: AuthType.LOGIN_WITH_GOOGLE,
+        authType: AuthType.USE_GEMINI,
       }),
     } as unknown as Config;
 

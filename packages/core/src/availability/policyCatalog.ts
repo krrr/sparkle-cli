@@ -18,7 +18,7 @@ import {
   PREVIEW_GEMINI_MODEL,
   resolveModel,
 } from '../config/models.js';
-import type { UserTierId } from '../code_assist/types.js';
+import type { UserTierId } from '../userTier.js';
 
 // actions and stateTransitions are optional when defining ModelPolicy
 type PolicyConfig = Omit<ModelPolicy, 'actions' | 'stateTransitions'> & {

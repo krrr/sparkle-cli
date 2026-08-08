@@ -19,7 +19,6 @@ import { A2AExpressApp, type UserBuilder } from '@a2a-js/sdk/server/express'; //
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../utils/logger.js';
 import type { AgentSettings } from '../types.js';
-import { GCSTaskStore, NoOpTaskStore } from '../persistence/gcs.js';
 import { CoderAgentExecutor } from '../agent/executor.js';
 import { requestStorage } from './requestStorage.js';
 import { loadConfig, loadEnvironment, setTargetDir } from '../config/config.js';
@@ -217,11 +216,7 @@ export async function createApp() {
     const allowedServerKeys = [
       'CODER_AGENT_PORT',
       'CODER_AGENT_WORKSPACE_PATH',
-      'GCS_BUCKET_NAME',
       'LOG_LEVEL',
-      'GOOGLE_APPLICATION_CREDENTIALS',
-      'GOOGLE_CLOUD_PROJECT',
-      'GEMINI_CLI_USE_COMPUTE_ADC',
     ];
     for (const key of allowedServerKeys) {
       if (globalEnv[key] !== undefined) {
@@ -246,16 +241,10 @@ export async function createApp() {
     }
 
     // loadEnvironment() is called within getConfig now
-    const bucketName = process.env['GCS_BUCKET_NAME'];
     let taskStoreForExecutor: TaskStore;
     let taskStoreForHandler: TaskStore;
 
-    if (bucketName) {
-      logger.info(`Using GCSTaskStore with bucket: ${bucketName}`);
-      const gcsTaskStore = new GCSTaskStore(bucketName);
-      taskStoreForExecutor = gcsTaskStore;
-      taskStoreForHandler = new NoOpTaskStore(gcsTaskStore);
-    } else {
+    {
       logger.info('Using InMemoryTaskStore');
       const inMemoryTaskStore = new InMemoryTaskStore();
       taskStoreForExecutor = inMemoryTaskStore;

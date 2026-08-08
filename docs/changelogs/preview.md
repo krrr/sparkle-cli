@@ -13,8 +13,6 @@ npm install -g @google/gemini-cli@preview
 
 ## Highlights
 
-- **Caretaker LLM Triage Orchestrator**: Implemented the LLM triage orchestrator
-  and container build configuration to support caretaker triage workflows.
 - **Enhanced Workspace Trust & Sandbox Hardening**: Aligned macOS permissive
   Seatbelt profiles with the deny-default model and enforced workspace trust and
   task isolation in the Agent-to-Agent (A2A) server to prevent remote code
@@ -33,9 +31,6 @@ npm install -g @google/gemini-cli@preview
 - fix(core,a2a): group cancelled tool responses and coalesce consecutive roles
   to prevent 400 Bad Request by @luisfelipe-alt in
   [#28407](https://github.com/google-gemini/gemini-cli/pull/28407)
-- feat(caretaker-triage): implement LLM triage orchestrator and container build
-  by @chadd28 in
-  [#28345](https://github.com/google-gemini/gemini-cli/pull/28345)
 - refactor(cli): align macOS permissive Seatbelt profiles with deny-default
   model by @ompatel-aiml in
   [#28424](https://github.com/google-gemini/gemini-cli/pull/28424)

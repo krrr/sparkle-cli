@@ -17,9 +17,7 @@ interface AboutBoxProps {
   sandboxEnv: string;
   modelVersion: string;
   selectedAuthType: string;
-  gcpProject: string;
   ideClient: string;
-  userEmail?: string;
   tier?: string;
 }
 
@@ -29,9 +27,7 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
   sandboxEnv,
   modelVersion,
   selectedAuthType,
-  gcpProject,
   ideClient,
-  userEmail,
   tier,
 }) => {
   const settings = useSettings();
@@ -113,13 +109,7 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
             </Text>
           </Box>
           <Box>
-            <Text color={theme.text.primary}>
-              {selectedAuthType.startsWith('oauth')
-                ? userEmail
-                  ? `Signed in with Google (${userEmail})`
-                  : 'Signed in with Google'
-                : selectedAuthType}
-            </Text>
+            <Text color={theme.text.primary}>{selectedAuthType}</Text>
           </Box>
         </Box>
       )}
@@ -132,18 +122,6 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
           </Box>
           <Box>
             <Text color={theme.text.primary}>{tier}</Text>
-          </Box>
-        </Box>
-      )}
-      {gcpProject && (
-        <Box flexDirection="row">
-          <Box width="35%">
-            <Text bold color={theme.text.link}>
-              GCP Project
-            </Text>
-          </Box>
-          <Box>
-            <Text color={theme.text.primary}>{gcpProject}</Text>
           </Box>
         </Box>
       )}

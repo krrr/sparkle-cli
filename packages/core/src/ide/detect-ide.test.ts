@@ -69,20 +69,6 @@ describe('detectIde', () => {
     expect(detectIde(ideProcessInfo)).toBe(IDE_DEFINITIONS.codespaces);
   });
 
-  it('should detect Cloud Shell via EDITOR_IN_CLOUD_SHELL', () => {
-    vi.stubEnv('TERM_PROGRAM', 'vscode');
-    vi.stubEnv('EDITOR_IN_CLOUD_SHELL', 'true');
-    vi.stubEnv('CURSOR_TRACE_ID', '');
-    expect(detectIde(ideProcessInfo)).toBe(IDE_DEFINITIONS.cloudshell);
-  });
-
-  it('should detect Cloud Shell via CLOUD_SHELL', () => {
-    vi.stubEnv('TERM_PROGRAM', 'vscode');
-    vi.stubEnv('CLOUD_SHELL', 'true');
-    vi.stubEnv('CURSOR_TRACE_ID', '');
-    expect(detectIde(ideProcessInfo)).toBe(IDE_DEFINITIONS.cloudshell);
-  });
-
   it('should detect Trae', () => {
     vi.stubEnv('TERM_PROGRAM', 'vscode');
     vi.stubEnv('TERM_PRODUCT', 'Trae');

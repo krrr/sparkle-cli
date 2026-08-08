@@ -180,12 +180,6 @@ Each server configuration supports the following properties:
   server. Tools listed here will not be available to the model, even if they are
   exposed by the server. `excludeTools` takes precedence over `includeTools`. If
   a tool is in both lists, it will be excluded.
-- **`targetAudience`** (string): The OAuth Client ID allowlisted on the
-  IAP-protected application you are trying to access. Used with
-  `authProviderType: 'service_account_impersonation'`.
-- **`targetServiceAccount`** (string): The email address of the Google Cloud
-  Service Account to impersonate. Used with
-  `authProviderType: 'service_account_impersonation'`.
 
 ### Environment variable expansion
 
@@ -226,7 +220,7 @@ leakage of sensitive host environment variables (like AWS keys or GitHub tokens)
 to arbitrary third-party MCP servers that might execute malicious code or log
 your environment. This includes:
 
-- Core project keys: `GEMINI_API_KEY`, `GOOGLE_API_KEY`, etc.
+- Core project keys: `GEMINI_API_KEY`, etc.
 - Variables matching sensitive patterns: `*TOKEN*`, `*SECRET*`, `*PASSWORD*`,
   `*KEY*`, `*AUTH*`, `*CREDENTIAL*`.
 - Certificates and private key patterns.
@@ -370,66 +364,6 @@ property:
   one of the following:
   - **`dynamic_discovery`** (default): The CLI will automatically discover the
     OAuth configuration from the server.
-  - **`google_credentials`**: The CLI will use the Google Application Default
-    Credentials (ADC) to authenticate with the server. When using this provider,
-    you must specify the required scopes.
-  - **`service_account_impersonation`**: The CLI will impersonate a Google Cloud
-    Service Account to authenticate with the server. This is useful for
-    accessing IAP-protected services (this was specifically designed for Cloud
-    Run services).
-
-#### Google credentials
-
-```json
-{
-  "mcpServers": {
-    "googleCloudServer": {
-      "httpUrl": "https://my-gcp-service.run.app/mcp",
-      "authProviderType": "google_credentials",
-      "oauth": {
-        "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
-      }
-    }
-  }
-}
-```
-
-#### Service account impersonation
-
-To authenticate with a server using Service Account Impersonation, you must set
-the `authProviderType` to `service_account_impersonation` and provide the
-following properties:
-
-- **`targetAudience`** (string): The OAuth Client ID allowlisted on the
-  IAP-protected application you are trying to access.
-- **`targetServiceAccount`** (string): The email address of the Google Cloud
-  Service Account to impersonate.
-
-The CLI will use your local Application Default Credentials (ADC) to generate an
-OIDC ID token for the specified service account and audience. This token will
-then be used to authenticate with the MCP server.
-
-#### Setup instructions
-
-1. **[Create](https://cloud.google.com/iap/docs/oauth-client-creation) or use an
-   existing OAuth 2.0 client ID.** To use an existing OAuth 2.0 client ID,
-   follow the steps in
-   [How to share OAuth Clients](https://cloud.google.com/iap/docs/sharing-oauth-clients).
-2. **Add the OAuth ID to the allowlist for
-   [programmatic access](https://cloud.google.com/iap/docs/sharing-oauth-clients#programmatic_access)
-   for the application.** Since Cloud Run is not yet a supported resource type
-   in gcloud iap, you must allowlist the Client ID on the project.
-3. **Create a service account.**
-   [Documentation](https://cloud.google.com/iam/docs/service-accounts-create#creating),
-   [Cloud Console Link](https://console.cloud.google.com/iam-admin/serviceaccounts)
-4. **Add both the service account and users to the IAP Policy** in the
-   "Security" tab of the Cloud Run service itself or via gcloud.
-5. **Grant all users and groups** who will access the MCP Server the necessary
-   permissions to
-   [impersonate the service account](https://cloud.google.com/docs/authentication/use-service-account-impersonation)
-   (for example, `roles/iam.serviceAccountTokenCreator`).
-6. **[Enable](https://console.cloud.google.com/apis/library/iamcredentials.googleapis.com)
-   the IAM Credentials API** for your project.
 
 ### Example configurations
 
@@ -539,16 +473,14 @@ then be used to authenticate with the MCP server.
 }
 ```
 
-### SSE MCP server with SA impersonation
+### SSE MCP server with OAuth
 
 ```json
 {
   "mcpServers": {
-    "myIapProtectedServer": {
-      "url": "https://my-iap-service.run.app/sse",
-      "authProviderType": "service_account_impersonation",
-      "targetAudience": "YOUR_IAP_CLIENT_ID.apps.googleusercontent.com",
-      "targetServiceAccount": "your-sa@your-project.iam.gserviceaccount.com"
+    "myOAuthServer": {
+      "url": "https://my-service.example.com/sse",
+      "authProviderType": "dynamic_discovery"
     }
   }
 }
@@ -620,8 +552,7 @@ Tool parameter schemas undergo sanitization for Gemini API compatibility:
 
 - **`$schema` properties** are removed
 - **`additionalProperties`** are stripped
-- **`anyOf` with `default`** have their default values removed (Vertex AI
-  compatibility)
+- **`anyOf` with `default`** have their default values removed
 - **Recursive processing** applies to nested schemas
 
 ### 5. Connection management

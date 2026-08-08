@@ -71,11 +71,7 @@ import {
 import { ASK_USER_TOOL_NAME } from '../../tools/tool-names.js';
 import { FixedDeque } from 'mnemonist';
 import { GIT_COMMIT_INFO, CLI_VERSION } from '../../generated/git-commit.js';
-import {
-  IDE_DEFINITIONS,
-  detectIdeFromEnv,
-  isCloudShell,
-} from '../../ide/detect-ide.js';
+import { IDE_DEFINITIONS, detectIdeFromEnv } from '../../ide/detect-ide.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { getErrorMessage } from '../../utils/errors.js';
 
@@ -185,8 +181,6 @@ export interface LogRequest {
 function determineSurface(): string {
   if (process.env['SURFACE']) {
     return process.env['SURFACE'];
-  } else if (isCloudShell()) {
-    return IDE_DEFINITIONS.cloudshell.name;
   } else if (process.env['GITHUB_SHA']) {
     return 'GitHub';
   } else if (process.env['TERM_PROGRAM'] === 'vscode') {
@@ -637,27 +631,12 @@ export class ClearcutLogger {
       },
       {
         gemini_cli_key:
-          EventMetadataKey.GEMINI_CLI_START_SESSION_VERTEX_API_ENABLED,
-        value: event.vertex_ai_enabled.toString(),
-      },
-      {
-        gemini_cli_key:
           EventMetadataKey.GEMINI_CLI_START_SESSION_DEBUG_MODE_ENABLED,
         value: event.debug_enabled.toString(),
       },
       {
-        gemini_cli_key:
-          EventMetadataKey.GEMINI_CLI_START_SESSION_VERTEX_API_ENABLED,
-        value: event.vertex_ai_enabled.toString(),
-      },
-      {
         gemini_cli_key: EventMetadataKey.GEMINI_CLI_START_SESSION_MCP_SERVERS,
         value: event.mcp_servers,
-      },
-      {
-        gemini_cli_key:
-          EventMetadataKey.GEMINI_CLI_START_SESSION_VERTEX_API_ENABLED,
-        value: event.vertex_ai_enabled.toString(),
       },
       {
         gemini_cli_key:
