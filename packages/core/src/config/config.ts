@@ -184,7 +184,6 @@ import { loadPoliciesFromToml } from '../policy/toml-loader.js';
 import { CheckerRunner } from '../safety/checker-runner.js';
 import { ContextBuilder } from '../safety/context-builder.js';
 import { CheckerRegistry } from '../safety/registry.js';
-import { ConsecaSafetyChecker } from '../safety/conseca/conseca.js';
 import type { AgentLoopContext } from './agent-loop-context.js';
 
 export interface AccessibilitySettings {
@@ -735,7 +734,6 @@ export interface ConfigParameters {
     adminSkillsEnabled?: boolean;
     agents?: AgentSettings;
   }>;
-  enableConseca?: boolean;
   billing?: {
     overageStrategy?: OverageStrategy;
   };
@@ -775,7 +773,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly debugMode: boolean;
   private readonly question: string | undefined;
   private readonly worktreeSettings: WorktreeSettings | undefined;
-  readonly enableConseca: boolean;
 
   private readonly coreTools: string[] | undefined;
   private readonly mainAgentTools: string[] | undefined;
@@ -1306,7 +1303,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.recordResponses = params.recordResponses;
     this.fileExclusions = new FileExclusions(this);
     this.eventEmitter = params.eventEmitter;
-    this.enableConseca = params.enableConseca ?? false;
 
     // Initialize Safety Infrastructure
     const contextBuilder = new ContextBuilder(this);
@@ -1334,12 +1330,6 @@ export class Config implements McpContext, AgentLoopContext {
       },
       checkerRunner,
     );
-
-    // Register Conseca if enabled
-    if (this.enableConseca) {
-      debugLogger.log('[SAFETY] Registering Conseca Safety Checker');
-      ConsecaSafetyChecker.getInstance().setContext(this);
-    }
 
     this._messageBus = new MessageBus(this.policyEngine, this.debugMode);
     this.acknowledgedAgentsService = new AcknowledgedAgentsService();

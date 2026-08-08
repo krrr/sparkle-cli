@@ -507,7 +507,6 @@ their corresponding top-level category object in your `settings.json` file.
 #### `billing`
 
 - **`billing.overageStrategy`** (enum):
-
   - **Description:** How to handle quota exhaustion when AI credits are
     available. 'ask' prompts each time, 'always' automatically uses credits,
     'never' disables credit usage.
@@ -1936,17 +1935,8 @@ their corresponding top-level category object in your `settings.json` file.
   - **Requires restart:** Yes
 
 - **`security.auth.useExternal`** (boolean):
-
   - **Description:** Whether to use an external authentication flow.
   - **Default:** `undefined`
-  - **Requires restart:** Yes
-
-- **`security.enableConseca`** (boolean):
-  - **Description:** Enable the context-aware security checker. This feature
-    uses an LLM to dynamically generate and enforce security policies for tool
-    use based on your prompt, providing an additional layer of protection
-    against unintended actions.
-  - **Default:** `false`
   - **Requires restart:** Yes
 
 #### `advanced`

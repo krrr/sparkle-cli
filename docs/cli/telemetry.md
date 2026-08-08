@@ -706,20 +706,6 @@ Logs when the conversation state is rewound.
 
 </details>
 
-##### `gemini_cli.conseca.verdict`
-
-Logs security verdicts from ConSeca.
-
-<details>
-<summary>Attributes</summary>
-
-- `verdict` (string)
-- `decision` (string: "accept", "reject", or "modify")
-- `reason` (string, optional)
-- `tool_name` (string, optional)
-
-</details>
-
 ##### `gemini_cli.hook_call`
 
 Logs execution of lifecycle hooks.

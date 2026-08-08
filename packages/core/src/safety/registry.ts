@@ -9,8 +9,6 @@ import * as fs from 'node:fs';
 import { type InProcessChecker, AllowedPathChecker } from './built-in.js';
 import { InProcessCheckerType } from '../policy/types.js';
 
-import { ConsecaSafetyChecker } from './conseca/conseca.js';
-
 /**
  * Registry for managing safety checker resolution.
  */
@@ -28,10 +26,7 @@ export class CheckerRegistry {
       CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS = new Map<
         string,
         InProcessChecker
-      >([
-        [InProcessCheckerType.ALLOWED_PATH, new AllowedPathChecker()],
-        [InProcessCheckerType.CONSECA, ConsecaSafetyChecker.getInstance()],
-      ]);
+      >([[InProcessCheckerType.ALLOWED_PATH, new AllowedPathChecker()]]);
     }
     return CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS;
   }

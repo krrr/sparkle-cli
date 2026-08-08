@@ -124,8 +124,6 @@ export enum EventNames {
   TOKEN_STORAGE_INITIALIZATION = 'token_storage_initialization',
   ONBOARDING_START = 'onboarding_start',
   ONBOARDING_SUCCESS = 'onboarding_success',
-  CONSECA_POLICY_GENERATION = 'conseca_policy_generation',
-  CONSECA_VERDICT = 'conseca_verdict',
   STARTUP_STATS = 'startup_stats',
   CREDITS_USED = 'credits_used',
   OVERAGE_OPTION_SELECTED = 'overage_option_selected',

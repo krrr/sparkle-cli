@@ -45,10 +45,6 @@ export {
   logOnboardingStart,
   logOnboardingSuccess,
 } from './loggers.js';
-export {
-  logConsecaPolicyGeneration,
-  logConsecaVerdict,
-} from './conseca-logger.js';
 export type { SlashCommandEvent, ChatCompressionEvent } from './types.js';
 export {
   SlashCommandStatus,
@@ -68,8 +64,6 @@ export {
   RewindEvent,
   OnboardingStartEvent,
   OnboardingSuccessEvent,
-  ConsecaPolicyGenerationEvent,
-  ConsecaVerdictEvent,
 } from './types.js';
 export { LlmRole } from './llmRole.js';
 export { makeSlashCommandEvent, makeChatCompressionEvent } from './types.js';
