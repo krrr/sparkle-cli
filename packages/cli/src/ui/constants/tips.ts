@@ -147,7 +147,6 @@ export const INFORMATIVE_TIPS = [
   'Reload instructional context from GEMINI.md files with /memory reload',
   'List the paths of the GEMINI.md files in use with /memory list',
   'Choose your Gemini model with /model',
-  'Display the privacy notice with /privacy',
   'Restore project files to a previous state with /restore',
   'Exit the CLI with /quit or /exit',
   'Check model-specific usage stats with /stats model',

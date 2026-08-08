@@ -70,7 +70,6 @@ vi.mock('../ui/commands/authCommand.js', () => ({ authCommand: {} }));
 vi.mock('../ui/commands/agentsCommand.js', () => ({
   agentsCommand: { name: 'agents' },
 }));
-vi.mock('../ui/commands/bugCommand.js', () => ({ bugCommand: {} }));
 vi.mock('../ui/commands/bugMemoryCommand.js', () => ({
   bugMemoryCommand: { name: 'bug-memory' },
 }));
@@ -106,7 +105,6 @@ vi.mock('../ui/commands/memoryCommand.js', () => ({
 vi.mock('../ui/commands/modelCommand.js', () => ({
   modelCommand: { name: 'model' },
 }));
-vi.mock('../ui/commands/privacyCommand.js', () => ({ privacyCommand: {} }));
 vi.mock('../ui/commands/quitCommand.js', () => ({ quitCommand: {} }));
 vi.mock('../ui/commands/resumeCommand.js', () => ({
   resumeCommand: {

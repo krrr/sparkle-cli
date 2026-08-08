@@ -357,7 +357,9 @@ describe('gemini.tsx main function', () => {
       expect.stringContaining('Unhandled Promise Rejection'),
     );
     expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Please file a bug report using the /bug tool.'),
+      expect.stringContaining(
+        'Please file a bug report at https://github.com/google-gemini/gemini-cli/issues.',
+      ),
     );
 
     // Simulate a second rejection

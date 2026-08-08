@@ -180,7 +180,7 @@ export function setupUnhandledRejectionHandler() {
     }
 
     const errorMessage = `=========================================
-This is an unexpected error. Please file a bug report using the /bug tool.
+This is an unexpected error. Please file a bug report at https://github.com/google-gemini/gemini-cli/issues.
 CRITICAL: Unhandled Promise Rejection!
 =========================================
 Reason: ${reason}${

@@ -124,7 +124,6 @@ export interface OpenDialogActionReturn {
     | 'auth'
     | 'theme'
     | 'editor'
-    | 'privacy'
     | 'settings'
     | 'sessionBrowser'
     | 'model'

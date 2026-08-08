@@ -493,9 +493,6 @@ export const useSlashCommandProcessor = (
                     case 'editor':
                       actions.openEditorDialog();
                       return { type: 'handled' };
-                    case 'privacy':
-                      actions.openPrivacyNotice();
-                      return { type: 'handled' };
                     case 'sessionBrowser':
                       actions.openSessionBrowser();
                       return { type: 'handled' };
