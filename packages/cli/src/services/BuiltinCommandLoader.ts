@@ -34,7 +34,6 @@ import { initCommand } from '../ui/commands/initCommand.js';
 import { mcpCommand } from '../ui/commands/mcpCommand.js';
 import { memoryCommand } from '../ui/commands/memoryCommand.js';
 import { modelCommand } from '../ui/commands/modelCommand.js';
-import { oncallCommand } from '../ui/commands/oncallCommand.js';
 import { permissionsCommand } from '../ui/commands/permissionsCommand.js';
 import { planCommand } from '../ui/commands/planCommand.js';
 import { policiesCommand } from '../ui/commands/policiesCommand.js';
@@ -49,7 +48,6 @@ import { skillsCommand } from '../ui/commands/skillsCommand.js';
 import { settingsCommand } from '../ui/commands/settingsCommand.js';
 import { tasksCommand } from '../ui/commands/tasksCommand.js';
 import { vimCommand } from '../ui/commands/vimCommand.js';
-import { setupGithubCommand } from '../ui/commands/setupGithubCommand.js';
 import { terminalSetupCommand } from '../ui/commands/terminalSetupCommand.js';
 import { voiceCommand } from '../ui/commands/voiceCommand.js';
 
@@ -133,7 +131,6 @@ export class BuiltinCommandLoader implements ICommandLoader {
       rewindCommand,
       await ideCommand(),
       initCommand,
-      ...(isNightlyBuild ? [oncallCommand] : []),
       mcpCommand,
       memoryCommand(this.config),
       modelCommand,
@@ -154,7 +151,6 @@ export class BuiltinCommandLoader implements ICommandLoader {
       settingsCommand,
       tasksCommand,
       vimCommand,
-      setupGithubCommand,
       terminalSetupCommand,
       ...(this.config?.isVoiceModeEnabled() ? [voiceCommand] : []),
     ];
