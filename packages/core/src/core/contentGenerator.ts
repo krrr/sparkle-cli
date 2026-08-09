@@ -18,9 +18,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import * as os from 'node:os';
 import type { Config } from '../config/config.js';
 import { loadApiKey } from './apiKeyCredentialStorage.js';
-
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
-import { InstallationManager } from '../utils/installationManager.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { parseCustomHeaders } from '../utils/customHeaderUtils.js';
 import { determineSurface } from '../utils/surface.js';
@@ -217,14 +215,6 @@ export async function createContentGenerator(
       let headers: Record<string, string> = { ...baseHeaders };
       if (config.customHeaders) {
         headers = { ...headers, ...config.customHeaders };
-      }
-      if (gcConfig?.getUsageStatisticsEnabled()) {
-        const installationManager = new InstallationManager();
-        const installationId = installationManager.getInstallationId();
-        headers = {
-          ...headers,
-          'x-gemini-api-privileged-user-id': `${installationId}`,
-        };
       }
       if (config.authType === AuthType.GATEWAY && config.apiKey === '') {
         headers['x-goog-api-key'] = '';

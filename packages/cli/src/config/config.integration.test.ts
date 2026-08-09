@@ -23,8 +23,6 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
 } from '@google/gemini-cli-core';
 import { createTestMergedSettings } from './settings.js';
-import { http, HttpResponse } from 'msw';
-
 import { setupServer } from 'msw/node';
 
 export const server = setupServer();
@@ -42,8 +40,6 @@ afterAll(() => {
   server.close();
 });
 
-const CLEARCUT_URL = 'https://play.googleapis.com/log';
-
 // Mock file discovery service and tool registry
 vi.mock('@google/gemini-cli-core', async () => {
   const actual = await vi.importActual('@google/gemini-cli-core');
@@ -60,8 +56,6 @@ describe('Configuration Integration Tests', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    server.resetHandlers(http.post(CLEARCUT_URL, () => HttpResponse.text()));
-
     tempDir = fs.mkdtempSync(path.join(tmpdir(), 'gemini-cli-test-'));
     vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
     vi.clearAllMocks();
