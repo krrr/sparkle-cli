@@ -2007,15 +2007,6 @@ const SETTINGS_SCHEMA = {
     description: 'Setting to enable experimental features',
     showInDialog: false,
     properties: {
-      gemma: {
-        type: 'boolean',
-        label: 'Gemma Models',
-        category: 'Experimental',
-        requiresRestart: true,
-        default: true,
-        description: 'Enable access to Gemma 4 models via Gemini API.',
-        showInDialog: true,
-      },
       voiceMode: {
         type: 'boolean',
         label: 'Voice Mode',

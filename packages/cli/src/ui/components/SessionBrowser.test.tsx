@@ -86,7 +86,6 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
       getProjectTempDir: () => '/tmp/test',
     },
     getSessionId: () => 'default-session-id',
-    getExperimentalGemma: () => false,
     ...overrides,
   }) as Config;
 

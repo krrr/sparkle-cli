@@ -69,7 +69,6 @@ describe('<ModelDialog />', () => {
     getGemini31LaunchedSync: () => boolean;
     getProModelNoAccess: () => Promise<boolean>;
     getProModelNoAccessSync: () => boolean;
-    getExperimentalGemma: () => boolean;
     getLastRetrievedQuota: () =>
       | {
           buckets: Array<{
@@ -89,7 +88,6 @@ describe('<ModelDialog />', () => {
     getGemini31LaunchedSync: mockGetGemini31LaunchedSync,
     getProModelNoAccess: mockGetProModelNoAccess,
     getProModelNoAccessSync: mockGetProModelNoAccessSync,
-    getExperimentalGemma: () => false,
     getLastRetrievedQuota: () => ({ buckets: [] }),
     getSessionId: () => 'test-session-id',
   };

@@ -547,13 +547,9 @@ export function isActiveModel(
   model: string,
   useGemini3_1: boolean = false,
   useCustomToolModel: boolean = false,
-  experimentalGemma: boolean = true,
 ): boolean {
   if (!VALID_GEMINI_MODELS.has(model) || model === 'none') {
     return false;
-  }
-  if (model === GEMMA_4_31B_IT_MODEL || model === GEMMA_4_26B_A4B_IT_MODEL) {
-    return experimentalGemma;
   }
   if (model === PREVIEW_GEMINI_FLASH_LITE_MODEL) {
     return false;

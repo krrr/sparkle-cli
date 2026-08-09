@@ -1969,12 +1969,6 @@ their corresponding top-level category object in your `settings.json` file.
 
 #### `experimental`
 
-- **`experimental.gemma`** (boolean):
-
-  - **Description:** Enable access to Gemma 4 models via Gemini API.
-  - **Default:** `true`
-  - **Requires restart:** Yes
-
 - **`experimental.voiceMode`** (boolean):
 
   - **Description:** Enable experimental voice dictation and commands (/voice,

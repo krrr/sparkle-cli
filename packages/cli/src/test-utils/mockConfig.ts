@@ -160,7 +160,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     emitMcpDiagnostic: vi.fn(),
     getEnableEventDrivenScheduler: vi.fn().mockReturnValue(false),
     getDisabledSkills: vi.fn().mockReturnValue([]),
-    getExperimentalGemma: vi.fn().mockReturnValue(false),
     getMemoryBoundaryMarkers: vi.fn().mockReturnValue(['.git']),
     getTerminalBackground: vi.fn().mockReturnValue(undefined),
     getEmbeddingModel: vi.fn().mockReturnValue('embedding-model'),

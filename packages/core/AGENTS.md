@@ -7,8 +7,6 @@ execution, and agent management.
 
 - `src/agent/` & `src/agents/`: Agent lifecycle and sub-agent management.
 - `src/availability/`: Model availability checks.
-- `src/billing/`: Billing and usage tracking.
-- `src/code_assist/`: Code assistance features.
 - `src/commands/`: Built-in CLI command implementations.
 - `src/config/`: Configuration management.
 - `src/confirmation-bus/`: User confirmation flow for tool execution.

@@ -112,7 +112,6 @@ export function createMockConfig(
     }),
     isContextManagementEnabled: vi.fn().mockReturnValue(false),
     getContextManagementConfig: vi.fn().mockReturnValue({ enabled: false }),
-    getExperimentalGemma: vi.fn().mockReturnValue(false),
     ...overrides,
   } as unknown as Config;
 

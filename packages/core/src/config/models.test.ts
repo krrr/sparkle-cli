@@ -595,15 +595,6 @@ describe('isActiveModel', () => {
     expect(isActiveModel(DEFAULT_GEMINI_FLASH_MODEL)).toBe(true);
   });
 
-  it('should return true for Gemma 4 models when experimentalGemma is not provided (defaults to true)', () => {
-    expect(isActiveModel(GEMMA_4_31B_IT_MODEL)).toBe(true);
-    expect(isActiveModel(GEMMA_4_26B_A4B_IT_MODEL)).toBe(true);
-    expect(isActiveModel(GEMMA_4_31B_IT_MODEL, false, false, true)).toBe(true);
-    expect(isActiveModel(GEMMA_4_26B_A4B_IT_MODEL, false, false, true)).toBe(
-      true,
-    );
-  });
-
   it('should return false for Gemini 3.1 models when Gemini 3.1 is not launched', () => {
     expect(isActiveModel(PREVIEW_GEMINI_3_1_MODEL)).toBe(false);
   });
@@ -663,17 +654,13 @@ describe('isActiveModel', () => {
   });
 
   it('should return false for Gemini 3.1 preview models when useGemini3_1 is false', () => {
-    expect(isActiveModel(PREVIEW_GEMINI_3_1_MODEL, false, false, true)).toBe(
-      false,
-    );
-    expect(isActiveModel(PREVIEW_GEMINI_3_1_MODEL, false, false, false)).toBe(
-      false,
-    );
+    expect(isActiveModel(PREVIEW_GEMINI_3_1_MODEL, false, false)).toBe(false);
+    expect(isActiveModel(PREVIEW_GEMINI_3_1_MODEL, false, false)).toBe(false);
     expect(
-      isActiveModel(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL, false, false, true),
+      isActiveModel(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL, false, false),
     ).toBe(false);
     expect(
-      isActiveModel(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL, false, false, false),
+      isActiveModel(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL, false, false),
     ).toBe(false);
     if (PREVIEW_GEMINI_FLASH_LITE_MODEL !== 'none') {
       expect(isActiveModel(PREVIEW_GEMINI_FLASH_LITE_MODEL, false, false)).toBe(

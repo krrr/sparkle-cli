@@ -1000,7 +1000,6 @@ export async function loadCliConfig(
     skillsSupport: settings.skills?.enabled ?? true,
     disabledSkills: settings.skills?.disabled,
     experimentalAutoMemory: settings.experimental?.autoMemory,
-    experimentalGemma: settings.experimental?.gemma,
     contextManagement,
     modelSteering: settings.experimental?.modelSteering,
     topicUpdateNarration:

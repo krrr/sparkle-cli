@@ -2724,32 +2724,6 @@ describe('loadCliConfig approval mode', () => {
   });
 });
 
-describe('loadCliConfig experimental.gemma', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
-    vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
-    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.restoreAllMocks();
-  });
-
-  it('should load experimental.gemma setting from merged settings', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      experimental: {
-        gemma: true,
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getExperimentalGemma()).toBe(true);
-  });
-});
-
 describe('loadCliConfig fileFiltering', () => {
   const originalArgv = process.argv;
 
