@@ -56,7 +56,6 @@ import {
 } from '../tools/shellBackgroundTools.js';
 import { GeminiClient } from '../core/client.js';
 import { BaseLlmClient } from '../core/baseLlmClient.js';
-import { LocalLiteRtLmClient } from '../core/localLiteRtLmClient.js';
 import type { HookDefinition, HookEventName } from '../hooks/types.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { GitService } from '../services/gitService.js';
@@ -218,16 +217,6 @@ export interface TelemetrySettings {
 
 export interface OutputSettings {
   format?: OutputFormat;
-}
-
-export interface GemmaModelRouterSettings {
-  enabled?: boolean;
-  autoStartServer?: boolean;
-  binaryPath?: string;
-  classifier?: {
-    host?: string;
-    model?: string;
-  };
 }
 
 export interface ADKSettings {
@@ -676,7 +665,6 @@ export interface ConfigParameters {
   directWebFetch?: boolean;
   policyUpdateConfirmationRequest?: PolicyUpdateConfirmationRequest;
   output?: OutputSettings;
-  gemmaModelRouter?: GemmaModelRouterSettings;
   adk?: ADKSettings;
   disableModelRouterForAuth?: AuthType[];
   retryFetchErrors?: boolean;
@@ -792,7 +780,6 @@ export class Config implements McpContext, AgentLoopContext {
   private _sandboxManager: SandboxManager;
   private readonly _sandboxPolicyManager: SandboxPolicyManager;
   private baseLlmClient!: BaseLlmClient;
-  private localLiteRtLmClient?: LocalLiteRtLmClient;
   private modelRouterService: ModelRouterService;
   private readonly modelAvailabilityService: ModelAvailabilityService;
   private readonly fileFiltering: {
@@ -900,7 +887,6 @@ export class Config implements McpContext, AgentLoopContext {
     | undefined;
   private readonly outputSettings: OutputSettings;
 
-  private readonly gemmaModelRouter: GemmaModelRouterSettings;
   private readonly agentSessionNoninteractiveEnabled: boolean;
   private readonly agentSessionInteractiveEnabled: boolean;
   private readonly agentSessionSubagentEnabled: boolean;
@@ -1321,17 +1307,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.outputSettings = {
       format: params.output?.format ?? OutputFormat.TEXT,
     };
-    this.gemmaModelRouter = {
-      enabled: params.gemmaModelRouter?.enabled ?? false,
-      autoStartServer: params.gemmaModelRouter?.autoStartServer ?? true,
-      binaryPath: params.gemmaModelRouter?.binaryPath ?? '',
-      classifier: {
-        host:
-          params.gemmaModelRouter?.classifier?.host ?? 'http://localhost:9379',
-        model:
-          params.gemmaModelRouter?.classifier?.model ?? 'gemma3-1b-gpu-custom',
-      },
-    };
 
     this.agentSessionNoninteractiveEnabled =
       params.adk?.agentSessionNoninteractiveEnabled ?? false;
@@ -1660,13 +1635,6 @@ export class Config implements McpContext, AgentLoopContext {
       }
     }
     return this.baseLlmClient;
-  }
-
-  getLocalLiteRtLmClient(): LocalLiteRtLmClient {
-    if (!this.localLiteRtLmClient) {
-      this.localLiteRtLmClient = new LocalLiteRtLmClient(this);
-    }
-    return this.localLiteRtLmClient;
   }
 
   get promptId(): string {
@@ -3650,14 +3618,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getEnableHooksUI(): boolean {
     return this.enableHooksUI;
-  }
-
-  getGemmaModelRouterEnabled(): boolean {
-    return this.gemmaModelRouter.enabled ?? false;
-  }
-
-  getGemmaModelRouterSettings(): GemmaModelRouterSettings {
-    return this.gemmaModelRouter;
   }
 
   getAgentSessionNoninteractiveEnabled(): boolean {

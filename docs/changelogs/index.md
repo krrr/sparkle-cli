@@ -135,8 +135,7 @@ on GitHub.
   ([#25395](https://github.com/google-gemini/gemini-cli/pull/25395) by
   @ruomengz, [#25716](https://github.com/google-gemini/gemini-cli/pull/25716) by
   @SandyTao520).
-- **UX and Local Models:** Enabled topic update narrations by default and
-  streamlined Gemma local model setup with `gemini gemma`
+- **UX Improvements:** Enabled topic update narrations by default
   ([#25586](https://github.com/google-gemini/gemini-cli/pull/25586) by
   @gundermanc, [#25498](https://github.com/google-gemini/gemini-cli/pull/25498)
   by @Samee24).

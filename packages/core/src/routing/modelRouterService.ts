@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GemmaClassifierStrategy } from './strategies/gemmaClassifierStrategy.js';
 import type { Config } from '../config/config.js';
 import type {
   RoutingContext,
@@ -46,11 +45,6 @@ export class ModelRouterService {
     // Approval mode is next.
     strategies.push(new ApprovalModeStrategy());
 
-    // Then, if enabled, the Gemma classifier is used.
-    if (this.config.getGemmaModelRouterSettings()?.enabled) {
-      strategies.push(new GemmaClassifierStrategy());
-    }
-
     // The generic classifier is next.
     strategies.push(new ClassifierStrategy());
 
@@ -90,7 +84,6 @@ export class ModelRouterService {
         context,
         this.config,
         this.config.getBaseLlmClient(),
-        this.config.getLocalLiteRtLmClient(),
       );
 
       debugLogger.debug(

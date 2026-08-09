@@ -10,7 +10,6 @@ import type { RoutingContext } from '../routingStrategy.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import type { Config } from '../../config/config.js';
 import type { ModelAvailabilityService } from '../../availability/modelAvailabilityService.js';
-import type { LocalLiteRtLmClient } from '../../core/localLiteRtLmClient.js';
 import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
@@ -33,7 +32,6 @@ describe('FallbackStrategy', () => {
   const strategy = new FallbackStrategy();
   const mockContext = {} as RoutingContext;
   const mockClient = {} as BaseLlmClient;
-  const mockLocalLiteRtLmClient = {} as LocalLiteRtLmClient;
   let mockService: ModelAvailabilityService;
   let mockConfig: Config;
 
@@ -53,12 +51,7 @@ describe('FallbackStrategy', () => {
     // Mock snapshot to return available
     vi.mocked(mockService.snapshot).mockReturnValue({ available: true });
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockClient,
-      mockLocalLiteRtLmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockClient);
     expect(decision).toBeNull();
     // Should check availability of the resolved model (DEFAULT_GEMINI_MODEL)
     expect(mockService.snapshot).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
@@ -76,12 +69,7 @@ describe('FallbackStrategy', () => {
       skipped: [],
     });
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockClient,
-      mockLocalLiteRtLmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockClient);
     expect(decision).toBeNull();
   });
 
@@ -98,12 +86,7 @@ describe('FallbackStrategy', () => {
       skipped: [{ model: DEFAULT_GEMINI_MODEL, reason: 'quota' }],
     });
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockClient,
-      mockLocalLiteRtLmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).not.toBeNull();
     expect(decision?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
@@ -118,12 +101,7 @@ describe('FallbackStrategy', () => {
     vi.mocked(mockService.snapshot).mockReturnValue({ available: true });
     vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_GEMINI_MODEL_AUTO);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockClient,
-      mockLocalLiteRtLmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).toBeNull();
     // Important: check that it queried snapshot with the RESOLVED model, not 'auto'
@@ -144,7 +122,6 @@ describe('FallbackStrategy', () => {
       contextWithRequestedModel,
       mockConfig,
       mockClient,
-      mockLocalLiteRtLmClient,
     );
 
     expect(decision).toBeNull();

@@ -746,13 +746,13 @@ describe('SettingsUtils', () => {
             description: 'Experimental settings',
             showInDialog: false,
             properties: {
-              gemmaModelRouter: {
+              adk: {
                 type: 'object',
-                label: 'Gemma Model Router',
+                label: 'ADK',
                 category: 'Experimental',
                 requiresRestart: true,
                 default: {},
-                description: 'Gemma model router settings',
+                description: 'ADK settings',
                 showInDialog: true,
               },
             },
@@ -762,7 +762,7 @@ describe('SettingsUtils', () => {
         // Test with empty object (default)
         const emptySettings = makeMockSettings({});
         const emptyResult = getDisplayValue(
-          'experimental.gemmaModelRouter',
+          'experimental.adk',
           emptySettings,
           emptySettings,
         );
@@ -772,14 +772,10 @@ describe('SettingsUtils', () => {
         // Test with object containing values
         const settings = makeMockSettings({
           experimental: {
-            gemmaModelRouter: { enabled: true, host: 'localhost' },
+            adk: { enabled: true, host: 'localhost' },
           },
         });
-        const result = getDisplayValue(
-          'experimental.gemmaModelRouter',
-          settings,
-          settings,
-        );
+        const result = getDisplayValue('experimental.adk', settings, settings);
         expect(result).toBe('{"enabled":true,"host":"localhost"}*');
         expect(result).not.toContain('[object Object]');
       });
