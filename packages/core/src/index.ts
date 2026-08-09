@@ -21,7 +21,6 @@ export * from './policy/config.js';
 export * from './policy/integrity.js';
 export * from './config/extensions/integrity.js';
 export * from './config/extensions/integrityTypes.js';
-export * from './billing/index.js';
 export * from './confirmation-bus/types.js';
 export * from './confirmation-bus/message-bus.js';
 
@@ -256,8 +255,6 @@ export { OAuthUtils } from './mcp/oauth-utils.js';
 
 // Export telemetry functions
 export * from './telemetry/index.js';
-export * from './telemetry/billingEvents.js';
-export { logBillingEvent } from './telemetry/loggers.js';
 export * from './telemetry/constants.js';
 export { createSessionId } from './utils/session.js';
 export * from './utils/compatibility.js';

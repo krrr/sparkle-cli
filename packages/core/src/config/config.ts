@@ -24,7 +24,6 @@ import {
   type ContentGenerator,
   type ContentGeneratorConfig,
 } from '../core/contentGenerator.js';
-import type { OverageStrategy } from '../billing/billing.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { ResourceRegistry } from '../resources/resource-registry.js';
 import { ToolRegistry } from '../tools/tool-registry.js';
@@ -731,9 +730,6 @@ export interface ConfigParameters {
     disabledSkills?: string[];
     agents?: AgentSettings;
   }>;
-  billing?: {
-    overageStrategy?: OverageStrategy;
-  };
   logRagSnippets?: boolean;
 }
 
@@ -835,7 +831,6 @@ export class Config implements McpContext, AgentLoopContext {
   fallbackModelHandler?: FallbackModelHandler;
   validationHandler?: ValidationHandler;
   private quotaErrorOccurred: boolean = false;
-  private creditsNotificationShown: boolean = false;
   private modelQuotas: Map<
     string,
     { remaining: number; limit: number; resetTime?: string }
@@ -941,10 +936,6 @@ export class Config implements McpContext, AgentLoopContext {
         agents?: AgentSettings;
       }>)
     | undefined;
-
-  private readonly billing: {
-    overageStrategy: OverageStrategy;
-  };
 
   private readonly enableAgents: boolean;
   private agents: AgentSettings;
@@ -1368,10 +1359,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.onModelChange = params.onModelChange;
     this.onReload = params.onReload;
 
-    this.billing = {
-      overageStrategy: params.billing?.overageStrategy ?? 'ask',
-    };
-
     if (params.contextFileName) {
       setGeminiMdFilename(params.contextFileName);
     }
@@ -1793,7 +1780,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.lastModeSwitchTime = performance.now();
     this.compressionTruncationCounter = 0;
     this.quotaErrorOccurred = false;
-    this.creditsNotificationShown = false;
     this.modelAvailabilityService.reset();
     this.modelQuotas.clear();
     this.lastRetrievedQuota = undefined;
@@ -1941,12 +1927,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.modelAvailabilityService.resetTurn();
   }
 
-  /** Resets billing state (overageStrategy, creditsNotificationShown) once per user prompt. */
-  resetBillingTurnState(overageStrategy?: OverageStrategy): void {
-    this.creditsNotificationShown = false;
-    this.billing.overageStrategy = overageStrategy ?? 'ask';
-  }
-
   getMaxSessionTurns(): number {
     return this.maxSessionTurns;
   }
@@ -1957,14 +1937,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getQuotaErrorOccurred(): boolean {
     return this.quotaErrorOccurred;
-  }
-
-  setCreditsNotificationShown(value: boolean): void {
-    this.creditsNotificationShown = value;
-  }
-
-  getCreditsNotificationShown(): boolean {
-    return this.creditsNotificationShown;
   }
 
   setQuota(
@@ -2223,10 +2195,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   setHasAccessToPreviewModel(hasAccess: boolean | null): void {
     this.hasAccessToPreviewModel = hasAccess;
-  }
-
-  async refreshAvailableCredits(): Promise<void> {
-    return;
   }
 
   async refreshUserQuota(): Promise<RetrieveUserQuotaResponse | undefined> {
@@ -2772,19 +2740,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getTelemetryOutfile(): string | undefined {
     return this.telemetrySettings.outfile;
-  }
-
-  getBillingSettings(): { overageStrategy: OverageStrategy } {
-    return this.billing;
-  }
-
-  /**
-   * Updates the overage strategy at runtime.
-   * Used to switch from 'ask' to 'always' after the user accepts credits
-   * via the overage dialog, so subsequent API calls auto-include credits.
-   */
-  setOverageStrategy(strategy: OverageStrategy): void {
-    this.billing.overageStrategy = strategy;
   }
 
   getTelemetryUseCollector(): boolean {

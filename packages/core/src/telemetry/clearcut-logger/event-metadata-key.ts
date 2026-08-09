@@ -666,28 +666,6 @@ export enum EventMetadataKey {
   GEMINI_CLI_NETWORK_RETRY_ERROR_TYPE = 182,
 
   // ==========================================================================
-  // Billing / AI Credits Event Keys
-  // ==========================================================================
-
-  // Logs the model associated with a billing event.
-  GEMINI_CLI_BILLING_MODEL = 185,
-
-  // Logs the number of AI credits consumed in a request.
-  GEMINI_CLI_BILLING_CREDITS_CONSUMED = 186,
-
-  // Logs the remaining AI credits after a request.
-  GEMINI_CLI_BILLING_CREDITS_REMAINING = 187,
-
-  // Logs the overage option selected by the user (e.g. use_credits, use_fallback, manage, stop).
-  GEMINI_CLI_BILLING_SELECTED_OPTION = 188,
-
-  // Logs the user's credit balance when the overage menu was shown.
-  GEMINI_CLI_BILLING_CREDIT_BALANCE = 189,
-
-  // Logs the source of a credit purchase click (e.g. overage_menu, empty_wallet_menu, manage).
-  GEMINI_CLI_BILLING_PURCHASE_SOURCE = 190,
-
-  // ==========================================================================
   // Gemini Enterprise (GE) Event Keys
   // ==========================================================================
 

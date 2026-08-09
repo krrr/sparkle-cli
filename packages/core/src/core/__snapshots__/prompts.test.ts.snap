@@ -196,8 +196,7 @@ ONLY use the built-in \`exit_plan_mode\` tool to present the plan for formal app
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > ApprovalMode in System Prompt > Approved Plan in Plan Mode > should include approved plan path when set in config 1`] = `
@@ -402,8 +401,7 @@ An approved plan is available for this task at \`../plans/feature-x.md\`.
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > ApprovalMode in System Prompt > should NOT include approval mode instructions for DEFAULT mode 1`] = `
@@ -517,7 +515,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -722,8 +719,7 @@ ONLY use the built-in \`exit_plan_mode\` tool to present the plan for formal app
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should append userMemory with separator when provided 1`] = `
@@ -907,7 +903,6 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Contextual Instructions (GEMINI.md)
 The following content is loaded from local and global configuration files.
@@ -1076,8 +1071,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should handle CodebaseInvestigator (enabled=true) 1`] = `
@@ -1229,8 +1223,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should handle git instructions when isGitRepository=false 1`] = `
@@ -1344,7 +1337,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -1464,7 +1456,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -1593,7 +1584,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -1726,7 +1716,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -1928,8 +1917,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include correct sandbox instructions for SANDBOX=sandbox-exec 1`] = `
@@ -2113,7 +2101,6 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # macOS Seatbelt
     
@@ -2301,7 +2288,6 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Sandbox
       
@@ -2488,8 +2474,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include mandate to distinguish between Directives and Inquiries 1`] = `
@@ -2672,8 +2657,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include modern approved plan instructions with completion in DEFAULT mode when approvedPlanPath is set 1`] = `
@@ -2850,8 +2834,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include planning phase suggestion when enter_plan_mode tool is enabled 1`] = `
@@ -3002,8 +2985,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include sub-agents in XML for preview models when invoke_agent tool is enabled 1`] = `
@@ -3186,8 +3168,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should include the TASK MANAGEMENT PROTOCOL in legacy prompt when task tracker is enabled 1`] = `
@@ -3314,7 +3295,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -3516,8 +3496,7 @@ You are operating with a persistent file-based task tracking system located at \
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should match snapshot on Windows 1`] = `
@@ -3631,7 +3610,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -3752,7 +3730,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -3955,8 +3932,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should return the base prompt when userMemory is whitespace only 1`] = `
@@ -4139,8 +4115,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should return the interactive avoidance prompt when in non-interactive mode 1`] = `
@@ -4253,7 +4228,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.
@@ -4442,8 +4416,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should use chatty system prompt for preview model 1`] = `
@@ -4626,8 +4599,7 @@ Operate using a **Research -> Strategy -> Execution** lifecycle. For the Executi
 - **Confirmation Protocol:** If a tool call is declined or cancelled, respect the decision immediately. Do not re-attempt the action or "negotiate" for the same tool call unless the user explicitly directs you to. Offer an alternative technical path if possible.
 
 ## Interaction Details
-- **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command."
+- **Help Command:** The user can use '/help' to display help information."
 `;
 
 exports[`Core System Prompt (prompts.ts) > should use legacy system prompt for non-preview model 1`] = `
@@ -4741,7 +4713,6 @@ IT IS CRITICAL TO FOLLOW THESE GUIDELINES TO AVOID EXCESSIVE TOKEN CONSUMPTION.
 
 ## Interaction Details
 - **Help Command:** The user can use '/help' to display help information.
-- **Feedback:** To report a bug or provide feedback, please use the /bug command.
 
 # Outside of Sandbox
 You are running outside of a sandbox container, directly on the user's system. For critical commands that are particularly likely to modify the user's system outside of the project directory or system temp directory, as you explain the command to the user (per the Explain Critical Commands rule above), also remind the user to consider enabling sandboxing.

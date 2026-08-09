@@ -10,8 +10,6 @@ import type { UserTierId } from '@google/gemini-cli-core';
 import type {
   ProQuotaDialogRequest,
   ValidationDialogRequest,
-  OverageMenuDialogRequest,
-  EmptyWalletDialogRequest,
 } from './UIStateContext.js';
 
 export interface QuotaState {
@@ -19,8 +17,6 @@ export interface QuotaState {
   stats?: QuotaStats;
   proQuotaRequest?: ProQuotaDialogRequest | null;
   validationRequest?: ValidationDialogRequest | null;
-  overageMenuRequest?: OverageMenuDialogRequest | null;
-  emptyWalletRequest?: EmptyWalletDialogRequest | null;
 }
 
 export const QuotaContext = createContext<QuotaState | null>(null);

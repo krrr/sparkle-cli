@@ -19,8 +19,6 @@ import { EditorSettingsDialog } from './EditorSettingsDialog.js';
 import { PrivacyNotice } from '../privacy/PrivacyNotice.js';
 import { ProQuotaDialog } from './ProQuotaDialog.js';
 import { ValidationDialog } from './ValidationDialog.js';
-import { OverageMenuDialog } from './OverageMenuDialog.js';
-import { EmptyWalletDialog } from './EmptyWalletDialog.js';
 import { relaunchApp } from '../../utils/processUtils.js';
 import { SessionBrowser } from './SessionBrowser.js';
 import { PermissionsModifyTrustDialog } from './PermissionsModifyTrustDialog.js';
@@ -96,28 +94,6 @@ export const DialogManager = ({
         }
         learnMoreUrl={quotaState.validationRequest.learnMoreUrl}
         onChoice={uiActions.handleValidationChoice}
-      />
-    );
-  }
-  if (quotaState.overageMenuRequest) {
-    return (
-      <OverageMenuDialog
-        failedModel={quotaState.overageMenuRequest.failedModel}
-        fallbackModel={quotaState.overageMenuRequest.fallbackModel}
-        resetTime={quotaState.overageMenuRequest.resetTime}
-        creditBalance={quotaState.overageMenuRequest.creditBalance}
-        onChoice={uiActions.handleOverageMenuChoice}
-      />
-    );
-  }
-  if (quotaState.emptyWalletRequest) {
-    return (
-      <EmptyWalletDialog
-        failedModel={quotaState.emptyWalletRequest.failedModel}
-        fallbackModel={quotaState.emptyWalletRequest.fallbackModel}
-        resetTime={quotaState.emptyWalletRequest.resetTime}
-        onGetCredits={quotaState.emptyWalletRequest.onGetCredits}
-        onChoice={uiActions.handleEmptyWalletChoice}
       />
     );
   }

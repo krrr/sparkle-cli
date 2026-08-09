@@ -51,7 +51,6 @@ import {
   type IdeInfo,
   type IdeContext,
   type UserTierId,
-  type GeminiUserTier,
   type UserFeedbackPayload,
   type HookSystemMessagePayload,
   type AgentDefinition,
@@ -84,8 +83,6 @@ import {
   type AgentsDiscoveredPayload,
   ChangeAuthRequestedError,
   buildUserSteeringHintPrompt,
-  logBillingEvent,
-  ApiKeyUpdatedEvent,
   LegacyAgentProtocol,
   type InjectionSource,
 } from '@google/gemini-cli-core';
@@ -443,9 +440,6 @@ export const AppContainer = (props: AppContainerProps) => {
       ? { remaining, limit, resetTime }
       : undefined;
   });
-  const [paidTier, setPaidTier] = useState<GeminiUserTier | undefined>(
-    undefined,
-  );
 
   const [isConfigInitialized, setConfigInitialized] = useState(false);
 
@@ -732,16 +726,10 @@ export const AppContainer = (props: AppContainerProps) => {
     handleProQuotaChoice,
     validationRequest,
     handleValidationChoice,
-    // G1 AI Credits
-    overageMenuRequest,
-    handleOverageMenuChoice,
-    emptyWalletRequest,
-    handleEmptyWalletChoice,
   } = useQuotaAndFallback({
     config,
     historyManager,
     userTier,
-    paidTier,
     settings,
     setModelSwitchedFromQuotaError,
     onShowAuthSelection: () => setAuthState(AuthState.Updating),
@@ -786,18 +774,12 @@ export const AppContainer = (props: AppContainerProps) => {
   const handleAuthSelect = useCallback(
     async (authType: AuthType | undefined, scope: LoadableSettingScope) => {
       if (authType) {
-        const previousAuthType =
-          config.getContentGeneratorConfig()?.authType ?? 'unknown';
         setAuthContext({});
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
         try {
           await config.refreshAuth(authType);
           setAuthState(AuthState.Authenticated);
-          logBillingEvent(
-            config,
-            new ApiKeyUpdatedEvent(previousAuthType, authType),
-          );
         } catch (e) {
           if (e instanceof ChangeAuthRequestedError) {
             return;
@@ -845,7 +827,6 @@ export const AppContainer = (props: AppContainerProps) => {
     // Only sync when not currently authenticating
     if (authState === AuthState.Authenticated) {
       setUserTier(config.getUserTier());
-      setPaidTier(config.getUserPaidTier());
     }
   }, [config, authState]);
 
@@ -2157,8 +2138,6 @@ export const AppContainer = (props: AppContainerProps) => {
     showIdeRestartPrompt ||
     !!proQuotaRequest ||
     !!validationRequest ||
-    !!overageMenuRequest ||
-    !!emptyWalletRequest ||
     isSessionBrowserOpen ||
     authState === AuthState.AwaitingApiKeyInput ||
     isAwaitingLoginRestart ||
@@ -2182,8 +2161,6 @@ export const AppContainer = (props: AppContainerProps) => {
     hasLoopDetectionConfirmationRequest ||
     !!proQuotaRequest ||
     !!validationRequest ||
-    !!overageMenuRequest ||
-    !!emptyWalletRequest ||
     !!customDialog;
 
   const loadingPhrases = settings.merged.ui.loadingPhrases;
@@ -2368,18 +2345,8 @@ export const AppContainer = (props: AppContainerProps) => {
       stats: quotaStats,
       proQuotaRequest,
       validationRequest,
-      // G1 AI Credits dialog state
-      overageMenuRequest,
-      emptyWalletRequest,
     }),
-    [
-      userTier,
-      quotaStats,
-      proQuotaRequest,
-      validationRequest,
-      overageMenuRequest,
-      emptyWalletRequest,
-    ],
+    [userTier, quotaStats, proQuotaRequest, validationRequest],
   );
 
   const uiState: UIState = useMemo(
@@ -2653,9 +2620,6 @@ export const AppContainer = (props: AppContainerProps) => {
       handleClearScreen,
       handleProQuotaChoice,
       handleValidationChoice,
-      // G1 AI Credits handlers
-      handleOverageMenuChoice,
-      handleEmptyWalletChoice,
       openSessionBrowser,
       closeSessionBrowser,
       handleResumeSession,
@@ -2746,8 +2710,6 @@ export const AppContainer = (props: AppContainerProps) => {
       handleClearScreen,
       handleProQuotaChoice,
       handleValidationChoice,
-      handleOverageMenuChoice,
-      handleEmptyWalletChoice,
       openSessionBrowser,
       closeSessionBrowser,
       handleResumeSession,

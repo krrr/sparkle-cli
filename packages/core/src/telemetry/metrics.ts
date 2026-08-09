@@ -48,8 +48,6 @@ const EVENT_HOOK_CALL_COUNT = 'gemini_cli.hook_call.count';
 const EVENT_HOOK_CALL_LATENCY = 'gemini_cli.hook_call.latency';
 const KEYCHAIN_AVAILABILITY_COUNT = 'gemini_cli.keychain.availability.count';
 const TOKEN_STORAGE_TYPE_COUNT = 'gemini_cli.token_storage.type.count';
-const OVERAGE_OPTION_COUNT = 'gemini_cli.overage_option.count';
-const CREDIT_PURCHASE_COUNT = 'gemini_cli.credit_purchase.count';
 const EVENT_ONBOARDING_START = 'gemini_cli.onboarding.start';
 const EVENT_ONBOARDING_SUCCESS = 'gemini_cli.onboarding.success';
 const EVENT_ONBOARDING_DURATION_MS = 'gemini_cli.onboarding.duration';
@@ -297,26 +295,6 @@ const COUNTER_DEFINITIONS = {
     attributes: {} as {
       type: string;
       forced: boolean;
-    },
-  },
-  [OVERAGE_OPTION_COUNT]: {
-    description: 'Counts overage option selections.',
-    valueType: ValueType.INT,
-    assign: (c: Counter) => (overageOptionCounter = c),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    attributes: {} as {
-      selected_option: string;
-      model: string;
-    },
-  },
-  [CREDIT_PURCHASE_COUNT]: {
-    description: 'Counts credit purchase link clicks.',
-    valueType: ValueType.INT,
-    assign: (c: Counter) => (creditPurchaseCounter = c),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    attributes: {} as {
-      source: string;
-      model: string;
     },
   },
   [BROWSER_AGENT_CONNECTION_FAILURE_COUNT]: {
@@ -792,8 +770,6 @@ let hookCallCounter: Counter | undefined;
 let hookCallLatencyHistogram: Histogram | undefined;
 let keychainAvailabilityCounter: Counter | undefined;
 let tokenStorageTypeCounter: Counter | undefined;
-let overageOptionCounter: Counter | undefined;
-let creditPurchaseCounter: Counter | undefined;
 let onboardingStartCounter: Counter | undefined;
 let onboardingSuccessCounter: Counter | undefined;
 let onboardingDurationHistogram: Histogram | undefined;
@@ -1617,33 +1593,8 @@ export function recordTokenStorageInitialization(
 }
 
 /**
- * Records a metric for an overage option selection.
+ * Records a metric for a browser agent connection.
  */
-export function recordOverageOptionSelected(
-  config: Config,
-  attributes: MetricDefinitions[typeof OVERAGE_OPTION_COUNT]['attributes'],
-): void {
-  if (!overageOptionCounter || !isMetricsInitialized) return;
-  overageOptionCounter.add(1, {
-    ...baseMetricDefinition.getCommonAttributes(config),
-    ...attributes,
-  });
-}
-
-/**
- * Records a metric for a credit purchase link click.
- */
-export function recordCreditPurchaseClick(
-  config: Config,
-  attributes: MetricDefinitions[typeof CREDIT_PURCHASE_COUNT]['attributes'],
-): void {
-  if (!creditPurchaseCounter || !isMetricsInitialized) return;
-  creditPurchaseCounter.add(1, {
-    ...baseMetricDefinition.getCommonAttributes(config),
-    ...attributes,
-  });
-}
-
 export function recordBrowserAgentConnection(
   config: Config,
   durationMs: number,

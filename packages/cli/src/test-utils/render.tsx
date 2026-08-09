@@ -574,8 +574,6 @@ const mockUIActions: UIActions = {
   handleClearScreen: vi.fn(),
   handleProQuotaChoice: vi.fn(),
   handleValidationChoice: vi.fn(),
-  handleOverageMenuChoice: vi.fn(),
-  handleEmptyWalletChoice: vi.fn(),
   setQueueErrorMessage: vi.fn(),
   addMessage: vi.fn(),
   popAllMessages: vi.fn(),
@@ -678,8 +676,6 @@ export const renderWithProviders = async (
     stats: undefined,
     proQuotaRequest: null,
     validationRequest: null,
-    overageMenuRequest: null,
-    emptyWalletRequest: null,
     ...providedQuotaState,
   };
 

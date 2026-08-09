@@ -267,8 +267,6 @@ const renderComposer = async (
     stats: undefined,
     proQuotaRequest: null,
     validationRequest: null,
-    overageMenuRequest: null,
-    emptyWalletRequest: null,
     ...quotaStateOverrides,
   };
 

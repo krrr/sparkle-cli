@@ -11,10 +11,7 @@ import type {
 } from '../types.js';
 import { MessageType } from '../types.js';
 import { formatDuration } from '../utils/formatters.js';
-import {
-  UserAccountManager,
-  getG1CreditBalance,
-} from '@google/gemini-cli-core';
+import { UserAccountManager } from '@google/gemini-cli-core';
 import {
   type CommandContext,
   type SlashCommand,
@@ -30,10 +27,8 @@ function getUserIdentity(context: CommandContext) {
   const userEmail = cachedAccount ?? undefined;
 
   const tier = context.services.agentContext?.config.getUserTierName();
-  const paidTier = context.services.agentContext?.config.getUserPaidTier();
-  const creditBalance = getG1CreditBalance(paidTier) ?? undefined;
 
-  return { selectedAuthType, userEmail, tier, creditBalance };
+  return { selectedAuthType, userEmail, tier };
 }
 
 async function defaultSessionView(context: CommandContext) {
@@ -48,8 +43,7 @@ async function defaultSessionView(context: CommandContext) {
   }
   const wallDuration = now.getTime() - sessionStartTime.getTime();
 
-  const { selectedAuthType, userEmail, tier, creditBalance } =
-    getUserIdentity(context);
+  const { selectedAuthType, userEmail, tier } = getUserIdentity(context);
   const currentModel = context.services.agentContext?.config.getModel();
 
   const statsItem: HistoryItemStats = {
@@ -59,14 +53,10 @@ async function defaultSessionView(context: CommandContext) {
     userEmail,
     tier,
     currentModel,
-    creditBalance,
   };
 
   if (context.services.agentContext?.config) {
-    const [quota] = await Promise.all([
-      context.services.agentContext.config.refreshUserQuota(),
-      context.services.agentContext.config.refreshAvailableCredits(),
-    ]);
+    const quota = await context.services.agentContext.config.refreshUserQuota();
     if (quota) {
       statsItem.quotas = quota;
       statsItem.pooledRemaining =
