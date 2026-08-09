@@ -6,17 +6,9 @@
 
 import { isDevelopment } from '../utils/installationInfo.js';
 import type { ICommandLoader } from './types.js';
-import {
-  CommandKind,
-  type SlashCommand,
-  type CommandContext,
-} from '../ui/commands/types.js';
-import type { MessageActionReturn, Config } from '@google/gemini-cli-core';
-import {
-  isNightly,
-  startupProfiler,
-  getAdminErrorMessage,
-} from '@google/gemini-cli-core';
+import { type SlashCommand } from '../ui/commands/types.js';
+import type { Config } from '@google/gemini-cli-core';
+import { isNightly, startupProfiler } from '@google/gemini-cli-core';
 import { aboutCommand } from '../ui/commands/aboutCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
 import { authCommand } from '../ui/commands/authCommand.js';
@@ -134,27 +126,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       exportSessionCommand,
       directoryCommand,
       editorCommand,
-      ...(this.config?.getExtensionsEnabled() === false
-        ? [
-            {
-              name: 'extensions',
-              description: 'Manage extensions',
-              kind: CommandKind.BUILT_IN,
-              autoExecute: false,
-              subCommands: [],
-              action: async (
-                _context: CommandContext,
-              ): Promise<MessageActionReturn> => ({
-                type: 'message',
-                messageType: 'error',
-                content: getAdminErrorMessage(
-                  'Extensions',
-                  this.config ?? undefined,
-                ),
-              }),
-            },
-          ]
-        : [extensionsCommand(this.config?.getEnableExtensionReloading())]),
+      extensionsCommand(this.config?.getEnableExtensionReloading()),
       helpCommand,
       footerCommand,
       shortcutsCommand,
@@ -163,25 +135,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       await ideCommand(),
       initCommand,
       ...(isNightlyBuild ? [oncallCommand] : []),
-      ...(this.config?.getMcpEnabled() === false
-        ? [
-            {
-              name: 'mcp',
-              description:
-                'Manage configured Model Context Protocol (MCP) servers',
-              kind: CommandKind.BUILT_IN,
-              autoExecute: false,
-              subCommands: [],
-              action: async (
-                _context: CommandContext,
-              ): Promise<MessageActionReturn> => ({
-                type: 'message',
-                messageType: 'error',
-                content: getAdminErrorMessage('MCP', this.config ?? undefined),
-              }),
-            },
-          ]
-        : [mcpCommand]),
+      mcpCommand,
       memoryCommand(this.config),
       modelCommand,
       ...(this.config?.getFolderTrust() ? [permissionsCommand] : []),
@@ -197,29 +151,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       statsCommand,
       themeCommand,
       toolsCommand,
-      ...(this.config?.isSkillsSupportEnabled()
-        ? this.config?.getSkillManager()?.isAdminEnabled() === false
-          ? [
-              {
-                name: 'skills',
-                description: 'Manage agent skills',
-                kind: CommandKind.BUILT_IN,
-                autoExecute: false,
-                subCommands: [],
-                action: async (
-                  _context: CommandContext,
-                ): Promise<MessageActionReturn> => ({
-                  type: 'message',
-                  messageType: 'error',
-                  content: getAdminErrorMessage(
-                    'Agent skills',
-                    this.config ?? undefined,
-                  ),
-                }),
-              },
-            ]
-          : [skillsCommand]
-        : []),
+      ...(this.config?.isSkillsSupportEnabled() ? [skillsCommand] : []),
       settingsCommand,
       gemmaStatusCommand,
       tasksCommand,

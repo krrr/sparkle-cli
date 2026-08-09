@@ -59,7 +59,7 @@ describe('deferred', () => {
       expect(mockExit).not.toHaveBeenCalled();
     });
 
-    it('should execute the deferred command if enabled', async () => {
+    it('should execute the deferred command', async () => {
       const mockHandler = vi.fn();
       setDeferredCommand({
         handler: mockHandler,
@@ -67,87 +67,10 @@ describe('deferred', () => {
         commandName: 'mcp',
       });
 
-      const settings = createMockSettings({
-        merged: { admin: { mcp: { enabled: true } } },
-      }).merged;
+      const settings = createMockSettings().merged;
       await runDeferredCommand(settings);
       expect(mockHandler).toHaveBeenCalled();
       expect(mockRunExitCleanup).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(ExitCodes.SUCCESS);
-    });
-
-    it('should exit with FATAL_CONFIG_ERROR if MCP is disabled', async () => {
-      setDeferredCommand({
-        handler: vi.fn(),
-        argv: {} as ArgumentsCamelCase,
-        commandName: 'mcp',
-      });
-
-      const settings = createMockSettings({
-        merged: { admin: { mcp: { enabled: false } } },
-      }).merged;
-      await runDeferredCommand(settings);
-
-      expect(mockCoreEvents.emitFeedback).toHaveBeenCalledWith(
-        'error',
-        'MCP is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-      );
-      expect(mockRunExitCleanup).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(ExitCodes.FATAL_CONFIG_ERROR);
-    });
-
-    it('should exit with FATAL_CONFIG_ERROR if extensions are disabled', async () => {
-      setDeferredCommand({
-        handler: vi.fn(),
-        argv: {} as ArgumentsCamelCase,
-        commandName: 'extensions',
-      });
-
-      const settings = createMockSettings({
-        merged: { admin: { extensions: { enabled: false } } },
-      }).merged;
-      await runDeferredCommand(settings);
-
-      expect(mockCoreEvents.emitFeedback).toHaveBeenCalledWith(
-        'error',
-        'Extensions is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-      );
-      expect(mockRunExitCleanup).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(ExitCodes.FATAL_CONFIG_ERROR);
-    });
-
-    it('should exit with FATAL_CONFIG_ERROR if skills are disabled', async () => {
-      setDeferredCommand({
-        handler: vi.fn(),
-        argv: {} as ArgumentsCamelCase,
-        commandName: 'skills',
-      });
-
-      const settings = createMockSettings({
-        merged: { admin: { skills: { enabled: false } } },
-      }).merged;
-      await runDeferredCommand(settings);
-
-      expect(mockCoreEvents.emitFeedback).toHaveBeenCalledWith(
-        'error',
-        'Agent skills is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-      );
-      expect(mockRunExitCleanup).toHaveBeenCalled();
-      expect(mockExit).toHaveBeenCalledWith(ExitCodes.FATAL_CONFIG_ERROR);
-    });
-
-    it('should execute if admin settings are undefined (default implicit enable)', async () => {
-      const mockHandler = vi.fn();
-      setDeferredCommand({
-        handler: mockHandler,
-        argv: {} as ArgumentsCamelCase,
-        commandName: 'mcp',
-      });
-
-      const settings = createMockSettings({}).merged; // No admin settings
-      await runDeferredCommand(settings);
-
-      expect(mockHandler).toHaveBeenCalled();
       expect(mockExit).toHaveBeenCalledWith(ExitCodes.SUCCESS);
     });
   });
@@ -175,21 +98,18 @@ describe('deferred', () => {
       await runDeferredCommand(createMockSettings().merged);
       expect(originalHandler).toHaveBeenCalledWith(
         expect.objectContaining({
-          settings: expect.objectContaining({
-            admin: expect.objectContaining({
-              extensions: expect.objectContaining({ enabled: true }),
-            }),
-          }),
+          settings: expect.anything(),
         }),
       );
       expect(mockExit).toHaveBeenCalledWith(ExitCodes.SUCCESS);
     });
 
     it('should use parentCommandName if provided', async () => {
+      const mockHandler = vi.fn();
       const commandModule: CommandModule = {
         command: 'subcommand',
         describe: 'sub command',
-        handler: vi.fn(),
+        handler: mockHandler,
       };
 
       const deferredModule = defer(commandModule, 'parent');
@@ -198,15 +118,10 @@ describe('deferred', () => {
       const deferredMcp = defer(commandModule, 'mcp');
       await deferredMcp.handler({} as ArgumentsCamelCase);
 
-      const mcpSettings = createMockSettings({
-        merged: { admin: { mcp: { enabled: false } } },
-      }).merged;
-      await runDeferredCommand(mcpSettings);
+      await runDeferredCommand(createMockSettings().merged);
 
-      expect(mockCoreEvents.emitFeedback).toHaveBeenCalledWith(
-        'error',
-        'MCP is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-      );
+      expect(mockHandler).toHaveBeenCalled();
+      expect(mockExit).toHaveBeenCalledWith(ExitCodes.SUCCESS);
     });
 
     it('should fallback to unknown if no parentCommandName is provided', async () => {
@@ -220,20 +135,8 @@ describe('deferred', () => {
       const deferredModule = defer(commandModule);
       await deferredModule.handler({} as ArgumentsCamelCase);
 
-      // Verify it runs even if all known commands are disabled,
-      // confirming it didn't capture 'mcp', 'extensions', or 'skills'
-      // and defaulted to 'unknown' (or something else safe).
-      const settings = createMockSettings({
-        merged: {
-          admin: {
-            mcp: { enabled: false },
-            extensions: { enabled: false },
-            skills: { enabled: false },
-          },
-        },
-      }).merged;
-
-      await runDeferredCommand(settings);
+      // Verify it runs even without a parent command name and defaulted to 'unknown'.
+      await runDeferredCommand(createMockSettings().merged);
 
       expect(mockHandler).toHaveBeenCalled();
       expect(mockExit).toHaveBeenCalledWith(ExitCodes.SUCCESS);

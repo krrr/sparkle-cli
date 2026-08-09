@@ -27,7 +27,7 @@ export class SkillCommandLoader implements ICommandLoader {
     }
 
     const skillManager = this.config.getSkillManager();
-    if (!skillManager || !skillManager.isAdminEnabled()) {
+    if (!skillManager) {
       return [];
     }
 

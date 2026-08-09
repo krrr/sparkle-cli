@@ -15,11 +15,7 @@ import {
 } from 'vitest';
 import { listMcpServers } from './list.js';
 import { loadSettings } from '../../config/settings.js';
-import {
-  createTransport,
-  debugLogger,
-  type AdminControlsSettings,
-} from '@google/gemini-cli-core';
+import { createTransport, debugLogger } from '@google/gemini-cli-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { ExtensionStorage } from '../../config/extensions/storage.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
@@ -309,56 +305,6 @@ describe('mcp list command', () => {
       expect.stringContaining(
         'extension-server (from test-extension): /ext/server  (stdio) - Connected',
       ),
-    );
-  });
-
-  it('should filter servers based on admin allowlist passed in settings', async () => {
-    const adminControls = {
-      strictModeDisabled: true,
-      mcpSetting: {
-        mcpEnabled: true,
-        mcpConfig: {
-          mcpServers: {
-            'allowed-server': { url: 'http://allowed' },
-          },
-        },
-      },
-    };
-
-    const mcpServers = {
-      'allowed-server': { command: 'cmd1' },
-      'forbidden-server': { command: 'cmd2' },
-    };
-
-    const mockSettings = createMockSettings({
-      mcpServers,
-      isTrusted: true,
-    });
-    // setRemoteAdminSettings is the correct way to set admin settings in tests
-    (
-      mockSettings as unknown as {
-        setRemoteAdminSettings: (controls: AdminControlsSettings) => void;
-      }
-    ).setRemoteAdminSettings(adminControls as unknown as AdminControlsSettings);
-
-    mockedLoadSettings.mockReturnValue(mockSettings);
-
-    mockClient.connect.mockResolvedValue(undefined);
-    mockClient.ping.mockResolvedValue(undefined);
-
-    await listMcpServers(mockSettings);
-
-    expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining('allowed-server'),
-    );
-    expect(debugLogger.log).not.toHaveBeenCalledWith(
-      expect.stringContaining('forbidden-server'),
-    );
-    expect(mockedCreateTransport).toHaveBeenCalledWith(
-      'allowed-server',
-      expect.objectContaining({ url: 'http://allowed' }), // Should use admin config
-      false,
-      expect.anything(),
     );
   });
 

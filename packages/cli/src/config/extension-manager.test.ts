@@ -252,7 +252,6 @@ describe('ExtensionManager', () => {
             folderTrust: { enabled: false }, // Disable trust for simplicity in this test
           },
           experimental: { extensionConfig: false },
-          admin: { extensions: { enabled: true }, mcp: { enabled: true } },
           hooksConfig: { enabled: true },
         } as unknown as MergedSettings,
         requestConsent: () => Promise.resolve(true),
@@ -286,7 +285,6 @@ describe('ExtensionManager', () => {
           folderTrust: { enabled: true },
         },
         experimental: { extensionConfig: false },
-        admin: { extensions: { enabled: true }, mcp: { enabled: true } },
         hooksConfig: { enabled: true },
       } as unknown as MergedSettings;
 
@@ -329,7 +327,6 @@ describe('ExtensionManager', () => {
           allowedExtensions: [realPath.replace(/\\/g, '\\\\')],
         },
         experimental: { extensionConfig: false },
-        admin: { extensions: { enabled: true }, mcp: { enabled: true } },
         hooksConfig: { enabled: true },
       } as unknown as MergedSettings;
 
@@ -359,7 +356,6 @@ describe('ExtensionManager', () => {
           allowedExtensions: [absolutePath.replace(/\\/g, '\\\\')],
         },
         experimental: { extensionConfig: false },
-        admin: { extensions: { enabled: true }, mcp: { enabled: true } },
         hooksConfig: { enabled: true },
       } as unknown as MergedSettings;
 

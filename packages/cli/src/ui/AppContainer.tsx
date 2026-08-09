@@ -271,8 +271,6 @@ export const AppContainer = (props: AppContainerProps) => {
   const isBackgroundTaskVisibleRef = useRef<boolean>(false);
   const backgroundTasksRef = useRef<Map<number, BackgroundTask>>(new Map());
 
-  const [adminSettingsChanged, setAdminSettingsChanged] = useState(false);
-
   const [expandedTools, setExpandedTools] = useState<Set<string>>(new Set());
 
   const toggleExpansion = useCallback((callId: string) => {
@@ -572,23 +570,14 @@ export const AppContainer = (props: AppContainerProps) => {
       setSettingsNonce((prev) => prev + 1);
     };
 
-    const handleAdminSettingsChanged = () => {
-      setAdminSettingsChanged(true);
-    };
-
     const handleAgentsDiscovered = (payload: AgentsDiscoveredPayload) => {
       setNewAgents(payload.agents);
     };
 
     coreEvents.on(CoreEvent.SettingsChanged, handleSettingsChanged);
-    coreEvents.on(CoreEvent.AdminSettingsChanged, handleAdminSettingsChanged);
     coreEvents.on(CoreEvent.AgentsDiscovered, handleAgentsDiscovered);
     return () => {
       coreEvents.off(CoreEvent.SettingsChanged, handleSettingsChanged);
-      coreEvents.off(
-        CoreEvent.AdminSettingsChanged,
-        handleAdminSettingsChanged,
-      );
       coreEvents.off(CoreEvent.AgentsDiscovered, handleAgentsDiscovered);
     };
   }, [settings]);
@@ -803,7 +792,6 @@ export const AppContainer = (props: AppContainerProps) => {
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
         try {
-          config.setRemoteAdminSettings(undefined);
           await config.refreshAuth(authType);
           setAuthState(AuthState.Authenticated);
           logBillingEvent(
@@ -2150,7 +2138,6 @@ export const AppContainer = (props: AppContainerProps) => {
     shouldShowIdePrompt ||
     isFolderTrustDialogOpen ||
     isPolicyUpdateDialogOpen ||
-    adminSettingsChanged ||
     !!commandConfirmationRequest ||
     !!authConsentRequest ||
     !!permissionConfirmationRequest ||
@@ -2508,7 +2495,6 @@ export const AppContainer = (props: AppContainerProps) => {
       activeBackgroundTaskPid,
       backgroundTaskHeight,
       isBackgroundTaskListOpen,
-      adminSettingsChanged,
       newAgents,
       showIsExpandableHint,
       hintMode:
@@ -2626,7 +2612,6 @@ export const AppContainer = (props: AppContainerProps) => {
       isBackgroundTaskListOpen,
       activeBackgroundTaskPid,
       backgroundTasks,
-      adminSettingsChanged,
       newAgents,
       showIsExpandableHint,
     ],
@@ -2700,15 +2685,6 @@ export const AppContainer = (props: AppContainerProps) => {
       onHintClear: () => {},
       onHintSubmit: () => {},
       handleRestart: async () => {
-        if (process.send) {
-          const remoteSettings = config.getRemoteAdminSettings();
-          if (remoteSettings) {
-            process.send({
-              type: 'admin-settings-update',
-              settings: remoteSettings,
-            });
-          }
-        }
         await relaunchApp();
       },
       handleNewAgentsSelect: async (choice: NewAgentsChoice) => {

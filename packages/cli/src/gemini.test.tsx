@@ -1293,7 +1293,6 @@ describe('gemini.tsx main function exit codes', () => {
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
         refreshAuth: vi.fn().mockResolvedValue(undefined),
-        getRemoteAdminSettings: vi.fn().mockReturnValue(undefined),
         isInteractive: vi.fn().mockReturnValue(true),
       }),
     );
@@ -1331,7 +1330,6 @@ describe('gemini.tsx main function exit codes', () => {
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
         refreshAuth: vi.fn().mockRejectedValue(new Error('Auth failed')),
-        getRemoteAdminSettings: vi.fn().mockReturnValue(undefined),
         isInteractive: vi.fn().mockReturnValue(true),
       }),
     );

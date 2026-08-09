@@ -15,7 +15,6 @@ import {
   EDITOR_OPTIONS,
   AuthProviderType,
   type MCPServerConfig,
-  type RequiredMcpServerConfig,
   type BugCommandSettings,
   type TelemetrySettings,
   type AuthType,
@@ -2856,125 +2855,6 @@ const SETTINGS_SCHEMA = {
       },
     },
   },
-
-  admin: {
-    type: 'object',
-    label: 'Admin',
-    category: 'Admin',
-    requiresRestart: false,
-    default: {},
-    description: 'Settings configured remotely by enterprise admins.',
-    showInDialog: false,
-    mergeStrategy: MergeStrategy.REPLACE,
-    properties: {
-      secureModeEnabled: {
-        type: 'boolean',
-        label: 'Secure Mode Enabled',
-        category: 'Admin',
-        requiresRestart: false,
-        default: false,
-        description:
-          'If true, disallows YOLO mode and "Always allow" options from being used.',
-        showInDialog: false,
-        mergeStrategy: MergeStrategy.REPLACE,
-      },
-      extensions: {
-        type: 'object',
-        label: 'Extensions Settings',
-        category: 'Admin',
-        requiresRestart: false,
-        default: {},
-        description: 'Extensions-specific admin settings.',
-        showInDialog: false,
-        mergeStrategy: MergeStrategy.REPLACE,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            label: 'Extensions Enabled',
-            category: 'Admin',
-            requiresRestart: false,
-            default: true,
-            description:
-              'If false, disallows extensions from being installed or used.',
-            showInDialog: false,
-            mergeStrategy: MergeStrategy.REPLACE,
-          },
-        },
-      },
-      mcp: {
-        type: 'object',
-        label: 'MCP Settings',
-        category: 'Admin',
-        requiresRestart: false,
-        default: {},
-        description: 'MCP-specific admin settings.',
-        showInDialog: false,
-        mergeStrategy: MergeStrategy.REPLACE,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            label: 'MCP Enabled',
-            category: 'Admin',
-            requiresRestart: false,
-            default: true,
-            description: 'If false, disallows MCP servers from being used.',
-            showInDialog: false,
-            mergeStrategy: MergeStrategy.REPLACE,
-          },
-          config: {
-            type: 'object',
-            label: 'MCP Config',
-            category: 'Admin',
-            requiresRestart: false,
-            default: {} as Record<string, MCPServerConfig>,
-            description: 'Admin-configured MCP servers (allowlist).',
-            showInDialog: false,
-            mergeStrategy: MergeStrategy.REPLACE,
-            additionalProperties: {
-              type: 'object',
-              ref: 'MCPServerConfig',
-            },
-          },
-          requiredConfig: {
-            type: 'object',
-            label: 'Required MCP Config',
-            category: 'Admin',
-            requiresRestart: false,
-            default: {} as Record<string, RequiredMcpServerConfig>,
-            description: 'Admin-required MCP servers that are always injected.',
-            showInDialog: false,
-            mergeStrategy: MergeStrategy.REPLACE,
-            additionalProperties: {
-              type: 'object',
-              ref: 'RequiredMcpServerConfig',
-            },
-          },
-        },
-      },
-      skills: {
-        type: 'object',
-        label: 'Skills Settings',
-        category: 'Admin',
-        requiresRestart: false,
-        default: {},
-        description: 'Agent Skills-specific admin settings.',
-        showInDialog: false,
-        mergeStrategy: MergeStrategy.REPLACE,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            label: 'Skills Enabled',
-            category: 'Admin',
-            requiresRestart: false,
-            default: true,
-            description: 'If false, disallows agent skills from being used.',
-            showInDialog: false,
-            mergeStrategy: MergeStrategy.REPLACE,
-          },
-        },
-      },
-    },
-  },
 } as const satisfies SettingsSchema;
 
 export type SettingsSchemaType = typeof SETTINGS_SCHEMA;
@@ -3073,71 +2953,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
         type: 'string',
         description:
           'Authentication provider used for acquiring credentials (for example `dynamic_discovery`).',
-        enum: Object.values(AuthProviderType),
-      },
-      targetAudience: {
-        type: 'string',
-        description:
-          'OAuth target audience (CLIENT_ID.apps.googleusercontent.com).',
-      },
-      targetServiceAccount: {
-        type: 'string',
-        description:
-          'Service account email to impersonate (name@project.iam.gserviceaccount.com).',
-      },
-    },
-  },
-  RequiredMcpServerConfig: {
-    type: 'object',
-    description:
-      'Admin-required MCP server configuration (remote transports only).',
-    additionalProperties: false,
-    properties: {
-      url: {
-        type: 'string',
-        description: 'URL for the required MCP server.',
-      },
-      type: {
-        type: 'string',
-        description: 'Transport type for the required server.',
-        enum: ['sse', 'http'],
-      },
-      headers: {
-        type: 'object',
-        description: 'Additional HTTP headers sent to the server.',
-        additionalProperties: { type: 'string' },
-      },
-      timeout: {
-        type: 'number',
-        description: 'Timeout in milliseconds for MCP requests.',
-      },
-      trust: {
-        type: 'boolean',
-        description:
-          'Marks the server as trusted. Defaults to true for admin-required servers.',
-      },
-      description: {
-        type: 'string',
-        description: 'Human-readable description of the server.',
-      },
-      includeTools: {
-        type: 'array',
-        description: 'Subset of tools enabled for this server.',
-        items: { type: 'string' },
-      },
-      excludeTools: {
-        type: 'array',
-        description: 'Tools disabled for this server.',
-        items: { type: 'string' },
-      },
-      oauth: {
-        type: 'object',
-        description: 'OAuth configuration for authenticating with the server.',
-        additionalProperties: true,
-      },
-      authProviderType: {
-        type: 'string',
-        description: 'Authentication provider used for acquiring credentials.',
         enum: Object.values(AuthProviderType),
       },
       targetAudience: {

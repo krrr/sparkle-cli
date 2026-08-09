@@ -2361,39 +2361,6 @@ their corresponding top-level category object in your `settings.json` file.
     regardless of token count.
   - **Default:** `true`
   - **Requires restart:** Yes
-
-#### `admin`
-
-- **`admin.secureModeEnabled`** (boolean):
-
-  - **Description:** If true, disallows YOLO mode and "Always allow" options
-    from being used.
-  - **Default:** `false`
-
-- **`admin.extensions.enabled`** (boolean):
-
-  - **Description:** If false, disallows extensions from being installed or
-    used.
-  - **Default:** `true`
-
-- **`admin.mcp.enabled`** (boolean):
-
-  - **Description:** If false, disallows MCP servers from being used.
-  - **Default:** `true`
-
-- **`admin.mcp.config`** (object):
-
-  - **Description:** Admin-configured MCP servers (allowlist).
-  - **Default:** `{}`
-
-- **`admin.mcp.requiredConfig`** (object):
-
-  - **Description:** Admin-required MCP servers that are always injected.
-  - **Default:** `{}`
-
-- **`admin.skills.enabled`** (boolean):
-  - **Description:** If false, disallows agent skills from being used.
-  - **Default:** `true`
   <!-- SETTINGS-AUTOGEN:END -->
 
 #### `mcpServers`

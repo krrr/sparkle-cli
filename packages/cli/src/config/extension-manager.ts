@@ -52,8 +52,6 @@ import {
   type HookEventName,
   type ResolvedExtensionSetting,
   coreEvents,
-  applyAdminAllowlist,
-  getAdminBlockedMcpServersMessage,
   CoreToolCallStatus,
   loadExtensionPolicies,
   isSubpath,
@@ -616,11 +614,6 @@ Would you like to attempt to install via "git clone" instead?`,
 
     this.loadingPromise = (async () => {
       try {
-        if (this.settings.admin?.extensions?.enabled === false) {
-          this.loadedExtensions = [];
-          return this.loadedExtensions;
-        }
-
         const extensionsDir = ExtensionStorage.getUserExtensionsDir();
         if (!fs.existsSync(extensionsDir)) {
           this.loadedExtensions = [];
@@ -826,36 +819,14 @@ Would you like to attempt to install via "git clone" instead?`,
       }
 
       if (config.mcpServers) {
-        if (this.settings.admin?.mcp?.enabled === false) {
-          config.mcpServers = undefined;
-        } else {
-          // Apply admin allowlist if configured
-          const adminAllowlist = this.settings.admin?.mcp?.config;
-          if (adminAllowlist && Object.keys(adminAllowlist).length > 0) {
-            const result = applyAdminAllowlist(
-              config.mcpServers,
-              adminAllowlist,
-            );
-            config.mcpServers = result.mcpServers;
-
-            if (result.blockedServerNames.length > 0) {
-              const message = getAdminBlockedMcpServersMessage(
-                result.blockedServerNames,
-                undefined,
-              );
-              coreEvents.emitConsoleLog('warn', message);
-            }
-          }
-
-          // Then apply local filtering/sanitization
-          if (config.mcpServers) {
-            config.mcpServers = Object.fromEntries(
-              Object.entries(config.mcpServers).map(([key, value]) => [
-                key,
-                filterMcpConfig(value),
-              ]),
-            );
-          }
+        // Apply local filtering/sanitization
+        if (config.mcpServers) {
+          config.mcpServers = Object.fromEntries(
+            Object.entries(config.mcpServers).map(([key, value]) => [
+              key,
+              filterMcpConfig(value),
+            ]),
+          );
         }
       }
 

@@ -208,7 +208,6 @@ export enum CoreEvent {
   HookEnd = 'hook-end',
   HookSystemMessage = 'hook-system-message',
   AgentsRefreshed = 'agents-refreshed',
-  AdminSettingsChanged = 'admin-settings-changed',
   RetryAttempt = 'retry-attempt',
   ConsentRequest = 'consent-request',
   McpProgress = 'mcp-progress',
@@ -244,7 +243,6 @@ export interface CoreEvents extends ExtensionEvents {
   [CoreEvent.HookEnd]: [HookEndPayload];
   [CoreEvent.HookSystemMessage]: [HookSystemMessagePayload];
   [CoreEvent.AgentsRefreshed]: never[];
-  [CoreEvent.AdminSettingsChanged]: never[];
   [CoreEvent.RetryAttempt]: [RetryAttemptPayload];
   [CoreEvent.ConsentRequest]: [ConsentRequestPayload];
   [CoreEvent.McpProgress]: [McpProgressPayload];
@@ -385,13 +383,6 @@ export class CoreEventEmitter extends EventEmitter<CoreEvents> {
    */
   emitAgentsRefreshed(): void {
     this.emit(CoreEvent.AgentsRefreshed);
-  }
-
-  /**
-   * Notifies subscribers that admin settings have changed.
-   */
-  emitAdminSettingsChanged(): void {
-    this.emit(CoreEvent.AdminSettingsChanged);
   }
 
   /**

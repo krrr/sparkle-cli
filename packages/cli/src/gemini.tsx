@@ -29,7 +29,6 @@ import {
   SessionStartSource,
   SessionEndReason,
   ValidationRequiredError,
-  type AdminControlsSettings,
   debugLogger,
   isHeadlessMode,
   Storage,
@@ -349,13 +348,6 @@ export async function main() {
   let config: Config | undefined;
   const cliStartupHandle = startupProfiler.start('cli_startup');
 
-  // Listen for admin controls from parent process (IPC) in non-sandbox mode. In
-  // sandbox mode, we re-fetch the admin controls from the server once we enter
-  // the sandbox.
-  // TODO: Cache settings in sandbox mode as well.
-  const adminControlsListner = setupAdminControlsListener();
-  registerCleanup(adminControlsListner.cleanup);
-
   const cleanupStdio = patchStdio();
   registerSyncCleanup(() => {
     // This is needed to ensure we don't lose any buffered output.
@@ -492,11 +484,8 @@ export async function main() {
     loadedSettings: settings,
   });
 
-  adminControlsListner.setConfig(partialConfig);
-
-  // Refresh auth to fetch remote admin settings from CCPA and before entering
-  // the sandbox because the sandbox will interfere with the Oauth2 web
-  // redirect.
+  // Refresh auth before entering the sandbox because the sandbox will interfere
+  // with the Oauth2 web redirect.
   let initialAuthFailed = false;
   if (!settings.merged.security.auth.useExternal && !argv.isCommand) {
     try {
@@ -534,19 +523,7 @@ export async function main() {
     }
   }
 
-  const remoteAdminSettings = partialConfig.getRemoteAdminSettings();
-  // Set remote admin settings if returned from CCPA.
-  if (remoteAdminSettings) {
-    settings.setRemoteAdminSettings(remoteAdminSettings);
-    if (process.send) {
-      process.send({
-        type: 'admin-settings-update',
-        settings: remoteAdminSettings,
-      });
-    }
-  }
-
-  // Run deferred command now that we have admin settings.
+  // Run deferred command now that settings are loaded.
   await runDeferredCommand(settings.merged);
 
   // hop into sandbox if we are outside and sandboxing is enabled
@@ -620,8 +597,6 @@ export async function main() {
     // storage-related operations (like listing or resuming sessions) have
     // access to the project identifier.
     await config.storage.initialize();
-
-    adminControlsListner.setConfig(config);
 
     if (config.isInteractive() && settings.merged.general.devtools) {
       const { setupInitialActivityLogger } = await import(
@@ -911,38 +886,4 @@ export function initializeOutputListenersAndFlush(config?: Config) {
       return { event, args };
     },
   );
-}
-
-function setupAdminControlsListener() {
-  let pendingSettings: AdminControlsSettings | undefined;
-  let config: Config | undefined;
-
-  const messageHandler = (msg: unknown) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const message = msg as {
-      type?: string;
-      settings?: AdminControlsSettings;
-    };
-    if (message?.type === 'admin-settings' && message.settings) {
-      if (config) {
-        config.setRemoteAdminSettings(message.settings);
-      } else {
-        pendingSettings = message.settings;
-      }
-    }
-  };
-
-  process.on('message', messageHandler);
-
-  return {
-    setConfig: (newConfig: Config) => {
-      config = newConfig;
-      if (pendingSettings) {
-        config.setRemoteAdminSettings(pendingSettings);
-      }
-    },
-    cleanup: () => {
-      process.off('message', messageHandler);
-    },
-  };
 }

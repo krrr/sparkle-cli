@@ -56,7 +56,6 @@ describe('ExtensionManager theme loading', () => {
       settings: createTestMergedSettings({
         experimental: { extensionConfig: true },
         security: { blockGitExtensions: false },
-        admin: { extensions: { enabled: true }, mcp: { enabled: true } },
       }),
       requestConsent: async () => true,
       requestSetting: async () => '',

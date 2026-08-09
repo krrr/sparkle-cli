@@ -31,14 +31,10 @@ import {
   getVersion,
   coreEvents,
   GEMINI_MODEL_ALIAS_AUTO,
-  getAdminErrorMessage,
   isHeadlessMode,
   Config,
   SimpleExtensionLoader,
   resolveToRealPath,
-  applyAdminAllowlist,
-  applyRequiredServers,
-  getAdminBlockedMcpServersMessage,
   getProjectRootForWorktree,
   isGeminiWorktree,
   type WorktreeSettings,
@@ -733,19 +729,11 @@ export async function loadCliConfig(
   }
 
   // Override approval mode if disableYoloMode is set.
-  if (settings.security?.disableYoloMode || settings.admin?.secureModeEnabled) {
+  if (settings.security?.disableYoloMode) {
     if (approvalMode === ApprovalMode.YOLO) {
-      if (settings.admin?.secureModeEnabled) {
-        debugLogger.error(
-          'YOLO mode is disabled by "secureModeEnabled" setting.',
-        );
-      } else {
-        debugLogger.error(
-          'YOLO mode is disabled by the "disableYolo" setting.',
-        );
-      }
+      debugLogger.error('YOLO mode is disabled by the "disableYolo" setting.');
       throw new FatalConfigError(
-        getAdminErrorMessage('YOLO mode', undefined /* config */),
+        'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
       );
     }
   } else if (approvalMode === ApprovalMode.YOLO) {
@@ -874,9 +862,8 @@ export async function loadCliConfig(
 
   const ptyInfo = await getPty();
 
-  const mcpEnabled = settings.admin?.mcp?.enabled ?? true;
-  const extensionsEnabled = settings.admin?.extensions?.enabled ?? true;
-  const adminSkillsEnabled = settings.admin?.skills?.enabled ?? true;
+  const mcpEnabled = true;
+  const extensionsEnabled = true;
 
   // Create MCP enablement manager and callbacks
   const mcpEnablementManager = McpServerEnablementManager.getInstance();
@@ -884,42 +871,8 @@ export async function loadCliConfig(
     ? mcpEnablementManager.getEnablementCallbacks()
     : undefined;
 
-  const adminAllowlist = settings.admin?.mcp?.config;
-  let mcpServerCommand = mcpEnabled ? settings.mcp?.serverCommand : undefined;
-  let mcpServers = mcpEnabled ? settings.mcpServers : {};
-
-  if (mcpEnabled && adminAllowlist && Object.keys(adminAllowlist).length > 0) {
-    const result = applyAdminAllowlist(mcpServers, adminAllowlist);
-    mcpServers = result.mcpServers;
-    mcpServerCommand = undefined;
-
-    if (result.blockedServerNames && result.blockedServerNames.length > 0) {
-      const message = getAdminBlockedMcpServersMessage(
-        result.blockedServerNames,
-        undefined,
-      );
-      coreEvents.emitConsoleLog('warn', message);
-    }
-  }
-
-  // Apply admin-required MCP servers (injected regardless of allowlist)
-  if (mcpEnabled) {
-    const requiredMcpConfig = settings.admin?.mcp?.requiredConfig;
-    if (requiredMcpConfig && Object.keys(requiredMcpConfig).length > 0) {
-      const requiredResult = applyRequiredServers(
-        mcpServers ?? {},
-        requiredMcpConfig,
-      );
-      mcpServers = requiredResult.mcpServers;
-
-      if (requiredResult.requiredServerNames.length > 0) {
-        coreEvents.emitConsoleLog(
-          'info',
-          `Admin-required MCP servers injected: ${requiredResult.requiredServerNames.join(', ')}`,
-        );
-      }
-    }
-  }
+  const mcpServerCommand = mcpEnabled ? settings.mcp?.serverCommand : undefined;
+  const mcpServers = mcpEnabled ? settings.mcpServers : {};
 
   let clientName: string | undefined = undefined;
   if (isAcpMode) {
@@ -989,7 +942,6 @@ export async function loadCliConfig(
     mcpEnabled,
     extensionsEnabled,
     agents: settings.agents,
-    adminSkillsEnabled,
     allowedMcpServers: mcpEnabled
       ? (argv.allowedMcpServerNames ??
         (loadedSettings
@@ -1010,11 +962,8 @@ export async function loadCliConfig(
     enableEnvironmentVariableRedaction:
       settings.security?.environmentVariableRedaction?.enabled,
     approvalMode,
-    disableYoloMode:
-      settings.security?.disableYoloMode || settings.admin?.secureModeEnabled,
-    disableAlwaysAllow:
-      settings.security?.disableAlwaysAllow ||
-      settings.admin?.secureModeEnabled,
+    disableYoloMode: settings.security?.disableYoloMode,
+    disableAlwaysAllow: settings.security?.disableAlwaysAllow,
     showMemoryUsage: settings.ui?.showMemoryUsage || false,
     accessibility: {
       ...settings.ui?.accessibility,

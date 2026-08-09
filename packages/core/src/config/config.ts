@@ -159,7 +159,6 @@ import type {
   GeminiUserTier,
   RetrieveUserQuotaResponse,
 } from '../userTier.js';
-import type { AdminControlsSettings } from '../admin-controls/types.js';
 import type { HierarchicalMemory } from './memory.js';
 import {
   getExperiments,
@@ -707,7 +706,6 @@ export interface ConfigParameters {
   enableEventDrivenScheduler?: boolean;
   skillsSupport?: boolean;
   disabledSkills?: string[];
-  adminSkillsEnabled?: boolean;
   autoDistillation?: boolean;
   experimentalAutoMemory?: boolean;
   experimentalGemma?: boolean;
@@ -731,7 +729,6 @@ export interface ConfigParameters {
   agents?: AgentSettings;
   onReload?: () => Promise<{
     disabledSkills?: string[];
-    adminSkillsEnabled?: boolean;
     agents?: AgentSettings;
   }>;
   billing?: {
@@ -941,7 +938,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly onReload:
     | (() => Promise<{
         disabledSkills?: string[];
-        adminSkillsEnabled?: boolean;
         agents?: AgentSettings;
       }>)
     | undefined;
@@ -955,7 +951,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly enableEventDrivenScheduler: boolean;
   private readonly skillsSupport: boolean;
   private disabledSkills: string[];
-  private readonly adminSkillsEnabled: boolean;
   private readonly experimentalAutoMemory: boolean;
   private readonly experimentalGemma: boolean;
   private readonly experimentalContextManagementConfig?: string;
@@ -970,7 +965,6 @@ export class Config implements McpContext, AgentLoopContext {
   private memoryContextManager?: MemoryContextManager;
   private readonly contextManagement: ContextManagementConfig;
   private terminalBackground: string | undefined = undefined;
-  private remoteAdminSettings: AdminControlsSettings | undefined;
   private latestApiRequest: GenerateContentParameters | undefined;
   private lastModeSwitchTime: number = performance.now();
   readonly injectionService: InjectionService;
@@ -1127,7 +1121,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.enableEventDrivenScheduler = params.enableEventDrivenScheduler ?? true;
     this.skillsSupport = params.skillsSupport ?? true;
     this.disabledSkills = params.disabledSkills ?? [];
-    this.adminSkillsEnabled = params.adminSkillsEnabled ?? true;
     this.modelAvailabilityService = new ModelAvailabilityService();
     this.dynamicModelConfiguration = params.dynamicModelConfiguration ?? false;
 
@@ -1511,22 +1504,19 @@ export class Config implements McpContext, AgentLoopContext {
     }
 
     if (this.skillsSupport) {
-      this.getSkillManager().setAdminSettings(this.adminSkillsEnabled);
-      if (this.adminSkillsEnabled) {
-        await this.getSkillManager().discoverSkills(
-          this.storage,
-          this.getExtensions(),
-          this.isTrustedFolder(),
-        );
-        this.getSkillManager().setDisabledSkills(this.disabledSkills);
+      await this.getSkillManager().discoverSkills(
+        this.storage,
+        this.getExtensions(),
+        this.isTrustedFolder(),
+      );
+      this.getSkillManager().setDisabledSkills(this.disabledSkills);
 
-        // Re-register ActivateSkillTool to update its schema with the discovered enabled skill enums
-        if (this.getSkillManager().getSkills().length > 0) {
-          this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
-          this.toolRegistry.registerTool(
-            new ActivateSkillTool(this, this.messageBus),
-          );
-        }
+      // Re-register ActivateSkillTool to update its schema with the discovered enabled skill enums
+      if (this.getSkillManager().getSkills().length > 0) {
+        this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
+        this.toolRegistry.registerTool(
+          new ActivateSkillTool(this, this.messageBus),
+        );
       }
     }
 
@@ -1841,14 +1831,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   setLatestApiRequest(req: GenerateContentParameters): void {
     this.latestApiRequest = req;
-  }
-
-  getRemoteAdminSettings(): AdminControlsSettings | undefined {
-    return this.remoteAdminSettings;
-  }
-
-  setRemoteAdminSettings(settings: AdminControlsSettings | undefined): void {
-    this.remoteAdminSettings = settings;
   }
 
   shouldLoadMemoryFromIncludeDirectories(): boolean {
@@ -3540,30 +3522,22 @@ export class Config implements McpContext, AgentLoopContext {
     if (this.onReload) {
       const refreshed = await this.onReload();
       this.disabledSkills = refreshed.disabledSkills ?? [];
-      this.getSkillManager().setAdminSettings(
-        refreshed.adminSkillsEnabled ?? this.adminSkillsEnabled,
-      );
     }
 
-    if (this.getSkillManager().isAdminEnabled()) {
-      await this.getSkillManager().discoverSkills(
-        this.storage,
-        this.getExtensions(),
-        this.isTrustedFolder(),
-      );
-      this.getSkillManager().setDisabledSkills(this.disabledSkills);
+    await this.getSkillManager().discoverSkills(
+      this.storage,
+      this.getExtensions(),
+      this.isTrustedFolder(),
+    );
+    this.getSkillManager().setDisabledSkills(this.disabledSkills);
 
-      // Re-register ActivateSkillTool to update its schema with the newly discovered skills
-      if (this.getSkillManager().getSkills().length > 0) {
-        this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
-        this.toolRegistry.registerTool(
-          new ActivateSkillTool(this, this.messageBus),
-        );
-      } else {
-        this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
-      }
+    // Re-register ActivateSkillTool to update its schema with the newly discovered skills
+    if (this.getSkillManager().getSkills().length > 0) {
+      this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
+      this.toolRegistry.registerTool(
+        new ActivateSkillTool(this, this.messageBus),
+      );
     } else {
-      this.getSkillManager().clearSkills();
       this.toolRegistry.unregisterTool(ActivateSkillTool.Name);
     }
 

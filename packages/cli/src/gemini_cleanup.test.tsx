@@ -258,7 +258,6 @@ describe('gemini.tsx main function cleanup', () => {
       getUsageStatisticsEnabled: vi.fn(() => false),
       setTerminalBackground: vi.fn(),
       refreshAuth: vi.fn(),
-      getRemoteAdminSettings: vi.fn(() => undefined),
       getUseAlternateBuffer: vi.fn(() => false),
     } as unknown as Config);
 
@@ -456,7 +455,6 @@ describe('gemini.tsx main function cleanup', () => {
       getUsageStatisticsEnabled: vi.fn(() => false),
       setTerminalBackground: vi.fn(),
       refreshAuth: vi.fn(),
-      getRemoteAdminSettings: vi.fn(() => undefined),
       getUseAlternateBuffer: vi.fn(() => false),
       getUseTerminalBuffer: vi.fn(() => false),
       ...overrides,

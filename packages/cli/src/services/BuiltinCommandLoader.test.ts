@@ -171,7 +171,6 @@ describe('BuiltinCommandLoader', () => {
       getMcpEnabled: vi.fn().mockReturnValue(true),
       getSkillManager: vi.fn().mockReturnValue({
         getAllSkills: vi.fn().mockReturnValue([]),
-        isAdminEnabled: vi.fn().mockReturnValue(true),
       }),
       isVoiceModeEnabled: vi.fn().mockReturnValue(true),
       getContentGeneratorConfig: vi.fn().mockReturnValue({
@@ -384,7 +383,6 @@ describe('BuiltinCommandLoader profile', () => {
       getMcpEnabled: vi.fn().mockReturnValue(true),
       getSkillManager: vi.fn().mockReturnValue({
         getAllSkills: vi.fn().mockReturnValue([]),
-        isAdminEnabled: vi.fn().mockReturnValue(true),
       }),
       isVoiceModeEnabled: vi.fn().mockReturnValue(true),
       getContentGeneratorConfig: vi.fn().mockReturnValue({

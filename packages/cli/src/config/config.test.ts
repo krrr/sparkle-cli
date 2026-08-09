@@ -17,7 +17,6 @@ import {
   ASK_USER_TOOL_NAME,
   debugLogger,
   ApprovalMode,
-  type MCPServerConfig,
   type GeminiCLIExtension,
   Storage,
 } from '@google/gemini-cli-core';
@@ -131,10 +130,6 @@ vi.mock('@google/gemini-cli-core', async () => {
         approvalMode: approvalMode ?? ServerConfig.ApprovalMode.DEFAULT,
         nonInteractive: !interactive,
       }),
-    ),
-    getAdminErrorMessage: vi.fn(
-      (_feature) =>
-        `YOLO mode is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli`,
     ),
     isHeadlessMode: vi.fn((opts) => {
       if (process.env['VITEST'] === 'true') {
@@ -355,9 +350,6 @@ describe('parseArguments', () => {
       async ({ cmd, expected }) => {
         process.argv = ['node', 'script.js', ...cmd.split(' ')];
         const settings = createTestMergedSettings({
-          admin: {
-            mcp: { enabled: true },
-          },
           experimental: {
             extensionManagement: true,
           },
@@ -1445,7 +1437,7 @@ describe('Approval mode tool exclusion logic', () => {
     });
 
     await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
+      'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
     );
   });
 
@@ -1644,214 +1636,6 @@ describe('loadCliConfig with allowed-mcp-server-names', () => {
     const config = await loadCliConfig(settings, 'test-session', argv);
     expect(config.getAllowedMcpServers()).toEqual(['server2', 'server3']);
     expect(config.getBlockedMcpServers()).toEqual([]);
-  });
-});
-
-describe('loadCliConfig with admin.mcp.config', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
-    vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
-    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.restoreAllMocks();
-  });
-
-  const localMcpServers: Record<string, MCPServerConfig> = {
-    serverA: {
-      command: 'npx',
-      args: ['-y', '@mcp/server-a'],
-      env: { KEY: 'VALUE' },
-      cwd: '/local/cwd',
-      trust: false,
-    },
-    serverB: {
-      command: 'npx',
-      args: ['-y', '@mcp/server-b'],
-      trust: false,
-    },
-  };
-
-  const baseSettings = createTestMergedSettings({
-    mcp: { serverCommand: 'npx -y @mcp/default-server' },
-    mcpServers: localMcpServers,
-  });
-
-  it('should use local configuration if admin allowlist is empty', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      mcp: baseSettings.mcp,
-      mcpServers: localMcpServers,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: {} },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getMcpServers()).toEqual(localMcpServers);
-    expect(config.getMcpServerCommand()).toBe('npx -y @mcp/default-server');
-  });
-
-  it('should ignore locally configured servers not present in the allowlist', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const adminAllowlist: Record<string, MCPServerConfig> = {
-      serverA: {
-        type: 'sse',
-        url: 'https://admin-server-a.com/sse',
-        trust: true,
-      },
-    };
-    const settings = createTestMergedSettings({
-      mcp: baseSettings.mcp,
-      mcpServers: localMcpServers,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: adminAllowlist },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-
-    const mergedServers = config.getMcpServers() ?? {};
-    expect(mergedServers).toHaveProperty('serverA');
-    expect(mergedServers).not.toHaveProperty('serverB');
-  });
-
-  it('should clear command, args, env, and cwd for present servers', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const adminAllowlist: Record<string, MCPServerConfig> = {
-      serverA: {
-        type: 'sse',
-        url: 'https://admin-server-a.com/sse',
-        trust: true,
-      },
-    };
-    const settings = createTestMergedSettings({
-      mcpServers: localMcpServers,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: adminAllowlist },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-
-    const serverA = config.getMcpServers()?.['serverA'];
-    expect(serverA).toEqual({
-      // eslint-disable-next-line @typescript-eslint/no-misused-spread
-      ...localMcpServers['serverA'],
-      type: 'sse',
-      url: 'https://admin-server-a.com/sse',
-      trust: true,
-      command: undefined,
-      args: undefined,
-      env: undefined,
-      cwd: undefined,
-      httpUrl: undefined,
-      tcp: undefined,
-    });
-  });
-
-  it('should not initialize a server if it is in allowlist but missing locally', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const adminAllowlist: Record<string, MCPServerConfig> = {
-      serverC: {
-        type: 'sse',
-        url: 'https://admin-server-c.com/sse',
-        trust: true,
-      },
-    };
-    const settings = createTestMergedSettings({
-      mcpServers: localMcpServers,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: adminAllowlist },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-
-    const mergedServers = config.getMcpServers() ?? {};
-    expect(mergedServers).not.toHaveProperty('serverC');
-    expect(Object.keys(mergedServers)).toHaveLength(0);
-  });
-
-  it('should merge local fields and prefer admin tool filters', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const adminAllowlist: Record<string, MCPServerConfig> = {
-      serverA: {
-        type: 'sse',
-        url: 'https://admin-server-a.com/sse',
-        trust: true,
-        includeTools: ['admin_tool'],
-      },
-    };
-    const localMcpServersWithTools: Record<string, MCPServerConfig> = {
-      serverA: {
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
-        ...localMcpServers['serverA'],
-        includeTools: ['local_tool'],
-        timeout: 1234,
-      },
-    };
-    const settings = createTestMergedSettings({
-      mcpServers: localMcpServersWithTools,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: adminAllowlist },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-
-    const serverA = (config.getMcpServers() ?? {})['serverA'];
-    expect(serverA).toMatchObject({
-      timeout: 1234,
-      includeTools: ['admin_tool'],
-      type: 'sse',
-      url: 'https://admin-server-a.com/sse',
-      trust: true,
-    });
-    expect(serverA).not.toHaveProperty('command');
-    expect(serverA).not.toHaveProperty('args');
-    expect(serverA).not.toHaveProperty('env');
-    expect(serverA).not.toHaveProperty('cwd');
-    expect(serverA).not.toHaveProperty('httpUrl');
-    expect(serverA).not.toHaveProperty('tcp');
-  });
-
-  it('should use local tool filters when admin does not define them', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const adminAllowlist: Record<string, MCPServerConfig> = {
-      serverA: {
-        type: 'sse',
-        url: 'https://admin-server-a.com/sse',
-        trust: true,
-      },
-    };
-    const localMcpServersWithTools: Record<string, MCPServerConfig> = {
-      serverA: {
-        // eslint-disable-next-line @typescript-eslint/no-misused-spread
-        ...localMcpServers['serverA'],
-        includeTools: ['local_tool'],
-      },
-    };
-    const settings = createTestMergedSettings({
-      mcpServers: localMcpServersWithTools,
-      admin: {
-        ...baseSettings.admin,
-        mcp: { enabled: true, config: adminAllowlist },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-
-    const serverA = config.getMcpServers()?.['serverA'];
-    expect(serverA?.includeTools).toEqual(['local_tool']);
   });
 });
 
@@ -3589,66 +3373,8 @@ describe('loadCliConfig disableYoloMode', () => {
       security: { disableYoloMode: true },
     });
     await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
+      'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
     );
-  });
-});
-
-describe('loadCliConfig secureModeEnabled', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
-    vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
-    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
-    vi.mocked(isWorkspaceTrusted).mockReturnValue({
-      isTrusted: true,
-      source: undefined,
-    });
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.restoreAllMocks();
-  });
-
-  it('should throw an error if YOLO mode is attempted when secureModeEnabled is true', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      admin: {
-        secureModeEnabled: true,
-      },
-    });
-
-    await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-    );
-  });
-
-  it('should throw an error if approval-mode=yolo is attempted when secureModeEnabled is true', async () => {
-    process.argv = ['node', 'script.js', '--approval-mode=yolo'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      admin: {
-        secureModeEnabled: true,
-      },
-    });
-
-    await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled by your administrator. To enable it, please request an update to the settings at: https://goo.gle/manage-gemini-cli',
-    );
-  });
-
-  it('should set disableYoloMode to true when secureModeEnabled is true', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      admin: {
-        secureModeEnabled: true,
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.isYoloModeDisabled()).toBe(true);
   });
 });
 
@@ -3685,148 +3411,110 @@ describe('loadCliConfig mcpEnabled', () => {
     expect(config.getAllowedMcpServers()).toEqual(['serverA']);
     expect(config.getBlockedMcpServers()).toEqual(['serverB']);
   });
+});
 
-  it('should disable MCP when mcpEnabled is false', async () => {
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      ...mcpSettings,
-      admin: {
-        mcp: {
-          enabled: false,
-        },
-      },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getMcpEnabled()).toBe(false);
-    expect(config.getMcpServerCommand()).toBeUndefined();
-    expect(config.getMcpServers()).toEqual({});
-    expect(config.getAllowedMcpServers()).toEqual([]);
-    expect(config.getBlockedMcpServers()).toEqual([]);
+describe('extension plan settings', () => {
+  beforeEach(() => {
+    vi.spyOn(Storage.prototype, 'getProjectTempDir').mockReturnValue(
+      '/mock/home/user/.gemini/tmp/test-project',
+    );
   });
 
-  it('should enable MCP when mcpEnabled is true', async () => {
+  it('should use plan directory from active extension when user has not specified one', async () => {
     process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
     const settings = createTestMergedSettings({
-      ...mcpSettings,
-      admin: {
-        mcp: {
+      general: {
+        plan: { enabled: true },
+      },
+    });
+    const argv = await parseArguments(settings);
+
+    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
+      {
+        name: 'ext-plan',
+        isActive: true,
+        plan: { directory: 'ext-plans-dir' },
+      } as unknown as GeminiCLIExtension,
+    ]);
+
+    const config = await loadCliConfig(settings, 'test-session', argv);
+    expect(config.storage.getPlansDir()).toContain('ext-plans-dir');
+  });
+
+  it('should NOT use plan directory from active extension when user has specified one', async () => {
+    process.argv = ['node', 'script.js'];
+    const settings = createTestMergedSettings({
+      general: {
+        plan: {
           enabled: true,
+          directory: 'user-plans-dir',
         },
       },
     });
+    const argv = await parseArguments(settings);
+
+    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
+      {
+        name: 'ext-plan',
+        isActive: true,
+        plan: { directory: 'ext-plans-dir' },
+      } as unknown as GeminiCLIExtension,
+    ]);
+
     const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getMcpEnabled()).toBe(true);
-    expect(config.getMcpServerCommand()).toBe('mcp-server');
-    expect(config.getMcpServers()).toEqual({ serverA: { url: 'http://a' } });
-    expect(config.getAllowedMcpServers()).toEqual(['serverA']);
-    expect(config.getBlockedMcpServers()).toEqual(['serverB']);
+    expect(config.storage.getPlansDir()).toContain('user-plans-dir');
+    expect(config.storage.getPlansDir()).not.toContain('ext-plans-dir');
   });
 
-  describe('extension plan settings', () => {
-    beforeEach(() => {
-      vi.spyOn(Storage.prototype, 'getProjectTempDir').mockReturnValue(
-        '/mock/home/user/.gemini/tmp/test-project',
-      );
+  it('should NOT use plan directory from inactive extension', async () => {
+    process.argv = ['node', 'script.js'];
+    const settings = createTestMergedSettings({
+      general: {
+        plan: { enabled: true },
+      },
     });
+    const argv = await parseArguments(settings);
 
-    it('should use plan directory from active extension when user has not specified one', async () => {
-      process.argv = ['node', 'script.js'];
-      const settings = createTestMergedSettings({
-        general: {
-          plan: { enabled: true },
-        },
-      });
-      const argv = await parseArguments(settings);
+    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
+      {
+        name: 'ext-plan',
+        isActive: false,
+        plan: { directory: 'ext-plans-dir-inactive' },
+      } as unknown as GeminiCLIExtension,
+    ]);
 
-      vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
-        {
-          name: 'ext-plan',
-          isActive: true,
-          plan: { directory: 'ext-plans-dir' },
-        } as unknown as GeminiCLIExtension,
-      ]);
+    const config = await loadCliConfig(settings, 'test-session', argv);
+    expect(config.storage.getPlansDir()).not.toContain(
+      'ext-plans-dir-inactive',
+    );
+  });
 
-      const config = await loadCliConfig(settings, 'test-session', argv);
-      expect(config.storage.getPlansDir()).toContain('ext-plans-dir');
+  it('should use default path if neither user nor extension settings provide a plan directory', async () => {
+    process.argv = ['node', 'script.js'];
+    const settings = createTestMergedSettings({
+      general: {
+        plan: { enabled: true },
+      },
     });
+    const argv = await parseArguments(settings);
 
-    it('should NOT use plan directory from active extension when user has specified one', async () => {
-      process.argv = ['node', 'script.js'];
-      const settings = createTestMergedSettings({
-        general: {
-          plan: {
-            enabled: true,
-            directory: 'user-plans-dir',
-          },
-        },
-      });
-      const argv = await parseArguments(settings);
+    // No extensions providing plan directory
+    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
 
-      vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
-        {
-          name: 'ext-plan',
-          isActive: true,
-          plan: { directory: 'ext-plans-dir' },
-        } as unknown as GeminiCLIExtension,
-      ]);
-
-      const config = await loadCliConfig(settings, 'test-session', argv);
-      expect(config.storage.getPlansDir()).toContain('user-plans-dir');
-      expect(config.storage.getPlansDir()).not.toContain('ext-plans-dir');
-    });
-
-    it('should NOT use plan directory from inactive extension', async () => {
-      process.argv = ['node', 'script.js'];
-      const settings = createTestMergedSettings({
-        general: {
-          plan: { enabled: true },
-        },
-      });
-      const argv = await parseArguments(settings);
-
-      vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([
-        {
-          name: 'ext-plan',
-          isActive: false,
-          plan: { directory: 'ext-plans-dir-inactive' },
-        } as unknown as GeminiCLIExtension,
-      ]);
-
-      const config = await loadCliConfig(settings, 'test-session', argv);
-      expect(config.storage.getPlansDir()).not.toContain(
-        'ext-plans-dir-inactive',
-      );
-    });
-
-    it('should use default path if neither user nor extension settings provide a plan directory', async () => {
-      process.argv = ['node', 'script.js'];
-      const settings = createTestMergedSettings({
-        general: {
-          plan: { enabled: true },
-        },
-      });
-      const argv = await parseArguments(settings);
-
-      // No extensions providing plan directory
-      vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
-
-      const config = await loadCliConfig(settings, 'test-session', argv);
-      // Should return the default managed temp directory path
-      expect(config.storage.getPlansDir()).toBe(
-        path.join(
-          '/mock',
-          'home',
-          'user',
-          '.gemini',
-          'tmp',
-          'test-project',
-          'test-session',
-          'plans',
-        ),
-      );
-    });
+    const config = await loadCliConfig(settings, 'test-session', argv);
+    // Should return the default managed temp directory path
+    expect(config.storage.getPlansDir()).toBe(
+      path.join(
+        '/mock',
+        'home',
+        'user',
+        '.gemini',
+        'tmp',
+        'test-project',
+        'test-session',
+        'plans',
+      ),
+    );
   });
 });
 

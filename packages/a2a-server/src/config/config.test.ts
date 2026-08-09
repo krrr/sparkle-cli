@@ -42,8 +42,6 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
         getExperiments: vi.fn().mockReturnValue({
           flags: {},
         }),
-        getRemoteAdminSettings: vi.fn(),
-        setRemoteAdminSettings: vi.fn(),
       };
       return mockConfig;
     }),
@@ -77,9 +75,6 @@ vi.mock('@google/gemini-cli-core', async (importOriginal) => {
           checkers: [],
         }),
       ),
-    coreEvents: {
-      emitAdminSettingsChanged: vi.fn(),
-    },
   };
 });
 
@@ -332,8 +327,6 @@ describe('loadConfig', () => {
               waitForMcpInit: vi.fn(),
               refreshAuth: refreshAuthMock,
               getExperiments: vi.fn().mockReturnValue({ flags: {} }),
-              getRemoteAdminSettings: vi.fn(),
-              setRemoteAdminSettings: vi.fn(),
             }) as unknown as Config,
         );
       };

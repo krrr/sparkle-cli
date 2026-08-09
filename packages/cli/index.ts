@@ -90,8 +90,6 @@ async function run() {
     const memoryArgs = await getMemoryNodeArgs();
     const { spawnArgs, env: newEnv } = getSpawnConfig(memoryArgs, scriptArgs);
 
-    let latestAdminSettings: unknown = undefined;
-
     // Prevent the parent process from exiting prematurely on signals.
     // The child process will receive the same signals and handle its own cleanup.
     for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
@@ -104,16 +102,6 @@ async function run() {
       const child = spawn(process.execPath, spawnArgs, {
         stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
         env: newEnv,
-      });
-
-      if (latestAdminSettings) {
-        child.send({ type: 'admin-settings', settings: latestAdminSettings });
-      }
-
-      child.on('message', (msg: { type?: string; settings?: unknown }) => {
-        if (msg.type === 'admin-settings-update' && msg.settings) {
-          latestAdminSettings = msg.settings;
-        }
       });
 
       return new Promise<number>((resolve) => {

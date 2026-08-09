@@ -302,22 +302,6 @@ description: project-desc
     expect(enabled.map((s) => s.name)).toContain('builtin-skill');
   });
 
-  it('should maintain admin settings state', async () => {
-    const service = new SkillManager();
-
-    // Case 1: Enabled by admin
-
-    service.setAdminSettings(true);
-
-    expect(service.isAdminEnabled()).toBe(true);
-
-    // Case 2: Disabled by admin
-
-    service.setAdminSettings(false);
-
-    expect(service.isAdminEnabled()).toBe(false);
-  });
-
   it('should reset active skill names', () => {
     const service = new SkillManager();
     service.activateSkill('skill-1');

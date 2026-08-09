@@ -18,7 +18,6 @@ describe('SkillCommandLoader', () => {
   beforeEach(() => {
     mockSkillManager = {
       getDisplayableSkills: vi.fn(),
-      isAdminEnabled: vi.fn().mockReturnValue(true),
     };
 
     mockConfig = {
@@ -36,13 +35,6 @@ describe('SkillCommandLoader', () => {
 
   it('should return an empty array if SkillManager is missing', async () => {
     mockConfig.getSkillManager.mockReturnValue(null);
-    const loader = new SkillCommandLoader(mockConfig);
-    const commands = await loader.loadCommands(new AbortController().signal);
-    expect(commands).toEqual([]);
-  });
-
-  it('should return an empty array if skills are admin-disabled', async () => {
-    mockSkillManager.isAdminEnabled.mockReturnValue(false);
     const loader = new SkillCommandLoader(mockConfig);
     const commands = await loader.loadCommands(new AbortController().signal);
     expect(commands).toEqual([]);

@@ -201,7 +201,6 @@ export interface UIState {
   activeBackgroundTaskPid: number | null;
   backgroundTaskHeight: number;
   isBackgroundTaskListOpen: boolean;
-  adminSettingsChanged: boolean;
   newAgents: AgentDefinition[] | null;
   showIsExpandableHint: boolean;
   hintMode: boolean;

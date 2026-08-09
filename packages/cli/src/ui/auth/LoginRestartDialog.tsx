@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type Config } from '@google/gemini-cli-core';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -12,13 +11,11 @@ import { relaunchApp } from '../../utils/processUtils.js';
 
 interface LoginRestartDialogProps {
   onDismiss: () => void;
-  config: Config;
   message?: string;
 }
 
 export const LoginRestartDialog = ({
   onDismiss,
-  config,
   message,
 }: LoginRestartDialogProps) => {
   useKeypress(
@@ -28,15 +25,6 @@ export const LoginRestartDialog = ({
         return true;
       } else if (key.name === 'r' || key.name === 'R') {
         setTimeout(async () => {
-          if (process.send) {
-            const remoteSettings = config.getRemoteAdminSettings();
-            if (remoteSettings) {
-              process.send({
-                type: 'admin-settings-update',
-                settings: remoteSettings,
-              });
-            }
-          }
           await relaunchApp();
         }, 100);
         return true;

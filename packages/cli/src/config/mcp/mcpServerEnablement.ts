@@ -48,7 +48,7 @@ export interface EnablementCallbacks {
 export interface ServerLoadResult {
   allowed: boolean;
   reason?: string;
-  blockType?: 'admin' | 'allowlist' | 'excludelist' | 'session' | 'enablement';
+  blockType?: 'allowlist' | 'excludelist' | 'session' | 'enablement';
 }
 
 /**
@@ -100,7 +100,6 @@ export function isInSettingsList(
 export async function canLoadServer(
   serverId: string,
   config: {
-    adminMcpEnabled: boolean;
     allowedList?: string[];
     excludedList?: string[];
     enablement?: EnablementCallbacks;
@@ -108,17 +107,7 @@ export async function canLoadServer(
 ): Promise<ServerLoadResult> {
   const normalizedId = normalizeServerId(serverId);
 
-  // 1. Admin kill switch
-  if (!config.adminMcpEnabled) {
-    return {
-      allowed: false,
-      reason:
-        'MCP servers are disabled by administrator. Check admin settings or contact your admin.',
-      blockType: 'admin',
-    };
-  }
-
-  // 2. Allowlist check
+  // 1. Allowlist check
   if (config.allowedList !== undefined) {
     const { found, deprecationWarning } = isInSettingsList(
       normalizedId,
@@ -136,7 +125,7 @@ export async function canLoadServer(
     }
   }
 
-  // 3. Excludelist check
+  // 2. Excludelist check
   if (config.excludedList) {
     const { found, deprecationWarning } = isInSettingsList(
       normalizedId,
@@ -154,7 +143,7 @@ export async function canLoadServer(
     }
   }
 
-  // 4. Session disable check (before file-based enablement)
+  // 3. Session disable check (before file-based enablement)
   if (config.enablement?.isSessionDisabled(normalizedId)) {
     return {
       allowed: false,
@@ -163,7 +152,7 @@ export async function canLoadServer(
     };
   }
 
-  // 5. File-based enablement check
+  // 4. File-based enablement check
   if (
     config.enablement &&
     !(await config.enablement.isFileEnabled(normalizedId))

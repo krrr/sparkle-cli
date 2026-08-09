@@ -17,7 +17,7 @@ import {
 } from '../types.js';
 import { disableSkill, enableSkill } from '../../utils/skillSettings.js';
 
-import { getAdminErrorMessage, getErrorMessage } from '@google/gemini-cli-core';
+import { getErrorMessage } from '@google/gemini-cli-core';
 import {
   linkSkill,
   renderSkillActionFeedback,
@@ -152,19 +152,6 @@ async function disableAction(
     return;
   }
   const skillManager = context.services.agentContext?.config.getSkillManager();
-  if (skillManager?.isAdminEnabled() === false) {
-    context.ui.addItem(
-      {
-        type: MessageType.ERROR,
-        text: getAdminErrorMessage(
-          'Agent skills',
-          context.services.agentContext?.config ?? undefined,
-        ),
-      },
-      Date.now(),
-    );
-    return;
-  }
 
   const skill = skillManager?.getSkill(skillName);
   if (!skill) {
@@ -209,21 +196,6 @@ async function enableAction(
       type: MessageType.ERROR,
       text: 'Please provide a skill name to enable.',
     });
-    return;
-  }
-
-  const skillManager = context.services.agentContext?.config.getSkillManager();
-  if (skillManager?.isAdminEnabled() === false) {
-    context.ui.addItem(
-      {
-        type: MessageType.ERROR,
-        text: getAdminErrorMessage(
-          'Agent skills',
-          context.services.agentContext?.config ?? undefined,
-        ),
-      },
-      Date.now(),
-    );
     return;
   }
 

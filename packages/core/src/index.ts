@@ -61,9 +61,6 @@ export * from './core/apiKeyCredentialStorage.js';
 export * from './userTier.js';
 export * from './experiments/experiments.js';
 export * from './experiments/flagNames.js';
-export * from './admin-controls/types.js';
-export * from './admin-controls/admin-controls.js';
-export * from './admin-controls/mcp-utils.js';
 
 // Export utilities
 export * from './utils/fetch.js';

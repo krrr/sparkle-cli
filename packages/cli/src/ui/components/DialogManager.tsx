@@ -34,7 +34,6 @@ import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import process from 'node:process';
 import { type UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
-import { AdminSettingsChangedDialog } from './AdminSettingsChangedDialog.js';
 import { IdeTrustChangeDialog } from './IdeTrustChangeDialog.js';
 import { NewAgentsNotification } from './NewAgentsNotification.js';
 import { AgentConfigDialog } from './AgentConfigDialog.js';
@@ -64,9 +63,6 @@ export const DialogManager = ({
     terminalWidth: uiTerminalWidth,
   } = uiState;
 
-  if (uiState.adminSettingsChanged) {
-    return <AdminSettingsChangedDialog />;
-  }
   if (uiState.showIdeRestartPrompt) {
     return <IdeTrustChangeDialog reason={uiState.ideTrustRestartReason} />;
   }
@@ -311,7 +307,6 @@ export const DialogManager = ({
       <Box flexDirection="column">
         <LoginRestartDialog
           onDismiss={uiActions.dismissLoginRestart}
-          config={config}
           message={uiState.loginRestartMessage}
         />
       </Box>

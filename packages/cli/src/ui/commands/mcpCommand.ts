@@ -441,7 +441,6 @@ async function handleEnableDisable(
   if (enable) {
     const settings = loadSettings();
     const result = await canLoadServer(name, {
-      adminMcpEnabled: settings.merged.admin?.mcp?.enabled ?? true,
       allowedList: settings.merged.mcp?.allowed,
       excludedList: settings.merged.mcp?.excluded,
     });
@@ -459,15 +458,6 @@ async function handleEnableDisable(
       manager.clearSessionDisable(name);
     } else {
       await manager.enable(name);
-    }
-    if (result.blockType === 'admin') {
-      context.ui.addItem(
-        {
-          type: 'warning',
-          text: 'MCP disabled by admin. Will load when enabled.',
-        },
-        Date.now(),
-      );
     }
   } else {
     if (isSession) {

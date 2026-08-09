@@ -5,11 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  ApprovalMode,
-  type Config,
-  getAdminErrorMessage,
-} from '@google/gemini-cli-core';
+import { ApprovalMode, type Config } from '@google/gemini-cli-core';
 import { useKeypress } from './useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from './useKeyMatchers.js';
@@ -48,19 +44,10 @@ export function useApprovalModeIndicator({
           config.getApprovalMode() !== ApprovalMode.YOLO
         ) {
           if (addItem) {
-            let text =
-              'You cannot enter YOLO mode since it is disabled in your settings.';
-            const adminSettings = config.getRemoteAdminSettings();
-            const hasSettings =
-              adminSettings && Object.keys(adminSettings).length > 0;
-            if (hasSettings && !adminSettings.strictModeDisabled) {
-              text = getAdminErrorMessage('YOLO mode', config);
-            }
-
             addItem(
               {
                 type: MessageType.WARNING,
-                text,
+                text: 'You cannot enter YOLO mode since it is disabled in your settings.',
               },
               Date.now(),
             );

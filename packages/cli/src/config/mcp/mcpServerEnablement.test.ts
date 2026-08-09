@@ -122,14 +122,8 @@ describe('McpServerEnablementManager', () => {
 });
 
 describe('canLoadServer', () => {
-  it('blocks when admin has disabled MCP', async () => {
-    const result = await canLoadServer('s', { adminMcpEnabled: false });
-    expect(result.blockType).toBe('admin');
-  });
-
   it('blocks when server is not in allowlist', async () => {
     const result = await canLoadServer('s', {
-      adminMcpEnabled: true,
       allowedList: ['other'],
     });
     expect(result.blockType).toBe('allowlist');
@@ -137,7 +131,6 @@ describe('canLoadServer', () => {
 
   it('blocks when server is in excludelist', async () => {
     const result = await canLoadServer('s', {
-      adminMcpEnabled: true,
       excludedList: ['s'],
     });
     expect(result.blockType).toBe('excludelist');
@@ -145,7 +138,6 @@ describe('canLoadServer', () => {
 
   it('blocks when server is session-disabled', async () => {
     const result = await canLoadServer('s', {
-      adminMcpEnabled: true,
       enablement: createMockEnablement(true, true),
     });
     expect(result.blockType).toBe('session');
@@ -153,20 +145,18 @@ describe('canLoadServer', () => {
 
   it('blocks when server is file-disabled', async () => {
     const result = await canLoadServer('s', {
-      adminMcpEnabled: true,
       enablement: createMockEnablement(false, false),
     });
     expect(result.blockType).toBe('enablement');
   });
 
-  it('allows when admin MCP is enabled and no restrictions', async () => {
-    const result = await canLoadServer('s', { adminMcpEnabled: true });
+  it('allows when no restrictions', async () => {
+    const result = await canLoadServer('s', {});
     expect(result.allowed).toBe(true);
   });
 
   it('allows when server passes all checks', async () => {
     const result = await canLoadServer('s', {
-      adminMcpEnabled: true,
       allowedList: ['s'],
       enablement: createMockEnablement(false, true),
     });

@@ -26,9 +26,7 @@ vi.mock('../policy/policy-engine.js', () => ({
   })),
 }));
 vi.mock('../skills/skillManager.js', () => ({
-  SkillManager: vi.fn().mockImplementation(() => ({
-    setAdminSettings: vi.fn(),
-  })),
+  SkillManager: vi.fn().mockImplementation(() => ({})),
 }));
 vi.mock('../agents/registry.js', () => ({
   AgentRegistry: vi.fn().mockImplementation(() => ({

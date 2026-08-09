@@ -18,7 +18,6 @@ import {
   Storage,
   coreEvents,
   homedir,
-  type AdminControlsSettings,
   createCache,
 } from '@google/gemini-cli-core';
 import stripJsonComments from 'strip-json-comments';
@@ -336,7 +335,6 @@ export class LoadedSettings {
   private _workspaceFile: SettingsFile;
   private _merged: MergedSettings;
   private _snapshot: LoadedSettingsSnapshot;
-  private _remoteAdminSettings: Partial<Settings> | undefined;
 
   get merged(): MergedSettings {
     return this._merged;
@@ -383,22 +381,6 @@ export class LoadedSettings {
       isTrusted,
     );
 
-    // Remote admin settings always take precedence and file-based admin settings
-    // are ignored.
-    const adminSettingSchema = getSettingsSchema().admin;
-    if (adminSettingSchema?.properties) {
-      const adminSchema = adminSettingSchema.properties;
-      const adminDefaults = getDefaultsFromSchema(adminSchema);
-
-      // The final admin settings are the defaults overridden by remote settings.
-      // Any admin settings from files are ignored.
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      merged.admin = customDeepMerge(
-        (path: string[]) => getMergeStrategyForPath(['admin', ...path]),
-        adminDefaults,
-        this._remoteAdminSettings?.admin ?? {},
-      ) as MergedSettings['admin'];
-    }
     return merged;
   }
 
@@ -474,34 +456,6 @@ export class LoadedSettings {
     this._merged = this.computeMergedSettings();
     this._snapshot = this.computeSnapshot();
     coreEvents.emitSettingsChanged();
-  }
-
-  setRemoteAdminSettings(remoteSettings: AdminControlsSettings): void {
-    const admin: Settings['admin'] = {};
-    const { strictModeDisabled, mcpSetting, cliFeatureSetting } =
-      remoteSettings;
-
-    if (Object.keys(remoteSettings).length === 0) {
-      this._remoteAdminSettings = { admin };
-      this._merged = this.computeMergedSettings();
-      return;
-    }
-
-    admin.secureModeEnabled = !strictModeDisabled;
-    admin.mcp = {
-      enabled: mcpSetting?.mcpEnabled,
-      config: mcpSetting?.mcpConfig?.mcpServers,
-      requiredConfig: mcpSetting?.requiredMcpConfig,
-    };
-    admin.extensions = {
-      enabled: cliFeatureSetting?.extensionsSetting?.extensionsEnabled,
-    };
-    admin.skills = {
-      enabled: cliFeatureSetting?.unmanagedCapabilitiesEnabled,
-    };
-
-    this._remoteAdminSettings = { admin };
-    this._merged = this.computeMergedSettings();
   }
 
   /**

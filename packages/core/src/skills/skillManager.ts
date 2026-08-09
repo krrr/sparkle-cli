@@ -17,7 +17,6 @@ export { type SkillDefinition };
 export class SkillManager {
   private skills: SkillDefinition[] = [];
   private activeSkillNames: Set<string> = new Set();
-  private adminSkillsEnabled = true;
 
   /**
    * Clears all discovered skills.
@@ -31,20 +30,6 @@ export class SkillManager {
    */
   reset(): void {
     this.activeSkillNames.clear();
-  }
-
-  /**
-   * Sets administrative settings for skills.
-   */
-  setAdminSettings(enabled: boolean): void {
-    this.adminSkillsEnabled = enabled;
-  }
-
-  /**
-   * Returns true if skills are enabled by the admin.
-   */
-  isAdminEnabled(): boolean {
-    return this.adminSkillsEnabled;
   }
 
   /**

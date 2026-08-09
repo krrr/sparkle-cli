@@ -16,7 +16,6 @@ import { exitCli } from '../utils.js';
 import { getMcpServersFromConfig } from './list.js';
 
 const GREEN = '\x1b[32m';
-const YELLOW = '\x1b[33m';
 const RED = '\x1b[31m';
 const RESET = '\x1b[0m';
 
@@ -43,7 +42,6 @@ async function handleEnable(args: Args): Promise<void> {
   }
 
   const result = await canLoadServer(name, {
-    adminMcpEnabled: settings.merged.admin?.mcp?.enabled ?? true,
     allowedList: settings.merged.mcp?.allowed,
     excludedList: settings.merged.mcp?.excluded,
   });
@@ -62,12 +60,6 @@ async function handleEnable(args: Args): Promise<void> {
   } else {
     await manager.enable(name);
     debugLogger.log(`${GREEN}✓${RESET} MCP server '${name}' enabled.`);
-  }
-
-  if (result.blockType === 'admin') {
-    debugLogger.log(
-      `${YELLOW}Warning:${RESET} MCP servers are disabled by administrator.`,
-    );
   }
 }
 

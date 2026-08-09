@@ -13,7 +13,6 @@ import {
   RELAUNCH_EXIT_CODE,
   _resetRelaunchStateForTesting,
 } from '../../utils/processUtils.js';
-import { type Config } from '@google/gemini-cli-core';
 
 // Mocks
 vi.mock('../hooks/useKeypress.js', () => ({
@@ -33,10 +32,6 @@ describe('LoginRestartDialog', () => {
     .spyOn(process, 'exit')
     .mockImplementation(() => undefined as never);
 
-  const mockConfig = {
-    getRemoteAdminSettings: vi.fn(),
-  } as unknown as Config;
-
   beforeEach(() => {
     vi.clearAllMocks();
     exitSpy.mockClear();
@@ -46,7 +41,7 @@ describe('LoginRestartDialog', () => {
 
   it('renders correctly with default message', async () => {
     const { lastFrame, unmount } = await render(
-      <LoginRestartDialog onDismiss={onDismiss} config={mockConfig} />,
+      <LoginRestartDialog onDismiss={onDismiss} />,
     );
     expect(lastFrame()).toMatchSnapshot();
     unmount();
@@ -56,7 +51,6 @@ describe('LoginRestartDialog', () => {
     const { lastFrame, unmount } = await render(
       <LoginRestartDialog
         onDismiss={onDismiss}
-        config={mockConfig}
         message="Authenticating to Vertex AI in Cloud Shell requires a restart to apply project settings."
       />,
     );
@@ -66,7 +60,7 @@ describe('LoginRestartDialog', () => {
 
   it('calls onDismiss when escape is pressed', async () => {
     const { unmount } = await render(
-      <LoginRestartDialog onDismiss={onDismiss} config={mockConfig} />,
+      <LoginRestartDialog onDismiss={onDismiss} />,
     );
     const keypressHandler = mockedUseKeypress.mock.calls[0][0];
 
@@ -88,7 +82,7 @@ describe('LoginRestartDialog', () => {
       vi.useFakeTimers();
 
       const { unmount } = await render(
-        <LoginRestartDialog onDismiss={onDismiss} config={mockConfig} />,
+        <LoginRestartDialog onDismiss={onDismiss} />,
       );
       const keypressHandler = mockedUseKeypress.mock.calls[0][0];
 

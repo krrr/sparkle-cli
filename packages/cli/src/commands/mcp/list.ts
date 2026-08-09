@@ -15,8 +15,6 @@ import {
   MCPServerStatus,
   createTransport,
   debugLogger,
-  applyAdminAllowlist,
-  getAdminBlockedMcpServersMessage,
 } from '@google/gemini-cli-core';
 import type { MCPServerConfig } from '@google/gemini-cli-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
@@ -34,7 +32,6 @@ export async function getMcpServersFromConfig(
   settings?: MergedSettings,
 ): Promise<{
   mcpServers: Record<string, MCPServerConfig>;
-  blockedServerNames: string[];
 }> {
   if (!settings) {
     settings = loadSettings().merged;
@@ -61,10 +58,7 @@ export async function getMcpServersFromConfig(
     });
   }
 
-  const adminAllowlist = settings.admin?.mcp?.config;
-  const filteredResult = applyAdminAllowlist(mcpServers, adminAllowlist);
-
-  return filteredResult;
+  return { mcpServers };
 }
 
 const MCP_LIST_DEFAULT_TIMEOUT_MSEC = 5000;
@@ -165,7 +159,6 @@ async function getServerStatus(
   const mcpEnablementManager = McpServerEnablementManager.getInstance();
 
   const loadResult = await canLoadServer(serverName, {
-    adminMcpEnabled: activeSettings.admin?.mcp?.enabled ?? true,
     allowedList: consolidatedAllowed,
     excludedList:
       consolidatedExcluded.length > 0 ? consolidatedExcluded : undefined,
@@ -174,7 +167,6 @@ async function getServerStatus(
 
   if (!loadResult.allowed) {
     if (
-      loadResult.blockType === 'admin' ||
       loadResult.blockType === 'allowlist' ||
       loadResult.blockType === 'excludelist'
     ) {
@@ -203,22 +195,11 @@ export async function listMcpServers(
     ? loadedSettings.getMergedSettingsAsIfTrusted()
     : activeSettings;
 
-  const { mcpServers, blockedServerNames } =
-    await getMcpServersFromConfig(allSettings);
+  const { mcpServers } = await getMcpServersFromConfig(allSettings);
   const serverNames = Object.keys(mcpServers);
 
-  if (blockedServerNames.length > 0) {
-    const message = getAdminBlockedMcpServersMessage(
-      blockedServerNames,
-      undefined,
-    );
-    debugLogger.log(chalk.yellow(message + '\n'));
-  }
-
   if (serverNames.length === 0) {
-    if (blockedServerNames.length === 0) {
-      debugLogger.log('No MCP servers configured.');
-    }
+    debugLogger.log('No MCP servers configured.');
     return;
   }
 
