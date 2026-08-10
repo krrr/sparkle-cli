@@ -131,7 +131,7 @@ describe('<StatsDisplay />', () => {
     expect(output).toMatchSnapshot();
   });
 
-  it('resolves gemini-3-flash to gemini-3.5-flash in the model usage table', async () => {
+  it('displays gemini-3-flash model names as-is in the model usage table', async () => {
     const metrics = createTestMetrics({
       models: {
         'gemini-3-flash': {
@@ -153,8 +153,8 @@ describe('<StatsDisplay />', () => {
     const { lastFrame } = await renderWithMockedStats(metrics);
     const output = lastFrame();
 
-    expect(output).toContain('gemini-3.5-flash');
-    expect(output).not.toContain('gemini-3-flash\u0020'); // Avoid matching parts of substrings if not intended
+    expect(output).toContain('gemini-3-flash');
+    expect(output).not.toContain('gemini-3.5-flash');
     expect(output).toMatchSnapshot();
   });
 

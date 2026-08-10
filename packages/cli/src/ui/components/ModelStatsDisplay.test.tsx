@@ -353,7 +353,7 @@ describe('<ModelStatsDisplay />', () => {
     unmount();
   });
 
-  it('should resolve gemini-3-flash to gemini-3.5-flash via getDisplayString', async () => {
+  it('should display gemini-3-flash model names as-is via getDisplayString', async () => {
     const { lastFrame, unmount } = await renderWithMockedStats({
       models: {
         'gemini-3-flash': {
@@ -390,8 +390,8 @@ describe('<ModelStatsDisplay />', () => {
     });
 
     const output = lastFrame();
-    expect(output).toContain('gemini-3.5-flash');
-    expect(output).not.toContain('gemini-3-flash');
+    expect(output).toContain('gemini-3-flash');
+    expect(output).not.toContain('gemini-3.5-flash');
     expect(output).toMatchSnapshot();
     unmount();
   });

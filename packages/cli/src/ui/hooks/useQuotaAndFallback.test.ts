@@ -669,7 +669,7 @@ Your admin might have disabled the access to this model.`,
       );
     });
 
-    it('should show a special message when falling back from the preview model', async () => {
+    it('should show a fallback message when falling back from the pro model', async () => {
       const { result } = await renderHook(() =>
         useQuotaAndFallback({
           config: mockConfig,
@@ -702,11 +702,11 @@ Your admin might have disabled the access to this model.`,
       const lastCall = (mockHistoryManager.addItem as Mock).mock.calls[0][0];
       expect(lastCall.type).toBe(MessageType.INFO);
       expect(lastCall.text).toContain(
-        `Switched to fallback model gemini-2.5-pro`,
+        `Switched to fallback model ${DEFAULT_GEMINI_MODEL}`,
       );
     });
 
-    it('should show a special message when falling back from the preview model, but do not show periodical check message for flash model fallback', async () => {
+    it('should show a fallback message when falling back from the flash model, but do not show periodical check message for flash model fallback', async () => {
       const { result } = await renderHook(() =>
         useQuotaAndFallback({
           config: mockConfig,
@@ -739,7 +739,7 @@ Your admin might have disabled the access to this model.`,
       const lastCall = (mockHistoryManager.addItem as Mock).mock.calls[0][0];
       expect(lastCall.type).toBe(MessageType.INFO);
       expect(lastCall.text).toContain(
-        `Switched to fallback model gemini-2.5-flash`,
+        `Switched to fallback model ${DEFAULT_GEMINI_FLASH_MODEL}`,
       );
     });
   });

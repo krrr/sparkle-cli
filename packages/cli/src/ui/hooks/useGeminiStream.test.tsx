@@ -2516,7 +2516,7 @@ describe('useGeminiStream', () => {
           mockAuthType,
           undefined,
           'gemini-2.5-pro',
-          'gemini-2.5-flash',
+          'gemini-flash-latest',
         );
       });
     });
@@ -3753,7 +3753,7 @@ describe('useGeminiStream', () => {
         expect.any(String),
         undefined,
         'gemini-2.5-pro',
-        'gemini-2.5-flash',
+        'gemini-flash-latest',
       );
     });
 
