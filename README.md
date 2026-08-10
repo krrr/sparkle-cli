@@ -1,10 +1,10 @@
-# Gemini CLI
+# Sparkle CLI
 
-My Gemini CLI fork.
+Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 
-## Changes
+## Main Changes
 
-- Removed Google Cloud related feature (Gemini API keep untouched)
 - Added OpenAI API support
+- Removed Google Cloud and Enterprise features (keep Gemini API)
 
 ## Installation

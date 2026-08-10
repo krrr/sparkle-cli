@@ -1,14 +1,9 @@
-# Gemini CLI Project Context
+# Sparkle CLI Project Context
 
-Gemini CLI is an open-source AI agent that brings the power of Gemini directly
-into the terminal. It is designed to be a terminal-first, extensible, and
-powerful tool for developers.
+Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 
 ## Project Overview
 
-- **Purpose:** Provide a seamless terminal interface for Gemini models,
-  supporting code understanding, generation, automation, and integration via MCP
-  (Model Context Protocol).
 - **Main Technologies:**
   - **Runtime:** Node.js (>=20.0.0, recommended ~20.19.0 for development)
   - **Language:** TypeScript
@@ -66,11 +61,7 @@ powerful tool for developers.
 
 ## Development Conventions
 
-- **Contributions:** Follow the process outlined in `CONTRIBUTING.md`. Requires
-  signing the Google CLA.
-- **Pull Requests:** Keep PRs small, focused, and linked to an existing issue.
-  Always activate the `pr-creator` skill for PR generation, even when using the
-  `gh` CLI.
+- **Contributions:** Follow the process outlined in `CONTRIBUTING.md`.
 - **Commit Messages:** Follow the
   [Conventional Commits](https://www.conventionalcommits.org/) standard.
 - **Imports:** Use specific imports and avoid restricted relative imports
