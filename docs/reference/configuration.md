@@ -593,36 +593,6 @@ their corresponding top-level category object in your `settings.json` file.
           }
         }
       },
-      "gemini-3-pro-preview": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3-pro-preview"
-        }
-      },
-      "gemini-3-flash-preview": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3-flash-preview"
-        }
-      },
-      "gemini-3.1-pro-preview": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3.1-pro-preview"
-        }
-      },
-      "gemini-3.1-pro-preview-customtools": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3.1-pro-preview-customtools"
-        }
-      },
-      "gemini-3.1-flash-lite-preview": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemini-3.1-flash-lite-preview"
-        }
-      },
       "gemini-2.5-pro": {
         "extends": "chat-base-2.5",
         "modelConfig": {
@@ -653,18 +623,6 @@ their corresponding top-level category object in your `settings.json` file.
           "model": "gemini-3.5-flash"
         }
       },
-      "gemma-4-31b-it": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemma-4-31b-it"
-        }
-      },
-      "gemma-4-26b-a4b-it": {
-        "extends": "chat-base-3",
-        "modelConfig": {
-          "model": "gemma-4-26b-a4b-it"
-        }
-      },
       "gemini-2.5-flash-base": {
         "extends": "base",
         "modelConfig": {
@@ -674,7 +632,7 @@ their corresponding top-level category object in your `settings.json` file.
       "gemini-3-flash-base": {
         "extends": "base",
         "modelConfig": {
-          "model": "gemini-3-flash-preview"
+          "model": "gemini-3.5-flash"
         }
       },
       "gemini-3.5-flash-base": {
@@ -785,7 +743,7 @@ their corresponding top-level category object in your `settings.json` file.
       "loop-detection-double-check": {
         "extends": "base",
         "modelConfig": {
-          "model": "gemini-3-pro-preview"
+          "model": "gemini-2.5-pro"
         }
       },
       "llm-edit-fixer": {
@@ -809,44 +767,29 @@ their corresponding top-level category object in your `settings.json` file.
           }
         }
       },
-      "chat-compression-3-pro": {
-        "modelConfig": {
-          "model": "gemini-3-pro-preview"
-        }
-      },
-      "chat-compression-3-flash": {
-        "modelConfig": {
-          "model": "gemini-3-flash-preview"
-        }
-      },
-      "chat-compression-3.1-flash-lite": {
-        "modelConfig": {
-          "model": "gemini-3.1-flash-lite"
-        }
-      },
-      "chat-compression-2.5-pro": {
+      "chat-compression-pro": {
         "modelConfig": {
           "model": "gemini-2.5-pro"
         }
       },
-      "chat-compression-2.5-flash": {
+      "chat-compression-flash": {
         "modelConfig": {
           "model": "gemini-2.5-flash"
         }
       },
-      "chat-compression-2.5-flash-lite": {
+      "chat-compression-flash-lite": {
         "modelConfig": {
           "model": "gemini-2.5-flash-lite"
         }
       },
       "chat-compression-default": {
         "modelConfig": {
-          "model": "gemini-3-pro-preview"
+          "model": "gemini-2.5-pro"
         }
       },
       "agent-history-provider-summarizer": {
         "modelConfig": {
-          "model": "gemini-3-flash-preview"
+          "model": "gemini-2.5-flash"
         }
       }
     }
@@ -883,46 +826,6 @@ their corresponding top-level category object in your `settings.json` file.
         "tier": "flash-lite",
         "family": "gemini-3",
         "isPreview": false,
-        "isVisible": true,
-        "features": {
-          "thinking": false,
-          "multimodalToolUse": true
-        }
-      },
-      "gemini-3.1-pro-preview": {
-        "tier": "pro",
-        "family": "gemini-3",
-        "isPreview": true,
-        "isVisible": true,
-        "features": {
-          "thinking": true,
-          "multimodalToolUse": true
-        }
-      },
-      "gemini-3.1-pro-preview-customtools": {
-        "tier": "pro",
-        "family": "gemini-3",
-        "isPreview": true,
-        "isVisible": false,
-        "features": {
-          "thinking": true,
-          "multimodalToolUse": true
-        }
-      },
-      "gemini-3-pro-preview": {
-        "tier": "pro",
-        "family": "gemini-3",
-        "isPreview": true,
-        "isVisible": true,
-        "features": {
-          "thinking": true,
-          "multimodalToolUse": true
-        }
-      },
-      "gemini-3-flash-preview": {
-        "tier": "flash",
-        "family": "gemini-3",
-        "isPreview": true,
         "isVisible": true,
         "features": {
           "thinking": false,
@@ -994,7 +897,7 @@ their corresponding top-level category object in your `settings.json` file.
       "auto": {
         "displayName": "Auto",
         "tier": "auto",
-        "isPreview": true,
+        "isPreview": false,
         "isVisible": true,
         "features": {
           "thinking": true,
@@ -1027,18 +930,6 @@ their corresponding top-level category object in your `settings.json` file.
           "thinking": false,
           "multimodalToolUse": false
         }
-      },
-      "auto-gemini-3": {
-        "tier": "auto",
-        "family": "gemini-3",
-        "isPreview": true,
-        "isVisible": false
-      },
-      "auto-gemini-2.5": {
-        "tier": "auto",
-        "family": "gemini-2.5",
-        "isPreview": false,
-        "isVisible": false
       }
     }
     ```
@@ -1053,209 +944,17 @@ their corresponding top-level category object in your `settings.json` file.
 
     ```json
     {
-      "gemma-4-31b-it": {
-        "default": "gemma-4-31b-it"
-      },
-      "gemma-4-26b-a4b-it": {
-        "default": "gemma-4-26b-a4b-it"
-      },
-      "gemini-3.1-pro-preview": {
-        "default": "gemini-3.1-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          }
-        ]
-      },
-      "gemini-3.1-pro-preview-customtools": {
-        "default": "gemini-3.1-pro-preview-customtools",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          }
-        ]
-      },
-      "gemini-3-flash-preview": {
-        "default": "gemini-3-flash-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false,
-              "useGemini3_5Flash": true
-            },
-            "target": "gemini-3.5-flash"
-          },
-          {
-            "condition": {
-              "hasAccessToPreview": false,
-              "useGemini3_5Flash": false
-            },
-            "target": "gemini-2.5-flash"
-          }
-        ]
-      },
-      "gemini-3.5-flash": {
-        "default": "gemini-3.5-flash",
-        "contexts": [
-          {
-            "condition": {
-              "useGemini3_5Flash": false,
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-flash"
-          },
-          {
-            "condition": {
-              "useGemini3_5Flash": false
-            },
-            "target": "gemini-3-flash-preview"
-          }
-        ]
-      },
-      "gemini-2.5-flash": {
-        "default": "gemini-2.5-flash",
-        "contexts": [
-          {
-            "condition": {
-              "useGemini3_5Flash": true
-            },
-            "target": "gemini-3.5-flash"
-          }
-        ]
-      },
-      "gemini-3-pro-preview": {
-        "default": "gemini-3-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true,
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true
-            },
-            "target": "gemini-3.1-pro-preview"
-          }
-        ]
-      },
       "auto": {
-        "default": "gemini-3-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true,
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true
-            },
-            "target": "gemini-3.1-pro-preview"
-          }
-        ]
+        "default": "gemini-pro-latest"
       },
       "pro": {
-        "default": "gemini-3-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true,
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true
-            },
-            "target": "gemini-3.1-pro-preview"
-          }
-        ]
-      },
-      "gemini-3.1-flash-lite": {
-        "default": "gemini-3.1-flash-lite"
+        "default": "gemini-pro-latest"
       },
       "flash": {
-        "default": "gemini-3-flash-preview",
-        "contexts": [
-          {
-            "condition": {
-              "useGemini3_5Flash": true
-            },
-            "target": "gemini-3.5-flash"
-          },
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-flash"
-          }
-        ]
+        "default": "gemini-flash-latest"
       },
       "flash-lite": {
-        "default": "gemini-3.1-flash-lite"
-      },
-      "auto-gemini-3": {
-        "default": "gemini-3-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true,
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true
-            },
-            "target": "gemini-3.1-pro-preview"
-          }
-        ]
-      },
-      "auto-gemini-2.5": {
-        "default": "gemini-2.5-pro"
+        "default": "gemini-flash-lite-latest"
       }
     }
     ```
@@ -1271,57 +970,10 @@ their corresponding top-level category object in your `settings.json` file.
     ```json
     {
       "flash": {
-        "default": "gemini-3-flash-preview",
-        "contexts": [
-          {
-            "condition": {
-              "useGemini3_5Flash": true
-            },
-            "target": "gemini-3.5-flash"
-          },
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-flash"
-          },
-          {
-            "condition": {
-              "requestedModels": ["gemini-2.5-pro", "auto-gemini-2.5"]
-            },
-            "target": "gemini-2.5-flash"
-          }
-        ]
+        "default": "gemini-2.5-flash"
       },
       "pro": {
-        "default": "gemini-3-pro-preview",
-        "contexts": [
-          {
-            "condition": {
-              "hasAccessToPreview": false
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "requestedModels": ["gemini-2.5-pro", "auto-gemini-2.5"]
-            },
-            "target": "gemini-2.5-pro"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true,
-              "useCustomTools": true
-            },
-            "target": "gemini-3.1-pro-preview-customtools"
-          },
-          {
-            "condition": {
-              "useGemini3_1": true
-            },
-            "target": "gemini-3.1-pro-preview"
-          }
-        ]
+        "default": "gemini-2.5-pro"
       }
     }
     ```
@@ -1336,75 +988,6 @@ their corresponding top-level category object in your `settings.json` file.
 
     ```json
     {
-      "preview": [
-        {
-          "model": "gemini-3-pro-preview",
-          "actions": {
-            "terminal": "prompt",
-            "transient": "prompt",
-            "not_found": "prompt",
-            "unknown": "prompt"
-          },
-          "stateTransitions": {
-            "terminal": "terminal",
-            "transient": "terminal",
-            "not_found": "terminal",
-            "unknown": "terminal"
-          }
-        },
-        {
-          "model": "gemini-3-flash-preview",
-          "isLastResort": true,
-          "maxAttempts": 10,
-          "actions": {
-            "terminal": "prompt",
-            "transient": "prompt",
-            "not_found": "prompt",
-            "unknown": "prompt"
-          },
-          "stateTransitions": {
-            "terminal": "terminal",
-            "transient": "terminal",
-            "not_found": "terminal",
-            "unknown": "terminal"
-          }
-        }
-      ],
-      "auto-preview": [
-        {
-          "model": "gemini-3-pro-preview",
-          "maxAttempts": 3,
-          "actions": {
-            "terminal": "prompt",
-            "transient": "silent",
-            "not_found": "prompt",
-            "unknown": "prompt"
-          },
-          "stateTransitions": {
-            "terminal": "terminal",
-            "transient": "sticky_retry",
-            "not_found": "terminal",
-            "unknown": "terminal"
-          }
-        },
-        {
-          "model": "gemini-3-flash-preview",
-          "isLastResort": true,
-          "maxAttempts": 10,
-          "actions": {
-            "terminal": "prompt",
-            "transient": "prompt",
-            "not_found": "prompt",
-            "unknown": "prompt"
-          },
-          "stateTransitions": {
-            "terminal": "terminal",
-            "transient": "terminal",
-            "not_found": "terminal",
-            "unknown": "terminal"
-          }
-        }
-      ],
       "default": [
         {
           "model": "gemini-2.5-pro",

@@ -84,7 +84,7 @@ export function useQuotaAndFallback({
         if (VALID_GEMINI_MODELS.has(failedModel)) {
           const messageLines = [
             `It seems like you don't have access to ${getDisplayString(failedModel)}.`,
-            `Your admin might have disabled the access. Contact them to enable the Preview Release Channel.`,
+            `Your admin might have disabled the access to this model.`,
           ];
           message = messageLines.join('\n');
         } else {

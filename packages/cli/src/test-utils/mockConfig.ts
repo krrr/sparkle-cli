@@ -169,7 +169,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getAllowedMcpServers: vi.fn().mockReturnValue([]),
     getBlockedMcpServers: vi.fn().mockReturnValue([]),
     getExperiments: vi.fn().mockReturnValue(undefined),
-    getHasAccessToPreviewModel: vi.fn().mockReturnValue(false),
     validatePathAccess: vi.fn().mockReturnValue(null),
     getUseAlternateBuffer: vi.fn().mockReturnValue(false),
     getUseTerminalBuffer: vi.fn().mockReturnValue(false),

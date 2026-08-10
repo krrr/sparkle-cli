@@ -65,10 +65,7 @@ import type { McpClientManager } from '../tools/mcp-client-manager.js';
 import { DEFAULT_MODEL_CONFIGS } from './defaultModelConfigs.js';
 import {
   DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_3_1_MODEL,
-  DEFAULT_GEMINI_MODEL_AUTO,
-  PREVIEW_GEMINI_MODEL_AUTO,
-  PREVIEW_GEMINI_FLASH_MODEL,
+  GEMINI_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
 } from './models.js';
 import { Storage } from './storage.js';
@@ -677,20 +674,6 @@ describe('Server Config (config.ts)', () => {
       });
     });
 
-    describe('getGemini31LaunchedSync', () => {
-      it.each([AuthType.USE_GEMINI, AuthType.GATEWAY])(
-        'should return true for %s',
-        async (authType) => {
-          const config = new Config(baseParams);
-          vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-            authType,
-          });
-          await config.refreshAuth(authType);
-          expect(config.getGemini31LaunchedSync()).toBe(true);
-        },
-      );
-    });
-
     describe('getProModelNoAccessSync', () => {
       it('should return false for other auth types even if experiment is true', async () => {
         vi.mocked(getExperiments).mockResolvedValue({
@@ -868,14 +851,14 @@ describe('Server Config (config.ts)', () => {
 
       const config = new Config({
         ...baseParams,
-        model: PREVIEW_GEMINI_MODEL_AUTO,
+        model: GEMINI_MODEL_ALIAS_AUTO,
       });
 
       await config.refreshAuth(AuthType.GATEWAY);
       await config.getExperimentsAsync();
 
       await vi.waitFor(() => {
-        expect(config.getModel()).toBe(PREVIEW_GEMINI_FLASH_MODEL);
+        expect(config.getModel()).toBe(DEFAULT_GEMINI_FLASH_MODEL);
       });
     });
 
@@ -891,12 +874,12 @@ describe('Server Config (config.ts)', () => {
 
       const config = new Config({
         ...baseParams,
-        model: PREVIEW_GEMINI_MODEL_AUTO,
+        model: GEMINI_MODEL_ALIAS_AUTO,
       });
 
       await config.refreshAuth(AuthType.GATEWAY);
 
-      expect(config.getModel()).toBe(PREVIEW_GEMINI_MODEL_AUTO);
+      expect(config.getModel()).toBe(GEMINI_MODEL_ALIAS_AUTO);
     });
   });
 
@@ -1892,7 +1875,6 @@ describe('Server Config (config.ts)', () => {
       lastEmittedQuotaRemaining: number | undefined;
       lastEmittedQuotaLimit: number | undefined;
       lastQuotaFetchTime: number;
-      hasAccessToPreviewModel: boolean | null;
     }
     const configInternal = config as unknown as PrivateConfig;
 
@@ -1901,7 +1883,6 @@ describe('Server Config (config.ts)', () => {
     configInternal.lastEmittedQuotaRemaining = 0;
     configInternal.lastEmittedQuotaLimit = 100;
     configInternal.lastQuotaFetchTime = 12345;
-    configInternal.hasAccessToPreviewModel = true;
 
     // Listen for quota event
     const emitQuotaSpy = vi.spyOn(coreEvents, 'emitQuotaChanged');
@@ -2835,8 +2816,6 @@ describe('Config Quota & Preview Model Access', () => {
     it('should return undefined without a Code Assist server', async () => {
       const result = await config.refreshUserQuota();
       expect(result).toBeUndefined();
-      // Never set => stays null (unknown); getter returns false by default
-      expect(config.getHasAccessToPreviewModel()).toBe(false);
     });
 
     it('should return undefined from refreshUserQuotaIfStale', async () => {
@@ -3589,10 +3568,10 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     cwd: '/tmp',
     targetDir: '/path/to/target',
     debugMode: false,
-    model: PREVIEW_GEMINI_3_1_MODEL, // User saved preview model
+    model: DEFAULT_GEMINI_MODEL,
   };
 
-  it('should NOT reset preview model for GATEWAY auth when refreshUserQuota is not called (no projectId)', async () => {
+  it('should preserve the saved model across auth refresh', async () => {
     const mockContentConfig = {
       authType: AuthType.GATEWAY,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
@@ -3605,22 +3584,20 @@ describe('Model Persistence Bug Fix (#19864)', () => {
       mockContentConfig,
     );
     vi.mocked(createContentGenerator).mockResolvedValue(mockContentGenerator);
-    // getCodeAssistServer returns undefined by default, so refreshUserQuota() isn't called;
-    // hasAccessToPreviewModel stays null; reset only when === false, so we don't reset.
     const config = new Config(baseParams);
 
-    // Verify initial model is the preview model
-    expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
+    // Verify initial model is preserved
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth to simulate restart (GATEWAY auth, no projectId)
     await config.refreshAuth(AuthType.GATEWAY);
 
-    // Verify the model was NOT reset (bug fix)
-    expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
-    expect(config.getModel()).not.toBe(DEFAULT_GEMINI_MODEL_AUTO);
+    // Verify the model was NOT reset
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
+    expect(config.getModel()).not.toBe(GEMINI_MODEL_ALIAS_AUTO);
   });
 
-  it('should NOT reset preview model for USE_GEMINI (hasAccessToPreviewModel is set to true)', async () => {
+  it('should preserve the saved model for USE_GEMINI', async () => {
     const mockContentConfig = {
       authType: AuthType.USE_GEMINI,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
@@ -3636,32 +3613,30 @@ describe('Model Persistence Bug Fix (#19864)', () => {
 
     const config = new Config(baseParams);
 
-    // Verify initial model is the preview model
-    expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
+    // Verify initial model is preserved
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth
     await config.refreshAuth(AuthType.USE_GEMINI);
 
-    // For USE_GEMINI, hasAccessToPreviewModel should be set to true
-    // So the model should NOT be reset
-    expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
-    expect(config.getHasAccessToPreviewModel()).toBe(true);
+    // The model should NOT be reset
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('should persist model when user selects it with persistMode=true', () => {
     const onModelChange = vi.fn();
     const config = new Config({
       ...baseParams,
-      model: DEFAULT_GEMINI_MODEL_AUTO, // Initial model
+      model: GEMINI_MODEL_ALIAS_AUTO, // Initial model
       onModelChange,
     });
 
-    // User selects preview model with persist mode enabled
-    config.setModel(PREVIEW_GEMINI_3_1_MODEL, false); // isTemporary = false
+    // User selects a model with persist mode enabled
+    config.setModel(DEFAULT_GEMINI_MODEL, false); // isTemporary = false
 
     // Verify onModelChange was called to persist the model
-    expect(onModelChange).toHaveBeenCalledWith(PREVIEW_GEMINI_3_1_MODEL);
-    expect(config.getModel()).toBe(PREVIEW_GEMINI_3_1_MODEL);
+    expect(onModelChange).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
   });
 });
 
@@ -3724,59 +3699,5 @@ describe('ADKSettings', () => {
     };
     const config = new Config(params);
     expect(config.getAgentSessionNoninteractiveEnabled()).toBe(true);
-  });
-});
-
-describe('hasGemini35FlashGAAccess model setting', () => {
-  const baseParams: ConfigParameters = {
-    sessionId: 'test',
-    targetDir: '.',
-    debugMode: false,
-    model: 'test-model',
-    cwd: '.',
-  };
-
-  it('should set DEFAULT_GEMINI_FLASH_MODEL to gemini-3.5-flash and PREVIEW_GEMINI_FLASH_MODEL to gemini-3-flash-preview if hasGemini35FlashGAAccess returns true and authType is USE_GEMINI', () => {
-    const config = new Config(baseParams);
-    config['contentGeneratorConfig'] = { authType: AuthType.USE_GEMINI };
-
-    // Set experiment to return true for GEMINI_3_5_FLASH_GA_LAUNCHED
-    config.setExperiments({
-      experimentIds: [],
-      flags: {
-        [ExperimentFlags.GEMINI_3_5_FLASH_GA_LAUNCHED]: {
-          boolValue: true,
-        },
-      },
-    });
-
-    // Call the method
-    const result = config.hasGemini35FlashGAAccess();
-    expect(result).toBe(true);
-
-    expect(DEFAULT_GEMINI_FLASH_MODEL).toBe('gemini-3.5-flash');
-    expect(PREVIEW_GEMINI_FLASH_MODEL).toBe('gemini-3-flash-preview');
-  });
-
-  it('should set DEFAULT_GEMINI_FLASH_MODEL and PREVIEW_GEMINI_FLASH_MODEL to gemini-3.5-flash if hasGemini35FlashGAAccess returns true and authType is not USE_GEMINI', () => {
-    const config = new Config(baseParams);
-    config['contentGeneratorConfig'] = { authType: AuthType.GATEWAY };
-
-    // Set experiment to return true for GEMINI_3_5_FLASH_GA_LAUNCHED
-    config.setExperiments({
-      experimentIds: [],
-      flags: {
-        [ExperimentFlags.GEMINI_3_5_FLASH_GA_LAUNCHED]: {
-          boolValue: true,
-        },
-      },
-    });
-
-    // Call the method
-    const result = config.hasGemini35FlashGAAccess();
-    expect(result).toBe(true);
-
-    expect(DEFAULT_GEMINI_FLASH_MODEL).toBe('gemini-3.5-flash');
-    expect(PREVIEW_GEMINI_FLASH_MODEL).toBe('gemini-3.5-flash');
   });
 });

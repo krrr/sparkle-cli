@@ -446,7 +446,7 @@ describe('<ModelStatsDisplay />', () => {
         },
       },
       80,
-      'auto-gemini-3',
+      'auto',
     );
 
     const output = lastFrame();

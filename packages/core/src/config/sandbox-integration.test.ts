@@ -43,7 +43,6 @@ vi.mock('./models.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./models.js')>();
   return {
     ...actual,
-    isPreviewModel: vi.fn().mockReturnValue(false),
     resolveModel: vi.fn().mockReturnValue('test-model'),
   };
 });

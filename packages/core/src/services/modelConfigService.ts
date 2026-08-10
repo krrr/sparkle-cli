@@ -8,7 +8,6 @@ import type { GenerateContentConfig } from '@google/genai';
 import type { ModelPolicy } from '../availability/modelPolicy.js';
 import {
   getDisplayString,
-  PREVIEW_GEMINI_3_1_MODEL,
   isProModel,
   getAutoModelDescription,
 } from '../config/models.js';
@@ -63,12 +62,11 @@ export interface ModelConfigAlias {
 
 // A model definition is a mapping from a model name to a list of features
 // that the model supports. Model names can be either direct model IDs
-// (gemini-2.5-pro) or aliases (auto).
+// (gemini-pro-latest) or aliases (auto).
 export interface ModelDefinition {
   displayName?: string;
   tier?: string; // 'pro' | 'flash' | 'flash-lite' | 'custom' | 'auto'
   family?: string; // The gemini family, e.g. 'gemini-3' | 'gemini-2'
-  isPreview?: boolean;
   // Specifies whether the model should be visible in the dialog.
   isVisible?: boolean;
   /** A short description of the model for the dialog. */
@@ -98,22 +96,14 @@ export interface ModelResolution {
 
 /** The actual state of the current session. */
 export interface ResolutionContext {
-  useGemini3_1?: boolean;
-  useGemini3_1FlashLite?: boolean;
-  useGemini3_5Flash?: boolean;
   useCustomTools?: boolean;
-  hasAccessToPreview?: boolean;
   hasAccessToProModel?: boolean;
   requestedModel?: string;
 }
 
 /** The requirements defined in the registry. */
 export interface ResolutionCondition {
-  useGemini3_1?: boolean;
-  useGemini3_1FlashLite?: boolean;
-  useGemini3_5Flash?: boolean;
   useCustomTools?: boolean;
-  hasAccessToPreview?: boolean;
   /** Matches if the current model is in this list. */
   requestedModels?: string[];
 }
@@ -158,28 +148,18 @@ export class ModelConfigService {
     tier: string;
   }> {
     const definitions = this.config.modelDefinitions ?? {};
-    const shouldShowPreviewModels = context.hasAccessToPreview ?? false;
-    const useGemini31 = context.useGemini3_1 ?? false;
-    const useGemini3_5Flash = context.useGemini3_5Flash ?? false;
 
     const mainOptions = Object.entries(definitions)
       .filter(([_, m]) => {
         if (m.isVisible !== true) return false;
-        if (m.isPreview && !shouldShowPreviewModels) return false;
         if (m.tier !== 'auto') return false;
         return true;
       })
       .map(([id, m]) => {
-        let description = m.dialogDescription ?? '';
-        if (id === 'auto') {
-          description = getAutoModelDescription(
-            shouldShowPreviewModels,
-            useGemini31,
-            useGemini3_5Flash,
-          );
-        } else if (id === 'auto-gemini-3' && useGemini31) {
-          description = description.replace('gemini-3-pro', 'gemini-3.1-pro');
-        }
+        const description =
+          id === 'auto'
+            ? getAutoModelDescription()
+            : (m.dialogDescription ?? '');
 
         return {
           modelId: id,
@@ -192,18 +172,14 @@ export class ModelConfigService {
     const manualOptions = Object.entries(definitions)
       .filter(([id, m]) => {
         if (m.isVisible !== true) return false;
-        if (m.isPreview && !shouldShowPreviewModels) return false;
         if (m.tier === 'auto') return false;
         if (context.hasAccessToProModel === false && isProModel(id))
           return false;
-        if (id === PREVIEW_GEMINI_3_1_MODEL && !useGemini31) return false;
         return true;
       })
       .map(([id, m]) => {
         const resolvedId = this.resolveModelId(id, context);
-        const titleId = this.resolveModelId(id, {
-          useGemini3_1: useGemini31,
-        });
+        const titleId = this.resolveModelId(id);
         return {
           modelId: resolvedId,
           name: m.displayName ?? getDisplayString(titleId),
@@ -253,16 +229,8 @@ export class ModelConfigService {
       if (value === undefined) return true;
 
       switch (key) {
-        case 'useGemini3_1':
-          return value === context.useGemini3_1;
-        case 'useGemini3_1FlashLite':
-          return value === context.useGemini3_1FlashLite;
-        case 'useGemini3_5Flash':
-          return value === context.useGemini3_5Flash;
         case 'useCustomTools':
           return value === context.useCustomTools;
-        case 'hasAccessToPreview':
-          return value === context.hasAccessToPreview;
         case 'requestedModels':
           return (
             Array.isArray(value) &&

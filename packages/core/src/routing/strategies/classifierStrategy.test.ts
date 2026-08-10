@@ -16,16 +16,12 @@ import {
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  DEFAULT_GEMINI_MODEL_AUTO,
-  PREVIEW_GEMINI_MODEL_AUTO,
-  PREVIEW_GEMINI_3_1_MODEL,
-  PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
+  GEMINI_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
 import type { ResolvedModelConfig } from '../../services/modelConfigService.js';
 import { debugLogger } from '../../utils/debugLogger.js';
-import { AuthType } from '../../core/contentGenerator.js';
 import { ModelAvailabilityService } from '../../availability/modelAvailabilityService.js';
 
 vi.mock('../../core/baseLlmClient.js');
@@ -55,17 +51,8 @@ describe('ClassifierStrategy', () => {
       modelConfigService: {
         getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
       },
-      getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL_AUTO),
+      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(false),
-      getGemini31Launched: vi.fn().mockResolvedValue(false),
-      getUseCustomToolModel: vi.fn().mockImplementation(async () => {
-        const launched = await mockConfig.getGemini31Launched();
-        const authType = mockConfig.getContentGeneratorConfig().authType;
-        return launched && authType === AuthType.USE_GEMINI;
-      }),
-      getContentGeneratorConfig: vi.fn().mockReturnValue({
-        authType: AuthType.USE_GEMINI,
-      }),
       getModelAvailabilityService: vi
         .fn()
         .mockReturnValue(new ModelAvailabilityService()),
@@ -79,7 +66,7 @@ describe('ClassifierStrategy', () => {
 
   it('should return null if numerical routing is enabled and model is Gemini 3', async () => {
     vi.mocked(mockConfig.getNumericalRoutingEnabled).mockResolvedValue(true);
-    vi.mocked(mockConfig.getModel).mockReturnValue(PREVIEW_GEMINI_MODEL_AUTO);
+    vi.mocked(mockConfig.getModel).mockReturnValue('gemini-3-pro-preview');
 
     const decision = await strategy.route(
       mockContext,
@@ -93,7 +80,7 @@ describe('ClassifierStrategy', () => {
 
   it('should NOT return null if numerical routing is enabled but model is NOT Gemini 3', async () => {
     vi.mocked(mockConfig.getNumericalRoutingEnabled).mockResolvedValue(true);
-    vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_GEMINI_MODEL_AUTO);
+    vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
     vi.mocked(mockBaseLlmClient.generateJson).mockResolvedValue({
       reasoning: 'test',
       model_choice: 'flash',
@@ -444,13 +431,9 @@ describe('ClassifierStrategy', () => {
     expect(contents).toEqual(expectedContents);
   });
 
-  describe('Gemini 3.1 and Custom Tools Routing', () => {
-    it('should route to PREVIEW_GEMINI_3_1_MODEL when Gemini 3.1 is launched', async () => {
-      vi.mocked(mockConfig.getGemini31Launched).mockResolvedValue(true);
-      vi.mocked(mockConfig.getModel).mockReturnValue(PREVIEW_GEMINI_MODEL_AUTO);
-      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.GATEWAY,
-      });
+  describe('Classifier routing with default models', () => {
+    it('should route to the default pro model when classifier selects pro', async () => {
+      vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
       const mockApiResponse = {
         reasoning: 'Complex task',
         model_choice: 'pro',
@@ -465,36 +448,11 @@ describe('ClassifierStrategy', () => {
         mockBaseLlmClient,
       );
 
-      expect(decision?.model).toBe(PREVIEW_GEMINI_3_1_MODEL);
+      expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
-    it('should route to PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL when Gemini 3.1 is launched and auth is USE_GEMINI', async () => {
-      vi.mocked(mockConfig.getGemini31Launched).mockResolvedValue(true);
-      vi.mocked(mockConfig.getModel).mockReturnValue(PREVIEW_GEMINI_MODEL_AUTO);
-      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: AuthType.USE_GEMINI,
-      });
-      const mockApiResponse = {
-        reasoning: 'Complex task',
-        model_choice: 'pro',
-      };
-      vi.mocked(mockBaseLlmClient.generateJson).mockResolvedValue(
-        mockApiResponse,
-      );
-
-      const decision = await strategy.route(
-        mockContext,
-        mockConfig,
-        mockBaseLlmClient,
-      );
-
-      expect(decision?.model).toBe(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL);
-    });
-
-    it('should route to DEFAULT_GEMINI_FLASH_MODEL when hasGemini35FlashGAAccess is true', async () => {
-      mockConfig.hasGemini35FlashGAAccess = vi.fn().mockReturnValue(true);
-      vi.mocked(mockConfig.getModel).mockReturnValue(PREVIEW_GEMINI_MODEL_AUTO);
-
+    it('should route to the default flash model when classifier selects flash', async () => {
+      vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
       const mockApiResponse = {
         reasoning: 'Simple task',
         model_choice: 'flash',

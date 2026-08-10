@@ -14,9 +14,6 @@ import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_FLASH_MODEL,
-  PREVIEW_GEMINI_MODEL,
-  resolveModel,
 } from '../config/models.js';
 import type { UserTierId } from '../userTier.js';
 
@@ -27,13 +24,8 @@ type PolicyConfig = Omit<ModelPolicy, 'actions' | 'stateTransitions'> & {
 };
 
 export interface ModelPolicyOptions {
-  previewEnabled: boolean;
   isAutoSelection?: boolean;
   userTier?: UserTierId;
-  useGemini31?: boolean;
-  useGemini31FlashLite?: boolean;
-  useCustomToolModel?: boolean;
-  useGemini3_5Flash?: boolean;
 }
 
 const DEFAULT_ACTIONS: ModelPolicyActionMap = {
@@ -89,34 +81,6 @@ export function getModelPolicyChain(
   options: ModelPolicyOptions,
 ): ModelPolicyChain {
   const isAuto = options.isAutoSelection ?? false;
-
-  if (options.previewEnabled) {
-    const proModel = resolveModel(
-      PREVIEW_GEMINI_MODEL,
-      options.useGemini31,
-      options.useCustomToolModel,
-      true,
-      undefined,
-      options.useGemini3_5Flash,
-    );
-    return [
-      definePolicy({
-        model: proModel,
-        ...(isAuto
-          ? {
-              maxAttempts: 3,
-              actions: { ...DEFAULT_ACTIONS, transient: 'silent' },
-              stateTransitions: { ...DEFAULT_STATE, transient: 'sticky_retry' },
-            }
-          : {}),
-      }),
-      definePolicy({
-        model: PREVIEW_GEMINI_FLASH_MODEL,
-        isLastResort: true,
-        maxAttempts: 10,
-      }),
-    ];
-  }
 
   return [
     definePolicy({

@@ -117,17 +117,14 @@ describe('modelStringToModelConfigAlias', () => {
   });
 
   it('should handle valid names', () => {
-    expect(modelStringToModelConfigAlias('gemini-3-pro-preview')).toBe(
-      'chat-compression-3-pro',
-    );
     expect(modelStringToModelConfigAlias('gemini-2.5-pro')).toBe(
-      'chat-compression-2.5-pro',
+      'chat-compression-pro',
     );
     expect(modelStringToModelConfigAlias('gemini-2.5-flash')).toBe(
-      'chat-compression-2.5-flash',
+      'chat-compression-flash',
     );
     expect(modelStringToModelConfigAlias('gemini-2.5-flash-lite')).toBe(
-      'chat-compression-2.5-flash-lite',
+      'chat-compression-flash-lite',
     );
   });
 });

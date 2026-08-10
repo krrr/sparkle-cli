@@ -2207,7 +2207,7 @@ describe('GeminiChat', () => {
       );
 
       const stream = await chat.sendMessageStream(
-        { model: 'gemini-2.0-flash' },
+        { model: 'gemini-1.5-pro' },
         'hello',
         'prompt-id-thinking-budget',
         new AbortController().signal,
@@ -2219,7 +2219,7 @@ describe('GeminiChat', () => {
 
       expect(mockContentGenerator.generateContentStream).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-1.5-pro',
           config: expect.objectContaining({
             thinkingConfig: {
               thinkingBudget: 8192,

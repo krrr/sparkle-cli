@@ -205,7 +205,7 @@ export async function getCorrectedFileContent(
 
   if (!isJsonOrIpynb) {
     const activeModel = config.getActiveModel();
-    const resolvedModel = resolveModel(activeModel, false, false, true, config);
+    const resolvedModel = resolveModel(activeModel, config);
 
     const aggressiveUnescape =
       !isGemini3Model(resolvedModel, config) &&

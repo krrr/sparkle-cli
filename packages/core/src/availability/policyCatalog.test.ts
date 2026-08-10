@@ -11,66 +11,35 @@ import {
   validateModelPolicyChain,
 } from './policyCatalog.js';
 import {
+  DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
-  PREVIEW_GEMINI_3_1_MODEL,
-  PREVIEW_GEMINI_MODEL,
 } from '../config/models.js';
 
 describe('policyCatalog', () => {
-  it('returns preview chain when preview enabled', () => {
-    const chain = getModelPolicyChain({ previewEnabled: true });
-    expect(chain[0]?.model).toBe(PREVIEW_GEMINI_MODEL);
-    expect(chain).toHaveLength(2);
-  });
-
-  it('returns Gemini 3.1 chain when useGemini31 is true', () => {
-    const chain = getModelPolicyChain({
-      previewEnabled: true,
-      useGemini31: true,
-    });
-    expect(chain[0]?.model).toBe(PREVIEW_GEMINI_3_1_MODEL);
-    expect(chain).toHaveLength(2);
-    expect(chain[1]?.model).toBe('gemini-3-flash-preview');
-  });
-
-  it('returns Gemini 3.1 Custom Tools chain when useGemini31 and useCustomToolModel are true', () => {
-    const chain = getModelPolicyChain({
-      previewEnabled: true,
-      useGemini31: true,
-      useCustomToolModel: true,
-    });
-    expect(chain[0]?.model).toBe(PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL);
-    expect(chain).toHaveLength(2);
-    expect(chain[1]?.model).toBe('gemini-3-flash-preview');
-  });
-
-  it('returns default chain when preview disabled', () => {
-    const chain = getModelPolicyChain({ previewEnabled: false });
+  it('returns the default chain', () => {
+    const chain = getModelPolicyChain({});
     expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
+    expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     expect(chain).toHaveLength(2);
   });
 
-  it('marks preview transients as sticky retries when auto-selected', () => {
-    const [previewPolicy] = getModelPolicyChain({
-      previewEnabled: true,
-      isAutoSelection: true,
-    });
-    expect(previewPolicy.model).toBe(PREVIEW_GEMINI_MODEL);
-    expect(previewPolicy.stateTransitions.transient).toBe('sticky_retry');
+  it('marks transients as sticky retries when auto-selected', () => {
+    const [policy] = getModelPolicyChain({ isAutoSelection: true });
+    expect(policy.model).toBe(DEFAULT_GEMINI_MODEL);
+    expect(policy.stateTransitions.transient).toBe('sticky_retry');
   });
 
   it('applies default actions and state transitions for unspecified kinds', () => {
-    const [previewPolicy] = getModelPolicyChain({ previewEnabled: true });
-    expect(previewPolicy.stateTransitions.not_found).toBe('terminal');
-    expect(previewPolicy.stateTransitions.unknown).toBe('terminal');
-    expect(previewPolicy.actions.unknown).toBe('prompt');
+    const [policy] = getModelPolicyChain({});
+    expect(policy.stateTransitions.not_found).toBe('terminal');
+    expect(policy.stateTransitions.unknown).toBe('terminal');
+    expect(policy.actions.unknown).toBe('prompt');
   });
 
   it('clones policy maps so edits do not leak between calls', () => {
-    const firstCall = getModelPolicyChain({ previewEnabled: false });
+    const firstCall = getModelPolicyChain({});
     firstCall[0].actions.terminal = 'silent';
-    const secondCall = getModelPolicyChain({ previewEnabled: false });
+    const secondCall = getModelPolicyChain({});
     expect(secondCall[0].actions.terminal).toBe('prompt');
   });
 

@@ -27,10 +27,6 @@ import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_MODEL,
-  PREVIEW_GEMINI_FLASH_MODEL,
-  PREVIEW_GEMINI_3_1_MODEL,
-  PREVIEW_GEMINI_FLASH_LITE_MODEL,
 } from '../config/models.js';
 import { PreCompressTrigger } from '../hooks/types.js';
 
@@ -101,21 +97,12 @@ export function findCompressSplitPoint(
 
 export function modelStringToModelConfigAlias(model: string): string {
   switch (model) {
-    case PREVIEW_GEMINI_MODEL:
-    case PREVIEW_GEMINI_3_1_MODEL:
-      return 'chat-compression-3-pro';
-    case PREVIEW_GEMINI_FLASH_MODEL:
-      return 'chat-compression-3-flash';
-    case PREVIEW_GEMINI_FLASH_LITE_MODEL:
-    // fallthrough
     case DEFAULT_GEMINI_FLASH_LITE_MODEL:
-      return 'chat-compression-3.1-flash-lite';
-    case 'gemini-2.5-flash-lite':
-      return 'chat-compression-2.5-flash-lite';
+      return 'chat-compression-flash-lite';
     case DEFAULT_GEMINI_MODEL:
-      return 'chat-compression-2.5-pro';
+      return 'chat-compression-pro';
     case DEFAULT_GEMINI_FLASH_MODEL:
-      return 'chat-compression-2.5-flash';
+      return 'chat-compression-flash';
     default:
       return 'chat-compression-default';
   }

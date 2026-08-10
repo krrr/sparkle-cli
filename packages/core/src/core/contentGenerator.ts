@@ -151,15 +151,7 @@ export async function createContentGenerator(
       return new LoggingContentGenerator(fakeGenerator, gcConfig);
     }
     const version = await getVersion();
-    const model = resolveModel(
-      gcConfig.getModel(),
-      config.authType === AuthType.USE_GEMINI ||
-        ((await gcConfig.getGemini31Launched?.()) ?? false),
-      false,
-      gcConfig.getHasAccessToPreviewModel?.() ?? true,
-      gcConfig,
-      gcConfig.hasGemini35FlashGAAccess?.() ?? false,
-    );
+    const model = resolveModel(gcConfig.getModel(), gcConfig);
     const customHeadersEnv =
       process.env['GEMINI_CLI_CUSTOM_HEADERS'] || undefined;
     const clientName = gcConfig.getClientName();

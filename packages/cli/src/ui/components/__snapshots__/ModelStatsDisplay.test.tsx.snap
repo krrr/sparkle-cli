@@ -168,7 +168,7 @@ exports[`<ModelStatsDisplay /> > should handle long role name layout 1`] = `
 exports[`<ModelStatsDisplay /> > should handle models with long names (gemini-3-*-preview) without layout breaking 1`] = `
 "╭──────────────────────────────────────────────────────────────────────────────╮
 │                                                                              │
-│  Auto (Gemini 3) Stats For Nerds                                             │
+│  Auto Stats For Nerds                                                        │
 │                                                                              │
 │                                                                              │
 │  Metric                      gemini-3-pro-preview   gemini-3-flash-preview   │

@@ -178,21 +178,8 @@ export class NumericalClassifierStrategy implements RoutingStrategy {
 
       const { threshold, groupLabel, modelAlias } =
         await this.getRoutingDecision(score, config);
-      const [useGemini3_1, useCustomToolModel] = await Promise.all([
-        config.getGemini31Launched(),
-        config.getUseCustomToolModel(),
-      ]);
-      const useGemini3_5Flash = config.hasGemini35FlashGAAccess?.() ?? false;
       const selectedModel = normalizeModelId(
-        resolveClassifierModel(
-          normalizeModelId(model),
-          modelAlias,
-          useGemini3_1,
-          useCustomToolModel,
-          config.getHasAccessToPreviewModel?.() ?? true,
-          config,
-          useGemini3_5Flash,
-        ),
+        resolveClassifierModel(normalizeModelId(model), modelAlias, config),
       );
 
       const service = config.getModelAvailabilityService();

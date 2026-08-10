@@ -22,8 +22,8 @@ import {
 } from './policyCatalog.js';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_MODEL_AUTO,
   isAutoModel,
   isGemini3Model,
   resolveModel,
@@ -51,24 +51,11 @@ export function resolvePolicyChain(
   const configuredModel = normalizeModelId(config.getModel());
 
   let chain: ModelPolicyChain | undefined;
-  const useGemini31 = config.getGemini31LaunchedSync?.() ?? false;
-  const useCustomToolModel = config.getUseCustomToolModelSync?.() ?? false;
-  const hasAccessToPreview = config.getHasAccessToPreviewModel?.() ?? false;
-  const useGemini3_5Flash = config.hasGemini35FlashGAAccess?.() ?? false;
 
   // Capture the original family intent before any normalization or early downgrade.
   const isOriginallyGemini3 = isGemini3Model(modelFromConfig, config);
 
-  const resolvedModel = normalizeModelId(
-    resolveModel(
-      modelFromConfig,
-      useGemini31,
-      useCustomToolModel,
-      hasAccessToPreview,
-      config,
-      useGemini3_5Flash,
-    ),
-  );
+  const resolvedModel = normalizeModelId(resolveModel(modelFromConfig, config));
   const isAutoPreferred = normalizedPreferredModel
     ? isAutoModel(normalizedPreferredModel, config)
     : false;
@@ -81,39 +68,26 @@ export function resolvePolicyChain(
 
   // --- DYNAMIC PATH ---
   if (config.getExperimentalDynamicModelConfiguration?.() === true) {
-    const context = {
-      useGemini3_1: useGemini31,
-      useCustomTools: useCustomToolModel,
-      useGemini3_5Flash,
-    };
-
     if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
-      chain = config.modelConfigService.resolveChain('lite', context);
-    } else if (isOriginallyGemini3 || isAutoPreferred || isAutoConfigured) {
+      chain = config.modelConfigService.resolveChain('lite');
+    } else if (
+      isOriginallyGemini3 ||
+      isAutoPreferred ||
+      isAutoConfigured ||
+      resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
+    ) {
       // 1. Try to find a chain specifically for the current configured alias
       if (
         isAutoConfigured &&
         config.modelConfigService.getModelChain(configuredModel)
       ) {
-        chain = config.modelConfigService.resolveChain(
-          configuredModel,
-          context,
-        );
+        chain = config.modelConfigService.resolveChain(configuredModel);
       }
       // 2. Fallback to family-based auto-routing
       if (!chain) {
         const isAutoSelection = isAutoPreferred || isAutoConfigured;
-        const previewEnabled =
-          hasAccessToPreview &&
-          (isGemini3Model(resolvedModel, config) ||
-            normalizedPreferredModel === PREVIEW_GEMINI_MODEL_AUTO ||
-            configuredModel === PREVIEW_GEMINI_MODEL_AUTO);
         const autoPrefix = isAutoSelection ? 'auto-' : '';
-        const chainKey = previewEnabled ? 'preview' : 'default';
-        chain = config.modelConfigService.resolveChain(
-          `${autoPrefix}${chainKey}`,
-          context,
-        );
+        chain = config.modelConfigService.resolveChain(`${autoPrefix}default`);
       }
     }
     if (!chain) {
@@ -126,33 +100,14 @@ export function resolvePolicyChain(
 
     if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
       chain = getFlashLitePolicyChain();
-    } else if (isOriginallyGemini3 || isAutoPreferred || isAutoConfigured) {
+    } else if (
+      isOriginallyGemini3 ||
+      isAutoPreferred ||
+      isAutoConfigured ||
+      resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
+    ) {
       const isAutoSelection = isAutoPreferred || isAutoConfigured;
-      if (hasAccessToPreview) {
-        const previewEnabled =
-          isOriginallyGemini3 ||
-          normalizedPreferredModel === PREVIEW_GEMINI_MODEL_AUTO ||
-          configuredModel === PREVIEW_GEMINI_MODEL_AUTO;
-        chain = getModelPolicyChain({
-          previewEnabled,
-          isAutoSelection,
-          userTier: config.getUserTier(),
-          useGemini31,
-          useCustomToolModel,
-          useGemini3_5Flash,
-        });
-      } else {
-        // User requested Gemini 3 but has no access. Proactively downgrade
-        // to the stable Gemini 2.5 chain.
-        chain = getModelPolicyChain({
-          previewEnabled: false,
-          isAutoSelection,
-          userTier: config.getUserTier(),
-          useGemini31,
-          useCustomToolModel,
-          useGemini3_5Flash,
-        });
-      }
+      chain = getModelPolicyChain({ isAutoSelection });
     } else {
       chain = createSingleModelChain(modelFromConfig);
     }

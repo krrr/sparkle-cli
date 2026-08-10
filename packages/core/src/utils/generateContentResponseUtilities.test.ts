@@ -24,10 +24,6 @@ import {
   type CitationMetadata,
   type PartListUnion,
 } from '@google/genai';
-import {
-  DEFAULT_GEMINI_MODEL,
-  PREVIEW_GEMINI_MODEL,
-} from '../config/models.js';
 
 const mockTextPart = (text: string): Part => ({ text });
 const mockFunctionCallPart = (
@@ -88,7 +84,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -107,7 +103,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -126,7 +122,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -145,7 +141,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -168,7 +164,7 @@ describe('generateContentResponseUtilities', () => {
         'other_tool',
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
 
       const frPart = result.find((p) => p.functionResponse);
@@ -194,7 +190,7 @@ describe('generateContentResponseUtilities', () => {
           tool,
           callId,
           llmContent,
-          PREVIEW_GEMINI_MODEL,
+          'gemini-3-pro-preview',
         );
 
         const frPart = result.find((p) => p.functionResponse);
@@ -217,7 +213,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -239,7 +235,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -261,7 +257,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -295,7 +291,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         input,
-        DEFAULT_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
 
       expect(result).toHaveLength(1);
@@ -316,7 +312,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -344,7 +340,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -364,7 +360,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -383,7 +379,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -402,7 +398,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {
@@ -421,7 +417,7 @@ describe('generateContentResponseUtilities', () => {
         toolName,
         callId,
         llmContent,
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       expect(result).toEqual([
         {

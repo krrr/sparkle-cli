@@ -72,8 +72,6 @@ describe('AcpSessionManager', () => {
       }),
       getApprovalMode: vi.fn().mockReturnValue('default'),
       isPlanEnabled: vi.fn().mockReturnValue(true),
-      getGemini31LaunchedSync: vi.fn().mockReturnValue(false),
-      getHasAccessToPreviewModel: vi.fn().mockReturnValue(false),
       getCheckpointingEnabled: vi.fn().mockReturnValue(false),
       getDisableAlwaysAllow: vi.fn().mockReturnValue(false),
       validatePathAccess: vi.fn().mockReturnValue(null),
@@ -192,12 +190,10 @@ describe('AcpSessionManager', () => {
     });
   });
 
-  it('should include preview models when user has access', async () => {
+  it('should include auto model in available models', async () => {
     mockConfig.getContentGeneratorConfig = vi.fn().mockReturnValue({
       apiKey: 'test-key',
     });
-    mockConfig.getHasAccessToPreviewModel = vi.fn().mockReturnValue(true);
-    mockConfig.getGemini31LaunchedSync = vi.fn().mockReturnValue(true);
 
     const response = await manager.newSession(
       {
@@ -221,8 +217,6 @@ describe('AcpSessionManager', () => {
     mockConfig.getContentGeneratorConfig = vi.fn().mockReturnValue({
       apiKey: 'test-key',
     });
-    mockConfig.getHasAccessToPreviewModel = vi.fn().mockReturnValue(true);
-    mockConfig.getGemini31LaunchedSync = vi.fn().mockReturnValue(true);
 
     const response = await manager.newSession(
       {

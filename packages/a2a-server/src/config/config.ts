@@ -15,8 +15,8 @@ import {
   ApprovalMode,
   GEMINI_DIR,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
+  DEFAULT_GEMINI_MODEL,
   startupProfiler,
-  PREVIEW_GEMINI_MODEL,
   homedir,
   tmpdir,
   GitService,
@@ -303,7 +303,7 @@ export async function loadConfig(
   const configParams: ConfigParameters = {
     sessionId: taskId,
     clientName: 'a2a-server',
-    model: PREVIEW_GEMINI_MODEL,
+    model: DEFAULT_GEMINI_MODEL,
     embeddingModel: DEFAULT_GEMINI_EMBEDDING_MODEL,
     sandbox: undefined, // Sandbox might not be relevant for a server-side agent
     targetDir: workspaceDir, // Or a specific directory the agent operates on

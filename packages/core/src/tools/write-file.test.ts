@@ -85,7 +85,7 @@ const mockConfigInternal = {
   getIdeMode: vi.fn(() => false),
   getWorkspaceContext: () => new WorkspaceContext(rootDir, [plansDir]),
   getApiKey: () => 'test-key',
-  getModel: () => 'gemini-1.5-flash',
+  getModel: () => 'gemini-1.5-pro',
   getSandbox: () => false,
   getDebugMode: () => false,
   getQuestion: () => undefined,
@@ -107,7 +107,7 @@ const mockConfigInternal = {
   isInteractive: () => false,
   getDisableLLMCorrection: vi.fn(() => true),
   isPlanMode: vi.fn(() => false),
-  getActiveModel: () => 'gemini-1.5-flash',
+  getActiveModel: () => 'gemini-1.5-pro',
   storage: {
     getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
   },

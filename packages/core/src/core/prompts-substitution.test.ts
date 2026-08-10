@@ -63,8 +63,6 @@ describe('Core System Prompt Substitution', () => {
       isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(false),
       isTrackerEnabled: vi.fn().mockReturnValue(false),
       isModelSteeringEnabled: vi.fn().mockReturnValue(false),
-      getHasAccessToPreviewModel: vi.fn().mockReturnValue(true),
-      getGemini31LaunchedSync: vi.fn().mockReturnValue(true),
     } as unknown as Config;
   });
 

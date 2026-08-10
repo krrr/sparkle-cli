@@ -8,9 +8,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyModelSelection } from './policyHelpers.js';
 import type { Config } from '../config/config.js';
 import {
-  PREVIEW_GEMINI_MODEL,
-  PREVIEW_GEMINI_FLASH_MODEL,
-  PREVIEW_GEMINI_MODEL_AUTO,
+  DEFAULT_GEMINI_MODEL,
+  DEFAULT_GEMINI_FLASH_MODEL,
+  GEMINI_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import { ModelAvailabilityService } from './modelAvailabilityService.js';
 import { ModelConfigService } from '../services/modelConfigService.js';
@@ -24,11 +24,10 @@ describe('Fallback Integration', () => {
   beforeEach(() => {
     // Mocking Config because it has many dependencies
     config = {
-      getModel: () => PREVIEW_GEMINI_MODEL_AUTO,
-      getActiveModel: () => PREVIEW_GEMINI_MODEL_AUTO,
+      getModel: () => GEMINI_MODEL_ALIAS_AUTO,
+      getActiveModel: () => GEMINI_MODEL_ALIAS_AUTO,
       setActiveModel: vi.fn(),
       getUserTier: () => undefined,
-      getHasAccessToPreviewModel: () => true,
       getModelAvailabilityService: () => availabilityService,
       modelConfigService: undefined as unknown as ModelConfigService,
     } as unknown as Config;
@@ -41,11 +40,11 @@ describe('Fallback Integration', () => {
 
   it('should select fallback model when primary model is terminal and config is in AUTO mode', () => {
     // 1. Simulate "Pro" failing with a terminal quota error
-    // The policy chain for PREVIEW_GEMINI_MODEL_AUTO is [PREVIEW_GEMINI_MODEL, PREVIEW_GEMINI_FLASH_MODEL]
-    availabilityService.markTerminal(PREVIEW_GEMINI_MODEL, 'quota');
+    // The policy chain for DEFAULT_GEMINI_MODEL_AUTO is [DEFAULT_GEMINI_MODEL, DEFAULT_GEMINI_FLASH_MODEL]
+    availabilityService.markTerminal(DEFAULT_GEMINI_MODEL, 'quota');
 
     // 2. Request "Pro" explicitly (as Agent would)
-    const requestedModel = PREVIEW_GEMINI_MODEL;
+    const requestedModel = DEFAULT_GEMINI_MODEL;
 
     // 3. Apply model selection
     const result = applyModelSelection(config, {
@@ -54,52 +53,52 @@ describe('Fallback Integration', () => {
     });
 
     // 4. Expect fallback to Flash
-    expect(result.model).toBe(PREVIEW_GEMINI_FLASH_MODEL);
+    expect(result.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
 
     // 5. Expect active model to be updated
     expect(config.setActiveModel).toHaveBeenCalledWith(
-      PREVIEW_GEMINI_FLASH_MODEL,
+      DEFAULT_GEMINI_FLASH_MODEL,
     );
   });
 
-  it('should fallback for Gemini 3 models even if config is NOT in AUTO mode', () => {
+  it('should NOT fallback when config is NOT in AUTO mode', () => {
     // 1. Config is explicitly set to Pro, not Auto
-    vi.spyOn(config, 'getModel').mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.spyOn(config, 'getModel').mockReturnValue(DEFAULT_GEMINI_MODEL);
 
     // 2. Simulate "Pro" failing
-    availabilityService.markTerminal(PREVIEW_GEMINI_MODEL, 'quota');
+    availabilityService.markTerminal(DEFAULT_GEMINI_MODEL, 'quota');
 
     // 3. Request "Pro"
-    const requestedModel = PREVIEW_GEMINI_MODEL;
+    const requestedModel = DEFAULT_GEMINI_MODEL;
 
     // 4. Apply model selection
     const result = applyModelSelection(config, { model: requestedModel });
 
-    // 5. Expect it to fallback to Flash (because Gemini 3 uses PREVIEW_CHAIN)
-    expect(result.model).toBe(PREVIEW_GEMINI_FLASH_MODEL);
+    // 5. Expect no fallback (single-model chain)
+    expect(result.model).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('should fallback to Flash after failures and restore Pro on next turn', () => {
-    const requestedModel = PREVIEW_GEMINI_MODEL;
+    const requestedModel = DEFAULT_GEMINI_MODEL;
 
     // 1. Initial call should return Pro with 3 attempts
     const result1 = applyModelSelection(config, {
       model: requestedModel,
       isChatModel: true,
     });
-    expect(result1.model).toBe(PREVIEW_GEMINI_MODEL);
+    expect(result1.model).toBe(DEFAULT_GEMINI_MODEL);
     expect(result1.maxAttempts).toBe(3);
 
     // 2. Simulate failure and transition to sticky_retry with consumed=true
-    availabilityService.markRetryOncePerTurn(PREVIEW_GEMINI_MODEL, 3);
-    availabilityService.consumeStickyAttempt(PREVIEW_GEMINI_MODEL);
+    availabilityService.markRetryOncePerTurn(DEFAULT_GEMINI_MODEL, 3);
+    availabilityService.consumeStickyAttempt(DEFAULT_GEMINI_MODEL);
 
     // 3. Next call in same turn should fallback to Flash
     const result2 = applyModelSelection(config, {
       model: requestedModel,
       isChatModel: true,
     });
-    expect(result2.model).toBe(PREVIEW_GEMINI_FLASH_MODEL);
+    expect(result2.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
 
     // 4. Reset turn (start of new interaction)
     availabilityService.resetTurn();
@@ -109,7 +108,7 @@ describe('Fallback Integration', () => {
       model: requestedModel,
       isChatModel: true,
     });
-    expect(result3.model).toBe(PREVIEW_GEMINI_MODEL);
+    expect(result3.model).toBe(DEFAULT_GEMINI_MODEL);
     expect(result3.maxAttempts).toBe(3);
   });
 });

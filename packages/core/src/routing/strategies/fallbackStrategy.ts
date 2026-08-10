@@ -23,14 +23,7 @@ export class FallbackStrategy implements RoutingStrategy {
     _baseLlmClient: BaseLlmClient,
   ): Promise<RoutingDecision | null> {
     const requestedModel = context.requestedModel ?? config.getModel();
-    const resolvedModel = resolveModel(
-      requestedModel,
-      config.getGemini31LaunchedSync?.() ?? false,
-      false,
-      config.getHasAccessToPreviewModel?.() ?? true,
-      config,
-      config.hasGemini35FlashGAAccess?.() ?? false,
-    );
+    const resolvedModel = resolveModel(requestedModel, config);
     const service = config.getModelAvailabilityService();
     const snapshot = service.snapshot(resolvedModel);
 

@@ -32,7 +32,7 @@ import {
   type ServerGeminiStreamEvent,
 } from './turn.js';
 import { getCoreSystemPrompt } from './prompts.js';
-import { DEFAULT_GEMINI_MODEL_AUTO } from '../config/models.js';
+import { GEMINI_MODEL_ALIAS_AUTO } from '../config/models.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { setSimulate429 } from '../utils/testUtils.js';
 import { tokenLimit } from './tokenLimits.js';
@@ -2403,9 +2403,7 @@ ${JSON.stringify(
             skipped: [],
           },
         );
-        vi.mocked(mockConfig.getModel).mockReturnValue(
-          DEFAULT_GEMINI_MODEL_AUTO,
-        );
+        vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
         const stream = client.sendMessageStream(
           [{ text: 'Hi' }],
           new AbortController().signal,
@@ -2436,9 +2434,7 @@ ${JSON.stringify(
             skipped: [],
           },
         );
-        vi.mocked(mockConfig.getModel).mockReturnValue(
-          DEFAULT_GEMINI_MODEL_AUTO,
-        );
+        vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
         const stream = client.sendMessageStream(
           [{ text: 'Hi' }],
           new AbortController().signal,

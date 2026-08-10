@@ -1046,14 +1046,14 @@ describe('ModelConfigService', () => {
 
   // Resolves a model ID to a concrete model ID based on the provided context.
   describe('resolveModelId', () => {
-    it('should resolve based on useGemini3_5Flash condition', () => {
+    it('should resolve based on useCustomTools condition', () => {
       const config: ModelConfigServiceConfig = {
         modelIdResolutions: {
           flash: {
             default: 'gemini-2.0-flash',
             contexts: [
               {
-                condition: { useGemini3_5Flash: true },
+                condition: { useCustomTools: true },
                 target: 'gemini-3.5-flash',
               },
             ],
@@ -1062,30 +1062,27 @@ describe('ModelConfigService', () => {
       };
       const service = new ModelConfigService(config);
 
-      expect(service.resolveModelId('flash', { useGemini3_5Flash: true })).toBe(
+      expect(service.resolveModelId('flash', { useCustomTools: true })).toBe(
         'gemini-3.5-flash',
       );
-      expect(
-        service.resolveModelId('flash', { useGemini3_5Flash: false }),
-      ).toBe('gemini-2.0-flash');
+      expect(service.resolveModelId('flash', { useCustomTools: false })).toBe(
+        'gemini-2.0-flash',
+      );
       expect(service.resolveModelId('flash', {})).toBe('gemini-2.0-flash');
     });
 
-    it('should resolve based on complex conditions including useGemini3_5Flash', () => {
+    it('should resolve based on requestedModels condition', () => {
       const config: ModelConfigServiceConfig = {
         modelIdResolutions: {
           'gemini-flash': {
-            default: 'gemini-3-flash-preview',
+            default: 'gemini-2.5-flash',
             contexts: [
               {
-                condition: {
-                  useGemini3_5Flash: false,
-                  hasAccessToPreview: false,
-                },
+                condition: { requestedModels: ['gemini-2.5-pro'] },
                 target: 'gemini-2.5-flash',
               },
               {
-                condition: { useGemini3_5Flash: true },
+                condition: { useCustomTools: true },
                 target: 'gemini-3.5-flash',
               },
             ],
@@ -1094,24 +1091,24 @@ describe('ModelConfigService', () => {
       };
       const service = new ModelConfigService(config);
 
-      // Case 1: GA Access granted
+      // Case 1: Requested model matches
       expect(
-        service.resolveModelId('gemini-flash', { useGemini3_5Flash: true }),
+        service.resolveModelId('gemini-flash', {
+          requestedModel: 'gemini-2.5-pro',
+        }),
+      ).toBe('gemini-2.5-flash');
+
+      // Case 2: No matching requested model, custom tools enabled
+      expect(
+        service.resolveModelId('gemini-flash', {
+          useCustomTools: true,
+        }),
       ).toBe('gemini-3.5-flash');
 
-      // Case 2: GA Access denied, but has preview access
+      // Case 3: No conditions met
       expect(
         service.resolveModelId('gemini-flash', {
-          useGemini3_5Flash: false,
-          hasAccessToPreview: true,
-        }),
-      ).toBe('gemini-3-flash-preview');
-
-      // Case 3: GA Access denied AND no preview access
-      expect(
-        service.resolveModelId('gemini-flash', {
-          useGemini3_5Flash: false,
-          hasAccessToPreview: false,
+          useCustomTools: false,
         }),
       ).toBe('gemini-2.5-flash');
     });

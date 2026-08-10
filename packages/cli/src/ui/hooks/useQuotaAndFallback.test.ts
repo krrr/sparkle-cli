@@ -25,9 +25,8 @@ import {
   makeFakeConfig,
   type GoogleApiError,
   RetryableQuotaError,
-  PREVIEW_GEMINI_MODEL,
-  ModelNotFoundError,
   DEFAULT_GEMINI_MODEL,
+  ModelNotFoundError,
   DEFAULT_GEMINI_FLASH_MODEL,
 } from '@google/gemini-cli-core';
 import { useQuotaAndFallback } from './useQuotaAndFallback.js';
@@ -462,20 +461,20 @@ describe('useQuotaAndFallback', () => {
         const error = new ModelNotFoundError('model not found', 404);
 
         act(() => {
-          promise = handler('gemini-3-pro-preview', 'gemini-2.5-pro', error);
+          promise = handler(DEFAULT_GEMINI_MODEL, 'gemini-2.5-flash', error);
         });
 
         // The hook should now have a pending request for the UI to handle
         const request = result.current.proQuotaRequest;
         expect(request).not.toBeNull();
-        expect(request?.failedModel).toBe('gemini-3-pro-preview');
+        expect(request?.failedModel).toBe(DEFAULT_GEMINI_MODEL);
         expect(request?.isTerminalQuotaError).toBe(false);
         expect(request?.isModelNotFoundError).toBe(true);
 
         const message = request!.message;
         expect(message).toBe(
-          `It seems like you don't have access to gemini-3-pro-preview.
-Your admin might have disabled the access. Contact them to enable the Preview Release Channel.`,
+          `It seems like you don't have access to ${DEFAULT_GEMINI_MODEL}.
+Your admin might have disabled the access to this model.`,
         );
 
         // Simulate the user choosing to switch
@@ -687,7 +686,7 @@ Your admin might have disabled the access. Contact them to enable the Preview Re
       let promise: Promise<FallbackIntent | null>;
       act(() => {
         promise = handler(
-          PREVIEW_GEMINI_MODEL,
+          DEFAULT_GEMINI_MODEL,
           DEFAULT_GEMINI_MODEL,
           new Error('preview model failed'),
         );
@@ -724,7 +723,7 @@ Your admin might have disabled the access. Contact them to enable the Preview Re
       let promise: Promise<FallbackIntent | null>;
       act(() => {
         promise = handler(
-          PREVIEW_GEMINI_MODEL,
+          DEFAULT_GEMINI_MODEL,
           DEFAULT_GEMINI_FLASH_MODEL,
           new Error('preview model failed'),
         );

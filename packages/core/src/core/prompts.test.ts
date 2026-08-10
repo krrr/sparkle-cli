@@ -18,9 +18,7 @@ import { AGENT_TOOL_NAME } from '../tools/tool-names.js';
 import { GEMINI_DIR } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import {
-  PREVIEW_GEMINI_MODEL,
-  PREVIEW_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL_AUTO,
+  GEMINI_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_MODEL,
 } from '../config/models.js';
 import { ApprovalMode } from '../policy/types.js';
@@ -109,7 +107,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(false),
       isAgentsEnabled: vi.fn().mockReturnValue(false),
       getPreviewFeatures: vi.fn().mockReturnValue(true),
-      getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL_AUTO),
+      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
       getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
       getMessageBus: vi.fn(),
       getAgentRegistry: vi.fn().mockReturnValue({
@@ -173,7 +171,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should include available_skills with updated verbiage for preview models', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const skills = [
       {
         name: 'test-skill',
@@ -205,7 +205,9 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.mocked(mockConfig.toolRegistry.getAllToolNames).mockReturnValue([
       AGENT_TOOL_NAME,
     ]);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const agents = [
       {
         name: 'test-agent',
@@ -232,7 +234,9 @@ describe('Core System Prompt (prompts.ts)', () => {
 
   it('should NOT include sub-agents when the invoke_agent tool is disabled', () => {
     vi.mocked(mockConfig.toolRegistry.getAllToolNames).mockReturnValue([]);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const agents = [
       {
         name: 'test-agent',
@@ -278,7 +282,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should include the TASK MANAGEMENT PROTOCOL when task tracker is enabled', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
     const prompt = getCoreSystemPrompt(mockConfig);
     expect(prompt).toContain('# TASK MANAGEMENT PROTOCOL');
@@ -289,7 +295,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should use chatty system prompt for preview model', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const prompt = getCoreSystemPrompt(mockConfig);
     expect(prompt).toContain('You are Gemini CLI, an interactive CLI agent'); // Check for core content
     expect(prompt).toContain('- **User Hints:**');
@@ -299,7 +307,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
   it('should use chatty system prompt for preview flash model', () => {
     vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-      PREVIEW_GEMINI_FLASH_MODEL,
+      'gemini-3-flash-preview',
     );
     const prompt = getCoreSystemPrompt(mockConfig);
     expect(prompt).toContain('You are Gemini CLI, an interactive CLI agent'); // Check for core content
@@ -308,7 +316,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should include mandate to distinguish between Directives and Inquiries', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const prompt = getCoreSystemPrompt(mockConfig);
 
     expect(prompt).toContain('Distinguish between **Directives**');
@@ -324,7 +334,9 @@ describe('Core System Prompt (prompts.ts)', () => {
     ['whitespace only', '   \n  \t '],
   ])('should return the base prompt when userMemory is %s', (_, userMemory) => {
     vi.stubEnv('SANDBOX', undefined);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const prompt = getCoreSystemPrompt(mockConfig, userMemory);
     expect(prompt).not.toContain('---\n\n'); // Separator should not be present
     expect(prompt).toContain('You are Gemini CLI, an interactive CLI agent'); // Check for core content
@@ -334,7 +346,9 @@ describe('Core System Prompt (prompts.ts)', () => {
 
   it('should append userMemory with separator when provided', () => {
     vi.stubEnv('SANDBOX', undefined);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     const memory = 'This is custom user memory.\nBe extra polite.';
     const prompt = getCoreSystemPrompt(mockConfig, memory);
 
@@ -388,7 +402,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     (sandboxValue, expectedContains, expectedNotContains) => {
       vi.stubEnv('SANDBOX', sandboxValue);
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       const prompt = getCoreSystemPrompt(mockConfig);
       expect(prompt).toContain(expectedContains);
@@ -426,7 +440,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should redact grep and glob from the system prompt when they are disabled', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     vi.mocked(mockConfig.toolRegistry.getAllToolNames).mockReturnValue([]);
     const prompt = getCoreSystemPrompt(mockConfig);
 
@@ -461,7 +477,7 @@ describe('Core System Prompt (prompts.ts)', () => {
         isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(false),
         isAgentsEnabled: vi.fn().mockReturnValue(false),
         getModel: vi.fn().mockReturnValue('auto'),
-        getActiveModel: vi.fn().mockReturnValue(PREVIEW_GEMINI_MODEL),
+        getActiveModel: vi.fn().mockReturnValue('gemini-3-pro-preview'),
         getPreviewFeatures: vi.fn().mockReturnValue(true),
         getAgentRegistry: vi.fn().mockReturnValue({
           getDirectoryContext: vi.fn().mockReturnValue('Mock Agent Directory'),
@@ -538,7 +554,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     const setupPlanMode = () => {
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
       vi.mocked(mockConfig.toolRegistry.getAllTools).mockReturnValue(
@@ -592,7 +608,7 @@ describe('Core System Prompt (prompts.ts)', () => {
         { name: 'ask_user' },
       ] as unknown as AnyDeclarativeTool[];
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
       vi.mocked(mockConfig.toolRegistry.getAllTools).mockReturnValue(
@@ -695,7 +711,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it("should include 'tab' instructions when interactive shell is enabled", () => {
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       vi.mocked(mockConfig.isInteractive).mockReturnValue(true);
       vi.mocked(mockConfig.isInteractiveShellEnabled).mockReturnValue(true);
@@ -705,7 +721,7 @@ describe('Core System Prompt (prompts.ts)', () => {
 
     it("should NOT include 'tab' instructions when interactive shell is disabled", () => {
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        PREVIEW_GEMINI_MODEL,
+        'gemini-3-pro-preview',
       );
       vi.mocked(mockConfig.isInteractive).mockReturnValue(true);
       vi.mocked(mockConfig.isInteractiveShellEnabled).mockReturnValue(false);
@@ -725,7 +741,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   it('should include modern approved plan instructions with completion in DEFAULT mode when approvedPlanPath is set', () => {
     const planPath = '/tmp/plans/feature-x.md';
     vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(planPath);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.DEFAULT);
 
     const prompt = getCoreSystemPrompt(mockConfig);
@@ -739,7 +757,9 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it('should include planning phase suggestion when enter_plan_mode tool is enabled', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(PREVIEW_GEMINI_MODEL);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
+      'gemini-3-pro-preview',
+    );
     vi.mocked(mockConfig.toolRegistry.getAllToolNames).mockReturnValue([
       'enter_plan_mode',
     ]);

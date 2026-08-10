@@ -470,7 +470,7 @@ Respond ONLY with a JSON object where each key is the filepath and the value is:
       }
 
       const responseJson = await client.generateJson({
-        modelConfigKey: { model: 'chat-compression-2.5-flash-lite' },
+        modelConfigKey: { model: 'chat-compression-flash-lite' },
         contents: [{ role: 'user', parts: [{ text: userMessage }] }],
         systemInstruction: systemPrompt,
         schema: { properties, required: files.map((f) => f.filepath) },
@@ -511,7 +511,7 @@ Respond ONLY with a JSON object where each key is the filepath and the value is:
     const client = this.config.getBaseLlmClient();
     try {
       const response = await client.generateContent({
-        modelConfigKey: { model: 'chat-compression-2.5-flash-lite' },
+        modelConfigKey: { model: 'chat-compression-flash-lite' },
         contents: [{ role: 'user', parts: [{ text: promptMessage }] }],
         promptId: 'local-context-compression-summary',
         role: LlmRole.UTILITY_COMPRESSOR,

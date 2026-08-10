@@ -12,10 +12,7 @@ import {
   getAllGeminiMdFilenames,
   DEFAULT_CONTEXT_FILENAME,
 } from '../tools/memoryTool.js';
-import {
-  PREVIEW_GEMINI_MODEL,
-  DEFAULT_GEMINI_MODEL,
-} from '../config/models.js';
+import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import { ApprovalMode } from '../policy/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
 import { MockTool } from '../test-utils/mock-tool.js';
@@ -79,7 +76,7 @@ describe('PromptProvider', () => {
       getSkillManager: vi.fn().mockReturnValue({
         getSkills: vi.fn().mockReturnValue([]),
       }),
-      getActiveModel: vi.fn().mockReturnValue(PREVIEW_GEMINI_MODEL),
+      getActiveModel: vi.fn().mockReturnValue('gemini-3-pro-preview'),
       getAgentRegistry: vi.fn().mockReturnValue({
         getAllDefinitions: vi.fn().mockReturnValue([]),
         getDefinition: vi.fn().mockReturnValue(undefined),
@@ -87,8 +84,6 @@ describe('PromptProvider', () => {
       getApprovedPlanPath: vi.fn().mockReturnValue(undefined),
       getApprovalMode: vi.fn(),
       isTrackerEnabled: vi.fn().mockReturnValue(false),
-      getHasAccessToPreviewModel: vi.fn().mockReturnValue(true),
-      getGemini31LaunchedSync: vi.fn().mockReturnValue(true),
     } as unknown as Config;
   });
 
@@ -360,8 +355,6 @@ describe('PromptProvider', () => {
           }),
         ]),
       });
-      vi.mocked(mockConfig.getHasAccessToPreviewModel).mockReturnValue(true);
-      vi.mocked(mockConfig.getGemini31LaunchedSync).mockReturnValue(true);
     });
 
     it('should include active topic context when narration is enabled', () => {

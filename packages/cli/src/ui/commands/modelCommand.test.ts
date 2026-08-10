@@ -92,7 +92,6 @@ describe('modelCommand', () => {
       const mockSetModel = vi.fn();
       mockContext.services.agentContext = {
         setModel: mockSetModel,
-        getHasAccessToPreviewModel: vi.fn().mockReturnValue(true),
         getUserId: vi.fn().mockReturnValue('test-user'),
         getUsageStatisticsEnabled: vi.fn().mockReturnValue(true),
         getSessionId: vi.fn().mockReturnValue('test-session'),
@@ -127,7 +126,6 @@ describe('modelCommand', () => {
       const mockSetModel = vi.fn();
       mockContext.services.agentContext = {
         setModel: mockSetModel,
-        getHasAccessToPreviewModel: vi.fn().mockReturnValue(true),
         getUserId: vi.fn().mockReturnValue('test-user'),
         getUsageStatisticsEnabled: vi.fn().mockReturnValue(true),
         getSessionId: vi.fn().mockReturnValue('test-session'),
