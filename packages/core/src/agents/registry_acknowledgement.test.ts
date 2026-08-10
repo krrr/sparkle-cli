@@ -47,11 +47,11 @@ describe('AgentRegistry Acknowledgement', () => {
 
   beforeEach(async () => {
     // Create a unique temp directory for each test
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-cli-test-'));
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-cli-test-'));
 
-    // Override GEMINI_CLI_HOME to point to the temp directory
-    originalGeminiCliHome = process.env['GEMINI_CLI_HOME'];
-    process.env['GEMINI_CLI_HOME'] = tempDir;
+    // Override SPARKLE_CLI_HOME to point to the temp directory
+    originalGeminiCliHome = process.env['SPARKLE_CLI_HOME'];
+    process.env['SPARKLE_CLI_HOME'] = tempDir;
 
     ackService = new AcknowledgedAgentsService();
 
@@ -94,9 +94,9 @@ describe('AgentRegistry Acknowledgement', () => {
 
     // Restore environment variable
     if (originalGeminiCliHome) {
-      process.env['GEMINI_CLI_HOME'] = originalGeminiCliHome;
+      process.env['SPARKLE_CLI_HOME'] = originalGeminiCliHome;
     } else {
-      delete process.env['GEMINI_CLI_HOME'];
+      delete process.env['SPARKLE_CLI_HOME'];
     }
 
     // Clean up temp directory

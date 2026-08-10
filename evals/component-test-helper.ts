@@ -95,15 +95,15 @@ export class ComponentRig {
     await this.config.initialize();
 
     // Refresh auth using USE_GEMINI to initialize the real BaseLlmClient.
-    // This must happen BEFORE stubbing GEMINI_CLI_HOME because OAuth credential
-    // lookup resolves through homedir() → GEMINI_CLI_HOME.
+    // This must happen BEFORE stubbing SPARKLE_CLI_HOME because OAuth credential
+    // lookup resolves through homedir() → SPARKLE_CLI_HOME.
     await this.config.refreshAuth(AuthType.USE_GEMINI);
 
     // Isolate storage paths (session files, skills, extraction state) by
-    // pointing GEMINI_CLI_HOME at a per-test temp directory.  Storage resolves
+    // pointing SPARKLE_CLI_HOME at a per-test temp directory.  Storage resolves
     // global paths through `homedir()` which reads this env var.  This is set
     // after auth so credential lookup uses the real home directory.
-    vi.stubEnv('GEMINI_CLI_HOME', this.homeDir);
+    vi.stubEnv('SPARKLE_CLI_HOME', this.homeDir);
   }
 
   async cleanup() {

@@ -19,10 +19,12 @@ import { debugLogger } from '../utils/debugLogger.js';
 export function captureHeapSnapshot(): string | null {
   try {
     const timestamp = Date.now();
-    const filename = `gemini-heap-${timestamp}.heapsnapshot`;
+    const filename = `sparkle-heap-${timestamp}.heapsnapshot`;
 
     // Use mkdtempSync for a secure, uniquely named directory (mitigates symlink attacks)
-    const snapshotsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-heap-'));
+    const snapshotsDir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'sparkle-heap-'),
+    );
     const filePath = path.join(snapshotsDir, filename);
 
     // Note: v8.writeHeapSnapshot is a synchronous, blocking operation.

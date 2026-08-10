@@ -67,7 +67,7 @@ export interface CheckpointingSettings {
  * Loads settings from user and workspace directories.
  * Project settings override user settings if the workspace is trusted.
  *
- * How is it different to gemini-cli/cli: Returns already merged settings rather
+ * How is it different to sparkle-cli/cli: Returns already merged settings rather
  * than `LoadedSettings` (unnecessary since we are not modifying users
  * settings.json).
  */

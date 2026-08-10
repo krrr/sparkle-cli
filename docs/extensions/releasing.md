@@ -1,6 +1,6 @@
 # Release extensions
 
-Release Gemini CLI extensions to your users through a Git repository or GitHub
+Release Sparkle CLI extensions to your users through a Git repository or GitHub
 Releases. This guide explains how to share your work, list it in the gallery,
 and manage updates.
 
@@ -12,7 +12,7 @@ binary files.
 
 ## List your extension in the gallery
 
-The [Gemini CLI extension gallery](https://geminicli.com/extensions/browse/)
+The [Sparkle CLI extension gallery](https://geminicli.com/extensions/browse/)
 automatically indexes public extensions to help users discover your work. You
 don't need to submit an issue or email us to list your extension.
 
@@ -20,11 +20,11 @@ To have your extension automatically discovered and listed:
 
 1.  **Use a public repository:** Ensure your extension is hosted in a public
     GitHub repository.
-2.  **Add the GitHub topic:** Add the `gemini-cli-extension` topic to your
+2.  **Add the GitHub topic:** Add the `sparkle-cli-extension` topic to your
     repository's **About** section. Our crawler uses this topic to find new
     extensions.
-3.  **Place the manifest at the root:** Ensure your `gemini-extension.json` file
-    is in the absolute root of the repository or the release archive.
+3.  **Place the manifest at the root:** Ensure your `sparkle-extension.json`
+    file is in the absolute root of the repository or the release archive.
 
 Our system crawls tagged repositories daily. Once you tag your repository, your
 extension will appear in the gallery if it passes validation.
@@ -33,13 +33,13 @@ extension will appear in the gallery if it passes validation.
 
 Releasing through Git is the most flexible option. Create a public Git
 repository and provide the URL to your users. They can then install your
-extension using `gemini extensions install <your-repo-uri>`.
+extension using `sparkle extensions install <your-repo-uri>`.
 
 Users can optionally depend on a specific branch, tag, or commit using the
 `--ref` argument. For example:
 
 ```bash
-gemini extensions install <your-repo-uri> --ref=stable
+sparkle extensions install <your-repo-uri> --ref=stable
 ```
 
 Whenever you push commits to the referenced branch, the CLI prompts users to
@@ -63,7 +63,7 @@ Distributing extensions through
 [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
 provides a faster installation experience by avoiding a repository clone.
 
-Gemini CLI checks for updates by looking for the **Latest** release on GitHub.
+Sparkle CLI checks for updates by looking for the **Latest** release on GitHub.
 Users can also install specific versions using the `--ref` argument with a
 release tag. Use the `--pre-release` flag to install the latest version even if
 it isn't marked as **Latest**.
@@ -80,7 +80,7 @@ platform-independent, provide a single generic asset.
 
 #### Platform-specific archives
 
-To let Gemini CLI find the correct asset for a user's platform, use the
+To let Sparkle CLI find the correct asset for a user's platform, use the
 following naming convention:
 
 1.  **Platform and architecture-specific:**
@@ -105,7 +105,7 @@ Use these values for the placeholders:
 
 #### Archive structure
 
-Archives must be fully contained extensions. The `gemini-extension.json` file
+Archives must be fully contained extensions. The `sparkle-extension.json` file
 must be at the root of the archive. The rest of the layout should match a
 standard extension structure.
 
@@ -157,12 +157,12 @@ jobs:
 ## Migrate an extension repository
 
 If you move your extension to a new repository or rename it, use the
-`migratedTo` property in `gemini-extension.json` to seamlessly transition your
+`migratedTo` property in `sparkle-extension.json` to seamlessly transition your
 users.
 
 1.  **Create the new repository:** Set up your extension in its new location.
 2.  **Update the old repository:** In your original repository, update the
-    `gemini-extension.json` file to include the `migratedTo` property pointing
+    `sparkle-extension.json` file to include the `migratedTo` property pointing
     to the new repository URL, and increment the version number.
     ```json
     {
@@ -173,19 +173,19 @@ users.
     ```
 3.  **Release the update:** Publish this new version in your old repository.
 
-When users check for updates, Gemini CLI detects the `migratedTo` field,
+When users check for updates, Sparkle CLI detects the `migratedTo` field,
 verifies the new repository, and automatically updates their local installation
 to track the new source. All settings migrate automatically.
 
 ## How updates work
 
-Gemini CLI automatically checks for extension updates based on the installation
+Sparkle CLI automatically checks for extension updates based on the installation
 method. Understanding these mechanisms helps you ensure your users always have
 the latest version.
 
 ### Sync manifest and tags
 
-For GitHub releases, always ensure the `version` in `gemini-extension.json`
+For GitHub releases, always ensure the `version` in `sparkle-extension.json`
 matches your GitHub release tag. While the CLI uses tags for update detection,
 it displays the manifest version in the UI. Keeping them in sync prevents
 confusion.
@@ -205,7 +205,7 @@ The CLI uses different strategies depending on the installation type:
   directory's manifest with the installed version.
 
 To verify an extension's installation type, inspect the `type` field in the
-metadata file at `~/.gemini/extensions/<name>/.gemini-extension-install.json`.
+metadata file at `~/.gemini/extensions/<name>/.sparkle-extension-install.json`.
 
 </details>
 

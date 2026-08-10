@@ -1,6 +1,6 @@
 # Todo tool (`write_todos`)
 
-The `write_todos` tool allows the Gemini agent to maintain an internal list of
+The `write_todos` tool allows the Sparkle agent to maintain an internal list of
 subtasks for multi-step requests.
 
 ## Technical reference

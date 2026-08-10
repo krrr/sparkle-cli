@@ -1,23 +1,23 @@
-# Gemini CLI cheatsheet
+# Sparkle CLI cheatsheet
 
-This page provides a reference for commonly used Gemini CLI commands, options,
+This page provides a reference for commonly used Sparkle CLI commands, options,
 and parameters.
 
 ## CLI commands
 
-| Command                            | Description                        | Example                                                      |
-| ---------------------------------- | ---------------------------------- | ------------------------------------------------------------ |
-| `gemini`                           | Start interactive REPL             | `gemini`                                                     |
-| `gemini -p "query"`                | Query non-interactively            | `gemini -p "summarize README.md"`                            |
-| gemini "query"                     | Query and continue interactively   | gemini "explain this project"                                |
-| `cat file \| gemini`               | Process piped content              | `cat logs.txt \| gemini`<br>`Get-Content logs.txt \| gemini` |
-| `gemini -i "query"`                | Execute and continue interactively | `gemini -i "What is the purpose of this project?"`           |
-| `gemini -r "latest"`               | Continue most recent session       | `gemini -r "latest"`                                         |
-| `gemini -r "latest" "query"`       | Continue session with a new prompt | `gemini -r "latest" "Check for type errors"`                 |
-| `gemini -r "<session-id>" "query"` | Resume session by ID               | `gemini -r "abc123" "Finish this PR"`                        |
-| `gemini update`                    | Update to latest version           | `gemini update`                                              |
-| `gemini extensions`                | Manage extensions                  | See [Extensions Management](#extensions-management)          |
-| `gemini mcp`                       | Configure MCP servers              | See [MCP Server Management](#mcp-server-management)          |
+| Command                             | Description                        | Example                                                        |
+| ----------------------------------- | ---------------------------------- | -------------------------------------------------------------- |
+| `sparkle`                           | Start interactive REPL             | `sparkle`                                                      |
+| `sparkle -p "query"`                | Query non-interactively            | `sparkle -p "summarize README.md"`                             |
+| sparkle "query"                     | Query and continue interactively   | sparkle "explain this project"                                 |
+| `cat file \| sparkle`               | Process piped content              | `cat logs.txt \| sparkle`<br>`Get-Content logs.txt \| sparkle` |
+| `sparkle -i "query"`                | Execute and continue interactively | `sparkle -i "What is the purpose of this project?"`            |
+| `sparkle -r "latest"`               | Continue most recent session       | `sparkle -r "latest"`                                          |
+| `sparkle -r "latest" "query"`       | Continue session with a new prompt | `sparkle -r "latest" "Check for type errors"`                  |
+| `sparkle -r "<session-id>" "query"` | Resume session by ID               | `sparkle -r "abc123" "Finish this PR"`                         |
+| `sparkle update`                    | Update to latest version           | `sparkle update`                                               |
+| `sparkle extensions`                | Manage extensions                  | See [Extensions Management](#extensions-management)            |
+| `sparkle mcp`                       | Configure MCP servers              | See [MCP Server Management](#mcp-server-management)            |
 
 ### Positional arguments
 
@@ -51,7 +51,7 @@ These commands are available within the interactive REPL.
 | `--model`                        | `-m`  | string  | `auto`    | Model to use. See [Model Selection](#model-selection) for available values.                                                                                            |
 | `--prompt`                       | `-p`  | string  | -         | Prompt text. Appended to stdin input if provided. Forces non-interactive mode.                                                                                         |
 | `--prompt-interactive`           | `-i`  | string  | -         | Execute prompt and continue in interactive mode                                                                                                                        |
-| `--worktree`                     | `-w`  | string  | -         | Start Gemini in a new git worktree. If no name is provided, one is generated automatically. Requires `experimental.worktrees: true` in settings.                       |
+| `--worktree`                     | `-w`  | string  | -         | Start Sparkle in a new git worktree. If no name is provided, one is generated automatically. Requires `experimental.worktrees: true` in settings.                      |
 | `--sandbox`                      | `-s`  | boolean | `false`   | Run in a sandboxed environment for safer execution                                                                                                                     |
 | `--skip-trust`                   | -     | boolean | `false`   | Trust the current workspace for this session, skipping the folder trust check.                                                                                         |
 | `--approval-mode`                | -     | string  | `default` | Approval mode for tool execution. Choices: `default`, `auto_edit`, `yolo`, `plan`                                                                                      |
@@ -87,48 +87,48 @@ These are convenient shortcuts that map to specific models:
 
 ## Extensions management
 
-| Command                                            | Description                                  | Example                                                                        |
-| -------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
-| `gemini extensions install <source>`               | Install extension from Git URL or local path | `gemini extensions install https://github.com/user/my-extension`               |
-| `gemini extensions install <source> --ref <ref>`   | Install from specific branch/tag/commit      | `gemini extensions install https://github.com/user/my-extension --ref develop` |
-| `gemini extensions install <source> --auto-update` | Install with auto-update enabled             | `gemini extensions install https://github.com/user/my-extension --auto-update` |
-| `gemini extensions uninstall <name>`               | Uninstall one or more extensions             | `gemini extensions uninstall my-extension`                                     |
-| `gemini extensions list`                           | List all installed extensions                | `gemini extensions list`                                                       |
-| `gemini extensions update <name>`                  | Update a specific extension                  | `gemini extensions update my-extension`                                        |
-| `gemini extensions update --all`                   | Update all extensions                        | `gemini extensions update --all`                                               |
-| `gemini extensions enable <name>`                  | Enable an extension                          | `gemini extensions enable my-extension`                                        |
-| `gemini extensions disable <name>`                 | Disable an extension                         | `gemini extensions disable my-extension`                                       |
-| `gemini extensions link <path>`                    | Link local extension for development         | `gemini extensions link /path/to/extension`                                    |
-| `gemini extensions new <path>`                     | Create new extension from template           | `gemini extensions new ./my-extension`                                         |
-| `gemini extensions validate <path>`                | Validate extension structure                 | `gemini extensions validate ./my-extension`                                    |
+| Command                                             | Description                                  | Example                                                                         |
+| --------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------- |
+| `sparkle extensions install <source>`               | Install extension from Git URL or local path | `sparkle extensions install https://github.com/user/my-extension`               |
+| `sparkle extensions install <source> --ref <ref>`   | Install from specific branch/tag/commit      | `sparkle extensions install https://github.com/user/my-extension --ref develop` |
+| `sparkle extensions install <source> --auto-update` | Install with auto-update enabled             | `sparkle extensions install https://github.com/user/my-extension --auto-update` |
+| `sparkle extensions uninstall <name>`               | Uninstall one or more extensions             | `sparkle extensions uninstall my-extension`                                     |
+| `sparkle extensions list`                           | List all installed extensions                | `sparkle extensions list`                                                       |
+| `sparkle extensions update <name>`                  | Update a specific extension                  | `sparkle extensions update my-extension`                                        |
+| `sparkle extensions update --all`                   | Update all extensions                        | `sparkle extensions update --all`                                               |
+| `sparkle extensions enable <name>`                  | Enable an extension                          | `sparkle extensions enable my-extension`                                        |
+| `sparkle extensions disable <name>`                 | Disable an extension                         | `sparkle extensions disable my-extension`                                       |
+| `sparkle extensions link <path>`                    | Link local extension for development         | `sparkle extensions link /path/to/extension`                                    |
+| `sparkle extensions new <path>`                     | Create new extension from template           | `sparkle extensions new ./my-extension`                                         |
+| `sparkle extensions validate <path>`                | Validate extension structure                 | `sparkle extensions validate ./my-extension`                                    |
 
 See [Extensions Documentation](../extensions/index.md) for more details.
 
 ## MCP server management
 
-| Command                                                       | Description                     | Example                                                                                              |
-| ------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `gemini mcp add <name> <command>`                             | Add stdio-based MCP server      | `gemini mcp add github npx -y @modelcontextprotocol/server-github`                                   |
-| `gemini mcp add <name> <url> --transport http`                | Add HTTP-based MCP server       | `gemini mcp add api-server http://localhost:3000 --transport http`                                   |
-| `gemini mcp add <name> <command> --env KEY=value`             | Add with environment variables  | `gemini mcp add slack node server.js --env SLACK_TOKEN=xoxb-xxx`                                     |
-| `gemini mcp add <name> <command> --scope user`                | Add with user scope             | `gemini mcp add db node db-server.js --scope user`                                                   |
-| `gemini mcp add <name> <command> --include-tools tool1,tool2` | Add with specific tools         | `gemini mcp add github npx -y @modelcontextprotocol/server-github --include-tools list_repos,get_pr` |
-| `gemini mcp remove <name>`                                    | Remove an MCP server            | `gemini mcp remove github`                                                                           |
-| `gemini mcp list`                                             | List all configured MCP servers | `gemini mcp list`                                                                                    |
+| Command                                                        | Description                     | Example                                                                                               |
+| -------------------------------------------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `sparkle mcp add <name> <command>`                             | Add stdio-based MCP server      | `sparkle mcp add github npx -y @modelcontextprotocol/server-github`                                   |
+| `sparkle mcp add <name> <url> --transport http`                | Add HTTP-based MCP server       | `sparkle mcp add api-server http://localhost:3000 --transport http`                                   |
+| `sparkle mcp add <name> <command> --env KEY=value`             | Add with environment variables  | `sparkle mcp add slack node server.js --env SLACK_TOKEN=xoxb-xxx`                                     |
+| `sparkle mcp add <name> <command> --scope user`                | Add with user scope             | `sparkle mcp add db node db-server.js --scope user`                                                   |
+| `sparkle mcp add <name> <command> --include-tools tool1,tool2` | Add with specific tools         | `sparkle mcp add github npx -y @modelcontextprotocol/server-github --include-tools list_repos,get_pr` |
+| `sparkle mcp remove <name>`                                    | Remove an MCP server            | `sparkle mcp remove github`                                                                           |
+| `sparkle mcp list`                                             | List all configured MCP servers | `sparkle mcp list`                                                                                    |
 
 See [MCP Server Integration](../tools/mcp-server.md) for more details.
 
 ## Skills management
 
-| Command                          | Description                           | Example                                           |
-| -------------------------------- | ------------------------------------- | ------------------------------------------------- |
-| `gemini skills list`             | List all discovered agent skills      | `gemini skills list`                              |
-| `gemini skills install <source>` | Install skill from Git, path, or file | `gemini skills install https://github.com/u/repo` |
-| `gemini skills link <path>`      | Link local agent skills via symlink   | `gemini skills link /path/to/my-skills`           |
-| `gemini skills uninstall <name>` | Uninstall an agent skill              | `gemini skills uninstall my-skill`                |
-| `gemini skills enable <name>`    | Enable an agent skill                 | `gemini skills enable my-skill`                   |
-| `gemini skills disable <name>`   | Disable an agent skill                | `gemini skills disable my-skill`                  |
-| `gemini skills enable --all`     | Enable all skills                     | `gemini skills enable --all`                      |
-| `gemini skills disable --all`    | Disable all skills                    | `gemini skills disable --all`                     |
+| Command                           | Description                           | Example                                            |
+| --------------------------------- | ------------------------------------- | -------------------------------------------------- |
+| `sparkle skills list`             | List all discovered agent skills      | `sparkle skills list`                              |
+| `sparkle skills install <source>` | Install skill from Git, path, or file | `sparkle skills install https://github.com/u/repo` |
+| `sparkle skills link <path>`      | Link local agent skills via symlink   | `sparkle skills link /path/to/my-skills`           |
+| `sparkle skills uninstall <name>` | Uninstall an agent skill              | `sparkle skills uninstall my-skill`                |
+| `sparkle skills enable <name>`    | Enable an agent skill                 | `sparkle skills enable my-skill`                   |
+| `sparkle skills disable <name>`   | Disable an agent skill                | `sparkle skills disable my-skill`                  |
+| `sparkle skills enable --all`     | Enable all skills                     | `sparkle skills enable --all`                      |
+| `sparkle skills disable --all`    | Disable all skills                    | `sparkle skills disable --all`                     |
 
 See [Agent Skills Documentation](./skills.md) for more details.

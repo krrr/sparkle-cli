@@ -406,18 +406,18 @@ describe('Storage – additional helpers', () => {
 });
 
 describe('Storage - System Paths', () => {
-  const originalEnv = process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+  const originalEnv = process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'];
 
   afterEach(() => {
     if (originalEnv !== undefined) {
-      process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'] = originalEnv;
+      process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'] = originalEnv;
     } else {
-      delete process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+      delete process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'];
     }
   });
 
   it('getSystemSettingsPath returns correct path based on platform (default)', () => {
-    delete process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+    delete process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'];
 
     const platform = os.platform();
     const result = Storage.getSystemSettingsPath();
@@ -427,20 +427,20 @@ describe('Storage - System Paths', () => {
         '/Library/Application Support/GeminiCli/settings.json',
       );
     } else if (platform === 'win32') {
-      expect(result).toBe('C:\\ProgramData\\gemini-cli\\settings.json');
+      expect(result).toBe('C:\\ProgramData\\sparkle-cli\\settings.json');
     } else {
-      expect(result).toBe('/etc/gemini-cli/settings.json');
+      expect(result).toBe('/etc/sparkle-cli/settings.json');
     }
   });
 
-  it('getSystemSettingsPath follows GEMINI_CLI_SYSTEM_SETTINGS_PATH if set', () => {
+  it('getSystemSettingsPath follows SPARKLE_CLI_SYSTEM_SETTINGS_PATH if set', () => {
     const customPath = '/custom/path/settings.json';
-    process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'] = customPath;
+    process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'] = customPath;
     expect(Storage.getSystemSettingsPath()).toBe(customPath);
   });
 
   it('getSystemPoliciesDir returns correct path based on platform and ignores env var', () => {
-    process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'] =
+    process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'] =
       '/custom/path/settings.json';
     const platform = os.platform();
     const result = Storage.getSystemPoliciesDir();
@@ -450,9 +450,9 @@ describe('Storage - System Paths', () => {
     if (platform === 'darwin') {
       expect(result).toBe('/Library/Application Support/GeminiCli/policies');
     } else if (platform === 'win32') {
-      expect(result).toBe('C:\\ProgramData\\gemini-cli\\policies');
+      expect(result).toBe('C:\\ProgramData\\sparkle-cli\\policies');
     } else {
-      expect(result).toBe('/etc/gemini-cli/policies');
+      expect(result).toBe('/etc/sparkle-cli/policies');
     }
   });
 });

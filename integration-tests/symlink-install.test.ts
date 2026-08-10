@@ -58,7 +58,7 @@ describe.skipIf(skipFlaky)(
 
       const realExtPath = join(rig.testDir!, 'real-extension');
       mkdirSync(realExtPath);
-      writeFileSync(join(realExtPath, 'gemini-extension.json'), extension);
+      writeFileSync(join(realExtPath, 'sparkle-extension.json'), extension);
 
       const maliciousExtPath = join(
         os.tmpdir(),
@@ -66,7 +66,7 @@ describe.skipIf(skipFlaky)(
       );
       mkdirSync(maliciousExtPath);
       writeFileSync(
-        join(maliciousExtPath, 'gemini-extension.json'),
+        join(maliciousExtPath, 'sparkle-extension.json'),
         otherExtension,
       );
 
@@ -82,8 +82,8 @@ describe.skipIf(skipFlaky)(
           cwd: rig.testDir!,
           env: {
             ...process.env,
-            GEMINI_CLI_HOME: rig.homeDir!,
-            GEMINI_CLI_INTEGRATION_TEST: 'true',
+            SPARKLE_CLI_HOME: rig.homeDir!,
+            SPARKLE_CLI_INTEGRATION_TEST: 'true',
             GEMINI_PTY_INFO: 'node-pty',
           },
         });

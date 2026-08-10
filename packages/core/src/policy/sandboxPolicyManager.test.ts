@@ -11,7 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 describe('SandboxPolicyManager', () => {
-  const tempDir = path.join(os.tmpdir(), 'gemini-test-sandbox-policy');
+  const tempDir = path.join(os.tmpdir(), 'sparkle-test-sandbox-policy');
   const configPath = path.join(tempDir, 'sandbox.toml');
 
   beforeEach(() => {

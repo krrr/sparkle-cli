@@ -1,22 +1,22 @@
 # Frequently asked questions (FAQ)
 
 This page provides answers to common questions and solutions to frequent
-problems encountered while using Gemini CLI.
+problems encountered while using Sparkle CLI.
 
 ## General issues
 
-This section addresses common questions about Gemini CLI usage, security, and
+This section addresses common questions about Sparkle CLI usage, security, and
 troubleshooting general errors.
 
-### Why can't I use third-party software like Claude Code, OpenClaw, or OpenCode with Gemini CLI?
+### Why can't I use third-party software like Claude Code, OpenClaw, or OpenCode with Sparkle CLI?
 
-Using third-party software, tools, or services to harvest or piggyback on Gemini
-CLI's authentication credentials to access our backend services is a direct
-violation of our [applicable terms and policies](tos-privacy.md). Doing so
-bypasses our intended authentication and security structures, and such actions
-may be grounds for immediate suspension or termination of your account. If you
-would like to use a third-party coding agent with Gemini, the supported and
-secure method is to use a Google AI Studio API key.
+Using third-party software, tools, or services to harvest or piggyback on
+Sparkle CLI's authentication credentials to access our backend services is a
+direct violation of our [applicable terms and policies](tos-privacy.md). Doing
+so bypasses our intended authentication and security structures, and such
+actions may be grounds for immediate suspension or termination of your account.
+If you would like to use a third-party coding agent with Sparkle, the supported
+and secure method is to use a Google AI Studio API key.
 
 ### Why am I getting an `API error: 429 - Resource exhausted`?
 
@@ -50,24 +50,24 @@ If the problem persists, try deleting your `node_modules` directory and
 
 Cached token information is only displayed when cached tokens are being used.
 This feature is available for users authenticating with a Gemini API key. You
-can still view your total token usage using the `/stats` command in Gemini CLI.
+can still view your total token usage using the `/stats` command in Sparkle CLI.
 
 ## Installation and updates
 
-### How do I check which version of Gemini CLI I'm currently running?
+### How do I check which version of Sparkle CLI I'm currently running?
 
-You can check your current Gemini CLI version using one of these methods:
+You can check your current Sparkle CLI version using one of these methods:
 
-- Run `gemini --version` or `gemini -v` from your terminal
+- Run `sparkle --version` or `sparkle -v` from your terminal
 - Check the globally installed version using your package manager:
   - npm: `npm list -g sparkle-cli`
   - pnpm: `pnpm list -g sparkle-cli`
   - yarn: `yarn global list sparkle-cli`
   - bun: `bun pm ls -g sparkle-cli`
-  - homebrew: `brew list --versions gemini-cli`
-- Inside an active Gemini CLI session, use the `/about` command
+  - homebrew: `brew list --versions sparkle-cli`
+- Inside an active Sparkle CLI session, use the `/about` command
 
-### How do I update Gemini CLI to the latest version?
+### How do I update Sparkle CLI to the latest version?
 
 If you installed it globally via `npm`, update it using the command
 `npm install -g sparkle-cli@latest`. If you compiled it from source, pull the
@@ -99,26 +99,26 @@ risk.
 To store your API keys securely, you can:
 
 - **Use a `.env` file:** Create a `.env` file in your project's `.gemini`
-  directory (`.gemini/.env`) and store your keys there. Gemini CLI will
+  directory (`.gemini/.env`) and store your keys there. Sparkle CLI will
   automatically load these variables.
 - **Use your system's keyring:** For the most secure storage, use your operating
   system's secret management tool (like macOS Keychain, Windows Credential
   Manager, or a secret manager on Linux). You can then have your scripts or
   environment load the key from the secure storage at runtime.
 
-### Where are Gemini CLI configuration and settings files stored?
+### Where are Sparkle CLI configuration and settings files stored?
 
-Gemini CLI configuration is stored in two `settings.json` files:
+Sparkle CLI configuration is stored in two `settings.json` files:
 
 1.  In your home directory: `~/.gemini/settings.json`.
 2.  In your project's root directory: `./.gemini/settings.json`.
 
-Refer to [Gemini CLI Configuration](../reference/configuration.md) for more
+Refer to [Sparkle CLI Configuration](../reference/configuration.md) for more
 details.
 
 ## Not seeing your question?
 
 Search the
-[Gemini CLI Q&A discussions on GitHub](https://github.com/google-gemini/gemini-cli/discussions/categories/q-a)
+[Sparkle CLI Q&A discussions on GitHub](https://github.com/krrr/sparkle-cli/discussions/categories/q-a)
 or
-[start a new discussion on GitHub](https://github.com/google-gemini/gemini-cli/discussions/new?category=q-a)
+[start a new discussion on GitHub](https://github.com/krrr/sparkle-cli/discussions/new?category=q-a)

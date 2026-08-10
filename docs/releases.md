@@ -1,4 +1,4 @@
-# Gemini CLI releases
+# Sparkle CLI releases
 
 <!-- prettier-ignore -->
 > [!IMPORTANT]
@@ -177,8 +177,8 @@ require a full release cycle.
       release administrator.
 5.  Click **Run workflow**.
 
-The workflow will then run `npm dist-tag add` for the appropriate `gemini-cli`,
-`gemini-cli-core` and `gemini-cli-a2a-server` packages, pointing the specified
+The workflow will then run `npm dist-tag add` for the appropriate `sparkle-cli`,
+`sparkle-cli-core` and `sparkle-cli-a2a-server` packages, pointing the specified
 channel to the specified version.
 
 ## Patching
@@ -395,7 +395,7 @@ creating a public GitHub release, you can trigger the workflow manually from the
 GitHub UI.
 
 1.  Go to the
-    [Actions tab](https://github.com/google-gemini/gemini-cli/actions/workflows/release-manual.yml)
+    [Actions tab](https://github.com/krrr/sparkle-cli/actions/workflows/release-manual.yml)
     of the repository.
 2.  Click on the "Run workflow" dropdown.
 3.  Leave the `dry_run` option checked (`true`).
@@ -427,7 +427,7 @@ This command will do the following:
 You can then inspect the generated tarballs to ensure that they contain the
 correct files and that the `package.json` files have been updated correctly. The
 tarballs will be created in the root of each package's directory (for example,
-`packages/cli/google-gemini-cli-0.1.6.tgz`).
+`packages/cli/google-sparkle-cli-0.1.6.tgz`).
 
 By performing a dry run, you can be confident that your changes to the packaging
 process are correct and that the packages will be published successfully.
@@ -477,8 +477,8 @@ executable that enables `npx` usage directly from the GitHub repository.
     - **What happens:** The built JavaScript from both `packages/core/dist` and
       `packages/cli/dist`, along with all third-party JavaScript dependencies,
       are bundled by `esbuild` into a single, executable JavaScript file (for
-      example, `gemini.js`). The `node-pty` library is excluded from this bundle
-      as it contains native binaries.
+      example, `sparkle.js`). The `node-pty` library is excluded from this
+      bundle as it contains native binaries.
     - **Why:** This creates a single, optimized file that contains all the
       necessary application code. It simplifies execution for users who want to
       run the CLI without a full `npm install`, as all dependencies (including
@@ -487,10 +487,10 @@ executable that enables `npx` usage directly from the GitHub repository.
 2.  **The `bundle` directory is assembled:**
 
     - **What happens:** A temporary `bundle` folder is created at the project
-      root. The single `gemini.js` executable is placed inside it, along with
+      root. The single `sparkle.js` executable is placed inside it, along with
       other essential files.
     - **File movement:**
-      - `gemini.js` (from esbuild) -> `bundle/gemini.js`
+      - `sparkle.js` (from esbuild) -> `bundle/gemini.js`
       - `README.md` -> `bundle/README.md`
       - `LICENSE` -> `bundle/LICENSE`
       - `packages/cli/src/utils/*.sb` (sandbox profiles) -> `bundle/`
@@ -499,18 +499,17 @@ executable that enables `npx` usage directly from the GitHub repository.
 
 3.  **The GitHub release is created:**
     - **What happens:** The contents of the `bundle` directory, including the
-      `gemini.js` executable, are attached as assets to a new GitHub Release.
+      `sparkle.js` executable, are attached as assets to a new GitHub Release.
     - **Why:** This makes the single-file version of the CLI available for
-      direct download and enables the
-      `npx https://github.com/google-gemini/gemini-cli` command, which downloads
-      and runs this specific bundled asset.
+      direct download and enables the `npx https://github.com/krrr/sparkle-cli`
+      command, which downloads and runs this specific bundled asset.
 
 **Summary of artifacts**
 
 - **NPM:** Publishes standard, un-bundled Node.js packages. The primary artifact
   is the code in `packages/cli/dist`, which depends on `sparkle-cli-core`.
-- **GitHub release:** Publishes a single, bundled `gemini.js` file that contains
-  all dependencies, for easy execution via `npx`.
+- **GitHub release:** Publishes a single, bundled `sparkle.js` file that
+  contains all dependencies, for easy execution via `npx`.
 
 This dual-artifact process ensures that both traditional `npm` users and those
 who prefer the convenience of `npx` have an optimized experience.

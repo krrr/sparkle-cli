@@ -153,7 +153,7 @@ describe('SEA handling utilities', () => {
         '/path/to/script.js',
         'my-command',
       ]);
-      expect(config.env['GEMINI_CLI_NO_RELAUNCH']).toBe('true');
+      expect(config.env['SPARKLE_CLI_NO_RELAUNCH']).toBe('true');
       expect(config.env['NODE_OPTIONS']).toBeFalsy();
     });
 
@@ -176,7 +176,7 @@ describe('SEA handling utilities', () => {
       expect(config.env['NODE_OPTIONS']).toBe(
         '--existing-flag --max-old-space-size=8192',
       );
-      expect(config.env['GEMINI_CLI_NO_RELAUNCH']).toBe('true');
+      expect(config.env['SPARKLE_CLI_NO_RELAUNCH']).toBe('true');
     });
 
     it('throws error for complex nodeArgs in SEA mode', () => {

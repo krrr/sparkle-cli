@@ -937,9 +937,9 @@ describe('loadCliConfig', () => {
     });
   });
 
-  it('should add IDE workspace folders from GEMINI_CLI_IDE_WORKSPACE_PATH to include directories', async () => {
+  it('should add IDE workspace folders from SPARKLE_CLI_IDE_WORKSPACE_PATH to include directories', async () => {
     vi.stubEnv(
-      'GEMINI_CLI_IDE_WORKSPACE_PATH',
+      'SPARKLE_CLI_IDE_WORKSPACE_PATH',
       ['/project/folderA', '/project/folderB'].join(path.delimiter),
     );
     process.argv = ['node', 'script.js'];
@@ -951,7 +951,7 @@ describe('loadCliConfig', () => {
     expect(dirs).toContain('/project/folderB');
   });
 
-  it('should skip inaccessible workspace folders from GEMINI_CLI_IDE_WORKSPACE_PATH', async () => {
+  it('should skip inaccessible workspace folders from SPARKLE_CLI_IDE_WORKSPACE_PATH', async () => {
     vi.spyOn(ServerConfig, 'resolveToRealPath').mockImplementation((p) => {
       if (p.toString().includes('restricted')) {
         const err = new Error('EACCES: permission denied');
@@ -961,7 +961,7 @@ describe('loadCliConfig', () => {
       return p.toString();
     });
     vi.stubEnv(
-      'GEMINI_CLI_IDE_WORKSPACE_PATH',
+      'SPARKLE_CLI_IDE_WORKSPACE_PATH',
       ['/project/folderA', '/nonexistent/restricted/folder'].join(
         path.delimiter,
       ),
@@ -1726,9 +1726,9 @@ describe('loadCliConfig folderTrust', () => {
     vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
 
     originalVitest = process.env['VITEST'];
-    originalIntegrationTest = process.env['GEMINI_CLI_INTEGRATION_TEST'];
+    originalIntegrationTest = process.env['SPARKLE_CLI_INTEGRATION_TEST'];
     delete process.env['VITEST'];
-    delete process.env['GEMINI_CLI_INTEGRATION_TEST'];
+    delete process.env['SPARKLE_CLI_INTEGRATION_TEST'];
   });
 
   afterEach(() => {
@@ -1736,7 +1736,7 @@ describe('loadCliConfig folderTrust', () => {
       process.env['VITEST'] = originalVitest;
     }
     if (originalIntegrationTest !== undefined) {
-      process.env['GEMINI_CLI_INTEGRATION_TEST'] = originalIntegrationTest;
+      process.env['SPARKLE_CLI_INTEGRATION_TEST'] = originalIntegrationTest;
     }
 
     vi.unstubAllEnvs();

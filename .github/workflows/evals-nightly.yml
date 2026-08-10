@@ -30,7 +30,7 @@ permissions:
 jobs:
   evals:
     name: 'Evals (USUALLY_PASSING) nightly run'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     if: "github.repository == 'google-gemini/gemini-cli'"
     strategy:
       fail-fast: false
@@ -68,7 +68,7 @@ jobs:
         continue-on-error: true
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
           GEMINI_MODEL: '${{ matrix.model }}'
           RUN_EVALS: 'true'
           EVAL_SUITE_TYPE: "${{ github.event.inputs.suite_type || 'behavioral' }}"
@@ -103,7 +103,7 @@ jobs:
     name: 'Aggregate Results'
     needs: ['evals']
     if: "github.repository == 'google-gemini/gemini-cli' && always()"
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5

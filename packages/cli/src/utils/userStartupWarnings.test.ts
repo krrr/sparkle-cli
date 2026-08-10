@@ -72,7 +72,7 @@ describe('getUserStartupWarnings', () => {
         expect.objectContaining({
           id: 'home-directory',
           message: expect.stringContaining(
-            'Warning you are running Gemini CLI in your home directory',
+            'Warning you are running Sparkle CLI in your home directory',
           ),
           priority: WarningPriority.Low,
         }),
@@ -126,17 +126,17 @@ describe('getUserStartupWarnings', () => {
         expect.objectContaining({
           id: 'home-directory',
           message: expect.stringContaining(
-            'Warning you are running Gemini CLI in your home directory',
+            'Warning you are running Sparkle CLI in your home directory',
           ),
           priority: WarningPriority.Low,
         }),
       );
     });
 
-    it('should not return a warning when GEMINI_CLI_HOME differs from os.homedir', async () => {
+    it('should not return a warning when SPARKLE_CLI_HOME differs from os.homedir', async () => {
       const projectDir = path.join(testRootDir, 'project');
       await fs.mkdir(projectDir, { recursive: true });
-      vi.stubEnv('GEMINI_CLI_HOME', projectDir);
+      vi.stubEnv('SPARKLE_CLI_HOME', projectDir);
 
       const warnings = await getUserStartupWarnings({}, projectDir);
       expect(warnings.find((w) => w.id === 'home-directory')).toBeUndefined();
@@ -196,7 +196,7 @@ describe('getUserStartupWarnings', () => {
       vi.mocked(isFolderTrustEnabled).mockReturnValue(true);
       vi.mocked(isWorkspaceTrusted).mockImplementation(() => {
         throw new FatalUntrustedWorkspaceError(
-          'Gemini CLI is not running in a trusted directory',
+          'Sparkle CLI is not running in a trusted directory',
         );
       });
       vi.mocked(isHeadlessMode).mockReturnValue(true);

@@ -41,7 +41,7 @@ RUN HUSKY=0 npm run build && \
 # ---- Stage 2: Runtime ----
 FROM docker.io/library/node:20-slim
 
-ARG SANDBOX_NAME="gemini-cli-sandbox"
+ARG SANDBOX_NAME="sparkle-cli-sandbox"
 ARG CLI_VERSION_ARG
 ENV SANDBOX="$SANDBOX_NAME"
 ENV CLI_VERSION=$CLI_VERSION_ARG

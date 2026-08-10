@@ -65,7 +65,7 @@ function createTempFilesForModify(
   file_path: string,
 ): { oldPath: string; newPath: string; dirPath: string } {
   const diffDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'gemini-cli-tool-modify-'),
+    path.join(os.tmpdir(), 'sparkle-cli-tool-modify-'),
   );
 
   try {
@@ -83,11 +83,11 @@ function createTempFilesForModify(
   const timestamp = Date.now();
   const tempOldPath = path.join(
     diffDir,
-    `gemini-cli-modify-${fileName}-old-${timestamp}${ext}`,
+    `sparkle-cli-modify-${fileName}-old-${timestamp}${ext}`,
   );
   const tempNewPath = path.join(
     diffDir,
-    `gemini-cli-modify-${fileName}-new-${timestamp}${ext}`,
+    `sparkle-cli-modify-${fileName}-new-${timestamp}${ext}`,
   );
 
   fs.writeFileSync(tempOldPath, currentContent, {

@@ -119,7 +119,7 @@ async function handlePromotion(config: Config) {
  * Transport is only attached when the user presses F12.
  */
 export function setupInitialActivityLogger(config: Config) {
-  const target = process.env['GEMINI_CLI_ACTIVITY_LOG_TARGET'];
+  const target = process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET'];
 
   if (target) {
     if (!config.storage) return;

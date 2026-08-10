@@ -1400,7 +1400,7 @@ describe('ShellExecutionService child_process fallback', () => {
       });
 
       const truncationMessage =
-        '[GEMINI_CLI_WARNING: Output truncated. The buffer is limited to 16MB.]';
+        '[SPARKLE_CLI_WARNING: Output truncated. The buffer is limited to 16MB.]';
       expect(result.output).toContain(truncationMessage);
 
       const outputWithoutMessage = result.output
@@ -1888,7 +1888,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('GITHUB_SHA', 'test-sha');
     vi.stubEnv('MY_SENSITIVE_VAR', 'secret-value'); // This should be stripped out
     vi.stubEnv('PATH', '/test/path'); // An essential var that should be kept
-    vi.stubEnv('GEMINI_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
+    vi.stubEnv('SPARKLE_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
 
     vi.resetModules();
     const { ShellExecutionService } = await import(
@@ -1908,7 +1908,7 @@ describe('ShellExecutionService environment variables', () => {
     const ptyEnv = mockPtySpawn.mock.calls[0][2].env;
     expect(ptyEnv).not.toHaveProperty('MY_SENSITIVE_VAR');
     expect(ptyEnv).toHaveProperty('PATH', '/test/path');
-    expect(ptyEnv).toHaveProperty('GEMINI_CLI_TEST_VAR', 'test-value');
+    expect(ptyEnv).toHaveProperty('SPARKLE_CLI_TEST_VAR', 'test-value');
 
     // Ensure pty process exits for next test
     mockPtyProcess.onExit.mock.calls[0][0]({ exitCode: 0, signal: null });
@@ -1935,7 +1935,7 @@ describe('ShellExecutionService environment variables', () => {
     const cpEnv = mockCpSpawn.mock.calls[0][2].env;
     expect(cpEnv).not.toHaveProperty('MY_SENSITIVE_VAR');
     expect(cpEnv).toHaveProperty('PATH', '/test/path');
-    expect(cpEnv).toHaveProperty('GEMINI_CLI_TEST_VAR', 'test-value');
+    expect(cpEnv).toHaveProperty('SPARKLE_CLI_TEST_VAR', 'test-value');
 
     // Ensure child_process exits
     mockChildProcess.emit('exit', 0, null);
@@ -1948,7 +1948,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('SURFACE', 'Github');
     vi.stubEnv('MY_SENSITIVE_VAR', 'secret-value'); // This should be stripped out
     vi.stubEnv('PATH', '/test/path'); // An essential var that should be kept
-    vi.stubEnv('GEMINI_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
+    vi.stubEnv('SPARKLE_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
 
     vi.resetModules();
     const { ShellExecutionService } = await import(
@@ -1968,7 +1968,7 @@ describe('ShellExecutionService environment variables', () => {
     const ptyEnv = mockPtySpawn.mock.calls[0][2].env;
     expect(ptyEnv).not.toHaveProperty('MY_SENSITIVE_VAR');
     expect(ptyEnv).toHaveProperty('PATH', '/test/path');
-    expect(ptyEnv).toHaveProperty('GEMINI_CLI_TEST_VAR', 'test-value');
+    expect(ptyEnv).toHaveProperty('SPARKLE_CLI_TEST_VAR', 'test-value');
 
     // Ensure pty process exits for next test
     mockPtyProcess.onExit.mock.calls[0][0]({ exitCode: 0, signal: null });
@@ -1995,7 +1995,7 @@ describe('ShellExecutionService environment variables', () => {
     const cpEnv = mockCpSpawn.mock.calls[0][2].env;
     expect(cpEnv).not.toHaveProperty('MY_SENSITIVE_VAR');
     expect(cpEnv).toHaveProperty('PATH', '/test/path');
-    expect(cpEnv).toHaveProperty('GEMINI_CLI_TEST_VAR', 'test-value');
+    expect(cpEnv).toHaveProperty('SPARKLE_CLI_TEST_VAR', 'test-value');
 
     // Ensure child_process exits
     mockChildProcess.emit('exit', 0, null);
@@ -2024,7 +2024,7 @@ describe('ShellExecutionService environment variables', () => {
     expect(mockPtySpawn).toHaveBeenCalled();
     const ptyEnv = mockPtySpawn.mock.calls[0][2].env;
     expect(ptyEnv).toHaveProperty('MY_TEST_VAR', 'test-value');
-    expect(ptyEnv).toHaveProperty('GEMINI_CLI', '1');
+    expect(ptyEnv).toHaveProperty('SPARKLE_CLI', '1');
 
     // Ensure pty process exits
     mockPtyProcess.onExit.mock.calls[0][0]({ exitCode: 0, signal: null });
@@ -2043,7 +2043,7 @@ describe('ShellExecutionService environment variables', () => {
     expect(mockCpSpawn).toHaveBeenCalled();
     const cpEnv = mockCpSpawn.mock.calls[0][2].env;
     expect(cpEnv).toHaveProperty('MY_TEST_VAR', 'test-value');
-    expect(cpEnv).toHaveProperty('GEMINI_CLI', '1');
+    expect(cpEnv).toHaveProperty('SPARKLE_CLI', '1');
 
     // Ensure child_process exits
     mockChildProcess.emit('exit', 0, null);

@@ -155,7 +155,7 @@ describe('SandboxManager Integration', () => {
    * - macOS: Created in process.cwd() to avoid the seatbelt profile's global os.tmpdir() whitelist.
    * - Win/Linux: Created in os.tmpdir() because enforcing sandbox restrictions inside a large directory can be very slow.
    */
-  function createTempDir(prefix = 'gemini-sandbox-test-'): string {
+  function createTempDir(prefix = 'sparkle-sandbox-test-'): string {
     const baseDir = Platform.isMac
       ? path.join(process.cwd(), `.${prefix}`)
       : path.join(os.tmpdir(), prefix);

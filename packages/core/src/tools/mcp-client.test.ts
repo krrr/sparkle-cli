@@ -107,7 +107,7 @@ describe('mcp-client', () => {
     // create a tmp dir for this test
     // Create a unique temporary directory for the workspace to avoid conflicts
     testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-agent-test-'),
+      path.join(os.tmpdir(), 'sparkle-agent-test-'),
     );
     workspaceContext = new WorkspaceContext(testWorkspace);
   });
@@ -2401,7 +2401,7 @@ describe('mcp-client', () => {
       });
     });
 
-    it('sets an env variable GEMINI_CLI=1 for stdio MCP servers', async () => {
+    it('sets an env variable SPARKLE_CLI=1 for stdio MCP servers', async () => {
       const mockedTransport = vi
         .spyOn(SdkClientStdioLib, 'StdioClientTransport')
         .mockReturnValue({} as SdkClientStdioLib.StdioClientTransport);
@@ -2420,7 +2420,7 @@ describe('mcp-client', () => {
 
       const callArgs = mockedTransport.mock.calls[0][0];
       expect(callArgs.env).toBeDefined();
-      expect(callArgs.env!['GEMINI_CLI']).toBe('1');
+      expect(callArgs.env!['SPARKLE_CLI']).toBe('1');
     });
 
     it('should exclude extension settings with undefined values from environment', async () => {
@@ -2436,7 +2436,7 @@ describe('mcp-client', () => {
             name: 'test-ext',
             resolvedSettings: [
               {
-                envVar: 'GEMINI_CLI_EXT_VAR',
+                envVar: 'SPARKLE_CLI_EXT_VAR',
                 value: undefined,
                 sensitive: false,
                 name: 'ext-setting',
@@ -2455,7 +2455,7 @@ describe('mcp-client', () => {
 
       const callArgs = mockedTransport.mock.calls[0][0];
       expect(callArgs.env).toBeDefined();
-      expect(callArgs.env!['GEMINI_CLI_EXT_VAR']).toBeUndefined();
+      expect(callArgs.env!['SPARKLE_CLI_EXT_VAR']).toBeUndefined();
     });
 
     it('should include extension settings with defined values in environment', async () => {
@@ -2471,7 +2471,7 @@ describe('mcp-client', () => {
             name: 'test-ext',
             resolvedSettings: [
               {
-                envVar: 'GEMINI_CLI_EXT_VAR',
+                envVar: 'SPARKLE_CLI_EXT_VAR',
                 value: 'defined-value',
                 sensitive: false,
                 name: 'ext-setting',
@@ -2490,7 +2490,7 @@ describe('mcp-client', () => {
 
       const callArgs = mockedTransport.mock.calls[0][0];
       expect(callArgs.env).toBeDefined();
-      expect(callArgs.env!['GEMINI_CLI_EXT_VAR']).toBe('defined-value');
+      expect(callArgs.env!['SPARKLE_CLI_EXT_VAR']).toBe('defined-value');
     });
 
     it('should resolve environment variables in mcpServerConfig.env using extension settings', async () => {
@@ -2503,13 +2503,13 @@ describe('mcp-client', () => {
         {
           command: 'test-command',
           env: {
-            RESOLVED_VAR: '$GEMINI_CLI_EXT_VAR',
+            RESOLVED_VAR: '$SPARKLE_CLI_EXT_VAR',
           },
           extension: {
             name: 'test-ext',
             resolvedSettings: [
               {
-                envVar: 'GEMINI_CLI_EXT_VAR',
+                envVar: 'SPARKLE_CLI_EXT_VAR',
                 value: 'ext-value',
                 sensitive: false,
                 name: 'ext-setting',
@@ -2528,7 +2528,7 @@ describe('mcp-client', () => {
 
       const callArgs = mockedTransport.mock.calls[0][0];
       expect(callArgs.env).toBeDefined();
-      expect(callArgs.env!['GEMINI_CLI_EXT_VAR']).toBe('ext-value');
+      expect(callArgs.env!['SPARKLE_CLI_EXT_VAR']).toBe('ext-value');
       expect(callArgs.env!['RESOLVED_VAR']).toBe('ext-value');
     });
     it('should expand environment variables in mcpServerConfig.env and not redact them', async () => {
@@ -2661,7 +2661,7 @@ describe('connectToMcpServer with OAuth', () => {
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
     testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-agent-test-'),
+      path.join(os.tmpdir(), 'sparkle-agent-test-'),
     );
     workspaceContext = new WorkspaceContext(testWorkspace);
 
@@ -2882,7 +2882,7 @@ describe('connectToMcpServer - HTTP→SSE fallback', () => {
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
     testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-agent-test-'),
+      path.join(os.tmpdir(), 'sparkle-agent-test-'),
     );
     workspaceContext = new WorkspaceContext(testWorkspace);
 
@@ -3017,7 +3017,7 @@ describe('connectToMcpServer - OAuth with transport fallback', () => {
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
     testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-agent-test-'),
+      path.join(os.tmpdir(), 'sparkle-agent-test-'),
     );
     workspaceContext = new WorkspaceContext(testWorkspace);
 

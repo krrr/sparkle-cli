@@ -362,7 +362,7 @@ const createTestDefinition = <TOutput extends z.ZodTypeAny = z.ZodUnknown>(
       },
     },
     modelConfig: {
-      model: 'gemini-test-model',
+      model: 'sparkle-test-model',
       generateContentConfig: {
         temperature: 0,
         topP: 1,
@@ -3825,7 +3825,7 @@ describe('LocalAgentExecutor', () => {
           },
         },
         modelConfig: {
-          model: 'gemini-test-model',
+          model: 'sparkle-test-model',
           generateContentConfig: { temperature: 0, topP: 1 },
         },
         runConfig: { maxTimeMinutes: 5, maxTurns: 5 },
@@ -3917,7 +3917,7 @@ describe('LocalAgentExecutor', () => {
           },
         },
         modelConfig: {
-          model: 'gemini-test-model',
+          model: 'sparkle-test-model',
           generateContentConfig: { temperature: 0, topP: 1 },
         },
         runConfig: { maxTimeMinutes: 5, maxTurns: 5 },

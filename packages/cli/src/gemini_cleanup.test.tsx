@@ -190,12 +190,12 @@ vi.mock('./utils/sessionCleanup.js', async (importOriginal) => {
 describe('gemini.tsx main function cleanup', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env['GEMINI_CLI_NO_RELAUNCH'] = 'true';
-    vi.stubEnv('GEMINI_CLI_TRUST_WORKSPACE', 'true');
+    process.env['SPARKLE_CLI_NO_RELAUNCH'] = 'true';
+    vi.stubEnv('SPARKLE_CLI_TRUST_WORKSPACE', 'true');
   });
 
   afterEach(() => {
-    delete process.env['GEMINI_CLI_NO_RELAUNCH'];
+    delete process.env['SPARKLE_CLI_NO_RELAUNCH'];
     vi.restoreAllMocks();
   });
 

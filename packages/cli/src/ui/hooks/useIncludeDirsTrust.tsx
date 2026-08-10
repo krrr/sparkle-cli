@@ -40,9 +40,9 @@ async function finishAddingDirectories(
   }
 
   if (added.length > 0) {
-    const gemini = config.getGeminiClient();
-    if (gemini) {
-      await gemini.addDirectoryContext();
+    const sparkle = config.getGeminiClient();
+    if (sparkle) {
+      await sparkle.addDirectoryContext();
     }
   }
 

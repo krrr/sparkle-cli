@@ -323,7 +323,7 @@ describe('ShellTool', () => {
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
         expect.stringMatching(
-          /_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp['"]?\n\(\n {2}trap 'jobs -p > "\$_bgpids_file"' EXIT/,
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp['"]?\n\(\n {2}trap 'jobs -p > "\$_bgpids_file"' EXIT/,
         ),
         tempRootDir,
         expect.any(Function),
@@ -395,7 +395,9 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(/_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp/),
+        expect.stringMatching(
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
+        ),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -411,7 +413,9 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(/_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp/),
+        expect.stringMatching(
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
+        ),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -431,7 +435,9 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(/_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp/),
+        expect.stringMatching(
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
+        ),
         subdir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -454,7 +460,9 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(/_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp/),
+        expect.stringMatching(
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
+        ),
         path.join(tempRootDir, 'subdir'),
         expect.any(Function),
         expect.any(AbortSignal),
@@ -533,7 +541,9 @@ EOF`;
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(/_bgpids_file=.*gemini-shell-.*[/\\]bgpids\.tmp/),
+        expect.stringMatching(
+          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
+        ),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),

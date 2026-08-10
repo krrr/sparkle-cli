@@ -19,7 +19,7 @@ describe('mixed input crash prevention', () => {
   it('should not crash when using mixed prompt inputs', async () => {
     rig.setup('should not crash when using mixed prompt inputs');
 
-    // Test: echo "say '1'." | gemini --prompt-interactive="say '2'." say '3'.
+    // Test: echo "say '1'." | sparkle --prompt-interactive="say '2'." say '3'.
     const stdinContent = "say '1'.";
 
     try {

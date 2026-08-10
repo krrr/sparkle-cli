@@ -89,7 +89,7 @@ export async function runNonInteractive({
       },
     });
 
-    if (process.env['GEMINI_CLI_ACTIVITY_LOG_TARGET']) {
+    if (process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET']) {
       const { setupInitialActivityLogger } = await import(
         './utils/devtoolsService.js'
       );

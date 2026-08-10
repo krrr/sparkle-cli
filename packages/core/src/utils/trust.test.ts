@@ -32,7 +32,7 @@ vi.mock('./headless.js', async (importOriginal) => {
 describe('Trust Utility (Core)', () => {
   const tempDir = path.join(
     os.tmpdir(),
-    'gemini-trust-test-' + Math.random().toString(36).slice(2),
+    'sparkle-trust-test-' + Math.random().toString(36).slice(2),
   );
   const trustedFoldersPath = path.join(tempDir, 'trustedFolders.json');
 
@@ -45,7 +45,7 @@ describe('Trust Utility (Core)', () => {
     vi.mocked(headless.isHeadlessMode).mockReturnValue(false);
     ideContextStore.clear();
     resetTrustedFoldersForTesting();
-    delete process.env['GEMINI_CLI_TRUST_WORKSPACE'];
+    delete process.env['SPARKLE_CLI_TRUST_WORKSPACE'];
   });
 
   afterEach(() => {

@@ -12,16 +12,16 @@ fi
 pr="${1}"
 model="${2:-gemini-3.1-pro-preview}"
 REPO="google-gemini/gemini-cli"
-REVIEW_DIR="${HOME}/git/review/gemini-cli"
+REVIEW_DIR="${HOME}/git/review/sparkle-cli"
 
 if [[ ! -d "${REVIEW_DIR}" ]]; then
     echo "ERROR: Directory ${REVIEW_DIR} does not exist."
     echo ""
-    echo "Please create a new gemini-cli clone at that directory to use for reviews."
+    echo "Please create a new sparkle-cli clone at that directory to use for reviews."
     echo "Instructions:"
     echo "  mkdir -p ~/git/review"
     echo "  cd ~/git/review"
-    echo "  git clone https://github.com/google-gemini/gemini-cli.git"
+    echo "  git clone https://github.com/krrr/sparkle-cli.git"
     exit 1
 fi
 

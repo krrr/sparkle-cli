@@ -1,18 +1,18 @@
-# Build Gemini CLI extensions
+# Build Sparkle CLI extensions
 
-Gemini CLI extensions let you expand the capabilities of Gemini CLI by adding
+Sparkle CLI extensions let you expand the capabilities of Sparkle CLI by adding
 custom tools, commands, and context. This guide walks you through creating your
 first extension, from setting up a template to adding custom functionality and
 linking it for local development.
 
 ## Prerequisites
 
-Before you start, ensure you have Gemini CLI installed and a basic understanding
-of Node.js.
+Before you start, ensure you have Sparkle CLI installed and a basic
+understanding of Node.js.
 
 ## Extension features
 
-Extensions offer several ways to customize Gemini CLI. Use this table to decide
+Extensions offer several ways to customize Sparkle CLI. Use this table to decide
 which features your extension needs.
 
 | Feature                                                        | What it is                                                                                                                | When to use it                                                                                                                                                                                                                                                                                 | Invoked by            |
@@ -33,7 +33,7 @@ Run the following command to create a new directory called `my-first-extension`
 with the template files:
 
 ```bash
-gemini extensions new my-first-extension mcp-server
+sparkle extensions new my-first-extension mcp-server
 ```
 
 This creates a directory with the following structure:
@@ -41,7 +41,7 @@ This creates a directory with the following structure:
 ```
 my-first-extension/
 ├── example.js
-├── gemini-extension.json
+├── sparkle-extension.json
 └── package.json
 ```
 
@@ -49,9 +49,9 @@ my-first-extension/
 
 Your new extension contains several key files that define its behavior.
 
-### `gemini-extension.json`
+### `sparkle-extension.json`
 
-The manifest file tells Gemini CLI how to load and use your extension.
+The manifest file tells Sparkle CLI how to load and use your extension.
 
 ```json
 {
@@ -133,7 +133,7 @@ and scripts for your extension.
 Some extensions need configuration, such as API keys or user preferences. Let's
 add a setting for an API key.
 
-1.  Open `gemini-extension.json`.
+1.  Open `sparkle-extension.json`.
 2.  Add a `settings` array to the configuration:
 
     ```json
@@ -154,7 +154,7 @@ add a setting for an API key.
     }
     ```
 
-When a user installs this extension, Gemini CLI will prompt them to enter the
+When a user installs this extension, Sparkle CLI will prompt them to enter the
 "API Key". The value will be stored securely in the system keychain (because
 `sensitive` is true) and injected into the MCP server's process as the
 `MY_SERVICE_API_KEY` environment variable.
@@ -168,7 +168,7 @@ When a user installs this extension, Gemini CLI will prompt them to enter the
 
 ## Step 4: Link your extension
 
-Link your extension to your Gemini CLI installation for local development.
+Link your extension to your Sparkle CLI installation for local development.
 
 1.  **Install dependencies:**
 
@@ -179,15 +179,15 @@ Link your extension to your Gemini CLI installation for local development.
 
 2.  **Link the extension:**
 
-    The `link` command creates a symbolic link from Gemini CLI extensions
+    The `link` command creates a symbolic link from Sparkle CLI extensions
     directory to your development directory. Changes you make are reflected
     immediately.
 
     ```bash
-    gemini extensions link .
+    sparkle extensions link .
     ```
 
-Restart your Gemini CLI session to use the new `fetch_posts` tool. Test it by
+Restart your Sparkle CLI session to use the new `fetch_posts` tool. Test it by
 asking: "fetch posts".
 
 ## Step 5: Add a custom command
@@ -222,8 +222,8 @@ Custom commands create shortcuts for complex prompts.
     This command, `/fs:grep-code`, takes an argument, runs the `grep` shell
     command, and pipes the results into a prompt for summarization.
 
-After saving the file, restart Gemini CLI. Run `/fs:grep-code "some pattern"` to
-use your new command.
+After saving the file, restart Sparkle CLI. Run `/fs:grep-code "some pattern"`
+to use your new command.
 
 ## Step 6: Add a custom `AGENTS.md`
 
@@ -240,7 +240,7 @@ information.
     posts, use the `fetch_posts` tool. Be concise in your responses.
     ```
 
-2.  Update your `gemini-extension.json` to load this file:
+2.  Update your `sparkle-extension.json` to load this file:
 
     ```json
     {
@@ -257,7 +257,7 @@ information.
     }
     ```
 
-Restart Gemini CLI. The model now has the context from your `AGENTS.md` file in
+Restart Sparkle CLI. The model now has the context from your `AGENTS.md` file in
 every session where the extension is active.
 
 ## (Optional) Step 7: Add an Agent Skill
@@ -298,8 +298,8 @@ Skills are activated only when needed, which saves context tokens.
     3. Suggest remediation steps for any findings.
     ```
 
-Gemini CLI automatically discovers skills bundled with your extension. The model
-activates them when it identifies a relevant task.
+Sparkle CLI automatically discovers skills bundled with your extension. The
+model activates them when it identifies a relevant task.
 
 ## Step 8: Release your extension
 

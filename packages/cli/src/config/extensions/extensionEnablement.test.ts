@@ -29,7 +29,7 @@ const inMemoryFs: { [key: string]: string } = {};
 
 // Helper to create a temporary directory for testing
 function createTestDir() {
-  const dirPath = `/virtual-tmp/gemini-test-${Math.random().toString(36).substring(2, 15)}`;
+  const dirPath = `/virtual-tmp/sparkle-test-${Math.random().toString(36).substring(2, 15)}`;
   inMemoryFs[dirPath] = ''; // Simulate directory existence
   return {
     path: dirPath,
@@ -317,16 +317,16 @@ describe('ExtensionEnablementManager', () => {
 
   it('should correctly prioritize more specific enable rules', () => {
     manager.disable('ext-test', true, '/Users/chrstn');
-    manager.enable('ext-test', true, '/Users/chrstn/gemini-cli');
+    manager.enable('ext-test', true, '/Users/chrstn/sparkle-cli');
 
-    expect(manager.isEnabled('ext-test', '/Users/chrstn/gemini-cli')).toBe(
+    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(
       true,
     );
   });
 
   it('should not disable subdirectories if includeSubdirs is false', () => {
     manager.disable('ext-test', false, '/Users/chrstn');
-    expect(manager.isEnabled('ext-test', '/Users/chrstn/gemini-cli')).toBe(
+    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(
       true,
     );
   });

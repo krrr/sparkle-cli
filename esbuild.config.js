@@ -179,7 +179,7 @@ Promise.allSettled([
     console.error('worker-entry.js build failed:', workerResult.reason);
     process.exit(1);
   }
-  // error in a2a-server bundling will not stop gemini.js bundling process
+  // error in a2a-server bundling will not stop sparkle.js bundling process
   if (a2aResult.status === 'rejected') {
     console.warn('a2a-server build failed:', a2aResult.reason);
   }

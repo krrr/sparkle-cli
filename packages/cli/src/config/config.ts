@@ -159,9 +159,9 @@ export async function parseArguments(
   const startupMessages: string[] = [];
   const yargsInstance = yargs(rawArgv)
     .locale('en')
-    .scriptName('gemini')
+    .scriptName('sparkle')
     .usage(
-      'Usage: gemini [options] [command]\n\nGemini CLI - Defaults to interactive mode. Use -p/--prompt for non-interactive (headless) mode.',
+      'Usage: sparkle [options] [command]\n\nSparkle CLI - Defaults to interactive mode. Use -p/--prompt for non-interactive (headless) mode.',
     )
     .option('isCommand', {
       type: 'boolean',
@@ -271,7 +271,7 @@ export async function parseArguments(
   yargsInstance.command(hooksCommand);
 
   yargsInstance
-    .command('$0 [query..]', 'Launch Gemini CLI', (yargsInstance) =>
+    .command('$0 [query..]', 'Launch Sparkle CLI', (yargsInstance) =>
       yargsInstance
         .positional('query', {
           description:
@@ -307,7 +307,7 @@ export async function parseArguments(
           type: 'string',
           skipValidation: true,
           description:
-            'Start Gemini in a new git worktree. If no name is provided, one is generated automatically.',
+            'Start Sparkle in a new git worktree. If no name is provided, one is generated automatically.',
           coerce: (value: unknown): string => {
             const trimmed = typeof value === 'string' ? value.trim() : '';
             if (trimmed === '') {
@@ -399,8 +399,8 @@ export async function parseArguments(
           description:
             'Resume a previous session. Use "latest" for most recent or index number (e.g. --resume 5)',
           coerce: (value: string): string => {
-            // When --resume passed with a value (`gemini --resume 123`): value = "123" (string)
-            // When --resume passed without a value (`gemini --resume`): value = "" (string)
+            // When --resume passed with a value (`sparkle --resume 123`): value = "123" (string)
+            // When --resume passed without a value (`sparkle --resume`): value = "" (string)
             // When --resume not passed at all: this `coerce` function is not called at all, and
             //   `yargsInstance.argv.resume` is undefined.
             const trimmed = value.trim();
@@ -506,7 +506,7 @@ export async function parseArguments(
     }
     result = parsed;
     if (result['skip-trust']) {
-      process.env['GEMINI_CLI_TRUST_WORKSPACE'] = 'true';
+      process.env['SPARKLE_CLI_TRUST_WORKSPACE'] = 'true';
     }
   } catch (e) {
     const msg = getErrorMessage(e);
@@ -598,7 +598,7 @@ export async function loadCliConfig(
   const ideMode = settings.ide?.enabled ?? false;
 
   const folderTrust =
-    process.env['GEMINI_CLI_INTEGRATION_TEST'] === 'true' ||
+    process.env['SPARKLE_CLI_INTEGRATION_TEST'] === 'true' ||
     process.env['VITEST'] === 'true'
       ? false
       : (settings.security?.folderTrust?.enabled ?? false);
@@ -634,7 +634,7 @@ export async function loadCliConfig(
   // When running inside VSCode with multiple workspace folders,
   // automatically add the other folders as include directories
   // so Gemini has context of all open folders, not just the cwd.
-  const ideWorkspacePath = process.env['GEMINI_CLI_IDE_WORKSPACE_PATH'];
+  const ideWorkspacePath = process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'];
   if (ideWorkspacePath) {
     const realCwd = resolveToRealPath(cwd);
     const ideFolders = ideWorkspacePath.split(path.delimiter).filter((p) => {
@@ -672,7 +672,7 @@ export async function loadCliConfig(
     ?.find((ext) => ext.isActive && ext.plan?.directory)?.plan;
 
   let extensionRegistryURI =
-    process.env['GEMINI_CLI_EXTENSION_REGISTRY_URI'] ??
+    process.env['SPARKLE_CLI_EXTENSION_REGISTRY_URI'] ??
     (trustedFolder ? settings.experimental?.extensionRegistryURI : undefined);
 
   if (extensionRegistryURI && !extensionRegistryURI.startsWith('http')) {

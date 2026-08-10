@@ -399,7 +399,7 @@ export const useExecutionLifecycle = (
               command += ' ';
             }
             const tmpDir = fs.mkdtempSync(
-              path.join(os.tmpdir(), 'gemini-shell-'),
+              path.join(os.tmpdir(), 'sparkle-shell-'),
             );
             pwdFilePath = path.join(tmpDir, 'pwd.tmp');
             const escapedPwdFilePath = escapeShellArg(pwdFilePath, 'bash');

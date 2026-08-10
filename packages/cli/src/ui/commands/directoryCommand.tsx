@@ -57,12 +57,12 @@ async function finishAddingDirectories(
   }
 
   if (added.length > 0) {
-    const gemini = config.geminiClient;
-    if (gemini) {
-      await gemini.addDirectoryContext();
+    const sparkle = config.geminiClient;
+    if (sparkle) {
+      await sparkle.addDirectoryContext();
 
       // Persist directories to session file for resume support
-      const chatRecordingService = gemini.getChatRecordingService();
+      const chatRecordingService = sparkle.getChatRecordingService();
       const workspaceContext = config.getWorkspaceContext();
       chatRecordingService?.recordDirectories(
         workspaceContext.getDirectories(),

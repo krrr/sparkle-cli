@@ -19,7 +19,7 @@ const projectRoot = path.resolve(__dirname, '../../');
 
 describe('proxy-agent bundle shape', () => {
   it('preserves named constructors after ESM splitting', async () => {
-    const tmpDir = mkdtempSync(path.join(tmpdir(), 'gemini-proxy-test-'));
+    const tmpDir = mkdtempSync(path.join(tmpdir(), 'sparkle-proxy-test-'));
     const entryFile = path.join(tmpDir, 'entry.ts');
 
     // Create a minimal entry file that dynamically imports the proxy agents

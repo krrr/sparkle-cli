@@ -21,8 +21,8 @@ import {
   getSecureSanitizationConfig,
 } from './environmentSanitization.js';
 
-export const SHADOW_REPO_AUTHOR_NAME = 'Gemini CLI';
-export const SHADOW_REPO_AUTHOR_EMAIL = 'gemini-cli@google.com';
+export const SHADOW_REPO_AUTHOR_NAME = 'Sparkle CLI';
+export const SHADOW_REPO_AUTHOR_EMAIL = 'sparkle-cli@hazama.cc';
 
 const SHADOW_REPO_UNSAFE_OPTIONS = {
   allowUnsafeAlias: true,

@@ -78,10 +78,10 @@ describe('ExtensionManager', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-cli-test-home-'),
+      path.join(os.tmpdir(), 'sparkle-cli-test-home-'),
     );
     tempWorkspaceDir = fs.mkdtempSync(
-      path.join(tempHomeDir, 'gemini-cli-test-workspace-'),
+      path.join(tempHomeDir, 'sparkle-cli-test-workspace-'),
     );
     mockHomedir.mockReturnValue(tempHomeDir);
     userExtensionsDir = path.join(tempHomeDir, EXTENSIONS_DIRECTORY_NAME);
@@ -167,13 +167,13 @@ describe('ExtensionManager', () => {
         name: 'duplicate-ext',
         version: '1.0.0',
       });
-      fs.writeFileSync(path.join(ext1Dir, 'gemini-extension.json'), config);
+      fs.writeFileSync(path.join(ext1Dir, 'sparkle-extension.json'), config);
       fs.writeFileSync(
         path.join(ext1Dir, 'metadata.json'),
         JSON.stringify({ type: 'local', source: ext1Dir }),
       );
 
-      fs.writeFileSync(path.join(ext2Dir, 'gemini-extension.json'), config);
+      fs.writeFileSync(path.join(ext2Dir, 'sparkle-extension.json'), config);
       fs.writeFileSync(
         path.join(ext2Dir, 'metadata.json'),
         JSON.stringify({ type: 'local', source: ext2Dir }),
@@ -201,7 +201,7 @@ describe('ExtensionManager', () => {
         path.join(os.tmpdir(), 'external-ext-'),
       );
       fs.writeFileSync(
-        path.join(externalDir, 'gemini-extension.json'),
+        path.join(externalDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext2', version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -236,7 +236,7 @@ describe('ExtensionManager', () => {
       fs.mkdirSync(extensionDir, { recursive: true });
 
       fs.writeFileSync(
-        path.join(extensionDir, 'gemini-extension.json'),
+        path.join(extensionDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'test-ext', version: '1.0.0' }),
       );
 
@@ -386,7 +386,7 @@ describe('ExtensionManager', () => {
       const extDir = path.join(userExtensionsDir, oldName);
       fs.mkdirSync(extDir, { recursive: true });
       fs.writeFileSync(
-        path.join(extDir, 'gemini-extension.json'),
+        path.join(extDir, 'sparkle-extension.json'),
         JSON.stringify({ name: oldName, version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -401,7 +401,7 @@ describe('ExtensionManager', () => {
         path.join(tempHomeDir, 'new-source-'),
       );
       fs.writeFileSync(
-        path.join(newSourceDir, 'gemini-extension.json'),
+        path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: newName, version: '1.1.0' }),
       );
       fs.writeFileSync(
@@ -431,7 +431,7 @@ describe('ExtensionManager', () => {
       const extDir = path.join(userExtensionsDir, oldName);
       fs.mkdirSync(extDir, { recursive: true });
       fs.writeFileSync(
-        path.join(extDir, 'gemini-extension.json'),
+        path.join(extDir, 'sparkle-extension.json'),
         JSON.stringify({ name: oldName, version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -451,7 +451,7 @@ describe('ExtensionManager', () => {
         path.join(tempHomeDir, 'new-source-'),
       );
       fs.writeFileSync(
-        path.join(newSourceDir, 'gemini-extension.json'),
+        path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: newName, version: '1.1.0' }),
       );
       fs.writeFileSync(
@@ -475,7 +475,7 @@ describe('ExtensionManager', () => {
       const ext1Dir = path.join(userExtensionsDir, 'ext1');
       fs.mkdirSync(ext1Dir, { recursive: true });
       fs.writeFileSync(
-        path.join(ext1Dir, 'gemini-extension.json'),
+        path.join(ext1Dir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext1', version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -486,7 +486,7 @@ describe('ExtensionManager', () => {
       const ext2Dir = path.join(userExtensionsDir, 'ext2');
       fs.mkdirSync(ext2Dir, { recursive: true });
       fs.writeFileSync(
-        path.join(ext2Dir, 'gemini-extension.json'),
+        path.join(ext2Dir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext2', version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -501,7 +501,7 @@ describe('ExtensionManager', () => {
         path.join(tempHomeDir, 'new-source-'),
       );
       fs.writeFileSync(
-        path.join(newSourceDir, 'gemini-extension.json'),
+        path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext2', version: '1.1.0' }),
       );
       fs.writeFileSync(
@@ -525,7 +525,7 @@ describe('ExtensionManager', () => {
       const extDir = path.join(tempHomeDir, 'new-integrity-ext');
       fs.mkdirSync(extDir, { recursive: true });
       fs.writeFileSync(
-        path.join(extDir, 'gemini-extension.json'),
+        path.join(extDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'integrity-ext', version: '1.0.0' }),
       );
 
@@ -549,7 +549,7 @@ describe('ExtensionManager', () => {
       const extDir = path.join(userExtensionsDir, extName);
       fs.mkdirSync(extDir, { recursive: true });
       fs.writeFileSync(
-        path.join(extDir, 'gemini-extension.json'),
+        path.join(extDir, 'sparkle-extension.json'),
         JSON.stringify({ name: extName, version: '1.0.0' }),
       );
       fs.writeFileSync(
@@ -573,7 +573,7 @@ describe('ExtensionManager', () => {
         path.join(tempHomeDir, 'new-source-'),
       );
       fs.writeFileSync(
-        path.join(newSourceDir, 'gemini-extension.json'),
+        path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: extName, version: '1.1.0' }),
       );
 

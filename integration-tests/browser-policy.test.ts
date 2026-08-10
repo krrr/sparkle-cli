@@ -136,7 +136,7 @@ priority = 200
       const run = await rig.runInteractive({
         approvalMode: 'default',
         env: {
-          GEMINI_CLI_INTEGRATION_TEST: 'true',
+          SPARKLE_CLI_INTEGRATION_TEST: 'true',
         },
       });
 

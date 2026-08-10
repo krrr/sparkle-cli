@@ -248,7 +248,7 @@ export async function start_sandbox(
 
     debugLogger.log(`hopping into sandbox (command: ${command}) ...`);
 
-    // determine full path for gemini-cli to distinguish linked vs installed setting
+    // determine full path for sparkle-cli to distinguish linked vs installed setting
     const gcPath = process.argv[1] ? fs.realpathSync(process.argv[1]) : '';
 
     const projectSandboxDockerfile = path.join(
@@ -264,14 +264,14 @@ export async function start_sandbox(
     const workdir = path.resolve(process.cwd());
     const containerWorkdir = getContainerPath(workdir);
 
-    // if BUILD_SANDBOX is set, then call scripts/build_sandbox.js under gemini-cli repo
+    // if BUILD_SANDBOX is set, then call scripts/build_sandbox.js under sparkle-cli repo
     //
-    // note this can only be done with binary linked from gemini-cli repo
+    // note this can only be done with binary linked from sparkle-cli repo
     if (process.env['BUILD_SANDBOX']) {
-      if (!gcPath.includes('gemini-cli/packages/')) {
+      if (!gcPath.includes('sparkle-cli/packages/')) {
         throw new FatalSandboxError(
-          'Cannot build sandbox using installed gemini binary; ' +
-            'run `npm link ./packages/cli` under gemini-cli repo to switch to linked binary.',
+          'Cannot build sandbox using installed sparkle binary; ' +
+            'run `npm link ./packages/cli` under sparkle-cli repo to switch to linked binary.',
         );
       } else {
         debugLogger.log('building sandbox ...');
@@ -303,8 +303,8 @@ export async function start_sandbox(
     if (!(await ensureSandboxImageIsPresent(command, image, cliConfig))) {
       const remedy =
         image === LOCAL_DEV_SANDBOX_IMAGE_NAME
-          ? 'Try running `npm run build:all` or `npm run build:sandbox` under the gemini-cli repo to build it locally, or check the image name and your network connection.'
-          : 'Please check the image name, your network connection, or notify gemini-cli-dev@google.com if the issue persists.';
+          ? 'Try running `npm run build:all` or `npm run build:sandbox` under the sparkle-cli repo to build it locally, or check the image name and your network connection.'
+          : 'Please check the image name, your network connection, or notify sparkle-cli-dev@hazama.cc if the issue persists.';
       throw new FatalSandboxError(
         `Sandbox image '${image}' is missing or could not be pulled. ${remedy}`,
       );
@@ -480,9 +480,9 @@ export async function start_sandbox(
     // CLI starts cannot race on the same sequential name.
     const imageName = parseImageName(image);
     const isIntegrationTest =
-      process.env['GEMINI_CLI_INTEGRATION_TEST'] === 'true';
+      process.env['SPARKLE_CLI_INTEGRATION_TEST'] === 'true';
     const containerNamePrefix = isIntegrationTest
-      ? 'gemini-cli-integration-test'
+      ? 'sparkle-cli-integration-test'
       : imageName;
     const containerName = `${containerNamePrefix}-${randomBytes(6).toString(
       'hex',
@@ -490,11 +490,11 @@ export async function start_sandbox(
     debugLogger.log(`ContainerName: ${containerName}`);
     args.push('--name', containerName, '--hostname', containerName);
 
-    // copy GEMINI_CLI_TEST_VAR for integration tests
-    if (process.env['GEMINI_CLI_TEST_VAR']) {
+    // copy SPARKLE_CLI_TEST_VAR for integration tests
+    if (process.env['SPARKLE_CLI_TEST_VAR']) {
       args.push(
         '--env',
-        `GEMINI_CLI_TEST_VAR=${process.env['GEMINI_CLI_TEST_VAR']}`,
+        `SPARKLE_CLI_TEST_VAR=${process.env['SPARKLE_CLI_TEST_VAR']}`,
       );
     }
 
@@ -535,8 +535,8 @@ export async function start_sandbox(
 
     // Pass through IDE mode environment variables
     for (const envVar of [
-      'GEMINI_CLI_IDE_SERVER_PORT',
-      'GEMINI_CLI_IDE_WORKSPACE_PATH',
+      'SPARKLE_CLI_IDE_SERVER_PORT',
+      'SPARKLE_CLI_IDE_WORKSPACE_PATH',
       'TERM_PROGRAM',
     ]) {
       if (process.env[envVar]) {
@@ -609,7 +609,7 @@ export async function start_sandbox(
     let userFlag = '';
     const finalEntrypoint = entrypoint(workdir, cliArgs);
 
-    if (process.env['GEMINI_CLI_INTEGRATION_TEST'] === 'true') {
+    if (process.env['SPARKLE_CLI_INTEGRATION_TEST'] === 'true') {
       args.push('--user', 'root');
       userFlag = '--user root';
     } else if (await shouldUseCurrentUserInSandbox()) {
@@ -622,10 +622,10 @@ export async function start_sandbox(
 
       // Instead of passing --user to the main sandbox container, we let it
       // start as root, then create a user with the host's UID/GID, and
-      // finally switch to that user to run the gemini process. This is
+      // finally switch to that user to run the sparkle process. This is
       // necessary on Linux to ensure the user exists within the
       // container's /etc/passwd file, which is required by os.userInfo().
-      const username = 'gemini';
+      const username = 'sparkle';
       const homeDir = getContainerPath(homedir());
       const quotedHomeDir = quote([homeDir]);
 
@@ -782,14 +782,14 @@ export async function start_sandbox(
 // Unlike Docker/Podman, LXC does not launch a transient container from an
 // image. The user creates and manages their own LXC container; Gemini runs
 // inside it via `lxc exec`. The container name is stored in config.image
-// (default: "gemini-sandbox"). The workspace is bind-mounted into the
+// (default: "sparkle-sandbox"). The workspace is bind-mounted into the
 // container at the same absolute path.
 async function start_lxc_sandbox(
   config: SandboxConfig,
   nodeArgs: string[] = [],
   cliArgs: string[] = [],
 ): Promise<number> {
-  const containerName = config.image || 'gemini-sandbox';
+  const containerName = config.image || 'sparkle-sandbox';
   const workdir = path.resolve(process.cwd());
 
   debugLogger.log(
@@ -866,7 +866,7 @@ async function start_lxc_sandbox(
   try {
     // Bind-mount the working directory into the container at the same path.
     // Using "lxc config device add" is idempotent when the device name matches.
-    const workspaceDeviceName = `gemini-workspace-${randomBytes(4).toString(
+    const workspaceDeviceName = `sparkle-workspace-${randomBytes(4).toString(
       'hex',
     )}`;
     devicesToRemove.push(workspaceDeviceName);
@@ -895,7 +895,7 @@ async function start_lxc_sandbox(
     if (config.allowedPaths) {
       for (const hostPath of config.allowedPaths) {
         if (hostPath && path.isAbsolute(hostPath) && fs.existsSync(hostPath)) {
-          const allowedDeviceName = `gemini-allowed-${randomBytes(4).toString(
+          const allowedDeviceName = `sparkle-allowed-${randomBytes(4).toString(
             'hex',
           )}`;
           devicesToRemove.push(allowedDeviceName);
@@ -938,9 +938,9 @@ async function start_lxc_sandbox(
       GEMINI_MODEL: process.env['GEMINI_MODEL'],
       TERM: process.env['TERM'],
       COLORTERM: process.env['COLORTERM'],
-      GEMINI_CLI_IDE_SERVER_PORT: process.env['GEMINI_CLI_IDE_SERVER_PORT'],
-      GEMINI_CLI_IDE_WORKSPACE_PATH:
-        process.env['GEMINI_CLI_IDE_WORKSPACE_PATH'],
+      SPARKLE_CLI_IDE_SERVER_PORT: process.env['SPARKLE_CLI_IDE_SERVER_PORT'],
+      SPARKLE_CLI_IDE_WORKSPACE_PATH:
+        process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'],
       TERM_PROGRAM: process.env['TERM_PROGRAM'],
     };
     for (const [key, value] of Object.entries(envVarsToForward)) {

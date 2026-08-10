@@ -21,7 +21,7 @@ describe('reportError', () => {
 
   beforeEach(async () => {
     // Create a temporary directory for logs
-    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-report-test-'));
+    testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-report-test-'));
     vi.resetAllMocks();
     debugLoggerErrorSpy = vi
       .spyOn(debugLogger, 'error')
@@ -36,7 +36,7 @@ describe('reportError', () => {
   });
 
   const getExpectedReportPath = (type: string) =>
-    path.join(testDir, `gemini-client-error-${type}-${MOCK_TIMESTAMP}.json`);
+    path.join(testDir, `sparkle-client-error-${type}-${MOCK_TIMESTAMP}.json`);
 
   it('should generate a report and log the path', async () => {
     const error = new Error('Test error');

@@ -99,10 +99,10 @@ describe('ModelConfigService Integration', () => {
 
   it('should resolve a simple model, applying core agent defaults', () => {
     const resolved = service.getResolvedConfig({
-      model: 'gemini-test-model',
+      model: 'sparkle-test-model',
     });
 
-    expect(resolved.model).toBe('gemini-test-model');
+    expect(resolved.model).toBe('sparkle-test-model');
     expect(resolved.generateContentConfig).toEqual({
       temperature: 0.5, // from agent override
       stopSequences: ['AGENT_STOP'], // from agent override
@@ -156,11 +156,11 @@ describe('ModelConfigService Integration', () => {
 
   it('should apply settings for an unknown model but a known agent', () => {
     const resolved = service.getResolvedConfig({
-      model: 'gemini-test-model',
+      model: 'sparkle-test-model',
       overrideScope: 'core',
     });
 
-    expect(resolved.model).toBe('gemini-test-model');
+    expect(resolved.model).toBe('sparkle-test-model');
     expect(resolved.generateContentConfig).toEqual({
       temperature: 0.5, // from agent override
       stopSequences: ['AGENT_STOP'], // from agent override

@@ -23,36 +23,30 @@ npm install -g sparkle-cli
 ## What's Changed
 
 - Refactor: exclude transient CI configuration files from workspace context by
-  @DavidAPierce in
-  [#28216](https://github.com/google-gemini/gemini-cli/pull/28216)
+  @DavidAPierce in [#28216](https://github.com/krrr/sparkle-cli/pull/28216)
 - chore(release): bump version to 0.52.0-nightly.20260707.g27a3da3e8 by
-  @gemini-cli-robot in
-  [#28323](https://github.com/google-gemini/gemini-cli/pull/28323)
-- Changelog for v0.51.0-preview.0 by @gemini-cli-robot in
-  [#28320](https://github.com/google-gemini/gemini-cli/pull/28320)
-- Changelog for v0.50.0 by @gemini-cli-robot in
-  [#28322](https://github.com/google-gemini/gemini-cli/pull/28322)
+  @sparkle-cli-robot in [#28323](https://github.com/krrr/sparkle-cli/pull/28323)
+- Changelog for v0.51.0-preview.0 by @sparkle-cli-robot in
+  [#28320](https://github.com/krrr/sparkle-cli/pull/28320)
+- Changelog for v0.50.0 by @sparkle-cli-robot in
+  [#28322](https://github.com/krrr/sparkle-cli/pull/28322)
 - fix(core-tools): bypass LLM correction for JSON and IPYNB files in write_file
   and replace by @amelidev in
-  [#28223](https://github.com/google-gemini/gemini-cli/pull/28223)
+  [#28223](https://github.com/krrr/sparkle-cli/pull/28223)
 - fix(core): use unambiguous previous intent label in fallback summary by
-  @amelidev in [#28343](https://github.com/google-gemini/gemini-cli/pull/28343)
+  @amelidev in [#28343](https://github.com/krrr/sparkle-cli/pull/28343)
 - fix(privacy): show a clear message when the account has no Code Assist tier by
-  @ompatel-aiml in
-  [#28304](https://github.com/google-gemini/gemini-cli/pull/28304)
+  @ompatel-aiml in [#28304](https://github.com/krrr/sparkle-cli/pull/28304)
 - fix(core): enrich shared project quota limit errors with setup hint by
-  @amelidev in [#28391](https://github.com/google-gemini/gemini-cli/pull/28391)
+  @amelidev in [#28391](https://github.com/krrr/sparkle-cli/pull/28391)
 - fix(a2a-server): ensure task cancellation aborts execution loop by
-  @luisfelipe-alt in
-  [#28316](https://github.com/google-gemini/gemini-cli/pull/28316)
+  @luisfelipe-alt in [#28316](https://github.com/krrr/sparkle-cli/pull/28316)
 - fix(core): simplify plan mode write policy to support relative paths by
-  @DavidAPierce in
-  [#28398](https://github.com/google-gemini/gemini-cli/pull/28398)
+  @DavidAPierce in [#28398](https://github.com/krrr/sparkle-cli/pull/28398)
 - feat(core): Bump node google-auth-library version to 10.9.0 by @jerrylin3321
-  in [#28385](https://github.com/google-gemini/gemini-cli/pull/28385)
+  in [#28385](https://github.com/krrr/sparkle-cli/pull/28385)
 - chore/release: bump version to 0.52.0-nightly.20260715.gfa975395b by
-  @gemini-cli-robot in
-  [#28402](https://github.com/google-gemini/gemini-cli/pull/28402)
+  @sparkle-cli-robot in [#28402](https://github.com/krrr/sparkle-cli/pull/28402)
 
 **Full Changelog**:
-https://github.com/google-gemini/gemini-cli/compare/v0.51.0...v0.52.0
+https://github.com/krrr/sparkle-cli/compare/v0.51.0...v0.52.0

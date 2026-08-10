@@ -149,7 +149,7 @@ describe('Checkpointing Integration', () => {
       },
     );
 
-    expect(logOutput).toBe('Gemini CLI <gemini-cli@google.com>');
+    expect(logOutput).toBe('Sparkle CLI <sparkle-cli@hazama.cc>');
     expect(logOutput).not.toContain('Global User');
   });
 });

@@ -70,7 +70,7 @@ export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 export const DEFAULT_THINKING_MODE = 8192;
 
 export function getAutoModelDescription() {
-  return `Let Gemini CLI decide the best model for the task: ${getDisplayString(DEFAULT_GEMINI_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
+  return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_GEMINI_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
 }
 
 /**

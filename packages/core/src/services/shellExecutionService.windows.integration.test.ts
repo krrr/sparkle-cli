@@ -19,7 +19,7 @@ const isWindows = os.platform() === 'win32';
  * argument passing. PowerShell 7 (pwsh.exe) passes arguments correctly.
  *
  * These tests exercise the full pipeline end-to-end. They pass when
- * gemini-cli selects pwsh.exe from PATH; they fail when the pipeline
+ * sparkle-cli selects pwsh.exe from PATH; they fail when the pipeline
  * routes through Windows PowerShell 5.1.
  */
 describe.skipIf(!isWindows)(

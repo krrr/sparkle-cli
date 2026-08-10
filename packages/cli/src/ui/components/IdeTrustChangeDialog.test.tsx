@@ -25,7 +25,7 @@ describe('IdeTrustChangeDialog', () => {
     expect(frameText).toContain(
       'Workspace trust has changed due to a change in the IDE connection.',
     );
-    expect(frameText).toContain("Press 'r' to restart Gemini");
+    expect(frameText).toContain("Press 'r' to restart");
     unmount();
   });
 
@@ -38,7 +38,7 @@ describe('IdeTrustChangeDialog', () => {
     expect(frameText).toContain(
       'Workspace trust has changed due to a change in the IDE trust.',
     );
-    expect(frameText).toContain("Press 'r' to restart Gemini");
+    expect(frameText).toContain("Press 'r' to restart");
     unmount();
   });
 

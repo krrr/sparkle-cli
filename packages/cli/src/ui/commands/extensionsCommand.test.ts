@@ -515,7 +515,7 @@ describe('extensionsCommand', () => {
     it('should only add an info message in a sandbox environment', async () => {
       // Simulate a sandbox environment
       vi.stubEnv('NODE_ENV', '');
-      vi.stubEnv('SANDBOX', 'gemini-sandbox');
+      vi.stubEnv('SANDBOX', 'sparkle-sandbox');
       const extensionsUrl = 'https://geminicli.com/extensions/';
 
       await exploreAction(mockContext, '');

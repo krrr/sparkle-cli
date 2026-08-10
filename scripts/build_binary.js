@@ -445,7 +445,7 @@ if (existsSync(bundleDir)) {
 const filesToRemove = [
   'sparkle.mjs',
   'sparkle.mjs.map',
-  'gemini-sea.cjs',
+  'sparkle-sea.cjs',
   'sea-launch.cjs',
   'manifest.json',
   'native_modules',

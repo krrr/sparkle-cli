@@ -153,7 +153,7 @@ export async function createContentGenerator(
     const version = await getVersion();
     const model = resolveModel(gcConfig.getModel(), gcConfig);
     const customHeadersEnv =
-      process.env['GEMINI_CLI_CUSTOM_HEADERS'] || undefined;
+      process.env['SPARKLE_CLI_CUSTOM_HEADERS'] || undefined;
     const clientName = gcConfig.getClientName();
     const surface = determineSurface();
 
@@ -177,8 +177,8 @@ export async function createContentGenerator(
       userAgent = `CloudCodeVSCode/${version} (aidev_client; os_type=${osType}; os_version=${osVersion}; arch=${arch}; host_path=${hostPath}; proxy_client=geminicli)`;
     } else {
       const userAgentPrefix = clientName
-        ? `GeminiCLI-${clientName}`
-        : 'GeminiCLI';
+        ? `SparkleCLI-${clientName}`
+        : 'SparkleCLI';
       userAgent = `${userAgentPrefix}/${version}/${model} (${process.platform}; ${process.arch}; ${surface})`;
     }
 

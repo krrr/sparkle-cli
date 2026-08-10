@@ -27,7 +27,7 @@ import {
   type GeminiCliOperation,
 } from './constants.js';
 
-const TRACER_NAME = 'gemini-cli';
+const TRACER_NAME = 'sparkle-cli';
 const TRACER_VERSION = 'v1';
 
 /**

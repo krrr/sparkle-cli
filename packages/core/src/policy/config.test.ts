@@ -833,7 +833,7 @@ name = "invalid-name"
   });
 
   it('should allow overriding Plan Mode deny with user policy', async () => {
-    const userPolicyDir = '/tmp/gemini-cli-test/user/policies';
+    const userPolicyDir = '/tmp/sparkle-cli-test/user/policies';
     vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(userPolicyDir);
 
     mockPolicyFile(
@@ -880,7 +880,7 @@ modes = ["plan"]
 
   it('should deduplicate security warnings when called multiple times', async () => {
     const systemPoliciesDir = nodePath.resolve(
-      '/tmp/gemini-cli-test/system/policies',
+      '/tmp/sparkle-cli-test/system/policies',
     );
     vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
       systemPoliciesDir,

@@ -19,7 +19,7 @@ export function performInit(doesGeminiMdExist: boolean): CommandActionReturn {
   return {
     type: 'submit_prompt',
     content: `
-You are an AI agent that brings the power of Gemini directly into the terminal. Your task is to analyze the current directory and generate a comprehensive AGENTS.md file to be used as instructional context for future interactions.
+You are an terminal-based AI agent. Your task is to analyze the current directory and generate a comprehensive AGENTS.md file to be used as instructional context for future interactions.
 
 **Analysis Process:**
 

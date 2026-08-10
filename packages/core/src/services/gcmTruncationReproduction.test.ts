@@ -16,8 +16,10 @@ describe('AES-GCM Tag Length Verification', () => {
 
   beforeEach(async () => {
     // Create a unique temporary directory for test isolation
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-test-keychain-'));
-    vi.stubEnv('GEMINI_CLI_HOME', tempDir);
+    tempDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'sparkle-test-keychain-'),
+    );
+    vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
   });
 
   afterEach(async () => {
@@ -39,7 +41,7 @@ describe('AES-GCM Tag Length Verification', () => {
     const credentialsFilePath = path.join(
       tempDir,
       '.gemini',
-      'gemini-credentials.json',
+      'sparkle-credentials.json',
     );
     const rawEncryptedData = await fs.readFile(credentialsFilePath, 'utf-8');
 
@@ -88,7 +90,7 @@ describe('AES-GCM Tag Length Verification', () => {
     const credentialsFilePath = path.join(
       tempDir,
       '.gemini',
-      'gemini-credentials.json',
+      'sparkle-credentials.json',
     );
     const legacyIv = crypto.randomBytes(16);
     const encryptionKey = (keychain as unknown as { encryptionKey: Buffer })
@@ -136,7 +138,7 @@ describe('AES-GCM Tag Length Verification', () => {
     const credentialsFilePath = path.join(
       tempDir,
       '.gemini',
-      'gemini-credentials.json',
+      'sparkle-credentials.json',
     );
     const rawEncryptedData = await fs.readFile(credentialsFilePath, 'utf-8');
 
@@ -174,7 +176,7 @@ describe('AES-GCM Tag Length Verification', () => {
     const credentialsFilePath = path.join(
       tempDir,
       '.gemini',
-      'gemini-credentials.json',
+      'sparkle-credentials.json',
     );
     const rawEncryptedData = await fs.readFile(credentialsFilePath, 'utf-8');
 

@@ -26,7 +26,7 @@ async function run(cmd) {
 }
 
 const IGNORE_MESSAGES = [
-  'thank you so much for your contribution to Gemini CLI!',
+  'thank you so much for your contribution to Sparkle CLI!',
   "I'm currently reviewing this pull request and will post my feedback shortly.",
   'This pull request is being closed because it is not currently linked to an issue.',
 ];
@@ -43,7 +43,7 @@ async function main() {
     process.exit(1);
   }
 
-  const gqlQuery = `query($branch:String!){repository(name:"gemini-cli",owner:"google-gemini"){pullRequests(headRefName:$branch,first:100){nodes{id,number,state,comments(first:100){nodes{createdAt,isMinimized,minimizedReason,author{login},body,url,authorAssociation}},reviews(first:100){nodes{id,author{login},createdAt,isMinimized,minimizedReason,body,state,comments(first:30){nodes{id,replyTo{id},author{login},createdAt,body,isMinimized,minimizedReason,path,line,startLine,originalLine,originalStartLine}}}}}}}}`;
+  const gqlQuery = `query($branch:String!){repository(name:"sparkle-cli",owner:"google-gemini"){pullRequests(headRefName:$branch,first:100){nodes{id,number,state,comments(first:100){nodes{createdAt,isMinimized,minimizedReason,author{login},body,url,authorAssociation}},reviews(first:100){nodes{id,author{login},createdAt,isMinimized,minimizedReason,body,state,comments(first:30){nodes{id,replyTo{id},author{login},createdAt,body,isMinimized,minimizedReason,path,line,startLine,originalLine,originalStartLine}}}}}}}}`;
 
   const [authInfo, diff, commits, rawJson] = await Promise.all([
     run('gh auth status -a'),

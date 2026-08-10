@@ -33,7 +33,7 @@ describe('WindowsSandboxManager', () => {
    * Creates a temporary directory and returns its canonical real path.
    */
   function createTempDir(name: string, parent = os.tmpdir()): string {
-    const rawPath = fs.mkdtempSync(path.join(parent, `gemini-test-${name}-`));
+    const rawPath = fs.mkdtempSync(path.join(parent, `sparkle-test-${name}-`));
     return fs.realpathSync(rawPath);
   }
 
@@ -405,7 +405,7 @@ describe('WindowsSandboxManager', () => {
   it('includes non-existent forbidden paths in the forbidden manifest', async () => {
     const missingPath = path.join(
       os.tmpdir(),
-      'gemini-cli-test-missing',
+      'sparkle-cli-test-missing',
       'does-not-exist.txt',
     );
 

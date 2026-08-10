@@ -176,7 +176,7 @@ export class AppRig {
   constructor(private options: AppRigOptions = {}) {
     const uniqueId = randomUUID();
     this.testDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), `gemini-app-rig-${uniqueId.slice(0, 8)}-`),
+      path.join(os.tmpdir(), `sparkle-app-rig-${uniqueId.slice(0, 8)}-`),
     );
     this.sessionId = `test-session-${uniqueId}`;
     activeRigs.set(this.sessionId, this);
@@ -243,7 +243,7 @@ export class AppRig {
 
   private setupEnvironment() {
     // Stub environment variables to avoid interference from developer's machine
-    vi.stubEnv('GEMINI_CLI_HOME', this.testDir);
+    vi.stubEnv('SPARKLE_CLI_HOME', this.testDir);
     vi.stubEnv('TERM_PROGRAM', 'other');
     vi.stubEnv('VSCODE_GIT_IPC_HANDLE', '');
     if (this.options.fakeResponsesPath) {

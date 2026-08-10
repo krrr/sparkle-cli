@@ -36,7 +36,7 @@ jobs:
   merge_queue_skipper:
     permissions: 'read-all'
     name: 'Merge Queue Skipper'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     if: "github.repository == 'google-gemini/gemini-cli'"
     outputs:
       skip: '${{ steps.merge-queue-ci-skipper.outputs.skip-check }}'
@@ -44,11 +44,11 @@ jobs:
       - id: 'merge-queue-ci-skipper'
         uses: 'cariad-tech/merge-queue-ci-skipper@1032489e59437862c90a08a2c92809c903883772' # ratchet:cariad-tech/merge-queue-ci-skipper@main
         with:
-          secret: '${{ secrets.GEMINI_CLI_ROBOT_GITHUB_PAT }}'
+          secret: '${{ secrets.SPARKLE_CLI_ROBOT_GITHUB_PAT }}'
 
   lint:
     name: 'Lint'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     needs: 'merge_queue_skipper'
     if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
     env:
@@ -126,7 +126,7 @@ jobs:
 
   test_linux:
     name: 'Test (Linux) - ${{ matrix.node-version }}, ${{ matrix.shard }}'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     needs:
       - 'merge_queue_skipper'
     if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
@@ -170,7 +170,7 @@ jobs:
       - name: 'Run tests and generate reports'
         env:
           NO_COLOR: true
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
         run: |
           if [[ "${{ matrix.shard }}" == "cli" ]]; then
             npm run test:ci --workspace "sparkle-cli"
@@ -261,7 +261,7 @@ jobs:
       - name: 'Run tests and generate reports'
         env:
           NO_COLOR: true
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
         run: |
           if [[ "${{ matrix.shard }}" == "cli" ]]; then
             npm run test:ci --workspace "sparkle-cli" -- --coverage.enabled=false
@@ -321,7 +321,7 @@ jobs:
 
   codeql:
     name: 'CodeQL'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     needs: 'merge_queue_skipper'
     if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
     permissions:
@@ -348,7 +348,7 @@ jobs:
     name: 'Check Bundle Size'
     needs: 'merge_queue_skipper'
     if: "github.repository == 'google-gemini/gemini-cli' && github.event_name == 'pull_request' && needs.merge_queue_skipper.outputs.skip == 'false'"
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     permissions:
       contents: 'read' # For checkout
       pull-requests: 'write' # For commenting
@@ -371,7 +371,7 @@ jobs:
 
   test_windows:
     name: 'Slow Test - Win - ${{ matrix.shard }}'
-    runs-on: 'gemini-cli-windows-16-core'
+    runs-on: 'sparkle-cli-windows-16-core'
     needs: 'merge_queue_skipper'
     if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
     timeout-minutes: 60
@@ -428,7 +428,7 @@ jobs:
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
           NO_COLOR: true
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
           NODE_OPTIONS: '--max-old-space-size=32768 --max-semi-space-size=256'
           UV_THREADPOOL_SIZE: '32'
           NODE_ENV: 'test'
@@ -479,7 +479,7 @@ jobs:
       - 'test_windows'
       - 'codeql'
       - 'bundle_size'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     steps:
       - name: 'Check all job results'
         run: |

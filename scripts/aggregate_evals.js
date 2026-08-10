@@ -110,7 +110,7 @@ function fetchHistoricalData() {
     // Fetch artifacts for each run
     for (const run of runs) {
       const tmpDir = fs.mkdtempSync(
-        path.join(os.tmpdir(), `gemini-evals-${run.databaseId}-`),
+        path.join(os.tmpdir(), `sparkle-evals-${run.databaseId}-`),
       );
       try {
         // Download report.json files.
@@ -147,7 +147,7 @@ function fetchHistoricalData() {
 function generateMarkdown(currentStatsByModel, history) {
   console.log('### Evals Nightly Summary\n');
   console.log(
-    'See [evals/README.md](https://github.com/google-gemini/gemini-cli/tree/main/evals) for more details.\n',
+    'See [evals/README.md](https://github.com/krrr/sparkle-cli/tree/main/evals) for more details.\n',
   );
 
   // Reverse history to show oldest first

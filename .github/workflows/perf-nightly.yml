@@ -11,7 +11,7 @@ permissions:
 jobs:
   perf-test:
     name: 'Run Performance Usage Tests'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     if: "github.repository == 'google-gemini/gemini-cli'"
     steps:
       - name: 'Checkout'

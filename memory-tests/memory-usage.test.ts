@@ -422,7 +422,7 @@ async function generateSharedLargeChatData(tempDir: string) {
       // Start of a new turn
       activeResponsesStream.write(JSON.stringify(complexityResponse) + '\n');
 
-      // Find all subsequent gemini messages until the next user message
+      // Find all subsequent sparkle messages until the next user message
       let j = i + 1;
       while (j < messages.length && messages[j].type === 'gemini') {
         const geminiMsg = messages[j];
@@ -467,7 +467,7 @@ async function generateSharedLargeChatData(tempDir: string) {
       }
       // End of turn
       activeResponsesStream.write(JSON.stringify(summaryResponse) + '\n');
-      // Skip the gemini messages we just processed
+      // Skip the sparkle messages we just processed
       i = j - 1;
     }
   }

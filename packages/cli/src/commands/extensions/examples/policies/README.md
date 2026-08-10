@@ -1,7 +1,7 @@
 # Policy engine example extension
 
 This extension demonstrates how to contribute security rules and safety checkers
-to the Gemini CLI Policy Engine.
+to the Sparkle CLI Policy Engine.
 
 ## Description
 
@@ -13,18 +13,18 @@ The extension uses a `policies/` directory containing `.toml` files to define:
 
 ## Structure
 
-- `gemini-extension.json`: The manifest file.
+- `sparkle-extension.json`: The manifest file.
 - `policies/`: Contains the `.toml` policy files.
 
 ## How to use
 
-1.  Link this extension to your local Gemini CLI installation:
+1.  Link this extension to your local Sparkle CLI installation:
 
     ```bash
-    gemini extensions link packages/cli/src/commands/extensions/examples/policies
+    sparkle extensions link packages/cli/src/commands/extensions/examples/policies
     ```
 
-2.  Restart your Gemini CLI session.
+2.  Restart your Sparkle CLI session.
 
 3.  **Observe the policies:**
     - Try asking the model to delete a directory: The policy engine will prompt
@@ -36,6 +36,6 @@ The extension uses a `policies/` directory containing `.toml` files to define:
 
 ## Security note
 
-For security, Gemini CLI ignores any `allow` decisions or `yolo` mode
+For security, Sparkle CLI ignores any `allow` decisions or `yolo` mode
 configurations contributed by extensions. This ensures that extensions can
 strengthen security but cannot bypass user confirmation.

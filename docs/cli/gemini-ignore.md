@@ -1,9 +1,9 @@
 # Ignoring files
 
 This document provides an overview of the Gemini Ignore (`.geminiignore`)
-feature of Gemini CLI.
+feature of Sparkle CLI.
 
-Gemini CLI includes the ability to automatically ignore files, similar to
+Sparkle CLI includes the ability to automatically ignore files, similar to
 `.gitignore`. Adding paths to your `.geminiignore` file will exclude them from
 tools that support this feature, although they will still be visible to other
 services (such as Git).
@@ -26,7 +26,7 @@ files:
 - `!` negates a pattern.
 
 You can update your `.geminiignore` file at any time. To apply the changes, you
-must restart your Gemini CLI session.
+must restart your Sparkle CLI session.
 
 ## How to use `.geminiignore`
 

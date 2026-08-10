@@ -16,7 +16,7 @@ describe('FolderTrustDiscoveryService', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'gemini-discovery-test-'),
+      path.join(os.tmpdir(), 'sparkle-discovery-test-'),
     );
   });
 

@@ -38,9 +38,9 @@ describe('resolveWorkspacePolicyState', () => {
 
   beforeEach(() => {
     // Create a temporary directory for the test
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-cli-test-'));
-    // Redirect GEMINI_CLI_HOME to the temp directory to isolate integrity storage
-    vi.stubEnv('GEMINI_CLI_HOME', tempDir);
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-'));
+    // Redirect SPARKLE_CLI_HOME to the temp directory to isolate integrity storage
+    vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
 
     workspaceDir = path.join(tempDir, 'workspace');
     fs.mkdirSync(workspaceDir);
@@ -225,7 +225,7 @@ describe('resolveWorkspacePolicyState', () => {
     // Create a symlink to the home directory
     const symlinkDir = path.join(
       os.tmpdir(),
-      `gemini-cli-symlink-${Date.now()}`,
+      `sparkle-cli-symlink-${Date.now()}`,
     );
     fs.symlinkSync(tempDir, symlinkDir, 'dir');
 

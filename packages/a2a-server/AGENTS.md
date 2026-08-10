@@ -1,6 +1,6 @@
-# Gemini CLI A2A Server (`sparkle-cli-a2a-server`)
+# Sparkle CLI A2A Server (`sparkle-cli-a2a-server`)
 
-Experimental Agent-to-Agent (A2A) server that exposes Gemini CLI capabilities
+Experimental Agent-to-Agent (A2A) server that exposes Sparkle CLI capabilities
 over HTTP for inter-agent communication.
 
 ## Architecture
@@ -15,7 +15,7 @@ over HTTP for inter-agent communication.
 
 ## Running
 
-- Binary entry point: `gemini-cli-a2a-server`
+- Binary entry point: `sparkle-cli-a2a-server`
 
 ## Testing
 

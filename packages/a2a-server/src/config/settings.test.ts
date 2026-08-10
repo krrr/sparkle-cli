@@ -48,7 +48,7 @@ describe('loadSettings', () => {
   const mockHomeDir = path.join(os.tmpdir(), `gemini-home-${mocks.suffix}`);
   const mockWorkspaceDir = path.join(
     os.tmpdir(),
-    `gemini-workspace-${mocks.suffix}`,
+    `sparkle-workspace-${mocks.suffix}`,
   );
   const mockGeminiHomeDir = path.join(mockHomeDir, '.gemini');
   const mockGeminiWorkspaceDir = path.join(mockWorkspaceDir, '.gemini');

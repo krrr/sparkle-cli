@@ -576,7 +576,7 @@ describe('FileCommandLoader', () => {
           'project.toml': 'prompt = "Project command"',
         },
         [extensionDir]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'test-ext',
             version: '1.0.0',
           }),
@@ -625,7 +625,7 @@ describe('FileCommandLoader', () => {
 
       mock({
         [extensionDir]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'test-ext',
             version: '1.0.0',
           }),
@@ -729,7 +729,7 @@ describe('FileCommandLoader', () => {
 
       mock({
         [extensionDir1]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'active-ext',
             version: '1.0.0',
           }),
@@ -738,7 +738,7 @@ describe('FileCommandLoader', () => {
           },
         },
         [extensionDir2]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'inactive-ext',
             version: '1.0.0',
           }),
@@ -786,7 +786,7 @@ describe('FileCommandLoader', () => {
 
       mock({
         [extensionDir]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'no-commands',
             version: '1.0.0',
           }),
@@ -822,7 +822,7 @@ describe('FileCommandLoader', () => {
 
       mock({
         [extensionDir]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'a',
             version: '1.0.0',
           }),
@@ -888,7 +888,7 @@ describe('FileCommandLoader', () => {
 
       mock({
         [extensionDir]: {
-          'gemini-extension.json': JSON.stringify({
+          'sparkle-extension.json': JSON.stringify({
             name: 'my-test-ext',
             id: extensionId,
             version: '1.0.0',

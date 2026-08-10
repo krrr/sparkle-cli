@@ -24,8 +24,8 @@ const projectHash = crypto
   .update(projectRoot)
   .digest('hex');
 
-// Returns the home directory, respecting GEMINI_CLI_HOME
-const homedir = () => process.env['GEMINI_CLI_HOME'] || os.homedir();
+// Returns the home directory, respecting SPARKLE_CLI_HOME
+const homedir = () => process.env['SPARKLE_CLI_HOME'] || os.homedir();
 
 // User-level .gemini directory in home
 const USER_GEMINI_DIR = path.join(homedir(), GEMINI_DIR);
@@ -45,12 +45,12 @@ export const WORKSPACE_SETTINGS_FILE = path.join(
 export function getJson(url) {
   const tmpFile = path.join(
     os.tmpdir(),
-    `gemini-cli-releases-${Date.now()}.json`,
+    `sparkle-cli-releases-${Date.now()}.json`,
   );
   try {
     const result = spawnSync(
       'curl',
-      ['-sL', '-H', 'User-Agent: gemini-cli-dev-script', '-o', tmpFile, url],
+      ['-sL', '-H', 'User-Agent: sparkle-cli-dev-script', '-o', tmpFile, url],
       { stdio: 'pipe', encoding: 'utf-8' },
     );
     if (result.status !== 0) {
@@ -255,7 +255,7 @@ export async function ensureBinary(
 
   const downloadUrl = asset.browser_download_url;
   const tmpDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'gemini-cli-telemetry-'),
+    path.join(os.tmpdir(), 'sparkle-cli-telemetry-'),
   );
   const archivePath = path.join(tmpDir, asset.name);
 

@@ -84,7 +84,7 @@ async function create(dir: string, structure: FileSystemStructure) {
 export async function createTmpDir(
   structure: FileSystemStructure,
 ): Promise<string> {
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-cli-test-'));
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-cli-test-'));
   await create(tmpDir, structure);
   return tmpDir;
 }

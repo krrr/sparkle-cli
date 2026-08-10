@@ -1008,7 +1008,7 @@ describe('convertSessionToHistoryFormats', () => {
         id: '5',
         timestamp: new Date().toISOString(),
         type: 'gemini',
-        content: 'Hello gemini',
+        content: 'Hello sparkle',
         thoughts: [
           {
             subject: 'Thinking',
@@ -1039,7 +1039,7 @@ describe('convertSessionToHistoryFormats', () => {
     });
     expect(result.uiHistory[5]).toEqual({
       type: 'gemini',
-      text: 'Hello gemini',
+      text: 'Hello sparkle',
     });
   });
 
@@ -1050,7 +1050,7 @@ describe('convertSessionToHistoryFormats', () => {
         timestamp: new Date().toISOString(),
         type: 'user',
         content:
-          '<session_context>\nThis is the Gemini CLI\n</session_context>',
+          '<session_context>\nThis is the Sparkle CLI\n</session_context>',
       },
       {
         id: '2',

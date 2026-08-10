@@ -126,7 +126,7 @@ describe('handleValidate', () => {
     });
     expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining(
-        'The following context files referenced in gemini-extension.json are missing: contextFile.md',
+        'The following context files referenced in sparkle-extension.json are missing: contextFile.md',
       ),
     );
     expect(processSpy).toHaveBeenCalledWith(1);

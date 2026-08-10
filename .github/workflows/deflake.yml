@@ -26,7 +26,7 @@ concurrency:
 jobs:
   deflake_e2e_linux:
     name: 'E2E Test (Linux) - ${{ matrix.sandbox }}'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     if: "github.repository == 'google-gemini/gemini-cli'"
     strategy:
       fail-fast: false
@@ -63,7 +63,7 @@ jobs:
       - name: 'Run E2E tests'
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
           IS_DOCKER: "${{ matrix.sandbox == 'sandbox:docker' }}"
           KEEP_OUTPUT: 'true'
           RUNS: '${{ github.event.inputs.runs }}'
@@ -108,7 +108,7 @@ jobs:
         if: "runner.os != 'Windows'"
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
           KEEP_OUTPUT: 'true'
           RUNS: '${{ github.event.inputs.runs }}'
           SANDBOX: 'sandbox:none'
@@ -119,7 +119,7 @@ jobs:
 
   deflake_e2e_windows:
     name: 'Slow E2E - Win'
-    runs-on: 'gemini-cli-windows-16-core'
+    runs-on: 'sparkle-cli-windows-16-core'
     if: "github.repository == 'google-gemini/gemini-cli'"
     steps:
       - name: 'Checkout'
@@ -164,7 +164,7 @@ jobs:
       - name: 'Run E2E tests'
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-          GEMINI_CLI_TRUST_WORKSPACE: true
+          SPARKLE_CLI_TRUST_WORKSPACE: true
           KEEP_OUTPUT: 'true'
           SANDBOX: 'sandbox:none'
           VERBOSE: 'true'

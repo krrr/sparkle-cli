@@ -87,14 +87,14 @@ describe('ExtensionStorage', () => {
   });
 
   it('should create a temporary directory', async () => {
-    const mockTmpDir = '/tmp/gemini-extension-123';
+    const mockTmpDir = '/tmp/sparkle-extension-123';
     vi.mocked(fs.promises.mkdtemp).mockResolvedValue(mockTmpDir);
     vi.mocked(os.tmpdir).mockReturnValue('/tmp');
 
     const result = await ExtensionStorage.createTmpDir();
 
     expect(fs.promises.mkdtemp).toHaveBeenCalledWith(
-      path.join('/tmp', 'gemini-extension'),
+      path.join('/tmp', 'sparkle-extension'),
     );
     expect(result).toBe(mockTmpDir);
   });

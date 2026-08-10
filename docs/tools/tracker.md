@@ -4,10 +4,10 @@
 > [!NOTE]
 > This is an experimental feature currently under active development.
 
-The `tracker_*` tools allow the Gemini agent to maintain an internal, persistent
-graph of tasks and dependencies for multi-step requests. This suite of tools
-provides a more robust and granular way to manage execution plans than the
-legacy `write_todos` tool.
+The `tracker_*` tools allow the Sparkle agent to maintain an internal,
+persistent graph of tasks and dependencies for multi-step requests. This suite
+of tools provides a more robust and granular way to manage execution plans than
+the legacy `write_todos` tool.
 
 ## Technical reference
 
@@ -42,7 +42,7 @@ directory, allowing the agent to manage its plan for the current session.
   graph (DAG). The agent must resolve dependencies before starting blocked
   tasks.
 - **Interaction:** Users can view the current state of the tracker by asking the
-  agent to visualize it, or by running `gemini-cli` commands if implemented.
+  agent to visualize it, or by running `sparkle-cli` commands if implemented.
 
 ## Use cases
 

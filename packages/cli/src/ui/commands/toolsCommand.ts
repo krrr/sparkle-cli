@@ -43,7 +43,7 @@ async function listTools(
 
 const listSubCommand: SlashCommand = {
   name: 'list',
-  description: 'List available Gemini CLI tools.',
+  description: 'List available Sparkle CLI tools.',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context: CommandContext): Promise<void> =>
@@ -53,7 +53,7 @@ const listSubCommand: SlashCommand = {
 const descSubCommand: SlashCommand = {
   name: 'desc',
   altNames: ['descriptions'],
-  description: 'List available Gemini CLI tools with descriptions.',
+  description: 'List available Sparkle CLI tools with descriptions.',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context: CommandContext): Promise<void> =>
@@ -63,7 +63,7 @@ const descSubCommand: SlashCommand = {
 export const toolsCommand: SlashCommand = {
   name: 'tools',
   description:
-    'List available Gemini CLI tools. Use /tools desc to include descriptions.',
+    'List available Sparkle CLI tools. Use /tools desc to include descriptions.',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   subCommands: [listSubCommand, descSubCommand],

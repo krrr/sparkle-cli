@@ -89,7 +89,7 @@ describe('Agent Server Endpoints', () => {
   beforeAll(async () => {
     // Create a unique temporary directory for the workspace to avoid conflicts
     testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-agent-test-'),
+      path.join(os.tmpdir(), 'sparkle-agent-test-'),
     );
     app = await createApp();
     await new Promise<void>((resolve) => {

@@ -24,7 +24,7 @@ describe('Linux Clipboard Integration', () => {
     // Create a dummy image file for testing
     dummyImagePath = path.join(
       os.tmpdir(),
-      `gemini-test-clipboard-${Date.now()}.png`,
+      `sparkle-test-clipboard-${Date.now()}.png`,
     );
     fs.writeFileSync(dummyImagePath, Buffer.from(DUMMY_PNG_BASE64, 'base64'));
   });
@@ -104,7 +104,7 @@ describe('Linux Clipboard Integration', () => {
       // Expect the CLI to have processed the image and echoed back the path (or the prompt containing it)
       // The output usually contains the user's input echoed back + model response.
       // The pasted image path should look like @.../clipboard-....png
-      expect(result).toMatch(/@\/.*\.gemini-clipboard\/clipboard-.*\.png/);
+      expect(result).toMatch(/@\/.*\.sparkle-clipboard\/clipboard-.*\.png/);
     },
   );
 });

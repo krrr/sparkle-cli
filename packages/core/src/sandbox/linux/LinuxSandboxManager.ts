@@ -97,7 +97,7 @@ function getSeccompBpfPath(): string {
     buf.writeUInt32LE(inst.k, offset + 4);
   }
 
-  const tempDir = fs.mkdtempSync(join(os.tmpdir(), 'gemini-cli-seccomp-'));
+  const tempDir = fs.mkdtempSync(join(os.tmpdir(), 'sparkle-cli-seccomp-'));
   const bpfPath = join(tempDir, 'seccomp.bpf');
   fs.writeFileSync(bpfPath, buf);
   cachedBpfPath = bpfPath;
@@ -187,7 +187,7 @@ export class LinuxSandboxManager implements SandboxManager {
     ) {
       return LinuxSandboxManager.maskFilePath;
     }
-    const tempDir = fs.mkdtempSync(join(os.tmpdir(), 'gemini-cli-mask-file-'));
+    const tempDir = fs.mkdtempSync(join(os.tmpdir(), 'sparkle-cli-mask-file-'));
     const maskPath = join(tempDir, 'mask');
     fs.writeFileSync(maskPath, '');
     fs.chmodSync(maskPath, 0);
@@ -340,7 +340,7 @@ export class LinuxSandboxManager implements SandboxManager {
   private writeArgsToTempFile(args: string[]): string {
     const tempFile = join(
       os.tmpdir(),
-      `gemini-cli-bwrap-args-${Date.now()}-${Math.random().toString(36).slice(2)}.args`,
+      `sparkle-cli-bwrap-args-${Date.now()}-${Math.random().toString(36).slice(2)}.args`,
     );
     const content = Buffer.from(args.join('\0') + '\0');
     fs.writeFileSync(tempFile, content, { mode: 0o600 });

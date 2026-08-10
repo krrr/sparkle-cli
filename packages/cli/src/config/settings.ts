@@ -80,8 +80,8 @@ export const USER_SETTINGS_DIR = path.dirname(USER_SETTINGS_PATH);
 export const DEFAULT_EXCLUDED_ENV_VARS = [
   'DEBUG',
   'DEBUG_MODE',
-  'GEMINI_CLI_IDE_SERVER_STDIO_COMMAND',
-  'GEMINI_CLI_IDE_SERVER_STDIO_ARGS',
+  'SPARKLE_CLI_IDE_SERVER_STDIO_COMMAND',
+  'SPARKLE_CLI_IDE_SERVER_STDIO_ARGS',
 ];
 
 const AUTH_ENV_VAR_WHITELIST = ['GEMINI_API_KEY', 'GOOGLE_API_KEY'];
@@ -95,21 +95,21 @@ export function sanitizeEnvVar(value: string): string {
 }
 
 export function getSystemSettingsPath(): string {
-  if (process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH']) {
-    return process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+  if (process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH']) {
+    return process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'];
   }
   if (platform() === 'darwin') {
     return '/Library/Application Support/GeminiCli/settings.json';
   } else if (platform() === 'win32') {
-    return 'C:\\ProgramData\\gemini-cli\\settings.json';
+    return 'C:\\ProgramData\\sparkle-cli\\settings.json';
   } else {
-    return '/etc/gemini-cli/settings.json';
+    return '/etc/sparkle-cli/settings.json';
   }
 }
 
 export function getSystemDefaultsPath(): string {
-  if (process.env['GEMINI_CLI_SYSTEM_DEFAULTS_PATH']) {
-    return process.env['GEMINI_CLI_SYSTEM_DEFAULTS_PATH'];
+  if (process.env['SPARKLE_CLI_SYSTEM_DEFAULTS_PATH']) {
+    return process.env['SPARKLE_CLI_SYSTEM_DEFAULTS_PATH'];
   }
   return path.join(
     path.dirname(getSystemSettingsPath()),

@@ -262,7 +262,7 @@ async function resolveFilePaths(
       ignoredFiles.push({ path: pathName, reason });
       const reasonText =
         reason === 'both'
-          ? 'ignored by both git and gemini'
+          ? 'ignored by both git and sparkle'
           : reason === 'git'
             ? 'git-ignored'
             : 'gemini-ignored';

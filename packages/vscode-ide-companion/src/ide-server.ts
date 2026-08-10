@@ -36,9 +36,9 @@ class CORSError extends Error {
 }
 
 const MCP_SESSION_ID_HEADER = 'mcp-session-id';
-const IDE_SERVER_PORT_ENV_VAR = 'GEMINI_CLI_IDE_SERVER_PORT';
-const IDE_WORKSPACE_PATH_ENV_VAR = 'GEMINI_CLI_IDE_WORKSPACE_PATH';
-const IDE_AUTH_TOKEN_ENV_VAR = 'GEMINI_CLI_IDE_AUTH_TOKEN';
+const IDE_SERVER_PORT_ENV_VAR = 'SPARKLE_CLI_IDE_SERVER_PORT';
+const IDE_WORKSPACE_PATH_ENV_VAR = 'SPARKLE_CLI_IDE_WORKSPACE_PATH';
+const IDE_AUTH_TOKEN_ENV_VAR = 'SPARKLE_CLI_IDE_AUTH_TOKEN';
 
 interface WritePortAndWorkspaceArgs {
   context: vscode.ExtensionContext;
@@ -344,11 +344,11 @@ export class IDEServer {
           this.log(`IDE server listening on http://127.0.0.1:${this.port}`);
           let portFile: string | undefined;
           try {
-            const portDir = path.join(tmpdir(), 'gemini', 'ide');
+            const portDir = path.join(tmpdir(), 'sparkle', 'ide');
             await fs.mkdir(portDir, { recursive: true });
             portFile = path.join(
               portDir,
-              `gemini-ide-server-${process.ppid}-${this.port}.json`,
+              `sparkle-ide-server-${process.ppid}-${this.port}.json`,
             );
             this.portFile = portFile;
           } catch (err) {
@@ -437,7 +437,7 @@ const createMcpServer = (
 ) => {
   const server = new McpServer(
     {
-      name: 'gemini-cli-companion-mcp-server',
+      name: 'sparkle-cli-companion-mcp-server',
       version: '1.0.0',
     },
     { capabilities: { logging: {} } },

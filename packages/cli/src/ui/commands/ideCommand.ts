@@ -16,7 +16,7 @@ import {
   getIdeInstaller,
   IDEConnectionStatus,
   ideContextStore,
-  GEMINI_CLI_COMPANION_EXTENSION_NAME,
+  SPARKLE_CLI_COMPANION_EXTENSION_NAME,
 } from 'sparkle-cli-core';
 import path from 'node:path';
 import type {
@@ -146,7 +146,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
         ({
           type: 'message',
           messageType: 'error',
-          content: `IDE integration is not supported in your current environment. To use this feature, run Gemini CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.`,
+          content: `IDE integration is not supported in your current environment. To use this feature, run Sparkle CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.`,
         }) as const,
     };
   }
@@ -186,7 +186,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
         context.ui.addItem(
           {
             type: 'error',
-            text: `No installer is available for ${ideClient.getDetectedIdeDisplayName()}. Please install the '${GEMINI_CLI_COMPANION_EXTENSION_NAME}' extension manually from the marketplace.`,
+            text: `No installer is available for ${ideClient.getDetectedIdeDisplayName()}. Please install the '${SPARKLE_CLI_COMPANION_EXTENSION_NAME}' extension manually from the marketplace.`,
           },
           Date.now(),
         );

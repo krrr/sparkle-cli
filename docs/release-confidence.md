@@ -1,7 +1,7 @@
 # Release confidence strategy
 
 This document outlines the strategy for gaining confidence in every release of
-Gemini CLI. It serves as a checklist and quality gate for release manager to
+Sparkle CLI. It serves as a checklist and quality gate for release manager to
 ensure we are shipping a high-quality product.
 
 ## The goal
@@ -74,7 +74,7 @@ manually run through this checklist.
   - [ ] Uninstall any existing global version: `npm uninstall -g sparkle-cli`
   - [ ] Clear npx cache (optional but recommended): `npm cache clean --force`
   - [ ] Install the preview version: `npm install -g sparkle-cli@preview`
-  - [ ] Verify version: `gemini --version`
+  - [ ] Verify version: `sparkle --version`
 
 - **Authentication:**
 
@@ -83,13 +83,13 @@ manually run through this checklist.
 
 - **Basic prompting:**
 
-  - [ ] Run `gemini "Tell me a joke"` and verify a sensible response.
-  - [ ] Run in interactive mode: `gemini`. Ask a follow-up question to test
+  - [ ] Run `sparkle "Tell me a joke"` and verify a sensible response.
+  - [ ] Run in interactive mode: `sparkle`. Ask a follow-up question to test
         context.
 
 - **Piped input:**
 
-  - [ ] Run `echo "Summarize this" | gemini` and verify it processes stdin.
+  - [ ] Run `echo "Summarize this" | sparkle` and verify it processes stdin.
 
 - **Context management:**
 
@@ -102,7 +102,7 @@ manually run through this checklist.
   - [ ] Validate that setting is changed
 
 - **Function calling:**
-  - [ ] In interactive mode, ask gemini to "create a file named hello.md with
+  - [ ] In interactive mode, ask sparkle to "create a file named hello.md with
         the content 'hello world'" and verify the file is created correctly.
 
 If any of these CUJs fail, the release is a no-go until a patch is applied to
@@ -139,14 +139,14 @@ A bug bash should be considered for any release that involves:
 
 ### Dashboard health
 
-- [ ] Go to `go/gemini-cli-dash`.
+- [ ] Go to `go/sparkle-cli-dash`.
 - [ ] Navigate to the "Tool Call" tab.
 - [ ] Validate that there are no spikes in errors for the release you would like
       to promote.
 
 ### Model evaluation
 
-- [ ] Navigate to `go/gemini-cli-offline-evals-dash`.
+- [ ] Navigate to `go/sparkle-cli-offline-evals-dash`.
 - [ ] Make sure that the release you want to promote's recurring run is within
       average eval runs.
 

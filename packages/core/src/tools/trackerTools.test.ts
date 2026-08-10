@@ -30,7 +30,7 @@ describe('Tracker Tools Integration', () => {
 
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tracker-tools-test-'));
-    vi.stubEnv('GEMINI_CLI_HOME', tempDir);
+    vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
     config = new Config({
       sessionId: `test-session-${Math.random().toString(36).substring(7)}`,
       targetDir: tempDir,

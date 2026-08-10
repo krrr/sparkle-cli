@@ -289,7 +289,7 @@ describe('sea-launch', () => {
       deps.fs.readFileSync.mockReturnValue('content');
 
       const runtime = prepareRuntime(mockManifest, mockGetAsset, deps);
-      expect(runtime).toContain('gemini-runtime-1.0.0-user');
+      expect(runtime).toContain('sparkle-runtime-1.0.0-user');
       expect(deps.fs.rmSync).not.toHaveBeenCalled();
     });
 
@@ -341,11 +341,11 @@ describe('sea-launch', () => {
       prepareRuntime(mockManifest, mockGetAsset, deps);
 
       expect(deps.fs.rmSync).toHaveBeenCalledWith(
-        expect.stringContaining('gemini-runtime'),
+        expect.stringContaining('sparkle-runtime'),
         expect.anything(),
       );
       expect(deps.fs.mkdirSync).toHaveBeenCalledWith(
-        expect.stringContaining('gemini-setup'),
+        expect.stringContaining('sparkle-setup'),
         expect.anything(),
       );
     });
@@ -412,7 +412,7 @@ describe('sea-launch', () => {
         prepareRuntime(mockManifest, mockGetAsset, deps);
 
         expect(deps.fs.rmSync).toHaveBeenCalledWith(
-          expect.stringContaining('gemini-runtime'),
+          expect.stringContaining('sparkle-runtime'),
           expect.anything(),
         );
       } finally {
@@ -468,11 +468,11 @@ describe('sea-launch', () => {
       prepareRuntime(mockManifest, mockGetAsset, deps);
 
       expect(deps.fs.rmSync).toHaveBeenCalledWith(
-        expect.stringContaining('gemini-runtime'),
+        expect.stringContaining('sparkle-runtime'),
         expect.anything(),
       );
       expect(deps.fs.mkdirSync).toHaveBeenCalledWith(
-        expect.stringContaining('gemini-setup'),
+        expect.stringContaining('sparkle-setup'),
         expect.anything(),
       );
     });
@@ -536,9 +536,9 @@ describe('sea-launch', () => {
       const runtime = prepareRuntime(mockManifest, mockGetAsset, deps);
 
       expect(deps.fs.renameSync).toHaveBeenCalled();
-      expect(runtime).toContain('gemini-runtime');
+      expect(runtime).toContain('sparkle-runtime');
       expect(deps.fs.rmSync).toHaveBeenCalledWith(
-        expect.stringContaining('gemini-setup'),
+        expect.stringContaining('sparkle-setup'),
         expect.anything(),
       );
     });

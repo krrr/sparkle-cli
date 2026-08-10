@@ -1,15 +1,15 @@
-# Gemini CLI for the enterprise
+# Sparkle CLI for the enterprise
 
 This document outlines configuration patterns and best practices for deploying
-and managing Gemini CLI in an enterprise environment. By leveraging system-level
-settings, administrators can enforce security policies, manage tool access, and
-ensure a consistent experience for all users.
+and managing Sparkle CLI in an enterprise environment. By leveraging
+system-level settings, administrators can enforce security policies, manage tool
+access, and ensure a consistent experience for all users.
 
 <!-- prettier-ignore -->
 > [!WARNING]
 > The patterns described in this document are intended to help
 > administrators create a more controlled and secure environment for using
-> Gemini CLI. However, they should not be considered a foolproof security
+> Sparkle CLI. However, they should not be considered a foolproof security
 > boundary. A determined user with sufficient privileges on their local machine
 > may still be able to circumvent these configurations. These measures are
 > designed to prevent accidental misuse and enforce corporate policy in a
@@ -47,7 +47,7 @@ Here is how settings from different levels are combined.
       "theme": "default-corporate-theme"
     },
     "context": {
-      "includeDirectories": ["/etc/gemini-cli/common-context"]
+      "includeDirectories": ["/etc/sparkle-cli/common-context"]
     }
   }
   ```
@@ -103,7 +103,7 @@ Here is how settings from different levels are combined.
       }
     },
     "context": {
-      "includeDirectories": ["/etc/gemini-cli/global-context"]
+      "includeDirectories": ["/etc/sparkle-cli/global-context"]
     }
   }
   ```
@@ -129,10 +129,10 @@ This results in the following merged configuration:
     },
     "context": {
       "includeDirectories": [
-        "/etc/gemini-cli/common-context",
+        "/etc/sparkle-cli/common-context",
         "~/gemini-context",
         "./project-context",
-        "/etc/gemini-cli/global-context"
+        "/etc/sparkle-cli/global-context"
       ]
     }
   }
@@ -149,10 +149,10 @@ This results in the following merged configuration:
   Defaults, User, Workspace, and then System Overrides.
 
 - **Location**:
-  - **Linux**: `/etc/gemini-cli/settings.json`
-  - **Windows**: `C:\ProgramData\gemini-cli\settings.json`
+  - **Linux**: `/etc/sparkle-cli/settings.json`
+  - **Windows**: `C:\ProgramData\sparkle-cli\settings.json`
   - **macOS**: `/Library/Application Support/GeminiCli/settings.json`
-  - The path can be overridden using the `GEMINI_CLI_SYSTEM_SETTINGS_PATH`
+  - The path can be overridden using the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH`
     environment variable.
 - **Control**: This file should be managed by system administrators and
   protected with appropriate file permissions to prevent unauthorized
@@ -163,45 +163,45 @@ configuration patterns described below.
 
 ### Enforcing system settings with a wrapper script
 
-While the `GEMINI_CLI_SYSTEM_SETTINGS_PATH` environment variable provides
+While the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment variable provides
 flexibility, a user could potentially override it to point to a different
 settings file, bypassing the centrally managed configuration. To mitigate this,
 enterprises can deploy a wrapper script or alias that ensures the environment
 variable is always set to the corporate-controlled path.
 
-This approach ensures that no matter how the user calls the `gemini` command,
+This approach ensures that no matter how the user calls the `sparkle` command,
 the enterprise settings are always loaded with the highest precedence.
 
 **Example wrapper script:**
 
-Administrators can create a script named `gemini` and place it in a directory
-that appears earlier in the user's `PATH` than the actual Gemini CLI binary (for
-example, `/usr/local/bin/gemini`).
+Administrators can create a script named `sparkle` and place it in a directory
+that appears earlier in the user's `PATH` than the actual Sparkle CLI binary
+(for example, `/usr/local/bin/gemini`).
 
 ```bash
 #!/bin/bash
 
 # Enforce the path to the corporate system settings file.
 # This ensures that the company's configuration is always applied.
-export GEMINI_CLI_SYSTEM_SETTINGS_PATH="/etc/gemini-cli/settings.json"
+export SPARKLE_CLI_SYSTEM_SETTINGS_PATH="/etc/sparkle-cli/settings.json"
 
-# Find the original gemini executable.
+# Find the original sparkle executable.
 # This is a simple example; a more robust solution might be needed
 # depending on the installation method.
-REAL_GEMINI_PATH=$(type -aP gemini | grep -v "^$(type -P gemini)$" | head -n 1)
+REAL_GEMINI_PATH=$(type -aP sparkle | grep -v "^$(type -P sparkle)$" | head -n 1)
 
 if [ -z "$REAL_GEMINI_PATH" ]; then
   echo "Error: The original 'gemini' executable was not found." >&2
   exit 1
 fi
 
-# Pass all arguments to the real Gemini CLI executable.
+# Pass all arguments to the real Sparkle CLI executable.
 exec "$REAL_GEMINI_PATH" "$@"
 ```
 
-By deploying this script, the `GEMINI_CLI_SYSTEM_SETTINGS_PATH` is set within
+By deploying this script, the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` is set within
 the script's environment, and the `exec` command replaces the script process
-with the actual Gemini CLI process, which inherits the environment variable.
+with the actual Sparkle CLI process, which inherits the environment variable.
 This makes it significantly more difficult for a user to bypass the enforced
 settings.
 
@@ -211,17 +211,17 @@ On Windows, administrators can achieve similar results by adding the environment
 variable to the system-wide or user-specific PowerShell profile:
 
 ```powershell
-Add-Content -Path $PROFILE -Value '$env:GEMINI_CLI_SYSTEM_SETTINGS_PATH="C:\ProgramData\gemini-cli\settings.json"'
+Add-Content -Path $PROFILE -Value '$env:SPARKLE_CLI_SYSTEM_SETTINGS_PATH="C:\ProgramData\sparkle-cli\settings.json"'
 ```
 
 ## User isolation in shared environments
 
 In shared compute environments (like ML experiment runners or shared build
-servers), you can isolate Gemini CLI state by overriding the user's home
+servers), you can isolate Sparkle CLI state by overriding the user's home
 directory.
 
-By default, Gemini CLI stores configuration and history in `~/.gemini`. You can
-use the `GEMINI_CLI_HOME` environment variable to point to a unique directory
+By default, Sparkle CLI stores configuration and history in `~/.gemini`. You can
+use the `SPARKLE_CLI_HOME` environment variable to point to a unique directory
 for a specific user or job. The CLI will create a `.gemini` folder inside the
 specified path.
 
@@ -229,16 +229,16 @@ specified path.
 
 ```bash
 # Isolate state for a specific job
-export GEMINI_CLI_HOME="/tmp/gemini-job-123"
-gemini
+export SPARKLE_CLI_HOME="/tmp/gemini-job-123"
+sparkle
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
 # Isolate state for a specific job
-$env:GEMINI_CLI_HOME="C:\temp\gemini-job-123"
-gemini
+$env:SPARKLE_CLI_HOME="C:\temp\gemini-job-123"
+sparkle
 ```
 
 ## Restricting tool access
@@ -318,8 +318,8 @@ effectively.
 
 ### How MCP server configurations are merged
 
-Gemini CLI loads `settings.json` files from three levels: System, Workspace, and
-User. When it comes to the `mcpServers` object, these configurations are
+Sparkle CLI loads `settings.json` files from three levels: System, Workspace,
+and User. When it comes to the `mcpServers` object, these configurations are
 **merged**:
 
 1.  **Merging:** The lists of servers from all three levels are combined into a
@@ -456,10 +456,10 @@ a custom `sandbox.Dockerfile` as described in the
 
 ## Controlling network access via proxy
 
-In corporate environments with strict network policies, you can configure Gemini
-CLI to route all outbound traffic through a corporate proxy. This can be set via
-an environment variable, but it can also be enforced for custom tools via the
-`mcpServers` configuration.
+In corporate environments with strict network policies, you can configure
+Sparkle CLI to route all outbound traffic through a corporate proxy. This can be
+set via an environment variable, but it can also be enforced for custom tools
+via the `mcpServers` configuration.
 
 **Example (for an MCP server):**
 
@@ -480,7 +480,7 @@ an environment variable, but it can also be enforced for custom tools via the
 
 ## Telemetry and auditing
 
-For auditing and monitoring purposes, you can configure Gemini CLI to send
+For auditing and monitoring purposes, you can configure Sparkle CLI to send
 telemetry data to a central location. This lets you track tool usage and other
 events. For more information, see the [telemetry documentation](./telemetry.md).
 
@@ -529,7 +529,7 @@ enforced one.
 ## Putting it all together: example system `settings.json`
 
 Here is an example of a system `settings.json` file that combines several of the
-patterns discussed above to create a secure, controlled environment for Gemini
+patterns discussed above to create a secure, controlled environment for Sparkle
 CLI.
 
 ```json

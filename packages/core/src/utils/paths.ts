@@ -16,11 +16,11 @@ export const TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json';
 
 /**
  * Returns the home directory.
- * If GEMINI_CLI_HOME environment variable is set, it returns its value.
+ * If SPARKLE_CLI_HOME environment variable is set, it returns its value.
  * Otherwise, it returns the user's home directory.
  */
 export function homedir(): string {
-  const envHome = process.env['GEMINI_CLI_HOME'];
+  const envHome = process.env['SPARKLE_CLI_HOME'];
   if (envHome) {
     return envHome;
   }

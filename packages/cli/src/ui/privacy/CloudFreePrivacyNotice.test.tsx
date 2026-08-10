@@ -74,7 +74,7 @@ describe('CloudFreePrivacyNotice', () => {
     {
       stateName: 'tier unavailable state',
       mockState: { isFreeTier: undefined, isTierUnavailable: true },
-      expectedText: 'Gemini CLI Privacy Notice',
+      expectedText: 'Sparkle CLI Privacy Notice',
     },
     {
       stateName: 'free tier state',

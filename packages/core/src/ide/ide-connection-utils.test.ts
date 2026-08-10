@@ -47,11 +47,11 @@ vi.mock('undici', () => ({
 describe('ide-connection-utils', () => {
   beforeEach(() => {
     // Mock environment variables
-    vi.stubEnv('GEMINI_CLI_IDE_WORKSPACE_PATH', '/test/workspace');
-    vi.stubEnv('GEMINI_CLI_IDE_SERVER_PORT', '');
-    vi.stubEnv('GEMINI_CLI_IDE_SERVER_STDIO_COMMAND', '');
-    vi.stubEnv('GEMINI_CLI_IDE_SERVER_STDIO_ARGS', '');
-    vi.stubEnv('GEMINI_CLI_IDE_AUTH_TOKEN', '');
+    vi.stubEnv('SPARKLE_CLI_IDE_WORKSPACE_PATH', '/test/workspace');
+    vi.stubEnv('SPARKLE_CLI_IDE_SERVER_PORT', '');
+    vi.stubEnv('SPARKLE_CLI_IDE_SERVER_STDIO_COMMAND', '');
+    vi.stubEnv('SPARKLE_CLI_IDE_SERVER_STDIO_ARGS', '');
+    vi.stubEnv('SPARKLE_CLI_IDE_AUTH_TOKEN', '');
 
     vi.spyOn(process, 'cwd').mockReturnValue('/test/workspace/sub-dir');
     vi.mocked(os.tmpdir).mockReturnValue('/tmp');
@@ -73,7 +73,7 @@ describe('ide-connection-utils', () => {
 
       expect(result).toEqual(config);
       expect(fs.promises.readFile).toHaveBeenCalledWith(
-        path.join('/tmp', 'gemini', 'ide', 'gemini-ide-server-12345.json'),
+        path.join('/tmp', 'sparkle', 'ide', 'sparkle-ide-server-12345.json'),
         'utf8',
       );
     });
@@ -100,14 +100,19 @@ describe('ide-connection-utils', () => {
         vi.mocked(fs.promises.readdir) as Mock<
           (path: fs.PathLike) => Promise<string[]>
         >
-      ).mockResolvedValue(['gemini-ide-server-12345-123.json']);
+      ).mockResolvedValue(['sparkle-ide-server-12345-123.json']);
       vi.mocked(fs.promises.readFile).mockResolvedValue(JSON.stringify(config));
 
       const result = await getConnectionConfigFromFile(12345);
 
       expect(result).toEqual(config);
       expect(fs.promises.readFile).toHaveBeenCalledWith(
-        path.join('/tmp', 'gemini', 'ide', 'gemini-ide-server-12345-123.json'),
+        path.join(
+          '/tmp',
+          'sparkle',
+          'ide',
+          'sparkle-ide-server-12345-123.json',
+        ),
         'utf8',
       );
     });
@@ -129,8 +134,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json',
-        'gemini-ide-server-12345-222.json',
+        'sparkle-ide-server-12345-111.json',
+        'sparkle-ide-server-12345-222.json',
       ]);
       vi.mocked(fs.promises.readFile)
         .mockResolvedValueOnce(JSON.stringify(invalidConfig))
@@ -155,7 +160,7 @@ describe('ide-connection-utils', () => {
         vi.mocked(fs.promises.readdir) as Mock<
           (path: fs.PathLike) => Promise<string[]>
         >
-      ).mockResolvedValue([`gemini-ide-server-${otherPid}-111.json`]);
+      ).mockResolvedValue([`sparkle-ide-server-${otherPid}-111.json`]);
       vi.mocked(fs.promises.readFile).mockResolvedValueOnce(
         JSON.stringify(validConfig),
       );
@@ -166,9 +171,9 @@ describe('ide-connection-utils', () => {
       expect(fs.promises.readFile).toHaveBeenCalledWith(
         path.join(
           '/tmp',
-          'gemini',
+          'sparkle',
           'ide',
-          `gemini-ide-server-${otherPid}-111.json`,
+          `sparkle-ide-server-${otherPid}-111.json`,
         ),
         'utf8',
       );
@@ -188,8 +193,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        `gemini-ide-server-${otherPid}-1.json`,
-        `gemini-ide-server-${targetPid}-1.json`,
+        `sparkle-ide-server-${otherPid}-1.json`,
+        `sparkle-ide-server-${targetPid}-1.json`,
       ]);
 
       // readFile will be called for both files in the sorted order.
@@ -204,9 +209,9 @@ describe('ide-connection-utils', () => {
       expect(fs.promises.readFile).toHaveBeenCalledWith(
         path.join(
           '/tmp',
-          'gemini',
+          'sparkle',
           'ide',
-          `gemini-ide-server-${targetPid}-1.json`,
+          `sparkle-ide-server-${targetPid}-1.json`,
         ),
         'utf8',
       );
@@ -227,8 +232,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        `gemini-ide-server-${deadPid}-1.json`,
-        `gemini-ide-server-${alivePid}-1.json`,
+        `sparkle-ide-server-${deadPid}-1.json`,
+        `sparkle-ide-server-${alivePid}-1.json`,
       ]);
 
       vi.spyOn(process, 'kill').mockImplementation((pid) => {
@@ -246,9 +251,9 @@ describe('ide-connection-utils', () => {
       expect(fs.promises.readFile).toHaveBeenCalledWith(
         path.join(
           '/tmp',
-          'gemini',
+          'sparkle',
           'ide',
-          `gemini-ide-server-${alivePid}-1.json`,
+          `sparkle-ide-server-${alivePid}-1.json`,
         ),
         'utf8',
       );
@@ -269,8 +274,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        `gemini-ide-server-${oldPid}-1.json`,
-        `gemini-ide-server-${newPid}-1.json`,
+        `sparkle-ide-server-${oldPid}-1.json`,
+        `sparkle-ide-server-${newPid}-1.json`,
       ]);
 
       // Both are alive
@@ -286,9 +291,9 @@ describe('ide-connection-utils', () => {
       expect(fs.promises.readFile).toHaveBeenCalledWith(
         path.join(
           '/tmp',
-          'gemini',
+          'sparkle',
           'ide',
-          `gemini-ide-server-${newPid}-1.json`,
+          `sparkle-ide-server-${newPid}-1.json`,
         ),
         'utf8',
       );
@@ -305,8 +310,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json',
-        'gemini-ide-server-12345-222.json',
+        'sparkle-ide-server-12345-111.json',
+        'sparkle-ide-server-12345-222.json',
       ]);
       vi.mocked(fs.promises.readFile)
         .mockResolvedValueOnce(JSON.stringify(config1))
@@ -318,7 +323,7 @@ describe('ide-connection-utils', () => {
     });
 
     it('should prioritize the config matching the port from the environment variable', async () => {
-      vi.stubEnv('GEMINI_CLI_IDE_SERVER_PORT', '2222');
+      vi.stubEnv('SPARKLE_CLI_IDE_SERVER_PORT', '2222');
       const config1 = { port: '1111', workspacePath: '/test/workspace' };
       const config2 = { port: '2222', workspacePath: '/test/workspace' };
       vi.mocked(fs.promises.readFile).mockRejectedValueOnce(
@@ -329,8 +334,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json',
-        'gemini-ide-server-12345-222.json',
+        'sparkle-ide-server-12345-111.json',
+        'sparkle-ide-server-12345-222.json',
       ]);
       vi.mocked(fs.promises.readFile)
         .mockResolvedValueOnce(JSON.stringify(config1))
@@ -351,8 +356,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json',
-        'gemini-ide-server-12345-222.json',
+        'sparkle-ide-server-12345-111.json',
+        'sparkle-ide-server-12345-222.json',
       ]);
       vi.mocked(fs.promises.readFile)
         .mockResolvedValueOnce('invalid json')
@@ -386,9 +391,9 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json', // valid
+        'sparkle-ide-server-12345-111.json', // valid
         'not-a-config-file.txt', // invalid
-        'gemini-ide-server-asdf.json', // invalid
+        'sparkle-ide-server-asdf.json', // invalid
       ]);
       vi.mocked(fs.promises.readFile).mockResolvedValueOnce(
         JSON.stringify(validConfig),
@@ -398,17 +403,22 @@ describe('ide-connection-utils', () => {
 
       expect(result).toEqual(validConfig);
       expect(fs.promises.readFile).toHaveBeenCalledWith(
-        path.join('/tmp', 'gemini', 'ide', 'gemini-ide-server-12345-111.json'),
+        path.join(
+          '/tmp',
+          'sparkle',
+          'ide',
+          'sparkle-ide-server-12345-111.json',
+        ),
         'utf8',
       );
       expect(fs.promises.readFile).not.toHaveBeenCalledWith(
-        path.join('/tmp', 'gemini', 'ide', 'not-a-config-file.txt'),
+        path.join('/tmp', 'sparkle', 'ide', 'not-a-config-file.txt'),
         'utf8',
       );
     });
 
     it('should match env port string to a number port in the config', async () => {
-      vi.stubEnv('GEMINI_CLI_IDE_SERVER_PORT', '3333');
+      vi.stubEnv('SPARKLE_CLI_IDE_SERVER_PORT', '3333');
       const config1 = { port: 1111, workspacePath: '/test/workspace' };
       const config2 = { port: 3333, workspacePath: '/test/workspace' };
       vi.mocked(fs.promises.readFile).mockRejectedValueOnce(
@@ -419,8 +429,8 @@ describe('ide-connection-utils', () => {
           (path: fs.PathLike) => Promise<string[]>
         >
       ).mockResolvedValue([
-        'gemini-ide-server-12345-111.json',
-        'gemini-ide-server-12345-222.json',
+        'sparkle-ide-server-12345-111.json',
+        'sparkle-ide-server-12345-222.json',
       ]);
       vi.mocked(fs.promises.readFile)
         .mockResolvedValueOnce(JSON.stringify(config1))

@@ -1,12 +1,12 @@
 # Activate skill tool (`activate_skill`)
 
-The `activate_skill` tool lets Gemini CLI load specialized procedural expertise
+The `activate_skill` tool lets Sparkle CLI load specialized procedural expertise
 and resources when they are relevant to your request.
 
 ## Description
 
 Skills are packages of instructions and tools designed for specific engineering
-tasks, such as reviewing code or creating pull requests. Gemini CLI uses this
+tasks, such as reviewing code or creating pull requests. Sparkle CLI uses this
 tool to "activate" a skill, which provides it with detailed guidelines and
 specialized tools tailored to that task.
 
@@ -19,7 +19,7 @@ specialized tools tailored to that task.
 
 ## Usage
 
-The `activate_skill` tool is used exclusively by the Gemini agent. You cannot
+The `activate_skill` tool is used exclusively by the Sparkle agent. You cannot
 invoke this tool manually.
 
 When the agent identifies that a task matches a discovered skill, it requests to

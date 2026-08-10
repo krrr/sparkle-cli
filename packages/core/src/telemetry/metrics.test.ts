@@ -349,7 +349,7 @@ describe('Telemetry Metrics', () => {
       { type: 'thought', tokens: 25, model: 'gemini-pro' },
       { type: 'cache', tokens: 75, model: 'gemini-pro' },
       { type: 'tool', tokens: 125, model: 'gemini-pro' },
-      { type: 'input', tokens: 200, model: 'gemini-different-model' },
+      { type: 'input', tokens: 200, model: 'sparkle-different-model' },
     ])(
       'should record token usage for $type type with $tokens tokens for model $model',
       ({ type, tokens, model }) => {

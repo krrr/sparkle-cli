@@ -85,8 +85,8 @@ import {
 import { expandEnvVars } from '../utils/envExpansion.js';
 
 import {
-  GEMINI_CLI_IDENTIFICATION_ENV_VAR,
-  GEMINI_CLI_IDENTIFICATION_ENV_VAR_VALUE,
+  SPARKLE_CLI_IDENTIFICATION_ENV_VAR,
+  SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
 } from '../services/shellExecutionService.js';
 
 export const MCP_DEFAULT_TIMEOUT_MSEC = 10 * 60 * 1000; // default to 10 minutes
@@ -1821,7 +1821,7 @@ export async function connectToMcpServer(
 ): Promise<Client> {
   const mcpClient = new Client(
     {
-      name: 'gemini-cli-mcp-client',
+      name: 'sparkle-cli-mcp-client',
       version: clientVersion,
     },
     {
@@ -2295,7 +2295,7 @@ export async function createTransport(
   if (mcpServerConfig.command) {
     if (!cliConfig.isTrustedFolder()) {
       throw new Error(
-        `MCP server '${mcpServerName}' uses stdio transport but current folder is not trusted. Use 'gemini trust' to enable it.`,
+        `MCP server '${mcpServerName}' uses stdio transport but current folder is not trusted. Use 'sparkle trust' to enable it.`,
       );
     }
     const extensionEnv = getExtensionEnvironment(mcpServerConfig.extension);
@@ -2308,8 +2308,8 @@ export async function createTransport(
     });
 
     const finalEnv: Record<string, string> = {
-      [GEMINI_CLI_IDENTIFICATION_ENV_VAR]:
-        GEMINI_CLI_IDENTIFICATION_ENV_VAR_VALUE,
+      [SPARKLE_CLI_IDENTIFICATION_ENV_VAR]:
+        SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
       ...extensionEnv,
     };
     for (const [key, value] of Object.entries(sanitizedEnv)) {

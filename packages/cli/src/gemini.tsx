@@ -132,7 +132,7 @@ export function getNodeMemoryArgs(isDebugMode: boolean): string[] {
     );
   }
 
-  if (process.env['GEMINI_CLI_NO_RELAUNCH']) {
+  if (process.env['SPARKLE_CLI_NO_RELAUNCH']) {
     return [];
   }
 
@@ -179,7 +179,7 @@ export function setupUnhandledRejectionHandler() {
     }
 
     const errorMessage = `=========================================
-This is an unexpected error. Please file a bug report at https://github.com/google-gemini/gemini-cli/issues.
+This is an unexpected error. Please file a bug report at https://github.com/krrr/sparkle-cli/issues.
 CRITICAL: Unhandled Promise Rejection!
 =========================================
 Reason: ${reason}${
@@ -582,7 +582,7 @@ export async function main() {
   }
 
   // We are now past the logic handling potentially launching a child process
-  // to run Gemini CLI. It is now safe to perform expensive initialization that
+  // to run Sparkle CLI. It is now safe to perform expensive initialization that
   // may have side effects.
   {
     const loadConfigHandle = startupProfiler.start('load_cli_config');
@@ -776,7 +776,7 @@ export async function main() {
 
     if (!input) {
       debugLogger.error(
-        `No input provided via stdin. Input can be provided by piping data into gemini or using the --prompt option.`,
+        `No input provided via stdin. Input can be provided by piping data into sparkle or using the --prompt option.`,
       );
       await runExitCleanup();
       process.exit(ExitCodes.FATAL_INPUT_ERROR);

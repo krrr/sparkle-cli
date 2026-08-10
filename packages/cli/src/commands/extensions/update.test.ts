@@ -99,7 +99,7 @@ describe('extensions update command', () => {
 
       expect(emitFeedback).toHaveBeenCalledWith(
         'error',
-        'Extension "missing-extension" not found.\n\nInstalled extensions:\next1 (1.0.0)\next2 (2.0.0)\n\nRun "gemini extensions list" for details.',
+        'Extension "missing-extension" not found.\n\nInstalled extensions:\next1 (1.0.0)\next2 (2.0.0)\n\nRun "sparkle extensions list" for details.',
       );
       expect(mockUpdateExtension).not.toHaveBeenCalled();
       mockCwd.mockRestore();

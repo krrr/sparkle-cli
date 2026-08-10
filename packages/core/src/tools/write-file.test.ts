@@ -140,12 +140,12 @@ describe('WriteFileTool', () => {
     tempDir = fs.realpathSync(rawTempDir);
 
     const rawRootDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-cli-test-root-'),
+      path.join(os.tmpdir(), 'sparkle-cli-test-root-'),
     );
     rootDir = fs.realpathSync(rawRootDir);
 
     const rawPlansDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'gemini-cli-test-plans-'),
+      path.join(os.tmpdir(), 'sparkle-cli-test-plans-'),
     );
     plansDir = fs.realpathSync(rawPlansDir);
 

@@ -1,11 +1,11 @@
-# Sandboxing in Gemini CLI
+# Sandboxing in Sparkle CLI
 
-This document provides a guide to sandboxing in Gemini CLI, including
+This document provides a guide to sandboxing in Sparkle CLI, including
 prerequisites, quickstart, and configuration.
 
 ## Prerequisites
 
-Before using sandboxing, you need to install and set up Gemini CLI:
+Before using sandboxing, you need to install and set up Sparkle CLI:
 
 ```bash
 npm install -g sparkle-cli
@@ -14,7 +14,7 @@ npm install -g sparkle-cli
 To verify the installation:
 
 ```bash
-gemini --version
+sparkle --version
 ```
 
 ## Overview of sandboxing
@@ -39,7 +39,7 @@ configuration file.
 ### Using the command flag
 
 ```bash
-gemini -s -p "analyze the code structure"
+sparkle -s -p "analyze the code structure"
 ```
 
 ### Using an environment variable
@@ -48,14 +48,14 @@ gemini -s -p "analyze the code structure"
 
 ```bash
 export GEMINI_SANDBOX=true
-gemini -p "run the test suite"
+sparkle -p "run the test suite"
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
 $env:GEMINI_SANDBOX="true"
-gemini -p "run the test suite"
+sparkle -p "run the test suite"
 ```
 
 ### Configuring via settings.json
@@ -103,7 +103,7 @@ Built-in profiles (set via `SEATBELT_PROFILE` env var):
 ### 2. Container-based (Docker/Podman)
 
 Cross-platform sandboxing with complete process isolation using container
-technology. By default, it uses the `ghcr.io/google/gemini-cli:latest` image.
+technology. By default, it uses the `ghcr.io/google/sparkle-cli:latest` image.
 
 **Prerequisites:**
 
@@ -120,13 +120,13 @@ files while remaining isolated from the rest of your system.
 
 **Quick setup:**
 
-To enable Docker sandboxing, run Gemini CLI with the sandbox flag and specify
+To enable Docker sandboxing, run Sparkle CLI with the sandbox flag and specify
 Docker as the provider:
 
 ```bash
 # Using the environment variable (Recommended)
 export GEMINI_SANDBOX=docker
-gemini -p "build the project"
+sparkle -p "build the project"
 
 # Or configure it permanently in your settings.json
 # {"tools": {"sandbox": "docker"}}
@@ -135,7 +135,7 @@ gemini -p "build the project"
 **Customizing the Sandbox Image:**
 
 If your project requires specific dependencies, you can specify a custom image
-name or have Gemini CLI build one for you automatically. You can use any Docker
+name or have Sparkle CLI build one for you automatically. You can use any Docker
 or Podman image as your sandbox, provided it has standard shell utilities (like
 `bash`) available.
 
@@ -167,15 +167,15 @@ export GEMINI_SANDBOX_IMAGE="us-central1-docker.pkg.dev/my-project/my-repo/my-cu
 **Option B: Building a local custom image automatically**
 
 If you prefer to define your environment as code, you can provide a Dockerfile
-and Gemini CLI will build the image automatically.
+and Sparkle CLI will build the image automatically.
 
 1.  Create a `.gemini/sandbox.Dockerfile` in your project root.
 2.  Ensure you have the `gh` CLI installed and authenticated (if you are using
-    the default `ghcr.io/google/gemini-cli` image as a base).
+    the default `ghcr.io/google/sparkle-cli` image as a base).
 3.  Run your command with the `BUILD_SANDBOX` environment variable set:
 
 ```bash
-BUILD_SANDBOX=1 GEMINI_SANDBOX=docker gemini -p "run my custom build"
+BUILD_SANDBOX=1 GEMINI_SANDBOX=docker sparkle -p "run my custom build"
 ```
 
 ### 3. Windows Native Sandbox (Windows only)
@@ -209,7 +209,7 @@ strong security barrier between AI operations and the host OS.
 - Docker installed and running
 - gVisor/runsc runtime configured
 
-When you set `sandbox: "runsc"`, Gemini CLI runs
+When you set `sandbox: "runsc"`, Sparkle CLI runs
 `docker run --runtime=runsc ...` to execute containers with gVisor isolation.
 runsc is not auto-detected; you must specify it explicitly (e.g.
 `GEMINI_SANDBOX=runsc` or `sandbox: "runsc"`).
@@ -231,7 +231,7 @@ such as Snapcraft and Rockcraft.
 
 - Linux only.
 - LXC/LXD must be installed (`snap install lxd` or `apt install lxd`).
-- A container must be created and running before starting Gemini CLI. Gemini
+- A container must be created and running before starting Sparkle CLI. Sparkle
   does **not** create the container automatically.
 
 **Quick setup**:
@@ -241,11 +241,11 @@ such as Snapcraft and Rockcraft.
 lxd init --auto
 
 # Create and start an Ubuntu container
-lxc launch ubuntu:24.04 gemini-sandbox
+lxc launch ubuntu:24.04 sparkle-sandbox
 
 # Enable LXC sandboxing
 export GEMINI_SANDBOX=lxc
-gemini -p "build the project"
+sparkle -p "build the project"
 ```
 
 **Custom container name**:
@@ -253,7 +253,7 @@ gemini -p "build the project"
 ```bash
 export GEMINI_SANDBOX=lxc
 export GEMINI_SANDBOX_IMAGE=my-snapcraft-container
-gemini -p "build the snap"
+sparkle -p "build the snap"
 ```
 
 **Limitations**:
@@ -267,8 +267,8 @@ gemini -p "build the snap"
 ## Tool sandboxing
 
 Tool-level sandboxing provides granular isolation for individual tool executions
-(like `shell_exec` and `write_file`) instead of sandboxing the entire Gemini CLI
-process.
+(like `shell_exec` and `write_file`) instead of sandboxing the entire Sparkle
+CLI process.
 
 This approach offers better integration with your local environment for non-tool
 tasks (like UI rendering and configuration loading) while still providing
@@ -290,23 +290,23 @@ you can disable it by setting `security.toolSandboxing` to `false` in your
 
 <!-- prettier-ignore -->
 > [!NOTE]
-> Changing the `security.toolSandboxing` setting requires a restart of Gemini
+> Changing the `security.toolSandboxing` setting requires a restart of Sparkle
 > CLI to take effect.
 
 ## Sandbox expansion
 
-Sandbox expansion is a dynamic permission system that lets Gemini CLI request
+Sandbox expansion is a dynamic permission system that lets Sparkle CLI request
 additional permissions for a command when needed.
 
 When a sandboxed command fails due to permission restrictions (like restricted
 file paths or network access), or when a command is proactively identified as
-requiring extra permissions (like `npm install`), Gemini CLI will present you
+requiring extra permissions (like `npm install`), Sparkle CLI will present you
 with a "Sandbox Expansion Request."
 
 ### How sandbox expansion works
 
-1.  **Detection**: Gemini CLI detects a sandbox denial or proactively identifies
-    a command that requires extra permissions.
+1.  **Detection**: Sparkle CLI detects a sandbox denial or proactively
+    identifies a command that requires extra permissions.
 2.  **Request**: A modal dialog is shown, explaining which additional
     permissions (e.g., specific directories or network access) are required.
 3.  **Approval**: If you approve the expansion, the command is executed with the
@@ -336,7 +336,7 @@ export SANDBOX_MOUNTS="/path/on/host:/path/in/container:rw,/another/path:ro"
 
 ## Running inside a Docker container
 
-If you are running Gemini CLI itself from within an official or custom Docker
+If you are running Sparkle CLI itself from within an official or custom Docker
 container and want to enable sandboxing, you must share the host's Docker socket
 and ensure your workspace paths align.
 
@@ -355,7 +355,7 @@ docker run -it \
   -v /absolute/path/on/host/project:/absolute/path/on/host/project \
   -w /absolute/path/on/host/project \
   -e GEMINI_SANDBOX=docker \
-  ghcr.io/google/gemini-cli:latest
+  ghcr.io/google/sparkle-cli:latest
 ```
 
 ## Advanced settings
@@ -428,7 +428,7 @@ $env:SANDBOX_SET_UID_GID="false"  # Disable UID/GID mapping
 **Missing commands**
 
 - Add to a custom Dockerfile. Automatic `BUILD_SANDBOX` builds are only
-  available when running Gemini CLI from source; npm installs need a prebuilt
+  available when running Sparkle CLI from source; npm installs need a prebuilt
   image instead.
 - Install via `sandbox.bashrc`.
 
@@ -440,23 +440,23 @@ $env:SANDBOX_SET_UID_GID="false"  # Disable UID/GID mapping
 ### Debug mode
 
 ```bash
-DEBUG=1 gemini -s -p "debug command"
+DEBUG=1 sparkle -s -p "debug command"
 ```
 
 <!-- prettier-ignore -->
 > [!NOTE]
 > If you have `DEBUG=true` in a project's `.env` file, it won't affect
-> gemini-cli due to automatic exclusion. Use `.gemini/.env` files for
-> gemini-cli specific debug settings.
+> sparkle-cli due to automatic exclusion. Use `.gemini/.env` files for
+> sparkle-cli specific debug settings.
 
 ### Inspect sandbox
 
 ```bash
 # Check environment
-gemini -s -p "run shell command: env | grep SANDBOX"
+sparkle -s -p "run shell command: env | grep SANDBOX"
 
 # List mounts
-gemini -s -p "run shell command: mount | grep workspace"
+sparkle -s -p "run shell command: mount | grep workspace"
 ```
 
 ## Security notes

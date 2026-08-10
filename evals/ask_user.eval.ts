@@ -78,7 +78,7 @@ describe('ask_user', () => {
       'packages/core/package.json': JSON.stringify({
         name: 'sparkle-cli-core',
       }),
-      'README.md': '# Gemini CLI',
+      'README.md': '# Sparkle CLI',
     },
     prompt: `I want to completely rewrite the core package to support the upcoming V2 architecture, but I haven't decided what that looks like yet. We need to figure out the requirements first. Can you ask me some questions to help nail down the design?`,
     setup: async (rig) => {
@@ -109,7 +109,7 @@ describe('ask_user', () => {
   // Regression test for issue #20177: Ensure the agent does not use \`ask_user\` to
   // confirm shell commands. Fixed via prompt refinements and tool definition
   // updates to clarify that shell command confirmation is handled by the UI.
-  // See fix: https://github.com/google-gemini/gemini-cli/pull/20504
+  // See fix: https://github.com/krrr/sparkle-cli/pull/20504
   askUserEvalTest('USUALLY_PASSES', {
     suiteName: 'default',
     suiteType: 'behavioral',

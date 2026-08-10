@@ -105,7 +105,7 @@ export function fetchNightlyHistory(lookbackCount) {
 
     for (const run of runs) {
       const tmpDir = fs.mkdtempSync(
-        path.join(os.tmpdir(), `gemini-evals-hist-${run.databaseId}-`),
+        path.join(os.tmpdir(), `sparkle-evals-hist-${run.databaseId}-`),
       );
       try {
         execSync(

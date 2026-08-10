@@ -1,4 +1,4 @@
-# Gemini CLI Test Utils (`sparkle-cli-test-utils`)
+# Sparkle CLI Test Utils (`sparkle-cli-test-utils`)
 
 Shared test utilities used across the monorepo. This is a private package — not
 published to npm.

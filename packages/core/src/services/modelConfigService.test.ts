@@ -179,7 +179,7 @@ describe('ModelConfigService', () => {
       aliases: {
         'test-alias': {
           modelConfig: {
-            model: 'gemini-test-model',
+            model: 'sparkle-test-model',
             generateContentConfig: {
               topP: 0.9,
               topK: 50,
@@ -189,7 +189,7 @@ describe('ModelConfigService', () => {
       },
       overrides: [
         {
-          match: { model: 'gemini-test-model' },
+          match: { model: 'sparkle-test-model' },
           modelConfig: {
             generateContentConfig: {
               topK: 40,
@@ -206,7 +206,7 @@ describe('ModelConfigService', () => {
           },
         },
         {
-          match: { model: 'gemini-test-model', overrideScope: 'test-agent' },
+          match: { model: 'sparkle-test-model', overrideScope: 'test-agent' },
           modelConfig: {
             generateContentConfig: {
               temperature: 0.2,
@@ -222,7 +222,7 @@ describe('ModelConfigService', () => {
       overrideScope: 'test-agent',
     });
 
-    expect(resolved.model).toBe('gemini-test-model');
+    expect(resolved.model).toBe('sparkle-test-model');
     expect(resolved.generateContentConfig).toEqual({
       // From global, overridden by most specific override
       temperature: 0.2,
@@ -579,7 +579,7 @@ describe('ModelConfigService', () => {
 
       service.registerRuntimeModelConfig('runtime-alias', {
         modelConfig: {
-          model: 'gemini-runtime-model',
+          model: 'sparkle-runtime-model',
           generateContentConfig: {
             temperature: 0.123,
           },
@@ -588,7 +588,7 @@ describe('ModelConfigService', () => {
 
       const resolved = service.getResolvedConfig({ model: 'runtime-alias' });
 
-      expect(resolved.model).toBe('gemini-runtime-model');
+      expect(resolved.model).toBe('sparkle-runtime-model');
       expect(resolved.generateContentConfig).toEqual({
         temperature: 0.123,
       });

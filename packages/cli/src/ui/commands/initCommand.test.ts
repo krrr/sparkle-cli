@@ -87,9 +87,7 @@ describe('initCommand', () => {
 
     // Assert: Check that the correct prompt is submitted
     expect(result.type).toBe('submit_prompt');
-    expect(result.content).toContain(
-      'You are an AI agent that brings the power of Gemini',
-    );
+    expect(result.content).toContain('You are an terminal-based AI agent');
   });
 
   it('should return an error if config is not available', async () => {

@@ -17,13 +17,13 @@ export class FileKeychain implements Keychain {
 
   constructor() {
     const configDir = path.join(homedir(), GEMINI_DIR);
-    this.tokenFilePath = path.join(configDir, 'gemini-credentials.json');
+    this.tokenFilePath = path.join(configDir, 'sparkle-credentials.json');
     this.encryptionKey = this.deriveEncryptionKey();
   }
 
   private deriveEncryptionKey(): Buffer {
-    const salt = `${os.hostname()}-${os.userInfo().username}-gemini-cli`;
-    return crypto.scryptSync('gemini-cli-oauth', salt, 32);
+    const salt = `${os.hostname()}-${os.userInfo().username}-sparkle-cli`;
+    return crypto.scryptSync('sparkle-cli-oauth', salt, 32);
   }
 
   private encrypt(text: string): string {

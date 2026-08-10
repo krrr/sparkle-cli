@@ -48,16 +48,16 @@ describe('Trusted Folders', () => {
 
   beforeEach(() => {
     // Create a temporary directory for each test
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-cli-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-'));
     trustedFoldersPath = path.join(tempDir, 'trustedFolders.json');
 
     // Set the environment variable to point to the temp file
-    vi.stubEnv('GEMINI_CLI_TRUSTED_FOLDERS_PATH', trustedFoldersPath);
+    vi.stubEnv('SPARKLE_CLI_TRUSTED_FOLDERS_PATH', trustedFoldersPath);
 
     // Reset the internal state
     resetTrustedFoldersForTesting();
     vi.clearAllMocks();
-    delete process.env['GEMINI_CLI_TRUST_WORKSPACE'];
+    delete process.env['SPARKLE_CLI_TRUST_WORKSPACE'];
   });
 
   afterEach(() => {
@@ -432,15 +432,15 @@ describe('Trusted Folders', () => {
       });
     });
 
-    it('should return true when GEMINI_CLI_TRUST_WORKSPACE is true', async () => {
-      process.env['GEMINI_CLI_TRUST_WORKSPACE'] = 'true';
+    it('should return true when SPARKLE_CLI_TRUST_WORKSPACE is true', async () => {
+      process.env['SPARKLE_CLI_TRUST_WORKSPACE'] = 'true';
       try {
         expect(isWorkspaceTrusted(mockSettings)).toEqual({
           isTrusted: true,
           source: 'env',
         });
       } finally {
-        delete process.env['GEMINI_CLI_TRUST_WORKSPACE'];
+        delete process.env['SPARKLE_CLI_TRUST_WORKSPACE'];
       }
     });
 

@@ -29,7 +29,7 @@ export default defineConfig({
     setupFiles: [path.resolve(__dirname, '../packages/cli/test-setup.ts')],
     server: {
       deps: {
-        inline: [/@google\/gemini-cli-core/],
+        inline: [/sparkle-cli-core/],
       },
     },
   },

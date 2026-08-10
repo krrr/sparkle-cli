@@ -1,8 +1,8 @@
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-# Gemini CLI authentication setup
+# Sparkle CLI authentication setup
 
-To use Gemini CLI, you'll need a Gemini API key from Google AI Studio. This
+To use Sparkle CLI, you'll need a Gemini API key from Google AI Studio. This
 guide helps you quickly set up the best way to authenticate based on how you're
 using the CLI.
 
@@ -25,9 +25,9 @@ Select the authentication method that matches your situation in the table below:
 
 ## Use Gemini API key <a id="gemini-api"></a>
 
-You can use an API key from Google AI Studio to authenticate with Gemini CLI.
+You can use an API key from Google AI Studio to authenticate with Sparkle CLI.
 
-To authenticate and use Gemini CLI with a Gemini API key:
+To authenticate and use Sparkle CLI with a Gemini API key:
 
 1. Obtain your API key from
    [Google AI Studio](https://aistudio.google.com/app/apikey).
@@ -59,13 +59,13 @@ To authenticate and use Gemini CLI with a Gemini API key:
 3. Start the CLI:
 
    ```bash
-   gemini
+   sparkle
    ```
 
 4. Select **Use Gemini API key**.
 
 > [!WARNING]
-> Treat API keys, especially for services like Gemini, as sensitive
+> Treat API keys, especially for services like Sparkle, as sensitive
 > credentials. Protect them to prevent unauthorized access and potential misuse
 > of the service under your account.
 
@@ -105,7 +105,7 @@ persist them with the following methods:
 > any process launched from that shell can read them.
 
 2.  **Use a `.env` file:** Create a `.gemini/.env` file in your project
-    directory or home directory. Gemini CLI automatically loads variables from
+    directory or home directory. Sparkle CLI automatically loads variables from
     the first `.env` file it finds, searching up from the current directory,
     then in your home directory's `.gemini/.env` (for example, `~/.gemini/.env`
     or `%USERPROFILE%\.gemini\.env`).
@@ -154,5 +154,5 @@ configure authentication using environment variables:
 Your authentication method affects your quotas, pricing, Terms of Service, and
 privacy notices. Review the following pages to learn more:
 
-- [Gemini CLI: Quotas and Pricing](../resources/quota-and-pricing.md).
-- [Gemini CLI: Terms of Service and Privacy Notice](../resources/tos-privacy.md).
+- [Sparkle CLI: Quotas and Pricing](../resources/quota-and-pricing.md).
+- [Sparkle CLI: Terms of Service and Privacy Notice](../resources/tos-privacy.md).

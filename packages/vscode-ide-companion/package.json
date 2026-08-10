@@ -1,13 +1,13 @@
 {
   "name": "sparkle-cli-vscode-ide-companion",
-  "displayName": "Gemini CLI Companion",
-  "description": "Enable Gemini CLI with direct access to your IDE workspace.",
+  "displayName": "Sparkle CLI Companion",
+  "description": "Enable Sparkle CLI with direct access to your IDE workspace.",
   "version": "0.54.4",
   "publisher": "google",
   "icon": "assets/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/google-gemini/gemini-cli.git",
+    "url": "https://github.com/krrr/sparkle-cli.git",
     "directory": "packages/vscode-ide-companion"
   },
   "engines": {
@@ -19,10 +19,10 @@
     "AI"
   ],
   "keywords": [
-    "gemini-cli",
-    "gemini cli",
-    "gemini",
-    "gemini code",
+    "sparkle-cli",
+    "sparkle cli",
+    "sparkle",
+    "sparkle code",
     "cli",
     "ide integration",
     "ide companion"
@@ -32,74 +32,74 @@
   ],
   "contributes": {
     "configuration": {
-      "title": "Gemini CLI",
+      "title": "Sparkle CLI",
       "properties": {
-        "gemini-cli.debug.logging.enabled": {
+        "sparkle-cli.debug.logging.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable detailed logging for debugging the Gemini CLI Companion."
+          "description": "Enable detailed logging for debugging the Sparkle CLI Companion."
         }
       }
     },
     "languages": [
       {
-        "id": "gemini-diff-editable"
+        "id": "sparkle-diff-editable"
       }
     ],
     "commands": [
       {
-        "command": "gemini.diff.accept",
-        "title": "Gemini CLI: Accept Diff",
+        "command": "sparkle.diff.accept",
+        "title": "Sparkle CLI: Accept Diff",
         "icon": "$(check)"
       },
       {
-        "command": "gemini.diff.cancel",
-        "title": "Gemini CLI: Close Diff Editor",
+        "command": "sparkle.diff.cancel",
+        "title": "Sparkle CLI: Close Diff Editor",
         "icon": "$(close)"
       },
       {
-        "command": "gemini-cli.runGeminiCLI",
-        "title": "Gemini CLI: Run"
+        "command": "sparkle-cli.runSparkleCLI",
+        "title": "Sparkle CLI: Run"
       },
       {
-        "command": "gemini-cli.showNotices",
-        "title": "Gemini CLI: View Third-Party Notices"
+        "command": "sparkle-cli.showNotices",
+        "title": "Sparkle CLI: View Third-Party Notices"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "gemini.diff.accept",
-          "when": "gemini.diff.isVisible"
+          "command": "sparkle.diff.accept",
+          "when": "sparkle.diff.isVisible"
         },
         {
-          "command": "gemini.diff.cancel",
-          "when": "gemini.diff.isVisible"
+          "command": "sparkle.diff.cancel",
+          "when": "sparkle.diff.isVisible"
         }
       ],
       "editor/title": [
         {
-          "command": "gemini.diff.accept",
-          "when": "gemini.diff.isVisible",
+          "command": "sparkle.diff.accept",
+          "when": "sparkle.diff.isVisible",
           "group": "navigation"
         },
         {
-          "command": "gemini.diff.cancel",
-          "when": "gemini.diff.isVisible",
+          "command": "sparkle.diff.cancel",
+          "when": "sparkle.diff.isVisible",
           "group": "navigation"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "gemini.diff.accept",
+        "command": "sparkle.diff.accept",
         "key": "ctrl+s",
-        "when": "gemini.diff.isVisible"
+        "when": "sparkle.diff.isVisible"
       },
       {
-        "command": "gemini.diff.accept",
+        "command": "sparkle.diff.accept",
         "key": "cmd+s",
-        "when": "gemini.diff.isVisible"
+        "when": "sparkle.diff.isVisible"
       }
     ]
   },

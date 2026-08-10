@@ -28,7 +28,7 @@ export function isolateTestEnv(runDir: string): void {
   process.env['GEMINI_FORCE_FILE_STORAGE'] = 'true';
 
   // Mark as integration test
-  process.env['GEMINI_CLI_INTEGRATION_TEST'] = 'true';
+  process.env['SPARKLE_CLI_INTEGRATION_TEST'] = 'true';
 
   // Isolate telemetry log
   process.env['TELEMETRY_LOG_FILE'] = join(runDir, 'telemetry.log');

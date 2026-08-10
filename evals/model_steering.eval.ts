@@ -19,7 +19,7 @@ describe('Model Steering Behavioral Evals', () => {
     },
     files: {
       'README.md':
-        '# Gemini CLI\nThis is a tool for developers.\nLicense: Apache-2.0\nLine 4\nLine 5\nLine 6',
+        '# Sparkle CLI\nThis is a tool for developers.\nLicense: Apache-2.0\nLine 4\nLine 5\nLine 6',
     },
     prompt: 'Find the first 5 lines of README.md',
     setup: async (rig) => {

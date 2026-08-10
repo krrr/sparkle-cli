@@ -25,7 +25,7 @@ permissions:
 jobs:
   detect-changes:
     name: 'Detect Steering Changes'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     # Security: pull_request_target allows secrets, so we must gate carefully.
     # Detection should not run code from the fork.
     if: "github.repository == 'google-gemini/gemini-cli' && github.event.pull_request.draft == false"
@@ -90,7 +90,7 @@ jobs:
     if: "needs.detect-changes.outputs.SHOULD_RUN == 'true'"
     # Manual approval gate via environment
     environment: 'eval-gate'
-    runs-on: 'gemini-cli-ubuntu-16-core'
+    runs-on: 'sparkle-cli-ubuntu-16-core'
     env:
       # CENTRALIZED MODEL LIST
       MODEL_LIST: 'gemini-3-flash-preview'
@@ -183,7 +183,7 @@ jobs:
               echo ""
 
               if [[ "${{ steps.analysis.outputs.MISSING_EVALS }}" == "true" ]]; then
-                echo "- ⚠️ **Consider adding Evals:** No behavioral evaluations (\`evals/*.eval.ts\`) were added or updated in this PR. Consider [adding a test case](https://github.com/google-gemini/gemini-cli/blob/main/evals/README.md#creating-an-evaluation) to verify the new behavior and prevent regressions."
+                echo "- ⚠️ **Consider adding Evals:** No behavioral evaluations (\`evals/*.eval.ts\`) were added or updated in this PR. Consider [adding a test case](https://github.com/krrr/sparkle-cli/blob/main/evals/README.md#creating-an-evaluation) to verify the new behavior and prevent regressions."
               fi
 
               if [[ "${{ steps.analysis.outputs.IS_MAINTAINER }}" == "true" ]]; then

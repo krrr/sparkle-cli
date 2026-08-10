@@ -53,7 +53,7 @@ describe('Configuration Integration Tests', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(tmpdir(), 'gemini-cli-test-'));
+    tempDir = fs.mkdtempSync(path.join(tmpdir(), 'sparkle-cli-test-'));
     vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
     vi.clearAllMocks();
   });

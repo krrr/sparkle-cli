@@ -24,11 +24,11 @@ describe('heap-snapshot', () => {
   });
 
   it('should capture a heap snapshot to a secure directory', () => {
-    vi.mocked(fs.mkdtempSync).mockReturnValue('/tmp/gemini-heap-abc123');
+    vi.mocked(fs.mkdtempSync).mockReturnValue('/tmp/sparkle-heap-abc123');
 
     const filePath = captureHeapSnapshot();
 
-    expect(filePath).toContain('gemini-heap-abc123');
+    expect(filePath).toContain('sparkle-heap-abc123');
     expect(filePath).toContain('.heapsnapshot');
     expect(v8.writeHeapSnapshot).toHaveBeenCalledWith(filePath);
   });

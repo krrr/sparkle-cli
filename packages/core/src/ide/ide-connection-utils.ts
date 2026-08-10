@@ -63,7 +63,7 @@ export function validateWorkspacePath(
   if (!isWithinWorkspace) {
     return {
       isValid: false,
-      error: `Directory mismatch. Gemini CLI is running in a different location than the open workspace in the IDE. Please run the CLI from one of the following directories: ${ideWorkspacePaths.join(
+      error: `Directory mismatch. Sparkle CLI is running in a different location than the open workspace in the IDE. Please run the CLI from one of the following directories: ${ideWorkspacePaths.join(
         ', ',
       )}`,
     };
@@ -72,7 +72,7 @@ export function validateWorkspacePath(
 }
 
 export function getPortFromEnv(): string | undefined {
-  const port = process.env['GEMINI_CLI_IDE_SERVER_PORT'];
+  const port = process.env['SPARKLE_CLI_IDE_SERVER_PORT'];
   if (!port) {
     return undefined;
   }
@@ -80,12 +80,12 @@ export function getPortFromEnv(): string | undefined {
 }
 
 export function getStdioConfigFromEnv(): StdioConfig | undefined {
-  const command = process.env['GEMINI_CLI_IDE_SERVER_STDIO_COMMAND'];
+  const command = process.env['SPARKLE_CLI_IDE_SERVER_STDIO_COMMAND'];
   if (!command) {
     return undefined;
   }
 
-  const argsStr = process.env['GEMINI_CLI_IDE_SERVER_STDIO_ARGS'];
+  const argsStr = process.env['SPARKLE_CLI_IDE_SERVER_STDIO_ARGS'];
   let args: string[] = [];
   if (argsStr) {
     try {
@@ -96,18 +96,18 @@ export function getStdioConfigFromEnv(): StdioConfig | undefined {
         args = parsedArgs;
       } else {
         logger.error(
-          'GEMINI_CLI_IDE_SERVER_STDIO_ARGS must be a JSON array string.',
+          'SPARKLE_CLI_IDE_SERVER_STDIO_ARGS must be a JSON array string.',
         );
       }
     } catch (e) {
-      logger.error('Failed to parse GEMINI_CLI_IDE_SERVER_STDIO_ARGS:', e);
+      logger.error('Failed to parse SPARKLE_CLI_IDE_SERVER_STDIO_ARGS:', e);
     }
   }
 
   return { command, args };
 }
 
-const IDE_SERVER_FILE_REGEX = /^gemini-ide-server-(\d+)-\d+\.json$/;
+const IDE_SERVER_FILE_REGEX = /^sparkle-ide-server-(\d+)-\d+\.json$/;
 
 export async function getConnectionConfigFromFile(
   pid: number,
@@ -118,9 +118,9 @@ export async function getConnectionConfigFromFile(
   try {
     const portFile = path.join(
       os.tmpdir(),
-      'gemini',
+      'sparkle',
       'ide',
-      `gemini-ide-server-${pid}.json`,
+      `sparkle-ide-server-${pid}.json`,
     );
     const portFileContents = await fs.promises.readFile(portFile, 'utf8');
     const parsed: unknown = JSON.parse(portFileContents);
@@ -136,12 +136,12 @@ export async function getConnectionConfigFromFile(
     throw new Error('Invalid connection config format');
   } catch {
     // For newer extension versions, the file name matches the pattern
-    // /^gemini-ide-server-${pid}-\d+\.json$/. If multiple IDE
+    // /^sparkle-ide-server-${pid}-\d+\.json$/. If multiple IDE
     // windows are open, multiple files matching the pattern are expected to
     // exist.
   }
 
-  const portFileDir = path.join(os.tmpdir(), 'gemini', 'ide');
+  const portFileDir = path.join(os.tmpdir(), 'sparkle', 'ide');
   let portFiles;
   try {
     portFiles = await fs.promises.readdir(portFileDir);

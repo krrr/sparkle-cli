@@ -58,7 +58,7 @@ Follow these steps to create a GitHub issue:
     form has been converted to a standard body, OR to use the `--field` flags
     for YAML forms.
 
-    *Note: For the `gemini-cli` repository which uses YAML forms, you can often
+    *Note: For the `sparkle-cli` repository which uses YAML forms, you can often
     submit the content as a single body if a specific field-based submission is
     not required by the automation.*
 

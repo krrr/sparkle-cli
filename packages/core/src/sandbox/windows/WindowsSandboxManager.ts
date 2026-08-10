@@ -418,7 +418,7 @@ export class WindowsSandboxManager implements SandboxManager {
 
     // 5. Generate Manifests
     const tempDir = await fs.promises.mkdtemp(
-      path.join(os.tmpdir(), 'gemini-cli-sandbox-'),
+      path.join(os.tmpdir(), 'sparkle-cli-sandbox-'),
     );
 
     const forbiddenManifestPath = path.join(tempDir, 'forbidden.txt');

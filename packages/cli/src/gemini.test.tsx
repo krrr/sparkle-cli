@@ -279,7 +279,7 @@ describe('gemini.tsx main function', () => {
     vi.stubEnv('GEMINI_SANDBOX', '');
     vi.stubEnv('SANDBOX', '');
     vi.stubEnv('SHPOOL_SESSION_NAME', '');
-    vi.stubEnv('GEMINI_CLI_TRUST_WORKSPACE', 'true');
+    vi.stubEnv('SPARKLE_CLI_TRUST_WORKSPACE', 'true');
 
     initialUnhandledRejectionListeners =
       process.listeners('unhandledRejection');
@@ -348,7 +348,7 @@ describe('gemini.tsx main function', () => {
     );
     expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Please file a bug report at https://github.com/google-gemini/gemini-cli/issues.',
+        'Please file a bug report at https://github.com/krrr/sparkle-cli/issues.',
       ),
     );
 
@@ -406,7 +406,7 @@ describe('getNodeMemoryArgs', () => {
   beforeEach(() => {
     osTotalMemSpy = vi.spyOn(os, 'totalmem');
     v8GetHeapStatisticsSpy = vi.spyOn(v8, 'getHeapStatistics');
-    delete process.env['GEMINI_CLI_NO_RELAUNCH'];
+    delete process.env['SPARKLE_CLI_NO_RELAUNCH'];
 
     originalConfig = process.config;
     Object.defineProperty(process, 'config', {
@@ -426,8 +426,8 @@ describe('getNodeMemoryArgs', () => {
     });
   });
 
-  it('should return empty array if GEMINI_CLI_NO_RELAUNCH is set', () => {
-    process.env['GEMINI_CLI_NO_RELAUNCH'] = 'true';
+  it('should return empty array if SPARKLE_CLI_NO_RELAUNCH is set', () => {
+    process.env['SPARKLE_CLI_NO_RELAUNCH'] = 'true';
     expect(getNodeMemoryArgs(false)).toEqual([]);
   });
 
@@ -480,8 +480,8 @@ describe('gemini.tsx main function kitty protocol', () => {
 
   beforeEach(() => {
     // Set no relaunch in tests since process spawning causing issues in tests
-    originalEnvNoRelaunch = process.env['GEMINI_CLI_NO_RELAUNCH'];
-    process.env['GEMINI_CLI_NO_RELAUNCH'] = 'true';
+    originalEnvNoRelaunch = process.env['SPARKLE_CLI_NO_RELAUNCH'];
+    process.env['SPARKLE_CLI_NO_RELAUNCH'] = 'true';
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!(process.stdin as any).setRawMode) {
@@ -501,9 +501,9 @@ describe('gemini.tsx main function kitty protocol', () => {
   afterEach(() => {
     // Restore original env variables
     if (originalEnvNoRelaunch !== undefined) {
-      process.env['GEMINI_CLI_NO_RELAUNCH'] = originalEnvNoRelaunch;
+      process.env['SPARKLE_CLI_NO_RELAUNCH'] = originalEnvNoRelaunch;
     } else {
-      delete process.env['GEMINI_CLI_NO_RELAUNCH'];
+      delete process.env['SPARKLE_CLI_NO_RELAUNCH'];
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (process.stdin as any).isTTY = originalIsTTY;
@@ -1225,8 +1225,8 @@ describe('gemini.tsx main function exit codes', () => {
   let originalIsTTY: boolean | undefined;
 
   beforeEach(() => {
-    originalEnvNoRelaunch = process.env['GEMINI_CLI_NO_RELAUNCH'];
-    process.env['GEMINI_CLI_NO_RELAUNCH'] = 'true';
+    originalEnvNoRelaunch = process.env['SPARKLE_CLI_NO_RELAUNCH'];
+    process.env['SPARKLE_CLI_NO_RELAUNCH'] = 'true';
     vi.spyOn(process, 'exit').mockImplementation((code) => {
       throw new MockProcessExitError(code);
     });
@@ -1238,9 +1238,9 @@ describe('gemini.tsx main function exit codes', () => {
 
   afterEach(() => {
     if (originalEnvNoRelaunch !== undefined) {
-      process.env['GEMINI_CLI_NO_RELAUNCH'] = originalEnvNoRelaunch;
+      process.env['SPARKLE_CLI_NO_RELAUNCH'] = originalEnvNoRelaunch;
     } else {
-      delete process.env['GEMINI_CLI_NO_RELAUNCH'];
+      delete process.env['SPARKLE_CLI_NO_RELAUNCH'];
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (process.stdin as any).isTTY = originalIsTTY;

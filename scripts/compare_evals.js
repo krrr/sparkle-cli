@@ -84,7 +84,7 @@ function main() {
         markdown += `### Failure ${i + 1}: ${r.name}\n\n`;
       }
 
-      markdown += '#### 1. Ask Gemini CLI to fix it (Recommended)\n';
+      markdown += '#### 1. Ask Sparkle CLI to fix it (Recommended)\n';
       markdown += 'Copy and paste this prompt to the agent:\n';
       markdown += '```text\n';
       markdown += `The eval "${r.name}" in ${r.file} is failing. Investigate and fix it using the behavioral-evals skill.\n`;
@@ -105,7 +105,7 @@ function main() {
 
     markdown += '#### 3. Manual Fix\n';
     markdown +=
-      'See the [Fixing Guide](https://github.com/google-gemini/gemini-cli/blob/main/evals/README.md#fixing-evaluations) for detailed troubleshooting steps.\n';
+      'See the [Fixing Guide](https://github.com/krrr/sparkle-cli/blob/main/evals/README.md#fixing-evaluations) for detailed troubleshooting steps.\n';
     markdown += '</details>\n';
 
     process.stdout.write(markdown);

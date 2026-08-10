@@ -17,7 +17,7 @@ describe('skillUtils', () => {
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skill-utils-test-'));
     vi.spyOn(process, 'cwd').mockReturnValue(tempDir);
-    vi.stubEnv('GEMINI_CLI_HOME', tempDir);
+    vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
   });
 
   afterEach(async () => {

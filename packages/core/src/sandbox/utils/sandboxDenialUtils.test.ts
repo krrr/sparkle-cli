@@ -123,9 +123,9 @@ EACCES: permission denied, mkdir '/Users/galzahavi/.pnpm-store/v3'
   it('should detect Python PermissionError and extract path accurately', () => {
     const output = `Caught exception: [Errno 13] Permission denied: '/etc/test_sandbox_denial'
 Traceback (most recent call last):
-  File "/usr/local/google/home/davidapierce/gemini-cli/repro_sandbox.py", line 9, in <module>
+  File "/usr/local/google/home/davidapierce/sparkle-cli/repro_sandbox.py", line 9, in <module>
     raise e
-  File "/usr/local/google/home/davidapierce/gemini-cli/repro_sandbox.py", line 5, in <module>
+  File "/usr/local/google/home/davidapierce/sparkle-cli/repro_sandbox.py", line 5, in <module>
     with open('/etc/test_sandbox_denial', 'w') as f:
          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 PermissionError: [Errno 13] Permission denied: '/etc/test_sandbox_denial'`;

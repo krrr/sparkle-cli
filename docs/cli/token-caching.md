@@ -1,6 +1,6 @@
 # Token caching and cost optimization
 
-Gemini CLI automatically optimizes API costs through token caching when using
+Sparkle CLI automatically optimizes API costs through token caching when using
 Gemini API key authentication. This feature reuses previous system instructions
 and context to reduce the number of tokens processed in subsequent requests.
 

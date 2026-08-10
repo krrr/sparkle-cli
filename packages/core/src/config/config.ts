@@ -3460,14 +3460,14 @@ export class Config implements McpContext, AgentLoopContext {
 
   getAgentSessionNoninteractiveEnabled(): boolean {
     return (
-      process.env['GEMINI_CLI_EXP_AGENT'] === 'true' ||
+      process.env['SPARKLE_CLI_EXP_AGENT'] === 'true' ||
       this.agentSessionNoninteractiveEnabled
     );
   }
 
   getAgentSessionInteractiveEnabled(): boolean {
     return (
-      process.env['GEMINI_CLI_EXP_AGENT'] === 'true' ||
+      process.env['SPARKLE_CLI_EXP_AGENT'] === 'true' ||
       this.agentSessionInteractiveEnabled
     );
   }

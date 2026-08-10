@@ -81,7 +81,7 @@ const dockerFile = argv.f;
 
 if (!image.length) {
   console.warn(
-    'No default image tag specified in gemini-cli/packages/cli/package.json',
+    'No default image tag specified in sparkle-cli/packages/cli/package.json',
   );
 }
 
@@ -136,7 +136,7 @@ function buildImage(imageName, dockerfile) {
     if (isWindows) {
       // PowerShell doesn't support <() process substitution.
       // Create a temporary auth file that we will clean up after.
-      tempAuthFile = join(os.tmpdir(), `gemini-auth-${Date.now()}.json`);
+      tempAuthFile = join(os.tmpdir(), `sparkle-auth-${Date.now()}.json`);
       writeFileSync(tempAuthFile, '{}');
       buildCommandArgs = `--authfile="${tempAuthFile}"`;
     } else {

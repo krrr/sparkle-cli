@@ -40,6 +40,6 @@ export class ExtensionStorage {
   }
 
   static async createTmpDir(): Promise<string> {
-    return fs.promises.mkdtemp(path.join(os.tmpdir(), 'gemini-extension'));
+    return fs.promises.mkdtemp(path.join(os.tmpdir(), 'sparkle-extension'));
   }
 }

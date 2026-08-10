@@ -271,7 +271,7 @@ describe('Server Config (config.ts)', () => {
   const MODEL = DEFAULT_GEMINI_MODEL;
   const SANDBOX: SandboxConfig = createMockSandboxConfig({
     command: 'docker',
-    image: 'gemini-cli-sandbox',
+    image: 'sparkle-cli-sandbox',
   });
   const TARGET_DIR = '/path/to/target';
   const DEBUG_MODE = false;
@@ -2230,7 +2230,7 @@ describe('BaseLlmClient Lifecycle', () => {
   const MODEL = 'gemini-pro';
   const SANDBOX: SandboxConfig = createMockSandboxConfig({
     command: 'docker',
-    image: 'gemini-cli-sandbox',
+    image: 'sparkle-cli-sandbox',
   });
   const TARGET_DIR = '/path/to/target';
   const DEBUG_MODE = false;
@@ -2295,7 +2295,7 @@ describe('Generation Config Merging (HACK)', () => {
   const MODEL = 'gemini-pro';
   const SANDBOX: SandboxConfig = createMockSandboxConfig({
     command: 'docker',
-    image: 'gemini-cli-sandbox',
+    image: 'sparkle-cli-sandbox',
   });
   const TARGET_DIR = '/path/to/target';
   const DEBUG_MODE = false;
@@ -2803,7 +2803,7 @@ describe('Config Quota & Preview Model Access', () => {
       allowedPaths: [],
       networkAccess: false,
       command: 'docker',
-      image: 'gemini-cli-sandbox',
+      image: 'sparkle-cli-sandbox',
     },
   };
 

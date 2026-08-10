@@ -30,7 +30,7 @@ describe('extension install', () => {
 
   it('installs a local extension, verifies a command, and updates it', async () => {
     rig.setup('extension install test');
-    const testServerPath = join(rig.testDir!, 'gemini-extension.json');
+    const testServerPath = join(rig.testDir!, 'sparkle-extension.json');
     writeFileSync(testServerPath, extension);
     try {
       const result = await rig.runCommand(

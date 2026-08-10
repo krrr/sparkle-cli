@@ -122,7 +122,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
 
   const finalRuntimeDir = pathMod.join(
     tempBase,
-    `gemini-runtime-${safeVersion}-${safeUsername}`,
+    `sparkle-runtime-${safeVersion}-${safeUsername}`,
   );
 
   let runtimeDir;
@@ -163,7 +163,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
   if (!useExisting) {
     const setupDir = pathMod.join(
       tempBase,
-      `gemini-setup-${processPid}-${Date.now()}`,
+      `sparkle-setup-${processPid}-${Date.now()}`,
     );
 
     try {

@@ -33,7 +33,7 @@ const argv = yargs(hideBin(process.argv)).option('q', {
   default: false,
 }).argv;
 
-const homedir = () => process.env['GEMINI_CLI_HOME'] || os.homedir();
+const homedir = () => process.env['SPARKLE_CLI_HOME'] || os.homedir();
 
 let geminiSandbox = process.env.GEMINI_SANDBOX;
 

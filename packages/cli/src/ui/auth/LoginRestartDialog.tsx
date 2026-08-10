@@ -36,7 +36,7 @@ export const LoginRestartDialog = ({
 
   const displayMessage =
     message ??
-    "You've successfully signed in with Google. Gemini CLI needs to be restarted.";
+    "You've successfully signed in with Google. Sparkle CLI needs to be restarted.";
 
   return (
     <Box

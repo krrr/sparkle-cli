@@ -36,7 +36,7 @@ export async function relaunchAppInChildProcess(
   additionalNodeArgs: string[],
   additionalScriptArgs: string[],
 ) {
-  if (process.env['GEMINI_CLI_NO_RELAUNCH']) {
+  if (process.env['SPARKLE_CLI_NO_RELAUNCH']) {
     return;
   }
 

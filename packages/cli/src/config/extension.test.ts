@@ -197,10 +197,10 @@ describe('extension tests', () => {
     });
     vi.mocked(loadSkillsFromDir).mockResolvedValue([]);
     tempHomeDir = getRealPath(
-      fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-cli-test-home-')),
+      fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-home-')),
     );
     tempWorkspaceDir = getRealPath(
-      fs.mkdtempSync(path.join(tempHomeDir, 'gemini-cli-test-workspace-')),
+      fs.mkdtempSync(path.join(tempHomeDir, 'sparkle-cli-test-workspace-')),
     );
     userExtensionsDir = path.join(tempHomeDir, EXTENSIONS_DIRECTORY_NAME);
     mockRequestConsent = vi.fn();
@@ -1076,7 +1076,7 @@ name = "yolo-checker"
         );
 
         fs.writeFileSync(
-          path.join(sourceExtDir, 'gemini-extension.json'),
+          path.join(sourceExtDir, 'sparkle-extension.json'),
           JSON.stringify({
             name: 'hook-extension-install',
             version: '1.0.0',
@@ -1145,7 +1145,7 @@ name = "yolo-checker"
       );
     });
 
-    it('should throw an error and cleanup if gemini-extension.json is missing', async () => {
+    it('should throw an error and cleanup if sparkle-extension.json is missing', async () => {
       const sourceExtDir = getRealPath(path.join(tempHomeDir, 'bad-extension'));
       fs.mkdirSync(sourceExtDir, { recursive: true });
       const configPath = path.join(sourceExtDir, EXTENSIONS_CONFIG_FILENAME);
@@ -1161,7 +1161,7 @@ name = "yolo-checker"
       expect(fs.existsSync(targetExtDir)).toBe(false);
     });
 
-    it('should throw an error for invalid JSON in gemini-extension.json', async () => {
+    it('should throw an error for invalid JSON in sparkle-extension.json', async () => {
       const sourceExtDir = getRealPath(path.join(tempHomeDir, 'bad-json-ext'));
       fs.mkdirSync(sourceExtDir, { recursive: true });
       const configPath = path.join(sourceExtDir, EXTENSIONS_CONFIG_FILENAME);
@@ -1175,7 +1175,7 @@ name = "yolo-checker"
       ).rejects.toThrow(`Failed to load extension config from ${configPath}`);
     });
 
-    it('should throw an error for missing name in gemini-extension.json', async () => {
+    it('should throw an error for missing name in sparkle-extension.json', async () => {
       const sourceExtDir = getRealPath(
         createExtension({
           extensionsDir: tempHomeDir,
@@ -1373,7 +1373,7 @@ name = "yolo-checker"
         '.gemini',
         'trustedFolders.json',
       );
-      vi.stubEnv('GEMINI_CLI_TRUSTED_FOLDERS_PATH', trustedFoldersPath);
+      vi.stubEnv('SPARKLE_CLI_TRUSTED_FOLDERS_PATH', trustedFoldersPath);
       vi.mocked(isWorkspaceTrusted).mockReturnValue({
         isTrusted: false,
         source: undefined,
@@ -1804,8 +1804,8 @@ ${INSTALL_WARNING_MESSAGE}`,
     });
 
     describe('installing from github', () => {
-      const gitUrl = 'https://github.com/google/gemini-test-extension.git';
-      const extensionName = 'gemini-test-extension';
+      const gitUrl = 'https://github.com/google/sparkle-test-extension.git';
+      const extensionName = 'sparkle-test-extension';
 
       beforeEach(() => {
         // Mock the git clone behavior for github installs that fallback to it.
@@ -1935,7 +1935,7 @@ ${INSTALL_WARNING_MESSAGE}`,
         // has no github releases so it is the only install method.
         expect(mockRequestConsent).toHaveBeenCalledExactlyOnceWith(
           expect.stringContaining(
-            'Installing extension "gemini-test-extension"',
+            'Installing extension "sparkle-test-extension"',
           ),
         );
         expect(mockGit.clone).toHaveBeenCalled();

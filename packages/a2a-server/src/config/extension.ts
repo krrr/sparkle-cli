@@ -18,11 +18,11 @@ import * as path from 'node:path';
 import { logger } from '../utils/logger.js';
 
 export const EXTENSIONS_DIRECTORY_NAME = path.join(GEMINI_DIR, 'extensions');
-export const EXTENSIONS_CONFIG_FILENAME = 'gemini-extension.json';
-export const INSTALL_METADATA_FILENAME = '.gemini-extension-install.json';
+export const EXTENSIONS_CONFIG_FILENAME = 'sparkle-extension.json';
+export const INSTALL_METADATA_FILENAME = '.sparkle-extension-install.json';
 
 /**
- * Extension definition as written to disk in gemini-extension.json files.
+ * Extension definition as written to disk in sparkle-extension.json files.
  * This should *not* be referenced outside of the logic for reading files.
  * If information is required for manipulating extensions (load, unload, update)
  * outside of the loading process that data needs to be stored on the

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains performance/CPU integration tests for the Gemini CLI.
+This directory contains performance/CPU integration tests for the Sparkle CLI.
 These tests measure wall-clock time, CPU usage, and event loop responsiveness to
 detect regressions across key scenarios.
 

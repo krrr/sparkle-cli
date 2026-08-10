@@ -20,7 +20,7 @@ try {
     .replace(/\.git$/, '')
     .trim();
 } catch (e) {
-  REPO = 'google-gemini/gemini-cli';
+  REPO = 'krrr/sparkle-cli';
 }
 
 const FAILED_FILES = new Set();

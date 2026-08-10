@@ -132,7 +132,7 @@ const mockSessionStats = {
 describe('<Footer />', () => {
   beforeEach(() => {
     const root = path.parse(process.cwd()).root;
-    vi.stubEnv('GEMINI_CLI_HOME', path.join(root, 'Users', 'test'));
+    vi.stubEnv('SPARKLE_CLI_HOME', path.join(root, 'Users', 'test'));
     vi.stubEnv('SANDBOX', '');
     vi.stubEnv('SEATBELT_PROFILE', '');
   });
@@ -347,7 +347,7 @@ describe('<Footer />', () => {
     });
 
     it('should display "current process" for custom sandbox when SANDBOX env is set', async () => {
-      vi.stubEnv('SANDBOX', 'gemini-cli-test-sandbox');
+      vi.stubEnv('SANDBOX', 'sparkle-cli-test-sandbox');
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
@@ -406,7 +406,7 @@ describe('<Footer />', () => {
     });
 
     it('should prioritize untrusted message over sandbox info', async () => {
-      vi.stubEnv('SANDBOX', 'gemini-cli-test-sandbox');
+      vi.stubEnv('SANDBOX', 'sparkle-cli-test-sandbox');
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,

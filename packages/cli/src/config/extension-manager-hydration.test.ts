@@ -51,9 +51,9 @@ describe('ExtensionManager hydration', () => {
     vi.spyOn(coreEvents, 'emitFeedback');
     vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
 
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-test-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-test-'));
     mockHomedir.mockReturnValue(tempDir);
-    vi.stubEnv('GEMINI_CLI_HOME', tempDir);
+    vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
 
     // Create the extensions directory that ExtensionManager expects
     extensionsDir = path.join(tempDir, '.gemini', EXTENSIONS_DIRECTORY_NAME);

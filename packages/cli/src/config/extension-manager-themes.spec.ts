@@ -35,7 +35,7 @@ describe('ExtensionManager theme loading', () => {
 
   beforeAll(async () => {
     tempHomeDir = await fs.promises.mkdtemp(
-      path.join(tmpdir(), 'gemini-cli-test-'),
+      path.join(tmpdir(), 'sparkle-cli-test-'),
     );
   });
 
@@ -46,7 +46,7 @@ describe('ExtensionManager theme loading', () => {
   });
 
   beforeEach(() => {
-    process.env['GEMINI_CLI_HOME'] = tempHomeDir;
+    process.env['SPARKLE_CLI_HOME'] = tempHomeDir;
     userExtensionsDir = path.join(tempHomeDir, GEMINI_DIR, 'extensions');
     // Ensure userExtensionsDir is clean for each test
     fs.rmSync(userExtensionsDir, { recursive: true, force: true });
@@ -69,7 +69,7 @@ describe('ExtensionManager theme loading', () => {
   });
 
   afterEach(() => {
-    delete process.env['GEMINI_CLI_HOME'];
+    delete process.env['SPARKLE_CLI_HOME'];
   });
 
   it('should register themes from an extension when started', async () => {

@@ -88,8 +88,8 @@ export class Storage {
   }
 
   static getTrustedFoldersPath(): string {
-    if (process.env['GEMINI_CLI_TRUSTED_FOLDERS_PATH']) {
-      return process.env['GEMINI_CLI_TRUSTED_FOLDERS_PATH'];
+    if (process.env['SPARKLE_CLI_TRUSTED_FOLDERS_PATH']) {
+      return process.env['SPARKLE_CLI_TRUSTED_FOLDERS_PATH'];
     }
     return path.join(Storage.getGlobalGeminiDir(), TRUSTED_FOLDERS_FILENAME);
   }
@@ -132,17 +132,17 @@ export class Storage {
 
   private static getSystemConfigDir(): string {
     if (os.platform() === 'darwin') {
-      return '/Library/Application Support/GeminiCli';
+      return '/Library/Application Support/SparkleCli';
     } else if (os.platform() === 'win32') {
-      return 'C:\\ProgramData\\gemini-cli';
+      return 'C:\\ProgramData\\sparkle-cli';
     } else {
-      return '/etc/gemini-cli';
+      return '/etc/sparkle-cli';
     }
   }
 
   static getSystemSettingsPath(): string {
-    if (process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH']) {
-      return process.env['GEMINI_CLI_SYSTEM_SETTINGS_PATH'];
+    if (process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH']) {
+      return process.env['SPARKLE_CLI_SYSTEM_SETTINGS_PATH'];
     }
     return path.join(Storage.getSystemConfigDir(), 'settings.json');
   }
@@ -423,7 +423,7 @@ export class Storage {
   }
 
   getExtensionsConfigPath(): string {
-    return path.join(this.getExtensionsDir(), 'gemini-extension.json');
+    return path.join(this.getExtensionsDir(), 'sparkle-extension.json');
   }
 
   getHistoryFilePath(): string {

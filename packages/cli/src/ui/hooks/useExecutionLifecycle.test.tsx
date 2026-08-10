@@ -167,7 +167,7 @@ describe('useExecutionLifecycle', () => {
     );
     mockIsBinary.mockReturnValue(false);
     vi.mocked(fs.existsSync).mockReturnValue(false);
-    vi.mocked(fs.mkdtempSync).mockReturnValue('/tmp/gemini-shell-abcdef');
+    vi.mocked(fs.mkdtempSync).mockReturnValue('/tmp/sparkle-shell-abcdef');
 
     mockShellExecutionService.mockImplementation((_cmd, _cwd, callback) => {
       mockShellOutputCallback = callback;
@@ -253,7 +253,7 @@ describe('useExecutionLifecycle', () => {
         }),
       ],
     });
-    const tmpFile = path.join('/tmp/gemini-shell-abcdef', 'pwd.tmp');
+    const tmpFile = path.join('/tmp/sparkle-shell-abcdef', 'pwd.tmp');
     const escapedTmpFile = escapeShellArg(tmpFile, 'bash');
     const wrappedCommand = `{\nls -l\n}\n__code=$?; pwd > ${escapedTmpFile}; exit $__code`;
     expect(mockShellExecutionService).toHaveBeenCalledWith(
@@ -364,7 +364,7 @@ describe('useExecutionLifecycle', () => {
         );
       });
 
-      const tmpFile = path.join('/tmp/gemini-shell-abcdef', 'pwd.tmp');
+      const tmpFile = path.join('/tmp/sparkle-shell-abcdef', 'pwd.tmp');
       const escapedTmpFile = escapeShellArg(tmpFile, 'bash');
       const wrappedCommand = `{\nstream\n}\n__code=$?; pwd > ${escapedTmpFile}; exit $__code`;
       expect(mockShellExecutionService).toHaveBeenCalledWith(
@@ -657,7 +657,7 @@ describe('useExecutionLifecycle', () => {
       type: 'error',
       text: 'An unexpected error occurred: Synchronous spawn error',
     });
-    const tmpFile = path.join('/tmp/gemini-shell-abcdef', 'pwd.tmp');
+    const tmpFile = path.join('/tmp/sparkle-shell-abcdef', 'pwd.tmp');
     // Verify that the temporary file was cleaned up
     expect(vi.mocked(fs.unlinkSync)).toHaveBeenCalledWith(tmpFile);
     expect(setShellInputFocusedMock).toHaveBeenCalledWith(false);
@@ -665,7 +665,7 @@ describe('useExecutionLifecycle', () => {
 
   describe('Directory Change Warning', () => {
     it('should show a warning if the working directory changes', async () => {
-      const tmpFile = path.join('/tmp/gemini-shell-abcdef', 'pwd.tmp');
+      const tmpFile = path.join('/tmp/sparkle-shell-abcdef', 'pwd.tmp');
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('/test/dir/new'); // A different directory
 

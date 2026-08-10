@@ -75,8 +75,8 @@ echo "  ↳ [2/5] Starting build and lint..."
 rm -f "${log_dir}/build-and-lint.exit"
 { { npm run clean && npm ci && npm run format && npm run build && npm run lint:ci && npm run typecheck; } > "${log_dir}/build-and-lint.log" 2>&1; echo $? > "${log_dir}/build-and-lint.exit"; } &
 
-# Dynamically resolve gemini binary (fallback to your nightly path)
-GEMINI_CMD="$(command -v gemini || echo "${HOME}/.gcli/nightly/node_modules/.bin/gemini")"
+# Dynamically resolve sparkle binary (fallback to your nightly path)
+GEMINI_CMD="$(command -v sparkle || echo "${HOME}/.gcli/nightly/node_modules/.bin/gemini")"
 # shellcheck disable=SC2312
 POLICY_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/policy.toml"
 

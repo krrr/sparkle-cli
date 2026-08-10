@@ -69,8 +69,8 @@ export class GeminiAgent {
       protocolVersion: acp.PROTOCOL_VERSION,
       authMethods,
       agentInfo: {
-        name: 'gemini-cli',
-        title: 'Gemini CLI',
+        name: 'sparkle-cli',
+        title: 'Sparkle CLI',
         version,
       },
       agentCapabilities: {

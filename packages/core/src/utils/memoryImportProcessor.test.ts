@@ -872,7 +872,7 @@ describe('memoryImportProcessor', () => {
 
     it('should reject paths that escape allowed directories via symbolic links', () => {
       const tmpDir = fsSync.realpathSync(os.tmpdir());
-      const testRoot = fsSync.mkdtempSync(path.join(tmpDir, 'gemini-test-'));
+      const testRoot = fsSync.mkdtempSync(path.join(tmpDir, 'sparkle-test-'));
       const allowedDir = path.join(testRoot, 'allowed');
       const outsideDir = path.join(testRoot, 'outside');
       const symlinkDir = path.join(allowedDir, 'sym_outside');

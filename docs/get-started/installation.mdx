@@ -1,8 +1,8 @@
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-# Gemini CLI installation, execution, and releases
+# Sparkle CLI installation, execution, and releases
 
-This document provides an overview of Gemini CLI's system requirements,
+This document provides an overview of Sparkle CLI's system requirements,
 installation methods, and release types.
 
 ## Recommended system specifications
@@ -18,9 +18,9 @@ installation methods, and release types.
 - **Shell:** Bash, Zsh, or PowerShell
 - **Internet connection required**
 
-## Install Gemini CLI
+## Install Sparkle CLI
 
-We recommend most users install Gemini CLI using one of the following
+We recommend most users install Sparkle CLI using one of the following
 installation methods.
 
 <Tabs>
@@ -38,7 +38,7 @@ installation methods.
   Install globally with Homebrew:
 
   ```bash
-  brew install gemini-cli
+  brew install sparkle-cli
   ```
 
   </TabItem>
@@ -47,7 +47,7 @@ installation methods.
   Install globally with MacPorts:
 
   ```bash
-  sudo port install gemini-cli
+  sudo port install sparkle-cli
   ```
 
   </TabItem>
@@ -60,30 +60,30 @@ installation methods.
   conda create -y -n gemini_env -c conda-forge nodejs
   conda activate gemini_env
 
-  # Install Gemini CLI globally via npm (inside the environment)
+  # Install Sparkle CLI globally via npm (inside the environment)
   npm install -g sparkle-cli
   ```
 
   </TabItem>
 </Tabs>
 
-## Run Gemini CLI
+## Run Sparkle CLI
 
-For most users, we recommend running Gemini CLI with the `gemini` command:
+For most users, we recommend running Sparkle CLI with the `sparkle` command:
 
 ```bash
-gemini
+sparkle
 ```
 
 For a list of options and additional commands, see the
 [CLI cheatsheet](../cli/cli-reference.md).
 
-You can also run Gemini CLI using one of the following advanced methods:
+You can also run Sparkle CLI using one of the following advanced methods:
 
 <Tabs>
   <TabItem label="npx">
 
-  Run instantly with npx. You can run Gemini CLI without permanent installation.
+  Run instantly with npx. You can run Sparkle CLI without permanent installation.
 
   ```bash
   # Using npx (no installation required)
@@ -94,13 +94,13 @@ You can also run Gemini CLI using one of the following advanced methods:
   helpful for testing features still in development:
 
   ```bash
-  npx https://github.com/google-gemini/gemini-cli
+  npx https://github.com/krrr/sparkle-cli
   ```
 
   </TabItem>
   <TabItem label="Docker/Podman Sandbox">
 
-  For security and isolation, Gemini CLI can be run inside a container. This is
+  For security and isolation, Sparkle CLI can be run inside a container. This is
   the default way that the CLI executes tools that might have side effects.
 
   - **Directly from the registry:** You can run the published sandbox image
@@ -108,13 +108,13 @@ You can also run Gemini CLI using one of the following advanced methods:
     to run the CLI.
     ```bash
     # Run the published sandbox image for a specified CLI version
-    docker run --rm -it us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.42.0-nightly.20260428.g59b2dea0e
+    docker run --rm -it us-docker.pkg.dev/gemini-code-dev/sparkle-cli/sandbox:0.42.0-nightly.20260428.g59b2dea0e
     ```
-  - **Using the `--sandbox` flag:** If you have Gemini CLI installed locally
+  - **Using the `--sandbox` flag:** If you have Sparkle CLI installed locally
     (using the standard installation described above), you can instruct it to run
     inside the sandbox container.
     ```bash
-    gemini --sandbox -y -p "your prompt here"
+    sparkle --sandbox -y -p "your prompt here"
     ```
 
   </TabItem>
@@ -144,8 +144,8 @@ You can also run Gemini CLI using one of the following advanced methods:
     # Link the local cli package to your global node_modules
     npm link packages/cli
 
-    # Now you can run your local version using the `gemini` command
-    gemini
+    # Now you can run your local version using the `sparkle` command
+    sparkle
     ```
 
   </TabItem>
@@ -153,7 +153,7 @@ You can also run Gemini CLI using one of the following advanced methods:
 
 ## Releases
 
-Gemini CLI has three release channels: stable, preview, and nightly. For most
+Sparkle CLI has three release channels: stable, preview, and nightly. For most
 users, we recommend the stable release, which is the default installation.
 
 <Tabs>

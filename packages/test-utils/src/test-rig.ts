@@ -382,7 +382,8 @@ export class TestRig {
     this.testName = testName;
     const sanitizedName = sanitizeTestName(testName);
     const testFileDir =
-      env['INTEGRATION_TEST_FILE_DIR'] || join(os.tmpdir(), 'gemini-cli-tests');
+      env['INTEGRATION_TEST_FILE_DIR'] ||
+      join(os.tmpdir(), 'sparkle-cli-tests');
     this.testDir = join(testFileDir, sanitizedName);
     this.homeDir = join(testFileDir, sanitizedName + '-home');
 
@@ -681,10 +682,10 @@ export class TestRig {
         key !== 'GOOGLE_API_KEY' &&
         key !== 'GEMINI_MODEL' &&
         key !== 'GEMINI_DEBUG' &&
-        key !== 'GEMINI_CLI_TEST_VAR' &&
-        key !== 'GEMINI_CLI_INTEGRATION_TEST' &&
+        key !== 'SPARKLE_CLI_TEST_VAR' &&
+        key !== 'SPARKLE_CLI_INTEGRATION_TEST' &&
         key !== 'GOOGLE_GEMINI_BASE_URL' &&
-        !key.startsWith('GEMINI_CLI_ACTIVITY_LOG')
+        !key.startsWith('SPARKLE_CLI_ACTIVITY_LOG')
       ) {
         delete cleanEnv[key];
       }
@@ -692,7 +693,7 @@ export class TestRig {
 
     return {
       ...cleanEnv,
-      GEMINI_CLI_HOME: this.homeDir!,
+      SPARKLE_CLI_HOME: this.homeDir!,
       GEMINI_PTY_INFO: 'child_process',
       ...extraEnv,
     };

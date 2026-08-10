@@ -9,7 +9,7 @@ import { evalTest } from './test-helper.js';
 
 describe('Edits location eval', () => {
   /**
-   * Ensure that Gemini CLI always updates existing test files, if present,
+   * Ensure that Sparkle CLI always updates existing test files, if present,
    * instead of creating a new one.
    */
   evalTest('USUALLY_PASSES', {

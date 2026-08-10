@@ -2,7 +2,7 @@
 
 This guide covers security considerations, performance optimization, debugging
 techniques, and privacy considerations for developing and deploying hooks in
-Gemini CLI.
+Sparkle CLI.
 
 ## Performance
 
@@ -217,7 +217,7 @@ Write-Host "Exit code: $LASTEXITCODE"
 
 ### Check exit codes
 
-Gemini CLI uses exit codes for high-level flow control:
+Sparkle CLI uses exit codes for high-level flow control:
 
 - **Exit 0 (Success)**: The hook ran successfully. The CLI parses `stdout` for
   JSON decisions.
@@ -401,18 +401,18 @@ git add .gemini/settings.json
 Understanding where hooks come from and what they can do is critical for secure
 usage.
 
-| Hook Source                   | Description                                                                                                                       |
-| :---------------------------- | :-------------------------------------------------------------------------------------------------------------------------------- |
-| **System**                    | Configured by system administrators (for example, `/etc/gemini-cli/settings.json`, `/Library/...`). Assumed to be the **safest**. |
-| **User** (`~/.gemini/...`)    | Configured by you. You are responsible for ensuring they are safe.                                                                |
-| **Extensions**                | You explicitly approve and install these. Security depends on the extension source (integrity).                                   |
-| **Project** (`./.gemini/...`) | **Untrusted by default.** Safest in trusted internal repos; higher risk in third-party/public repos.                              |
+| Hook Source                   | Description                                                                                                                        |
+| :---------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
+| **System**                    | Configured by system administrators (for example, `/etc/sparkle-cli/settings.json`, `/Library/...`). Assumed to be the **safest**. |
+| **User** (`~/.gemini/...`)    | Configured by you. You are responsible for ensuring they are safe.                                                                 |
+| **Extensions**                | You explicitly approve and install these. Security depends on the extension source (integrity).                                    |
+| **Project** (`./.gemini/...`) | **Untrusted by default.** Safest in trusted internal repos; higher risk in third-party/public repos.                               |
 
 #### Project Hook Security
 
 When you open a project with hooks defined in `.gemini/settings.json`:
 
-1. **Detection**: Gemini CLI detects the hooks.
+1. **Detection**: Sparkle CLI detects the hooks.
 2. **Identification**: A unique identity is generated for each hook based on its
    `name` and `command`.
 3. **Warning**: If this specific hook identity has not been seen before, a
@@ -422,7 +422,7 @@ When you open a project with hooks defined in `.gemini/settings.json`:
 5. **Trust**: The hook is marked as "trusted" for this project.
 
 > **Modification detection**: If the `command` string of a project hook is
-> changed (for example, by a `git pull`), its identity changes. Gemini CLI will
+> changed (for example, by a `git pull`), its identity changes. Sparkle CLI will
 > treat it as a **new, untrusted hook** and warn you again. This prevents
 > malicious actors from silently swapping a verified command for a malicious
 > one.
@@ -448,8 +448,8 @@ When you open a project with hooks defined in `.gemini/settings.json`:
 
 #### Sanitize environment
 
-Hooks inherit the environment of Gemini CLI process, which may include sensitive
-API keys. Gemini CLI provides a
+Hooks inherit the environment of Sparkle CLI process, which may include
+sensitive API keys. Sparkle CLI provides a
 [redaction system](../reference/configuration.md#environment-variable-redaction)
 that automatically filters variables matching sensitive patterns (for example,
 `KEY`, `TOKEN`).
@@ -606,7 +606,7 @@ fi
 
 ### Use timeouts
 
-Prevent denial-of-service (hanging agents) by enforcing timeouts. Gemini CLI
+Prevent denial-of-service (hanging agents) by enforcing timeouts. Sparkle CLI
 defaults to 60 seconds, but you should set stricter limits for fast hooks.
 
 ```json

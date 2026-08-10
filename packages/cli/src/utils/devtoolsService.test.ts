@@ -119,7 +119,7 @@ describe('devtoolsService', () => {
     vi.clearAllMocks();
     MockWebSocket.instances = [];
     resetForTesting();
-    delete process.env['GEMINI_CLI_ACTIVITY_LOG_TARGET'];
+    delete process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET'];
   });
 
   describe('setupInitialActivityLogger', () => {
@@ -136,7 +136,7 @@ describe('devtoolsService', () => {
     });
 
     it('initializes in file mode when target env var is set', () => {
-      process.env['GEMINI_CLI_ACTIVITY_LOG_TARGET'] = '/tmp/test.jsonl';
+      process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET'] = '/tmp/test.jsonl';
       const config = createMockConfig();
       setupInitialActivityLogger(config);
 
@@ -149,7 +149,7 @@ describe('devtoolsService', () => {
     });
 
     it('does nothing in file mode when config.storage is missing', () => {
-      process.env['GEMINI_CLI_ACTIVITY_LOG_TARGET'] = '/tmp/test.jsonl';
+      process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET'] = '/tmp/test.jsonl';
       const config = createMockConfig({ storage: undefined });
       setupInitialActivityLogger(config);
 

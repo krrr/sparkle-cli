@@ -1163,7 +1163,7 @@ describe('useTextBuffer', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-cli-test-'));
+      tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-'));
     });
 
     afterEach(() => {

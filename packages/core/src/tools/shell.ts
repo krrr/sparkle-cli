@@ -498,7 +498,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
 
     const onAbort = () => combinedController.abort();
     try {
-      tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-shell-'));
+      tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-shell-'));
       tempFilePath = path.join(tempDir, 'bgpids.tmp');
 
       // Windows shells do not support the POSIX jobs output used here.

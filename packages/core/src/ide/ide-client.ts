@@ -127,7 +127,7 @@ export class IdeClient {
     if (!this.currentIde) {
       this.setState(
         IDEConnectionStatus.Disconnected,
-        `IDE integration is not supported in your current environment. To use this feature, run Gemini CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.`,
+        `IDE integration is not supported in your current environment. To use this feature, run Sparkle CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.`,
         false,
       );
       return;
@@ -139,11 +139,11 @@ export class IdeClient {
       ? await getConnectionConfigFromFile(this.ideProcessInfo.pid)
       : undefined;
     const authToken =
-      connectionConfig?.authToken ?? process.env['GEMINI_CLI_IDE_AUTH_TOKEN'];
+      connectionConfig?.authToken ?? process.env['SPARKLE_CLI_IDE_AUTH_TOKEN'];
 
     const workspacePath =
       connectionConfig?.workspacePath ??
-      process.env['GEMINI_CLI_IDE_WORKSPACE_PATH'];
+      process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'];
 
     const { isValid, error } = validateWorkspacePath(
       workspacePath,

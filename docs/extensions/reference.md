@@ -1,29 +1,29 @@
 # Extension reference
 
-This guide covers the `gemini extensions` commands and the structure of the
-`gemini-extension.json` configuration file.
+This guide covers the `sparkle extensions` commands and the structure of the
+`sparkle-extension.json` configuration file.
 
 ## Manage extensions
 
-Use the `gemini extensions` command group to manage your extensions from the
+Use the `sparkle extensions` command group to manage your extensions from the
 terminal.
 
-Note that commands like `gemini extensions install` are not supported within the
-CLI's interactive mode. However, you can use the `/extensions list` command to
-view installed extensions. All management operations, including updates to slash
-commands, take effect only after you restart the CLI session.
+Note that commands like `sparkle extensions install` are not supported within
+the CLI's interactive mode. However, you can use the `/extensions list` command
+to view installed extensions. All management operations, including updates to
+slash commands, take effect only after you restart the CLI session.
 
 ### Install an extension
 
 Install an extension by providing its GitHub repository URL or a local file
 path.
 
-Gemini CLI creates a copy of the extension during installation. You must run
-`gemini extensions update` to pull changes from the source. To install from
+Sparkle CLI creates a copy of the extension during installation. You must run
+`sparkle extensions update` to pull changes from the source. To install from
 GitHub, you must have `git` installed on your machine.
 
 ```bash
-gemini extensions install <source> [--ref <ref>] [--auto-update] [--pre-release] [--consent] [--skip-settings]
+sparkle extensions install <source> [--ref <ref>] [--auto-update] [--pre-release] [--consent] [--skip-settings]
 ```
 
 - `<source>`: The GitHub URL or local path of the extension.
@@ -38,7 +38,7 @@ gemini extensions install <source> [--ref <ref>] [--auto-update] [--pre-release]
 To uninstall one or more extensions, use the `uninstall` command:
 
 ```bash
-gemini extensions uninstall <name...>
+sparkle extensions uninstall <name...>
 ```
 
 ### Disable an extension
@@ -47,7 +47,7 @@ Extensions are enabled globally by default. You can disable an extension
 entirely or for a specific workspace.
 
 ```bash
-gemini extensions disable <name> [--scope <scope>]
+sparkle extensions disable <name> [--scope <scope>]
 ```
 
 - `<name>`: The name of the extension to disable.
@@ -58,7 +58,7 @@ gemini extensions disable <name> [--scope <scope>]
 Re-enable a disabled extension using the `enable` command:
 
 ```bash
-gemini extensions enable <name> [--scope <scope>]
+sparkle extensions enable <name> [--scope <scope>]
 ```
 
 - `<name>`: The name of the extension to enable.
@@ -66,17 +66,17 @@ gemini extensions enable <name> [--scope <scope>]
 
 ### Update an extension
 
-Update an extension to the version specified in its `gemini-extension.json`
+Update an extension to the version specified in its `sparkle-extension.json`
 file.
 
 ```bash
-gemini extensions update <name>
+sparkle extensions update <name>
 ```
 
 To update all installed extensions at once:
 
 ```bash
-gemini extensions update --all
+sparkle extensions update --all
 ```
 
 ### Create an extension from a template
@@ -84,7 +84,7 @@ gemini extensions update --all
 Create a new extension directory using a built-in template.
 
 ```bash
-gemini extensions new <path> [template]
+sparkle extensions new <path> [template]
 ```
 
 - `<path>`: The directory to create.
@@ -93,20 +93,20 @@ gemini extensions new <path> [template]
 
 ### Link a local extension
 
-Create a symbolic link between your development directory and Gemini CLI
+Create a symbolic link between your development directory and Sparkle CLI
 extensions directory. This lets you test changes immediately without
 reinstalling.
 
 ```bash
-gemini extensions link <path>
+sparkle extensions link <path>
 ```
 
 ## Extension format
 
-Gemini CLI loads extensions from `<home>/.gemini/extensions`. Each extension
-must have a `gemini-extension.json` file in its root directory.
+Sparkle CLI loads extensions from `<home>/.gemini/extensions`. Each extension
+must have a `sparkle-extension.json` file in its root directory.
 
-### `gemini-extension.json`
+### `sparkle-extension.json`
 
 The manifest file defines the extension's behavior and configuration.
 
@@ -171,7 +171,7 @@ The manifest file defines the extension's behavior and configuration.
     settings. If not specified by either the extension or the user, the default
     is `~/.gemini/tmp/<project>/<session-id>/plans/`.
 
-When Gemini CLI starts, it loads all the extensions and merges their
+When Sparkle CLI starts, it loads all the extensions and merges their
 configurations. If there are any conflicts, the workspace configuration takes
 precedence.
 
@@ -207,7 +207,7 @@ To define settings, add a `settings` array to your manifest:
 To update an extension's settings:
 
 ```bash
-gemini extensions config <name> [setting] [--scope <scope>]
+sparkle extensions config <name> [setting] [--scope <scope>]
 ```
 
 #### Environment variable sanitization
@@ -219,7 +219,7 @@ Extensions **will not** inherit the user's full shell environment variables.
 They will only have access to:
 
 1. Standard safe variables (e.g., `HOME`, `PATH`, `TMPDIR`).
-2. Variables explicitly declared and requested in the `gemini-extension.json`
+2. Variables explicitly declared and requested in the `sparkle-extension.json`
    manifest via the `settings` array (using the `envVar` property).
 
 If your extension requires specific environment variables (like an API key,
@@ -229,7 +229,7 @@ so the CLI can allowlist them for use within the extension.
 ### Custom commands
 
 Provide [custom commands](../cli/custom-commands.md) by placing TOML files in a
-`commands/` subdirectory. Gemini CLI uses the directory structure to determine
+`commands/` subdirectory. Sparkle CLI uses the directory structure to determine
 the command name.
 
 For an extension named `gcp`:
@@ -241,7 +241,7 @@ For an extension named `gcp`:
 
 Intercept and customize CLI behavior using [hooks](../hooks/index.md). Define
 hooks in a `hooks/hooks.json` file within your extension directory. Note that
-hooks are not defined in the `gemini-extension.json` manifest.
+hooks are not defined in the `sparkle-extension.json` manifest.
 
 ### Agent skills
 
@@ -260,12 +260,12 @@ agent definition files (`.md`) to an `agents/` directory in your extension root.
 
 ### <a id="policy-engine"></a>Policy Engine
 
-Extensions can contribute policy rules and safety checkers to Gemini CLI
+Extensions can contribute policy rules and safety checkers to Sparkle CLI
 [Policy Engine](../reference/policy-engine.md). These rules are defined in
 `.toml` files and take effect when the extension is activated.
 
 To add policies, create a `policies/` directory in your extension's root and
-place your `.toml` policy files inside it. Gemini CLI automatically loads all
+place your `.toml` policy files inside it. Sparkle CLI automatically loads all
 `.toml` files from this directory.
 
 Rules contributed by extensions run in their own tier (tier 2), alongside
@@ -274,7 +274,7 @@ but lower priority than user or admin policies.
 
 <!-- prettier-ignore -->
 > [!WARNING]
-> For security, Gemini CLI ignores any `allow` decisions or `yolo`
+> For security, Sparkle CLI ignores any `allow` decisions or `yolo`
 > mode configurations in extension policies. This ensures that an extension
 > cannot automatically approve tool calls or bypass security measures without
 > your confirmation.
@@ -301,7 +301,7 @@ required_context = ["environment"]
 ### Themes
 
 Extensions can provide custom themes to personalize the CLI UI. Themes are
-defined in the `themes` array in `gemini-extension.json`.
+defined in the `themes` array in `sparkle-extension.json`.
 
 **Example**
 
@@ -351,7 +351,7 @@ the extension name (for example, `/gcp.deploy`) using a dot separator.
 
 ## Variables
 
-Gemini CLI supports variable substitution in `gemini-extension.json` and
+Sparkle CLI supports variable substitution in `sparkle-extension.json` and
 `hooks/hooks.json`.
 
 | Variable           | Description                                     |

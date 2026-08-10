@@ -417,7 +417,7 @@ describe('Gemini Client (client.ts)', () => {
       // The first message should be the environment context, coalesced with
       // the consecutive user turn that follows it.
       expect(history[0].role).toBe('user');
-      expect(history[0].parts?.[0]?.text).toContain('This is the Gemini CLI');
+      expect(history[0].parts?.[0]?.text).toContain('This is the Sparkle CLI');
       expect(history[0].parts?.[0]?.text).toContain(
         "The project's temporary directory is:",
       );

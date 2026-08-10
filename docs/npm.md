@@ -4,7 +4,7 @@ This monorepo contains two main packages: `sparkle-cli` and `sparkle-cli-core`.
 
 ## `sparkle-cli`
 
-This is the main package for Gemini CLI. It is responsible for the user
+This is the main package for Sparkle CLI. It is responsible for the user
 interface, command parsing, and all other user-facing functionality.
 
 When this package is published, it is bundled into a single executable file.

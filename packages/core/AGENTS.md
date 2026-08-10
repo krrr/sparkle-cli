@@ -1,6 +1,6 @@
-# Gemini CLI Core (`sparkle-cli-core`)
+# Sparkle CLI Core (`sparkle-cli-core`)
 
-Backend logic for Gemini CLI: API orchestration, prompt construction, tool
+Backend logic for Sparkle CLI: API orchestration, prompt construction, tool
 execution, and agent management.
 
 ## Architecture

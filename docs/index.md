@@ -8,17 +8,17 @@ Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 
 Jump in to Sparkle CLI.
 
-- **[Quickstart](./get-started/index.md):** Your first session with Gemini CLI.
-- **[Installation](./get-started/installation.mdx):** How to install Gemini CLI
+- **[Quickstart](./get-started/index.md):** Your first session with Sparkle CLI.
+- **[Installation](./get-started/installation.mdx):** How to install Sparkle CLI
   on your system.
 - **[Authentication](./get-started/authentication.mdx):** Setup instructions for
   personal and enterprise accounts.
 - **[CLI cheatsheet](./cli/cli-reference.md):** A quick reference for common
   commands and options.
-- **[Gemini 3 on Gemini CLI](./get-started/gemini-3.md):** Learn about Gemini 3
-  support in Gemini CLI.
+- **[Gemini 3 on Sparkle CLI](./get-started/gemini-3.md):** Learn about Gemini 3
+  support in Sparkle CLI.
 
-## Use Gemini CLI
+## Use Sparkle CLI
 
 User-focused guides and tutorials for daily development workflows.
 
@@ -42,16 +42,16 @@ User-focused guides and tutorials for daily development workflows.
 
 ## Features
 
-Technical documentation for each capability of Gemini CLI.
+Technical documentation for each capability of Sparkle CLI.
 
-- **[Extensions](./extensions/index.md):** Extend Gemini CLI with new tools and
+- **[Extensions](./extensions/index.md):** Extend Sparkle CLI with new tools and
   capabilities.
 - **[Agent Skills](./cli/skills.md):** Use specialized agents for specific
   tasks.
 - **[Checkpointing](./cli/checkpointing.md):** Automatic session snapshots.
 - **[Headless mode](./cli/headless.md):** Programmatic and scripting interface.
-- **[Hooks](./hooks/index.md):** Customize Gemini CLI behavior with scripts.
-- **[IDE integration](./ide-integration/index.md):** Integrate Gemini CLI with
+- **[Hooks](./hooks/index.md):** Customize Sparkle CLI behavior with scripts.
+- **[IDE integration](./ide-integration/index.md):** Integrate Sparkle CLI with
   your favorite IDE.
 - **[MCP servers](./tools/mcp-server.md):** Connect to and use remote agents.
 - **[Model routing](./cli/model-routing.md):** Automatic fallback resilience.
@@ -70,7 +70,7 @@ Technical documentation for each capability of Gemini CLI.
 
 ## Configuration
 
-Settings and customization options for Gemini CLI.
+Settings and customization options for Sparkle CLI.
 
 - **[Custom commands](./cli/custom-commands.md):** Personalized shortcuts.
 - **[Enterprise configuration](./cli/enterprise.md):** Professional environment
@@ -96,7 +96,7 @@ Deep technical documentation and API specifications.
   environment variables.
 - **[Keyboard shortcuts](./reference/keyboard-shortcuts.md):** Productivity
   tips.
-- **[Memory import processor](./reference/memport.md):** How Gemini CLI
+- **[Memory import processor](./reference/memport.md):** How Sparkle CLI
   processes memory from various sources.
 - **[Policy engine](./reference/policy-engine.md):** Fine-grained execution
   control.
@@ -114,11 +114,12 @@ Support, release history, and legal information.
   terms.
 - **[Troubleshooting](./resources/troubleshooting.md):** Common issues and
   solutions.
-- **[Uninstall](./resources/uninstall.md):** How to uninstall Gemini CLI.
+- **[Uninstall](./resources/uninstall.md):** How to uninstall Sparkle CLI.
 
 ## Development
 
-- **[Contribution guide](/docs/contributing):** How to contribute to Gemini CLI.
+- **[Contribution guide](/docs/contributing):** How to contribute to Sparkle
+  CLI.
 - **[Integration testing](./integration-tests.md):** Running integration tests.
 - **[Issue and PR automation](./issue-and-pr-automation.md):** Automation for
   issues and pull requests.

@@ -1,13 +1,13 @@
-# Gemini CLI extensions
+# Sparkle CLI extensions
 
-Gemini CLI extensions package prompts, MCP servers, custom commands, themes,
+Sparkle CLI extensions package prompts, MCP servers, custom commands, themes,
 hooks, sub-agents, and agent skills into a familiar and user-friendly format.
-With extensions, you can expand the capabilities of Gemini CLI and share those
+With extensions, you can expand the capabilities of Sparkle CLI and share those
 capabilities with others. They are designed to be easily installable and
 shareable.
 
 To see what's possible, browse the
-[Gemini CLI extension gallery](https://geminicli.com/extensions/browse/).
+[Sparkle CLI extension gallery](https://geminicli.com/extensions/browse/).
 
 ## Choose your path
 
@@ -15,8 +15,8 @@ Choose the guide that best fits your needs.
 
 ### I want to use extensions
 
-Learn how to discover, install, and manage extensions to enhance your Gemini CLI
-experience.
+Learn how to discover, install, and manage extensions to enhance your Sparkle
+CLI experience.
 
 - **[Manage extensions](#manage-extensions):** List and verify your installed
   extensions.
@@ -42,11 +42,11 @@ and their status:
 /extensions list
 ```
 
-You can also manage extensions from your terminal using the `gemini extensions`
+You can also manage extensions from your terminal using the `sparkle extensions`
 command group:
 
 ```bash
-gemini extensions list
+sparkle extensions list
 ```
 
 ## Installation
@@ -54,7 +54,7 @@ gemini extensions list
 Install an extension by providing its GitHub repository URL. For example:
 
 ```bash
-gemini extensions install https://github.com/gemini-cli-extensions/workspace
+sparkle extensions install https://github.com/sparkle-cli-extensions/workspace
 ```
 
 For more advanced installation options, see the

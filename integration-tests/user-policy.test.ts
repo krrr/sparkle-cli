@@ -41,7 +41,7 @@ priority = 100
       `,
     );
 
-    // Run gemini with a prompt that triggers ls -F
+    // Run sparkle with a prompt that triggers ls -F
     // approvalMode: 'default' in headless mode will DENY if it hits ASK_USER
     const result = await rig.run({
       args: ['-p', 'Run ls -F', '--model', 'gemini-3.1-pro-preview'],
@@ -69,7 +69,7 @@ priority = 100
 
     // DO NOT create the policy file here
 
-    // Run gemini with a prompt that triggers ls -F
+    // Run sparkle with a prompt that triggers ls -F
     const result = await rig.run({
       args: ['-p', 'Run ls -F', '--model', 'gemini-3.1-pro-preview'],
       approvalMode: 'default',

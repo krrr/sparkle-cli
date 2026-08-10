@@ -169,7 +169,7 @@ export function AuthDialog({
         </Box>
         <Box marginTop={1}>
           <Text color={theme.text.primary}>
-            Terms of Services and Privacy Notice for Gemini CLI
+            Terms of Services and Privacy Notice for Sparkle CLI
           </Text>
         </Box>
         <Box marginTop={1}>
