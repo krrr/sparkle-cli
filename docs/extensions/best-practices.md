@@ -44,9 +44,9 @@ gemini extensions link .
 Changes to your code are immediately available in the CLI after you rebuild the
 project and restart the session.
 
-### Use `GEMINI.md` effectively
+### Use `AGENTS.md` effectively
 
-Your `GEMINI.md` file provides essential context to the model.
+Your `AGENTS.md` file provides essential context to the model.
 
 - **Focus on goals:** Explain the high-level purpose of the extension and how to
   interact with its tools.

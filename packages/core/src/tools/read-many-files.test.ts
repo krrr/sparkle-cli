@@ -916,7 +916,7 @@ Content of file[1]
     it('should discover JIT context sequentially to avoid duplicate shared parent context', async () => {
       const { discoverJitContext } = await import('./jit-context.js');
 
-      // Simulate two subdirectories sharing a parent GEMINI.md.
+      // Simulate two subdirectories sharing a parent AGENTS.md.
       // Sequential execution means the second call sees the parent already
       // loaded, so it only returns its own leaf context.
       const callOrder: string[] = [];

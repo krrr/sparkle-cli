@@ -35,7 +35,7 @@ These commands are available within the interactive REPL.
 | `/agents reload`     | Reload the agent registry                       |
 | `/commands list`     | List available custom slash commands            |
 | `/commands reload`   | Reload custom slash commands                    |
-| `/memory reload`     | Reload context files (for example, `GEMINI.md`) |
+| `/memory reload`     | Reload context files (for example, `AGENTS.md`) |
 | `/mcp reload`        | Restart and reload MCP servers                  |
 | `/extensions reload` | Reload all active extensions                    |
 | `/help`              | Show help for all commands                      |

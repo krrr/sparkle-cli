@@ -295,7 +295,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     const memory = 'This is custom user memory.\nBe extra polite.';
     const prompt = getCoreSystemPrompt(mockConfig, memory);
 
-    expect(prompt).toContain('# Contextual Instructions (GEMINI.md)');
+    expect(prompt).toContain('# Contextual Instructions (AGENTS.md)');
     expect(prompt).toContain('<loaded_context>');
     expect(prompt).toContain(memory);
     expect(prompt).toContain('You are Gemini CLI, an interactive CLI agent'); // Ensure base prompt follows

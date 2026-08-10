@@ -98,11 +98,11 @@ describe('SkillExtractionAgent', () => {
     expect(prompt).toContain(
       'the target MUST be exactly the single global personal memory',
     );
-    expect(prompt).toContain('~/.gemini/GEMINI.md');
+    expect(prompt).toContain('~/.gemini/AGENTS.md');
     expect(prompt).not.toContain('memory.md');
     expect(prompt).not.toContain('and siblings');
     expect(prompt).toContain(
-      'Project/workspace shared instructions (GEMINI.md and similar files',
+      'Project/workspace shared instructions (AGENTS.md and similar files',
     );
     expect(prompt).toContain('MEMORY PATCH FORMAT (STRICT)');
     expect(prompt).toContain('--- /dev/null');

@@ -21,11 +21,11 @@
  *   3. Seed `MEMORY.md` and TWO canonical inbox patches:
  *        - .inbox/private/extraction.patch  (multi-hunk: update MEMORY.md
  *          + create verify-workflow.md + add MEMORY.md pointer to it)
- *        - .inbox/global/extraction.patch   (creates ~/.gemini/GEMINI.md)
+ *        - .inbox/global/extraction.patch   (creates ~/.gemini/AGENTS.md)
  *   4. Print a verification checklist + the launch command.
  *
  * To clean up later, delete `<projectMemoryDir>/.inbox/` and the seeded
- * MEMORY.md / GEMINI.md files.
+ * MEMORY.md / AGENTS.md files.
  */
 
 import * as fs from 'node:fs/promises';
@@ -56,7 +56,7 @@ const memoryDir = storage.getProjectMemoryTempDir();
 const inboxPrivate = path.join(memoryDir, '.inbox', 'private');
 const inboxGlobal = path.join(memoryDir, '.inbox', 'global');
 const homeDir = os.homedir();
-const globalGeminiMd = path.join(homeDir, '.gemini', 'GEMINI.md');
+const globalGeminiMd = path.join(homeDir, '.gemini', 'AGENTS.md');
 
 console.log(`\n🔧 Seeding inbox for cwd: ${cwd}`);
 console.log(`   memoryDir = ${memoryDir}\n`);
@@ -112,7 +112,7 @@ await seed(
 );
 
 // --- 3. Canonical GLOBAL extraction.patch ---
-//     Creates ~/.gemini/GEMINI.md. Backs up any existing one first.
+//     Creates ~/.gemini/AGENTS.md. Backs up any existing one first.
 let existingGlobalGemini = null;
 try {
   existingGlobalGemini = await fs.readFile(globalGeminiMd, 'utf-8');
@@ -139,7 +139,7 @@ await seed(
     `+- Prefer concise architecture summaries.`,
     ``,
   ].join('\n'),
-  'canonical GLOBAL extraction.patch (creates ~/.gemini/GEMINI.md)',
+  'canonical GLOBAL extraction.patch (creates ~/.gemini/AGENTS.md)',
 );
 
 // --- Summary ---
@@ -206,7 +206,7 @@ console.log(`
    │                  │          │ MEMORY.md updated; verify-workflow.md │
    │                  │          │ created.                              │
    │ Global memory    │ Apply    │ "Applied all 1 global memory patch."  │
-   │                  │          │ ~/.gemini/GEMINI.md created.          │
+   │                  │          │ ~/.gemini/AGENTS.md created.          │
    └──────────────────┴──────────┴───────────────────────────────────────┘
 
 7. Verify final state on disk:

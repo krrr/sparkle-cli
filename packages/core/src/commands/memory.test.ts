@@ -127,7 +127,7 @@ describe('memory commands', () => {
 
   describe('listMemoryFiles', () => {
     it('should list the memory files in use', () => {
-      const filePaths = ['/path/to/GEMINI.md', '/other/path/GEMINI.md'];
+      const filePaths = ['/path/to/AGENTS.md', '/other/path/AGENTS.md'];
       vi.mocked(mockConfig.getGeminiMdFilePaths).mockReturnValue(filePaths);
 
       const result = listMemoryFiles(mockConfig);
@@ -136,7 +136,7 @@ describe('memory commands', () => {
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
         expect(result.content).toContain(
-          'There are 2 GEMINI.md file(s) in use:',
+          'There are 2 AGENTS.md file(s) in use:',
         );
         expect(result.content).toContain(filePaths.join('\n'));
       }
@@ -150,7 +150,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toBe('No GEMINI.md files in use.');
+        expect(result.content).toBe('No AGENTS.md files in use.');
       }
     });
 
@@ -164,7 +164,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toBe('No GEMINI.md files in use.');
+        expect(result.content).toBe('No AGENTS.md files in use.');
       }
     });
   });
@@ -404,7 +404,7 @@ describe('memory commands', () => {
       await fs.mkdir(patchDir, { recursive: true });
       await fs.writeFile(
         path.join(patchDir, 'escape.patch'),
-        buildCreationPatch(path.join(projectRoot, 'GEMINI.md'), 'Hi.\n'),
+        buildCreationPatch(path.join(projectRoot, 'AGENTS.md'), 'Hi.\n'),
       );
 
       const patches = await listInboxMemoryPatches(patchConfig);
@@ -464,7 +464,7 @@ describe('memory commands', () => {
     });
 
     it('omits global patches with disallowed targets from the listing', async () => {
-      // Same defense for the global tier: only ~/.gemini/GEMINI.md is allowed.
+      // Same defense for the global tier: only ~/.gemini/AGENTS.md is allowed.
       // memory.md (legacy lowercase), sibling .md files, and settings.json all
       // get filtered out of the listing instead of confusing the user.
       const patchDir = path.join(memoryTempDir, '.inbox', 'global');
@@ -490,7 +490,7 @@ describe('memory commands', () => {
       await fs.writeFile(
         path.join(patchDir, 'nested.patch'),
         buildCreationPatch(
-          path.join(globalMemoryDir, 'GEMINI.md', 'nested.md'),
+          path.join(globalMemoryDir, 'AGENTS.md', 'nested.md'),
           'rejected\n',
         ),
       );
@@ -699,22 +699,22 @@ describe('memory commands', () => {
       );
     });
 
-    it('applies a global creation patch to ~/.gemini/GEMINI.md', async () => {
-      const target = path.join(globalMemoryDir, 'GEMINI.md');
+    it('applies a global creation patch to ~/.gemini/AGENTS.md', async () => {
+      const target = path.join(globalMemoryDir, 'AGENTS.md');
       // Sanity check: target does not exist before apply.
       await expect(fs.access(target)).rejects.toThrow();
 
       const patchDir = path.join(memoryTempDir, '.inbox', 'global');
       await fs.mkdir(patchDir, { recursive: true });
       await fs.writeFile(
-        path.join(patchDir, 'GEMINI.patch'),
+        path.join(patchDir, 'AGENTS.patch'),
         buildCreationPatch(target, '# Personal preferences\n- prefer X\n'),
       );
 
       const result = await applyInboxMemoryPatch(
         patchConfig,
         'global',
-        'GEMINI.patch',
+        'AGENTS.patch',
       );
 
       expect(result.success).toBe(true);
@@ -722,44 +722,44 @@ describe('memory commands', () => {
         '# Personal preferences\n- prefer X\n',
       );
       await expect(
-        fs.access(path.join(patchDir, 'GEMINI.patch')),
+        fs.access(path.join(patchDir, 'AGENTS.patch')),
       ).rejects.toThrow();
     });
 
-    it('applies a global update patch to ~/.gemini/GEMINI.md', async () => {
-      const target = path.join(globalMemoryDir, 'GEMINI.md');
+    it('applies a global update patch to ~/.gemini/AGENTS.md', async () => {
+      const target = path.join(globalMemoryDir, 'AGENTS.md');
       await fs.writeFile(target, '- prefer X\n');
 
       const patchDir = path.join(memoryTempDir, '.inbox', 'global');
       await fs.mkdir(patchDir, { recursive: true });
       await fs.writeFile(
-        path.join(patchDir, 'GEMINI.patch'),
+        path.join(patchDir, 'AGENTS.patch'),
         buildUpdatePatch(target, '- prefer X\n', '- prefer Y\n'),
       );
 
       const result = await applyInboxMemoryPatch(
         patchConfig,
         'global',
-        'GEMINI.patch',
+        'AGENTS.patch',
       );
 
       expect(result.success).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe('- prefer Y\n');
       await expect(
-        fs.access(path.join(patchDir, 'GEMINI.patch')),
+        fs.access(path.join(patchDir, 'AGENTS.patch')),
       ).rejects.toThrow();
     });
 
     it.runIf(isCaseInsensitivePathPlatform)(
       'accepts global memory patch targets with different path casing',
       async () => {
-        const target = path.join(globalMemoryDir, 'GEMINI.md');
+        const target = path.join(globalMemoryDir, 'AGENTS.md');
         await fs.writeFile(target, '- prefer X\n');
 
         const patchDir = path.join(memoryTempDir, '.inbox', 'global');
         await fs.mkdir(patchDir, { recursive: true });
         await fs.writeFile(
-          path.join(patchDir, 'GEMINI.patch'),
+          path.join(patchDir, 'AGENTS.patch'),
           buildUpdatePatch(
             swapAsciiPathCase(target),
             '- prefer X\n',
@@ -773,7 +773,7 @@ describe('memory commands', () => {
         const result = await applyInboxMemoryPatch(
           patchConfig,
           'global',
-          'GEMINI.patch',
+          'AGENTS.patch',
         );
 
         expect(result.success).toBe(true);
@@ -787,9 +787,9 @@ describe('memory commands', () => {
       const patchDir = path.join(memoryTempDir, '.inbox', 'global');
       await fs.mkdir(patchDir, { recursive: true });
       await fs.writeFile(
-        path.join(patchDir, 'GEMINI.patch'),
+        path.join(patchDir, 'AGENTS.patch'),
         buildCreationPatch(
-          path.join(globalMemoryDir, 'GEMINI.md'),
+          path.join(globalMemoryDir, 'AGENTS.md'),
           'Prefer concise.\n',
         ),
       );
@@ -797,12 +797,12 @@ describe('memory commands', () => {
       const result = await dismissInboxMemoryPatch(
         patchConfig,
         'global',
-        'GEMINI.patch',
+        'AGENTS.patch',
       );
 
       expect(result.success).toBe(true);
       await expect(
-        fs.access(path.join(patchDir, 'GEMINI.patch')),
+        fs.access(path.join(patchDir, 'AGENTS.patch')),
       ).rejects.toThrow();
     });
 
@@ -910,7 +910,7 @@ describe('memory commands', () => {
       await expect(fs.access(path.join(patchDir, 'b.patch'))).rejects.toThrow();
     });
 
-    it('rejects global patches that target anything other than ~/.gemini/GEMINI.md', async () => {
+    it('rejects global patches that target anything other than ~/.gemini/AGENTS.md', async () => {
       const patchDir = path.join(memoryTempDir, '.inbox', 'global');
       await fs.mkdir(patchDir, { recursive: true });
 
@@ -945,7 +945,7 @@ describe('memory commands', () => {
       await fs.writeFile(
         path.join(patchDir, 'nested.patch'),
         buildCreationPatch(
-          path.join(globalMemoryDir, 'GEMINI.md', 'nested.md'),
+          path.join(globalMemoryDir, 'AGENTS.md', 'nested.md'),
           'Should be rejected.\n',
         ),
       );
@@ -972,7 +972,7 @@ describe('memory commands', () => {
         ).rejects.toThrow();
       }
       await expect(
-        fs.access(path.join(globalMemoryDir, 'GEMINI.md', 'nested.md')),
+        fs.access(path.join(globalMemoryDir, 'AGENTS.md', 'nested.md')),
       ).rejects.toThrow();
     });
 

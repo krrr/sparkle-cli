@@ -11,8 +11,8 @@ import type { Config } from '@google/gemini-cli-core';
 
 describe('Tips', () => {
   it.each([
-    { fileCount: 0, description: 'renders all tips including GEMINI.md tip' },
-    { fileCount: 5, description: 'renders fewer tips when GEMINI.md exists' },
+    { fileCount: 0, description: 'renders all tips including AGENTS.md tip' },
+    { fileCount: 5, description: 'renders fewer tips when AGENTS.md exists' },
   ])('$description', async ({ fileCount }) => {
     const config = {
       getGeminiMdFileCount: vi.fn().mockReturnValue(fileCount),

@@ -5,7 +5,7 @@ exports[`consent > maybeRequestConsentOrFail > consent string generation > shoul
 This extension will run the following MCP servers:
   * server1 (local): npm start
   * server2 (remote): https://remote.com
-This extension will append info to your gemini.md context using my-context.md
+This extension will append info to your context file using my-context.md
 This extension will exclude the following core tools: tool1,tool2
 
 The extension you are about to install may have been created by a third-party developer and sourced
@@ -38,7 +38,7 @@ exports[`consent > maybeRequestConsentOrFail > consent string generation > shoul
 This extension will run the following MCP servers:
   * server1 (local): npm start
   * server2 (remote): https://remote.com
-This extension will append info to your gemini.md context using my-context.md
+This extension will append info to your context file using my-context.md
 This extension will exclude the following core tools: tool1,tool2
 
 Agent Skills:

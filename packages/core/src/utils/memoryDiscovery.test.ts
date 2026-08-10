@@ -98,7 +98,7 @@ describe('memoryDiscovery', () => {
     });
   });
 
-  describe('EISDIR handling for GEMINI.md as a directory', () => {
+  describe('EISDIR handling for AGENTS.md as a directory', () => {
     it('readGeminiMdFiles returns null content (without throwing) when path is a directory', async () => {
       const dirAsFilePath = await createEmptyDir(
         path.join(projectRoot, DEFAULT_CONTEXT_FILENAME),
@@ -166,7 +166,7 @@ describe('memoryDiscovery', () => {
       );
     });
 
-    it('should fall back to legacy GEMINI.md when MEMORY.md is absent', async () => {
+    it('should fall back to legacy AGENTS.md when MEMORY.md is absent', async () => {
       const memoryDir = await createEmptyDir(path.join(testRootDir, 'memdir3'));
       const legacyFile = await createTestFile(
         path.join(memoryDir, DEFAULT_CONTEXT_FILENAME),
@@ -178,7 +178,7 @@ describe('memoryDiscovery', () => {
       expect(result).toContain(legacyFile);
     });
 
-    it('should return empty array when neither MEMORY.md nor GEMINI.md exists', async () => {
+    it('should return empty array when neither MEMORY.md nor AGENTS.md exists', async () => {
       const memoryDir = await createEmptyDir(path.join(testRootDir, 'memdir4'));
 
       const result = await getUserProjectMemoryPaths(memoryDir);
@@ -190,7 +190,7 @@ describe('memoryDiscovery', () => {
   describe('getExtensionMemoryPaths', () => {
     it('should return active extension context files', async () => {
       const extFile = await createTestFile(
-        path.join(testRootDir, 'ext', 'GEMINI.md'),
+        path.join(testRootDir, 'ext', 'AGENTS.md'),
         'Extension content',
       );
       const loader = new SimpleExtensionLoader([
@@ -208,7 +208,7 @@ describe('memoryDiscovery', () => {
 
     it('should ignore inactive extensions', async () => {
       const extFile = await createTestFile(
-        path.join(testRootDir, 'ext', 'GEMINI.md'),
+        path.join(testRootDir, 'ext', 'AGENTS.md'),
         'Extension content',
       );
       const loader = new SimpleExtensionLoader([
@@ -269,11 +269,11 @@ describe('memoryDiscovery', () => {
       );
 
       // No .git, so ceiling falls back to the trusted root itself.
-      // notesDir has no GEMINI.md and won't traverse up to docsDir.
+      // notesDir has no AGENTS.md and won't traverse up to docsDir.
       const resultNotes = await getEnvironmentMemoryPaths([notesDir]);
       expect(resultNotes).toHaveLength(0);
 
-      // docsDir has a GEMINI.md at the trusted root itself, so it's found.
+      // docsDir has a AGENTS.md at the trusted root itself, so it's found.
       const resultDocs = await getEnvironmentMemoryPaths([docsDir]);
       expect(resultDocs).toHaveLength(1);
       expect(resultDocs[0]).toBe(docsFile);
@@ -310,7 +310,7 @@ describe('memoryDiscovery', () => {
             const normalizedPath = String(filePath).replace(/\\/g, '/');
             return {
               dev: 1,
-              ino: normalizedPath.endsWith('/GEMINI.md') ? 101 : 202,
+              ino: normalizedPath.endsWith('/AGENTS.md') ? 101 : 202,
             };
           }),
         };
@@ -321,7 +321,7 @@ describe('memoryDiscovery', () => {
         const memoryTool = await import('../tools/memoryTool.js');
         const memoryDiscovery = await import('./memoryDiscovery.js');
         vi.mocked(paths.homedir).mockReturnValue('/home/tester');
-        memoryTool.setGeminiMdFilename(['GEMINI.md', 'gemini.md']);
+        memoryTool.setGeminiMdFilename(['AGENTS.md', 'agents.md']);
 
         const result = await memoryDiscovery.getEnvironmentMemoryPaths(
           ['/case-root'],
@@ -329,8 +329,8 @@ describe('memoryDiscovery', () => {
         );
 
         expect(result).toEqual([
-          paths.toAbsolutePath('/case-root/GEMINI.md'),
-          paths.toAbsolutePath('/case-root/gemini.md'),
+          paths.toAbsolutePath('/case-root/AGENTS.md'),
+          paths.toAbsolutePath('/case-root/agents.md'),
         ]);
       } finally {
         platformSpy.mockRestore();
@@ -399,12 +399,12 @@ describe('memoryDiscovery', () => {
   describe('file identity deduplication', () => {
     it('should deduplicate files that point to the same inode (same physical file)', async () => {
       const geminiFile = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'agents.md'),
         'Project root memory',
       );
 
       // create hard link to simulate case-insensitive filesystem behavior
-      const geminiFileLink = path.join(projectRoot, 'GEMINI.md');
+      const geminiFileLink = path.join(projectRoot, 'AGENTS.md');
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
@@ -444,11 +444,11 @@ describe('memoryDiscovery', () => {
 
     it('should handle case where files have different inodes (different files)', async () => {
       const geminiFileLower = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'agents.md'),
         'Lowercase file content',
       );
       const geminiFileUpper = await createTestFile(
-        path.join(projectRoot, 'GEMINI.md'),
+        path.join(projectRoot, 'AGENTS.md'),
         'Uppercase file content',
       );
 
@@ -469,7 +469,7 @@ describe('memoryDiscovery', () => {
 
     it("should handle files that cannot be stat'd (missing files)", async () => {
       const geminiFile = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'agents.md'),
         'Valid file content',
       );
       const missingFile = path.join(projectRoot, 'missing.md');
@@ -485,12 +485,12 @@ describe('memoryDiscovery', () => {
 
     it('should deduplicate multiple paths pointing to same file (3+ duplicates)', async () => {
       const geminiFile = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'agents.md'),
         'Project root memory',
       );
 
-      const link1 = path.join(projectRoot, 'GEMINI.md');
-      const link2 = path.join(projectRoot, 'Gemini.md');
+      const link1 = path.join(projectRoot, 'AGENTS.md');
+      const link2 = path.join(projectRoot, 'Agents.md');
 
       try {
         await fsPromises.link(geminiFile, link1);
@@ -619,11 +619,11 @@ describe('memoryDiscovery', () => {
       const targetFile = path.join(subDir, 'target.txt');
 
       const geminiFile = await createTestFile(
-        path.join(subDir, 'gemini.md'),
+        path.join(subDir, 'agents.md'),
         'JIT memory content',
       );
 
-      const geminiFileLink = path.join(subDir, 'GEMINI.md');
+      const geminiFileLink = path.join(subDir, 'AGENTS.md');
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
@@ -643,7 +643,7 @@ describe('memoryDiscovery', () => {
       const stats2 = await fsPromises.lstat(geminiFileLink);
       expect(stats1.ino).toBe(stats2.ino);
 
-      setGeminiMdFilename(['gemini.md', 'GEMINI.md']);
+      setGeminiMdFilename(['agents.md', 'AGENTS.md']);
 
       const result = await loadJitSubdirectoryMemory(
         targetFile,
@@ -716,7 +716,7 @@ describe('memoryDiscovery', () => {
         new Set(),
       );
 
-      // Should find the GEMINI.md in the same directory as the file
+      // Should find the AGENTS.md in the same directory as the file
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
       expect(result.files[0].content).toBe('Src context rules');
@@ -767,7 +767,7 @@ describe('memoryDiscovery', () => {
         new Set(),
       );
 
-      // subDir is within the trusted root, so its GEMINI.md is found
+      // subDir is within the trusted root, so its AGENTS.md is found
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
       expect(result.files[0].content).toBe('Content without git');

@@ -250,8 +250,7 @@ export function ExtensionDetails({
       {extension.hasContext && (
         <Box flexDirection="column" marginBottom={1}>
           <Text color={theme.text.primary}>
-            This extension will append info to your gemini.md context using
-            gemini.md
+            This extension will append info to your AGENTS.md context file
           </Text>
         </Box>
       )}

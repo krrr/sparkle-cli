@@ -271,7 +271,7 @@ describe('extension tests', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should load context file path when GEMINI.md is present', async () => {
+    it('should load context file path when AGENTS.md is present', async () => {
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'ext1',
@@ -290,7 +290,7 @@ describe('extension tests', () => {
       const ext1 = extensions.find((e) => e.name === 'ext1');
       const ext2 = extensions.find((e) => e.name === 'ext2');
       expect(ext1?.contextFiles).toEqual([
-        path.join(userExtensionsDir, 'ext1', 'GEMINI.md'),
+        path.join(userExtensionsDir, 'ext1', 'AGENTS.md'),
       ]);
       expect(ext2?.contextFiles).toEqual([]);
     });
