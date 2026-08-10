@@ -20,12 +20,11 @@ import type {
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
 import type { A2AClientManager } from './a2a-client-manager.js';
+import { ThinkingLevel } from '@google/genai';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
-  DEFAULT_THINKING_MODE,
 } from '../config/models.js';
 import * as tomlLoader from './agentLoader.js';
 import { SimpleExtensionLoader } from '../utils/extensionLoader.js';
@@ -145,26 +144,7 @@ describe('AgentRegistry', () => {
       );
     });
 
-    it('should use default model for codebase investigator for non-preview models', async () => {
-      const previewConfig = makeMockedConfig({ model: DEFAULT_GEMINI_MODEL });
-      const previewRegistry = new TestableAgentRegistry(previewConfig);
-
-      await previewRegistry.initialize();
-
-      const investigatorDef = previewRegistry.getDefinition(
-        'codebase_investigator',
-      ) as LocalAgentDefinition;
-      expect(investigatorDef).toBeDefined();
-      expect(investigatorDef?.modelConfig.model).toBe(DEFAULT_GEMINI_MODEL);
-      expect(
-        investigatorDef?.modelConfig.generateContentConfig?.thinkingConfig,
-      ).toStrictEqual({
-        includeThoughts: true,
-        thinkingBudget: DEFAULT_THINKING_MODE,
-      });
-    });
-
-    it('should use the default flash model for codebase investigator if main model is modern', async () => {
+    it('should use the default flash model for codebase investigator', async () => {
       const previewConfig = makeMockedConfig({ model: 'gemini-3-pro-preview' });
       const previewRegistry = new TestableAgentRegistry(previewConfig);
 
@@ -181,23 +161,8 @@ describe('AgentRegistry', () => {
         investigatorDef?.modelConfig.generateContentConfig?.thinkingConfig,
       ).toStrictEqual({
         includeThoughts: true,
-        thinkingBudget: DEFAULT_THINKING_MODE,
+        thinkingLevel: ThinkingLevel.HIGH,
       });
-    });
-
-    it('should use the default pro model for codebase investigator if main model is not modern', async () => {
-      const previewConfig = makeMockedConfig({
-        model: GEMINI_MODEL_ALIAS_AUTO,
-      });
-      const previewRegistry = new TestableAgentRegistry(previewConfig);
-
-      await previewRegistry.initialize();
-
-      const investigatorDef = previewRegistry.getDefinition(
-        'codebase_investigator',
-      ) as LocalAgentDefinition;
-      expect(investigatorDef).toBeDefined();
-      expect(investigatorDef?.modelConfig.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
     it('should use the model from the investigator settings', async () => {

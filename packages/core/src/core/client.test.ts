@@ -369,8 +369,8 @@ describe('Gemini Client (client.ts)', () => {
         parts: [{ text: 'some old message' }],
       });
       const historyWithOldMessage = client.getHistory();
-      expect(historyWithOldMessage.length).toBeGreaterThan(
-        initialHistory.length,
+      expect(JSON.stringify(historyWithOldMessage)).toContain(
+        'some old message',
       );
 
       // 2. Call resetChat.
@@ -414,16 +414,17 @@ describe('Gemini Client (client.ts)', () => {
       const chat = await client.startChat(extraHistory);
       const history = chat.getHistory();
 
-      // The first message should be the environment context
+      // The first message should be the environment context, coalesced with
+      // the consecutive user turn that follows it.
       expect(history[0].role).toBe('user');
       expect(history[0].parts?.[0]?.text).toContain('This is the Gemini CLI');
       expect(history[0].parts?.[0]?.text).toContain(
         "The project's temporary directory is:",
       );
+      expect(history[0].parts).toContainEqual({ text: 'Old message' });
 
       // The subsequent messages should be the extra history
-      expect(history[1]).toEqual(extraHistory[0]);
-      expect(history[2]).toEqual(extraHistory[1]);
+      expect(history[1]).toEqual(extraHistory[1]);
     });
   });
 

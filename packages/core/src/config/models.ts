@@ -205,42 +205,6 @@ export function isProModel(
 }
 
 /**
- * Checks if the model is a Gemini 3 model.
- *
- * @param model The model name to check.
- * @param config Optional config object for dynamic model configuration.
- * @returns True if the model is a Gemini 3 model.
- */
-export function isGemini3Model(
-  model: string,
-  config?: ModelCapabilityContext,
-): boolean {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
-    // Legacy behavior resolves the model first.
-    const resolved = resolveModel(model, config);
-    return (
-      config.modelConfigService.getModelDefinition(resolved)?.family ===
-      'gemini-3'
-    );
-  }
-
-  const resolved = resolveModel(model);
-  return /^gemini-3(\.|-|$)/.test(resolved);
-}
-
-/**
- * Checks if the model is a Gemini 2.x model.
- *
- * @param model The model name to check.
- * @returns True if the model is a Gemini-2.x model.
- */
-export function isGemini2Model(model: string): boolean {
-  // This is legacy behavior, will remove this when gemini 2 models are no
-  // longer needed.
-  return /^gemini-2(\.|$)/.test(model);
-}
-
-/**
  * Checks if the model is a "custom" model (not Gemini branded).
  *
  * @param model The model name to check.
@@ -264,14 +228,14 @@ export function isCustomModel(
 
 /**
  * Checks if the model should be treated as a modern model.
- * This includes Gemini 3 models and any custom models.
+ * All Gemini models are treated as Gemini 3, and custom models are also
+ * treated as modern.
  *
  * @param model The model name to check.
  * @returns True if the model supports modern features like thoughts.
  */
-export function supportsModernFeatures(model: string): boolean {
-  if (isGemini3Model(model)) return true;
-  return isCustomModel(model);
+export function supportsModernFeatures(_model: string): boolean {
+  return true;
 }
 
 /**
@@ -308,7 +272,7 @@ export function supportsMultimodalFunctionResponse(
         ?.multimodalToolUse === true
     );
   }
-  return model.startsWith('gemini-3-');
+  return model.startsWith('gemini-');
 }
 
 /**

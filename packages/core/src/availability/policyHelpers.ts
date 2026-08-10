@@ -25,7 +25,7 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   isAutoModel,
-  isGemini3Model,
+  isCustomModel,
   resolveModel,
 } from '../config/models.js';
 import { normalizeModelId } from '../utils/modelUtils.js';
@@ -53,7 +53,8 @@ export function resolvePolicyChain(
   let chain: ModelPolicyChain | undefined;
 
   // Capture the original family intent before any normalization or early downgrade.
-  const isOriginallyGemini3 = isGemini3Model(modelFromConfig, config);
+  // All Gemini models are treated as Gemini 3.
+  const isOriginallyGemini3 = !isCustomModel(modelFromConfig, config);
 
   const resolvedModel = normalizeModelId(resolveModel(modelFromConfig, config));
   const isAutoPreferred = normalizedPreferredModel

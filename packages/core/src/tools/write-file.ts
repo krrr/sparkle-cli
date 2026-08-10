@@ -55,12 +55,6 @@ import { WRITE_FILE_DEFINITION } from './definitions/coreTools.js';
 import { resolveToolDeclaration } from './definitions/resolver.js';
 import { detectOmissionPlaceholders } from './omissionPlaceholderDetector.js';
 import { resolveAndValidatePlanPath } from '../utils/planUtils.js';
-import {
-  isGemini3Model,
-  isGemini2Model,
-  isCustomModel,
-  resolveModel,
-} from '../config/models.js';
 import { discoverJitContext, appendJitContext } from './jit-context.js';
 
 /**
@@ -204,20 +198,14 @@ export async function getCorrectedFileContent(
   );
 
   if (!isJsonOrIpynb) {
-    const activeModel = config.getActiveModel();
-    const resolvedModel = resolveModel(activeModel, config);
-
-    const aggressiveUnescape =
-      !isGemini3Model(resolvedModel, config) &&
-      !isGemini2Model(resolvedModel) &&
-      !isCustomModel(resolvedModel, config);
-
+    // All models are treated as Gemini 3, which never uses aggressive
+    // unescaping.
     correctedContent = await ensureCorrectFileContent(
       proposedContent,
       config.getBaseLlmClient(),
       abortSignal,
       config.getDisableLLMCorrection(),
-      aggressiveUnescape,
+      false,
     );
   }
 

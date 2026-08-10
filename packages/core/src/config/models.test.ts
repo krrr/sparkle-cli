@@ -8,8 +8,6 @@ import { describe, it, expect } from 'vitest';
 import {
   resolveModel,
   resolveClassifierModel,
-  isGemini3Model,
-  isGemini2Model,
   isCustomModel,
   supportsModernFeatures,
   isAutoModel,
@@ -90,14 +88,6 @@ describe('Dynamic Configuration Parity', () => {
     }
   });
 
-  it('isGemini3Model should match legacy behavior', () => {
-    for (const model of modelsToTest) {
-      const legacy = isGemini3Model(model, legacyConfig);
-      const dynamic = isGemini3Model(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
-  });
-
   it('isCustomModel should match legacy behavior', () => {
     for (const model of modelsToTest) {
       const legacy = isCustomModel(model, legacyConfig);
@@ -156,38 +146,13 @@ describe('isCustomModel', () => {
 });
 
 describe('supportsModernFeatures', () => {
-  it('should return true for Gemini 3 models', () => {
+  it('should return true for all models', () => {
     expect(supportsModernFeatures('gemini-3-pro-preview')).toBe(true);
     expect(supportsModernFeatures('gemini-3-flash-preview')).toBe(true);
-  });
-
-  it('should return true for custom models', () => {
     expect(supportsModernFeatures('testing')).toBe(true);
     expect(supportsModernFeatures('some-custom-model')).toBe(true);
-  });
-
-  it('should return false for older Gemini models', () => {
-    expect(supportsModernFeatures('gemini-2.5-pro')).toBe(false);
-    expect(supportsModernFeatures('gemini-2.5-flash')).toBe(false);
-    expect(supportsModernFeatures('gemini-2.0-flash')).toBe(false);
-    expect(supportsModernFeatures('gemini-1.5-pro')).toBe(false);
-    expect(supportsModernFeatures('gemini-1.0-pro')).toBe(false);
-  });
-
-  it('should return false for aliases that resolve to Gemini 2.5 models', () => {
-    expect(supportsModernFeatures(GEMINI_MODEL_ALIAS_PRO)).toBe(false);
-    expect(supportsModernFeatures(GEMINI_MODEL_ALIAS_AUTO)).toBe(false);
-  });
-});
-
-describe('isGemini3Model', () => {
-  it('should return true for gemini-3 models', () => {
-    expect(isGemini3Model('gemini-3-pro-preview')).toBe(true);
-    expect(isGemini3Model('gemini-3-flash-preview')).toBe(true);
-  });
-
-  it('should return false for arbitrary strings', () => {
-    expect(isGemini3Model('gpt-4')).toBe(false);
+    expect(supportsModernFeatures(GEMINI_MODEL_ALIAS_PRO)).toBe(true);
+    expect(supportsModernFeatures(GEMINI_MODEL_ALIAS_AUTO)).toBe(true);
   });
 });
 
@@ -213,11 +178,7 @@ describe('getDisplayString', () => {
 describe('supportsMultimodalFunctionResponse', () => {
   it('should return true for gemini-3 model', () => {
     expect(supportsMultimodalFunctionResponse('gemini-3-pro')).toBe(true);
-  });
-
-  it('should return false for gemini-2 models', () => {
-    expect(supportsMultimodalFunctionResponse('gemini-2.5-pro')).toBe(false);
-    expect(supportsMultimodalFunctionResponse('gemini-2.5-flash')).toBe(false);
+    expect(supportsMultimodalFunctionResponse('gemini-pro-latest')).toBe(true);
   });
 
   it('should return false for other models', () => {
@@ -284,32 +245,6 @@ describe('resolveModel', () => {
     expect(resolveModel(GEMINI_MODEL_ALIAS_FLASH_LITE, dynamicConfig)).toBe(
       DEFAULT_GEMINI_FLASH_LITE_MODEL,
     );
-  });
-});
-
-describe('isGemini2Model', () => {
-  it('should return true for gemini-2.5-pro', () => {
-    expect(isGemini2Model('gemini-2.5-pro')).toBe(true);
-  });
-
-  it('should return true for gemini-2.5-flash', () => {
-    expect(isGemini2Model('gemini-2.5-flash')).toBe(true);
-  });
-
-  it('should return true for gemini-2.0-flash', () => {
-    expect(isGemini2Model('gemini-2.0-flash')).toBe(true);
-  });
-
-  it('should return false for gemini-1.5-pro', () => {
-    expect(isGemini2Model('gemini-1.5-pro')).toBe(false);
-  });
-
-  it('should return false for gemini-3-pro', () => {
-    expect(isGemini2Model('gemini-3-pro')).toBe(false);
-  });
-
-  it('should return false for arbitrary strings', () => {
-    expect(isGemini2Model('gpt-4')).toBe(false);
   });
 });
 

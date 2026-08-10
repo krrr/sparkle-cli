@@ -78,7 +78,6 @@ import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   isAutoModel,
-  isGemini2Model,
   resolveModel,
 } from './models.js';
 import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
@@ -1239,11 +1238,9 @@ export class Config implements McpContext, AgentLoopContext {
     this.truncateToolOutputThreshold =
       params.truncateToolOutputThreshold ??
       DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD;
-    const isGemini2 = isGemini2Model(this.model);
-    this.useWriteTodos =
-      isGemini2 && !this.trackerEnabled
-        ? (params.useWriteTodos ?? true)
-        : false;
+    // Write-todos is only supported on Gemini 2 models; all models are treated
+    // as Gemini 3 now.
+    this.useWriteTodos = false;
     this.workspacePoliciesDir = params.workspacePoliciesDir;
     this.enableHooksUI = params.enableHooksUI ?? true;
     this.enableHooks = params.enableHooks ?? true;

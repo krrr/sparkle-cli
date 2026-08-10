@@ -61,7 +61,7 @@ describe('Fallback Integration', () => {
     );
   });
 
-  it('should NOT fallback when config is NOT in AUTO mode', () => {
+  it('should fallback even when config is NOT in AUTO mode (all Gemini models get the Gemini 3 chain)', () => {
     // 1. Config is explicitly set to Pro, not Auto
     vi.spyOn(config, 'getModel').mockReturnValue(DEFAULT_GEMINI_MODEL);
 
@@ -74,8 +74,22 @@ describe('Fallback Integration', () => {
     // 4. Apply model selection
     const result = applyModelSelection(config, { model: requestedModel });
 
-    // 5. Expect no fallback (single-model chain)
-    expect(result.model).toBe(DEFAULT_GEMINI_MODEL);
+    // 5. Expect fallback to Flash (single-model chain only applies to custom models)
+    expect(result.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+  });
+
+  it('should NOT fallback for a custom model', () => {
+    // 1. Config is explicitly set to a custom model
+    vi.spyOn(config, 'getModel').mockReturnValue('my-custom-model');
+
+    // 2. Simulate the custom model failing
+    availabilityService.markTerminal('my-custom-model', 'quota');
+
+    // 3. Request the custom model
+    const result = applyModelSelection(config, { model: 'my-custom-model' });
+
+    // 4. Expect no fallback (single-model chain)
+    expect(result.model).toBe('my-custom-model');
   });
 
   it('should fallback to Flash after failures and restore Pro on next turn', () => {

@@ -4094,23 +4094,15 @@ describe('GeminiChat', () => {
       }
 
       // Verify history expansion
-      // Turn 1: Tool response (cleaned)
-      // Turn 2: Model Ack (synthetic)
-      // Turn 3: User Binary data (current request)
-      expect(capturedContents).toHaveLength(3);
+      // The synthetic model acknowledgment is a thought-only turn, which is
+      // stripped for modern models, and the two consecutive user turns are
+      // coalesced into a single user turn.
+      expect(capturedContents).toHaveLength(1);
       expect(capturedContents[0].role).toBe('user');
       expect(capturedContents[0].parts![0].functionResponse!.response).toEqual({
         output: 'Success',
       });
-      expect(capturedContents[1].role).toBe('model');
-      expect(capturedContents[1].parts![0].text).toContain(
-        'Binary content received',
-      );
-      expect(capturedContents[1].parts![0].thoughtSignature).toBe(
-        SYNTHETIC_THOUGHT_SIGNATURE,
-      );
-      expect(capturedContents[2].role).toBe('user');
-      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
+      expect(capturedContents[0].parts![1].inlineData!.mimeType).toBe(
         'audio/mpeg',
       );
     });
@@ -4175,19 +4167,21 @@ describe('GeminiChat', () => {
       // Turn 1: Cleaned tool responses (both)
       // Turn 2: Model Ack
       // Turn 3: Both binary parts combined
-      expect(capturedContents).toHaveLength(3);
-      expect(capturedContents[0].parts).toHaveLength(2);
+      // The synthetic model acknowledgment is a thought-only turn, which is
+      // stripped for modern models, and the two consecutive user turns are
+      // coalesced into a single user turn.
+      expect(capturedContents).toHaveLength(1);
+      expect(capturedContents[0].parts).toHaveLength(4);
       expect(capturedContents[0].parts![0].functionResponse!.response).toEqual({
         output: 'Success 1',
       });
       expect(capturedContents[0].parts![1].functionResponse!.response).toEqual({
         output: 'Success 2',
       });
-      expect(capturedContents[2].parts).toHaveLength(2);
-      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
+      expect(capturedContents[0].parts![2].inlineData!.mimeType).toBe(
         'audio/mpeg',
       );
-      expect(capturedContents[2].parts![1].inlineData!.mimeType).toBe(
+      expect(capturedContents[0].parts![3].inlineData!.mimeType).toBe(
         'video/mp4',
       );
     });

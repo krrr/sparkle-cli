@@ -12,10 +12,7 @@ import {
 import type { RoutingContext } from '../routingStrategy.js';
 import type { Config } from '../../config/config.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
-import {
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
-} from '../../config/models.js';
+import { DEFAULT_GEMINI_FLASH_MODEL } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
 import type { ResolvedModelConfig } from '../../services/modelConfigService.js';
@@ -82,21 +79,8 @@ describe('NumericalClassifierStrategy', () => {
     expect(mockBaseLlmClient.generateJson).not.toHaveBeenCalled();
   });
 
-  it('should return null if the model is not a Gemini 3 model', async () => {
-    vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
-
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
-
-    expect(decision).toBeNull();
-    expect(mockBaseLlmClient.generateJson).not.toHaveBeenCalled();
-  });
-
-  it('should return null if the model is explicitly a Gemini 2 model', async () => {
-    vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
+  it('should return null if the model is a custom model', async () => {
+    vi.mocked(mockConfig.getModel).mockReturnValue('my-custom-model');
 
     const decision = await strategy.route(
       mockContext,

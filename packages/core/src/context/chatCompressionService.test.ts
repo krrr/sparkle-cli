@@ -24,6 +24,11 @@ import { tokenLimit } from '../core/tokenLimits.js';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
+import {
+  DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_GEMINI_MODEL,
+} from 'src/config/models.js';
 
 vi.mock('../telemetry/loggers.js');
 vi.mock('../utils/environmentContext.js');
@@ -117,13 +122,13 @@ describe('modelStringToModelConfigAlias', () => {
   });
 
   it('should handle valid names', () => {
-    expect(modelStringToModelConfigAlias('gemini-2.5-pro')).toBe(
+    expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_MODEL)).toBe(
       'chat-compression-pro',
     );
-    expect(modelStringToModelConfigAlias('gemini-2.5-flash')).toBe(
+    expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_FLASH_MODEL)).toBe(
       'chat-compression-flash',
     );
-    expect(modelStringToModelConfigAlias('gemini-2.5-flash-lite')).toBe(
+    expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_FLASH_LITE_MODEL)).toBe(
       'chat-compression-flash-lite',
     );
   });
@@ -134,7 +139,7 @@ describe('ChatCompressionService', () => {
   let mockChat: GeminiChat;
   let mockConfig: Config;
   let testTempDir: string;
-  const mockModel = 'gemini-2.5-pro';
+  const mockModel = 'gemini-pro-latest';
   const mockPromptId = 'test-prompt-id';
 
   beforeEach(() => {

@@ -8,7 +8,7 @@
  * Single source of truth for mapping model IDs to tool families.
  */
 
-import { isGemini3Model } from '../../config/models.js';
+import { isCustomModel } from '../../config/models.js';
 import { type ToolFamily } from './types.js';
 
 /**
@@ -23,8 +23,8 @@ export function getToolFamily(modelId?: string): ToolFamily {
     return 'default-legacy';
   }
 
-  // Explicit mapping for Gemini 3 family
-  if (isGemini3Model(modelId)) {
+  // All Gemini models are treated as the Gemini 3 family.
+  if (!isCustomModel(modelId)) {
     return 'gemini-3';
   }
 

@@ -78,9 +78,9 @@ describe('ClassifierStrategy', () => {
     expect(mockBaseLlmClient.generateJson).not.toHaveBeenCalled();
   });
 
-  it('should NOT return null if numerical routing is enabled but model is NOT Gemini 3', async () => {
+  it('should NOT return null if numerical routing is enabled but model is custom', async () => {
     vi.mocked(mockConfig.getNumericalRoutingEnabled).mockResolvedValue(true);
-    vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
+    vi.mocked(mockConfig.getModel).mockReturnValue('my-custom-model');
     vi.mocked(mockBaseLlmClient.generateJson).mockResolvedValue({
       reasoning: 'test',
       model_choice: 'flash',

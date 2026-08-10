@@ -104,7 +104,10 @@ describe('Core System Prompt Substitution', () => {
 
     expect(prompt).toContain('Agents:');
     expect(prompt).toContain('# Available Sub-Agents');
-    expect(prompt).toContain('- test-agent -> Test Agent Description');
+    expect(prompt).toContain('<name>test-agent</name>');
+    expect(prompt).toContain(
+      '<description>Test Agent Description</description>',
+    );
     expect(prompt).not.toContain('${SubAgents}');
   });
 

@@ -139,37 +139,6 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.unstubAllGlobals();
   });
 
-  it('should include available_skills when provided in config', () => {
-    const skills = [
-      {
-        name: 'test-skill',
-        description: 'A test skill description',
-        location: '/path/to/test-skill/SKILL.md',
-        body: 'Skill content',
-      },
-    ];
-    vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue(skills);
-    const prompt = getCoreSystemPrompt(mockConfig);
-
-    expect(prompt).toContain('# Available Agent Skills');
-    expect(prompt).toContain(
-      "To activate a skill and receive its detailed instructions, you can call the `activate_skill` tool with the skill's name.",
-    );
-    expect(prompt).toContain('Skill Guidance');
-    expect(prompt).toContain('<available_skills>');
-    expect(prompt).toContain('<skill>');
-    expect(prompt).toContain('<name>test-skill</name>');
-    expect(prompt).toContain(
-      '<description>A test skill description</description>',
-    );
-    expect(prompt).toContain(
-      '<location>/path/to/test-skill/SKILL.md</location>',
-    );
-    expect(prompt).toContain('</skill>');
-    expect(prompt).toContain('</available_skills>');
-    expect(prompt).toMatchSnapshot();
-  });
-
   it('should include available_skills with updated verbiage for preview models', () => {
     vi.mocked(mockConfig.getActiveModel).mockReturnValue(
       'gemini-3-pro-preview',
@@ -253,32 +222,6 @@ describe('Core System Prompt (prompts.ts)', () => {
     expect(prompt).not.toContain('<available_subagents>');
     expect(prompt).not.toContain('<subagent>');
     expect(prompt).not.toContain('<name>test-agent</name>');
-  });
-
-  it('should use legacy system prompt for non-preview model', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
-    const prompt = getCoreSystemPrompt(mockConfig);
-    expect(prompt).toContain(
-      'You are an interactive CLI agent specializing in software engineering tasks.',
-    );
-    expect(prompt).not.toContain('No sub-agents are currently available.');
-    expect(prompt).toContain('# Core Mandates');
-    expect(prompt).toContain('- **Conventions:**');
-    expect(prompt).toContain('- **User Hints:**');
-    expect(prompt).toContain('# Outside of Sandbox');
-    expect(prompt).toContain('# Final Reminder');
-    expect(prompt).toMatchSnapshot();
-  });
-
-  it('should include the TASK MANAGEMENT PROTOCOL in legacy prompt when task tracker is enabled', () => {
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
-    vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
-    const prompt = getCoreSystemPrompt(mockConfig);
-    expect(prompt).toContain('# TASK MANAGEMENT PROTOCOL');
-    expect(prompt).toContain(
-      '**PLAN MODE INTEGRATION**: If an approved plan exists, you MUST use the `tracker_create_task` tool',
-    );
-    expect(prompt).toMatchSnapshot();
   });
 
   it('should include the TASK MANAGEMENT PROTOCOL when task tracker is enabled', () => {
@@ -675,32 +618,6 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   describe('Platform-specific and Background Process instructions', () => {
-    it('should include Windows-specific shell efficiency commands on win32', () => {
-      mockPlatform('win32');
-      vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        DEFAULT_GEMINI_MODEL,
-      );
-      const prompt = getCoreSystemPrompt(mockConfig);
-      expect(prompt).toContain(
-        "using commands like 'type' or 'findstr' (on CMD) and 'Get-Content' or 'Select-String' (on PowerShell)",
-      );
-      expect(prompt).not.toContain(
-        "using commands like 'grep', 'tail', 'head'",
-      );
-    });
-
-    it('should include generic shell efficiency commands on non-Windows', () => {
-      mockPlatform('linux');
-      vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        DEFAULT_GEMINI_MODEL,
-      );
-      const prompt = getCoreSystemPrompt(mockConfig);
-      expect(prompt).toContain("using commands like 'grep', 'tail', 'head'");
-      expect(prompt).not.toContain(
-        "using commands like 'type' or 'findstr' (on CMD) and 'Get-Content' or 'Select-String' (on PowerShell)",
-      );
-    });
-
     it('should use is_background parameter in background process instructions', () => {
       const prompt = getCoreSystemPrompt(mockConfig);
       expect(prompt).toContain(
@@ -728,14 +645,6 @@ describe('Core System Prompt (prompts.ts)', () => {
       const prompt = getCoreSystemPrompt(mockConfig);
       expect(prompt).not.toContain('`tab`');
     });
-  });
-
-  it('should include approved plan instructions when approvedPlanPath is set', () => {
-    const planPath = '/path/to/approved/plan.md';
-    vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(planPath);
-    const prompt = getCoreSystemPrompt(mockConfig);
-
-    expect(prompt).toMatchSnapshot();
   });
 
   it('should include modern approved plan instructions with completion in DEFAULT mode when approvedPlanPath is set', () => {

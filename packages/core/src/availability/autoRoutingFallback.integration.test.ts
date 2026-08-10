@@ -141,14 +141,14 @@ describe('Auto Routing Fallback Integration', () => {
     expect(attemptsFlash).toBe(10);
   });
 
-  it('should try 10 times and prompt user in non-auto mode', async () => {
-    // Instantiate real Config in non-auto mode
+  it('should try 10 times and prompt user for a custom model', async () => {
+    // Instantiate real Config with a custom model (single-model chain)
     const configNonAuto = new Config({
       sessionId: 'test-session',
       targetDir: '/test',
       debugMode: false,
       cwd: '/test',
-      model: DEFAULT_GEMINI_MODEL, // Non-auto mode
+      model: 'my-custom-model', // Custom model (no fallback chain)
     });
 
     // Force interactive mode to enable fallback handler in BaseLlmClient
@@ -160,7 +160,7 @@ describe('Auto Routing Fallback Integration', () => {
       AuthType.USE_GEMINI,
     );
 
-    let attemptsPro = 0;
+    let attemptsCustom = 0;
 
     const mockGoogleApiError = {
       code: 429,
@@ -171,10 +171,10 @@ describe('Auto Routing Fallback Integration', () => {
     // Spy on generateContent to simulate failures
     vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
       async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
-          attemptsPro++;
+        if (params.model === 'my-custom-model') {
+          attemptsCustom++;
           throw new RetryableQuotaError(
-            'Quota exceeded for Pro',
+            'Quota exceeded for custom model',
             mockGoogleApiError,
             0,
           );
@@ -191,7 +191,7 @@ describe('Auto Routing Fallback Integration', () => {
     configNonAuto.setFallbackModelHandler(handler);
 
     const promise = clientNonAuto.generateContent({
-      modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true },
+      modelConfigKey: { model: 'my-custom-model', isChatModel: true },
       contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
       abortSignal: new AbortController().signal,
       promptId: 'test-prompt',
@@ -200,18 +200,18 @@ describe('Auto Routing Fallback Integration', () => {
     });
 
     await Promise.all([
-      expect(promise).rejects.toThrow('Quota exceeded for Pro'),
+      expect(promise).rejects.toThrow('Quota exceeded for custom model'),
       vi.runAllTimersAsync(),
     ]);
 
     // Verify attempts (should default to 10)
-    expect(attemptsPro).toBe(10);
+    expect(attemptsCustom).toBe(10);
 
     // Verify handler was called once after 10 attempts to prompt user
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler).toHaveBeenCalledWith(
-      DEFAULT_GEMINI_MODEL,
-      DEFAULT_GEMINI_MODEL,
+      'my-custom-model',
+      'my-custom-model',
       expect.any(RetryableQuotaError),
     );
   });

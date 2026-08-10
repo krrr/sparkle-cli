@@ -360,7 +360,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.correctedContent).toBe(correctedContent);
       expect(result.originalContent).toBe('');
@@ -368,7 +368,7 @@ describe('WriteFileTool', () => {
       expect(result.error).toBeUndefined();
     });
 
-    it('should set aggressiveUnescape to false for gemini-3 models', async () => {
+    it('should set aggressiveUnescape to false', async () => {
       const filePath = path.join(rootDir, 'gemini3_file.txt');
       const proposedContent = 'Proposed new content.';
       const abortSignal = new AbortController().signal;
@@ -420,7 +420,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.correctedContent).toBe(correctedProposedContent);
       expect(result.originalContent).toBe(originalContent);
@@ -531,7 +531,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(confirmation).toEqual(
         expect.objectContaining({
@@ -569,7 +569,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(confirmation).toEqual(
         expect.objectContaining({
@@ -775,7 +775,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.llmContent).toMatch(
         /Successfully created and wrote to new file/,
@@ -820,7 +820,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.llmContent).toMatch(/Successfully overwrote file/);
       const writtenContent = await fsService.readTextFile(filePath);
@@ -1091,7 +1091,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.correctedContent).toBe(proposedContent);
       expect(result.fileExists).toBe(false);
@@ -1119,7 +1119,7 @@ describe('WriteFileTool', () => {
         mockBaseLlmClientInstance,
         abortSignal,
         true,
-        true, // aggressiveUnescape
+        false, // aggressiveUnescape
       );
       expect(result.correctedContent).toBe(proposedContent);
       expect(result.originalContent).toBe(originalContent);

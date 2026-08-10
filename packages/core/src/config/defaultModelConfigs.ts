@@ -252,7 +252,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       tier: 'pro',
       family: 'gemini-3',
       isVisible: true,
-      features: { thinking: true, multimodalToolUse: false },
+      features: { thinking: true, multimodalToolUse: true },
     },
 
     // Aliases
@@ -303,7 +303,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
   modelChains: {
     default: [
       {
-        model: 'gemini-2.5-pro',
+        model: DEFAULT_GEMINI_MODEL,
         actions: {
           terminal: 'prompt',
           transient: 'prompt',
@@ -312,13 +312,13 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
         stateTransitions: {
           terminal: 'terminal',
-          transient: 'sticky_retry',
+          transient: 'terminal',
           not_found: 'terminal',
           unknown: 'terminal',
         },
       },
       {
-        model: 'gemini-2.5-flash',
+        model: DEFAULT_GEMINI_FLASH_MODEL,
         isLastResort: true,
         maxAttempts: 10,
         actions: {
@@ -337,7 +337,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     ],
     'auto-default': [
       {
-        model: 'gemini-2.5-pro',
+        model: DEFAULT_GEMINI_MODEL,
         maxAttempts: 3,
         actions: {
           terminal: 'prompt',
@@ -353,7 +353,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: 'gemini-2.5-flash',
+        model: DEFAULT_GEMINI_FLASH_MODEL,
         isLastResort: true,
         maxAttempts: 10,
         actions: {
@@ -387,7 +387,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: 'gemini-2.5-flash',
+        model: DEFAULT_GEMINI_FLASH_MODEL,
         actions: {
           terminal: 'silent',
           transient: 'silent',
@@ -402,7 +402,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: 'gemini-2.5-pro',
+        model: DEFAULT_GEMINI_MODEL,
         isLastResort: true,
         actions: {
           terminal: 'silent',
