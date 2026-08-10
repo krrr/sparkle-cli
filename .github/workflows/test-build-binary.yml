@@ -116,14 +116,14 @@ jobs:
         run: 'npm run build:binary'
 
       - name: 'Build Core Package'
-        run: 'npm run build -w @google/gemini-cli-core'
+        run: 'npm run build -w sparkle-cli-core'
 
       - name: 'Verify Output Exists'
         run: |
-          if [ -f "dist/${{ matrix.platform_name }}/gemini" ]; then
-            echo "Binary found at dist/${{ matrix.platform_name }}/gemini"
-          elif [ -f "dist/${{ matrix.platform_name }}/gemini.exe" ]; then
-            echo "Binary found at dist/${{ matrix.platform_name }}/gemini.exe"
+          if [ -f "dist/${{ matrix.platform_name }}/sparkle" ]; then
+            echo "Binary found at dist/${{ matrix.platform_name }}/sparkle"
+          elif [ -f "dist/${{ matrix.platform_name }}/sparkle.exe" ]; then
+            echo "Binary found at dist/${{ matrix.platform_name }}/sparkle.exe"
           else
             echo "Error: Binary not found in dist/${{ matrix.platform_name }}/"
             ls -R dist/
@@ -133,10 +133,10 @@ jobs:
       - name: 'Smoke Test Binary'
         run: |
           echo "Running binary smoke test..."
-          if [ -f "dist/${{ matrix.platform_name }}/gemini.exe" ]; then
-            "./dist/${{ matrix.platform_name }}/gemini.exe" --version
+          if [ -f "dist/${{ matrix.platform_name }}/sparkle.exe" ]; then
+            "./dist/${{ matrix.platform_name }}/sparkle.exe" --version
           else
-            "./dist/${{ matrix.platform_name }}/gemini" --version
+            "./dist/${{ matrix.platform_name }}/sparkle" --version
           fi
 
       - name: 'Run Integration Tests'
@@ -147,9 +147,9 @@ jobs:
         run: |
           echo "Running integration tests with binary..."
           if [[ "${{ matrix.os }}" == 'windows-latest' ]]; then
-            BINARY_PATH="$(cygpath -m "$(pwd)/dist/${{ matrix.platform_name }}/gemini.exe")"
+            BINARY_PATH="$(cygpath -m "$(pwd)/dist/${{ matrix.platform_name }}/sparkle.exe")"
           else
-            BINARY_PATH="$(pwd)/dist/${{ matrix.platform_name }}/gemini"
+            BINARY_PATH="$(pwd)/dist/${{ matrix.platform_name }}/sparkle"
           fi
           echo "Using binary at $BINARY_PATH"
           export INTEGRATION_TEST_GEMINI_BINARY_PATH="$BINARY_PATH"
@@ -158,6 +158,6 @@ jobs:
       - name: 'Upload Artifact'
         uses: 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' # ratchet:actions/upload-artifact@v4
         with:
-          name: 'gemini-cli-${{ matrix.platform_name }}'
+          name: 'sparkle-cli-${{ matrix.platform_name }}'
           path: 'dist/${{ matrix.platform_name }}/'
           retention-days: 5

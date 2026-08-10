@@ -15,8 +15,8 @@ import {
   FatalSandboxError,
   homedir,
   type SandboxConfig,
-} from '@google/gemini-cli-core';
-import { createMockSandboxConfig } from '@google/gemini-cli-test-utils';
+} from 'sparkle-cli-core';
+import { createMockSandboxConfig } from 'sparkle-cli-test-utils';
 import { EventEmitter } from 'node:events';
 
 const { mockedHomedir, mockedGetContainerPath, mockedExecCommands } =
@@ -85,9 +85,8 @@ vi.mock('node:util', async (importOriginal) => {
   };
 });
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     debugLogger: {

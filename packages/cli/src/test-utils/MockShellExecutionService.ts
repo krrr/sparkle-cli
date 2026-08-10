@@ -10,7 +10,7 @@ import type {
   ShellExecutionResult,
   ShellOutputEvent,
   ShellExecutionConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 export interface MockShellCommand {
   command: string | RegExp;

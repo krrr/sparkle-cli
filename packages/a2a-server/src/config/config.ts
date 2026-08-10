@@ -27,7 +27,7 @@ import {
   type ConfigParameters,
   type ExtensionLoader,
   resolveToRealPath,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 import { logger } from '../utils/logger.js';
 import type { Settings } from './settings.js';

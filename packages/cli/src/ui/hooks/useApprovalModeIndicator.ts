@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ApprovalMode, type Config } from '@google/gemini-cli-core';
+import { ApprovalMode, type Config } from 'sparkle-cli-core';
 import { useKeypress } from './useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from './useKeyMatchers.js';

@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { Config } from '@google/gemini-cli-core';
+import type { Config } from 'sparkle-cli-core';
 
 export interface PrivacyState {
   isLoading: boolean;

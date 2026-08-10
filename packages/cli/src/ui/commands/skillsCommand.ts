@@ -17,7 +17,7 @@ import {
 } from '../types.js';
 import { disableSkill, enableSkill } from '../../utils/skillSettings.js';
 
-import { getErrorMessage } from '@google/gemini-cli-core';
+import { getErrorMessage } from 'sparkle-cli-core';
 import {
   linkSkill,
   renderSkillActionFeedback,

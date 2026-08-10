@@ -10,7 +10,7 @@ import {
   hasRedirection,
   type CoreToolCallStatus,
   type ToolCallRequestInfo,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 export interface MinimalTrackedToolCall {
   status: CoreToolCallStatus;

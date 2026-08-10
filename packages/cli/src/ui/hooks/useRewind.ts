@@ -5,10 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type {
-  ConversationRecord,
-  MessageRecord,
-} from '@google/gemini-cli-core';
+import type { ConversationRecord, MessageRecord } from 'sparkle-cli-core';
 import {
   calculateTurnStats,
   calculateRewindImpact,

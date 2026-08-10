@@ -15,12 +15,11 @@ import {
   disableWorkspacePolicies,
   setDisableWorkspacePolicies,
 } from './policy.js';
-import { writeToStderr } from '@google/gemini-cli-core';
+import { writeToStderr } from 'sparkle-cli-core';
 
 // Mock debugLogger to avoid noise in test output
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     debugLogger: {

@@ -15,17 +15,16 @@ import {
   GEMINI_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
-} from '@google/gemini-cli-core';
-import type { Config, ModelSlashCommandEvent } from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
+import type { Config, ModelSlashCommandEvent } from 'sparkle-cli-core';
 
 // Mock dependencies
 const mockGetDisplayString = vi.fn();
 const mockLogModelSlashCommand = vi.fn();
 const mockModelSlashCommandEvent = vi.fn();
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     getDisplayString: (val: string) => mockGetDisplayString(val),

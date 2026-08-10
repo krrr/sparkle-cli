@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import type { ArgumentsCamelCase, CommandModule } from 'yargs';
-import { ExitCodes } from '@google/gemini-cli-core';
+import { ExitCodes } from 'sparkle-cli-core';
 import { runExitCleanup } from './utils/cleanup.js';
 import type { MergedSettings } from './config/settings.js';
 import process from 'node:process';

@@ -11,7 +11,7 @@ import type {
   AuthType,
   Config,
   ContentGeneratorConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 // Mock child components
 vi.mock('./GeminiPrivacyNotice.js', async () => {

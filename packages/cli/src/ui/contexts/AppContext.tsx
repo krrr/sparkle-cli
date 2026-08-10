@@ -5,7 +5,7 @@
  */
 
 import { createContext, useContext } from 'react';
-import type { StartupWarning } from '@google/gemini-cli-core';
+import type { StartupWarning } from 'sparkle-cli-core';
 
 export interface AppState {
   version: string;

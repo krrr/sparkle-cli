@@ -19,16 +19,15 @@ import {
   ApprovalMode,
   PRIORITY_YOLO_ALLOW_ALL,
   createPolicyEngineConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import type { AgentSettings } from '../types.js';
 
 // Isolate environment loading from the user's real ~/.gemini/.env file.
 const mockHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-home-'));
 
 // Mock dependencies
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     homedir: () => mockHomeDir,

@@ -18,8 +18,8 @@ import type {
   ModelMetrics,
   RoleMetrics,
   ToolCallStats,
-} from '@google/gemini-cli-core';
-import { uiTelemetryService } from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
+import { uiTelemetryService } from 'sparkle-cli-core';
 
 export enum ToolCallDecision {
   ACCEPT = 'accept',

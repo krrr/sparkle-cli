@@ -43,7 +43,7 @@ import {
   applyInboxMemoryPatch,
   dismissInboxMemoryPatch,
   isProjectSkillPatchTarget,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 type Phase =
   | 'list'

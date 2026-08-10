@@ -29,7 +29,7 @@ import {
   type Config,
   ShellExecutionService,
   CoreToolCallStatus,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import {
   calculateShellMaxLines,
   calculateToolContentMaxLines,

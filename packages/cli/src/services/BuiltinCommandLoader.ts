@@ -7,8 +7,8 @@
 import { isDevelopment } from '../utils/installationInfo.js';
 import type { ICommandLoader } from './types.js';
 import { type SlashCommand } from '../ui/commands/types.js';
-import type { Config } from '@google/gemini-cli-core';
-import { isNightly, startupProfiler } from '@google/gemini-cli-core';
+import type { Config } from 'sparkle-cli-core';
+import { isNightly, startupProfiler } from 'sparkle-cli-core';
 import { aboutCommand } from '../ui/commands/aboutCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
 import { authCommand } from '../ui/commands/authCommand.js';

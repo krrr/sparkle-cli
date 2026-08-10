@@ -78,7 +78,7 @@ import {
   createTestMergedSettings,
   resetSettingsCacheForTesting,
 } from './settings.js';
-import { FatalConfigError, GEMINI_DIR, Storage } from '@google/gemini-cli-core';
+import { FatalConfigError, GEMINI_DIR, Storage } from 'sparkle-cli-core';
 import { updateSettingsFilePreservingFormat } from '../utils/commentJson.js';
 import {
   getSettingsSchema,
@@ -124,9 +124,8 @@ const mockCoreEvents = vi.hoisted(() => ({
   emitSettingsChanged: vi.fn(),
 }));
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   const os = await import('node:os');
   const pathMod = await import('node:path');
   const fsMod = await import('node:fs');

@@ -104,7 +104,7 @@ await seed(
     `+# Verify Workflow`,
     `+`,
     `+- Run \`npm run typecheck\` after editing any *.ts file.`,
-    `+- Run \`npm run build --workspace @google/gemini-cli-core\` before testing CLI changes.`,
+    `+- Run \`npm run build --workspace sparkle-cli-core\` before testing CLI changes.`,
     `+- Inbox patches are guarded by /memory inbox.`,
     ``,
   ].join('\n'),
@@ -164,12 +164,12 @@ console.log(`
      node -e "const fs=require('fs'),p=require('os').homedir()+'/.gemini/settings.json';let s={};try{s=JSON.parse(fs.readFileSync(p,'utf-8'))}catch{}s.experimental=s.experimental||{};s.experimental.autoMemory=true;fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(s,null,2))"
 
 2. Launch the just-built CLI from THIS REPO ONLY. Do NOT use any globally
-   installed "gemini" binary — it will be a stale build that doesn't know
+   installed "sparkle" binary — it will be a stale build that doesn't know
    about memory patches and will silently show only skills.
 
      npm run start
 
-   (or, equivalently: node ${path.relative(cwd, REPO_ROOT)}/bundle/gemini.js)
+   (or, equivalently: node ${path.relative(cwd, REPO_ROOT)}/bundle/sparkle.js)
 
    Sanity check before launching:
      node ${path.relative(cwd, path.join(REPO_ROOT, 'scripts/check-inbox.js'))}

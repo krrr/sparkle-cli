@@ -14,7 +14,7 @@ import {
   type LoadableSettingScope,
   type LoadedSettings,
 } from '../../config/settings.js';
-import { AuthType } from '@google/gemini-cli-core';
+import { AuthType } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { AuthState } from '../types.js';
 import { validateAuthMethodWithSettings } from './useAuth.js';

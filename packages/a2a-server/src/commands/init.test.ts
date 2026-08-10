@@ -10,7 +10,7 @@ import {
   performInit,
   type CommandActionReturn,
   type Config,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CoderAgentExecutor } from '../agent/executor.js';
@@ -20,9 +20,8 @@ import { createMockConfig } from '../utils/testing_utils.js';
 import type { CommandContext } from './types.js';
 import { logger } from '../utils/logger.js';
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     performInit: vi.fn(),
@@ -89,7 +88,8 @@ describe('InitCommand', () => {
       vi.mocked(performInit).mockReturnValue({
         type: 'message',
         messageType: 'info',
-        content: 'An AGENTS.md file already exists in this directory. No changes were made.',
+        content:
+          'An AGENTS.md file already exists in this directory. No changes were made.',
       } as CommandActionReturn);
 
       await command.execute(context, []);

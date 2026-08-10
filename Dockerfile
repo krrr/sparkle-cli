@@ -80,15 +80,15 @@ ENV PATH=$PATH:/usr/local/share/npm-global/bin
 # switch to non-root user node
 USER node
 
-# install gemini-cli and clean up
-COPY --chown=node:node packages/cli/dist/google-gemini-cli-*.tgz /tmp/gemini-cli.tgz
-COPY --chown=node:node packages/core/dist/google-gemini-cli-core-*.tgz /tmp/gemini-core.tgz
-RUN npm install -g /tmp/gemini-core.tgz \
-  && npm install -g /tmp/gemini-cli.tgz \
-  && node -e "const fs=require('node:fs'); JSON.parse(fs.readFileSync('/usr/local/share/npm-global/lib/node_modules/@google/gemini-cli/package.json','utf8')); JSON.parse(fs.readFileSync('/usr/local/share/npm-global/lib/node_modules/@google/gemini-cli-core/package.json','utf8'));" \
-  && gemini --version > /dev/null \
+# install sparkle-cli and clean up
+COPY --chown=node:node packages/cli/dist/sparkle-cli-*.tgz /tmp/sparkle-cli.tgz
+COPY --chown=node:node packages/core/dist/sparkle-cli-core-*.tgz /tmp/sparkle-core.tgz
+RUN npm install -g /tmp/sparkle-core.tgz \
+  && npm install -g /tmp/sparkle-cli.tgz \
+  && node -e "const fs=require('node:fs'); JSON.parse(fs.readFileSync('/usr/local/share/npm-global/lib/node_modules/sparkle-cli/package.json','utf8')); JSON.parse(fs.readFileSync('/usr/local/share/npm-global/lib/node_modules/sparkle-cli-core/package.json','utf8'));" \
+  && sparkle --version > /dev/null \
   && npm cache clean --force \
-  && rm -f /tmp/gemini-{cli,core}.tgz
+  && rm -f /tmp/sparkle-{cli,core}.tgz
 
 # default entrypoint when none specified
-ENTRYPOINT ["/usr/local/share/npm-global/bin/gemini"]
+ENTRYPOINT ["/usr/local/share/npm-global/bin/sparkle"]

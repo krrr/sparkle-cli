@@ -15,10 +15,10 @@ Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 - **Architecture:** Monorepo structure using npm workspaces.
   - `packages/cli`: User-facing terminal UI, input processing, and display
     rendering.
-  - `packages/core`: Backend logic, Gemini API orchestration, prompt
+  - `packages/core`: Backend logic, Sparkle API orchestration, prompt
     construction, and tool execution.
   - `packages/a2a-server`: Experimental Agent-to-Agent server.
-  - `packages/sdk`: Programmatic SDK for embedding Gemini CLI capabilities.
+  - `packages/sdk`: Programmatic SDK for embedding Sparkle CLI capabilities.
   - `packages/devtools`: Integrated developer tools (Network/Console inspector).
   - `packages/test-utils`: Shared test utilities and test rig.
   - `packages/vscode-ide-companion`: VS Code extension pairing with the CLI.
@@ -48,7 +48,7 @@ Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
     regression tests against baselines. Excluded from `preflight`, run nightly.)
   - **Workspace-Specific:** `npm test -w <pkg> -- <path>` (Note: `<path>` must
     be relative to the workspace root, e.g.,
-    `-w @google/gemini-cli-core -- src/routing/modelRouterService.test.ts`)
+    `-w sparkle-cli-core -- src/routing/modelRouterService.test.ts`)
 - **Full Validation:** `npm run preflight` (Heaviest check; runs clean, install,
   build, lint, type check, and tests. Recommended before submitting PRs. Due to
   its long runtime, only run this at the very end of a code implementation task.

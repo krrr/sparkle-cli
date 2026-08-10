@@ -1,18 +1,12 @@
-# Gemini CLI documentation
+# Sparkle CLI documentation
 
-Gemini CLI brings the power of Gemini models directly into your terminal. Use it
-to understand code, automate tasks, and build workflows with your local project
-context.
+Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 
 ## Install
 
-```bash
-npm install -g @google/gemini-cli
-```
-
 ## Get started
 
-Jump in to Gemini CLI.
+Jump in to Sparkle CLI.
 
 - **[Quickstart](./get-started/index.md):** Your first session with Gemini CLI.
 - **[Installation](./get-started/installation.mdx):** How to install Gemini CLI

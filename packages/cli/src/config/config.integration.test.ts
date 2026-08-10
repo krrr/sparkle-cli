@@ -17,11 +17,8 @@ import {
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { tmpdir } from 'node:os';
-import type { ConfigParameters } from '@google/gemini-cli-core';
-import {
-  Config,
-  DEFAULT_FILE_FILTERING_OPTIONS,
-} from '@google/gemini-cli-core';
+import type { ConfigParameters } from 'sparkle-cli-core';
+import { Config, DEFAULT_FILE_FILTERING_OPTIONS } from 'sparkle-cli-core';
 import { createTestMergedSettings } from './settings.js';
 import { setupServer } from 'msw/node';
 
@@ -41,8 +38,8 @@ afterAll(() => {
 });
 
 // Mock file discovery service and tool registry
-vi.mock('@google/gemini-cli-core', async () => {
-  const actual = await vi.importActual('@google/gemini-cli-core');
+vi.mock('sparkle-cli-core', async () => {
+  const actual = await vi.importActual('sparkle-cli-core');
   return {
     ...actual,
     FileDiscoveryService: vi.fn().mockImplementation(() => ({

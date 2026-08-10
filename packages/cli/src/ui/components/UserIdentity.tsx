@@ -8,7 +8,7 @@ import type React from 'react';
 import { useMemo } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import { type Config } from '@google/gemini-cli-core';
+import { type Config } from 'sparkle-cli-core';
 import { isUltraTier } from '../../utils/tierUtils.js';
 
 interface UserIdentityProps {

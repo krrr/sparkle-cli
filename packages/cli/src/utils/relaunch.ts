@@ -10,7 +10,7 @@ import {
   getSpawnConfig,
   getScriptArgs,
 } from './processUtils.js';
-import { writeToStderr } from '@google/gemini-cli-core';
+import { writeToStderr } from 'sparkle-cli-core';
 
 export async function relaunchOnExitCode(runner: () => Promise<number>) {
   while (true) {

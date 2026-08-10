@@ -28,7 +28,7 @@ import {
   DEFAULT_GEMINI_MODEL,
   ModelNotFoundError,
   DEFAULT_GEMINI_FLASH_MODEL,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { useQuotaAndFallback } from './useQuotaAndFallback.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { MessageType } from '../types.js';

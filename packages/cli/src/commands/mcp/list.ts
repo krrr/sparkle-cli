@@ -15,8 +15,8 @@ import {
   MCPServerStatus,
   createTransport,
   debugLogger,
-} from '@google/gemini-cli-core';
-import type { MCPServerConfig } from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
+import type { MCPServerConfig } from 'sparkle-cli-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
 import {

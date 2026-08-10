@@ -9,7 +9,7 @@ import {
   fetchWithTimeout,
   resolveToRealPath,
   isPrivateIp,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { AsyncFzf } from 'fzf';
 
 export interface RegistryExtension {

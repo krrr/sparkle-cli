@@ -5,7 +5,7 @@
  */
 
 import type { CommandModule } from 'yargs';
-import { debugLogger } from '@google/gemini-cli-core';
+import { debugLogger } from 'sparkle-cli-core';
 import {
   McpServerEnablementManager,
   canLoadServer,

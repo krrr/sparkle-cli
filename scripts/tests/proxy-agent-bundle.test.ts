@@ -39,7 +39,7 @@ describe('proxy-agent bundle shape', () => {
 
     // Bundle with the exact same splitting config and aliases as cliConfig
     await esbuild.build({
-      entryPoints: { gemini: entryFile },
+      entryPoints: { sparkle: entryFile },
       outdir: path.join(tmpDir, 'bundle'),
       bundle: true,
       splitting: true,
@@ -60,7 +60,7 @@ describe('proxy-agent bundle shape', () => {
 
     // Import the bundled chunk
     const bundledEntryUrl = pathToFileURL(
-      path.join(tmpDir, 'bundle/gemini.mjs'),
+      path.join(tmpDir, 'bundle/sparkle.mjs'),
     ).href;
     const { getAgents } = await import(bundledEntryUrl);
 

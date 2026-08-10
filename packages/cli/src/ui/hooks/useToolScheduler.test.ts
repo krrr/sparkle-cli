@@ -22,13 +22,12 @@ import {
   CoreToolCallStatus,
   type WaitingToolCall,
   SubagentState,
-} from '@google/gemini-cli-core';
-import { createMockMessageBus } from '@google/gemini-cli-core/src/test-utils/mock-message-bus.js';
+} from 'sparkle-cli-core';
+import { createMockMessageBus } from 'sparkle-cli-core/src/test-utils/mock-message-bus.js';
 
 // Mock Core Scheduler
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     Scheduler: vi.fn().mockImplementation(() => ({
@@ -275,7 +274,7 @@ describe('useToolScheduler', () => {
     };
 
     // Mock the specific return value for this test
-    const { Scheduler } = await import('@google/gemini-cli-core');
+    const { Scheduler } = await import('sparkle-cli-core');
     vi.mocked(Scheduler).mockImplementation(
       () =>
         ({

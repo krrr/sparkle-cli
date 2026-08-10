@@ -83,7 +83,7 @@ const cliConfig = {
   banner: {
     js: `const require = (await import('node:module')).createRequire(import.meta.url); const __chunk_filename = (await import('node:url')).fileURLToPath(import.meta.url); const __chunk_dirname = (await import('node:path')).dirname(__chunk_filename);`,
   },
-  entryPoints: { gemini: 'packages/cli/index.ts' },
+  entryPoints: { sparkle: 'packages/cli/index.ts' },
   outdir: 'bundle',
   splitting: true,
   define: {
@@ -109,7 +109,7 @@ const cliConfig = {
       __dirname,
       'packages/cli/src/patches/http-proxy-agent.ts',
     ),
-    '@google/gemini-cli-devtools': path.resolve(
+    'sparkle-cli-devtools': path.resolve(
       __dirname,
       'packages/devtools/src/index.ts',
     ),

@@ -16,7 +16,7 @@ import {
   getErrorMessage,
   unescapePath,
   type EditorType,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import {
   toCodePoints,
   cpLen,

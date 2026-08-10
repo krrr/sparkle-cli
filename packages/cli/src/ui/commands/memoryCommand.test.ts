@@ -17,11 +17,10 @@ import {
   showMemory,
   listMemoryFiles,
   flattenMemory,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const original = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...original,
     getErrorMessage: vi.fn((error: unknown) => {

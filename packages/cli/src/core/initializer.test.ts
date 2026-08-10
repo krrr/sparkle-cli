@@ -11,14 +11,13 @@ import {
   logIdeConnection,
   logCliConfiguration,
   type Config,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { performInitialAuth } from './auth.js';
 import { validateTheme } from './theme.js';
 import { type LoadedSettings } from '../config/settings.js';
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     IdeClient: {

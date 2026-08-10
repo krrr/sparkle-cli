@@ -5,7 +5,7 @@
  */
 
 import { describe, it, beforeAll, afterAll, afterEach } from 'vitest';
-import { TestRig, MemoryTestHarness } from '@google/gemini-cli-test-utils';
+import { TestRig, MemoryTestHarness } from 'sparkle-cli-test-utils';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {

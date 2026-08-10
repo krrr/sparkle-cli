@@ -1,5 +1,5 @@
 {
-  "name": "@google/gemini-cli-test-utils",
+  "name": "sparkle-cli-test-utils",
   "version": "0.54.4",
   "private": true,
   "main": "src/index.ts",
@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/gemini-cli-core": "file:../core",
+    "sparkle-cli-core": "file:../core",
     "@lydell/node-pty": "1.1.0",
     "asciichart": "1.5.25",
     "strip-ansi": "7.1.2",

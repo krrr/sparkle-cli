@@ -173,10 +173,10 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: true
         run: |
           if [[ "${{ matrix.shard }}" == "cli" ]]; then
-            npm run test:ci --workspace "@google/gemini-cli"
+            npm run test:ci --workspace "sparkle-cli"
           else
             # Explicitly list non-cli packages to ensure they are sharded correctly
-            npm run test:ci --workspace "@google/gemini-cli-core" --workspace "@google/gemini-cli-a2a-server" --workspace "gemini-cli-vscode-ide-companion" --workspace "@google/gemini-cli-test-utils" --if-present -- --coverage.enabled=false
+            npm run test:ci --workspace "sparkle-cli-core" --workspace "sparkle-cli-a2a-server" --workspace "sparkle-cli-vscode-ide-companion" --workspace "sparkle-cli-test-utils" --if-present -- --coverage.enabled=false
             npm run test:scripts
           fi
 
@@ -184,7 +184,7 @@ jobs:
         run: 'npm run bundle'
 
       - name: 'Smoke test bundle'
-        run: 'node ./bundle/gemini.js --version'
+        run: 'node ./bundle/sparkle.js --version'
 
       - name: 'Smoke test npx installation'
         run: |
@@ -264,10 +264,10 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: true
         run: |
           if [[ "${{ matrix.shard }}" == "cli" ]]; then
-            npm run test:ci --workspace "@google/gemini-cli" -- --coverage.enabled=false
+            npm run test:ci --workspace "sparkle-cli" -- --coverage.enabled=false
           else
             # Explicitly list non-cli packages to ensure they are sharded correctly
-            npm run test:ci --workspace "@google/gemini-cli-core" --workspace "@google/gemini-cli-a2a-server" --workspace "gemini-cli-vscode-ide-companion" --workspace "@google/gemini-cli-test-utils" --if-present -- --coverage.enabled=false
+            npm run test:ci --workspace "sparkle-cli-core" --workspace "sparkle-cli-a2a-server" --workspace "sparkle-cli-vscode-ide-companion" --workspace "sparkle-cli-test-utils" --if-present -- --coverage.enabled=false
             npm run test:scripts
           fi
 
@@ -275,7 +275,7 @@ jobs:
         run: 'npm run bundle'
 
       - name: 'Smoke test bundle'
-        run: 'node ./bundle/gemini.js --version'
+        run: 'node ./bundle/sparkle.js --version'
 
       - name: 'Smoke test npx installation'
         run: |
@@ -434,11 +434,11 @@ jobs:
           NODE_ENV: 'test'
         run: |
           if ("${{ matrix.shard }}" -eq "cli") {
-            npm run test:ci --workspace "@google/gemini-cli" -- --coverage.enabled=false
+            npm run test:ci --workspace "sparkle-cli" -- --coverage.enabled=false
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           } else {
             # Explicitly list non-cli packages to ensure they are sharded correctly
-            npm run test:ci --workspace "@google/gemini-cli-core" --workspace "@google/gemini-cli-a2a-server" --workspace "gemini-cli-vscode-ide-companion" --workspace "@google/gemini-cli-test-utils" --if-present -- --coverage.enabled=false
+            npm run test:ci --workspace "sparkle-cli-core" --workspace "sparkle-cli-a2a-server" --workspace "sparkle-cli-vscode-ide-companion" --workspace "sparkle-cli-test-utils" --if-present -- --coverage.enabled=false
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             npm run test:scripts
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -450,7 +450,7 @@ jobs:
         shell: 'pwsh'
 
       - name: 'Smoke test bundle'
-        run: 'node ./bundle/gemini.js --version'
+        run: 'node ./bundle/sparkle.js --version'
         shell: 'pwsh'
 
       - name: 'Smoke test npx installation'

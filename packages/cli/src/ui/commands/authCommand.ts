@@ -10,7 +10,7 @@ import type {
   LogoutActionReturn,
 } from './types.js';
 import { CommandKind } from './types.js';
-import { clearApiKey } from '@google/gemini-cli-core';
+import { clearApiKey } from 'sparkle-cli-core';
 import { SettingScope } from '../../config/settings.js';
 
 const authLoginCommand: SlashCommand = {

@@ -51,7 +51,7 @@ import {
   RECITATION_BLOCKED_MESSAGE,
   OTHER_BLOCKED_MESSAGE,
   TRUE_EMPTY_RESPONSE_MESSAGE,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import type {
   Config,
   EditorType,
@@ -66,7 +66,7 @@ import type {
   ToolCallResponseInfo,
   GeminiErrorEventValue,
   RetryAttemptPayload,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { type Part, type PartListUnion, FinishReason } from '@google/genai';
 import type {
   HistoryItem,

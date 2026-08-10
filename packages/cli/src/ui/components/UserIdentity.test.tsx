@@ -11,7 +11,7 @@ import {
   makeFakeConfig,
   AuthType,
   type ContentGeneratorConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 describe('<UserIdentity />', () => {
   beforeEach(() => {

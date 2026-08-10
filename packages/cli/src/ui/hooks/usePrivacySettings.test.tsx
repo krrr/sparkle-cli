@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { act } from 'react';
 import { render } from '../../test-utils/render.js';
-import type { Config } from '@google/gemini-cli-core';
+import type { Config } from 'sparkle-cli-core';
 import { usePrivacySettings } from './usePrivacySettings.js';
 
 describe('usePrivacySettings', () => {

@@ -6,12 +6,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { setupWorktree } from './worktreeSetup.js';
-import * as coreFunctions from '@google/gemini-cli-core';
+import * as coreFunctions from 'sparkle-cli-core';
 
 // Mock dependencies
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     getProjectRootForWorktree: vi.fn(),

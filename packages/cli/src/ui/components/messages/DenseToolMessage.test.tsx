@@ -17,7 +17,7 @@ import {
   type ListDirectoryResult,
   type ReadManyFilesResult,
   makeFakeConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import type {
   SerializableConfirmationDetails,
   ToolResultDisplay,

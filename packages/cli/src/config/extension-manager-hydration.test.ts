@@ -13,7 +13,7 @@ import {
   debugLogger,
   coreEvents,
   type CommandHookConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { createTestMergedSettings } from './settings.js';
 import { createExtension } from '../test-utils/createExtension.js';
 import { EXTENSIONS_DIRECTORY_NAME } from './extensions/variables.js';
@@ -28,10 +28,9 @@ vi.mock('node:os', async (importOriginal) => {
   };
 });
 
-// Mock @google/gemini-cli-core
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+// Mock sparkle-cli-core
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
     homedir: mockHomedir,

@@ -19,7 +19,7 @@ import {
   getDisplayString,
   isProModel,
   getAutoModelDescription,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
 import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';

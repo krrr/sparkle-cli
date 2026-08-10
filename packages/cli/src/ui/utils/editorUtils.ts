@@ -18,7 +18,7 @@ import {
   isTerminalEditor,
   isValidEditorType,
   resolveEditorTypeFromCommand,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 /**
  * Command name substrings used to guess whether an unknown $VISUAL/$EDITOR

@@ -149,7 +149,7 @@ describe('sea-launch', () => {
 
       const mockFs = {
         openSync: vi.fn((p) => {
-          if (p.endsWith('gemini.mjs')) return 10;
+          if (p.endsWith('sparkle.mjs')) return 10;
           if (p.endsWith('file.txt')) return 20;
           throw new Error('Not found');
         }),

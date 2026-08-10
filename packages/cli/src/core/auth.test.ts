@@ -10,11 +10,10 @@ import {
   type Config,
   ValidationRequiredError,
   AuthType,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
   };

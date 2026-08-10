@@ -21,7 +21,7 @@ import {
   makeFakeConfig,
   coreEvents,
   type GeminiClient,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 
 const {
   logSlashCommand,
@@ -46,9 +46,8 @@ vi.mock('./useAlternateBuffer.js', () => ({
   useAlternateBuffer: mockUseAlternateBuffer,
 }));
 
-vi.mock('@google/gemini-cli-core', async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import('@google/gemini-cli-core')>();
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const original = await importOriginal<typeof import('sparkle-cli-core')>();
 
   return {
     ...original,

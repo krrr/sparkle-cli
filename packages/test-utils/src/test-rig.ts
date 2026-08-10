@@ -11,10 +11,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { env } from 'node:process';
 import { setTimeout as sleep } from 'node:timers/promises';
-import {
-  DEFAULT_GEMINI_FLASH_MODEL,
-  GEMINI_DIR,
-} from '@google/gemini-cli-core';
+import { DEFAULT_GEMINI_FLASH_MODEL, GEMINI_DIR } from 'sparkle-cli-core';
 export { GEMINI_DIR };
 import * as pty from '@lydell/node-pty';
 import stripAnsi from 'strip-ansi';
@@ -22,7 +19,7 @@ import * as os from 'node:os';
 import type { TestMcpConfig } from './test-mcp-server.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const BUNDLE_PATH = join(__dirname, '..', '..', '..', 'bundle/gemini.js');
+const BUNDLE_PATH = join(__dirname, '..', '..', '..', 'bundle/sparkle.js');
 
 // Get timeout based on environment
 export function getDefaultTimeout() {
@@ -538,9 +535,9 @@ export class TestRig {
   }
 
   /**
-   * The command and args to use to invoke Gemini CLI. Allows us to switch
-   * between using the bundled gemini.js (the default) and using the installed
-   * 'gemini' (used to verify npm bundles).
+   * The command and args to use to invoke Sparkle CLI. Allows us to switch
+   * between using the bundled sparkle.js (the default) and using the installed
+   * 'sparkle' (used to verify npm bundles).
    */
   private _getCommandAndArgs(extraInitialArgs: string[] = []): {
     command: string;
@@ -549,7 +546,7 @@ export class TestRig {
     const binaryPath = env['INTEGRATION_TEST_GEMINI_BINARY_PATH'];
     const isNpmReleaseTest =
       env['INTEGRATION_TEST_USE_INSTALLED_GEMINI'] === 'true';
-    const geminiCommand = os.platform() === 'win32' ? 'gemini.cmd' : 'gemini';
+    const geminiCommand = os.platform() === 'win32' ? 'sparkle.cmd' : 'sparkle';
     let command = 'node';
     let initialArgs = [BUNDLE_PATH, ...extraInitialArgs];
     if (binaryPath) {

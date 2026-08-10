@@ -69,7 +69,7 @@ function verifyIntegrity(dir, manifest, fsMod = fs, cryptoMod = crypto) {
       return hash.digest('hex');
     };
 
-    if (calculateHash(path.join(dir, 'gemini.mjs')) !== manifest.mainHash)
+    if (calculateHash(path.join(dir, 'sparkle.mjs')) !== manifest.mainHash)
       return false;
     if (manifest.files) {
       for (const file of manifest.files) {
@@ -179,7 +179,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
           mode: 0o755,
         });
       };
-      writeToSetup('gemini.mjs', 'gemini.mjs');
+      writeToSetup('sparkle.mjs', 'sparkle.mjs');
       if (manifest.files) {
         for (const file of manifest.files) {
           writeToSetup(file.key, file.path);
@@ -251,7 +251,7 @@ async function main(getAssetFn = getAsset) {
     crypto,
   });
 
-  const mainPath = path.join(runtimeDir, 'gemini.mjs');
+  const mainPath = path.join(runtimeDir, 'sparkle.mjs');
 
   await import(pathToFileURL(mainPath).href).catch((err) => {
     console.error('Fatal Error: Failed to launch. Please reinstall.', err);

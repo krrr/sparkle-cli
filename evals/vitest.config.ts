@@ -24,10 +24,7 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     alias: {
-      '@google/gemini-cli-core': path.resolve(
-        __dirname,
-        '../packages/core/index.ts',
-      ),
+      'sparkle-cli-core': path.resolve(__dirname, '../packages/core/index.ts'),
     },
     setupFiles: [path.resolve(__dirname, '../packages/cli/test-setup.ts')],
     server: {

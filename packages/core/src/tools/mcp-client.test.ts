@@ -45,7 +45,7 @@ import type { ResourceRegistry } from '../resources/resource-registry.js';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { cleanupTmpDir } from '@google/gemini-cli-test-utils';
+import { cleanupTmpDir } from 'sparkle-cli-test-utils';
 import { coreEvents } from '../utils/events.js';
 import type { EnvironmentSanitizationConfig } from '../services/environmentSanitization.js';
 

@@ -16,12 +16,12 @@ import {
   unlinkSync,
 } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { GEMINI_DIR } from '@google/gemini-cli-core';
+import { GEMINI_DIR } from 'sparkle-cli-core';
 import * as pty from '@lydell/node-pty';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const BUNDLE_PATH = join(__dirname, '..', 'bundle/gemini.js');
+const BUNDLE_PATH = join(__dirname, '..', 'bundle/sparkle.js');
 
 const extension = `{
   "name": "test-symlink-extension",

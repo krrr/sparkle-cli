@@ -60,18 +60,18 @@ You can check your current Gemini CLI version using one of these methods:
 
 - Run `gemini --version` or `gemini -v` from your terminal
 - Check the globally installed version using your package manager:
-  - npm: `npm list -g @google/gemini-cli`
-  - pnpm: `pnpm list -g @google/gemini-cli`
-  - yarn: `yarn global list @google/gemini-cli`
-  - bun: `bun pm ls -g @google/gemini-cli`
+  - npm: `npm list -g sparkle-cli`
+  - pnpm: `pnpm list -g sparkle-cli`
+  - yarn: `yarn global list sparkle-cli`
+  - bun: `bun pm ls -g sparkle-cli`
   - homebrew: `brew list --versions gemini-cli`
 - Inside an active Gemini CLI session, use the `/about` command
 
 ### How do I update Gemini CLI to the latest version?
 
 If you installed it globally via `npm`, update it using the command
-`npm install -g @google/gemini-cli@latest`. If you compiled it from source, pull
-the latest changes from the repository, and then rebuild using the command
+`npm install -g sparkle-cli@latest`. If you compiled it from source, pull the
+latest changes from the repository, and then rebuild using the command
 `npm run build`.
 
 ## Platform-specific issues

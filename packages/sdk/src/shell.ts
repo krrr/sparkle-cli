@@ -9,7 +9,7 @@ import {
   ShellExecutionService,
   ShellTool,
   type Config as CoreConfig,
-} from '@google/gemini-cli-core';
+} from 'sparkle-cli-core';
 import type {
   AgentShell,
   AgentShellResult,
