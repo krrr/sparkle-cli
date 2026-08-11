@@ -10,9 +10,7 @@ import {
   type FallbackIntent,
   TerminalQuotaError,
   ModelNotFoundError,
-  VALID_GEMINI_MODELS,
   isProModel,
-  getDisplayString,
 } from 'sparkle-cli-core';
 import { useEffect } from 'react';
 import { type UseHistoryManagerReturn } from './useHistoryManager.js';
@@ -66,15 +64,10 @@ export function useQuotaAndFallback({
       }
 
       if (error instanceof ModelNotFoundError) {
-        const messageLines = VALID_GEMINI_MODELS.has(failedModel)
-          ? [
-              `It seems like you don't have access to ${getDisplayString(failedModel)}.`,
-              `Your admin might have disabled the access to this model.`,
-            ]
-          : [
-              `Model "${failedModel}" was not found or is invalid.`,
-              `/model to switch models.`,
-            ];
+        const messageLines = [
+          `Model "${failedModel}" was not found or is invalid.`,
+          `/model to switch models.`,
+        ];
         historyManager.addItem(
           { type: MessageType.ERROR, text: messageLines.join('\n') },
           Date.now(),

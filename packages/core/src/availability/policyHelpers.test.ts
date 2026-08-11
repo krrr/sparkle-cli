@@ -93,8 +93,7 @@ describe('policyHelpers', () => {
         getModel: () => 'auto',
       });
       const chain = resolvePolicyChain(config, DEFAULT_GEMINI_FLASH_MODEL);
-      // Due to Gemini 2.x wrapsAround, the chain will contain both flash and pro
-      expect(chain.length).toBeGreaterThanOrEqual(1);
+      expect(chain).toHaveLength(1);
       expect(chain[0]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 
@@ -120,20 +119,6 @@ describe('policyHelpers', () => {
       expect(chain[2]?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
-    it('wraps around the chain when wrapsAround is true', () => {
-      const config = createMockConfig({
-        getModel: () => GEMINI_MODEL_ALIAS_AUTO,
-      });
-      const chain = resolvePolicyChain(
-        config,
-        DEFAULT_GEMINI_FLASH_MODEL,
-        true,
-      );
-      expect(chain).toHaveLength(2);
-      expect(chain[0]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-      expect(chain[1]?.model).toBe(DEFAULT_GEMINI_MODEL);
-    });
-
     it('applies SILENT_ACTIONS when ApprovalMode is PLAN', () => {
       const config = createMockConfig({
         getApprovalMode: () => ApprovalMode.PLAN,
@@ -154,14 +139,9 @@ describe('policyHelpers', () => {
       { name: 'Flash Lite', model: DEFAULT_GEMINI_FLASH_LITE_MODEL },
       { name: 'Concrete Model (2.5 Pro)', model: DEFAULT_GEMINI_MODEL },
       { name: 'Custom Model', model: 'my-custom-model' },
-      {
-        name: 'Wrap Around',
-        model: GEMINI_MODEL_ALIAS_AUTO,
-        wrapsAround: true,
-      },
     ];
 
-    testCases.forEach(({ name, model, wrapsAround }) => {
+    testCases.forEach(({ name, model }) => {
       it(`achieves parity for: ${name}`, () => {
         const createBaseConfig = (dynamic: boolean) =>
           createMockConfig({
@@ -172,16 +152,8 @@ describe('policyHelpers', () => {
             modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
           });
 
-        const legacyChain = resolvePolicyChain(
-          createBaseConfig(false),
-          model,
-          wrapsAround,
-        );
-        const dynamicChain = resolvePolicyChain(
-          createBaseConfig(true),
-          model,
-          wrapsAround,
-        );
+        const legacyChain = resolvePolicyChain(createBaseConfig(false), model);
+        const dynamicChain = resolvePolicyChain(createBaseConfig(true), model);
 
         expect(dynamicChain).toEqual(legacyChain);
       });
@@ -198,17 +170,6 @@ describe('policyHelpers', () => {
       const context = buildFallbackPolicyContext(chain, 'b');
       expect(context.failedPolicy?.model).toBe('b');
       expect(context.candidates.map((p) => p.model)).toEqual(['c']);
-    });
-
-    it('wraps around when building fallback context if wrapsAround is true', () => {
-      const chain = [
-        createDefaultPolicy('a'),
-        createDefaultPolicy('b'),
-        createDefaultPolicy('c'),
-      ];
-      const context = buildFallbackPolicyContext(chain, 'b', true);
-      expect(context.failedPolicy?.model).toBe('b');
-      expect(context.candidates.map((p) => p.model)).toEqual(['c', 'a']);
     });
 
     it('returns full chain when model is not in policy list', () => {

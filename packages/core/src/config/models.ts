@@ -52,12 +52,6 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-pro-latest';
 export const DEFAULT_GEMINI_FLASH_MODEL = 'gemini-flash-latest';
 export const DEFAULT_GEMINI_FLASH_LITE_MODEL = 'gemini-flash-lite-latest';
 
-export const VALID_GEMINI_MODELS = new Set([
-  DEFAULT_GEMINI_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_FLASH_LITE_MODEL,
-]);
-
 // Model aliases for user convenience.
 export const GEMINI_MODEL_ALIAS_AUTO = 'auto';
 export const GEMINI_MODEL_ALIAS_PRO = 'pro';
@@ -273,17 +267,4 @@ export function supportsMultimodalFunctionResponse(
     );
   }
   return model.startsWith('gemini-');
-}
-
-/**
- * Checks if the given model is considered active.
- *
- * @param model The model name to check.
- * @returns True if the model is active.
- */
-export function isActiveModel(model: string): boolean {
-  if (!VALID_GEMINI_MODELS.has(model) || model === 'none') {
-    return false;
-  }
-  return true;
 }

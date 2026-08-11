@@ -40,7 +40,6 @@ import { ApprovalMode } from '../policy/types.js';
 export function resolvePolicyChain(
   config: Config,
   preferredModel?: string,
-  wrapsAround: boolean = false,
 ): ModelPolicyChain {
   const normalizedPreferredModel = preferredModel
     ? normalizeModelId(preferredModel)
@@ -61,11 +60,6 @@ export function resolvePolicyChain(
     ? isAutoModel(normalizedPreferredModel, config)
     : false;
   const isAutoConfigured = isAutoModel(configuredModel, config);
-
-  // We always wrap around for Gemini 3 chains to ensure maximum availability
-  // between models in the same family (e.g. fallback to Pro if Flash is exhausted).
-  const effectiveWrapsAround =
-    wrapsAround || isAutoPreferred || isAutoConfigured || isOriginallyGemini3;
 
   // --- DYNAMIC PATH ---
   if (config.getExperimentalDynamicModelConfiguration?.() === true) {
@@ -95,7 +89,7 @@ export function resolvePolicyChain(
       // No matching modelChains found, default to single model chain
       chain = createSingleModelChain(modelFromConfig);
     }
-    chain = applyDynamicSlicing(chain, resolvedModel, effectiveWrapsAround);
+    chain = applyDynamicSlicing(chain, resolvedModel);
   } else {
     // --- LEGACY PATH ---
 
@@ -112,7 +106,7 @@ export function resolvePolicyChain(
     } else {
       chain = createSingleModelChain(modelFromConfig);
     }
-    chain = applyDynamicSlicing(chain, resolvedModel, effectiveWrapsAround);
+    chain = applyDynamicSlicing(chain, resolvedModel);
   }
   // Apply Unified Silent Injection for Plan Mode with defensive checks
   if (config?.getApprovalMode?.() === ApprovalMode.PLAN) {
@@ -126,21 +120,18 @@ export function resolvePolicyChain(
 }
 
 /**
- * Applies active-index slicing and wrap-around logic to a chain template.
+ * Applies active-index slicing to a chain template.
  */
 function applyDynamicSlicing(
   chain: ModelPolicy[],
   resolvedModel: string,
-  wrapsAround: boolean,
 ): ModelPolicyChain {
   const normalizedResolved = normalizeModelId(resolvedModel);
   const activeIndex = chain.findIndex(
     (policy) => normalizeModelId(policy.model) === normalizedResolved,
   );
   if (activeIndex !== -1) {
-    return wrapsAround
-      ? [...chain.slice(activeIndex), ...chain.slice(0, activeIndex)]
-      : [...chain.slice(activeIndex)];
+    return [...chain.slice(activeIndex)];
   }
 
   // If the user specified a model not in the default chain, we assume they want
@@ -153,12 +144,10 @@ function applyDynamicSlicing(
  * fallback candidates that follow it.
  * @param chain - The ordered list of available model policies.
  * @param failedModel - The identifier of the model that failed.
- * @param wrapsAround - If true, treats the chain as a circular buffer.
  */
 export function buildFallbackPolicyContext(
   chain: ModelPolicyChain,
   failedModel: string,
-  wrapsAround: boolean = false,
 ): {
   failedPolicy?: ModelPolicy;
   candidates: ModelPolicy[];
@@ -170,14 +159,11 @@ export function buildFallbackPolicyContext(
   if (index === -1) {
     return { failedPolicy: undefined, candidates: chain };
   }
-  // Return [candidates_after, candidates_before] to prioritize downgrades
-  // (continuing the chain) before wrapping around to upgrades.
-  const candidates = wrapsAround
-    ? [...chain.slice(index + 1), ...chain.slice(0, index)]
-    : [...chain.slice(index + 1)];
+  // Return the remaining candidates after the failed model to prioritize
+  // downgrades (continuing the chain).
   return {
     failedPolicy: chain[index],
-    candidates,
+    candidates: [...chain.slice(index + 1)],
   };
 }
 

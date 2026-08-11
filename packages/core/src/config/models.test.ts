@@ -20,7 +20,6 @@ import {
   GEMINI_MODEL_ALIAS_FLASH,
   GEMINI_MODEL_ALIAS_FLASH_LITE,
   GEMINI_MODEL_ALIAS_AUTO,
-  isActiveModel,
   isProModel,
   getAutoModelDescription,
 } from './models.js';
@@ -270,22 +269,6 @@ describe('resolveClassifierModel', () => {
     expect(
       resolveClassifierModel(GEMINI_MODEL_ALIAS_AUTO, GEMINI_MODEL_ALIAS_PRO),
     ).toBe(DEFAULT_GEMINI_MODEL);
-  });
-});
-
-describe('isActiveModel', () => {
-  it('should return true for valid GA models', () => {
-    expect(isActiveModel(DEFAULT_GEMINI_MODEL)).toBe(true);
-    expect(isActiveModel(DEFAULT_GEMINI_FLASH_MODEL)).toBe(true);
-    expect(isActiveModel(DEFAULT_GEMINI_FLASH_LITE_MODEL)).toBe(true);
-  });
-
-  it('should return false for preview and unknown models', () => {
-    expect(isActiveModel('gemini-3-pro-preview')).toBe(false);
-    expect(isActiveModel('gemini-3.1-pro-preview')).toBe(false);
-    expect(isActiveModel('invalid-model')).toBe(false);
-    expect(isActiveModel(GEMINI_MODEL_ALIAS_AUTO)).toBe(false);
-    expect(isActiveModel('none')).toBe(false);
   });
 });
 
