@@ -11,7 +11,6 @@ import type { HierarchicalMemory } from '../config/memory.js';
 import { GEMINI_DIR, makeRelative } from '../utils/paths.js';
 import { ApprovalMode } from '../policy/types.js';
 import * as snippets from './snippets.js';
-import * as legacySnippets from './snippets.legacy.js';
 import {
   resolvePathFromEnv,
   applySubstitutions,
@@ -22,13 +21,12 @@ import { CodebaseInvestigatorAgent } from '../agents/codebase-investigator.js';
 import { isGitRepository } from '../utils/gitUtils.js';
 import {
   WRITE_TODOS_TOOL_NAME,
-  READ_FILE_TOOL_NAME,
   ENTER_PLAN_MODE_TOOL_NAME,
   GLOB_TOOL_NAME,
   GREP_TOOL_NAME,
   AGENT_TOOL_NAME,
 } from '../tools/tool-names.js';
-import { resolveModel, supportsModernFeatures } from '../config/models.js';
+
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
 import {
   getAllGeminiMdFilenames,
@@ -70,12 +68,6 @@ export class PromptProvider {
 
     const approvedPlanPath = context.config.getApprovedPlanPath();
 
-    const desiredModel = resolveModel(
-      context.config.getActiveModel(),
-      context.config,
-    );
-    const isModernModel = supportsModernFeatures(desiredModel);
-    const activeSnippets = isModernModel ? snippets : legacySnippets;
     const contextFilenames = getAllGeminiMdFilenames();
 
     let trackerDir = context.config.isTrackerEnabled()
@@ -113,19 +105,14 @@ export class PromptProvider {
         throw new Error(`missing system prompt file '${systemMdPath}'`);
       }
       basePrompt = fs.readFileSync(systemMdPath, 'utf8');
-      const skillsPrompt = activeSnippets.renderAgentSkills(
+      const skillsPrompt = snippets.renderAgentSkills(
         skills.map((s) => ({
           name: s.name,
           description: s.description,
           location: s.location,
         })),
       );
-      basePrompt = applySubstitutions(
-        basePrompt,
-        context.config,
-        skillsPrompt,
-        isModernModel,
-      );
+      basePrompt = applySubstitutions(basePrompt, context.config, skillsPrompt);
     } else {
       // --- Standard Composition ---
       const hasHierarchicalMemory =
@@ -244,22 +231,13 @@ export class PromptProvider {
           () => ({ interactive: interactiveMode }),
           isGitRepository(process.cwd()) ? true : false,
         ),
-        finalReminder: isModernModel
-          ? undefined
-          : this.withSection('finalReminder', () => ({
-              readFileToolName: READ_FILE_TOOL_NAME,
-            })),
-      } as snippets.SystemPromptOptions;
+      };
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const getCoreSystemPrompt = activeSnippets.getCoreSystemPrompt as (
-        options: snippets.SystemPromptOptions,
-      ) => string;
-      basePrompt = getCoreSystemPrompt(options);
+      basePrompt = snippets.getCoreSystemPrompt(options);
     }
 
     // --- Finalization (Shell) ---
-    const finalPrompt = activeSnippets.renderFinalShell(
+    const finalPrompt = snippets.renderFinalShell(
       basePrompt,
       userMemory,
       contextFilenames,
@@ -290,15 +268,7 @@ export class PromptProvider {
   }
 
   getCompressionPrompt(context: AgentLoopContext): string {
-    const desiredModel = resolveModel(
-      context.config.getActiveModel(),
-      context.config,
-    );
-    const isModernModel = supportsModernFeatures(desiredModel);
-    const activeSnippets = isModernModel ? snippets : legacySnippets;
-    return activeSnippets.getCompressionPrompt(
-      context.config.getApprovedPlanPath(),
-    );
+    return snippets.getCompressionPrompt(context.config.getApprovedPlanPath());
   }
 
   private withSection<T>(

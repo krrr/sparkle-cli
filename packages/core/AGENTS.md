@@ -31,10 +31,6 @@ execution, and agent management.
 
 ## Coding Conventions
 
-- **Legacy Snippets:** `src/prompts/snippets.legacy.ts` is a snapshot of an
-  older system prompt. Avoid changing the prompting verbiage to preserve its
-  historical behavior; however, structural changes to ensure compilation or
-  simplify the code are permitted.
 - **Style:** Follow existing backend logic patterns. This package has no UI
   dependencies — keep it framework-agnostic.
 

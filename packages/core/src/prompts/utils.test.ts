@@ -28,10 +28,6 @@ vi.mock('./snippets.js', () => ({
   renderSubAgents: vi.fn().mockReturnValue('mocked-sub-agents'),
 }));
 
-vi.mock('./snippets.legacy.js', () => ({
-  renderSubAgents: vi.fn().mockReturnValue('mocked-legacy-sub-agents'),
-}));
-
 describe('resolvePathFromEnv', () => {
   it('should return default values for undefined input', () => {
     const result = resolvePathFromEnv(undefined);
@@ -247,23 +243,8 @@ describe('applySubstitutions', () => {
   });
 
   it('should replace ${SubAgents} with rendered sub-agents content', () => {
-    const result = applySubstitutions(
-      'Agents: ${SubAgents}',
-      mockConfig,
-      '',
-      true,
-    );
+    const result = applySubstitutions('Agents: ${SubAgents}', mockConfig, '');
     expect(result).toContain('mocked-sub-agents');
-  });
-
-  it('should use legacy snippets when isGemini3 is false', () => {
-    const result = applySubstitutions(
-      'Agents: ${SubAgents}',
-      mockConfig,
-      '',
-      false,
-    );
-    expect(result).toContain('mocked-legacy-sub-agents');
   });
 
   it('should replace ${AvailableTools} with tool names list', () => {

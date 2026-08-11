@@ -9,7 +9,6 @@ import process from 'node:process';
 import { homedir } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import * as snippets from './snippets.js';
-import * as legacySnippets from './snippets.legacy.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 
 export type ResolvedPath = {
@@ -65,14 +64,12 @@ export function applySubstitutions(
   prompt: string,
   context: AgentLoopContext,
   skillsPrompt: string,
-  isGemini3: boolean = false,
 ): string {
   let result = prompt;
 
   result = result.replace(/\${AgentSkills}/g, skillsPrompt);
 
-  const activeSnippets = isGemini3 ? snippets : legacySnippets;
-  const subAgentsContent = activeSnippets.renderSubAgents(
+  const subAgentsContent = snippets.renderSubAgents(
     context.config
       .getAgentRegistry()
       .getAllDefinitions()
