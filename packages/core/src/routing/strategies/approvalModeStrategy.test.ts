@@ -13,6 +13,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   GEMINI_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 import { ApprovalMode } from '../../policy/types.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 
@@ -37,6 +39,7 @@ describe('ApprovalModeStrategy', () => {
       getApprovalMode: vi.fn().mockReturnValue(ApprovalMode.DEFAULT),
       getApprovedPlanPath: vi.fn().mockReturnValue(undefined),
       getPlanModeRoutingEnabled: vi.fn().mockResolvedValue(true),
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
 
     mockBaseLlmClient = {} as BaseLlmClient;

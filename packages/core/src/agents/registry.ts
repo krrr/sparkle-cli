@@ -685,7 +685,10 @@ export class AgentRegistry {
       },
     );
 
-    if (agentModelConfig.model && isAutoModel(agentModelConfig.model)) {
+    if (
+      agentModelConfig.model &&
+      isAutoModel(agentModelConfig.model, this.config)
+    ) {
       this.config.modelConfigService.registerRuntimeModelOverride({
         match: {
           overrideScope: definition.name,

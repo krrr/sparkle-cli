@@ -10,21 +10,12 @@ import type {
   ModelPolicyChain,
   ModelPolicyStateMap,
 } from './modelPolicy.js';
-import {
-  DEFAULT_GEMINI_FLASH_LITE_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
-} from '../config/models.js';
 
 // actions and stateTransitions are optional when defining ModelPolicy
 type PolicyConfig = Omit<ModelPolicy, 'actions' | 'stateTransitions'> & {
   actions?: ModelPolicyActionMap;
   stateTransitions?: ModelPolicyStateMap;
 };
-
-export interface ModelPolicyOptions {
-  isAutoSelection?: boolean;
-}
 
 const DEFAULT_ACTIONS: ModelPolicyActionMap = {
   terminal: 'prompt',
@@ -47,58 +38,8 @@ const DEFAULT_STATE: ModelPolicyStateMap = {
   unknown: 'terminal',
 };
 
-const AUTO_ROUTING_OVERRIDES = {
-  maxAttempts: 3,
-  actions: { ...DEFAULT_ACTIONS, transient: 'silent' } as ModelPolicyActionMap,
-  stateTransitions: {
-    ...DEFAULT_STATE,
-    transient: 'sticky_retry',
-  } as ModelPolicyStateMap,
-};
-
-const FLASH_LITE_CHAIN: ModelPolicyChain = [
-  definePolicy({
-    model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-    actions: SILENT_ACTIONS,
-  }),
-  definePolicy({
-    model: DEFAULT_GEMINI_FLASH_MODEL,
-    actions: SILENT_ACTIONS,
-  }),
-  definePolicy({
-    model: DEFAULT_GEMINI_MODEL,
-    isLastResort: true,
-    actions: SILENT_ACTIONS,
-  }),
-];
-
-/**
- * Returns the default ordered model policy chain for the user.
- */
-export function getModelPolicyChain(
-  options: ModelPolicyOptions,
-): ModelPolicyChain {
-  const isAuto = options.isAutoSelection ?? false;
-
-  return [
-    definePolicy({
-      model: DEFAULT_GEMINI_MODEL,
-      ...(isAuto ? AUTO_ROUTING_OVERRIDES : {}),
-    }),
-    definePolicy({
-      model: DEFAULT_GEMINI_FLASH_MODEL,
-      isLastResort: true,
-      maxAttempts: 10,
-    }),
-  ];
-}
-
 export function createSingleModelChain(model: string): ModelPolicyChain {
   return [definePolicy({ model, isLastResort: true })];
-}
-
-export function getFlashLitePolicyChain(): ModelPolicyChain {
-  return cloneChain(FLASH_LITE_CHAIN);
 }
 
 /**
@@ -139,16 +80,4 @@ function definePolicy(config: PolicyConfig): ModelPolicy {
       ...(config.stateTransitions ?? {}),
     },
   };
-}
-
-function clonePolicy(policy: ModelPolicy): ModelPolicy {
-  return {
-    ...policy,
-    actions: { ...policy.actions },
-    stateTransitions: { ...policy.stateTransitions },
-  };
-}
-
-function cloneChain(chain: ModelPolicyChain): ModelPolicyChain {
-  return chain.map(clonePolicy);
 }

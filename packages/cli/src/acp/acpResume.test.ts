@@ -20,6 +20,7 @@ import {
   AuthType,
   type Config,
   CoreToolCallStatus,
+  GEMINI_MODEL_ALIAS_AUTO,
 } from 'sparkle-cli-core';
 import { loadCliConfig, type CliArgs } from '../config/config.js';
 import {
@@ -108,6 +109,22 @@ describe('GeminiAgent Session Resume', () => {
       isAutoMemoryEnabled: vi.fn().mockReturnValue(false),
       isPlanEnabled: vi.fn().mockReturnValue(true),
       getModel: vi.fn().mockReturnValue('gemini-pro'),
+      getModelConfigService: vi.fn().mockReturnValue({
+        getAvailableModelOptions: vi.fn().mockReturnValue([
+          {
+            modelId: GEMINI_MODEL_ALIAS_AUTO,
+            tier: 'auto',
+            name: 'Auto',
+            description: 'Auto description',
+          },
+          {
+            modelId: 'gemini-pro',
+            tier: 'pro',
+            name: 'gemini-pro',
+            description: 'Pro description',
+          },
+        ]),
+      }),
       getCheckpointingEnabled: vi.fn().mockReturnValue(false),
       toolRegistry: {
         getTool: vi.fn().mockReturnValue({ kind: 'read' }),

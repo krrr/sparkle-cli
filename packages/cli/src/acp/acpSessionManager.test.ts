@@ -62,6 +62,22 @@ describe('AcpSessionManager', () => {
       getContentGeneratorConfig: vi.fn(),
       getActiveModel: vi.fn().mockReturnValue('gemini-pro'),
       getModel: vi.fn().mockReturnValue('gemini-pro'),
+      getModelConfigService: vi.fn().mockReturnValue({
+        getAvailableModelOptions: vi.fn().mockReturnValue([
+          {
+            modelId: GEMINI_MODEL_ALIAS_AUTO,
+            tier: 'auto',
+            name: 'Auto',
+            description: 'Auto description',
+          },
+          {
+            modelId: 'gemini-pro',
+            tier: 'pro',
+            name: 'gemini-pro',
+            description: 'Pro description',
+          },
+        ]),
+      }),
       getGeminiClient: vi.fn().mockReturnValue({
         startChat: vi.fn().mockResolvedValue({}),
       }),

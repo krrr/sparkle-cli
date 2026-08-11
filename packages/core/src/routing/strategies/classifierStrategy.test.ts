@@ -23,6 +23,8 @@ import type { Content } from '@google/genai';
 import type { ResolvedModelConfig } from '../../services/modelConfigService.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { ModelAvailabilityService } from '../../availability/modelAvailabilityService.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 
 vi.mock('../../core/baseLlmClient.js');
 
@@ -48,9 +50,12 @@ describe('ClassifierStrategy', () => {
       generateContentConfig: {},
     } as unknown as ResolvedModelConfig;
     mockConfig = {
-      modelConfigService: {
-        getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
-      },
+      modelConfigService: Object.assign(
+        new ModelConfigService(DEFAULT_MODEL_CONFIGS),
+        {
+          getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
+        },
+      ),
       getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(false),
       getModelAvailabilityService: vi

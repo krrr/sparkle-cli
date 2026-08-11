@@ -6,11 +6,7 @@
 
 import type { GenerateContentConfig } from '@google/genai';
 import type { ModelPolicy } from '../availability/modelPolicy.js';
-import {
-  getDisplayString,
-  isProModel,
-  getAutoModelDescription,
-} from '../config/models.js';
+import { getDisplayString, getAutoModelDescription } from '../config/models.js';
 
 // The primary key for the ModelConfig is the model string. However, we also
 // support a secondary key to limit the override scope, typically an agent name.
@@ -170,10 +166,10 @@ export class ModelConfigService {
       });
 
     const manualOptions = Object.entries(definitions)
-      .filter(([id, m]) => {
+      .filter(([_, m]) => {
         if (m.isVisible !== true) return false;
         if (m.tier === 'auto') return false;
-        if (context.hasAccessToProModel === false && isProModel(id))
+        if (context.hasAccessToProModel === false && m.tier === 'pro')
           return false;
         return true;
       })
@@ -301,9 +297,13 @@ export class ModelConfigService {
     if (!template) {
       return undefined;
     }
-    // Map through the template and resolve each model ID
+    // Map through the template and resolve each model ID. The actions and
+    // stateTransitions maps are cloned per call so that callers cannot mutate
+    // the shared chain template and leak state across requests.
     return template.map((policy) => ({
       ...policy,
+      actions: { ...policy.actions },
+      stateTransitions: { ...policy.stateTransitions },
       model: this.resolveModelId(policy.model, context),
     }));
   }

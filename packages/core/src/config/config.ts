@@ -669,7 +669,6 @@ export interface ConfigParameters {
   voiceMode?: boolean;
   rawOutput?: boolean;
   acceptRawOutputRisk?: boolean;
-  dynamicModelConfiguration?: boolean;
   modelConfigServiceConfig?: ModelConfigServiceConfig;
   enableHooks?: boolean;
   enableHooksUI?: boolean;
@@ -866,7 +865,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly disableAlwaysAllow: boolean;
   private readonly rawOutput: boolean;
   private readonly acceptRawOutputRisk: boolean;
-  private readonly dynamicModelConfiguration: boolean;
   private pendingIncludeDirectories: string[];
   private readonly enableHooksUI: boolean;
   private readonly enableHooks: boolean;
@@ -1062,7 +1060,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.skillsSupport = params.skillsSupport ?? true;
     this.disabledSkills = params.disabledSkills ?? [];
     this.modelAvailabilityService = new ModelAvailabilityService();
-    this.dynamicModelConfiguration = params.dynamicModelConfiguration ?? false;
 
     // HACK: The settings loading logic doesn't currently merge the default
     // generation config with the user's settings. This means if a user provides
@@ -1518,7 +1515,7 @@ export class Config implements McpContext, AgentLoopContext {
     // Initialize BaseLlmClient now that the ContentGenerator and experiments are available
     this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
 
-    if ((await this.getProModelNoAccess()) && isAutoModel(this.model)) {
+    if ((await this.getProModelNoAccess()) && isAutoModel(this.model, this)) {
       this.setModel(DEFAULT_GEMINI_FLASH_MODEL);
     }
   }
@@ -2396,10 +2393,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getAcceptRawOutputRisk(): boolean {
     return this.acceptRawOutputRisk;
-  }
-
-  getExperimentalDynamicModelConfiguration(): boolean {
-    return this.dynamicModelConfiguration;
   }
 
   getReleaseChannel(): string {

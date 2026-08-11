@@ -21,6 +21,7 @@ import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { resetVersionCache } from '../utils/version.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import type { ModelConfigService } from '../services/modelConfigService.js';
 
 vi.mock('@google/genai');
 vi.mock('./apiKeyCredentialStorage.js', () => ({
@@ -29,8 +30,20 @@ vi.mock('./apiKeyCredentialStorage.js', () => ({
 
 vi.mock('./fakeContentGenerator.js');
 
+const modelConfigService = {
+  getResolvedConfig: vi.fn(),
+  resolveModelId: (model: string) => model,
+  resolveClassifierModelId: (_tier: string, model: string) => model,
+  getModelDefinition: () => undefined,
+  getModelChain: () => undefined,
+  resolveChain: vi.fn(),
+  registerRuntimeModelConfig: vi.fn(),
+  registerRuntimeModelOverride: vi.fn(),
+} as unknown as ModelConfigService;
+
 const mockConfig = {
   getModel: vi.fn().mockReturnValue('gemini-pro'),
+  modelConfigService,
   getProxy: vi.fn().mockReturnValue(undefined),
   getUsageStatisticsEnabled: vi.fn().mockReturnValue(true),
   getClientName: vi.fn().mockReturnValue(undefined),
@@ -44,9 +57,22 @@ const mockConfig = {
   getExperiments: vi.fn().mockReturnValue(undefined),
 } as unknown as Config;
 
+function createMockConfig(overrides: Partial<Config> = {}): Config {
+  return {
+    getModel: vi.fn().mockReturnValue('gemini-pro'),
+    modelConfigService,
+    getProxy: vi.fn().mockReturnValue(undefined),
+    getUsageStatisticsEnabled: () => true,
+    getClientName: vi.fn().mockReturnValue(undefined),
+    ...overrides,
+  } as unknown as Config;
+}
+
 describe('getAuthTypeFromEnv', () => {
   beforeEach(() => {
     vi.stubEnv('GEMINI_API_KEY', '');
+    vi.stubEnv('OPENAI_API_KEY', '');
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', '');
   });
 
   afterEach(() => {
@@ -121,12 +147,7 @@ describe('createContentGenerator', () => {
   });
 
   it('should create a GoogleGenAI content generator', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => true,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    const mockConfig = createMockConfig();
 
     // Set a fixed version for testing
     vi.stubEnv('CLI_VERSION', '1.2.3');
@@ -162,12 +183,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should use standard User-Agent for a2a-server running outside VS Code', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => true,
+    const mockConfig = createMockConfig({
       getClientName: vi.fn().mockReturnValue('a2a-server'),
-    } as unknown as Config;
+    });
 
     // Set a fixed version for testing
     vi.stubEnv('CLI_VERSION', '1.2.3');
@@ -200,12 +218,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should include unified User-Agent for a2a-server (VS Code Agent Mode)', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => true,
+    const mockConfig = createMockConfig({
       getClientName: vi.fn().mockReturnValue('a2a-server'),
-    } as unknown as Config;
+    });
 
     // Set a fixed version for testing
     vi.stubEnv('CLI_VERSION', '1.2.3');
@@ -238,12 +253,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should include clientName prefix in User-Agent when specified (non-VSCode)', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => true,
+    const mockConfig = createMockConfig({
       getClientName: vi.fn().mockReturnValue('my-client'),
-    } as unknown as Config;
+    });
 
     // Set a fixed version for testing
     vi.stubEnv('CLI_VERSION', '1.2.3');
@@ -276,12 +288,7 @@ describe('createContentGenerator', () => {
   });
 
   it('should allow custom headers to override User-Agent', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
-      getUsageStatisticsEnabled: () => true,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    const mockConfig = createMockConfig();
 
     vi.stubEnv('SPARKLE_CLI_CUSTOM_HEADERS', 'User-Agent:MyCustomUA');
 
@@ -307,12 +314,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should include custom headers from SPARKLE_CLI_CUSTOM_HEADERS for GoogleGenAI requests without inferring auth mechanism', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -353,12 +357,10 @@ describe('createContentGenerator', () => {
   });
 
   it('should inject HttpsProxyAgent into googleAuthOptions when proxy URL uses https://', async () => {
-    const mockConfigWithProxy = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
+    const mockConfigWithProxy = createMockConfig({
       getProxy: vi.fn().mockReturnValue('https://proxy.example.com:8080'),
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -388,12 +390,10 @@ describe('createContentGenerator', () => {
   });
 
   it('should still use HttpsProxyAgent for HTTPS destinations even when proxy URL uses http://', async () => {
-    const mockConfigWithProxy = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
+    const mockConfigWithProxy = createMockConfig({
       getProxy: vi.fn().mockReturnValue('http://proxy.example.com:8080'),
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -423,12 +423,10 @@ describe('createContentGenerator', () => {
   });
 
   it('should trim whitespace from proxy URL before instantiating agent', async () => {
-    const mockConfigWithProxy = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
+    const mockConfigWithProxy = createMockConfig({
       getProxy: vi.fn().mockReturnValue('  https://proxy.example.com:8080  '),
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -479,12 +477,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should pass api key as Authorization Header when GEMINI_API_KEY_AUTH_MECHANISM is set to bearer', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -512,12 +507,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should not pass api key as Authorization Header when GEMINI_API_KEY_AUTH_MECHANISM is not set (default behavior)', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -554,11 +546,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should create a GoogleGenAI content generator with client install id logging disabled', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
     const mockGenerator = {
       models: {},
     } as unknown as GoogleGenAI;
@@ -584,12 +574,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should pass apiVersion to GoogleGenAI when GOOGLE_GENAI_API_VERSION is set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -617,12 +604,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should not include apiVersion when GOOGLE_GENAI_API_VERSION is not set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -654,12 +638,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should not include apiVersion when GOOGLE_GENAI_API_VERSION is an empty string', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -692,12 +673,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should pass baseUrl to GoogleGenAI when GOOGLE_GEMINI_BASE_URL is set', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -723,12 +701,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should prefer an explicit baseUrl over GOOGLE_GEMINI_BASE_URL', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -755,12 +730,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should allow localhost baseUrl overrides over http', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},
@@ -799,12 +771,9 @@ describe('createContentGenerator', () => {
   });
 
   it('should set empty x-goog-api-key header for GATEWAY auth when apiKey is empty string', async () => {
-    const mockConfig = {
-      getModel: vi.fn().mockReturnValue('gemini-pro'),
-      getProxy: vi.fn().mockReturnValue(undefined),
+    const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
-      getClientName: vi.fn().mockReturnValue(undefined),
-    } as unknown as Config;
+    });
 
     const mockGenerator = {
       models: {},

@@ -60,7 +60,55 @@ describe('<ModelDialog />', () => {
           }>;
         }
       | undefined;
+    getModelConfigService: () => ReturnType<Config['getModelConfigService']>;
   }
+
+  const mockModelConfigService = {
+    getAvailableModelOptions: vi.fn(
+      (context: { hasAccessToProModel?: boolean }) => {
+        const options = [
+          {
+            modelId: GEMINI_MODEL_ALIAS_AUTO,
+            tier: 'auto',
+            name: mockGetDisplayString(GEMINI_MODEL_ALIAS_AUTO),
+            description: 'Auto description',
+          },
+          {
+            modelId: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+            tier: 'flash-lite',
+            name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
+            description: 'Flash Lite description',
+          },
+          {
+            modelId: DEFAULT_GEMINI_FLASH_MODEL,
+            tier: 'flash',
+            name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
+            description: 'Flash description',
+          },
+          {
+            modelId: DEFAULT_GEMINI_MODEL,
+            tier: 'pro',
+            name: mockGetDisplayString(DEFAULT_GEMINI_MODEL),
+            description: 'Pro description',
+          },
+        ];
+        return context?.hasAccessToProModel === false
+          ? options.filter((o) => o.tier !== 'pro')
+          : options;
+      },
+    ),
+    getModelDefinition: vi.fn((modelId: string) =>
+      modelId === GEMINI_MODEL_ALIAS_AUTO
+        ? { tier: 'auto', isVisible: true }
+        : modelId === DEFAULT_GEMINI_MODEL
+          ? { tier: 'pro', isVisible: true }
+          : modelId === DEFAULT_GEMINI_FLASH_MODEL
+            ? { tier: 'flash', isVisible: true }
+            : modelId === DEFAULT_GEMINI_FLASH_LITE_MODEL
+              ? { tier: 'flash-lite', isVisible: true }
+              : undefined,
+    ),
+  };
 
   const mockConfig: MockConfig = {
     setModel: mockSetModel,
@@ -70,6 +118,10 @@ describe('<ModelDialog />', () => {
     getProModelNoAccessSync: mockGetProModelNoAccessSync,
     getLastRetrievedQuota: () => ({ buckets: [] }),
     getSessionId: () => 'test-session-id',
+    getModelConfigService: () =>
+      mockModelConfigService as unknown as ReturnType<
+        Config['getModelConfigService']
+      >,
   };
 
   beforeEach(() => {
@@ -216,14 +268,17 @@ describe('<ModelDialog />', () => {
     });
     await waitUntilReady();
 
-    // Now in manual view. Default selection is first item (DEFAULT_GEMINI_MODEL)
+    // Now in manual view. Default selection is the first item (flash-lite)
     await act(async () => {
       stdin.write('\r');
     });
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL, true);
+      expect(mockSetModel).toHaveBeenCalledWith(
+        DEFAULT_GEMINI_FLASH_LITE_MODEL,
+        true,
+      );
       expect(mockOnClose).toHaveBeenCalled();
     });
     unmount();
@@ -359,14 +414,17 @@ describe('<ModelDialog />', () => {
     });
     await waitUntilReady();
 
-    // Select the first model (DEFAULT_GEMINI_MODEL)
+    // Select the first model (DEFAULT_GEMINI_FLASH_LITE_MODEL)
     await act(async () => {
       stdin.write('\r');
     });
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL, true);
+      expect(mockSetModel).toHaveBeenCalledWith(
+        DEFAULT_GEMINI_FLASH_LITE_MODEL,
+        true,
+      );
     });
     unmount();
   });

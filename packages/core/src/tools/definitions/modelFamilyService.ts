@@ -8,7 +8,10 @@
  * Single source of truth for mapping model IDs to tool families.
  */
 
-import { isCustomModel } from '../../config/models.js';
+import {
+  isCustomModel,
+  type ModelCapabilityContext,
+} from '../../config/models.js';
 import { type ToolFamily } from './types.js';
 
 /**
@@ -16,15 +19,19 @@ import { type ToolFamily } from './types.js';
  * Defaults to 'default-legacy' if the model is not recognized or not provided.
  *
  * @param modelId The model identifier (e.g., 'gemini-2.5-pro', 'gemini-3-flash-preview')
+ * @param config Optional config for dynamic model capability checks.
  * @returns The resolved ToolFamily
  */
-export function getToolFamily(modelId?: string): ToolFamily {
+export function getToolFamily(
+  modelId?: string,
+  config?: ModelCapabilityContext,
+): ToolFamily {
   if (!modelId) {
     return 'default-legacy';
   }
 
   // All Gemini models are treated as the Gemini 3 family.
-  if (!isCustomModel(modelId)) {
+  if (!isCustomModel(modelId, config)) {
     return 'gemini-3';
   }
 

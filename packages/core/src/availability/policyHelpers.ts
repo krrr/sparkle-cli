@@ -16,8 +16,6 @@ import type {
 import {
   createDefaultPolicy,
   createSingleModelChain,
-  getModelPolicyChain,
-  getFlashLitePolicyChain,
   SILENT_ACTIONS,
 } from './policyCatalog.js';
 import {
@@ -61,53 +59,34 @@ export function resolvePolicyChain(
     : false;
   const isAutoConfigured = isAutoModel(configuredModel, config);
 
-  // --- DYNAMIC PATH ---
-  if (config.getExperimentalDynamicModelConfiguration?.() === true) {
-    if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
-      chain = config.modelConfigService.resolveChain('lite');
-    } else if (
-      isOriginallyGemini3 ||
-      isAutoPreferred ||
-      isAutoConfigured ||
-      resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
+  if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
+    chain = config.modelConfigService.resolveChain('lite');
+  } else if (
+    isOriginallyGemini3 ||
+    isAutoPreferred ||
+    isAutoConfigured ||
+    resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
+  ) {
+    // 1. Try to find a chain specifically for the current configured alias
+    if (
+      isAutoConfigured &&
+      config.modelConfigService.getModelChain(configuredModel)
     ) {
-      // 1. Try to find a chain specifically for the current configured alias
-      if (
-        isAutoConfigured &&
-        config.modelConfigService.getModelChain(configuredModel)
-      ) {
-        chain = config.modelConfigService.resolveChain(configuredModel);
-      }
-      // 2. Fallback to family-based auto-routing
-      if (!chain) {
-        const isAutoSelection = isAutoPreferred || isAutoConfigured;
-        const autoPrefix = isAutoSelection ? 'auto-' : '';
-        chain = config.modelConfigService.resolveChain(`${autoPrefix}default`);
-      }
+      chain = config.modelConfigService.resolveChain(configuredModel);
     }
+    // 2. Fallback to family-based auto-routing
     if (!chain) {
-      // No matching modelChains found, default to single model chain
-      chain = createSingleModelChain(modelFromConfig);
-    }
-    chain = applyDynamicSlicing(chain, resolvedModel);
-  } else {
-    // --- LEGACY PATH ---
-
-    if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
-      chain = getFlashLitePolicyChain();
-    } else if (
-      isOriginallyGemini3 ||
-      isAutoPreferred ||
-      isAutoConfigured ||
-      resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
-    ) {
       const isAutoSelection = isAutoPreferred || isAutoConfigured;
-      chain = getModelPolicyChain({ isAutoSelection });
-    } else {
-      chain = createSingleModelChain(modelFromConfig);
+      const autoPrefix = isAutoSelection ? 'auto-' : '';
+      chain = config.modelConfigService.resolveChain(`${autoPrefix}default`);
     }
-    chain = applyDynamicSlicing(chain, resolvedModel);
   }
+  if (!chain) {
+    // No matching modelChains found, default to single model chain
+    chain = createSingleModelChain(modelFromConfig);
+  }
+  chain = applyDynamicSlicing(chain, resolvedModel);
+
   // Apply Unified Silent Injection for Plan Mode with defensive checks
   if (config?.getApprovalMode?.() === ApprovalMode.PLAN) {
     return chain.map((policy) => ({

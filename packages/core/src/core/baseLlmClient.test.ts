@@ -118,6 +118,13 @@ describe('BaseLlmClient', () => {
         getResolvedConfig: vi
           .fn()
           .mockImplementation(({ model }) => makeResolvedModelConfig(model)),
+        resolveModelId: (model: string) => model,
+        resolveClassifierModelId: (_tier: string, model: string) => model,
+        getModelDefinition: () => undefined,
+        getModelChain: () => undefined,
+        resolveChain: vi.fn(),
+        registerRuntimeModelConfig: vi.fn(),
+        registerRuntimeModelOverride: vi.fn(),
       } as unknown as ModelConfigService,
       getModelAvailabilityService: vi
         .fn()

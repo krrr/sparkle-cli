@@ -973,7 +973,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
     const requestedModel = resolvedConfig.model;
 
     let modelToUse: string | undefined;
-    if (isAutoModel(requestedModel)) {
+    if (isAutoModel(requestedModel, this.context.config)) {
       modelToUse = this.cache.get('modelToUse');
 
       // If not cached, fetch from the router and cache the result.

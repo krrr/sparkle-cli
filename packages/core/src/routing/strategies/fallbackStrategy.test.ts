@@ -16,6 +16,8 @@ import {
   GEMINI_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
 import { selectModelForAvailability } from '../../availability/policyHelpers.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 
 vi.mock('../../availability/policyHelpers.js', () => ({
   selectModelForAvailability: vi.fn(),
@@ -25,6 +27,7 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
   ({
     getModelAvailabilityService: vi.fn(),
     getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
+    modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     ...overrides,
   }) as unknown as Config;
 

@@ -13,6 +13,8 @@ import {
   GEMINI_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
 } from '../../config/models.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 import type { Config } from '../../config/config.js';
 
 describe('DefaultStrategy', () => {
@@ -21,6 +23,7 @@ describe('DefaultStrategy', () => {
     const mockContext = {} as RoutingContext;
     const mockConfig = {
       getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
     const mockClient = {} as BaseLlmClient;
 
@@ -41,6 +44,7 @@ describe('DefaultStrategy', () => {
     const mockContext = {} as RoutingContext;
     const mockConfig = {
       getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
     const mockClient = {} as BaseLlmClient;
 
@@ -62,6 +66,7 @@ describe('DefaultStrategy', () => {
     const mockContext = {} as RoutingContext;
     const mockConfig = {
       getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_FLASH_MODEL),
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
     const mockClient = {} as BaseLlmClient;
 

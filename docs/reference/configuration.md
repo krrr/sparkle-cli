@@ -566,7 +566,8 @@ their corresponding top-level category object in your `settings.json` file.
         "modelConfig": {
           "generateContentConfig": {
             "thinkingConfig": {
-              "includeThoughts": true
+              "includeThoughts": true,
+              "thinkingLevel": "HIGH"
             },
             "temperature": 1,
             "topP": 0.95,
@@ -574,30 +575,20 @@ their corresponding top-level category object in your `settings.json` file.
           }
         }
       },
-      "chat-base-3": {
-        "extends": "chat-base",
-        "modelConfig": {
-          "generateContentConfig": {
-            "thinkingConfig": {
-              "thinkingLevel": "HIGH"
-            }
-          }
-        }
-      },
       "gemini-pro-latest": {
-        "extends": "chat-base-3",
+        "extends": "chat-base",
         "modelConfig": {
           "model": "gemini-pro-latest"
         }
       },
       "gemini-flash-lite-latest": {
-        "extends": "chat-base-3",
+        "extends": "chat-base",
         "modelConfig": {
           "model": "gemini-flash-lite-latest"
         }
       },
       "gemini-flash-latest": {
-        "extends": "chat-base-3",
+        "extends": "chat-base",
         "modelConfig": {
           "model": "gemini-flash-latest"
         }
@@ -605,7 +596,7 @@ their corresponding top-level category object in your `settings.json` file.
       "gemini-3-flash-base": {
         "extends": "base",
         "modelConfig": {
-          "model": "gemini-3.5-flash"
+          "model": "gemini-flash-latest"
         }
       },
       "classifier": {
@@ -615,7 +606,7 @@ their corresponding top-level category object in your `settings.json` file.
           "generateContentConfig": {
             "maxOutputTokens": 1024,
             "thinkingConfig": {
-              "thinkingBudget": 512
+              "thinkingLevel": "LOW"
             }
           }
         }
@@ -628,7 +619,7 @@ their corresponding top-level category object in your `settings.json` file.
             "temperature": 0.3,
             "maxOutputTokens": 16000,
             "thinkingConfig": {
-              "thinkingBudget": 0
+              "thinkingLevel": "LOW"
             }
           }
         }
@@ -641,7 +632,7 @@ their corresponding top-level category object in your `settings.json` file.
             "temperature": 0.2,
             "maxOutputTokens": 120,
             "thinkingConfig": {
-              "thinkingBudget": 0
+              "thinkingLevel": "LOW"
             }
           }
         }
@@ -652,7 +643,7 @@ their corresponding top-level category object in your `settings.json` file.
           "model": "flash-lite",
           "generateContentConfig": {
             "thinkingConfig": {
-              "thinkingBudget": 0
+              "thinkingLevel": "LOW"
             }
           }
         }
@@ -758,6 +749,25 @@ their corresponding top-level category object in your `settings.json` file.
         "modelConfig": {
           "model": "gemini-flash-latest"
         }
+      },
+      "deepseek-base": {
+        "extends": "base",
+        "modelConfig": {
+          "model": "deepseek-v4-flash",
+          "generateContentConfig": {
+            "temperature": 1
+          }
+        }
+      },
+      "deepseek-v4-flash": {
+        "extends": "deepseek-base",
+        "modelConfig": {}
+      },
+      "deepseek-v4-pro": {
+        "extends": "deepseek-base",
+        "modelConfig": {
+          "model": "deepseek-v4-pro"
+        }
       }
     }
     ```
@@ -846,6 +856,24 @@ their corresponding top-level category object in your `settings.json` file.
         "isVisible": false,
         "features": {
           "thinking": false,
+          "multimodalToolUse": false
+        }
+      },
+      "deepseek-v4-flash": {
+        "tier": "custom",
+        "family": "custom",
+        "isVisible": true,
+        "features": {
+          "thinking": false,
+          "multimodalToolUse": false
+        }
+      },
+      "deepseek-v4-pro": {
+        "tier": "custom",
+        "family": "custom",
+        "isVisible": true,
+        "features": {
+          "thinking": true,
           "multimodalToolUse": false
         }
       }
@@ -1595,13 +1623,6 @@ their corresponding top-level category object in your `settings.json` file.
 - **`experimental.directWebFetch`** (boolean):
 
   - **Description:** Enable web fetch behavior that bypasses LLM summarization.
-  - **Default:** `false`
-  - **Requires restart:** Yes
-
-- **`experimental.dynamicModelConfiguration`** (boolean):
-
-  - **Description:** Enable dynamic model configuration (definitions,
-    resolutions, and chains) via settings.
   - **Default:** `false`
   - **Requires restart:** Yes
 

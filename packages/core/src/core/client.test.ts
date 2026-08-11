@@ -32,7 +32,12 @@ import {
   type ServerGeminiStreamEvent,
 } from './turn.js';
 import { getCoreSystemPrompt } from './prompts.js';
-import { GEMINI_MODEL_ALIAS_AUTO } from '../config/models.js';
+import {
+  GEMINI_MODEL_ALIAS_AUTO,
+  DEFAULT_GEMINI_MODEL,
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_GEMINI_FLASH_LITE_MODEL,
+} from '../config/models.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { setSimulate429 } from '../utils/testUtils.js';
 import { tokenLimit } from './tokenLimits.js';
@@ -47,7 +52,6 @@ import type {
   ModelConfigKey,
   ResolvedModelConfig,
 } from '../services/modelConfigService.js';
-import * as policyCatalog from '../availability/policyCatalog.js';
 import { LlmRole, LoopType } from '../telemetry/types.js';
 import { partToString } from '../utils/partUtils.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
@@ -276,6 +280,50 @@ describe('Gemini Client (client.ts)', () => {
             } as unknown as ResolvedModelConfig,
           };
         },
+        resolveModelId: (model: string) => model,
+        resolveClassifierModelId: (_tier: string, model: string) => model,
+        getModelDefinition: (modelId: string) =>
+          modelId === GEMINI_MODEL_ALIAS_AUTO ? { tier: 'auto' } : undefined,
+        getModelChain: () => undefined,
+        resolveChain: vi.fn().mockImplementation((key: string) =>
+          key === 'lite'
+            ? [
+                {
+                  model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+                  isLastResort: false,
+                  actions: {},
+                  stateTransitions: {},
+                },
+                {
+                  model: DEFAULT_GEMINI_FLASH_MODEL,
+                  isLastResort: false,
+                  actions: {},
+                  stateTransitions: {},
+                },
+                {
+                  model: DEFAULT_GEMINI_MODEL,
+                  isLastResort: true,
+                  actions: {},
+                  stateTransitions: {},
+                },
+              ]
+            : [
+                {
+                  model: DEFAULT_GEMINI_MODEL,
+                  isLastResort: false,
+                  actions: {},
+                  stateTransitions: {},
+                },
+                {
+                  model: DEFAULT_GEMINI_FLASH_MODEL,
+                  isLastResort: true,
+                  actions: {},
+                  stateTransitions: {},
+                },
+              ],
+        ),
+        registerRuntimeModelConfig: vi.fn(),
+        registerRuntimeModelOverride: vi.fn(),
       },
       isInteractive: vi.fn().mockReturnValue(false),
       getExperiments: () => {},
@@ -2373,7 +2421,7 @@ ${JSON.stringify(
         vi.mocked(mockConfig.getModelRouterService).mockReturnValue(
           mockRouterService as unknown as ModelRouterService,
         );
-        vi.spyOn(policyCatalog, 'getModelPolicyChain').mockReturnValue([
+        vi.mocked(mockConfig.modelConfigService.resolveChain).mockReturnValue([
           {
             model: 'model-a',
             isLastResort: false,

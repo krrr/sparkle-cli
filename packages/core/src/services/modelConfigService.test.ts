@@ -10,6 +10,11 @@ import {
   type ModelConfigAlias,
   type ModelConfigServiceConfig,
 } from './modelConfigService.js';
+import {
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_GEMINI_MODEL,
+} from '../config/models.js';
+import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 
 describe('ModelConfigService', () => {
   it('should resolve a basic alias to its model and settings', () => {
@@ -1148,6 +1153,45 @@ describe('ModelConfigService', () => {
       expect(optionsWithUndefined.map((o) => o.modelId)).toContain(
         'gemini-3-pro',
       );
+    });
+  });
+
+  describe('model chains', () => {
+    it('pins the retry semantics of the auto-default chain', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+      const chain = service.resolveChain('auto-default');
+      expect(chain).toHaveLength(2);
+
+      const [primary, lastResort] = chain ?? [];
+      expect(primary).toBeDefined();
+      expect(lastResort).toBeDefined();
+      expect(primary?.model).toBe(DEFAULT_GEMINI_MODEL);
+      expect(primary?.maxAttempts).toBe(3);
+      expect(primary?.actions.transient).toBe('silent');
+      expect(primary?.stateTransitions.transient).toBe('sticky_retry');
+      expect(lastResort?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+      expect(lastResort?.isLastResort).toBe(true);
+      expect(lastResort?.maxAttempts).toBe(10);
+    });
+
+    it('clones policy maps so edits do not leak between calls', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+      const firstCall = service.resolveChain('default');
+      const secondCall = service.resolveChain('default');
+      expect(firstCall).toBeDefined();
+      expect(secondCall).toBeDefined();
+
+      const firstPolicy = firstCall?.[0];
+      const secondPolicy = secondCall?.[0];
+      expect(firstPolicy).toBeDefined();
+      expect(secondPolicy).toBeDefined();
+      if (firstPolicy && secondPolicy) {
+        firstPolicy.actions.terminal = 'silent';
+        expect(secondPolicy.actions.terminal).toBe('prompt');
+      }
+      expect(
+        DEFAULT_MODEL_CONFIGS.modelChains?.['default']?.[0]?.actions.terminal,
+      ).toBe('prompt');
     });
   });
 });

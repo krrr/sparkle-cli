@@ -12,12 +12,17 @@ import {
 import type { RoutingContext } from '../routingStrategy.js';
 import type { Config } from '../../config/config.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
-import { DEFAULT_GEMINI_FLASH_MODEL } from '../../config/models.js';
+import {
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_GEMINI_MODEL,
+} from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
 import type { ResolvedModelConfig } from '../../services/modelConfigService.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { ModelAvailabilityService } from '../../availability/modelAvailabilityService.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 
 vi.mock('../../core/baseLlmClient.js');
 
@@ -43,9 +48,12 @@ describe('NumericalClassifierStrategy', () => {
       generateContentConfig: {},
     } as unknown as ResolvedModelConfig;
     mockConfig = {
-      modelConfigService: {
-        getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
-      },
+      modelConfigService: Object.assign(
+        new ModelConfigService(DEFAULT_MODEL_CONFIGS),
+        {
+          getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
+        },
+      ),
       getModel: vi.fn().mockReturnValue('gemini-3-pro-preview'),
       getSessionId: vi.fn().mockReturnValue('control-group-id'), // Default to Control Group (Hash 71 >= 50)
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(true),
@@ -160,7 +168,7 @@ describe('NumericalClassifierStrategy', () => {
       );
 
       expect(decision).toEqual({
-        model: 'gemini-3-pro-preview',
+        model: DEFAULT_GEMINI_MODEL,
         metadata: {
           source: 'NumericalClassifier (Default)',
           latencyMs: expect.any(Number),
@@ -249,7 +257,7 @@ describe('NumericalClassifierStrategy', () => {
       );
 
       expect(decision).toEqual({
-        model: 'gemini-3-pro-preview', // Score 35 >= Threshold 30
+        model: DEFAULT_GEMINI_MODEL, // Score 35 >= Threshold 30
         metadata: {
           source: 'NumericalClassifier (Remote)',
           latencyMs: expect.any(Number),
@@ -328,7 +336,7 @@ describe('NumericalClassifierStrategy', () => {
       );
 
       expect(decision).toEqual({
-        model: 'gemini-3-pro-preview',
+        model: DEFAULT_GEMINI_MODEL,
         metadata: {
           source: 'NumericalClassifier (Default)',
           latencyMs: expect.any(Number),
@@ -755,7 +763,7 @@ describe('NumericalClassifierStrategy', () => {
         mockBaseLlmClient,
       );
 
-      expect(decision?.model).toBe('gemini-3-pro-preview');
+      expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
   });
 });

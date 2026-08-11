@@ -45,7 +45,6 @@ export interface IModelConfigService {
  */
 export interface ModelCapabilityContext {
   readonly modelConfigService: IModelConfigService;
-  getExperimentalDynamicModelConfiguration(): boolean;
 }
 
 export const DEFAULT_GEMINI_MODEL = 'gemini-pro-latest';
@@ -83,50 +82,28 @@ export function resolveModel(
       ? String(requestedModel ?? '').trim() || ''
       : requestedModel.trim() || '';
 
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     return config.modelConfigService.resolveModelId(normalizedModel, {
       useCustomTools: false,
     });
   }
 
-  let resolved: string;
+  // Static fallback matching the default dynamic resolution for standard aliases.
   switch (normalizedModel) {
     case GEMINI_MODEL_ALIAS_AUTO:
     case GEMINI_MODEL_ALIAS_PRO: {
-      resolved = DEFAULT_GEMINI_MODEL;
-      break;
+      return DEFAULT_GEMINI_MODEL;
     }
     case GEMINI_MODEL_ALIAS_FLASH: {
-      resolved = DEFAULT_GEMINI_FLASH_MODEL;
-      break;
+      return DEFAULT_GEMINI_FLASH_MODEL;
     }
     case GEMINI_MODEL_ALIAS_FLASH_LITE: {
-      resolved = DEFAULT_GEMINI_FLASH_LITE_MODEL;
-      break;
+      return DEFAULT_GEMINI_FLASH_LITE_MODEL;
     }
     default: {
-      resolved = normalizedModel;
-      break;
+      return normalizedModel;
     }
   }
-
-  if (resolved === 'none') {
-    return DEFAULT_GEMINI_FLASH_LITE_MODEL;
-  }
-
-  if (isFlashModel(resolved) && normalizedModel !== 'gemini-3-flash-preview') {
-    return DEFAULT_GEMINI_FLASH_MODEL;
-  }
-
-  return resolved;
-}
-
-function isFlashModel(model: string): boolean {
-  return (
-    model === DEFAULT_GEMINI_FLASH_MODEL ||
-    model === 'flash' ||
-    model.endsWith('flash')
-  );
 }
 
 /**
@@ -142,7 +119,7 @@ export function resolveClassifierModel(
   modelAlias: string,
   config?: ModelCapabilityContext,
 ): string {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     return config.modelConfigService.resolveClassifierModelId(
       modelAlias,
       requestedModel,
@@ -159,7 +136,7 @@ export function getDisplayString(
   model: string,
   config?: ModelCapabilityContext,
 ) {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     const definition = config.modelConfigService.getModelDefinition(model);
     if (definition?.displayName) {
       return definition.displayName;
@@ -189,7 +166,7 @@ export function isProModel(
   model: string,
   config?: ModelCapabilityContext,
 ): boolean {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     return config.modelConfigService.getModelDefinition(model)?.tier === 'pro';
   }
   return model.toLowerCase().includes('pro');
@@ -206,7 +183,7 @@ export function isCustomModel(
   model: string,
   config?: ModelCapabilityContext,
 ): boolean {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     const resolved = resolveModel(model, config);
     return (
       config.modelConfigService.getModelDefinition(resolved)?.tier ===
@@ -240,7 +217,7 @@ export function isAutoModel(
   model: string,
   config?: ModelCapabilityContext,
 ): boolean {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     return config.modelConfigService.getModelDefinition(model)?.tier === 'auto';
   }
   return model === GEMINI_MODEL_ALIAS_AUTO;
@@ -257,7 +234,7 @@ export function supportsMultimodalFunctionResponse(
   model: string,
   config?: ModelCapabilityContext,
 ): boolean {
-  if (config?.getExperimentalDynamicModelConfiguration?.() === true) {
+  if (config) {
     return (
       config.modelConfigService.getModelDefinition(model)?.features
         ?.multimodalToolUse === true

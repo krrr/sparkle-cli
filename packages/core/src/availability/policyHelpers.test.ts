@@ -29,7 +29,6 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config => {
     getModel: () => DEFAULT_GEMINI_MODEL,
     getContentGeneratorConfig: () => ({ authType: undefined }),
     getMaxAttemptsPerTurn: () => 3,
-    getExperimentalDynamicModelConfiguration: () => false,
     getReleaseChannel: () => 'preview',
     modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     ...overrides,
@@ -132,34 +131,6 @@ describe('policyHelpers', () => {
     });
   });
 
-  describe('resolvePolicyChain behavior is identical between dynamic and legacy implementations', () => {
-    const testCases = [
-      { name: 'Default Auto', model: GEMINI_MODEL_ALIAS_AUTO },
-      { name: 'Unified Auto', model: 'auto' },
-      { name: 'Flash Lite', model: DEFAULT_GEMINI_FLASH_LITE_MODEL },
-      { name: 'Concrete Model (2.5 Pro)', model: DEFAULT_GEMINI_MODEL },
-      { name: 'Custom Model', model: 'my-custom-model' },
-    ];
-
-    testCases.forEach(({ name, model }) => {
-      it(`achieves parity for: ${name}`, () => {
-        const createBaseConfig = (dynamic: boolean) =>
-          createMockConfig({
-            getExperimentalDynamicModelConfiguration: () => dynamic,
-            getModel: () => model,
-            getContentGeneratorConfig: () => ({ authType: undefined }),
-            getReleaseChannel: () => 'preview',
-            modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
-          });
-
-        const legacyChain = resolvePolicyChain(createBaseConfig(false), model);
-        const dynamicChain = resolvePolicyChain(createBaseConfig(true), model);
-
-        expect(dynamicChain).toEqual(legacyChain);
-      });
-    });
-  });
-
   describe('buildFallbackPolicyContext', () => {
     it('returns remaining candidates after the failed model', () => {
       const chain = [
@@ -183,6 +154,14 @@ describe('policyHelpers', () => {
   describe('applyModelSelection', () => {
     const mockModelConfigService = {
       getResolvedConfig: vi.fn(),
+      resolveModelId: (model: string) => model,
+      resolveClassifierModelId: (_tier: string, model: string) => model,
+      getModelDefinition: (modelId: string) =>
+        modelId === GEMINI_MODEL_ALIAS_AUTO ? { tier: 'auto' } : undefined,
+      getModelChain: () => undefined,
+      resolveChain: vi.fn(),
+      registerRuntimeModelConfig: vi.fn(),
+      registerRuntimeModelOverride: vi.fn(),
     };
 
     const mockAvailabilityService = {

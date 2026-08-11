@@ -7,40 +7,16 @@
 import { describe, it, expect } from 'vitest';
 import {
   createDefaultPolicy,
-  getModelPolicyChain,
+  createSingleModelChain,
   validateModelPolicyChain,
 } from './policyCatalog.js';
-import {
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
-} from '../config/models.js';
 
 describe('policyCatalog', () => {
-  it('returns the default chain', () => {
-    const chain = getModelPolicyChain({});
-    expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
-    expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-    expect(chain).toHaveLength(2);
-  });
-
-  it('marks transients as sticky retries when auto-selected', () => {
-    const [policy] = getModelPolicyChain({ isAutoSelection: true });
-    expect(policy.model).toBe(DEFAULT_GEMINI_MODEL);
-    expect(policy.stateTransitions.transient).toBe('sticky_retry');
-  });
-
-  it('applies default actions and state transitions for unspecified kinds', () => {
-    const [policy] = getModelPolicyChain({});
-    expect(policy.stateTransitions.not_found).toBe('terminal');
-    expect(policy.stateTransitions.unknown).toBe('terminal');
-    expect(policy.actions.unknown).toBe('prompt');
-  });
-
-  it('clones policy maps so edits do not leak between calls', () => {
-    const firstCall = getModelPolicyChain({});
-    firstCall[0].actions.terminal = 'silent';
-    const secondCall = getModelPolicyChain({});
-    expect(secondCall[0].actions.terminal).toBe('prompt');
+  it('createSingleModelChain produces a single last-resort policy', () => {
+    const chain = createSingleModelChain('test-model');
+    expect(chain).toHaveLength(1);
+    expect(chain[0]?.model).toBe('test-model');
+    expect(chain[0]?.isLastResort).toBe(true);
   });
 
   it('passes when there is exactly one last-resort policy', () => {

@@ -29,78 +29,75 @@ import { DEFAULT_MODEL_CONFIGS } from './defaultModelConfigs.js';
 
 const modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
 
-const dynamicConfig = {
-  getExperimentalDynamicModelConfiguration: () => true,
+const config = {
   modelConfigService,
 } as unknown as Config;
 
-const legacyConfig = {
-  getExperimentalDynamicModelConfiguration: () => false,
-  modelConfigService,
-} as unknown as Config;
-
-describe('Dynamic Configuration Parity', () => {
-  const modelsToTest = [
-    GEMINI_MODEL_ALIAS_AUTO,
-    GEMINI_MODEL_ALIAS_PRO,
-    GEMINI_MODEL_ALIAS_FLASH,
-    GEMINI_MODEL_ALIAS_FLASH_LITE,
-    DEFAULT_GEMINI_MODEL,
-    DEFAULT_GEMINI_FLASH_MODEL,
-    'custom-model',
-  ];
-
-  it('resolveModel should match legacy behavior when dynamicModelConfiguration flag enabled.', () => {
-    for (const model of modelsToTest) {
-      const legacy = resolveModel(model, legacyConfig);
-      const dynamic = resolveModel(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
+describe('config-driven model resolution', () => {
+  it('resolveModel resolves aliases via the model config service', () => {
+    expect(resolveModel(GEMINI_MODEL_ALIAS_AUTO, config)).toBe(
+      DEFAULT_GEMINI_MODEL,
+    );
+    expect(resolveModel(GEMINI_MODEL_ALIAS_PRO, config)).toBe(
+      DEFAULT_GEMINI_MODEL,
+    );
+    expect(resolveModel(GEMINI_MODEL_ALIAS_FLASH, config)).toBe(
+      DEFAULT_GEMINI_FLASH_MODEL,
+    );
+    expect(resolveModel(GEMINI_MODEL_ALIAS_FLASH_LITE, config)).toBe(
+      DEFAULT_GEMINI_FLASH_LITE_MODEL,
+    );
   });
 
-  it('resolveClassifierModel should match legacy behavior.', () => {
-    const classifierTiers = [GEMINI_MODEL_ALIAS_PRO, GEMINI_MODEL_ALIAS_FLASH];
-    const anchorModels = [GEMINI_MODEL_ALIAS_AUTO, DEFAULT_GEMINI_MODEL];
-
-    for (const tier of classifierTiers) {
-      for (const anchor of anchorModels) {
-        const legacy = resolveClassifierModel(anchor, tier, legacyConfig);
-        const dynamic = resolveClassifierModel(anchor, tier, dynamicConfig);
-        expect(dynamic).toBe(legacy);
-      }
-    }
+  it('resolveModel passes unknown models through without flash-suffix coercion', () => {
+    // Accepted behavior change: no implicit remapping of names ending in 'flash'.
+    expect(resolveModel('gemini-2.0-flash', config)).toBe('gemini-2.0-flash');
+    expect(resolveModel('custom-flash', config)).toBe('custom-flash');
   });
 
-  it('getDisplayString should match legacy behavior', () => {
-    for (const model of modelsToTest) {
-      const legacy = getDisplayString(model, legacyConfig);
-      const dynamic = getDisplayString(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
+  it('resolveModel passes "none" through unchanged', () => {
+    // Accepted behavior change: no special-casing of the 'none' model.
+    expect(resolveModel('none', config)).toBe('none');
   });
 
-  it('isProModel should match legacy behavior', () => {
-    for (const model of modelsToTest) {
-      const legacy = isProModel(model, legacyConfig);
-      const dynamic = isProModel(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
+  it('resolveClassifierModel resolves via the classifier id resolutions', () => {
+    expect(
+      resolveClassifierModel(
+        GEMINI_MODEL_ALIAS_AUTO,
+        GEMINI_MODEL_ALIAS_FLASH,
+        config,
+      ),
+    ).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    expect(
+      resolveClassifierModel(
+        GEMINI_MODEL_ALIAS_AUTO,
+        GEMINI_MODEL_ALIAS_PRO,
+        config,
+      ),
+    ).toBe(DEFAULT_GEMINI_MODEL);
   });
 
-  it('isCustomModel should match legacy behavior', () => {
-    for (const model of modelsToTest) {
-      const legacy = isCustomModel(model, legacyConfig);
-      const dynamic = isCustomModel(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
+  it('isProModel is tier-based when a config is provided', () => {
+    expect(isProModel(DEFAULT_GEMINI_MODEL, config)).toBe(true);
+    // Custom models with 'pro' in the name are no longer treated as Pro.
+    expect(isProModel('custom-pro-model', config)).toBe(false);
   });
 
-  it('supportsMultimodalFunctionResponse should match legacy behavior', () => {
-    for (const model of modelsToTest) {
-      const legacy = supportsMultimodalFunctionResponse(model, legacyConfig);
-      const dynamic = supportsMultimodalFunctionResponse(model, dynamicConfig);
-      expect(dynamic).toBe(legacy);
-    }
+  it('isCustomModel and isAutoModel honor definition tiers', () => {
+    expect(isCustomModel('custom-model', config)).toBe(true);
+    expect(isCustomModel(DEFAULT_GEMINI_MODEL, config)).toBe(false);
+    expect(isAutoModel(GEMINI_MODEL_ALIAS_AUTO, config)).toBe(true);
+    expect(isAutoModel(DEFAULT_GEMINI_MODEL, config)).toBe(false);
+  });
+
+  it('supportsMultimodalFunctionResponse requires a definition with the feature flag', () => {
+    expect(
+      supportsMultimodalFunctionResponse(DEFAULT_GEMINI_MODEL, config),
+    ).toBe(true);
+    // Unknown gemini-* models have no definition, so the feature is not assumed.
+    expect(
+      supportsMultimodalFunctionResponse('gemini-unknown-model', config),
+    ).toBe(false);
   });
 });
 
@@ -228,21 +225,6 @@ describe('resolveModel', () => {
   it('should keep explicit preview flash selections as-is', () => {
     expect(resolveModel('gemini-3-flash-preview')).toBe(
       'gemini-3-flash-preview',
-    );
-  });
-
-  it('should resolve aliases to the default models via the dynamic config', () => {
-    expect(resolveModel(GEMINI_MODEL_ALIAS_AUTO, dynamicConfig)).toBe(
-      DEFAULT_GEMINI_MODEL,
-    );
-    expect(resolveModel(GEMINI_MODEL_ALIAS_PRO, dynamicConfig)).toBe(
-      DEFAULT_GEMINI_MODEL,
-    );
-    expect(resolveModel(GEMINI_MODEL_ALIAS_FLASH, dynamicConfig)).toBe(
-      DEFAULT_GEMINI_FLASH_MODEL,
-    );
-    expect(resolveModel(GEMINI_MODEL_ALIAS_FLASH_LITE, dynamicConfig)).toBe(
-      DEFAULT_GEMINI_FLASH_LITE_MODEL,
     );
   });
 });

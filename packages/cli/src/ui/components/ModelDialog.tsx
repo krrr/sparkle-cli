@@ -8,15 +8,10 @@ import type React from 'react';
 import { useCallback, useContext, useMemo, useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import {
-  DEFAULT_GEMINI_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_FLASH_LITE_MODEL,
   GEMINI_MODEL_ALIAS_AUTO,
   ModelSlashCommandEvent,
   logModelSlashCommand,
   getDisplayString,
-  isProModel,
-  getAutoModelDescription,
 } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
@@ -53,10 +48,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const preferredModel = config?.getModel() || GEMINI_MODEL_ALIAS_AUTO;
 
   const manualModelSelected = useMemo(() => {
-    if (
-      config?.getExperimentalDynamicModelConfiguration?.() === true &&
-      config.getModelConfigService
-    ) {
+    if (config?.getModelConfigService) {
       const def = config
         .getModelConfigService()
         .getModelDefinition(preferredModel);
@@ -66,14 +58,6 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         : '';
     }
 
-    const manualModels = [
-      DEFAULT_GEMINI_MODEL,
-      DEFAULT_GEMINI_FLASH_MODEL,
-      DEFAULT_GEMINI_FLASH_LITE_MODEL,
-    ];
-    if (manualModels.includes(preferredModel)) {
-      return preferredModel;
-    }
     return '';
   }, [preferredModel, config]);
 
@@ -96,103 +80,50 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     { isActive: true },
   );
   const mainOptions = useMemo(() => {
-    // --- DYNAMIC PATH ---
-    if (
-      config?.getExperimentalDynamicModelConfiguration?.() === true &&
-      config.getModelConfigService
-    ) {
-      const allOptions = config
-        .getModelConfigService()
-        .getAvailableModelOptions({
-          hasAccessToProModel,
-        });
-
-      const list = allOptions
-        .filter((o) => o.tier === 'auto')
-        .map((o) => ({
-          value: o.modelId,
-          title: o.name,
-          description: o.description,
-          key: o.modelId,
-        }));
-
-      list.push({
-        value: 'Manual',
-        title: manualModelSelected
-          ? `Manual (${getDisplayString(manualModelSelected, config ?? undefined)})`
-          : 'Manual',
-        description: 'Manually select a model',
-        key: 'Manual',
-      });
-      return list;
+    if (!config?.getModelConfigService) {
+      return [];
     }
 
-    // --- LEGACY PATH ---
-    const list = [
-      {
-        value: GEMINI_MODEL_ALIAS_AUTO,
-        title: getDisplayString(GEMINI_MODEL_ALIAS_AUTO),
-        description: getAutoModelDescription(),
-        key: GEMINI_MODEL_ALIAS_AUTO,
-      },
-      {
-        value: 'Manual',
-        title: manualModelSelected
-          ? `Manual (${getDisplayString(manualModelSelected)})`
-          : 'Manual',
-        description: 'Manually select a model',
-        key: 'Manual',
-      },
-    ];
+    const allOptions = config.getModelConfigService().getAvailableModelOptions({
+      hasAccessToProModel,
+    });
 
+    const list = allOptions
+      .filter((o) => o.tier === 'auto')
+      .map((o) => ({
+        value: o.modelId,
+        title: o.name,
+        description: o.description,
+        key: o.modelId,
+      }));
+
+    list.push({
+      value: 'Manual',
+      title: manualModelSelected
+        ? `Manual (${getDisplayString(manualModelSelected, config ?? undefined)})`
+        : 'Manual',
+      description: 'Manually select a model',
+      key: 'Manual',
+    });
     return list;
   }, [config, manualModelSelected, hasAccessToProModel]);
 
   const manualOptions = useMemo(() => {
-    // --- DYNAMIC PATH ---
-    if (
-      config?.getExperimentalDynamicModelConfiguration?.() === true &&
-      config.getModelConfigService
-    ) {
-      const allOptions = config
-        .getModelConfigService()
-        .getAvailableModelOptions({
-          hasAccessToProModel,
-        });
-
-      return allOptions
-        .filter((o) => o.tier !== 'auto')
-        .map((o) => ({
-          value: o.modelId,
-          title: o.name,
-          key: o.modelId,
-        }));
+    if (!config?.getModelConfigService) {
+      return [];
     }
 
-    const options = [
-      {
-        value: DEFAULT_GEMINI_MODEL,
-        title: getDisplayString(DEFAULT_GEMINI_MODEL),
-        key: DEFAULT_GEMINI_MODEL,
-      },
-      {
-        value: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-        title: getDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
-        key: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-      },
-      {
-        value: DEFAULT_GEMINI_FLASH_MODEL,
-        title: getDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
-        key: DEFAULT_GEMINI_FLASH_MODEL,
-      },
-    ];
+    const allOptions = config.getModelConfigService().getAvailableModelOptions({
+      hasAccessToProModel,
+    });
 
-    if (!hasAccessToProModel) {
-      // Filter out all Pro models for free tier
-      return options.filter((option) => !isProModel(option.value));
-    }
-
-    return options;
+    return allOptions
+      .filter((o) => o.tier !== 'auto')
+      .map((o) => ({
+        value: o.modelId,
+        title: o.name,
+        key: o.modelId,
+      }));
   }, [hasAccessToProModel, config]);
 
   const options = useMemo(() => {

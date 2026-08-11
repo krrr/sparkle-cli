@@ -2247,16 +2247,6 @@ const SETTINGS_SCHEMA = {
           'Enable web fetch behavior that bypasses LLM summarization.',
         showInDialog: true,
       },
-      dynamicModelConfiguration: {
-        type: 'boolean',
-        label: 'Dynamic Model Configuration',
-        category: 'Experimental',
-        requiresRestart: true,
-        default: false,
-        description:
-          'Enable dynamic model configuration (definitions, resolutions, and chains) via settings.',
-        showInDialog: false,
-      },
       stressTestProfile: {
         type: 'boolean',
         label:

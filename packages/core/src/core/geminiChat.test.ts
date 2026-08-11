@@ -205,6 +205,13 @@ describe('GeminiChat', () => {
             },
           };
         }),
+        resolveModelId: (model: string) => model,
+        resolveClassifierModelId: (_tier: string, model: string) => model,
+        getModelDefinition: () => undefined,
+        getModelChain: () => undefined,
+        resolveChain: vi.fn(),
+        registerRuntimeModelConfig: vi.fn(),
+        registerRuntimeModelOverride: vi.fn(),
       },
       isInteractive: vi.fn().mockReturnValue(false),
       getEnableHooks: vi.fn().mockReturnValue(false),

@@ -11,12 +11,7 @@ import {
   Kind,
   ApprovalMode,
   GEMINI_MODEL_ALIAS_AUTO,
-  DEFAULT_GEMINI_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_FLASH_LITE_MODEL,
-  getDisplayString,
   ToolConfirmationOutcome,
-  getAutoModelDescription,
 } from 'sparkle-cli-core';
 import type * as acp from '@agentclientprotocol/sdk';
 import { z } from 'zod';
@@ -258,57 +253,10 @@ export function buildAvailableModels(
 } {
   const preferredModel = config.getModel() || GEMINI_MODEL_ALIAS_AUTO;
 
-  // --- DYNAMIC PATH ---
-  if (
-    config.getExperimentalDynamicModelConfiguration?.() === true &&
-    config.getModelConfigService
-  ) {
-    const options = config.getModelConfigService().getAvailableModelOptions({});
-
-    return {
-      availableModels: options,
-      currentModelId: preferredModel,
-    };
-  }
-
-  // --- LEGACY PATH ---
-  const mainOptions = [
-    {
-      value: GEMINI_MODEL_ALIAS_AUTO,
-      title: getDisplayString(GEMINI_MODEL_ALIAS_AUTO),
-      description: getAutoModelDescription(),
-    },
-  ];
-
-  const manualOptions = [
-    {
-      value: DEFAULT_GEMINI_MODEL,
-      title: getDisplayString(DEFAULT_GEMINI_MODEL),
-    },
-    {
-      value: DEFAULT_GEMINI_FLASH_MODEL,
-      title: getDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
-    },
-    {
-      value: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-      title: getDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
-    },
-  ];
-
-  const scaleOptions = (
-    options: Array<{ value: string; title: string; description?: string }>,
-  ) =>
-    options.map((o) => ({
-      modelId: o.value,
-      name: o.title,
-      description: o.description,
-    }));
+  const options = config.getModelConfigService().getAvailableModelOptions({});
 
   return {
-    availableModels: [
-      ...scaleOptions(mainOptions),
-      ...scaleOptions(manualOptions),
-    ],
+    availableModels: options,
     currentModelId: preferredModel,
   };
 }

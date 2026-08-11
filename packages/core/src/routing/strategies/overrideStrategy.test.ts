@@ -10,6 +10,8 @@ import type { RoutingContext } from '../routingStrategy.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import type { Config } from '../../config/config.js';
 import { GEMINI_MODEL_ALIAS_AUTO } from '../../config/models.js';
+import { ModelConfigService } from '../../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../../config/defaultModelConfigs.js';
 
 describe('OverrideStrategy', () => {
   const strategy = new OverrideStrategy();
@@ -19,6 +21,7 @@ describe('OverrideStrategy', () => {
   it('should return null when the override model is auto', async () => {
     const mockConfig = {
       getModel: () => GEMINI_MODEL_ALIAS_AUTO,
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as Config;
 
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
@@ -29,6 +32,7 @@ describe('OverrideStrategy', () => {
     const overrideModel = 'gemini-2.5-pro-custom';
     const mockConfig = {
       getModel: () => overrideModel,
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as Config;
 
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
@@ -46,6 +50,7 @@ describe('OverrideStrategy', () => {
     const overrideModel = 'gemini-2.5-flash-experimental';
     const mockConfig = {
       getModel: () => overrideModel,
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as Config;
 
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
@@ -59,6 +64,7 @@ describe('OverrideStrategy', () => {
     const configModel = 'config-model';
     const mockConfig = {
       getModel: () => configModel,
+      modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as Config;
     const contextWithRequestedModel = {
       requestedModel,

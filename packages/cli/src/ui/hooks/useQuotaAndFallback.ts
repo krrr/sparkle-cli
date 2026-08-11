@@ -43,7 +43,7 @@ export function useQuotaAndFallback({
       fallbackModel,
       error,
     ): Promise<FallbackIntent | null> => {
-      const usageLimitReachedModel = isProModel(failedModel)
+      const usageLimitReachedModel = isProModel(failedModel, config)
         ? 'all Pro models'
         : failedModel;
 

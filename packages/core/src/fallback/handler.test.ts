@@ -20,6 +20,7 @@ import type { ModelAvailabilityService } from '../availability/modelAvailability
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
 import { AuthType } from '../core/contentGenerator.js';
 import {
+  DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   GEMINI_MODEL_ALIAS_AUTO,
@@ -73,6 +74,52 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getActiveModel: vi.fn(() => MOCK_PRO_MODEL),
     getModel: vi.fn(() => MOCK_PRO_MODEL),
     isInteractive: vi.fn(() => false),
+    modelConfigService: {
+      getResolvedConfig: vi.fn(),
+      resolveModelId: (model: string) => model,
+      resolveClassifierModelId: (_tier: string, model: string) => model,
+      getModelDefinition: () => undefined,
+      getModelChain: () => undefined,
+      resolveChain: vi.fn().mockImplementation((key: string) =>
+        key === 'lite'
+          ? [
+              {
+                model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+                isLastResort: false,
+                actions: {},
+                stateTransitions: {},
+              },
+              {
+                model: DEFAULT_GEMINI_FLASH_MODEL,
+                isLastResort: false,
+                actions: {},
+                stateTransitions: {},
+              },
+              {
+                model: DEFAULT_GEMINI_MODEL,
+                isLastResort: true,
+                actions: {},
+                stateTransitions: {},
+              },
+            ]
+          : [
+              {
+                model: DEFAULT_GEMINI_MODEL,
+                isLastResort: false,
+                actions: {},
+                stateTransitions: {},
+              },
+              {
+                model: DEFAULT_GEMINI_FLASH_MODEL,
+                isLastResort: true,
+                actions: {},
+                stateTransitions: {},
+              },
+            ],
+      ),
+      registerRuntimeModelConfig: vi.fn(),
+      registerRuntimeModelOverride: vi.fn(),
+    },
     ...overrides,
   }) as unknown as Config;
 
