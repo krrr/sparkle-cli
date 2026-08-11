@@ -18,7 +18,6 @@ interface AboutBoxProps {
   modelVersion: string;
   selectedAuthType: string;
   ideClient: string;
-  tier?: string;
 }
 
 export const AboutBox: React.FC<AboutBoxProps> = ({
@@ -28,7 +27,6 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
   modelVersion,
   selectedAuthType,
   ideClient,
-  tier,
 }) => {
   const settings = useSettings();
   const showUserIdentity = settings.merged.ui.showUserIdentity;
@@ -110,18 +108,6 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
           </Box>
           <Box>
             <Text color={theme.text.primary}>{selectedAuthType}</Text>
-          </Box>
-        </Box>
-      )}
-      {showUserIdentity && tier && (
-        <Box flexDirection="row">
-          <Box width="35%">
-            <Text bold color={theme.text.link}>
-              Tier
-            </Text>
-          </Box>
-          <Box>
-            <Text color={theme.text.primary}>{tier}</Text>
           </Box>
         </Box>
       )}

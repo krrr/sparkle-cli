@@ -25,7 +25,6 @@ import {
   GEMINI_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import type { FallbackModelHandler } from './types.js';
-import { openBrowserSecurely } from '../utils/secure-browser-launcher.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import * as policyHelpers from '../availability/policyHelpers.js';
 import { createDefaultPolicy } from '../availability/policyCatalog.js';
@@ -73,7 +72,6 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     ),
     getActiveModel: vi.fn(() => MOCK_PRO_MODEL),
     getModel: vi.fn(() => MOCK_PRO_MODEL),
-    getUserTier: vi.fn(() => undefined),
     isInteractive: vi.fn(() => false),
     ...overrides,
   }) as unknown as Config;
@@ -239,23 +237,6 @@ describe('handleFallback', () => {
       expect(availability.selectFirstAvailable).toHaveBeenCalledWith([
         DEFAULT_GEMINI_FLASH_MODEL,
       ]);
-    });
-
-    it('should launch upgrade flow and avoid fallback mode when handler returns "upgrade"', async () => {
-      policyHandler.mockResolvedValue('upgrade');
-      vi.mocked(openBrowserSecurely).mockResolvedValue(undefined);
-
-      const result = await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-      );
-
-      expect(result).toBe(false);
-      expect(openBrowserSecurely).toHaveBeenCalledWith(
-        'https://goo.gle/set-up-gemini-code-assist',
-      );
-      expect(policyConfig.activateFallbackMode).not.toHaveBeenCalled();
     });
 
     it('should catch errors from the handler, log an error, and return null', async () => {

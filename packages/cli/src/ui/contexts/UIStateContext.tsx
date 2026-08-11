@@ -21,8 +21,6 @@ import type {
   IdeContext,
   ApprovalMode,
   IdeInfo,
-  FallbackIntent,
-  ValidationIntent,
   AgentDefinition,
   FolderDiscoveryResults,
   PolicyUpdateConfirmationRequest,
@@ -33,32 +31,10 @@ import type { SessionStatsState } from '../contexts/SessionContext.js';
 import type { ExtensionUpdateState } from '../state/extensions.js';
 import type { UpdateObject } from '../utils/updateCheck.js';
 
-export interface ProQuotaDialogRequest {
-  failedModel: string;
-  fallbackModel: string;
-  message: string;
-  isTerminalQuotaError: boolean;
-  isModelNotFoundError?: boolean;
-  resolve: (intent: FallbackIntent) => void;
-}
-
-export interface ValidationDialogRequest {
-  validationLink?: string;
-  validationDescription?: string;
-  learnMoreUrl?: string;
-  resolve: (intent: ValidationIntent) => void;
-}
-
 import { type UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
 import { type RestartReason } from '../hooks/useIdeTrustListener.js';
 import type { TerminalBackgroundColor } from '../utils/terminalCapabilityManager.js';
 import type { BackgroundTask } from '../hooks/useExecutionLifecycle.js';
-
-export interface AccountSuspensionInfo {
-  message: string;
-  appealUrl?: string;
-  appealLinkText?: string;
-}
 
 export interface UIState {
   history: HistoryItem[];
@@ -68,15 +44,11 @@ export interface UIState {
   isAuthenticating: boolean;
   isConfigInitialized: boolean;
   authError: string | null;
-  accountSuspensionInfo: AccountSuspensionInfo | null;
   isAuthDialogOpen: boolean;
   isAwaitingApiKeyInput: boolean;
-  isAwaitingLoginRestart: boolean;
-  loginRestartMessage?: string;
   apiKeyDefaultValue?: string;
   editorError: string | null;
   isEditorDialogOpen: boolean;
-  showPrivacyNotice: boolean;
   mouseMode: boolean;
   corgiMode: boolean;
   debugMessage: string;

@@ -11,14 +11,9 @@ import { FolderTrustDialog } from './FolderTrustDialog.js';
 import { ConsentPrompt } from './ConsentPrompt.js';
 import { ThemeDialog } from './ThemeDialog.js';
 import { SettingsDialog } from './SettingsDialog.js';
-import { AuthInProgress } from '../auth/AuthInProgress.js';
 import { AuthDialog } from '../auth/AuthDialog.js';
-import { BannedAccountDialog } from '../auth/BannedAccountDialog.js';
 import { ApiAuthDialog } from '../auth/ApiAuthDialog.js';
 import { EditorSettingsDialog } from './EditorSettingsDialog.js';
-import { PrivacyNotice } from '../privacy/PrivacyNotice.js';
-import { ProQuotaDialog } from './ProQuotaDialog.js';
-import { ValidationDialog } from './ValidationDialog.js';
 import { relaunchApp } from '../../utils/processUtils.js';
 import { SessionBrowser } from './SessionBrowser.js';
 import { PermissionsModifyTrustDialog } from './PermissionsModifyTrustDialog.js';
@@ -26,17 +21,14 @@ import { ModelDialog } from './ModelDialog.js';
 import { VoiceModelDialog } from './VoiceModelDialog.js';
 import { theme } from '../semantic-colors.js';
 import { useUIState } from '../contexts/UIStateContext.js';
-import { useQuotaState } from '../contexts/QuotaContext.js';
 import { useUIActions } from '../contexts/UIActionsContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
-import process from 'node:process';
 import { type UseHistoryManagerReturn } from '../hooks/useHistoryManager.js';
 import { IdeTrustChangeDialog } from './IdeTrustChangeDialog.js';
 import { NewAgentsNotification } from './NewAgentsNotification.js';
 import { AgentConfigDialog } from './AgentConfigDialog.js';
 import { PolicyUpdateDialog } from './PolicyUpdateDialog.js';
-import { LoginRestartDialog } from '../auth/LoginRestartDialog.js';
 
 interface DialogManagerProps {
   addItem: UseHistoryManagerReturn['addItem'];
@@ -52,7 +44,6 @@ export const DialogManager = ({
   const settings = useSettings();
 
   const uiState = useUIState();
-  const quotaState = useQuotaState();
   const uiActions = useUIActions();
   const {
     constrainHeight,
@@ -69,31 +60,6 @@ export const DialogManager = ({
       <NewAgentsNotification
         agents={uiState.newAgents}
         onSelect={uiActions.handleNewAgentsSelect}
-      />
-    );
-  }
-  if (quotaState.proQuotaRequest) {
-    return (
-      <ProQuotaDialog
-        failedModel={quotaState.proQuotaRequest.failedModel}
-        fallbackModel={quotaState.proQuotaRequest.fallbackModel}
-        message={quotaState.proQuotaRequest.message}
-        isTerminalQuotaError={quotaState.proQuotaRequest.isTerminalQuotaError}
-        isModelNotFoundError={!!quotaState.proQuotaRequest.isModelNotFoundError}
-        tierName={config?.getUserTierName()}
-        onChoice={uiActions.handleProQuotaChoice}
-      />
-    );
-  }
-  if (quotaState.validationRequest) {
-    return (
-      <ValidationDialog
-        validationLink={quotaState.validationRequest.validationLink}
-        validationDescription={
-          quotaState.validationRequest.validationDescription
-        }
-        learnMoreUrl={quotaState.validationRequest.learnMoreUrl}
-        onChoice={uiActions.handleValidationChoice}
       />
     );
   }
@@ -240,30 +206,6 @@ export const DialogManager = ({
       </Box>
     );
   }
-  if (uiState.accountSuspensionInfo) {
-    return (
-      <Box flexDirection="column">
-        <BannedAccountDialog
-          accountSuspensionInfo={uiState.accountSuspensionInfo}
-          onExit={() => {
-            process.exit(1);
-          }}
-          onChangeAuth={() => {
-            uiActions.clearAccountSuspension();
-          }}
-        />
-      </Box>
-    );
-  }
-  if (uiState.isAuthenticating) {
-    return (
-      <AuthInProgress
-        onTimeout={() => {
-          uiActions.onAuthError('Authentication cancelled.');
-        }}
-      />
-    );
-  }
   if (uiState.isAwaitingApiKeyInput) {
     return (
       <Box flexDirection="column">
@@ -278,16 +220,6 @@ export const DialogManager = ({
     );
   }
 
-  if (uiState.isAwaitingLoginRestart) {
-    return (
-      <Box flexDirection="column">
-        <LoginRestartDialog
-          onDismiss={uiActions.dismissLoginRestart}
-          message={uiState.loginRestartMessage}
-        />
-      </Box>
-    );
-  }
   if (uiState.isAuthDialogOpen) {
     return (
       <Box flexDirection="column">
@@ -296,11 +228,11 @@ export const DialogManager = ({
           setAuthState={uiActions.setAuthState}
           authError={uiState.authError}
           onAuthError={uiActions.onAuthError}
-          setAuthContext={uiActions.setAuthContext}
         />
       </Box>
     );
   }
+
   if (uiState.isEditorDialogOpen) {
     return (
       <Box flexDirection="column">
@@ -315,14 +247,6 @@ export const DialogManager = ({
           onExit={uiActions.exitEditorDialog}
         />
       </Box>
-    );
-  }
-  if (uiState.showPrivacyNotice) {
-    return (
-      <PrivacyNotice
-        onExit={() => uiActions.exitPrivacyNotice()}
-        config={config}
-      />
     );
   }
   if (uiState.isSessionBrowserOpen) {

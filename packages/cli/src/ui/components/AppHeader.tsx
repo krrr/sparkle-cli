@@ -5,7 +5,6 @@
  */
 
 import { Box, Text } from 'ink';
-import { UserIdentity } from './UserIdentity.js';
 import { Tips } from './Tips.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
@@ -128,11 +127,6 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
         <>
           {/* Line 2: Blank */}
           <Box height={1} />
-
-          {/* Lines 3 & 4: User Identity info (Email /auth and Plan /upgrade) */}
-          {settings.merged.ui.showUserIdentity !== false && (
-            <UserIdentity config={config} />
-          )}
         </>
       )}
     </Box>

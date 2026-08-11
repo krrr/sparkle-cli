@@ -972,14 +972,12 @@ export function recordOnboardingStart(config: Config): void {
  */
 export function recordOnboardingSuccess(
   config: Config,
-  userTier?: string,
   durationMs?: number,
 ): void {
   if (!isMetricsInitialized) return;
 
   const attributes: Attributes = {
     ...baseMetricDefinition.getCommonAttributes(config),
-    ...(userTier && { user_tier: userTier }),
   };
 
   if (onboardingSuccessCounter) {

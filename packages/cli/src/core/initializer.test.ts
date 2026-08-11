@@ -73,7 +73,6 @@ describe('initializer', () => {
     );
     vi.mocked(performInitialAuth).mockResolvedValue({
       authError: null,
-      accountSuspensionInfo: null,
     });
     vi.mocked(validateTheme).mockReturnValue(null);
   });
@@ -86,7 +85,6 @@ describe('initializer', () => {
 
     expect(result).toEqual({
       authError: null,
-      accountSuspensionInfo: null,
       themeError: null,
       shouldOpenAuthDialog: false,
       geminiMdFileCount: 5,
@@ -109,7 +107,6 @@ describe('initializer', () => {
 
     expect(result).toEqual({
       authError: null,
-      accountSuspensionInfo: null,
       themeError: null,
       shouldOpenAuthDialog: false,
       geminiMdFileCount: 5,
@@ -125,7 +122,6 @@ describe('initializer', () => {
   it('should handle auth error', async () => {
     vi.mocked(performInitialAuth).mockResolvedValue({
       authError: 'Auth failed',
-      accountSuspensionInfo: null,
     });
     const result = await initializeApp(
       mockConfig as unknown as Config,

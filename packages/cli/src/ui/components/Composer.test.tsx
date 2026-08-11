@@ -235,7 +235,6 @@ const createMockConfig = (overrides = {}): Config =>
     ...overrides,
   }) as unknown as Config;
 
-import { QuotaContext, type QuotaState } from '../contexts/QuotaContext.js';
 import { InputContext, type InputState } from '../contexts/InputContext.js';
 
 const renderComposer = async (
@@ -244,7 +243,6 @@ const renderComposer = async (
   config = createMockConfig(),
   uiActions = createMockUIActions(),
   inputStateOverrides: Partial<InputState> = {},
-  quotaStateOverrides: Partial<QuotaState> = {},
 ) => {
   const inputState = {
     buffer: { text: '' } as unknown as TextBuffer,
@@ -258,26 +256,16 @@ const renderComposer = async (
     ...inputStateOverrides,
   };
 
-  const quotaState: QuotaState = {
-    userTier: undefined,
-    stats: undefined,
-    proQuotaRequest: null,
-    validationRequest: null,
-    ...quotaStateOverrides,
-  };
-
   const result = await render(
     <ConfigContext.Provider value={config as unknown as Config}>
       <SettingsContext.Provider value={settings as unknown as LoadedSettings}>
-        <QuotaContext.Provider value={quotaState}>
-          <InputContext.Provider value={inputState}>
-            <UIStateContext.Provider value={uiState}>
-              <UIActionsContext.Provider value={uiActions}>
-                <Composer isFocused={true} />
-              </UIActionsContext.Provider>
-            </UIStateContext.Provider>
-          </InputContext.Provider>
-        </QuotaContext.Provider>
+        <InputContext.Provider value={inputState}>
+          <UIStateContext.Provider value={uiState}>
+            <UIActionsContext.Provider value={uiActions}>
+              <Composer isFocused={true} />
+            </UIActionsContext.Provider>
+          </UIStateContext.Provider>
+        </InputContext.Provider>
       </SettingsContext.Provider>
     </ConfigContext.Provider>,
   );

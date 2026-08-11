@@ -6,7 +6,6 @@
 
 import { isApiError, isStructuredError } from './quotaErrorDetection.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
-import type { UserTierId } from '../userTier.js';
 import { AuthType } from '../core/contentGenerator.js';
 
 const RATE_LIMIT_ERROR_MESSAGE_USE_GEMINI =
@@ -31,7 +30,6 @@ function getRateLimitMessage(
 export function parseAndFormatApiError(
   error: unknown,
   authType?: AuthType,
-  userTier?: UserTierId,
   currentModel?: string,
   fallbackModel?: string,
 ): string {

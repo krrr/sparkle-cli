@@ -514,8 +514,7 @@ export async function main() {
       }
     } catch (err) {
       // If validation is required, we don't treat it as a fatal failure.
-      // We allow the app to start, and the React-based ValidationDialog
-      // will handle it.
+      // We allow the app to start and show the error to the user.
       if (!(err instanceof ValidationRequiredError)) {
         debugLogger.error('Error authenticating:', err);
         initialAuthFailed = true;

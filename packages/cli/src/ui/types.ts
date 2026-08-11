@@ -12,7 +12,6 @@ import {
   type SerializableConfirmationDetails,
   type ToolResultDisplay,
   type ToolDisplay,
-  type RetrieveUserQuotaResponse,
   type SkillDefinition,
   type AgentDefinition,
   type ApprovalMode,
@@ -42,8 +41,6 @@ export enum AuthState {
   AwaitingApiKeyInput = 'awaiting_api_key_input',
   // Successfully authenticated
   Authenticated = 'authenticated',
-  // Waiting for the user to restart after a login
-  AwaitingLoginRestart = 'awaiting_login_restart',
 }
 
 // Only defining the state enum needed by the UI
@@ -206,7 +203,6 @@ export type HistoryItemAbout = HistoryItemBase & {
   selectedAuthType: string;
   ideClient: string;
   userEmail?: string;
-  tier?: string;
 };
 
 export type HistoryItemHelp = HistoryItemBase & {
@@ -216,24 +212,12 @@ export type HistoryItemHelp = HistoryItemBase & {
 
 export interface HistoryItemQuotaBase extends HistoryItemBase {
   selectedAuthType?: string;
-  userEmail?: string;
-  tier?: string;
   currentModel?: string;
-  pooledRemaining?: number;
-  pooledLimit?: number;
-  pooledResetTime?: string;
-}
-
-export interface QuotaStats {
-  remaining: number | undefined;
-  limit: number | undefined;
-  resetTime?: string;
 }
 
 export type HistoryItemStats = HistoryItemQuotaBase & {
   type: 'stats';
   duration: string;
-  quotas?: RetrieveUserQuotaResponse;
 };
 
 export type HistoryItemModelStats = HistoryItemQuotaBase & {

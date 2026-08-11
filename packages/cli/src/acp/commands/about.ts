@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { IdeClient, UserAccountManager, getVersion } from 'sparkle-cli-core';
+import { IdeClient, getVersion } from 'sparkle-cli-core';
 import type {
   Command,
   CommandContext,
@@ -35,12 +35,6 @@ export class AboutCommand implements Command {
       context.settings.merged?.security?.auth?.selectedType ?? '';
     const ideClient = await getIdeClientName(context);
 
-    const userAccountManager = new UserAccountManager();
-    const cachedAccount = userAccountManager.getCachedGoogleAccount();
-    const userEmail = cachedAccount ?? 'Unknown';
-
-    const tier = context.agentContext.config.getUserTierName() || 'Unknown';
-
     const info = [
       `- Version: ${cliVersion}`,
       `- OS: ${osVersion}`,
@@ -48,8 +42,6 @@ export class AboutCommand implements Command {
       `- Model: ${modelVersion}`,
       `- Auth Type: ${selectedAuthType}`,
       `- IDE Client: ${ideClient}`,
-      `- User Email: ${userEmail}`,
-      `- Tier: ${tier}`,
     ].join('\n');
 
     return {

@@ -18,11 +18,9 @@ import {
 import { type LoadedSettings } from '../config/settings.js';
 import { performInitialAuth } from './auth.js';
 import { validateTheme } from './theme.js';
-import type { AccountSuspensionInfo } from '../ui/contexts/UIStateContext.js';
 
 export interface InitializationResult {
   authError: string | null;
-  accountSuspensionInfo: AccountSuspensionInfo | null;
   themeError: string | null;
   shouldOpenAuthDialog: boolean;
   geminiMdFileCount: number;
@@ -40,7 +38,7 @@ export async function initializeApp(
   settings: LoadedSettings,
 ): Promise<InitializationResult> {
   const authHandle = startupProfiler.start('authenticate');
-  const { authError, accountSuspensionInfo } = await performInitialAuth(
+  const { authError } = await performInitialAuth(
     config,
     settings.merged.security.auth.selectedType,
   );
@@ -72,7 +70,6 @@ export async function initializeApp(
 
   return {
     authError,
-    accountSuspensionInfo,
     themeError,
     shouldOpenAuthDialog,
     geminiMdFileCount: config.getGeminiMdFileCount(),

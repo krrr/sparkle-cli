@@ -38,17 +38,14 @@ describe('AboutBox', () => {
     unmount();
   });
 
-  it.each([
-    ['ideClient', 'vscode', 'IDE Client'],
-    ['tier', 'Enterprise', 'Tier'],
-  ])('renders optional prop %s', async (prop, value, label) => {
-    const props = { ...defaultProps, [prop]: value };
+  it('renders IDE Client optional prop', async () => {
+    const props = { ...defaultProps, ideClient: 'vscode' };
     const { lastFrame, unmount } = await renderWithProviders(
       <AboutBox {...props} />,
     );
     const output = lastFrame();
-    expect(output).toContain(label);
-    expect(output).toContain(value);
+    expect(output).toContain('IDE Client');
+    expect(output).toContain('vscode');
     unmount();
   });
 

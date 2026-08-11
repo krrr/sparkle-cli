@@ -20,9 +20,6 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
         getDetectedIdeDisplayName: vi.fn().mockReturnValue('test-ide'),
       }),
     },
-    UserAccountManager: vi.fn().mockImplementation(() => ({
-      getCachedGoogleAccount: vi.fn().mockReturnValue('test-email@example.com'),
-    })),
     getVersion: vi.fn(),
   };
 });
@@ -39,7 +36,6 @@ describe('aboutCommand', () => {
           config: {
             getModel: vi.fn(),
             getIdeMode: vi.fn().mockReturnValue(true),
-            getUserTierName: vi.fn().mockReturnValue(undefined),
           },
         },
         settings: {
@@ -97,8 +93,6 @@ describe('aboutCommand', () => {
       modelVersion: 'test-model',
       selectedAuthType: 'test-auth',
       ideClient: 'test-ide',
-      userEmail: 'test-email@example.com',
-      tier: undefined,
     });
   });
 
@@ -154,23 +148,6 @@ describe('aboutCommand', () => {
         modelVersion: 'test-model',
         selectedAuthType: 'test-auth',
         ideClient: '',
-      }),
-    );
-  });
-
-  it('should display the tier when getUserTierName returns a value', async () => {
-    vi.mocked(
-      mockContext.services.agentContext!.config.getUserTierName,
-    ).mockReturnValue('Enterprise Tier');
-    if (!aboutCommand.action) {
-      throw new Error('The about command must have an action.');
-    }
-
-    await aboutCommand.action(mockContext, '');
-
-    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tier: 'Enterprise Tier',
       }),
     );
   });

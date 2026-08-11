@@ -256,66 +256,6 @@ describe('<Footer />', () => {
     unmount();
   });
 
-  it('displays the usage indicator when usage is low', async () => {
-    const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
-      config: mockConfig,
-      width: 120,
-      uiState: {
-        sessionStats: mockSessionStats,
-      },
-      quotaState: {
-        stats: {
-          remaining: 15,
-          limit: 100,
-          resetTime: undefined,
-        },
-      },
-    });
-    expect(lastFrame()).toContain('85% used');
-    expect(normalizeFrame(lastFrame())).toMatchSnapshot();
-    unmount();
-  });
-
-  it('hides the usage indicator when usage is not near limit', async () => {
-    const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
-      config: mockConfig,
-      width: 120,
-      uiState: {
-        sessionStats: mockSessionStats,
-      },
-      quotaState: {
-        stats: {
-          remaining: 85,
-          limit: 100,
-          resetTime: undefined,
-        },
-      },
-    });
-    expect(normalizeFrame(lastFrame())).toContain('15% used');
-    expect(normalizeFrame(lastFrame())).toMatchSnapshot();
-    unmount();
-  });
-
-  it('displays "Limit reached" message when remaining is 0', async () => {
-    const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
-      config: mockConfig,
-      width: 120,
-      uiState: {
-        sessionStats: mockSessionStats,
-      },
-      quotaState: {
-        stats: {
-          remaining: 0,
-          limit: 100,
-          resetTime: undefined,
-        },
-      },
-    });
-    expect(lastFrame()?.toLowerCase()).toContain('limit reached');
-    expect(normalizeFrame(lastFrame())).toMatchSnapshot();
-    unmount();
-  });
-
   it('displays the model name and abbreviated context used label on narrow terminals', async () => {
     const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
       config: mockConfig,

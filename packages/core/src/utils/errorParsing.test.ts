@@ -27,7 +27,6 @@ describe('parseAndFormatApiError', () => {
     const result = parseAndFormatApiError(
       errorMessage,
       undefined,
-      undefined,
       'gemini-2.5-pro',
       DEFAULT_GEMINI_FLASH_MODEL,
     );

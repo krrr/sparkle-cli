@@ -68,7 +68,6 @@ interface SlashCommandProcessorActions {
   openAuthDialog: () => void;
   openThemeDialog: () => void;
   openEditorDialog: () => void;
-  openPrivacyNotice: () => void;
   openSettingsDialog: () => void;
   openSessionBrowser: () => void;
   openModelDialog: () => void;

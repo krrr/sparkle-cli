@@ -49,15 +49,10 @@ const manageModelCommand: SlashCommand = {
   description: 'Opens a dialog to configure the model',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (context: CommandContext) => {
-    if (context.services.agentContext?.config) {
-      await context.services.agentContext.config.refreshUserQuota();
-    }
-    return {
-      type: 'dialog',
-      dialog: 'model',
-    };
-  },
+  action: async () => ({
+    type: 'dialog',
+    dialog: 'model',
+  }),
 };
 
 export const modelCommand: SlashCommand = {

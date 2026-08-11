@@ -23,7 +23,6 @@ import {
 } from '../utils/displayUtils.js';
 import { computeSessionStats } from '../utils/computeStats.js';
 import { useSettings } from '../contexts/SettingsContext.js';
-import type { QuotaStats } from '../types.js';
 import { LlmRole, getDisplayString } from 'sparkle-cli-core';
 
 // A more flexible and powerful StatRow component
@@ -141,9 +140,6 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
       <Text bold color={theme.text.primary}>
         Model Usage
       </Text>
-      <Text color={theme.text.secondary}>
-        Use /model to view model quota information
-      </Text>
       <Box height={1} />
 
       {/* Header */}
@@ -232,10 +228,7 @@ interface StatsDisplayProps {
   title?: string;
   footer?: string;
   selectedAuthType?: string;
-  userEmail?: string;
-  tier?: string;
   currentModel?: string;
-  quotaStats?: QuotaStats;
 }
 
 export const StatsDisplay: React.FC<StatsDisplayProps> = ({
@@ -243,8 +236,6 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   title,
   footer,
   selectedAuthType,
-  userEmail,
-  tier,
 }) => {
   const { stats } = useSessionStats();
   const { metrics } = stats;
@@ -304,18 +295,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         </StatRow>
         {showUserIdentity && selectedAuthType && (
           <StatRow title="Auth Method:">
-            <Text color={theme.text.primary}>
-              {selectedAuthType.startsWith('oauth')
-                ? userEmail
-                  ? `Signed in with Google (${userEmail})`
-                  : 'Signed in with Google'
-                : selectedAuthType}
-            </Text>
-          </StatRow>
-        )}
-        {showUserIdentity && tier && (
-          <StatRow title="Tier:">
-            <Text color={theme.text.primary}>{tier}</Text>
+            <Text color={theme.text.primary}>{selectedAuthType}</Text>
           </StatRow>
         )}
         <StatRow title="Tool Calls:">

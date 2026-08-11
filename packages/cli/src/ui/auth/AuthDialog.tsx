@@ -24,7 +24,6 @@ interface AuthDialogProps {
   setAuthState: (state: AuthState) => void;
   authError: string | null;
   onAuthError: (error: string | null) => void;
-  setAuthContext: (context: { requiresRestart?: boolean }) => void;
 }
 
 export function AuthDialog({
@@ -32,7 +31,6 @@ export function AuthDialog({
   setAuthState,
   authError,
   onAuthError,
-  setAuthContext,
 }: AuthDialogProps): React.JSX.Element {
   let items = [
     {
@@ -77,7 +75,6 @@ export function AuthDialog({
   const onSelect = useCallback(
     async (authType: AuthType | undefined, scope: LoadableSettingScope) => {
       if (authType) {
-        setAuthContext({});
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
         if (authType === AuthType.USE_GEMINI) {
@@ -90,7 +87,7 @@ export function AuthDialog({
       }
       setAuthState(AuthState.Unauthenticated);
     },
-    [settings, setAuthState, setAuthContext],
+    [settings, setAuthState],
   );
 
   const handleAuthSelect = async (authMethod: AuthType) => {

@@ -78,7 +78,6 @@ import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   isAutoModel,
-  resolveModel,
 } from './models.js';
 import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
@@ -147,11 +146,6 @@ import {
   type SafetyCheckerRule,
 } from '../policy/types.js';
 import { HookSystem } from '../hooks/index.js';
-import type {
-  UserTierId,
-  GeminiUserTier,
-  RetrieveUserQuotaResponse,
-} from '../userTier.js';
 import type { HierarchicalMemory } from './memory.js';
 import {
   getExperiments,
@@ -810,28 +804,6 @@ export class Config implements McpContext, AgentLoopContext {
   fallbackModelHandler?: FallbackModelHandler;
   validationHandler?: ValidationHandler;
   private quotaErrorOccurred: boolean = false;
-  private modelQuotas: Map<
-    string,
-    { remaining: number; limit: number; resetTime?: string }
-  > = new Map();
-  private lastRetrievedQuota?: RetrieveUserQuotaResponse;
-  private lastQuotaFetchTime = 0;
-  private lastEmittedQuotaRemaining: number | undefined;
-  private lastEmittedQuotaLimit: number | undefined;
-
-  private emitQuotaChangedEvent(): void {
-    const remaining = this.getQuotaRemaining();
-    const limit = this.getQuotaLimit();
-    const resetTime = this.getQuotaResetTime();
-    if (
-      this.lastEmittedQuotaRemaining !== remaining ||
-      this.lastEmittedQuotaLimit !== limit
-    ) {
-      this.lastEmittedQuotaRemaining = remaining;
-      this.lastEmittedQuotaLimit = limit;
-      coreEvents.emitQuotaChanged(remaining, limit, resetTime);
-    }
-  }
 
   private readonly summarizeToolOutput:
     | Record<string, SummarizeToolOutputSettings>
@@ -1526,8 +1498,6 @@ export class Config implements McpContext, AgentLoopContext {
     // Only assign to instance properties after successful initialization
     this.contentGeneratorConfig = newContentGeneratorConfig;
 
-    const quotaPromise: Promise<void> = Promise.resolve();
-
     this.experimentsPromise = getExperiments()
       .then((experiments) => {
         this.setExperiments(experiments);
@@ -1538,12 +1508,7 @@ export class Config implements McpContext, AgentLoopContext {
         return undefined;
       });
 
-    await Promise.all([
-      this.experimentsPromise,
-      quotaPromise.catch((e) => {
-        debugLogger.error('Failed to fetch user quota', e);
-      }),
-    ]);
+    await this.experimentsPromise;
 
     const requestTimeoutMs = this.getRequestTimeoutMs();
     if (requestTimeoutMs !== undefined) {
@@ -1563,18 +1528,6 @@ export class Config implements McpContext, AgentLoopContext {
       return this.experiments;
     }
     return getExperiments();
-  }
-
-  getUserTier(): UserTierId | undefined {
-    return this.contentGenerator?.userTier;
-  }
-
-  getUserTierName(): string | undefined {
-    return this.contentGenerator?.userTierName;
-  }
-
-  getUserPaidTier(): GeminiUserTier | undefined {
-    return this.contentGenerator?.paidTier;
   }
 
   /**
@@ -1714,14 +1667,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.compressionTruncationCounter = 0;
     this.quotaErrorOccurred = false;
     this.modelAvailabilityService.reset();
-    this.modelQuotas.clear();
-    this.lastRetrievedQuota = undefined;
-    this.lastQuotaFetchTime = 0;
-
-    // Force an event emission to clear the UI display
-    coreEvents.emitQuotaChanged(undefined, undefined, undefined);
-    this.lastEmittedQuotaRemaining = undefined;
-    this.lastEmittedQuotaLimit = undefined;
 
     if (previousPlansDir) {
       this.refreshSessionScopedPlansDirectory(previousPlansDir);
@@ -1786,9 +1731,6 @@ export class Config implements McpContext, AgentLoopContext {
       // When the user explicitly sets a model, that becomes the active model.
       this._activeModel = newModel;
       coreEvents.emitModelChanged(newModel);
-      this.lastEmittedQuotaRemaining = undefined;
-      this.lastEmittedQuotaLimit = undefined;
-      this.emitQuotaChangedEvent();
     }
     if (this.onModelChange && !isTemporary) {
       this.onModelChange(newModel);
@@ -1870,86 +1812,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getQuotaErrorOccurred(): boolean {
     return this.quotaErrorOccurred;
-  }
-
-  setQuota(
-    remaining: number | undefined,
-    limit: number | undefined,
-    modelId?: string,
-  ): void {
-    const activeModel = modelId ?? this.getActiveModel();
-    if (remaining !== undefined && limit !== undefined) {
-      const current = this.modelQuotas.get(activeModel);
-      if (
-        !current ||
-        current.remaining !== remaining ||
-        current.limit !== limit
-      ) {
-        this.modelQuotas.set(activeModel, { remaining, limit });
-        this.emitQuotaChangedEvent();
-      }
-    }
-  }
-
-  private getPooledQuota(): {
-    remaining?: number;
-    limit?: number;
-    resetTime?: string;
-  } {
-    const model = this.getModel();
-    if (!isAutoModel(model, this)) {
-      return {};
-    }
-
-    const primaryModel = resolveModel(model, this);
-    const proModel = primaryModel;
-    const flashModel = DEFAULT_GEMINI_FLASH_MODEL;
-
-    const proQuota = this.modelQuotas.get(proModel);
-    const flashQuota = this.modelQuotas.get(flashModel);
-
-    if (proQuota || flashQuota) {
-      // For reset time, take the one that is furthest in the future (most conservative)
-      const resetTime = [proQuota?.resetTime, flashQuota?.resetTime]
-        .filter((t): t is string => !!t)
-        .sort()
-        .reverse()[0];
-
-      return {
-        remaining: (proQuota?.remaining ?? 0) + (flashQuota?.remaining ?? 0),
-        limit: (proQuota?.limit ?? 0) + (flashQuota?.limit ?? 0),
-        resetTime,
-      };
-    }
-
-    return {};
-  }
-
-  getQuotaRemaining(): number | undefined {
-    const pooled = this.getPooledQuota();
-    if (pooled.remaining !== undefined) {
-      return pooled.remaining;
-    }
-    const primaryModel = resolveModel(this.getModel(), this);
-    return this.modelQuotas.get(primaryModel)?.remaining;
-  }
-
-  getQuotaLimit(): number | undefined {
-    const pooled = this.getPooledQuota();
-    if (pooled.limit !== undefined) {
-      return pooled.limit;
-    }
-    const primaryModel = resolveModel(this.getModel(), this);
-    return this.modelQuotas.get(primaryModel)?.limit;
-  }
-
-  getQuotaResetTime(): string | undefined {
-    const pooled = this.getPooledQuota();
-    if (pooled.resetTime !== undefined) {
-      return pooled.resetTime;
-    }
-    const primaryModel = resolveModel(this.getModel(), this);
-    return this.modelQuotas.get(primaryModel)?.resetTime;
   }
 
   getEmbeddingModel(): string {
@@ -2088,45 +1950,6 @@ export class Config implements McpContext, AgentLoopContext {
   }
   getQuestion(): string | undefined {
     return this.question;
-  }
-
-  async refreshUserQuota(): Promise<RetrieveUserQuotaResponse | undefined> {
-    return undefined;
-  }
-
-  async refreshUserQuotaIfStale(
-    staleMs = 30_000,
-  ): Promise<RetrieveUserQuotaResponse | undefined> {
-    const now = Date.now();
-    if (now - this.lastQuotaFetchTime > staleMs) {
-      return this.refreshUserQuota();
-    }
-    return this.lastRetrievedQuota;
-  }
-
-  getLastRetrievedQuota(): RetrieveUserQuotaResponse | undefined {
-    return this.lastRetrievedQuota;
-  }
-
-  getRemainingQuotaForModel(modelId: string):
-    | {
-        remainingAmount?: number;
-        remainingFraction?: number;
-        resetTime?: string;
-      }
-    | undefined {
-    const bucket = this.lastRetrievedQuota?.buckets?.find(
-      (b) => b.modelId === modelId,
-    );
-    if (!bucket) return undefined;
-
-    return {
-      remainingAmount: bucket.remainingAmount
-        ? parseInt(bucket.remainingAmount, 10)
-        : undefined,
-      remainingFraction: bucket.remainingFraction,
-      resetTime: bucket.resetTime,
-    };
   }
 
   getCoreTools(): string[] | undefined {

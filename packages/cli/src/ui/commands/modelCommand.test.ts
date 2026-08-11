@@ -31,24 +31,6 @@ describe('modelCommand', () => {
     });
   });
 
-  it('should call refreshUserQuota if config is available when opening dialog', async () => {
-    if (!modelCommand.action) {
-      throw new Error('The model command must have an action.');
-    }
-
-    const mockRefreshUserQuota = vi.fn();
-    mockContext.services.agentContext = {
-      refreshUserQuota: mockRefreshUserQuota,
-      get config() {
-        return this;
-      },
-    } as unknown as Config;
-
-    await modelCommand.action(mockContext, '');
-
-    expect(mockRefreshUserQuota).toHaveBeenCalled();
-  });
-
   describe('manage subcommand', () => {
     it('should return a dialog action to open the model dialog', async () => {
       const manageCommand = modelCommand.subCommands?.find(
@@ -62,23 +44,6 @@ describe('modelCommand', () => {
         type: 'dialog',
         dialog: 'model',
       });
-    });
-
-    it('should call refreshUserQuota if config is available', async () => {
-      const manageCommand = modelCommand.subCommands?.find(
-        (c) => c.name === 'manage',
-      );
-      const mockRefreshUserQuota = vi.fn();
-      mockContext.services.agentContext = {
-        refreshUserQuota: mockRefreshUserQuota,
-        get config() {
-          return this;
-        },
-      } as unknown as Config;
-
-      await manageCommand!.action!(mockContext, '');
-
-      expect(mockRefreshUserQuota).toHaveBeenCalled();
     });
   });
 

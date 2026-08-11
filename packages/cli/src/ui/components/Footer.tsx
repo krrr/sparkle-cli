@@ -18,10 +18,8 @@ import process from 'node:process';
 import os from 'node:os';
 import { MemoryUsageDisplay } from './MemoryUsageDisplay.js';
 import { ContextUsageDisplay } from './ContextUsageDisplay.js';
-import { QuotaDisplay } from './QuotaDisplay.js';
 import { DebugProfiler } from './DebugProfiler.js';
 import { useUIState } from '../contexts/UIStateContext.js';
-import { useQuotaState } from '../contexts/QuotaContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { useVimMode } from '../contexts/VimModeContext.js';
@@ -175,7 +173,6 @@ interface FooterColumn {
 
 export const Footer: React.FC = () => {
   const uiState = useUIState();
-  const quotaState = useQuotaState();
   const { copyModeEnabled } = useInputState();
   const config = useConfig();
   const settings = useSettings();
@@ -208,8 +205,6 @@ export const Footer: React.FC = () => {
     isTrustedFolder: uiState.isTrustedFolder,
     terminalWidth: uiState.terminalWidth,
   };
-
-  const quotaStats = quotaState.stats;
 
   const isFullErrorVerbosity = settings.merged.ui.errorVerbosity === 'full';
   const showErrorSummary =
@@ -332,24 +327,6 @@ export const Footer: React.FC = () => {
           ),
           10, // "100% used" is 9 chars
         );
-        break;
-      }
-      case 'quota': {
-        if (quotaStats?.remaining !== undefined && quotaStats.limit) {
-          addCol(
-            id,
-            header,
-            () => (
-              <QuotaDisplay
-                remaining={quotaStats.remaining}
-                limit={quotaStats.limit}
-                forceShow={true}
-                lowercase={true}
-              />
-            ),
-            9, // "100% used" is 9 chars
-          );
-        }
         break;
       }
       case 'memory-usage': {

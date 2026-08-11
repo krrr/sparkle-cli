@@ -7,8 +7,6 @@
 import type React from 'react';
 import { useCallback, useContext, useMemo, useState, useEffect } from 'react';
 import { Box, Text } from 'ink';
-import { ModelQuotaDisplay } from './ModelQuotaDisplay.js';
-import { useUIState } from '../contexts/UIStateContext.js';
 import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
@@ -31,7 +29,6 @@ interface ModelDialogProps {
 
 export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const config = useContext(ConfigContext);
-  const { terminalWidth } = useUIState();
   const [hasAccessToProModel, setHasAccessToProModel] = useState<boolean>(
     () => !(config?.getProModelNoAccessSync() ?? false),
   );
@@ -275,10 +272,6 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
           {'> To use a specific Gemini model on startup, use the --model flag.'}
         </Text>
       </Box>
-      <ModelQuotaDisplay
-        buckets={config?.getLastRetrievedQuota()?.buckets}
-        availableWidth={terminalWidth - 2}
-      />
       <Box marginTop={1} flexDirection="column">
         <Text color={theme.text.secondary}>(Press Esc to close)</Text>
       </Box>

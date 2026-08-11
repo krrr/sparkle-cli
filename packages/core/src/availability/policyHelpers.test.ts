@@ -26,7 +26,6 @@ import { ApprovalMode } from '../policy/types.js';
 
 const createMockConfig = (overrides: Partial<Config> = {}): Config => {
   const config = {
-    getUserTier: () => undefined,
     getModel: () => DEFAULT_GEMINI_MODEL,
     getContentGeneratorConfig: () => ({ authType: undefined }),
     getMaxAttemptsPerTurn: () => 3,

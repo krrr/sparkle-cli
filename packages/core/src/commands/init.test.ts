@@ -23,7 +23,9 @@ describe('performInit', () => {
     expect(result.type).toBe('submit_prompt');
 
     if (result.type === 'submit_prompt') {
-      expect(result.content).toContain('You are an AI agent');
+      expect(result.content).toContain(
+        'You are an terminal-based AI agent. Your task is to analyze the current directory',
+      );
     }
   });
 });

@@ -120,7 +120,6 @@ import {
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
 import * as uiTelemetry from './uiTelemetry.js';
 import { makeFakeConfig } from '../test-utils/config.js';
-import { UserAccountManager } from '../utils/userAccountManager.js';
 import { InstallationManager } from '../utils/installationManager.js';
 import { AgentTerminateMode } from '../agents/types.js';
 
@@ -141,10 +140,6 @@ describe('loggers', () => {
     vi.spyOn(uiTelemetry.uiTelemetryService, 'addEvent').mockImplementation(
       mockUiEvent.addEvent,
     );
-    vi.spyOn(
-      UserAccountManager.prototype,
-      'getCachedGoogleAccount',
-    ).mockReturnValue('test-user@example.com');
     vi.spyOn(
       InstallationManager.prototype,
       'getInstallationId',
@@ -232,7 +227,6 @@ describe('loggers', () => {
         body: 'CLI configuration loaded.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_CLI_CONFIG,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -311,7 +305,6 @@ describe('loggers', () => {
         body: 'User prompt. Length: 11.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_USER_PROMPT,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -350,7 +343,6 @@ describe('loggers', () => {
         body: 'User prompt. Length: 11.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_USER_PROMPT,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1184,7 +1176,6 @@ describe('loggers', () => {
         body: 'Switching to flash as Fallback.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_FLASH_FALLBACK,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1215,7 +1206,6 @@ describe('loggers', () => {
       expect(emittedEvent.attributes).toEqual(
         expect.objectContaining({
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_RIPGREP_FALLBACK,
           error: undefined,
@@ -1233,7 +1223,6 @@ describe('loggers', () => {
       expect(emittedEvent.attributes).toEqual(
         expect.objectContaining({
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_RIPGREP_FALLBACK,
           error: 'rg not found',
@@ -1365,7 +1354,6 @@ describe('loggers', () => {
         body: 'Tool call: test-function. Decision: accept. Success: true. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1520,7 +1508,6 @@ describe('loggers', () => {
         body: 'Tool call: test-function. Decision: reject. Success: false. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1601,7 +1588,6 @@ describe('loggers', () => {
         body: 'Tool call: test-function. Decision: modify. Success: true. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1681,7 +1667,6 @@ describe('loggers', () => {
         body: 'Tool call: test-function. Success: true. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1760,7 +1745,6 @@ describe('loggers', () => {
         body: 'Tool call: test-function. Success: false. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1859,7 +1843,6 @@ describe('loggers', () => {
         body: 'Tool call: mock_mcp_tool. Success: true. Duration: 100ms.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -1994,7 +1977,6 @@ describe('loggers', () => {
         body: 'Malformed JSON response from test-model.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_MALFORMED_JSON_RESPONSE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2020,7 +2002,6 @@ describe('loggers', () => {
         body: 'Invalid chunk received from stream.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_INVALID_CHUNK,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2073,7 +2054,6 @@ describe('loggers', () => {
         body: 'File operation: read. Lines: 10.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_FILE_OPERATION,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2124,7 +2104,6 @@ describe('loggers', () => {
         body: 'Tool output truncated for test-tool.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_TOOL_OUTPUT_TRUNCATED,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2171,7 +2150,6 @@ describe('loggers', () => {
         body: 'Model routing decision. Model: gemini-pro, Source: default',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           // eslint-disable-next-line @typescript-eslint/no-misused-spread
           ...event,
@@ -2205,7 +2183,6 @@ describe('loggers', () => {
         body: 'Model routing decision. Model: gemini-pro, Source: NumericalClassifier (Strict)',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           // eslint-disable-next-line @typescript-eslint/no-misused-spread
           ...event,
@@ -2265,7 +2242,6 @@ describe('loggers', () => {
         body: 'Installed extension testing',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_INSTALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2310,7 +2286,6 @@ describe('loggers', () => {
         body: 'Updated extension testing',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_UPDATE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2352,7 +2327,6 @@ describe('loggers', () => {
         body: 'Uninstalled extension testing',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_UNINSTALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2392,7 +2366,6 @@ describe('loggers', () => {
         body: 'Enabled extension testing',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_ENABLE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2432,7 +2405,6 @@ describe('loggers', () => {
         body: 'Disabled extension testing',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_EXTENSION_DISABLE,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2463,7 +2435,6 @@ describe('loggers', () => {
         body: 'Agent TestAgent started. ID: agent-123',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_AGENT_START,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2504,7 +2475,6 @@ describe('loggers', () => {
         body: 'Agent TestAgent finished. Reason: GOAL. Duration: 1000ms. Turns: 5.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_AGENT_FINISH,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2543,7 +2513,6 @@ describe('loggers', () => {
         body: 'Web fetch fallback attempt. Reason: private_ip',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_WEB_FETCH_FALLBACK_ATTEMPT,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2588,7 +2557,6 @@ describe('loggers', () => {
         body: 'Hook call before-tool./path/to/script.sh succeeded in 150ms',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_HOOK_CALL,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2634,7 +2602,6 @@ describe('loggers', () => {
         body: 'Network retry attempt 2/5 for test-model. Delay: 1000ms. Error type: Overloaded',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_NETWORK_RETRY_ATTEMPT,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2673,7 +2640,6 @@ describe('loggers', () => {
         body: 'Onboarding started.',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_ONBOARDING_START,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
@@ -2693,27 +2659,24 @@ describe('loggers', () => {
     });
 
     it('should log onboarding success event to OTEL and record metrics', () => {
-      const event = new OnboardingSuccessEvent('standard-tier', 100);
+      const event = new OnboardingSuccessEvent(100);
 
       logOnboardingSuccess(mockConfig, event);
 
       expect(mockLogger.emit).toHaveBeenCalledWith({
-        body: 'Onboarding succeeded. Tier: standard-tier. Duration: 100ms',
+        body: 'Onboarding succeeded. Duration: 100ms',
         attributes: {
           'session.id': 'test-session-id',
-          'user.email': 'test-user@example.com',
           'installation.id': 'test-installation-id',
           'event.name': EVENT_ONBOARDING_SUCCESS,
           'event.timestamp': '2025-01-01T00:00:00.000Z',
           interactive: false,
-          user_tier: 'standard-tier',
           duration_ms: 100,
         },
       });
 
       expect(metrics.recordOnboardingSuccess).toHaveBeenCalledWith(
         mockConfig,
-        'standard-tier',
         100,
       );
     });

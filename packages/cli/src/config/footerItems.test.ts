@@ -23,7 +23,6 @@ describe('footerItems', () => {
         'git-branch',
         'sandbox',
         'model-name',
-        'quota',
       ]);
     });
 
@@ -45,14 +44,13 @@ describe('footerItems', () => {
       expect(items).not.toContain('sandbox');
     });
 
-    it('removes model-name, context-used, and quota when hideModelInfo is true', () => {
+    it('removes model-name and context-used when hideModelInfo is true', () => {
       const settings = createMockSettings({
         ui: { footer: { hideModelInfo: true, hideContextPercentage: true } },
       }).merged;
       const items = deriveItemsFromLegacySettings(settings);
       expect(items).not.toContain('model-name');
       expect(items).not.toContain('context-used');
-      expect(items).not.toContain('quota');
     });
 
     it('includes context-used when hideContextPercentage is false', () => {
@@ -117,7 +115,6 @@ describe('footerItems', () => {
         'git-branch',
         'sandbox',
         'context-used',
-        'quota',
         'memory-usage',
         'session-id',
         'hostname',

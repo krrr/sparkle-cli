@@ -25,7 +25,6 @@ import {
 import { App } from './App.js';
 import { AppContext } from './contexts/AppContext.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
-import { QuotaContext } from './contexts/QuotaContext.js';
 import {
   UIActionsContext,
   type UIActions,
@@ -36,7 +35,6 @@ import {
   AuthState,
   type ConfirmationRequest,
   type PermissionConfirmationRequest,
-  type QuotaStats,
   MessageType,
   StreamingState,
   type HistoryItemInfo,
@@ -50,7 +48,6 @@ import {
   type Config,
   type IdeInfo,
   type IdeContext,
-  type UserTierId,
   type UserFeedbackPayload,
   type HookSystemMessagePayload,
   type AgentDefinition,
@@ -252,7 +249,6 @@ export const AppContainer = (props: AppContainerProps) => {
   const [quittingMessages, setQuittingMessages] = useState<
     HistoryItem[] | null
   >(null);
-  const [showPrivacyNotice, setShowPrivacyNotice] = useState<boolean>(false);
   const [themeError, setThemeError] = useState<string | null>(
     initializationResult.themeError,
   );
@@ -429,18 +425,6 @@ export const AppContainer = (props: AppContainerProps) => {
 
   const [currentModel, setCurrentModel] = useState(config.getModel());
 
-  const [userTier, setUserTier] = useState<UserTierId | undefined>(undefined);
-  const [quotaStats, setQuotaStats] = useState<QuotaStats | undefined>(() => {
-    const remaining = config.getQuotaRemaining();
-    const limit = config.getQuotaLimit();
-    const resetTime = config.getQuotaResetTime();
-    return remaining !== undefined ||
-      limit !== undefined ||
-      resetTime !== undefined
-      ? { remaining, limit, resetTime }
-      : undefined;
-  });
-
   const [isConfigInitialized, setConfigInitialized] = useState(false);
 
   const logger = useLogger(config);
@@ -539,23 +523,9 @@ export const AppContainer = (props: AppContainerProps) => {
       setCurrentModel(config.getModel());
     };
 
-    const handleQuotaChanged = (payload: {
-      remaining: number | undefined;
-      limit: number | undefined;
-      resetTime?: string;
-    }) => {
-      setQuotaStats({
-        remaining: payload.remaining,
-        limit: payload.limit,
-        resetTime: payload.resetTime,
-      });
-    };
-
     coreEvents.on(CoreEvent.ModelChanged, handleModelChanged);
-    coreEvents.on(CoreEvent.QuotaChanged, handleQuotaChanged);
     return () => {
       coreEvents.off(CoreEvent.ModelChanged, handleModelChanged);
-      coreEvents.off(CoreEvent.QuotaChanged, handleQuotaChanged);
     };
   }, [config]);
 
@@ -702,37 +672,13 @@ export const AppContainer = (props: AppContainerProps) => {
     onAuthError,
     apiKeyDefaultValue,
     reloadApiKey,
-    accountSuspensionInfo,
-    setAccountSuspensionInfo,
-  } = useAuthCommand(
-    settings,
-    config,
-    initializationResult.authError,
-    initializationResult.accountSuspensionInfo,
-  );
-  const [authContext, setAuthContext] = useState<{ requiresRestart?: boolean }>(
-    {},
-  );
+  } = useAuthCommand(settings, config, initializationResult.authError);
 
-  useEffect(() => {
-    if (authState === AuthState.Authenticated && authContext.requiresRestart) {
-      setAuthState(AuthState.AwaitingLoginRestart);
-      setAuthContext({});
-    }
-  }, [authState, authContext, setAuthState]);
-
-  const {
-    proQuotaRequest,
-    handleProQuotaChoice,
-    validationRequest,
-    handleValidationChoice,
-  } = useQuotaAndFallback({
+  useQuotaAndFallback({
     config,
     historyManager,
-    userTier,
     settings,
     setModelSwitchedFromQuotaError,
-    onShowAuthSelection: () => setAuthState(AuthState.Updating),
     errorVerbosity: settings.merged.ui.errorVerbosity,
   });
 
@@ -774,7 +720,6 @@ export const AppContainer = (props: AppContainerProps) => {
   const handleAuthSelect = useCallback(
     async (authType: AuthType | undefined, scope: LoadableSettingScope) => {
       if (authType) {
-        setAuthContext({});
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
         try {
@@ -792,7 +737,7 @@ export const AppContainer = (props: AppContainerProps) => {
       }
       setAuthState(AuthState.Authenticated);
     },
-    [settings, config, setAuthState, onAuthError, setAuthContext],
+    [settings, config, setAuthState, onAuthError],
   );
 
   const handleApiKeySubmit = useCallback(
@@ -821,14 +766,6 @@ export const AppContainer = (props: AppContainerProps) => {
     // Go back to auth method selection
     setAuthState(AuthState.Updating);
   }, [setAuthState]);
-
-  // Sync user tier from config when authentication changes
-  useEffect(() => {
-    // Only sync when not currently authenticating
-    if (authState === AuthState.Authenticated) {
-      setUserTier(config.getUserTier());
-    }
-  }, [config, authState]);
 
   // Check for enforced auth type mismatch
   useEffect(() => {
@@ -904,7 +841,6 @@ export const AppContainer = (props: AppContainerProps) => {
       openAuthDialog: () => setAuthState(AuthState.Updating),
       openThemeDialog,
       openEditorDialog,
-      openPrivacyNotice: () => setShowPrivacyNotice(true),
       openSettingsDialog,
       openSessionBrowser,
       openModelDialog,
@@ -951,7 +887,6 @@ export const AppContainer = (props: AppContainerProps) => {
       openAgentConfigDialog,
       setQuittingMessages,
       setDebugMessage,
-      setShowPrivacyNotice,
       setCorgiMode,
       dispatchExtensionStateUpdate,
       openPermissionsDialog,
@@ -1447,8 +1382,7 @@ export const AppContainer = (props: AppContainerProps) => {
     !isResuming &&
     (streamingState === StreamingState.Idle ||
       streamingState === StreamingState.Responding ||
-      streamingState === StreamingState.WaitingForConfirmation) &&
-    !proQuotaRequest;
+      streamingState === StreamingState.WaitingForConfirmation);
 
   const observerRef = useRef<ResizeObserver | null>(null);
 
@@ -1537,7 +1471,6 @@ export const AppContainer = (props: AppContainerProps) => {
       !isAuthDialogOpen &&
       !isThemeDialogOpen &&
       !isEditorDialogOpen &&
-      !showPrivacyNotice &&
       geminiClient?.isInitialized?.()
     ) {
       void handleFinalSubmit(initialPrompt);
@@ -1551,7 +1484,6 @@ export const AppContainer = (props: AppContainerProps) => {
     isAuthDialogOpen,
     isThemeDialogOpen,
     isEditorDialogOpen,
-    showPrivacyNotice,
     geminiClient,
   ]);
 
@@ -2112,9 +2044,6 @@ export const AppContainer = (props: AppContainerProps) => {
 
   const nightly = props.version.includes('nightly');
 
-  const isAwaitingLoginRestart = authState === AuthState.AwaitingLoginRestart;
-  const loginRestartMessage: string | undefined = undefined;
-
   const dialogsVisible =
     shouldShowIdePrompt ||
     isFolderTrustDialogOpen ||
@@ -2134,13 +2063,9 @@ export const AppContainer = (props: AppContainerProps) => {
     isAuthenticating ||
     isAuthDialogOpen ||
     isEditorDialogOpen ||
-    showPrivacyNotice ||
     showIdeRestartPrompt ||
-    !!proQuotaRequest ||
-    !!validationRequest ||
     isSessionBrowserOpen ||
     authState === AuthState.AwaitingApiKeyInput ||
-    isAwaitingLoginRestart ||
     !!newAgents;
 
   const hasPendingToolConfirmation = useMemo(
@@ -2159,8 +2084,6 @@ export const AppContainer = (props: AppContainerProps) => {
     !!authConsentRequest ||
     hasConfirmUpdateExtensionRequests ||
     hasLoopDetectionConfirmationRequest ||
-    !!proQuotaRequest ||
-    !!validationRequest ||
     !!customDialog;
 
   const loadingPhrases = settings.merged.ui.loadingPhrases;
@@ -2339,16 +2262,6 @@ export const AppContainer = (props: AppContainerProps) => {
     ],
   );
 
-  const quotaState = useMemo(
-    () => ({
-      userTier,
-      stats: quotaStats,
-      proQuotaRequest,
-      validationRequest,
-    }),
-    [userTier, quotaStats, proQuotaRequest, validationRequest],
-  );
-
   const uiState: UIState = useMemo(
     () => ({
       history: historyManager.history,
@@ -2359,15 +2272,11 @@ export const AppContainer = (props: AppContainerProps) => {
       isAuthenticating,
       isConfigInitialized,
       authError,
-      accountSuspensionInfo,
       isAuthDialogOpen,
       isAwaitingApiKeyInput: authState === AuthState.AwaitingApiKeyInput,
-      isAwaitingLoginRestart,
-      loginRestartMessage,
       apiKeyDefaultValue,
       editorError,
       isEditorDialogOpen,
-      showPrivacyNotice,
       mouseMode,
       corgiMode,
       debugMessage,
@@ -2475,11 +2384,9 @@ export const AppContainer = (props: AppContainerProps) => {
       isAuthenticating,
       isConfigInitialized,
       authError,
-      accountSuspensionInfo,
       isAuthDialogOpen,
       editorError,
       isEditorDialogOpen,
-      showPrivacyNotice,
       mouseMode,
       corgiMode,
       debugMessage,
@@ -2568,8 +2475,6 @@ export const AppContainer = (props: AppContainerProps) => {
       customDialog,
       apiKeyDefaultValue,
       authState,
-      isAwaitingLoginRestart,
-      loginRestartMessage,
       transientMessage,
       bannerData,
       bannerVisible,
@@ -2584,11 +2489,6 @@ export const AppContainer = (props: AppContainerProps) => {
     ],
   );
 
-  const exitPrivacyNotice = useCallback(
-    () => setShowPrivacyNotice(false),
-    [setShowPrivacyNotice],
-  );
-
   const uiActions: UIActions = useMemo(
     () => ({
       handleThemeSelect,
@@ -2599,7 +2499,6 @@ export const AppContainer = (props: AppContainerProps) => {
       onAuthError,
       handleEditorSelect,
       exitEditorDialog,
-      exitPrivacyNotice,
       closeSettingsDialog,
       closeModelDialog,
       openVoiceModelDialog,
@@ -2618,8 +2517,6 @@ export const AppContainer = (props: AppContainerProps) => {
       refreshStatic,
       handleFinalSubmit,
       handleClearScreen,
-      handleProQuotaChoice,
-      handleValidationChoice,
       openSessionBrowser,
       closeSessionBrowser,
       handleResumeSession,
@@ -2639,11 +2536,6 @@ export const AppContainer = (props: AppContainerProps) => {
       dismissBackgroundTask,
       setActiveBackgroundTaskPid,
       setIsBackgroundTaskListOpen,
-      setAuthContext,
-      dismissLoginRestart: () => {
-        setAuthContext({});
-        setAuthState(AuthState.Updating);
-      },
       onHintInput: () => {},
       onHintBackspace: () => {},
       onHintClear: () => {},
@@ -2672,10 +2564,6 @@ export const AppContainer = (props: AppContainerProps) => {
         setNewAgents(null);
       },
       getPreferredEditor,
-      clearAccountSuspension: () => {
-        setAccountSuspensionInfo(null);
-        setAuthState(AuthState.Updating);
-      },
       setVoiceModeEnabled: (value: boolean) => {
         setVoiceModeEnabled(value);
       },
@@ -2689,7 +2577,6 @@ export const AppContainer = (props: AppContainerProps) => {
       onAuthError,
       handleEditorSelect,
       exitEditorDialog,
-      exitPrivacyNotice,
       closeSettingsDialog,
       closeModelDialog,
       openVoiceModelDialog,
@@ -2708,8 +2595,6 @@ export const AppContainer = (props: AppContainerProps) => {
       refreshStatic,
       handleFinalSubmit,
       handleClearScreen,
-      handleProQuotaChoice,
-      handleValidationChoice,
       openSessionBrowser,
       closeSessionBrowser,
       handleResumeSession,
@@ -2729,8 +2614,6 @@ export const AppContainer = (props: AppContainerProps) => {
       dismissBackgroundTask,
       setActiveBackgroundTaskPid,
       setIsBackgroundTaskListOpen,
-      setAuthContext,
-      setAccountSuspensionInfo,
       newAgents,
       config,
       historyManager,
@@ -2741,36 +2624,34 @@ export const AppContainer = (props: AppContainerProps) => {
 
   return (
     <UIStateContext.Provider value={uiState}>
-      <QuotaContext.Provider value={quotaState}>
-        <InputContext.Provider value={inputState}>
-          <UIActionsContext.Provider value={uiActions}>
-            <ConfigContext.Provider value={config}>
-              <AppContext.Provider
-                value={{
-                  version: props.version,
-                  startupWarnings: props.startupWarnings || [],
-                }}
+      <InputContext.Provider value={inputState}>
+        <UIActionsContext.Provider value={uiActions}>
+          <ConfigContext.Provider value={config}>
+            <AppContext.Provider
+              value={{
+                version: props.version,
+                startupWarnings: props.startupWarnings || [],
+              }}
+            >
+              <ToolActionsProvider
+                config={config}
+                toolCalls={allToolCalls}
+                isExpanded={isExpanded}
+                toggleExpansion={toggleExpansion}
+                toggleAllExpansion={toggleAllExpansion}
               >
-                <ToolActionsProvider
-                  config={config}
-                  toolCalls={allToolCalls}
-                  isExpanded={isExpanded}
-                  toggleExpansion={toggleExpansion}
-                  toggleAllExpansion={toggleAllExpansion}
-                >
-                  <ShellFocusContext.Provider value={isFocused}>
-                    <MouseProvider mouseEventsEnabled={mouseMode}>
-                      <ScrollProvider>
-                        <App />
-                      </ScrollProvider>
-                    </MouseProvider>
-                  </ShellFocusContext.Provider>
-                </ToolActionsProvider>
-              </AppContext.Provider>
-            </ConfigContext.Provider>
-          </UIActionsContext.Provider>
-        </InputContext.Provider>
-      </QuotaContext.Provider>
+                <ShellFocusContext.Provider value={isFocused}>
+                  <MouseProvider mouseEventsEnabled={mouseMode}>
+                    <ScrollProvider>
+                      <App />
+                    </ScrollProvider>
+                  </MouseProvider>
+                </ShellFocusContext.Provider>
+              </ToolActionsProvider>
+            </AppContext.Provider>
+          </ConfigContext.Provider>
+        </UIActionsContext.Provider>
+      </InputContext.Provider>
     </UIStateContext.Provider>
   );
 };

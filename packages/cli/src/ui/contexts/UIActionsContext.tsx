@@ -37,7 +37,6 @@ export interface UIActions {
     scope: LoadableSettingScope,
   ) => void;
   exitEditorDialog: () => void;
-  exitPrivacyNotice: () => void;
   closeSettingsDialog: () => void;
   closeModelDialog: () => void;
   openVoiceModelDialog: () => void;
@@ -60,10 +59,6 @@ export interface UIActions {
   refreshStatic: () => void;
   handleFinalSubmit: (value: string) => Promise<void>;
   handleClearScreen: () => void;
-  handleProQuotaChoice: (
-    choice: 'retry_later' | 'retry_once' | 'retry_always' | 'upgrade',
-  ) => void;
-  handleValidationChoice: (choice: 'verify' | 'change_auth' | 'cancel') => void;
   openSessionBrowser: () => void;
   closeSessionBrowser: () => void;
   handleResumeSession: (session: SessionInfo) => Promise<void>;
@@ -83,8 +78,6 @@ export interface UIActions {
   dismissBackgroundTask: (pid: number) => Promise<void>;
   setActiveBackgroundTaskPid: (pid: number) => void;
   setIsBackgroundTaskListOpen: (isOpen: boolean) => void;
-  setAuthContext: (context: { requiresRestart?: boolean }) => void;
-  dismissLoginRestart: () => void;
   onHintInput: (char: string) => void;
   onHintBackspace: () => void;
   onHintClear: () => void;
@@ -92,7 +85,6 @@ export interface UIActions {
   handleRestart: () => void;
   handleNewAgentsSelect: (choice: NewAgentsChoice) => Promise<void>;
   getPreferredEditor: () => EditorType | undefined;
-  clearAccountSuspension: () => void;
   setVoiceModeEnabled: (value: boolean) => void;
 }
 

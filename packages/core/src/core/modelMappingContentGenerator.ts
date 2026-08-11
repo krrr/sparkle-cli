@@ -14,7 +14,6 @@ import {
 } from '@google/genai';
 import { type ContentGenerator } from './contentGenerator.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
-import type { UserTierId, GeminiUserTier } from '../userTier.js';
 import { normalizeModelId } from '../utils/modelUtils.js';
 
 export class ModelMappingContentGenerator implements ContentGenerator {
@@ -25,18 +24,6 @@ export class ModelMappingContentGenerator implements ContentGenerator {
 
   getWrapped(): ContentGenerator {
     return this.wrapped;
-  }
-
-  get userTier(): UserTierId | undefined {
-    return this.wrapped.userTier;
-  }
-
-  get userTierName(): string | undefined {
-    return this.wrapped.userTierName;
-  }
-
-  get paidTier(): GeminiUserTier | undefined {
-    return this.wrapped.paidTier;
   }
 
   private mapModel<T extends { model?: string }>(req: T): T {

@@ -33,22 +33,21 @@ describe('usePrivacySettings', () => {
     };
   };
 
-  it('should always report tier unavailable', async () => {
+  it('should start not loading without errors', async () => {
     const { result } = await act(async () => renderPrivacySettingsHook());
 
     expect(result.current.privacyState.isLoading).toBe(false);
-    expect(result.current.privacyState.isTierUnavailable).toBe(true);
     expect(result.current.privacyState.error).toBeUndefined();
   });
 
-  it('should keep reporting tier unavailable after updateDataCollectionOptIn', async () => {
+  it('should keep state after updateDataCollectionOptIn', async () => {
     const { result } = await act(async () => renderPrivacySettingsHook());
 
     await act(async () => {
       await result.current.updateDataCollectionOptIn(true);
     });
 
-    expect(result.current.privacyState.isTierUnavailable).toBe(true);
+    expect(result.current.privacyState.isLoading).toBe(false);
     expect(result.current.privacyState.dataCollectionOptIn).toBeUndefined();
   });
 });

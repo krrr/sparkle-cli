@@ -572,19 +572,12 @@ describe('<ModelStatsDisplay />', () => {
     });
 
     const { lastFrame, unmount } = await render(
-      <ModelStatsDisplay
-        selectedAuthType="oauth"
-        userEmail="test@example.com"
-        tier="Pro"
-      />,
+      <ModelStatsDisplay selectedAuthType="oauth" />,
     );
 
     const output = lastFrame();
     expect(output).toContain('Auth Method:');
-    expect(output).toContain('Signed in with Google');
-    expect(output).toContain('(test@example.com)');
-    expect(output).toContain('Tier:');
-    expect(output).toContain('Pro');
+    expect(output).toContain('oauth');
     unmount();
   });
 

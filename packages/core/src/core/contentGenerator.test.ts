@@ -151,7 +151,7 @@ describe('createContentGenerator', () => {
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': expect.stringMatching(
-            /GeminiCLI\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
+            /SparkleCLI\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
           ),
         }),
       }),
@@ -191,7 +191,7 @@ describe('createContentGenerator', () => {
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
             'User-Agent': expect.stringMatching(
-              /GeminiCLI-a2a-server\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
+              /SparkleCLI-a2a-server\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
             ),
           }),
         }),
@@ -267,7 +267,7 @@ describe('createContentGenerator', () => {
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
             'User-Agent': expect.stringMatching(
-              /GeminiCLI-my-client\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
+              /SparkleCLI-my-client\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
             ),
           }),
         }),

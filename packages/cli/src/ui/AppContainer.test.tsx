@@ -123,19 +123,16 @@ vi.mock('ink', async (importOriginal) => {
 });
 
 import { InputContext, type InputState } from './contexts/InputContext.js';
-import { QuotaContext, type QuotaState } from './contexts/QuotaContext.js';
 
 // Helper component will read the context values provided by AppContainer
 // so we can assert against them in our tests.
 let capturedUIState: UIState;
 let capturedInputState: InputState;
-let capturedQuotaState: QuotaState;
 let capturedUIActions: UIActions;
 let capturedOverflowActions: OverflowActions;
 function TestContextConsumer() {
   capturedUIState = useContext(UIStateContext)!;
   capturedInputState = useContext(InputContext)!;
-  capturedQuotaState = useContext(QuotaContext)!;
   capturedUIActions = useContext(UIActionsContext)!;
   capturedOverflowActions = useOverflowActions()!;
   return null;
@@ -363,10 +360,7 @@ describe('AppContainer State Management', () => {
     capturedUIState = null!;
 
     // **Provide a default return value for EVERY mocked hook.**
-    mockedUseQuotaAndFallback.mockReturnValue({
-      proQuotaRequest: null,
-      handleProQuotaChoice: vi.fn(),
-    });
+    mockedUseQuotaAndFallback.mockReturnValue(undefined);
     mockedUseHistory.mockReturnValue({
       history: [],
       addItem: vi.fn(),
@@ -795,15 +789,21 @@ describe('AppContainer State Management', () => {
         isFocused: false,
         hasReceivedFocusEvent: true,
       });
-      mockedUseQuotaAndFallback.mockReturnValue({
-        proQuotaRequest: { kind: 'upgrade' },
-        handleProQuotaChoice: vi.fn(),
-      });
-      let currentStreamingState: 'idle' | 'responding' = 'responding';
       mockedUseGeminiStream.mockImplementation(() => ({
         ...DEFAULT_GEMINI_STREAM_MOCK,
         streamingState: currentStreamingState,
       }));
+      let currentStreamingState: 'idle' | 'responding' = 'responding';
+
+      // Simulate an action-required confirmation dialog being pending
+      mockedUseSlashCommandProcessor.mockReturnValue({
+        handleSlashCommand: vi.fn(),
+        slashCommands: [],
+        pendingHistoryItems: [],
+        commandContext: {},
+        shellConfirmationRequest: null,
+        confirmationRequest: { prompt: 'test', onConfirm: vi.fn() },
+      });
 
       const { unmount, rerender } = await act(async () => renderAppContainer());
 
@@ -812,9 +812,14 @@ describe('AppContainer State Management', () => {
         rerender(getAppContainer());
       });
 
+      // The session-complete notification must not be sent while a dialog is pending
       expect(
-        terminalNotificationsMocks.notifyViaTerminal,
-      ).not.toHaveBeenCalled();
+        terminalNotificationsMocks.buildRunEventNotificationContent,
+      ).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'session_complete',
+        }),
+      );
 
       unmount();
     });
@@ -1092,7 +1097,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => true),
         resumeChat: vi.fn(),
-        getUserTier: vi.fn(),
         getChatRecordingService: vi.fn(() => mockChatRecordingService),
       };
 
@@ -1126,7 +1130,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => true),
         resumeChat: vi.fn(),
-        getUserTier: vi.fn(),
         getChatRecordingService: vi.fn(() => mockChatRecordingService),
         setHistory: vi.fn(),
       };
@@ -1171,7 +1174,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => true),
         getChatRecordingService: vi.fn(() => mockChatRecordingService),
-        getUserTier: vi.fn(),
       };
 
       const configWithRecording = makeFakeConfig();
@@ -1202,7 +1204,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => true),
         resumeChat: mockResumeChat,
-        getUserTier: vi.fn(),
         getChatRecordingService: vi.fn(() => ({
           initialize: vi.fn(),
           recordMessage: vi.fn(),
@@ -1264,7 +1265,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => false), // Not initialized
         resumeChat: mockResumeChat,
-        getUserTier: vi.fn(),
         getChatRecordingService: vi.fn(),
       };
 
@@ -1357,7 +1357,6 @@ describe('AppContainer State Management', () => {
       const mockGeminiClient = {
         isInitialized: vi.fn(() => true),
         getChatRecordingService: vi.fn(() => mockChatRecordingService),
-        getUserTier: vi.fn(),
       };
 
       const configWithRecording = makeFakeConfig();
@@ -1383,51 +1382,10 @@ describe('AppContainer State Management', () => {
   });
 
   describe('Quota and Fallback Integration', () => {
-    it('passes a null proQuotaRequest to QuotaContext by default', async () => {
-      // The default mock from beforeEach already sets proQuotaRequest to null
+    it('registers the fallback handler on initialization', async () => {
+      // The default mock from beforeEach already mocks useQuotaAndFallback
       const { unmount } = await act(async () => renderAppContainer());
-      // Assert that the context value is as expected
-      expect(capturedQuotaState.proQuotaRequest).toBeNull();
-      unmount();
-    });
-
-    it('passes a valid proQuotaRequest to QuotaContext when provided by the hook', async () => {
-      // Arrange: Create a mock request object that a UI dialog would receive
-      const mockRequest = {
-        failedModel: 'gemini-pro',
-        fallbackModel: 'gemini-flash',
-        resolve: vi.fn(),
-      };
-      mockedUseQuotaAndFallback.mockReturnValue({
-        proQuotaRequest: mockRequest,
-        handleProQuotaChoice: vi.fn(),
-      });
-
-      // Act: Render the container
-      const { unmount } = await act(async () => renderAppContainer());
-      // Assert: The mock request is correctly passed through the context
-      expect(capturedQuotaState.proQuotaRequest).toEqual(mockRequest);
-      unmount();
-    });
-
-    it('passes the handleProQuotaChoice function to UIActionsContext', async () => {
-      // Arrange: Create a mock handler function
-      const mockHandler = vi.fn();
-      mockedUseQuotaAndFallback.mockReturnValue({
-        proQuotaRequest: null,
-        handleProQuotaChoice: mockHandler,
-      });
-
-      // Act: Render the container
-      const { unmount } = await act(async () => renderAppContainer());
-      // Assert: The action in the context is the mock handler we provided
-      expect(capturedUIActions.handleProQuotaChoice).toBe(mockHandler);
-
-      // You can even verify that the plumbed function is callable
-      act(() => {
-        capturedUIActions.handleProQuotaChoice('retry_later');
-      });
-      expect(mockHandler).toHaveBeenCalledWith('retry_later');
+      expect(mockedUseQuotaAndFallback).toHaveBeenCalled();
       unmount();
     });
   });

@@ -12,16 +12,6 @@ import { MessageType } from '../types.js';
 import { formatDuration } from '../utils/formatters.js';
 import type { Config } from 'sparkle-cli-core';
 
-vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
-  return {
-    ...actual,
-    UserAccountManager: vi.fn().mockImplementation(() => ({
-      getCachedGoogleAccount: vi.fn().mockReturnValue('mock@example.com'),
-    })),
-  };
-});
-
 describe('statsCommand', () => {
   let mockContext: CommandContext;
   const startTime = new Date('2025-07-14T10:00:00.000Z');
@@ -42,8 +32,6 @@ describe('statsCommand', () => {
     if (!statsCommand.action) throw new Error('Command has no action');
 
     mockContext.services.agentContext = {
-      refreshUserQuota: vi.fn(),
-      getUserTierName: vi.fn(),
       getModel: vi.fn(),
       get config() {
         return this;
@@ -59,50 +47,8 @@ describe('statsCommand', () => {
       type: MessageType.STATS,
       duration: expectedDuration,
       selectedAuthType: '',
-      tier: undefined,
-      userEmail: 'mock@example.com',
       currentModel: undefined,
     });
-  });
-
-  it('should fetch and display quota if config is available', async () => {
-    if (!statsCommand.action) throw new Error('Command has no action');
-
-    const mockQuota = { buckets: [] };
-    const mockRefreshUserQuota = vi.fn().mockResolvedValue(mockQuota);
-    const mockGetUserTierName = vi.fn().mockReturnValue('Basic');
-    const mockGetModel = vi.fn().mockReturnValue('gemini-pro');
-    const mockGetQuotaRemaining = vi.fn().mockReturnValue(85);
-    const mockGetQuotaLimit = vi.fn().mockReturnValue(100);
-    const mockGetQuotaResetTime = vi
-      .fn()
-      .mockReturnValue('2025-01-01T12:00:00Z');
-
-    mockContext.services.agentContext = {
-      refreshUserQuota: mockRefreshUserQuota,
-      getUserTierName: mockGetUserTierName,
-      getModel: mockGetModel,
-      getQuotaRemaining: mockGetQuotaRemaining,
-      getQuotaLimit: mockGetQuotaLimit,
-      getQuotaResetTime: mockGetQuotaResetTime,
-      get config() {
-        return this;
-      },
-    } as unknown as Config;
-
-    await statsCommand.action(mockContext, '');
-
-    expect(mockRefreshUserQuota).toHaveBeenCalled();
-    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
-      expect.objectContaining({
-        quotas: mockQuota,
-        tier: 'Basic',
-        currentModel: 'gemini-pro',
-        pooledRemaining: 85,
-        pooledLimit: 100,
-        pooledResetTime: '2025-01-01T12:00:00Z',
-      }),
-    );
   });
 
   it('should display model stats when using the "model" subcommand', () => {
@@ -117,11 +63,7 @@ describe('statsCommand', () => {
     expect(mockContext.ui.addItem).toHaveBeenCalledWith({
       type: MessageType.MODEL_STATS,
       selectedAuthType: '',
-      tier: undefined,
-      userEmail: 'mock@example.com',
       currentModel: undefined,
-      pooledRemaining: undefined,
-      pooledLimit: undefined,
     });
   });
 

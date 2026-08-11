@@ -55,7 +55,6 @@ describe('AuthDialog', () => {
     setAuthState: (state: AuthState) => void;
     authError: string | null;
     onAuthError: (error: string | null) => void;
-    setAuthContext: (context: { requiresRestart?: boolean }) => void;
   };
   beforeEach(() => {
     vi.resetAllMocks();
@@ -74,7 +73,6 @@ describe('AuthDialog', () => {
       setAuthState: vi.fn(),
       authError: null,
       onAuthError: vi.fn(),
-      setAuthContext: vi.fn(),
     };
   });
 
@@ -170,7 +168,6 @@ describe('AuthDialog', () => {
         mockedRadioButtonSelect.mock.calls[0][0];
       await handleAuthSelect(AuthType.USE_GEMINI);
 
-      expect(props.setAuthContext).toHaveBeenCalledWith({});
       expect(props.settings.setValue).toHaveBeenCalledWith(
         expect.any(String),
         'security.auth.selectedType',

@@ -27,7 +27,6 @@ describe('Fallback Integration', () => {
       getModel: () => GEMINI_MODEL_ALIAS_AUTO,
       getActiveModel: () => GEMINI_MODEL_ALIAS_AUTO,
       setActiveModel: vi.fn(),
-      getUserTier: () => undefined,
       getModelAvailabilityService: () => availabilityService,
       modelConfigService: undefined as unknown as ModelConfigService,
     } as unknown as Config;

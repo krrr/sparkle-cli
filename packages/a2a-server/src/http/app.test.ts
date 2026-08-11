@@ -100,7 +100,6 @@ vi.mock('sparkle-cli-core', async () => {
     ...actual,
     GeminiClient: vi.fn().mockImplementation(() => ({
       sendMessageStream: sendMessageStreamSpy,
-      getUserTier: vi.fn().mockReturnValue('free'),
       initialize: vi.fn(),
     })),
     performRestore: vi.fn(),

@@ -9,7 +9,6 @@ import { DialogManager } from './DialogManager.js';
 import { describe, it, expect, vi } from 'vitest';
 import { Text } from 'ink';
 import { type UIState } from '../contexts/UIStateContext.js';
-import { type QuotaState } from '../contexts/QuotaContext.js';
 import { type RestartReason } from '../hooks/useIdeTrustListener.js';
 import { type IdeInfo } from 'sparkle-cli-core';
 
@@ -32,9 +31,6 @@ vi.mock('./ThemeDialog.js', () => ({
 vi.mock('./SettingsDialog.js', () => ({
   SettingsDialog: () => <Text>SettingsDialog</Text>,
 }));
-vi.mock('../auth/AuthInProgress.js', () => ({
-  AuthInProgress: () => <Text>AuthInProgress</Text>,
-}));
 vi.mock('../auth/AuthDialog.js', () => ({
   AuthDialog: () => <Text>AuthDialog</Text>,
 }));
@@ -43,12 +39,6 @@ vi.mock('../auth/ApiAuthDialog.js', () => ({
 }));
 vi.mock('./EditorSettingsDialog.js', () => ({
   EditorSettingsDialog: () => <Text>EditorSettingsDialog</Text>,
-}));
-vi.mock('../privacy/PrivacyNotice.js', () => ({
-  PrivacyNotice: () => <Text>PrivacyNotice</Text>,
-}));
-vi.mock('./ProQuotaDialog.js', () => ({
-  ProQuotaDialog: () => <Text>ProQuotaDialog</Text>,
 }));
 vi.mock('./PermissionsModifyTrustDialog.js', () => ({
   PermissionsModifyTrustDialog: () => <Text>PermissionsModifyTrustDialog</Text>,
@@ -88,7 +78,6 @@ describe('DialogManager', () => {
     isAwaitingApiKeyInput: false,
     isAuthDialogOpen: false,
     isEditorDialogOpen: false,
-    showPrivacyNotice: false,
     isPermissionsDialogOpen: false,
     isAgentConfigDialogOpen: false,
     selectedAgentName: undefined,
@@ -105,26 +94,13 @@ describe('DialogManager', () => {
     unmount();
   });
 
-  const testCases: Array<[Partial<UIState>, string, Partial<QuotaState>?]> = [
+  const testCases: Array<[Partial<UIState>, string]> = [
     [
       {
         showIdeRestartPrompt: true,
         ideTrustRestartReason: 'update' as RestartReason,
       },
       'IdeTrustChangeDialog',
-    ],
-    [
-      {},
-      'ProQuotaDialog',
-      {
-        proQuotaRequest: {
-          failedModel: 'a',
-          fallbackModel: 'b',
-          message: 'c',
-          isTerminalQuotaError: false,
-          resolve: vi.fn(),
-        },
-      },
     ],
     [
       {
@@ -155,11 +131,9 @@ describe('DialogManager', () => {
     [{ isThemeDialogOpen: true }, 'ThemeDialog'],
     [{ isSettingsDialogOpen: true }, 'SettingsDialog'],
     [{ isModelDialogOpen: true }, 'ModelDialog'],
-    [{ isAuthenticating: true }, 'AuthInProgress'],
     [{ isAwaitingApiKeyInput: true }, 'ApiAuthDialog'],
     [{ isAuthDialogOpen: true }, 'AuthDialog'],
     [{ isEditorDialogOpen: true }, 'EditorSettingsDialog'],
-    [{ showPrivacyNotice: true }, 'PrivacyNotice'],
     [{ isPermissionsDialogOpen: true }, 'PermissionsModifyTrustDialog'],
     [
       {
@@ -182,11 +156,7 @@ describe('DialogManager', () => {
 
   it.each(testCases)(
     'renders %s when state is %o',
-    async (
-      uiStateOverride: Partial<UIState>,
-      expectedComponent: string,
-      quotaStateOverride?: Partial<QuotaState>,
-    ) => {
+    async (uiStateOverride: Partial<UIState>, expectedComponent: string) => {
       const { lastFrame, unmount } = await renderWithProviders(
         <DialogManager {...defaultProps} />,
         {
@@ -194,7 +164,6 @@ describe('DialogManager', () => {
             ...baseUiState,
             ...uiStateOverride,
           } as Partial<UIState> as UIState,
-          quotaState: quotaStateOverride,
         },
       );
       expect(lastFrame()).toContain(expectedComponent);

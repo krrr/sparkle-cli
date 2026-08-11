@@ -16,23 +16,6 @@ describe('ModelMappingContentGenerator', () => {
     'gemini-pro': 'gemini-1.5-pro',
   };
 
-  it('delegates userTier, userTierName, and paidTier properties', () => {
-    const mockWrapped = {
-      userTier: 'free',
-      userTierName: 'Free Tier',
-      paidTier: { id: 'paid' },
-    } as unknown as ContentGenerator;
-
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
-
-    expect(generator.userTier).toBe('free');
-    expect(generator.userTierName).toBe('Free Tier');
-    expect(generator.paidTier).toEqual({ id: 'paid' });
-  });
-
   it('maps matching model without prefix', async () => {
     const mockWrapped = {
       generateContent: vi.fn().mockResolvedValue({}),

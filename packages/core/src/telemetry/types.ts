@@ -2322,13 +2322,11 @@ export const EVENT_ONBOARDING_SUCCESS = 'gemini_cli.onboarding.success';
 export class OnboardingSuccessEvent implements BaseTelemetryEvent {
   'event.name': 'onboarding_success';
   'event.timestamp': string;
-  userTier?: string;
   duration_ms?: number;
 
-  constructor(userTier?: string, duration_ms?: number) {
+  constructor(duration_ms?: number) {
     this['event.name'] = 'onboarding_success';
     this['event.timestamp'] = new Date().toISOString();
-    this.userTier = userTier;
     this.duration_ms = duration_ms;
   }
 
@@ -2337,13 +2335,12 @@ export class OnboardingSuccessEvent implements BaseTelemetryEvent {
       ...getCommonAttributes(config),
       'event.name': EVENT_ONBOARDING_SUCCESS,
       'event.timestamp': this['event.timestamp'],
-      user_tier: this.userTier ?? '',
       duration_ms: this.duration_ms ?? 0,
     };
   }
 
   toLogBody(): string {
-    return `Onboarding succeeded.${this.userTier ? ` Tier: ${this.userTier}` : ''}${this.duration_ms !== undefined ? `. Duration: ${this.duration_ms}ms` : ''}`;
+    return `Onboarding succeeded${this.duration_ms !== undefined ? `. Duration: ${this.duration_ms}ms` : ''}`;
   }
 }
 

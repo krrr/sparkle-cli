@@ -19,7 +19,6 @@ exports[`<SessionSummaryDisplay /> > renders the summary display with a title 1`
 │                                                                                                  │
 │                                                                                                  │
 │  Model Usage                                                                                     │
-│  Use /model to view model quota information                                                      │
 │                                                                                                  │
 │  Model                           Reqs  Input Tokens   Cache Reads Output Tokens                  │
 │  ──────────────────────────────────────────────────────────────────────────────────────────────  │

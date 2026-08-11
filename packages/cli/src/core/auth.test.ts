@@ -30,13 +30,13 @@ describe('auth', () => {
 
   it('should return null if authType is undefined', async () => {
     const result = await performInitialAuth(mockConfig, undefined);
-    expect(result).toEqual({ authError: null, accountSuspensionInfo: null });
+    expect(result).toEqual({ authError: null });
     expect(mockConfig.refreshAuth).not.toHaveBeenCalled();
   });
 
   it('should return null on successful auth', async () => {
     const result = await performInitialAuth(mockConfig, AuthType.USE_GEMINI);
-    expect(result).toEqual({ authError: null, accountSuspensionInfo: null });
+    expect(result).toEqual({ authError: null });
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
   });
 
@@ -46,7 +46,6 @@ describe('auth', () => {
     const result = await performInitialAuth(mockConfig, AuthType.USE_GEMINI);
     expect(result).toEqual({
       authError: 'Failed to sign in. Message: Authentication failed',
-      accountSuspensionInfo: null,
     });
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
   });
@@ -56,43 +55,7 @@ describe('auth', () => {
       new ValidationRequiredError('Validation required'),
     );
     const result = await performInitialAuth(mockConfig, AuthType.USE_GEMINI);
-    expect(result).toEqual({ authError: null, accountSuspensionInfo: null });
-    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
-  });
-
-  it('should return accountSuspensionInfo for 403 TOS_VIOLATION error', async () => {
-    vi.mocked(mockConfig.refreshAuth).mockRejectedValue({
-      response: {
-        data: {
-          error: {
-            code: 403,
-            message:
-              'This service has been disabled for violation of Terms of Service.',
-            details: [
-              {
-                '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
-                reason: 'TOS_VIOLATION',
-                domain: 'example.googleapis.com',
-                metadata: {
-                  appeal_url: 'https://example.com/appeal',
-                  appeal_url_link_text: 'Appeal Here',
-                },
-              },
-            ],
-          },
-        },
-      },
-    });
-    const result = await performInitialAuth(mockConfig, AuthType.USE_GEMINI);
-    expect(result).toEqual({
-      authError: null,
-      accountSuspensionInfo: {
-        message:
-          'This service has been disabled for violation of Terms of Service.',
-        appealUrl: 'https://example.com/appeal',
-        appealLinkText: 'Appeal Here',
-      },
-    });
+    expect(result).toEqual({ authError: null });
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
   });
 });

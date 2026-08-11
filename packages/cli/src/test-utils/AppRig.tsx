@@ -111,8 +111,6 @@ vi.mock('../ui/auth/useAuth.js', () => ({
     onAuthError: vi.fn(),
     apiKeyDefaultValue: 'test-api-key',
     reloadApiKey: vi.fn().mockResolvedValue('test-api-key'),
-    accountSuspensionInfo: null,
-    setAccountSuspensionInfo: vi.fn(),
   }),
   validateAuthMethodWithSettings: () => null,
 }));
@@ -423,7 +421,6 @@ export class AppRig {
           version="test-version"
           initializationResult={{
             authError: null,
-            accountSuspensionInfo: null,
             themeError: null,
             shouldOpenAuthDialog: false,
             geminiMdFileCount: 0,

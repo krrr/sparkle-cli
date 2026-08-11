@@ -143,14 +143,6 @@ vi.mock('../ui/commands/mcpCommand.js', () => ({
   },
 }));
 
-vi.mock('../ui/commands/upgradeCommand.js', () => ({
-  upgradeCommand: {
-    name: 'upgrade',
-    description: 'Upgrade command',
-    kind: 'BUILT_IN',
-  },
-}));
-
 describe('BuiltinCommandLoader', () => {
   let mockConfig: Config;
 
@@ -182,13 +174,6 @@ describe('BuiltinCommandLoader', () => {
       description: 'Restore command',
       kind: CommandKind.BUILT_IN,
     });
-  });
-
-  it('should exclude upgrade command', async () => {
-    const loader = new BuiltinCommandLoader(mockConfig);
-    const commands = await loader.loadCommands(new AbortController().signal);
-    const upgradeCmd = commands.find((c) => c.name === 'upgrade');
-    expect(upgradeCmd).toBeUndefined();
   });
 
   it('should correctly pass the config object to restore command factory', async () => {

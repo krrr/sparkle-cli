@@ -251,7 +251,6 @@ import { BaseLlmClient } from '../core/baseLlmClient.js';
 import { tokenLimit } from '../core/tokenLimits.js';
 import { getExperiments } from '../experiments/experiments.js';
 import { MemoryContextManager } from '../context/memoryContextManager.js';
-import { UserTierId } from '../userTier.js';
 import type {
   ModelConfigService,
   ModelConfigServiceConfig,
@@ -1869,24 +1868,6 @@ describe('Server Config (config.ts)', () => {
     config.getModelAvailabilityService().markTerminal('model-1', 'quota');
     config.setLatestApiRequest({} as never);
 
-    // Interface to access private fields without 'any'
-    interface PrivateConfig {
-      modelQuotas: Map<string, unknown>;
-      lastEmittedQuotaRemaining: number | undefined;
-      lastEmittedQuotaLimit: number | undefined;
-      lastQuotaFetchTime: number;
-    }
-    const configInternal = config as unknown as PrivateConfig;
-
-    // Mock internal quota state
-    configInternal.modelQuotas.set('model-1', { remaining: 0, limit: 100 });
-    configInternal.lastEmittedQuotaRemaining = 0;
-    configInternal.lastEmittedQuotaLimit = 100;
-    configInternal.lastQuotaFetchTime = 12345;
-
-    // Listen for quota event
-    const emitQuotaSpy = vi.spyOn(coreEvents, 'emitQuotaChanged');
-
     // 2. Trigger session change
     config.setSessionId('session-two');
 
@@ -1901,15 +1882,6 @@ describe('Server Config (config.ts)', () => {
       config.getModelAvailabilityService().snapshot('model-1').available,
     ).toBe(true);
     expect(config.getLatestApiRequest()).toBeUndefined();
-
-    // Quota resets
-    expect(configInternal.modelQuotas.size).toBe(0);
-    expect(configInternal.lastEmittedQuotaRemaining).toBeUndefined();
-    expect(configInternal.lastEmittedQuotaLimit).toBeUndefined();
-    expect(configInternal.lastQuotaFetchTime).toBe(0);
-
-    // Event emission
-    expect(emitQuotaSpy).toHaveBeenCalledWith(undefined, undefined, undefined);
   });
 });
 
@@ -2787,9 +2759,7 @@ describe('Hooks configuration', () => {
   });
 });
 
-describe('Config Quota & Preview Model Access', () => {
-  let config: Config;
-
+describe('Config Plan & Preview Model Access', () => {
   const baseParams: ConfigParameters = {
     cwd: '/tmp',
     targetDir: '/tmp',
@@ -2806,77 +2776,6 @@ describe('Config Quota & Preview Model Access', () => {
       image: 'sparkle-cli-sandbox',
     },
   };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    config = new Config(baseParams);
-  });
-
-  describe('refreshUserQuota', () => {
-    it('should return undefined without a Code Assist server', async () => {
-      const result = await config.refreshUserQuota();
-      expect(result).toBeUndefined();
-    });
-
-    it('should return undefined from refreshUserQuotaIfStale', async () => {
-      const result = await config.refreshUserQuotaIfStale();
-      expect(result).toBeUndefined();
-    });
-
-    it('should return undefined from getLastRetrievedQuota', async () => {
-      expect(config.getLastRetrievedQuota()).toBeUndefined();
-    });
-
-    it('should return undefined remaining quota for models', async () => {
-      expect(
-        config.getRemainingQuotaForModel('gemini-2.5-pro'),
-      ).toBeUndefined();
-    });
-  });
-
-  describe('refreshUserQuotaIfStale', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date('2025-01-01T00:00:00Z'));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
-    it('should return undefined and not refresh (no server)', async () => {
-      const result = await config.refreshUserQuotaIfStale();
-      expect(result).toBeUndefined();
-    });
-  });
-
-  describe('getUserTier and getUserTierName', () => {
-    it('should return undefined if contentGenerator is not initialized', () => {
-      const config = new Config(baseParams);
-      expect(config.getUserTier()).toBeUndefined();
-      expect(config.getUserTierName()).toBeUndefined();
-    });
-
-    it('should return values from contentGenerator after refreshAuth', async () => {
-      const config = new Config(baseParams);
-      const mockTier = UserTierId.STANDARD;
-      const mockTierName = 'Standard Tier';
-
-      vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-        authType: AuthType.USE_GEMINI,
-      } as ContentGeneratorConfig);
-
-      vi.mocked(createContentGenerator).mockResolvedValue({
-        userTier: mockTier,
-        userTierName: mockTierName,
-      } as Partial<ContentGenerator> as ContentGenerator);
-
-      await config.refreshAuth(AuthType.USE_GEMINI);
-
-      expect(config.getUserTier()).toBe(mockTier);
-      expect(config.getUserTierName()).toBe(mockTierName);
-    });
-  });
 
   describe('isPlanEnabled', () => {
     it('should return true by default', () => {

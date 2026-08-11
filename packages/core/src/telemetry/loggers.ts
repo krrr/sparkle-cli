@@ -857,7 +857,7 @@ export function logOnboardingSuccess(
     };
     logger.emit(logRecord);
 
-    recordOnboardingSuccess(config, event.userTier, event.duration_ms);
+    recordOnboardingSuccess(config, event.duration_ms);
   });
 }
 

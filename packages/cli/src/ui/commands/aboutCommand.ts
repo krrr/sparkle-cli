@@ -11,12 +11,7 @@ import {
 } from './types.js';
 import process from 'node:process';
 import { MessageType, type HistoryItemAbout } from '../types.js';
-import {
-  IdeClient,
-  UserAccountManager,
-  debugLogger,
-  getVersion,
-} from 'sparkle-cli-core';
+import { IdeClient, getVersion } from 'sparkle-cli-core';
 
 export const aboutCommand: SlashCommand = {
   name: 'about',
@@ -41,15 +36,6 @@ export const aboutCommand: SlashCommand = {
       context.services.settings.merged.security.auth.selectedType || '';
     const ideClient = await getIdeClientName(context);
 
-    const userAccountManager = new UserAccountManager();
-    const cachedAccount = userAccountManager.getCachedGoogleAccount();
-    debugLogger.log('AboutCommand: Retrieved cached Google account', {
-      cachedAccount,
-    });
-    const userEmail = cachedAccount ?? undefined;
-
-    const tier = context.services.agentContext?.config.getUserTierName();
-
     const aboutItem: Omit<HistoryItemAbout, 'id'> = {
       type: MessageType.ABOUT,
       cliVersion,
@@ -58,8 +44,6 @@ export const aboutCommand: SlashCommand = {
       modelVersion,
       selectedAuthType,
       ideClient,
-      userEmail,
-      tier,
     };
 
     context.ui.addItem(aboutItem);

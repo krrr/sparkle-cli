@@ -57,7 +57,6 @@ export * from './fallback/types.js';
 export * from './fallback/handler.js';
 
 export * from './core/apiKeyCredentialStorage.js';
-export * from './userTier.js';
 export * from './experiments/experiments.js';
 export * from './experiments/flagNames.js';
 
@@ -78,7 +77,6 @@ export * from './utils/gitIgnoreParser.js';
 export * from './utils/gitUtils.js';
 export * from './utils/editor.js';
 export * from './utils/quotaErrorDetection.js';
-export * from './utils/userAccountManager.js';
 export * from './utils/authConsent.js';
 export * from './utils/googleQuotaErrors.js';
 export * from './utils/googleErrors.js';

@@ -8,50 +8,36 @@ import {
   type Config,
   type FallbackModelHandler,
   type FallbackIntent,
-  type ValidationHandler,
-  type ValidationIntent,
   TerminalQuotaError,
   ModelNotFoundError,
-  type UserTierId,
   VALID_GEMINI_MODELS,
   isProModel,
   getDisplayString,
 } from 'sparkle-cli-core';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { type UseHistoryManagerReturn } from './useHistoryManager.js';
 import { MessageType } from '../types.js';
-import {
-  type ProQuotaDialogRequest,
-  type ValidationDialogRequest,
-} from '../contexts/UIStateContext.js';
 import type { LoadedSettings } from '../../config/settings.js';
 
 interface UseQuotaAndFallbackArgs {
   config: Config;
   historyManager: UseHistoryManagerReturn;
-  userTier: UserTierId | undefined;
   settings: LoadedSettings;
   setModelSwitchedFromQuotaError: (value: boolean) => void;
-  onShowAuthSelection: () => void;
   errorVerbosity?: 'low' | 'full';
 }
 
+/**
+ * Sets up the fallback model handler that automatically switches to a
+ * fallback model when the current model hits a quota or capacity limit.
+ */
 export function useQuotaAndFallback({
   config,
   historyManager,
-  userTier,
   settings,
   setModelSwitchedFromQuotaError,
-  onShowAuthSelection,
   errorVerbosity = 'full',
 }: UseQuotaAndFallbackArgs) {
-  const [proQuotaRequest, setProQuotaRequest] =
-    useState<ProQuotaDialogRequest | null>(null);
-  const [validationRequest, setValidationRequest] =
-    useState<ValidationDialogRequest | null>(null);
-  const isDialogPending = useRef(false);
-  const isValidationPending = useRef(false);
-
   // Set up Flash fallback handler
   useEffect(() => {
     const fallbackHandler: FallbackModelHandler = async (
@@ -59,17 +45,11 @@ export function useQuotaAndFallback({
       fallbackModel,
       error,
     ): Promise<FallbackIntent | null> => {
-      let message: string;
-      let isTerminalQuotaError = false;
-      let isModelNotFoundError = false;
       const usageLimitReachedModel = isProModel(failedModel)
         ? 'all Pro models'
         : failedModel;
 
       if (error instanceof TerminalQuotaError) {
-        isTerminalQuotaError = true;
-
-        // Default: Show existing ProQuotaDialog
         const messageLines = [
           `Usage limit reached for ${usageLimitReachedModel}.`,
           error.retryDelayMs
@@ -78,158 +58,56 @@ export function useQuotaAndFallback({
           `/stats model for usage details`,
           `/model to switch models.`,
         ].filter(Boolean);
-        message = messageLines.join('\n');
-      } else if (error instanceof ModelNotFoundError) {
-        isModelNotFoundError = true;
-        if (VALID_GEMINI_MODELS.has(failedModel)) {
-          const messageLines = [
-            `It seems like you don't have access to ${getDisplayString(failedModel)}.`,
-            `Your admin might have disabled the access to this model.`,
-          ];
-          message = messageLines.join('\n');
-        } else {
-          const messageLines = [
-            `Model "${failedModel}" was not found or is invalid.`,
-            `/model to switch models.`,
-          ];
-          message = messageLines.join('\n');
-        }
-      } else {
-        const messageLines = [
-          `We are currently experiencing high demand.`,
-          'We apologize and appreciate your patience.',
-          '/model to switch models.',
-        ];
-        message = messageLines.join('\n');
+        historyManager.addItem(
+          { type: MessageType.ERROR, text: messageLines.join('\n') },
+          Date.now(),
+        );
+        return 'retry_later';
+      }
+
+      if (error instanceof ModelNotFoundError) {
+        const messageLines = VALID_GEMINI_MODELS.has(failedModel)
+          ? [
+              `It seems like you don't have access to ${getDisplayString(failedModel)}.`,
+              `Your admin might have disabled the access to this model.`,
+            ]
+          : [
+              `Model "${failedModel}" was not found or is invalid.`,
+              `/model to switch models.`,
+            ];
+        historyManager.addItem(
+          { type: MessageType.ERROR, text: messageLines.join('\n') },
+          Date.now(),
+        );
+        return 'retry_later';
       }
 
       // In low verbosity mode, auto-retry transient capacity failures
-      // without interrupting with a dialog.
-      if (
-        errorVerbosity === 'low' &&
-        !isTerminalQuotaError &&
-        !isModelNotFoundError
-      ) {
+      // without interrupting the user.
+      if (errorVerbosity === 'low') {
         return 'retry_once';
       }
 
       setModelSwitchedFromQuotaError(true);
       config.setQuotaErrorOccurred(true);
-
-      if (isDialogPending.current) {
-        return 'stop'; // A dialog is already active, so just stop this request.
-      }
-      isDialogPending.current = true;
-
-      const intent: FallbackIntent = await new Promise<FallbackIntent>(
-        (resolve) => {
-          setProQuotaRequest({
-            failedModel,
-            fallbackModel,
-            resolve,
-            message,
-            isTerminalQuotaError,
-            isModelNotFoundError,
-          });
+      historyManager.addItem(
+        {
+          type: MessageType.INFO,
+          text: `Switching to fallback model ${fallbackModel} due to high demand.`,
         },
+        Date.now(),
       );
-
-      return intent;
+      return 'retry_always';
     };
 
     config.setFallbackModelHandler(fallbackHandler);
   }, [
     config,
     historyManager,
-    userTier,
     settings,
     setModelSwitchedFromQuotaError,
-    onShowAuthSelection,
     errorVerbosity,
   ]);
-
-  // Set up validation handler for 403 VALIDATION_REQUIRED errors
-  useEffect(() => {
-    const validationHandler: ValidationHandler = async (
-      validationLink,
-      validationDescription,
-      learnMoreUrl,
-    ): Promise<ValidationIntent> => {
-      if (isValidationPending.current) {
-        return 'cancel'; // A validation dialog is already active
-      }
-      isValidationPending.current = true;
-
-      const intent: ValidationIntent = await new Promise<ValidationIntent>(
-        (resolve) => {
-          // Call setValidationRequest directly - same pattern as proQuotaRequest
-          setValidationRequest({
-            validationLink,
-            validationDescription,
-            learnMoreUrl,
-            resolve,
-          });
-        },
-      );
-
-      return intent;
-    };
-
-    config.setValidationHandler(validationHandler);
-  }, [config]);
-
-  const handleProQuotaChoice = useCallback(
-    (choice: FallbackIntent) => {
-      if (!proQuotaRequest) return;
-
-      const intent: FallbackIntent = choice;
-      proQuotaRequest.resolve(intent);
-      setProQuotaRequest(null);
-      isDialogPending.current = false; // Reset the flag here
-
-      if (choice === 'retry_always' || choice === 'retry_once') {
-        // Reset quota error flags to allow the agent loop to continue.
-        setModelSwitchedFromQuotaError(false);
-        config.setQuotaErrorOccurred(false);
-
-        if (choice === 'retry_always') {
-          historyManager.addItem(
-            {
-              type: MessageType.INFO,
-              text: `Switched to fallback model ${proQuotaRequest.fallbackModel}`,
-            },
-            Date.now(),
-          );
-        }
-      }
-    },
-    [proQuotaRequest, historyManager, config, setModelSwitchedFromQuotaError],
-  );
-
-  const handleValidationChoice = useCallback(
-    (choice: ValidationIntent) => {
-      // Guard against double-execution (e.g. rapid clicks) and stale requests
-      if (!isValidationPending.current || !validationRequest) return;
-
-      // Immediately clear the flag to prevent any subsequent calls from passing the guard
-      isValidationPending.current = false;
-
-      validationRequest.resolve(choice);
-      setValidationRequest(null);
-
-      if (choice === 'change_auth' || choice === 'cancel') {
-        onShowAuthSelection();
-      }
-    },
-    [validationRequest, onShowAuthSelection],
-  );
-
-  return {
-    proQuotaRequest,
-    handleProQuotaChoice,
-    validationRequest,
-    handleValidationChoice,
-  };
 }
 
 function getResetTimeMessage(delayMs: number): string {

@@ -89,7 +89,6 @@ export function createMockConfig(
     getHistory: vi.fn().mockReturnValue([]),
     getEmbeddingModel: vi.fn().mockReturnValue('text-embedding-004'),
     getSessionId: vi.fn().mockReturnValue('test-session-id'),
-    getUserTier: vi.fn(),
     getMessageBus: vi.fn(),
     getPolicyEngine: vi.fn(),
     getEnableExtensionReloading: vi.fn().mockReturnValue(false),

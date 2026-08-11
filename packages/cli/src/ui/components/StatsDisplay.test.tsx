@@ -494,7 +494,7 @@ describe('<StatsDisplay />', () => {
   });
 
   describe('User Identity Display', () => {
-    it('renders User row with Auth Method and Tier', async () => {
+    it('renders User row with Auth Method', async () => {
       const metrics = createTestMetrics();
 
       useSessionStatsMock.mockReturnValue({
@@ -510,20 +510,14 @@ describe('<StatsDisplay />', () => {
       });
 
       const { lastFrame } = await renderWithProviders(
-        <StatsDisplay
-          duration="1s"
-          selectedAuthType="oauth"
-          userEmail="test@example.com"
-          tier="Pro"
-        />,
+        <StatsDisplay duration="1s" selectedAuthType="oauth" />,
         { width: 100 },
       );
       const output = lastFrame();
 
       expect(output).toContain('Auth Method:');
-      expect(output).toContain('Signed in with Google (test@example.com)');
-      expect(output).toContain('Tier:');
-      expect(output).toContain('Pro');
+      expect(output).toContain('oauth');
+      expect(output).not.toContain('Tier:');
     });
 
     it('renders User row with API Key and no Tier', async () => {

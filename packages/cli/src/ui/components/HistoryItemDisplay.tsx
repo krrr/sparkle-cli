@@ -143,7 +143,6 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
           modelVersion={itemForDisplay.modelVersion}
           selectedAuthType={itemForDisplay.selectedAuthType}
           ideClient={itemForDisplay.ideClient}
-          tier={itemForDisplay.tier}
         />
       )}
       {itemForDisplay.type === 'help' && commands && (
@@ -153,27 +152,12 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
         <StatsDisplay
           duration={itemForDisplay.duration}
           selectedAuthType={itemForDisplay.selectedAuthType}
-          userEmail={itemForDisplay.userEmail}
-          tier={itemForDisplay.tier}
         />
       )}
       {itemForDisplay.type === 'model_stats' && (
         <ModelStatsDisplay
           selectedAuthType={itemForDisplay.selectedAuthType}
-          userEmail={itemForDisplay.userEmail}
-          tier={itemForDisplay.tier}
           currentModel={itemForDisplay.currentModel}
-          quotaStats={
-            itemForDisplay.pooledRemaining !== undefined ||
-            itemForDisplay.pooledLimit !== undefined ||
-            itemForDisplay.pooledResetTime !== undefined
-              ? {
-                  remaining: itemForDisplay.pooledRemaining,
-                  limit: itemForDisplay.pooledLimit,
-                  resetTime: itemForDisplay.pooledResetTime,
-                }
-              : undefined
-          }
         />
       )}
       {itemForDisplay.type === 'tool_stats' && <ToolStatsDisplay />}

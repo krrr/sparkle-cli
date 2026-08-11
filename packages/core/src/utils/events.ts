@@ -184,15 +184,6 @@ export interface SlashCommandConflictsPayload {
   conflicts: SlashCommandConflict[];
 }
 
-/**
- * Payload for the 'quota-changed' event.
- */
-export interface QuotaChangedPayload {
-  remaining: number | undefined;
-  limit: number | undefined;
-  resetTime?: string;
-}
-
 export enum CoreEvent {
   UserFeedback = 'user-feedback',
   ModelChanged = 'model-changed',
@@ -215,7 +206,6 @@ export enum CoreEvent {
   RequestEditorSelection = 'request-editor-selection',
   EditorSelected = 'editor-selected',
   SlashCommandConflicts = 'slash-command-conflicts',
-  QuotaChanged = 'quota-changed',
   TelemetryKeychainAvailability = 'telemetry-keychain-availability',
   TelemetryTokenStorageType = 'telemetry-token-storage-type',
 }
@@ -234,7 +224,6 @@ export interface CoreEvents extends ExtensionEvents {
   [CoreEvent.ConsoleLog]: [ConsoleLogPayload];
   [CoreEvent.Output]: [OutputPayload];
   [CoreEvent.MemoryChanged]: [MemoryChangedPayload];
-  [CoreEvent.QuotaChanged]: [QuotaChangedPayload];
   [CoreEvent.ExternalEditorClosed]: never[];
   [CoreEvent.McpClientUpdate]: Array<Map<string, McpClient> | never>;
   [CoreEvent.OauthDisplayMessage]: string[];
@@ -421,18 +410,6 @@ export class CoreEventEmitter extends EventEmitter<CoreEvents> {
   emitSlashCommandConflicts(conflicts: SlashCommandConflict[]): void {
     const payload: SlashCommandConflictsPayload = { conflicts };
     this._emitOrQueue(CoreEvent.SlashCommandConflicts, payload);
-  }
-
-  /**
-   * Notifies subscribers that the quota has changed.
-   */
-  emitQuotaChanged(
-    remaining: number | undefined,
-    limit: number | undefined,
-    resetTime?: string,
-  ): void {
-    const payload: QuotaChangedPayload = { remaining, limit, resetTime };
-    this.emit(CoreEvent.QuotaChanged, payload);
   }
 
   /**

@@ -2514,7 +2514,6 @@ describe('useGeminiStream', () => {
         expect(mockParseAndFormatApiError).toHaveBeenCalledWith(
           'Rate limit exceeded',
           mockAuthType,
-          undefined,
           'gemini-2.5-pro',
           'gemini-flash-latest',
         );
@@ -3751,7 +3750,6 @@ describe('useGeminiStream', () => {
       expect(mockParseAndFormatApiError).toHaveBeenCalledWith(
         { message: 'Test error' },
         expect.any(String),
-        undefined,
         'gemini-2.5-pro',
         'gemini-flash-latest',
       );

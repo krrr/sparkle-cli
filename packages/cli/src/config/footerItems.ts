@@ -33,11 +33,6 @@ export const ALL_ITEMS = [
     description: 'Percentage of context window used',
   },
   {
-    id: 'quota',
-    header: 'quota',
-    description: 'Percentage of daily limit used (not shown when unavailable)',
-  },
-  {
     id: 'memory-usage',
     header: 'memory',
     description: 'Memory used by the application',
@@ -77,7 +72,6 @@ export const DEFAULT_ORDER = [
   'sandbox',
   'model-name',
   'context-used',
-  'quota',
   'memory-usage',
   'session-id',
   'hostname',
@@ -89,13 +83,7 @@ export const DEFAULT_ORDER = [
 export function deriveItemsFromLegacySettings(
   settings: MergedSettings,
 ): string[] {
-  const defaults = [
-    'workspace',
-    'git-branch',
-    'sandbox',
-    'model-name',
-    'quota',
-  ];
+  const defaults = ['workspace', 'git-branch', 'sandbox', 'model-name'];
   const items = [...defaults];
 
   const remove = (arr: string[], id: string) => {
@@ -108,7 +96,6 @@ export function deriveItemsFromLegacySettings(
   if (settings.ui.footer.hideModelInfo) {
     remove(items, 'model-name');
     remove(items, 'context-used');
-    remove(items, 'quota');
   }
   if (
     !settings.ui.footer.hideContextPercentage &&

@@ -20,8 +20,6 @@ import {
 import { Table, type Column } from './Table.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getDisplayString, isAutoModel, LlmRole } from 'sparkle-cli-core';
-import type { QuotaStats } from '../types.js';
-import { QuotaStatsInfo } from './QuotaStatsInfo.js';
 
 interface StatRowData {
   metric: string;
@@ -35,24 +33,14 @@ type RoleMetrics = NonNullable<NonNullable<ModelMetrics['roles']>[LlmRole]>;
 
 interface ModelStatsDisplayProps {
   selectedAuthType?: string;
-  userEmail?: string;
-  tier?: string;
   currentModel?: string;
-  quotaStats?: QuotaStats;
 }
 
 export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
   selectedAuthType,
-  userEmail,
-  tier,
   currentModel,
-  quotaStats,
 }) => {
   const { stats } = useSessionStats();
-
-  const pooledRemaining = quotaStats?.remaining;
-  const pooledLimit = quotaStats?.limit;
-  const pooledResetTime = quotaStats?.resetTime;
 
   const { models } = stats.metrics;
   const settings = useSettings();
@@ -333,34 +321,10 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
           <Box width={28}>
             <Text color={theme.text.link}>Auth Method:</Text>
           </Box>
-          <Text color={theme.text.primary}>
-            {selectedAuthType.startsWith('oauth')
-              ? userEmail
-                ? `Signed in with Google (${userEmail})`
-                : 'Signed in with Google'
-              : selectedAuthType}
-          </Text>
+          <Text color={theme.text.primary}>{selectedAuthType}</Text>
         </Box>
       )}
-      {showUserIdentity && tier && (
-        <Box>
-          <Box width={28}>
-            <Text color={theme.text.link}>Tier:</Text>
-          </Box>
-          <Text color={theme.text.primary}>{tier}</Text>
-        </Box>
-      )}
-      {isAuto &&
-        pooledRemaining !== undefined &&
-        pooledLimit !== undefined &&
-        pooledLimit > 0 && (
-          <QuotaStatsInfo
-            remaining={pooledRemaining}
-            limit={pooledLimit}
-            resetTime={pooledResetTime}
-          />
-        )}
-      {(showUserIdentity || isAuto) && <Box height={1} />}
+      {showUserIdentity && <Box height={1} />}
 
       <Table data={rows} columns={columns} />
     </Box>

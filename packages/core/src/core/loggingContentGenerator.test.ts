@@ -40,7 +40,6 @@ import {
   estimateContextBreakdown,
 } from './loggingContentGenerator.js';
 import type { Config } from '../config/config.js';
-import { UserTierId } from '../userTier.js';
 import { ApiRequestEvent, LlmRole } from '../telemetry/types.js';
 import { FatalAuthenticationError } from '../utils/errors.js';
 import {
@@ -746,18 +745,6 @@ describe('LoggingContentGenerator', () => {
         input: req.contents,
         output: response,
       });
-    });
-  });
-
-  describe('delegation', () => {
-    it('should delegate userTier to wrapped', () => {
-      wrapped.userTier = UserTierId.STANDARD;
-      expect(loggingContentGenerator.userTier).toBe(UserTierId.STANDARD);
-    });
-
-    it('should delegate userTierName to wrapped', () => {
-      wrapped.userTierName = 'Standard Tier';
-      expect(loggingContentGenerator.userTierName).toBe('Standard Tier');
     });
   });
 });

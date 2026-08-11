@@ -25,7 +25,6 @@ import { determineSurface } from '../utils/surface.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { getVersion, resolveModel } from '../../index.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
-import type { UserTierId, GeminiUserTier } from '../userTier.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -46,12 +45,6 @@ export interface ContentGenerator {
   countTokens(request: CountTokensParameters): Promise<CountTokensResponse>;
 
   embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse>;
-
-  userTier?: UserTierId;
-
-  userTierName?: string;
-
-  paidTier?: GeminiUserTier;
 }
 
 export enum AuthType {

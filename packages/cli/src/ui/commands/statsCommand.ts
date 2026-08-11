@@ -11,24 +11,14 @@ import type {
 } from '../types.js';
 import { MessageType } from '../types.js';
 import { formatDuration } from '../utils/formatters.js';
-import { UserAccountManager } from 'sparkle-cli-core';
 import {
   type CommandContext,
   type SlashCommand,
   CommandKind,
 } from './types.js';
 
-function getUserIdentity(context: CommandContext) {
-  const selectedAuthType =
-    context.services.settings.merged.security.auth.selectedType || '';
-
-  const userAccountManager = new UserAccountManager();
-  const cachedAccount = userAccountManager.getCachedGoogleAccount();
-  const userEmail = cachedAccount ?? undefined;
-
-  const tier = context.services.agentContext?.config.getUserTierName();
-
-  return { selectedAuthType, userEmail, tier };
+function getSelectedAuthType(context: CommandContext) {
+  return context.services.settings.merged.security.auth.selectedType || '';
 }
 
 async function defaultSessionView(context: CommandContext) {
@@ -43,30 +33,15 @@ async function defaultSessionView(context: CommandContext) {
   }
   const wallDuration = now.getTime() - sessionStartTime.getTime();
 
-  const { selectedAuthType, userEmail, tier } = getUserIdentity(context);
+  const selectedAuthType = getSelectedAuthType(context);
   const currentModel = context.services.agentContext?.config.getModel();
 
   const statsItem: HistoryItemStats = {
     type: MessageType.STATS,
     duration: formatDuration(wallDuration),
     selectedAuthType,
-    userEmail,
-    tier,
     currentModel,
   };
-
-  if (context.services.agentContext?.config) {
-    const quota = await context.services.agentContext.config.refreshUserQuota();
-    if (quota) {
-      statsItem.quotas = quota;
-      statsItem.pooledRemaining =
-        context.services.agentContext.config.getQuotaRemaining();
-      statsItem.pooledLimit =
-        context.services.agentContext.config.getQuotaLimit();
-      statsItem.pooledResetTime =
-        context.services.agentContext.config.getQuotaResetTime();
-    }
-  }
 
   context.ui.addItem(statsItem);
 }
@@ -99,23 +74,12 @@ export const statsCommand: SlashCommand = {
       autoExecute: true,
       isSafeConcurrent: true,
       action: (context: CommandContext) => {
-        const { selectedAuthType, userEmail, tier } = getUserIdentity(context);
+        const selectedAuthType = getSelectedAuthType(context);
         const currentModel = context.services.agentContext?.config.getModel();
-        const pooledRemaining =
-          context.services.agentContext?.config.getQuotaRemaining();
-        const pooledLimit =
-          context.services.agentContext?.config.getQuotaLimit();
-        const pooledResetTime =
-          context.services.agentContext?.config.getQuotaResetTime();
         context.ui.addItem({
           type: MessageType.MODEL_STATS,
           selectedAuthType,
-          userEmail,
-          tier,
           currentModel,
-          pooledRemaining,
-          pooledLimit,
-          pooledResetTime,
         } as HistoryItemModelStats);
       },
     },

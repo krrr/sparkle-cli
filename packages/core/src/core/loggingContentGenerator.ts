@@ -25,7 +25,6 @@ import {
 } from '../telemetry/types.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
 import type { Config } from '../config/config.js';
-import type { UserTierId, GeminiUserTier } from '../userTier.js';
 import {
   logApiError,
   logApiRequest,
@@ -35,7 +34,6 @@ import type { ContentGenerator } from './contentGenerator.js';
 import { toContents } from './partUtils.js';
 import { isStructuredError } from '../utils/quotaErrorDetection.js';
 import { runInDevTraceSpan, type SpanMetadata } from '../telemetry/trace.js';
-import { debugLogger } from '../utils/debugLogger.js';
 import { isAbortError, getErrorType } from '../utils/errors.js';
 import {
   GeminiCliOperation,
@@ -153,18 +151,6 @@ export class LoggingContentGenerator implements ContentGenerator {
 
   getWrapped(): ContentGenerator {
     return this.wrapped;
-  }
-
-  get userTier(): UserTierId | undefined {
-    return this.wrapped.userTier;
-  }
-
-  get userTierName(): string | undefined {
-    return this.wrapped.userTierName;
-  }
-
-  get paidTier(): GeminiUserTier | undefined {
-    return this.wrapped.paidTier;
   }
 
   private logApiRequest(
@@ -392,9 +378,6 @@ export class LoggingContentGenerator implements ContentGenerator {
             req.config,
             serverDetails,
           );
-          this.config
-            .refreshUserQuotaIfStale()
-            .catch((e) => debugLogger.debug('quota refresh failed', e));
           return response;
         } catch (error) {
           spanMetadata.error = error;
@@ -543,9 +526,6 @@ export class LoggingContentGenerator implements ContentGenerator {
         req.config,
         serverDetails,
       );
-      this.config
-        .refreshUserQuotaIfStale()
-        .catch((e) => debugLogger.debug('quota refresh failed', e));
       spanMetadata.output = responses.map(
         (response) => response.candidates?.[0]?.content ?? null,
       );
