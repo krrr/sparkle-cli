@@ -471,10 +471,14 @@ export async function main() {
 
   // Set a default auth type if one isn't set
   if (!settings.merged.security.auth.selectedType) {
+    const defaultAuthType =
+      !process.env['GEMINI_API_KEY'] && process.env['OPENAI_API_KEY']
+        ? AuthType.USE_OPENAI
+        : AuthType.USE_GEMINI;
     settings.setValue(
       SettingScope.User,
       'security.auth.selectedType',
-      AuthType.USE_GEMINI,
+      defaultAuthType,
     );
   }
 

@@ -35,7 +35,7 @@ export async function validateNonInteractiveAuth(
     }
 
     if (!effectiveAuthType) {
-      const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify the GEMINI_API_KEY environment variable before running.`;
+      const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify the GEMINI_API_KEY or OPENAI_API_KEY environment variable before running.`;
       throw new Error(message);
     }
 

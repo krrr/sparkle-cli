@@ -25,6 +25,11 @@ import { determineSurface } from '../utils/surface.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { getVersion, resolveModel } from '../../index.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import {
+  DEFAULT_OPENAI_BASE_URL,
+  OpenAiCompatibleGenerator,
+  type OpenAiProvider,
+} from './openAiCompatibleGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -50,6 +55,7 @@ export interface ContentGenerator {
 export enum AuthType {
   USE_GEMINI = 'gemini-api-key',
   GATEWAY = 'gateway',
+  USE_OPENAI = 'openai',
 }
 
 /**
@@ -58,6 +64,7 @@ export enum AuthType {
  * Checks in order:
  * 1. GOOGLE_GEMINI_BASE_URL -> GATEWAY
  * 2. GEMINI_API_KEY -> USE_GEMINI
+ * 3. OPENAI_API_KEY -> USE_OPENAI
  */
 export function getAuthTypeFromEnv(): AuthType | undefined {
   if (process.env['GOOGLE_GEMINI_BASE_URL']) {
@@ -65,6 +72,9 @@ export function getAuthTypeFromEnv(): AuthType | undefined {
   }
   if (process.env['GEMINI_API_KEY']) {
     return AuthType.USE_GEMINI;
+  }
+  if (process.env['OPENAI_API_KEY']) {
+    return AuthType.USE_OPENAI;
   }
   return undefined;
 }
@@ -76,6 +86,41 @@ export type ContentGeneratorConfig = {
   baseUrl?: string;
   customHeaders?: Record<string, string>;
 };
+
+/**
+ * Determines the OpenAI-compatible provider flavor.
+ *
+ * Priority:
+ * 1. OPENAI_PROVIDER environment variable
+ * 2. Model name prefix (e.g. `deepseek/...`)
+ * 3. Model name pattern (e.g. `deepseek-v4-flash`, `deepseek-v4-pro`)
+ * 4. Base URL hostname (e.g. api.deepseek.com)
+ * 5. 'openai'
+ */
+export function getOpenAiProvider(
+  gcConfig: Config,
+  config: ContentGeneratorConfig,
+  model: string,
+): OpenAiProvider {
+  const explicit =
+    (gcConfig.env && gcConfig.env['OPENAI_PROVIDER']) ||
+    process.env['OPENAI_PROVIDER'];
+  if (
+    explicit === 'deepseek' ||
+    explicit === 'openai' ||
+    explicit === 'custom'
+  ) {
+    return explicit;
+  }
+  if (model.toLowerCase().startsWith('deepseek')) {
+    return 'deepseek';
+  }
+  const baseUrl = config.baseUrl ?? '';
+  if (baseUrl.includes('deepseek')) {
+    return 'deepseek';
+  }
+  return 'openai';
+}
 
 function validateBaseUrl(baseUrl: string): void {
   try {
@@ -111,6 +156,14 @@ export async function createContentGeneratorConfig(
 
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
+
+    return contentGeneratorConfig;
+  }
+
+  if (authType === AuthType.USE_OPENAI) {
+    contentGeneratorConfig.apiKey = apiKey || getEnv('OPENAI_API_KEY') || '';
+    contentGeneratorConfig.baseUrl =
+      baseUrl || getEnv('OPENAI_BASE_URL') || DEFAULT_OPENAI_BASE_URL;
 
     return contentGeneratorConfig;
   }
@@ -249,6 +302,18 @@ export async function createContentGenerator(
         }),
       });
       return new LoggingContentGenerator(googleGenAI.models, gcConfig);
+    } else if (config.authType === AuthType.USE_OPENAI) {
+      const model = resolveModel(gcConfig.getModel(), gcConfig);
+      const provider = getOpenAiProvider(gcConfig, config, model);
+      return new LoggingContentGenerator(
+        new OpenAiCompatibleGenerator({
+          apiKey: config.apiKey ?? '',
+          baseUrl: config.baseUrl ?? DEFAULT_OPENAI_BASE_URL,
+          provider,
+          proxy: config.proxy,
+        }),
+        gcConfig,
+      );
     }
     throw new Error(
       `Error creating contentGenerator: Unsupported authType: ${config.authType}`,

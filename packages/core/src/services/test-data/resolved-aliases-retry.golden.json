@@ -207,5 +207,26 @@
   "agent-history-provider-summarizer": {
     "model": "gemini-flash-latest",
     "generateContentConfig": {}
+  },
+  "deepseek-base": {
+    "model": "deepseek-v4-flash",
+    "generateContentConfig": {
+      "temperature": 1,
+      "topP": 1
+    }
+  },
+  "deepseek-v4-flash": {
+    "model": "deepseek-v4-flash",
+    "generateContentConfig": {
+      "temperature": 1,
+      "topP": 1
+    }
+  },
+  "deepseek-v4-pro": {
+    "model": "deepseek-v4-pro",
+    "generateContentConfig": {
+      "temperature": 1,
+      "topP": 1
+    }
   }
 }

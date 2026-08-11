@@ -40,6 +40,17 @@ export function AuthDialog({
     },
   ];
 
+  if (process.env['OPENAI_API_KEY']) {
+    items = [
+      ...items,
+      {
+        label: 'Use OpenAI-compatible API Key',
+        value: AuthType.USE_OPENAI,
+        key: AuthType.USE_OPENAI,
+      },
+    ];
+  }
+
   if (settings.merged.security.auth.enforcedType) {
     items = items.filter(
       (item) => item.value === settings.merged.security.auth.enforcedType,

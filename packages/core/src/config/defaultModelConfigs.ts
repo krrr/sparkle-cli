@@ -209,6 +209,28 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         model: DEFAULT_GEMINI_FLASH_MODEL,
       },
     },
+
+    // OpenAI-compatible providers (used with the 'openai' auth type).
+    'deepseek-base': {
+      extends: 'base',
+      modelConfig: {
+        model: 'deepseek-v4-flash',
+        generateContentConfig: {
+          temperature: 1, // temperature will be ignored when thinking mode enabled
+          // default setting: thinking enabled, effort=high
+        },
+      },
+    },
+    'deepseek-v4-flash': {
+      extends: 'deepseek-base',
+      modelConfig: {},
+    },
+    'deepseek-v4-pro': {
+      extends: 'deepseek-base',
+      modelConfig: {
+        model: 'deepseek-v4-pro',
+      },
+    },
   },
   overrides: [
     {
@@ -262,6 +284,20 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       tier: 'flash-lite',
       isVisible: false,
       features: { thinking: false, multimodalToolUse: false },
+    },
+
+    // OpenAI-compatible models.
+    'deepseek-v4-flash': {
+      tier: 'custom',
+      family: 'custom',
+      isVisible: true,
+      features: { thinking: false, multimodalToolUse: false },
+    },
+    'deepseek-v4-pro': {
+      tier: 'custom',
+      family: 'custom',
+      isVisible: true,
+      features: { thinking: true, multimodalToolUse: false },
     },
   },
   modelIdResolutions: {
