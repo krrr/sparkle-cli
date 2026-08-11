@@ -10,8 +10,6 @@
  */
 
 import type { ToolDefinition, CoreToolSet } from './types.js';
-import { getToolFamily } from './modelFamilyService.js';
-import { DEFAULT_LEGACY_SET } from './model-family-sets/default-legacy.js';
 import { GEMINI_3_SET } from './model-family-sets/gemini-3.js';
 import {
   getShellDeclaration,
@@ -102,22 +100,13 @@ export {
 } from './base-declarations.js';
 
 // Re-export sets for compatibility
-export { DEFAULT_LEGACY_SET } from './model-family-sets/default-legacy.js';
 export { GEMINI_3_SET } from './model-family-sets/gemini-3.js';
 
 /**
  * Resolves the appropriate tool set for a given model ID.
  */
-export function getToolSet(modelId?: string): CoreToolSet {
-  const family = getToolFamily(modelId);
-
-  switch (family) {
-    case 'gemini-3':
-      return GEMINI_3_SET;
-    case 'default-legacy':
-    default:
-      return DEFAULT_LEGACY_SET;
-  }
+export function getToolSet(_modelId?: string): CoreToolSet {
+  return GEMINI_3_SET;
 }
 
 // ============================================================================
@@ -126,98 +115,98 @@ export function getToolSet(modelId?: string): CoreToolSet {
 
 export const READ_FILE_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.read_file;
+    return GEMINI_3_SET.read_file;
   },
   overrides: (modelId) => getToolSet(modelId).read_file,
 };
 
 export const WRITE_FILE_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.write_file;
+    return GEMINI_3_SET.write_file;
   },
   overrides: (modelId) => getToolSet(modelId).write_file,
 };
 
 export const GREP_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.grep_search;
+    return GEMINI_3_SET.grep_search;
   },
   overrides: (modelId) => getToolSet(modelId).grep_search,
 };
 
 export const RIP_GREP_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.grep_search_ripgrep;
+    return GEMINI_3_SET.grep_search_ripgrep;
   },
   overrides: (modelId) => getToolSet(modelId).grep_search_ripgrep,
 };
 
 export const WEB_SEARCH_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.google_web_search;
+    return GEMINI_3_SET.google_web_search;
   },
   overrides: (modelId) => getToolSet(modelId).google_web_search,
 };
 
 export const EDIT_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.replace;
+    return GEMINI_3_SET.replace;
   },
   overrides: (modelId) => getToolSet(modelId).replace,
 };
 
 export const GLOB_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.glob;
+    return GEMINI_3_SET.glob;
   },
   overrides: (modelId) => getToolSet(modelId).glob,
 };
 
 export const LS_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.list_directory;
+    return GEMINI_3_SET.list_directory;
   },
   overrides: (modelId) => getToolSet(modelId).list_directory,
 };
 
 export const WEB_FETCH_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.web_fetch;
+    return GEMINI_3_SET.web_fetch;
   },
   overrides: (modelId) => getToolSet(modelId).web_fetch,
 };
 
 export const READ_MANY_FILES_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.read_many_files;
+    return GEMINI_3_SET.read_many_files;
   },
   overrides: (modelId) => getToolSet(modelId).read_many_files,
 };
 
 export const WRITE_TODOS_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.write_todos;
+    return GEMINI_3_SET.write_todos;
   },
   overrides: (modelId) => getToolSet(modelId).write_todos,
 };
 
 export const GET_INTERNAL_DOCS_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.get_internal_docs;
+    return GEMINI_3_SET.get_internal_docs;
   },
   overrides: (modelId) => getToolSet(modelId).get_internal_docs,
 };
 
 export const ASK_USER_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.ask_user;
+    return GEMINI_3_SET.ask_user;
   },
   overrides: (modelId) => getToolSet(modelId).ask_user,
 };
 
 export const ENTER_PLAN_MODE_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.enter_plan_mode;
+    return GEMINI_3_SET.enter_plan_mode;
   },
   overrides: (modelId) => getToolSet(modelId).enter_plan_mode,
 };
@@ -276,14 +265,14 @@ export function getActivateSkillDefinition(
 
 export const READ_MCP_RESOURCE_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.read_mcp_resource;
+    return GEMINI_3_SET.read_mcp_resource;
   },
   overrides: (modelId) => getToolSet(modelId).read_mcp_resource,
 };
 
 export const LIST_MCP_RESOURCES_DEFINITION: ToolDefinition = {
   get base() {
-    return DEFAULT_LEGACY_SET.list_mcp_resources;
+    return GEMINI_3_SET.list_mcp_resources;
   },
   overrides: (modelId) => getToolSet(modelId).list_mcp_resources,
 };
