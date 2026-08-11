@@ -84,7 +84,6 @@ const MOCK_AGENT_V1: AgentDefinition = {
       topP: 1,
       thinkingConfig: {
         includeThoughts: true,
-        thinkingBudget: -1,
       },
     },
   },
@@ -461,7 +460,6 @@ describe('AgentRegistry', () => {
           topP: autoAgent.modelConfig.generateContentConfig?.topP,
           thinkingConfig: {
             includeThoughts: true,
-            thinkingBudget: -1,
           },
         },
       });
@@ -495,7 +493,6 @@ describe('AgentRegistry', () => {
           topP: MOCK_AGENT_V1.modelConfig.generateContentConfig?.topP,
           thinkingConfig: {
             includeThoughts: true,
-            thinkingBudget: -1,
           },
         },
       });
@@ -1416,7 +1413,7 @@ describe('AgentRegistry', () => {
               modelConfig: {
                 generateContentConfig: {
                   thinkingConfig: {
-                    thinkingBudget: 16384,
+                    thinkingLevel: ThinkingLevel.HIGH,
                   },
                 },
               },
@@ -1434,7 +1431,7 @@ describe('AgentRegistry', () => {
 
       expect(resolved.generateContentConfig.thinkingConfig).toEqual({
         includeThoughts: true, // Preserved from default
-        thinkingBudget: 16384, // Overridden
+        thinkingLevel: ThinkingLevel.HIGH, // Overridden
       });
     });
 

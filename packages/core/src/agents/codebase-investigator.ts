@@ -12,7 +12,6 @@ import {
   READ_FILE_TOOL_NAME,
 } from '../tools/tool-names.js';
 import {
-  DEFAULT_THINKING_MODE,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   supportsModernFeatures,
@@ -97,15 +96,10 @@ export const CodebaseInvestigatorAgent = (
       generateContentConfig: {
         temperature: 0.1,
         topP: 0.95,
-        thinkingConfig: supportsModernFeatures(model)
-          ? {
-              includeThoughts: true,
-              thinkingLevel: ThinkingLevel.HIGH,
-            }
-          : {
-              includeThoughts: true,
-              thinkingBudget: DEFAULT_THINKING_MODE,
-            },
+        thinkingConfig: {
+          includeThoughts: true,
+          thinkingLevel: ThinkingLevel.HIGH,
+        },
       },
     },
 

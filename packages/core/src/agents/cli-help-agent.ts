@@ -58,7 +58,6 @@ export const CliHelpAgent = (
       topP: 0.95,
       thinkingConfig: {
         includeThoughts: true,
-        thinkingBudget: -1,
       },
     },
   },

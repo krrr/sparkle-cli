@@ -31,7 +31,6 @@ import {
 import { MockTool } from '../test-utils/mock-tool.js';
 import type { Config } from '../config/config.js';
 import { setSimulate429 } from '../utils/testUtils.js';
-import { DEFAULT_THINKING_MODE } from '../config/models.js';
 import { AuthType } from './contentGenerator.js';
 import { TerminalQuotaError } from '../utils/googleQuotaErrors.js';
 import { type RetryOptions } from '../utils/retry.js';
@@ -194,13 +193,10 @@ describe('GeminiChat', () => {
       modelConfigService: {
         getResolvedConfig: vi.fn().mockImplementation((modelConfigKey) => {
           const model = modelConfigKey.model ?? mockConfig.getModel();
-          const thinkingConfig = model.startsWith('gemini-3')
-            ? {
-                thinkingLevel: ThinkingLevel.HIGH,
-              }
-            : {
-                thinkingBudget: DEFAULT_THINKING_MODE,
-              };
+          const thinkingConfig = {
+            thinkingLevel: ThinkingLevel.HIGH,
+          };
+
           return {
             model,
             generateContentConfig: {
@@ -2139,7 +2135,7 @@ describe('GeminiChat', () => {
             tools: [],
             temperature: 0,
             thinkingConfig: {
-              thinkingBudget: DEFAULT_THINKING_MODE,
+              thinkingLevel: ThinkingLevel.HIGH,
             },
             abortSignal: expect.any(AbortSignal),
           },
@@ -2186,47 +2182,6 @@ describe('GeminiChat', () => {
           }),
         }),
         'prompt-id-thinking-level',
-        LlmRole.MAIN,
-      );
-    });
-
-    it('should use thinkingBudget and remove thinkingLevel for non-gemini-3 models', async () => {
-      const response = (async function* () {
-        yield {
-          candidates: [
-            {
-              content: { parts: [{ text: 'response' }], role: 'model' },
-              finishReason: 'STOP',
-            },
-          ],
-        } as unknown as GenerateContentResponse;
-      })();
-      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(
-        response,
-      );
-
-      const stream = await chat.sendMessageStream(
-        { model: 'gemini-1.5-pro' },
-        'hello',
-        'prompt-id-thinking-budget',
-        new AbortController().signal,
-        LlmRole.MAIN,
-      );
-      for await (const _ of stream) {
-        // consume stream
-      }
-
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledWith(
-        expect.objectContaining({
-          model: 'gemini-1.5-pro',
-          config: expect.objectContaining({
-            thinkingConfig: {
-              thinkingBudget: 8192,
-              thinkingLevel: undefined,
-            },
-          }),
-        }),
-        'prompt-id-thinking-budget',
         LlmRole.MAIN,
       );
     });

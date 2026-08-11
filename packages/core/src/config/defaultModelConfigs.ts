@@ -31,6 +31,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         generateContentConfig: {
           thinkingConfig: {
             includeThoughts: true,
+            thinkingLevel: ThinkingLevel.HIGH,
           },
           temperature: 1,
           topP: 0.95,
@@ -38,35 +39,20 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    'chat-base-3': {
-      extends: 'chat-base',
-      modelConfig: {
-        generateContentConfig: {
-          thinkingConfig: {
-            thinkingLevel: ThinkingLevel.HIGH,
-          },
-        },
-      },
-    },
-    // Because `gemini-2.5-pro` and related model configs are "user-facing"
-    // today, i.e. they could be passed via `--model`, we have to be careful to
-    // ensure these model configs can be used interactively.
-    // TODO(joshualitt): Introduce internal base configs for the various models,
-    // note: we will have to think carefully about names.
     [DEFAULT_GEMINI_MODEL]: {
-      extends: 'chat-base-3',
+      extends: 'chat-base',
       modelConfig: {
         model: DEFAULT_GEMINI_MODEL,
       },
     },
     [DEFAULT_GEMINI_FLASH_LITE_MODEL]: {
-      extends: 'chat-base-3',
+      extends: 'chat-base',
       modelConfig: {
         model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
       },
     },
     [DEFAULT_GEMINI_FLASH_MODEL]: {
-      extends: 'chat-base-3',
+      extends: 'chat-base',
       modelConfig: {
         model: DEFAULT_GEMINI_FLASH_MODEL,
       },
@@ -76,7 +62,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     'gemini-3-flash-base': {
       extends: 'base',
       modelConfig: {
-        model: 'gemini-3.5-flash',
+        model: DEFAULT_GEMINI_FLASH_MODEL,
       },
     },
     classifier: {
@@ -86,7 +72,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         generateContentConfig: {
           maxOutputTokens: 1024,
           thinkingConfig: {
-            thinkingBudget: 512,
+            thinkingLevel: ThinkingLevel.LOW,
           },
         },
       },
@@ -99,7 +85,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
           temperature: 0.3,
           maxOutputTokens: 16000,
           thinkingConfig: {
-            thinkingBudget: 0,
+            thinkingLevel: ThinkingLevel.LOW,
           },
         },
       },
@@ -112,7 +98,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
           temperature: 0.2,
           maxOutputTokens: 120,
           thinkingConfig: {
-            thinkingBudget: 0,
+            thinkingLevel: ThinkingLevel.LOW,
           },
         },
       },
@@ -123,7 +109,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         model: 'flash-lite',
         generateContentConfig: {
           thinkingConfig: {
-            thinkingBudget: 0,
+            thinkingLevel: ThinkingLevel.LOW,
           },
         },
       },

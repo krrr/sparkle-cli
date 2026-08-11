@@ -60,9 +60,6 @@ export const GEMINI_MODEL_ALIAS_FLASH_LITE = 'flash-lite';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
-// Cap the thinking at 8192 to prevent run-away thinking loops.
-export const DEFAULT_THINKING_MODE = 8192;
-
 export function getAutoModelDescription() {
   return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_GEMINI_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
 }
