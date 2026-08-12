@@ -12,7 +12,7 @@ import { type UIState } from '../contexts/UIStateContext.js';
 
 import { type SessionStatsState } from '../contexts/SessionContext.js';
 import { type ThoughtSummary } from '../types.js';
-import { ApprovalMode } from 'sparkle-cli-core';
+import { ApprovalMode, CoreToolCallStatus } from 'sparkle-cli-core';
 
 vi.mock('../hooks/useComposerStatus.js', () => ({
   useComposerStatus: vi.fn(),
@@ -139,5 +139,54 @@ describe('<StatusRow />', () => {
 
     await waitUntilReady();
     expect(lastFrame()).toContain('Tip: Test Tip');
+  });
+
+  it('renders "Executing..." when a tool is currently executing', async () => {
+    (useComposerStatus as Mock).mockReturnValue({
+      isInteractiveShellWaiting: false,
+      showLoadingIndicator: true,
+      showTips: true,
+      showWit: true,
+      modeContentObj: null,
+      showMinimalContext: false,
+    });
+
+    const uiState: Partial<UIState> = {
+      ...defaultUiState,
+      pendingHistoryItems: [
+        {
+          type: 'tool_group',
+          tools: [
+            {
+              callId: 'call-1',
+              name: 'replace',
+              status: CoreToolCallStatus.Executing,
+              description: '',
+              resultDisplay: undefined,
+              confirmationDetails: undefined,
+            },
+          ],
+        },
+      ],
+    };
+
+    const { lastFrame, waitUntilReady } = await renderWithProviders(
+      <StatusRow
+        showUiDetails={false}
+        isNarrow={false}
+        terminalWidth={100}
+        hideContextSummary={false}
+        hideUiDetailsForSuggestions={false}
+        hasPendingActionRequired={false}
+      />,
+      {
+        width: 100,
+        uiState,
+      },
+    );
+
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Executing...');
+    expect(lastFrame()).not.toContain('Thinking...');
   });
 });

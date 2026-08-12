@@ -9,7 +9,8 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import { Box, Text, ResizeObserver, type DOMElement } from 'ink';
 import { isUserVisibleHook, type ThoughtSummary } from 'sparkle-cli-core';
 import stripAnsi from 'strip-ansi';
-import { type ActiveHook } from '../types.js';
+import { type ActiveHook, type HistoryItemWithoutId } from '../types.js';
+import { isToolExecuting } from '../utils/historyUtils.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { theme } from '../semantic-colors.js';
@@ -61,6 +62,7 @@ export const StatusNode: React.FC<{
   showLoadingIndicator: boolean;
   errorVerbosity: 'low' | 'full' | undefined;
   onResize?: (width: number) => void;
+  pendingHistoryItems?: HistoryItemWithoutId[];
 }> = ({
   showTips,
   showWit,
@@ -71,6 +73,7 @@ export const StatusNode: React.FC<{
   showLoadingIndicator,
   errorVerbosity,
   onResize,
+  pendingHistoryItems = [],
 }) => {
   const observerRef = useRef<ResizeObserver | null>(null);
 
@@ -126,6 +129,8 @@ export const StatusNode: React.FC<{
     } else {
       currentLoadingPhrase = GENERIC_WORKING_LABEL;
     }
+  } else if (isToolExecuting(pendingHistoryItems)) {
+    currentLoadingPhrase = 'Executing...';
   } else {
     // Sanitize thought subject to prevent terminal injection
     currentThought = thought
@@ -267,6 +272,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
         settings.merged.ui.errorVerbosity as 'low' | 'full' | undefined
       }
       onResize={onStatusResize}
+      pendingHistoryItems={uiState.pendingHistoryItems}
     />
   );
 
