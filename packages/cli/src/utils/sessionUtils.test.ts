@@ -1065,6 +1065,41 @@ describe('convertSessionToHistoryFormats', () => {
     expect(result.uiHistory[0].text).toBe('Real message');
   });
 
+  it('should skip tool response (functionResponse-only) user messages from UI history', () => {
+    const messages: MessageRecord[] = [
+      {
+        id: '1',
+        timestamp: new Date().toISOString(),
+        type: 'user',
+        content: 'Read the file',
+      },
+      {
+        id: '2',
+        timestamp: new Date().toISOString(),
+        type: 'user',
+        content: [
+          {
+            functionResponse: {
+              id: 'call_1',
+              name: 'read_file',
+              response: { output: 'file contents' },
+            },
+          },
+        ],
+      },
+    ];
+
+    const result = convertSessionToHistoryFormats(messages);
+
+    // The tool response message must not be rendered as a user history item
+    // (it would show up as "[Function Response: read_file]").
+    expect(result.uiHistory).toHaveLength(1);
+    expect(result.uiHistory[0]).toEqual({
+      type: 'user',
+      text: 'Read the file',
+    });
+  });
+
   it('should handle missing tool descriptions and displayNames', () => {
     const messages: MessageRecord[] = [
       {

@@ -14,6 +14,7 @@ import {
   type MessageRecord,
   loadConversationRecord,
 } from 'sparkle-cli-core';
+import type { PartListUnion } from '@google/genai';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { stripUnsafeCharacters } from '../ui/utils/textUtils.js';
@@ -569,6 +570,23 @@ export class SessionSelector {
 }
 
 /**
+ * Removes tool response (functionResponse) parts from a message's content.
+ * Tool responses are recorded as synthetic user messages to keep a linear
+ * session history, but they are internal API payloads — their results are
+ * already shown via the tool call UI (toolCalls on the preceding gemini
+ * message). Without this filter, resuming a session would render them as
+ * "[Function Response: <name>]" user messages.
+ */
+function stripFunctionResponseParts(content: PartListUnion): PartListUnion {
+  if (!Array.isArray(content)) {
+    return content;
+  }
+  return content.filter(
+    (part) => typeof part === 'string' || part.functionResponse === undefined,
+  );
+}
+
+/**
  * Converts session/conversation data into UI history format.
  */
 export function convertSessionToHistoryFormats(
@@ -594,9 +612,11 @@ export function convertSessionToHistoryFormats(
 
     // Add the message only if it has content
     const displayContentString = msg.displayContent
-      ? partListUnionToString(msg.displayContent)
+      ? partListUnionToString(stripFunctionResponseParts(msg.displayContent))
       : undefined;
-    const contentString = partListUnionToString(msg.content);
+    const contentString = partListUnionToString(
+      stripFunctionResponseParts(msg.content),
+    );
     const uiText = displayContentString || contentString;
 
     // Skip internal context messages in the UI history
