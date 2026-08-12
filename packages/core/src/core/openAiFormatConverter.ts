@@ -616,6 +616,11 @@ function parseArgs(argsJson: string): Record<string, unknown> | undefined {
  * of the stream). This guarantees every tool call is emitted exactly once,
  * which both the GeminiChat context-management path and the legacy path rely
  * on to avoid duplicate tool executions.
+ *
+ * Reasoning content (`reasoning_content`) is streamed one tiny fragment per
+ * chunk, so fragments are likewise buffered and emitted as a single
+ * consolidated thought part per reasoning block, matching how Gemini delivers
+ * complete thoughts.
  */
 export class OpenAiChunkConverter {
   private readonly toolCalls = new Map<
@@ -624,6 +629,8 @@ export class OpenAiChunkConverter {
   >();
   private readonly emittedCalls = new Set<number>();
   private readonly reasoningParts: string[] = [];
+  /** Reasoning fragments received but not yet emitted as a thought part. */
+  private pendingReasoning: string[] = [];
 
   constructor(private readonly nameMapper?: FunctionNameMapper) {}
 
@@ -663,7 +670,27 @@ export class OpenAiChunkConverter {
 
     if (delta?.reasoning_content) {
       this.reasoningParts.push(delta.reasoning_content);
-      parts.push({ text: delta.reasoning_content, thought: true });
+      this.pendingReasoning.push(delta.reasoning_content);
+    }
+
+    // OpenAI-compatible APIs stream reasoning content one tiny fragment per
+    // SSE chunk. Buffer those fragments and emit a single consolidated thought
+    // part when the reasoning block ends (content/tool calls/finish reason
+    // arrives, or the stream moves on to another chunk). This mirrors Gemini,
+    // which delivers each thought as one complete part. Emitting a part per
+    // fragment would turn every reasoning token into its own Thought event and
+    // flood the UI with one "thinking" line per token.
+    const reasoningEnded =
+      !delta?.reasoning_content ||
+      (typeof delta?.content === 'string' && delta.content.length > 0) ||
+      !!delta?.tool_calls ||
+      !!choice?.finish_reason;
+    if (reasoningEnded && this.pendingReasoning.length > 0) {
+      parts.push({
+        text: this.pendingReasoning.join(''),
+        thought: true,
+      });
+      this.pendingReasoning = [];
     }
     if (typeof delta?.content === 'string' && delta.content.length > 0) {
       parts.push({ text: delta.content });
@@ -701,13 +728,20 @@ export class OpenAiChunkConverter {
    */
   toFinalGeminiChunk(): GenerateContentResponse | undefined {
     const parts: Part[] = [];
-    let hasCalls = false;
+    // Flush reasoning fragments still buffered (some providers end the stream
+    // without a finish reason or a trailing content chunk).
+    if (this.pendingReasoning.length > 0) {
+      parts.push({
+        text: this.pendingReasoning.join(''),
+        thought: true,
+      });
+      this.pendingReasoning = [];
+    }
     for (const [index, call] of this.toolCalls) {
       if (this.emittedCalls.has(index) || !call.name) {
         continue;
       }
       this.emittedCalls.add(index);
-      hasCalls = true;
       parts.push({
         functionCall: {
           name: this.nameMapper?.toOriginalName(call.name) ?? call.name,
@@ -716,7 +750,7 @@ export class OpenAiChunkConverter {
         },
       });
     }
-    if (!hasCalls) {
+    if (parts.length === 0) {
       return undefined;
     }
     const response = new GenerateContentResponse();

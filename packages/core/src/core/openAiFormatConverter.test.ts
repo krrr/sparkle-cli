@@ -634,15 +634,67 @@ describe('OpenAiChunkConverter', () => {
     expect(r2.candidates![0].content!.parts).toEqual([{ text: 'lo' }]);
   });
 
-  it('converts reasoning_content into thought parts', () => {
+  it('buffers reasoning_content and emits one consolidated thought part per block', () => {
     const converter = new OpenAiChunkConverter();
-    const response = converter.toGeminiChunk({
-      choices: [{ delta: { reasoning_content: 'thinking...' } }],
+    // Reasoning fragments are buffered; nothing is emitted while the block is
+    // still in progress.
+    const r1 = converter.toGeminiChunk({
+      choices: [{ delta: { reasoning_content: 'think' } }],
     });
-    expect(response.candidates![0].content!.parts).toEqual([
+    expect(r1.candidates).toBeUndefined();
+    const r2 = converter.toGeminiChunk({
+      choices: [{ delta: { reasoning_content: 'ing...' } }],
+    });
+    expect(r2.candidates).toBeUndefined();
+    // The block ends when content starts; the whole reasoning block is emitted
+    // as ONE thought part instead of one part per fragment.
+    const r3 = converter.toGeminiChunk({
+      choices: [{ delta: { content: 'Answer' } }],
+    });
+    expect(r3.candidates![0].content!.parts).toEqual([
       { text: 'thinking...', thought: true },
+      { text: 'Answer' },
     ]);
     expect(converter.getReasoningContent()).toBe('thinking...');
+  });
+
+  it('flushes buffered reasoning when the stream finishes', () => {
+    const converter = new OpenAiChunkConverter();
+    const r1 = converter.toGeminiChunk({
+      choices: [{ delta: { reasoning_content: 'deep' } }],
+    });
+    expect(r1.candidates).toBeUndefined();
+    const r2 = converter.toGeminiChunk({
+      choices: [{ delta: {}, finish_reason: 'stop' }],
+    });
+    expect(r2.candidates![0].content!.parts).toEqual([
+      { text: 'deep', thought: true },
+    ]);
+    expect(r2.candidates![0].finishReason).toBe(FinishReason.STOP);
+  });
+
+  it('flushes buffered reasoning via toFinalGeminiChunk when the stream ends', () => {
+    const converter = new OpenAiChunkConverter();
+    converter.toGeminiChunk({
+      choices: [{ delta: { reasoning_content: 'leftover' } }],
+    });
+    const finalChunk = converter.toFinalGeminiChunk();
+    expect(finalChunk!.candidates![0].content!.parts).toEqual([
+      { text: 'leftover', thought: true },
+    ]);
+    expect(converter.toFinalGeminiChunk()).toBeUndefined();
+  });
+
+  it('does not duplicate buffered reasoning across flush paths', () => {
+    const converter = new OpenAiChunkConverter();
+    converter.toGeminiChunk({
+      choices: [{ delta: { reasoning_content: 'once' } }],
+    });
+    converter.toGeminiChunk({
+      choices: [{ delta: { content: 'text' }, finish_reason: 'stop' }],
+    });
+    expect(converter.toFinalGeminiChunk()).toBeUndefined();
+    expect(converter.getReasoningContent()).toBe('once');
   });
 
   it('assembles fragmented tool call deltas and emits them once on finish', () => {
