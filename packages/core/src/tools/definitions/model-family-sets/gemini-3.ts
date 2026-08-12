@@ -32,7 +32,7 @@ import {
   PARAM_PATTERN,
   PARAM_CASE_SENSITIVE,
   PARAM_RESPECT_GIT_IGNORE,
-  PARAM_RESPECT_GEMINI_IGNORE,
+  PARAM_RESPECT_SPARKLE_IGNORE,
   PARAM_FILE_FILTERING_OPTIONS,
   // Tool-specific parameter names
   READ_FILE_PARAM_START_LINE,
@@ -292,9 +292,9 @@ export const GEMINI_3_SET: CoreToolSet = {
             'Optional: Whether to respect .gitignore patterns when finding files. Only available in git repositories. Defaults to true.',
           type: 'boolean',
         },
-        [PARAM_RESPECT_GEMINI_IGNORE]: {
+        [PARAM_RESPECT_SPARKLE_IGNORE]: {
           description:
-            'Optional: Whether to respect .geminiignore patterns when finding files. Defaults to true.',
+            'Optional: Whether to respect .sparkleignore patterns when finding files. Defaults to true.',
           type: 'boolean',
         },
       },
@@ -322,7 +322,7 @@ export const GEMINI_3_SET: CoreToolSet = {
         },
         [PARAM_FILE_FILTERING_OPTIONS]: {
           description:
-            'Optional: Whether to respect ignore patterns from .gitignore or .geminiignore',
+            'Optional: Whether to respect ignore patterns from .gitignore or .sparkleignore',
           type: 'object',
           properties: {
             [PARAM_RESPECT_GIT_IGNORE]: {
@@ -330,9 +330,9 @@ export const GEMINI_3_SET: CoreToolSet = {
                 'Optional: Whether to respect .gitignore patterns when listing files. Only available in git repositories. Defaults to true.',
               type: 'boolean',
             },
-            [PARAM_RESPECT_GEMINI_IGNORE]: {
+            [PARAM_RESPECT_SPARKLE_IGNORE]: {
               description:
-                'Optional: Whether to respect .geminiignore patterns when listing files. Defaults to true.',
+                'Optional: Whether to respect .sparkleignore patterns when listing files. Defaults to true.',
               type: 'boolean',
             },
           },
@@ -476,7 +476,7 @@ Use this tool when the user's query implies needing the content of several files
         },
         [PARAM_FILE_FILTERING_OPTIONS]: {
           description:
-            'Whether to respect ignore patterns from .gitignore or .geminiignore',
+            'Whether to respect ignore patterns from .gitignore or .sparkleignore',
           type: 'object',
           properties: {
             [PARAM_RESPECT_GIT_IGNORE]: {
@@ -484,9 +484,9 @@ Use this tool when the user's query implies needing the content of several files
                 'Optional: Whether to respect .gitignore patterns when listing files. Only available in git repositories. Defaults to true.',
               type: 'boolean',
             },
-            [PARAM_RESPECT_GEMINI_IGNORE]: {
+            [PARAM_RESPECT_SPARKLE_IGNORE]: {
               description:
-                'Optional: Whether to respect .geminiignore patterns when listing files. Defaults to true.',
+                'Optional: Whether to respect .sparkleignore patterns when listing files. Defaults to true.',
               type: 'boolean',
             },
           },

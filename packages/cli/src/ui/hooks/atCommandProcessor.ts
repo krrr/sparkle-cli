@@ -215,7 +215,7 @@ interface ResolvedFile {
 
 interface IgnoredFile {
   path: string;
-  reason: 'git' | 'gemini' | 'both';
+  reason: 'git' | 'sparkle' | 'both';
 }
 
 /**
@@ -247,25 +247,25 @@ async function resolveFilePaths(
       respectFileIgnore.respectGitIgnore &&
       fileDiscovery.shouldIgnoreFile(pathName, {
         respectGitIgnore: true,
-        respectGeminiIgnore: false,
+        respectSparkleIgnore: false,
       });
-    const geminiIgnored =
-      respectFileIgnore.respectGeminiIgnore &&
+    const sparkleIgnored =
+      respectFileIgnore.respectSparkleIgnore &&
       fileDiscovery.shouldIgnoreFile(pathName, {
         respectGitIgnore: false,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       });
 
-    if (gitIgnored || geminiIgnored) {
+    if (gitIgnored || sparkleIgnored) {
       const reason =
-        gitIgnored && geminiIgnored ? 'both' : gitIgnored ? 'git' : 'gemini';
+        gitIgnored && sparkleIgnored ? 'both' : gitIgnored ? 'git' : 'sparkle';
       ignoredFiles.push({ path: pathName, reason });
       const reasonText =
         reason === 'both'
           ? 'ignored by both git and sparkle'
           : reason === 'git'
             ? 'git-ignored'
-            : 'gemini-ignored';
+            : 'sparkle-ignored';
       onDebugMessage(`Path ${pathName} is ${reasonText} and will be skipped.`);
       continue;
     }
@@ -536,7 +536,7 @@ async function readLocalFiles(
     include: pathSpecsToRead,
     file_filtering_options: {
       respect_git_ignore: respectFileIgnore.respectGitIgnore,
-      respect_gemini_ignore: respectFileIgnore.respectGeminiIgnore,
+      respect_sparkle_ignore: respectFileIgnore.respectSparkleIgnore,
     },
   };
 
@@ -635,7 +635,7 @@ function reportIgnoredFiles(
 
   const ignoredByReason: Record<string, string[]> = {
     git: [],
-    gemini: [],
+    sparkle: [],
     both: [],
   };
 
@@ -647,8 +647,8 @@ function reportIgnoredFiles(
   if (ignoredByReason['git'].length) {
     messages.push(`Git-ignored: ${ignoredByReason['git'].join(', ')}`);
   }
-  if (ignoredByReason['gemini'].length) {
-    messages.push(`Gemini-ignored: ${ignoredByReason['gemini'].join(', ')}`);
+  if (ignoredByReason['sparkle'].length) {
+    messages.push(`Sparkle-ignored: ${ignoredByReason['sparkle'].join(', ')}`);
   }
   if (ignoredByReason['both'].length) {
     messages.push(`Ignored by both: ${ignoredByReason['both'].join(', ')}`);

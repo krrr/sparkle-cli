@@ -75,8 +75,8 @@ Settings and customization options for Sparkle CLI.
 - **[Custom commands](./cli/custom-commands.md):** Personalized shortcuts.
 - **[Enterprise configuration](./cli/enterprise.md):** Professional environment
   controls.
-- **[Ignore files (.geminiignore)](./cli/gemini-ignore.md):** Exclusion pattern
-  reference.
+- **[Ignore files (.sparkleignore)](./cli/sparkle-ignore.md):** Exclusion
+  pattern reference.
 - **[Model configuration](./cli/generation-settings.md):** Fine-tune generation
   parameters like temperature and thinking budget.
 - **[Project context (AGENTS.md)](./cli/gemini-md.md):** Technical hierarchy of

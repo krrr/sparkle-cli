@@ -1182,9 +1182,9 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `true`
   - **Requires restart:** Yes
 
-- **`context.fileFiltering.respectGeminiIgnore`** (boolean):
+- **`context.fileFiltering.respectSparkleIgnore`** (boolean):
 
-  - **Description:** Respect .geminiignore files when searching.
+  - **Description:** Respect .sparkleignore files when searching.
   - **Default:** `true`
   - **Requires restart:** Yes
 
@@ -1210,7 +1210,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.fileFiltering.customIgnoreFilePaths`** (array):
   - **Description:** Additional ignore file paths to respect. These files take
-    precedence over .geminiignore and .gitignore. Files earlier in the array
+    precedence over .sparkleignore and .gitignore. Files earlier in the array
     take precedence over files later in the array, e.g. the first file takes
     precedence over the second one.
   - **Default:** `[]`

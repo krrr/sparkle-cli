@@ -131,7 +131,7 @@ export async function buildBwrapArgs(
       policyWriteKeys.has(toPathKey(filePath)) ||
       policyWriteKeys.has(toPathKey(realPath));
 
-    // If the workspace is writable, we allow editing .gitignore and .geminiignore by default.
+    // If the workspace is writable, we allow editing .gitignore and .sparkleignore by default.
     // .git remains protected unless explicitly requested (e.g. for git commands).
     const isImplicitlyWritable = workspaceWrite && file.path !== '.git';
 

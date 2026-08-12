@@ -29,7 +29,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
     this.projectRoot = path.resolve(projectRoot);
     this.processedExtraPatterns = ignore();
     if (this.extraPatterns) {
-      // extraPatterns are assumed to be from project root (like .geminiignore)
+      // extraPatterns are assumed to be from project root (like .sparkleignore)
       this.processedExtraPatterns.add(
         this.processPatterns(this.extraPatterns, '.'),
       );
@@ -190,7 +190,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
         ig.add(patterns);
       }
 
-      // Extra patterns (like .geminiignore) have final precedence
+      // Extra patterns (like .sparkleignore) have final precedence
       return ig.add(this.processedExtraPatterns).ignores(normalizedPath);
     } catch {
       return false;

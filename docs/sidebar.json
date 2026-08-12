@@ -194,8 +194,8 @@
             "slug": "docs/cli/enterprise"
           },
           {
-            "label": "Ignore files (.geminiignore)",
-            "slug": "docs/cli/gemini-ignore"
+            "label": "Ignore files (.sparkleignore)",
+            "slug": "docs/cli/sparkle-ignore"
           },
           {
             "label": "Model configuration",

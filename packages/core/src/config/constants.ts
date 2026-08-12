@@ -6,7 +6,7 @@
 
 export interface FileFilteringOptions {
   respectGitIgnore: boolean;
-  respectGeminiIgnore: boolean;
+  respectSparkleIgnore: boolean;
   enableFileWatcher?: boolean;
   maxFileCount?: number;
   searchTimeout?: number;
@@ -16,7 +16,7 @@ export interface FileFilteringOptions {
 // For memory files
 export const DEFAULT_MEMORY_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
   respectGitIgnore: false,
-  respectGeminiIgnore: true,
+  respectSparkleIgnore: true,
   enableFileWatcher: false,
   maxFileCount: 20000,
   searchTimeout: 5000,
@@ -26,7 +26,7 @@ export const DEFAULT_MEMORY_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
 // For all other files
 export const DEFAULT_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
   respectGitIgnore: true,
-  respectGeminiIgnore: true,
+  respectSparkleIgnore: true,
   enableFileWatcher: false,
   maxFileCount: 20000,
   searchTimeout: 5000,
@@ -34,7 +34,7 @@ export const DEFAULT_FILE_FILTERING_OPTIONS: FileFilteringOptions = {
 };
 
 // Generic exclusion file name
-export const GEMINI_IGNORE_FILE_NAME = '.geminiignore';
+export const SPARKLE_IGNORE_FILE_NAME = '.sparkleignore';
 
 // Extension integrity constants
 export const INTEGRITY_FILENAME = 'extension_integrity.json';

@@ -488,10 +488,10 @@ class GrepToolInvocation extends BaseToolInvocation<
         rgArgs.push('--glob', `!${exclude}`);
       });
 
-      // Add .geminiignore and custom ignore files support (if provided/mandated)
+      // Add .sparkleignore and custom ignore files support (if provided/mandated)
       // (ripgrep natively handles .gitignore)
-      const geminiIgnorePaths = this.fileDiscoveryService.getIgnoreFilePaths();
-      for (const ignorePath of geminiIgnorePaths) {
+      const sparkleIgnorePaths = this.fileDiscoveryService.getIgnoreFilePaths();
+      for (const ignorePath of sparkleIgnorePaths) {
         rgArgs.push('--ignore-file', ignorePath);
       }
     }

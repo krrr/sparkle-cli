@@ -54,7 +54,7 @@ describe('useAtCompletion', () => {
     mockConfig = {
       getFileFilteringOptions: vi.fn(() => ({
         respectGitIgnore: true,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       })),
       getEnableRecursiveFileSearch: () => true,
       getFileFilteringEnableFuzzySearch: () => true,
@@ -159,7 +159,7 @@ describe('useAtCompletion', () => {
         ignoreDirs: [],
         fileDiscoveryService: new FileDiscoveryService(testRootDir, {
           respectGitIgnore: false,
-          respectGeminiIgnore: false,
+          respectSparkleIgnore: false,
         }),
         cache: false,
         cacheTtl: 0,
@@ -291,7 +291,7 @@ describe('useAtCompletion', () => {
         ignoreDirs: [],
         fileDiscoveryService: new FileDiscoveryService(testRootDir, {
           respectGitIgnore: true,
-          respectGeminiIgnore: true,
+          respectSparkleIgnore: true,
         }),
         cache: false,
         cacheTtl: 0,
@@ -565,7 +565,7 @@ describe('useAtCompletion', () => {
       const configWithWatcher = {
         getFileFilteringOptions: vi.fn(() => ({
           respectGitIgnore: true,
-          respectGeminiIgnore: true,
+          respectSparkleIgnore: true,
           enableFileWatcher: true,
         })),
         getEnableRecursiveFileSearch: () => true,
@@ -645,7 +645,7 @@ describe('useAtCompletion', () => {
         getEnableRecursiveFileSearch: () => false,
         getFileFilteringOptions: vi.fn(() => ({
           respectGitIgnore: true,
-          respectGeminiIgnore: true,
+          respectSparkleIgnore: true,
         })),
         getFileFilteringEnableFuzzySearch: () => true,
       } as unknown as Config;

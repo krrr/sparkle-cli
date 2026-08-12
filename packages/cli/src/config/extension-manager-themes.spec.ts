@@ -197,7 +197,7 @@ describe('ExtensionManager theme loading', () => {
       getImportFormat: () => 'tree',
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       }),
       getDiscoveryMaxDirs: () => 200,
       getMemoryBoundaryMarkers: () => ['.git'],

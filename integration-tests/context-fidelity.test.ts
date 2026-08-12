@@ -108,7 +108,7 @@ describe('Context Management Fidelity E2E', () => {
 
       // Ignore trace and response files to keep environment context clean and stable
       fs.writeFileSync(
-        path.join(rig.testDir!, '.geminiignore'),
+        path.join(rig.testDir!, '.sparkleignore'),
         'traces/\nresp*.json\ndebug.log\n',
       );
 

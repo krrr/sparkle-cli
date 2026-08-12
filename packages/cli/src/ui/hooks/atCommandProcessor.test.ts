@@ -26,7 +26,7 @@ import {
   StandardFileSystemService,
   ToolRegistry,
   COMMON_IGNORE_PATTERNS,
-  GEMINI_IGNORE_FILE_NAME,
+  SPARKLE_IGNORE_FILE_NAME,
   ApprovalMode,
   // DEFAULT_FILE_EXCLUDES,
   CoreToolCallStatus,
@@ -92,10 +92,10 @@ describe('handleAtCommand', () => {
       getExcludeTools: vi.fn(),
       getFileService: () => new FileDiscoveryService(testRootDir),
       getFileFilteringRespectGitIgnore: () => true,
-      getFileFilteringRespectGeminiIgnore: () => true,
+      getFileFilteringRespectSparkleIgnore: () => true,
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       }),
       getFileSystemService: () => new StandardFileSystemService(),
       getEnableRecursiveFileSearch: vi.fn(() => true),
@@ -717,17 +717,17 @@ describe('handleAtCommand', () => {
     });
   });
 
-  describe('gemini-ignore filtering', () => {
-    it('should skip gemini-ignored files in @ commands', async () => {
+  describe('sparkle-ignore filtering', () => {
+    it('should skip sparkle-ignored files in @ commands', async () => {
       await createTestFile(
-        path.join(testRootDir, GEMINI_IGNORE_FILE_NAME),
+        path.join(testRootDir, SPARKLE_IGNORE_FILE_NAME),
         'build/output.js',
       );
-      const geminiIgnoredFile = await createTestFile(
+      const sparkleIgnoredFile = await createTestFile(
         path.join(testRootDir, 'build', 'output.js'),
         'console.log("Hello");',
       );
-      const query = `@${geminiIgnoredFile}`;
+      const query = `@${sparkleIgnoredFile}`;
 
       const result = await handleAtCommand({
         query,
@@ -742,16 +742,16 @@ describe('handleAtCommand', () => {
         processedQuery: [{ text: query }],
       });
       expect(mockOnDebugMessage).toHaveBeenCalledWith(
-        `Path ${geminiIgnoredFile} is gemini-ignored and will be skipped.`,
+        `Path ${sparkleIgnoredFile} is sparkle-ignored and will be skipped.`,
       );
       expect(mockOnDebugMessage).toHaveBeenCalledWith(
-        `Ignored 1 files:\nGemini-ignored: ${geminiIgnoredFile}`,
+        `Ignored 1 files:\nSparkle-ignored: ${sparkleIgnoredFile}`,
       );
     });
   });
-  it('should process non-ignored files when .geminiignore is present', async () => {
+  it('should process non-ignored files when .sparkleignore is present', async () => {
     await createTestFile(
-      path.join(testRootDir, GEMINI_IGNORE_FILE_NAME),
+      path.join(testRootDir, SPARKLE_IGNORE_FILE_NAME),
       'build/output.js',
     );
     const validFile = await createTestFile(
@@ -780,20 +780,20 @@ describe('handleAtCommand', () => {
     });
   });
 
-  it('should handle mixed gemini-ignored and valid files', async () => {
+  it('should handle mixed sparkle-ignored and valid files', async () => {
     await createTestFile(
-      path.join(testRootDir, GEMINI_IGNORE_FILE_NAME),
+      path.join(testRootDir, SPARKLE_IGNORE_FILE_NAME),
       'dist/bundle.js',
     );
     const validFile = await createTestFile(
       path.join(testRootDir, 'src', 'main.ts'),
       '// Main application entry',
     );
-    const geminiIgnoredFile = await createTestFile(
+    const sparkleIgnoredFile = await createTestFile(
       path.join(testRootDir, 'dist', 'bundle.js'),
       'console.log("bundle");',
     );
-    const query = `@${validFile} @${geminiIgnoredFile}`;
+    const query = `@${validFile} @${sparkleIgnoredFile}`;
 
     const result = await handleAtCommand({
       query,
@@ -806,7 +806,7 @@ describe('handleAtCommand', () => {
 
     expect(result).toEqual({
       processedQuery: [
-        { text: `@${getRelativePath(validFile)} @${geminiIgnoredFile}` },
+        { text: `@${getRelativePath(validFile)} @${sparkleIgnoredFile}` },
         { text: '\n--- Content from referenced files ---' },
         { text: `\nContent from @${getRelativePath(validFile)}:\n` },
         { text: '// Main application entry' },
@@ -814,10 +814,10 @@ describe('handleAtCommand', () => {
       ],
     });
     expect(mockOnDebugMessage).toHaveBeenCalledWith(
-      `Path ${geminiIgnoredFile} is gemini-ignored and will be skipped.`,
+      `Path ${sparkleIgnoredFile} is sparkle-ignored and will be skipped.`,
     );
     expect(mockOnDebugMessage).toHaveBeenCalledWith(
-      `Ignored 1 files:\nGemini-ignored: ${geminiIgnoredFile}`,
+      `Ignored 1 files:\nSparkle-ignored: ${sparkleIgnoredFile}`,
     );
   });
 

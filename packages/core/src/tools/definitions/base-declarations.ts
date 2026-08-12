@@ -18,7 +18,7 @@ export const PARAM_DIR_PATH = 'dir_path';
 export const PARAM_PATTERN = 'pattern';
 export const PARAM_CASE_SENSITIVE = 'case_sensitive';
 export const PARAM_RESPECT_GIT_IGNORE = 'respect_git_ignore';
-export const PARAM_RESPECT_GEMINI_IGNORE = 'respect_gemini_ignore';
+export const PARAM_RESPECT_SPARKLE_IGNORE = 'respect_sparkle_ignore';
 export const PARAM_FILE_FILTERING_OPTIONS = 'file_filtering_options';
 export const PARAM_DESCRIPTION = 'description';
 

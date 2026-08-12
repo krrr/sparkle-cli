@@ -9,7 +9,7 @@ import { IgnoreFileParser } from './ignoreFileParser.js';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import { GEMINI_IGNORE_FILE_NAME } from '../config/constants.js';
+import { SPARKLE_IGNORE_FILE_NAME } from '../config/constants.js';
 
 describe('IgnoreFileParser', () => {
   let projectRoot: string;
@@ -32,10 +32,13 @@ describe('IgnoreFileParser', () => {
   describe('Basic File Loading', () => {
     it('should identify paths ignored by a single ignore file', async () => {
       await createTestFile(
-        GEMINI_IGNORE_FILE_NAME,
+        SPARKLE_IGNORE_FILE_NAME,
         'ignored.txt\n/ignored_dir/',
       );
-      const parser = new IgnoreFileParser(projectRoot, GEMINI_IGNORE_FILE_NAME);
+      const parser = new IgnoreFileParser(
+        projectRoot,
+        SPARKLE_IGNORE_FILE_NAME,
+      );
 
       expect(parser.isIgnored('ignored.txt', false)).toBe(true);
       expect(parser.isIgnored('ignored_dir/file.txt', false)).toBe(true);

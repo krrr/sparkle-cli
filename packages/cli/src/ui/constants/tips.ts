@@ -36,7 +36,7 @@ export const INFORMATIVE_TIPS = [
   'Expand your workspace with additional directories (/directory)…',
   'Control how /memory reload loads context files (/settings)…',
   'Toggle respect for .gitignore files in context (/settings)…',
-  'Toggle respect for .geminiignore files in context (/settings)…',
+  'Toggle respect for .sparkleignore files in context (/settings)…',
   'Enable recursive file search for @-file completions (/settings)…',
   'Disable fuzzy search when searching for files (/settings)…',
   'Run tools in a secure sandbox environment (settings.json)…',

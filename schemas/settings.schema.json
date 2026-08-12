@@ -1835,10 +1835,10 @@
               "default": true,
               "type": "boolean"
             },
-            "respectGeminiIgnore": {
-              "title": "Respect .geminiignore",
-              "description": "Respect .geminiignore files when searching.",
-              "markdownDescription": "Respect .geminiignore files when searching.\n\n- Category: `Context`\n- Requires restart: `yes`\n- Default: `true`",
+            "respectSparkleIgnore": {
+              "title": "Respect .sparkleignore",
+              "description": "Respect .sparkleignore files when searching.",
+              "markdownDescription": "Respect .sparkleignore files when searching.\n\n- Category: `Context`\n- Requires restart: `yes`\n- Default: `true`",
               "default": true,
               "type": "boolean"
             },
@@ -1865,8 +1865,8 @@
             },
             "customIgnoreFilePaths": {
               "title": "Custom Ignore File Paths",
-              "description": "Additional ignore file paths to respect. These files take precedence over .geminiignore and .gitignore. Files earlier in the array take precedence over files later in the array, e.g. the first file takes precedence over the second one.",
-              "markdownDescription": "Additional ignore file paths to respect. These files take precedence over .geminiignore and .gitignore. Files earlier in the array take precedence over files later in the array, e.g. the first file takes precedence over the second one.\n\n- Category: `Context`\n- Requires restart: `yes`\n- Default: `[]`",
+              "description": "Additional ignore file paths to respect. These files take precedence over .sparkleignore and .gitignore. Files earlier in the array take precedence over files later in the array, e.g. the first file takes precedence over the second one.",
+              "markdownDescription": "Additional ignore file paths to respect. These files take precedence over .sparkleignore and .gitignore. Files earlier in the array take precedence over files later in the array, e.g. the first file takes precedence over the second one.\n\n- Category: `Context`\n- Requires restart: `yes`\n- Default: `[]`",
               "default": [],
               "type": "array",
               "items": {

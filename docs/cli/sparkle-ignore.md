@@ -1,48 +1,48 @@
 # Ignoring files
 
-This document provides an overview of the Gemini Ignore (`.geminiignore`)
+This document provides an overview of the Sparkle Ignore (`.sparkleignore`)
 feature of Sparkle CLI.
 
 Sparkle CLI includes the ability to automatically ignore files, similar to
-`.gitignore`. Adding paths to your `.geminiignore` file will exclude them from
+`.gitignore`. Adding paths to your `.sparkleignore` file will exclude them from
 tools that support this feature, although they will still be visible to other
 services (such as Git).
 
 ## How it works
 
-When you add a path to your `.geminiignore` file, tools that respect this file
+When you add a path to your `.sparkleignore` file, tools that respect this file
 will exclude matching files and directories from their operations. For example,
-when you use the `@` command to share files, any paths in your `.geminiignore`
+when you use the `@` command to share files, any paths in your `.sparkleignore`
 file will be automatically excluded.
 
-For the most part, `.geminiignore` follows the conventions of `.gitignore`
+For the most part, `.sparkleignore` follows the conventions of `.gitignore`
 files:
 
 - Blank lines and lines starting with `#` are ignored.
 - Standard glob patterns are supported (such as `*`, `?`, and `[]`).
 - Putting a `/` at the end will only match directories.
 - Putting a `/` at the beginning anchors the path relative to the
-  `.geminiignore` file.
+  `.sparkleignore` file.
 - `!` negates a pattern.
 
-You can update your `.geminiignore` file at any time. To apply the changes, you
+You can update your `.sparkleignore` file at any time. To apply the changes, you
 must restart your Sparkle CLI session.
 
-## How to use `.geminiignore`
+## How to use `.sparkleignore`
 
-To enable `.geminiignore`:
+To enable `.sparkleignore`:
 
-1. Create a file named `.geminiignore` in the root of your project directory.
+1. Create a file named `.sparkleignore` in the root of your project directory.
 
-To add a file or directory to `.geminiignore`:
+To add a file or directory to `.sparkleignore`:
 
-1. Open your `.geminiignore` file.
+1. Open your `.sparkleignore` file.
 2. Add the path or file you want to ignore, for example: `/archive/` or
    `apikeys.txt`.
 
-### `.geminiignore` examples
+### `.sparkleignore` examples
 
-You can use `.geminiignore` to ignore directories and files:
+You can use `.sparkleignore` to ignore directories and files:
 
 ```
 # Exclude your /packages/ directory and all subdirectories
@@ -52,7 +52,7 @@ You can use `.geminiignore` to ignore directories and files:
 apikeys.txt
 ```
 
-You can use wildcards in your `.geminiignore` file with `*`:
+You can use wildcards in your `.sparkleignore` file with `*`:
 
 ```
 # Exclude all .md files
@@ -67,4 +67,4 @@ Finally, you can exclude files and directories from exclusion with `!`:
 !README.md
 ```
 
-To remove paths from your `.geminiignore` file, delete the relevant lines.
+To remove paths from your `.sparkleignore` file, delete the relevant lines.

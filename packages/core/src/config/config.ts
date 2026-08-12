@@ -594,7 +594,7 @@ export interface ConfigParameters {
   usageStatisticsEnabled?: boolean;
   fileFiltering?: {
     respectGitIgnore?: boolean;
-    respectGeminiIgnore?: boolean;
+    respectSparkleIgnore?: boolean;
     enableFileWatcher?: boolean;
     enableRecursiveFileSearch?: boolean;
     enableFuzzySearch?: boolean;
@@ -771,7 +771,7 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly modelAvailabilityService: ModelAvailabilityService;
   private readonly fileFiltering: {
     respectGitIgnore: boolean;
-    respectGeminiIgnore: boolean;
+    respectSparkleIgnore: boolean;
     enableFileWatcher: boolean;
     enableRecursiveFileSearch: boolean;
     enableFuzzySearch: boolean;
@@ -1020,9 +1020,9 @@ export class Config implements McpContext, AgentLoopContext {
       respectGitIgnore:
         params.fileFiltering?.respectGitIgnore ??
         DEFAULT_FILE_FILTERING_OPTIONS.respectGitIgnore,
-      respectGeminiIgnore:
-        params.fileFiltering?.respectGeminiIgnore ??
-        DEFAULT_FILE_FILTERING_OPTIONS.respectGeminiIgnore,
+      respectSparkleIgnore:
+        params.fileFiltering?.respectSparkleIgnore ??
+        DEFAULT_FILE_FILTERING_OPTIONS.respectSparkleIgnore,
       enableFileWatcher:
         params.fileFiltering?.enableFileWatcher ??
         DEFAULT_FILE_FILTERING_OPTIONS.enableFileWatcher ??
@@ -1603,7 +1603,7 @@ export class Config implements McpContext, AgentLoopContext {
 
     this._sandboxForbiddenPaths = await this.getFileService().getIgnoredPaths({
       respectGitIgnore: false,
-      respectGeminiIgnore: true,
+      respectSparkleIgnore: true,
     });
 
     return this._sandboxForbiddenPaths;
@@ -2495,8 +2495,8 @@ export class Config implements McpContext, AgentLoopContext {
     return this.fileFiltering.respectGitIgnore;
   }
 
-  getFileFilteringRespectGeminiIgnore(): boolean {
-    return this.fileFiltering.respectGeminiIgnore;
+  getFileFilteringRespectSparkleIgnore(): boolean {
+    return this.fileFiltering.respectSparkleIgnore;
   }
 
   getCustomIgnoreFilePaths(): string[] {
@@ -2506,7 +2506,7 @@ export class Config implements McpContext, AgentLoopContext {
   getFileFilteringOptions(): FileFilteringOptions {
     return {
       respectGitIgnore: this.fileFiltering.respectGitIgnore,
-      respectGeminiIgnore: this.fileFiltering.respectGeminiIgnore,
+      respectSparkleIgnore: this.fileFiltering.respectSparkleIgnore,
       enableFileWatcher: this.fileFiltering.enableFileWatcher,
       maxFileCount: this.fileFiltering.maxFileCount,
       searchTimeout: this.fileFiltering.searchTimeout,
@@ -2558,7 +2558,7 @@ export class Config implements McpContext, AgentLoopContext {
     if (!this.fileDiscoveryService) {
       this.fileDiscoveryService = new FileDiscoveryService(this.targetDir, {
         respectGitIgnore: this.fileFiltering.respectGitIgnore,
-        respectGeminiIgnore: this.fileFiltering.respectGeminiIgnore,
+        respectSparkleIgnore: this.fileFiltering.respectSparkleIgnore,
         customIgnoreFilePaths: this.fileFiltering.customIgnoreFilePaths,
       });
     }

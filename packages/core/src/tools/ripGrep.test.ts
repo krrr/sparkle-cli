@@ -16,7 +16,7 @@ import { isSubpath, resolveToRealPath } from '../utils/paths.js';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import type { Config } from '../config/config.js';
-import { GEMINI_IGNORE_FILE_NAME } from '../config/constants.js';
+import { SPARKLE_IGNORE_FILE_NAME } from '../config/constants.js';
 import { createMockWorkspaceContext } from '../test-utils/mockWorkspaceContext.js';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { PassThrough, Readable } from 'node:stream';
@@ -116,14 +116,14 @@ function createMockConfig(
     getDebugMode: () => false,
     getFileFilteringOptions: () => ({
       respectGitIgnore: true,
-      respectGeminiIgnore: true,
+      respectSparkleIgnore: true,
       customIgnoreFilePaths: [],
     }),
     getFileFilteringRespectGitIgnore(this: Config) {
       return this.getFileFilteringOptions().respectGitIgnore;
     },
-    getFileFilteringRespectGeminiIgnore(this: Config) {
-      return this.getFileFilteringOptions().respectGeminiIgnore;
+    getFileFilteringRespectSparkleIgnore(this: Config) {
+      return this.getFileFilteringOptions().respectSparkleIgnore;
     },
     storage: {
       getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
@@ -557,13 +557,13 @@ describe('RipGrepTool', () => {
     }, 10000);
 
     it('should filter out files based on FileDiscoveryService even if ripgrep returns them', async () => {
-      // Create .geminiignore to ignore 'ignored.txt'
+      // Create .sparkleignore to ignore 'ignored.txt'
       await fs.writeFile(
-        path.join(tempRootDir, GEMINI_IGNORE_FILE_NAME),
+        path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
         'ignored.txt',
       );
 
-      // Re-initialize tool so FileDiscoveryService loads the new .geminiignore
+      // Re-initialize tool so FileDiscoveryService loads the new .sparkleignore
       const toolWithIgnore = new RipGrepTool(
         mockConfig,
         createMockMessageBus(),
@@ -1316,7 +1316,7 @@ describe('RipGrepTool', () => {
         'getFileFilteringOptions',
       ).mockReturnValue({
         respectGitIgnore: false,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
         customIgnoreFilePaths: [],
       });
       const gitIgnoreDisabledTool = new RipGrepTool(
@@ -1350,23 +1350,23 @@ describe('RipGrepTool', () => {
       );
     });
 
-    it('should add .geminiignore when enabled and patterns exist', async () => {
-      const geminiIgnorePath = resolveToRealPath(
-        path.join(tempRootDir, GEMINI_IGNORE_FILE_NAME),
+    it('should add .sparkleignore when enabled and patterns exist', async () => {
+      const sparkleIgnorePath = resolveToRealPath(
+        path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
       );
-      await fs.writeFile(geminiIgnorePath, 'ignored.log');
+      await fs.writeFile(sparkleIgnorePath, 'ignored.log');
 
-      const configWithGeminiIgnore = createMockConfig(tempRootDir);
+      const configWithSparkleIgnore = createMockConfig(tempRootDir);
       vi.spyOn(
-        configWithGeminiIgnore,
+        configWithSparkleIgnore,
         'getFileFilteringOptions',
       ).mockReturnValue({
         respectGitIgnore: true,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
         customIgnoreFilePaths: [],
       });
-      const geminiIgnoreTool = new RipGrepTool(
-        configWithGeminiIgnore,
+      const sparkleIgnoreTool = new RipGrepTool(
+        configWithSparkleIgnore,
         createMockMessageBus(),
       );
 
@@ -1386,32 +1386,32 @@ describe('RipGrepTool', () => {
       );
 
       const params: RipGrepToolParams = { pattern: 'secret' };
-      const invocation = geminiIgnoreTool.build(params);
+      const invocation = sparkleIgnoreTool.build(params);
       await invocation.execute({ abortSignal });
 
       expect(mockSpawn).toHaveBeenLastCalledWith(
         expect.anything(),
-        expect.arrayContaining(['--ignore-file', geminiIgnorePath]),
+        expect.arrayContaining(['--ignore-file', sparkleIgnorePath]),
         expect.anything(),
       );
     });
 
-    it('should skip .geminiignore when disabled', async () => {
-      const geminiIgnorePath = resolveToRealPath(
-        path.join(tempRootDir, GEMINI_IGNORE_FILE_NAME),
+    it('should skip .sparkleignore when disabled', async () => {
+      const sparkleIgnorePath = resolveToRealPath(
+        path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
       );
-      await fs.writeFile(geminiIgnorePath, 'ignored.log');
-      const configWithoutGeminiIgnore = createMockConfig(tempRootDir);
+      await fs.writeFile(sparkleIgnorePath, 'ignored.log');
+      const configWithoutSparkleIgnore = createMockConfig(tempRootDir);
       vi.spyOn(
-        configWithoutGeminiIgnore,
+        configWithoutSparkleIgnore,
         'getFileFilteringOptions',
       ).mockReturnValue({
         respectGitIgnore: true,
-        respectGeminiIgnore: false,
+        respectSparkleIgnore: false,
         customIgnoreFilePaths: [],
       });
-      const geminiIgnoreTool = new RipGrepTool(
-        configWithoutGeminiIgnore,
+      const sparkleIgnoreTool = new RipGrepTool(
+        configWithoutSparkleIgnore,
         createMockMessageBus(),
       );
 
@@ -1431,12 +1431,12 @@ describe('RipGrepTool', () => {
       );
 
       const params: RipGrepToolParams = { pattern: 'secret' };
-      const invocation = geminiIgnoreTool.build(params);
+      const invocation = sparkleIgnoreTool.build(params);
       await invocation.execute({ abortSignal });
 
       expect(mockSpawn).toHaveBeenLastCalledWith(
         expect.anything(),
-        expect.not.arrayContaining(['--ignore-file', geminiIgnorePath]),
+        expect.not.arrayContaining(['--ignore-file', sparkleIgnorePath]),
         expect.anything(),
       );
     });

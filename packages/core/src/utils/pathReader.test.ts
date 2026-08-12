@@ -22,10 +22,11 @@ const createMockConfig = (
   mockFileService?: FileDiscoveryService,
   fileFiltering: {
     respectGitIgnore?: boolean;
-    respectGeminiIgnore?: boolean;
+    respectSparkleIgnore?: boolean;
   } = {},
 ): Config => {
-  const { respectGitIgnore = true, respectGeminiIgnore = true } = fileFiltering;
+  const { respectGitIgnore = true, respectSparkleIgnore = true } =
+    fileFiltering;
   const workspace = new WorkspaceContext(cwd, otherDirs);
   const fileSystemService = new StandardFileSystemService();
   return {
@@ -35,7 +36,7 @@ const createMockConfig = (
     getFileSystemService: () => fileSystemService,
     getFileService: () => mockFileService,
     getFileFilteringRespectGitIgnore: () => respectGitIgnore,
-    getFileFilteringRespectGeminiIgnore: () => respectGeminiIgnore,
+    getFileFilteringRespectSparkleIgnore: () => respectSparkleIgnore,
   } as unknown as Config;
 };
 
@@ -307,7 +308,7 @@ describe('readPathFromWorkspace', () => {
         ['ignored.txt'],
         {
           respectGitIgnore: true,
-          respectGeminiIgnore: true,
+          respectSparkleIgnore: true,
         },
       );
     });
@@ -352,12 +353,12 @@ describe('readPathFromWorkspace', () => {
       } as unknown as FileDiscoveryService;
       const config = createMockConfig(CWD, [], mockFileService, {
         respectGitIgnore: false,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       });
       await readPathFromWorkspace('file.txt', config);
       expect(mockFileService.filterFiles).toHaveBeenCalledWith(['file.txt'], {
         respectGitIgnore: false,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       });
     });
 
@@ -374,14 +375,14 @@ describe('readPathFromWorkspace', () => {
       } as unknown as FileDiscoveryService;
       const config = createMockConfig(CWD, [], mockFileService, {
         respectGitIgnore: true,
-        respectGeminiIgnore: false,
+        respectSparkleIgnore: false,
       });
       await readPathFromWorkspace('my-dir', config);
       expect(mockFileService.filterFiles).toHaveBeenCalledWith(
         [path.join('my-dir', 'file.txt')],
         {
           respectGitIgnore: true,
-          respectGeminiIgnore: false,
+          respectSparkleIgnore: false,
         },
       );
     });

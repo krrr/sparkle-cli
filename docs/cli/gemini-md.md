@@ -109,7 +109,7 @@ While `AGENTS.md` is the default filename, you can configure this in your
 
 ## Next steps
 
-- Learn about [Ignoring files](./gemini-ignore.md) to exclude content from the
+- Learn about [Ignoring files](./sparkle-ignore.md) to exclude content from the
   context system.
 - Explore the [Memory tool](../tools/memory.md) to save persistent memories.
 - See how to use [Custom commands](./custom-commands.md) to automate common

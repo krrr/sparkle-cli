@@ -1036,7 +1036,7 @@ describe('Server Config (config.ts)', () => {
       ...baseParams,
       fileFiltering: {
         respectGitIgnore: false,
-        respectGeminiIgnore: false,
+        respectSparkleIgnore: false,
         customIgnoreFilePaths: ['.myignore'],
       },
     };
@@ -1048,7 +1048,7 @@ describe('Server Config (config.ts)', () => {
       path.resolve(TARGET_DIR),
       {
         respectGitIgnore: false,
-        respectGeminiIgnore: false,
+        respectSparkleIgnore: false,
         customIgnoreFilePaths: ['.myignore'],
       },
     );

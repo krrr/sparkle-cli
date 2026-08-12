@@ -51,7 +51,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
       getWorkspaceContext: () => createMockWorkspaceContext(tempRootDir),
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
-        respectGeminiIgnore: true,
+        respectSparkleIgnore: true,
       }),
       storage: {
         getProjectTempDir: () => path.join(tempRootDir, '.temp'),

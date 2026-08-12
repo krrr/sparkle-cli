@@ -99,7 +99,7 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getModelAvailabilityService: vi.fn().mockReturnValue({}),
     getEnableRecursiveFileSearch: vi.fn().mockReturnValue(true),
     getFileFilteringEnableFuzzySearch: vi.fn().mockReturnValue(true),
-    getFileFilteringRespectGeminiIgnore: vi.fn().mockReturnValue(true),
+    getFileFilteringRespectSparkleIgnore: vi.fn().mockReturnValue(true),
     getFileFilteringOptions: vi.fn().mockReturnValue({}),
     getCustomExcludes: vi.fn().mockReturnValue([]),
     getCheckpointingEnabled: vi.fn().mockReturnValue(false),
