@@ -55,7 +55,6 @@ export interface ToolCallRecord {
   id: string;
   name: string;
   args: Record<string, unknown>;
-  result?: PartListUnion | null;
   status: Status;
   timestamp: string;
   agentId?: string;

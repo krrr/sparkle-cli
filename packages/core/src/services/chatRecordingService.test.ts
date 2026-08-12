@@ -49,7 +49,6 @@ import {
 } from './chatRecordingService.js';
 import type { WorkspaceContext } from '../utils/workspaceContext.js';
 import { CoreToolCallStatus } from '../scheduler/types.js';
-import type { Part } from '@google/genai';
 import type { Config } from '../config/config.js';
 import { getProjectHash } from '../utils/paths.js';
 import type { HistoryTurn } from '../core/agentChatHistory.js';
@@ -1298,251 +1297,69 @@ describe('ChatRecordingService', () => {
       await chatRecordingService.initialize();
     });
 
-    it('should update tool results from API history (masking sync)', async () => {
-      // 1. Record an initial message and tool call
-      const modelMsgId = chatRecordingService.recordMessage({
-        type: 'gemini',
-        content: 'I will list the files.',
-        model: 'gemini-pro',
-      });
-
-      const callId = 'tool-call-123';
-      const originalResult = [{ text: 'a'.repeat(1000) }];
-      chatRecordingService.recordToolCalls('gemini-pro', [
-        {
-          id: callId,
-          name: 'list_files',
-          args: { path: '.' },
-          result: originalResult,
-          status: CoreToolCallStatus.Success,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-
-      // 2. Prepare mock history with masked content
-      const maskedSnippet =
-        '<tool_output_masked>short preview</tool_output_masked>';
-      const history: HistoryTurn[] = [
-        {
-          id: modelMsgId,
-          content: {
-            role: 'model',
-            parts: [
-              { functionCall: { name: 'list_files', args: { path: '.' } } },
-            ],
-          },
-        },
-        {
-          id: 'user-id',
-          content: {
-            role: 'user',
-            parts: [
-              {
-                functionResponse: {
-                  name: 'list_files',
-                  id: callId,
-                  response: { output: maskedSnippet },
-                },
-              },
-            ],
-          },
-        },
-      ];
-
-      // 3. Trigger sync
-      chatRecordingService.updateMessagesFromHistory(history);
-
-      // 4. Verify disk content
-      const sessionFile = chatRecordingService.getConversationFilePath()!;
-      const conversation = (await loadConversationRecord(
-        sessionFile,
-      )) as ConversationRecord;
-
-      const geminiMsg = conversation.messages[0];
-      if (geminiMsg.type !== 'gemini')
-        throw new Error('Expected gemini message');
-      expect(geminiMsg.toolCalls).toBeDefined();
-      expect(geminiMsg.toolCalls![0].id).toBe(callId);
-      // The implementation stringifies the response object
-      const result = geminiMsg.toolCalls![0].result;
-      if (!Array.isArray(result)) throw new Error('Expected array result');
-      const firstPart = result[0] as Part;
-      expect(firstPart.functionResponse).toBeDefined();
-      expect(firstPart.functionResponse!.id).toBe(callId);
-      expect(firstPart.functionResponse!.response).toEqual({
-        output: maskedSnippet,
-      });
-    });
-
-    it('should preserve multi-modal sibling parts during sync', async () => {
-      await chatRecordingService.initialize();
-      const modelMsgId = chatRecordingService.recordMessage({
-        type: 'gemini',
-        content: '',
-        model: 'gemini-pro',
-      });
-
-      const callId = 'multi-modal-call';
-      const originalResult: Part[] = [
-        {
-          functionResponse: {
-            id: callId,
-            name: 'read_file',
-            response: { content: '...' },
-          },
-        },
-        { inlineData: { mimeType: 'image/png', data: 'base64...' } },
-      ];
-
-      chatRecordingService.recordToolCalls('gemini-pro', [
-        {
-          id: callId,
-          name: 'read_file',
-          args: { path: 'image.png' },
-          result: originalResult,
-          status: CoreToolCallStatus.Success,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-
-      const maskedSnippet = '<masked>';
-      const history: HistoryTurn[] = [
-        {
-          id: modelMsgId,
-          content: { role: 'model', parts: [] },
-        },
-        {
-          id: 'user-id',
-          content: {
-            role: 'user',
-            parts: [
-              {
-                functionResponse: {
-                  name: 'read_file',
-                  id: callId,
-                  response: { output: maskedSnippet },
-                },
-              },
-              { inlineData: { mimeType: 'image/png', data: 'base64...' } },
-            ],
-          },
-        },
-      ];
-
-      chatRecordingService.updateMessagesFromHistory(history);
-
-      const sessionFile = chatRecordingService.getConversationFilePath()!;
-      const conversation = (await loadConversationRecord(
-        sessionFile,
-      )) as ConversationRecord;
-
-      const lastMsg = conversation.messages[0] as MessageRecord & {
-        type: 'gemini';
-      };
-      const result = lastMsg.toolCalls![0].result as Part[];
-      expect(result).toHaveLength(2);
-      expect(result[0].functionResponse!.response).toEqual({
-        output: maskedSnippet,
-      });
-      expect(result[1].inlineData).toBeDefined();
-      expect(result[1].inlineData!.mimeType).toBe('image/png');
-    });
-
-    it('should handle parts appearing BEFORE the functionResponse in a content block', async () => {
-      await chatRecordingService.initialize();
-      const modelMsgId = chatRecordingService.recordMessage({
-        type: 'gemini',
-        content: '',
-        model: 'gemini-pro',
-      });
-
-      const callId = 'prefix-part-call';
-
-      chatRecordingService.recordToolCalls('gemini-pro', [
-        {
-          id: callId,
-          name: 'read_file',
-          args: { path: 'test.txt' },
-          result: [],
-          status: CoreToolCallStatus.Success,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
-
-      const history: HistoryTurn[] = [
-        {
-          id: modelMsgId,
-          content: { role: 'model', parts: [] },
-        },
-        {
-          id: 'user-id',
-          content: {
-            role: 'user',
-            parts: [
-              { text: 'Prefix metadata or text' },
-              {
-                functionResponse: {
-                  name: 'read_file',
-                  id: callId,
-                  response: { output: 'file content' },
-                },
-              },
-            ],
-          },
-        },
-      ];
-
-      chatRecordingService.updateMessagesFromHistory(history);
-
-      const sessionFile = chatRecordingService.getConversationFilePath()!;
-      const conversation = (await loadConversationRecord(
-        sessionFile,
-      )) as ConversationRecord;
-
-      const lastMsg = conversation.messages[0] as MessageRecord & {
-        type: 'gemini';
-      };
-      const result = lastMsg.toolCalls![0].result as Part[];
-      expect(result).toHaveLength(2);
-      expect(result[0].text).toBe('Prefix metadata or text');
-      expect(result[1].functionResponse!.id).toBe(callId);
-    });
-
-    it('should not write to disk when no tool calls match', async () => {
-      chatRecordingService.recordMessage({
-        type: 'gemini',
-        content: 'Response with no tool calls',
-        model: 'gemini-pro',
-      });
-
+    it('should record new history turns that are not in the conversation', async () => {
       const appendFileSyncSpy = vi.mocked(fs.appendFileSync);
       appendFileSyncSpy.mockClear();
 
-      // History with a tool call ID that doesn't exist in the conversation
       const history: HistoryTurn[] = [
         {
           id: 'user-id',
           content: {
             role: 'user',
-            parts: [
-              {
-                functionResponse: {
-                  name: 'read_file',
-                  id: 'nonexistent-call-id',
-                  response: { output: 'some content' },
-                },
-              },
-            ],
+            parts: [{ text: 'A new user turn' }],
           },
         },
       ];
 
       chatRecordingService.updateMessagesFromHistory(history);
 
-      // In the new 'Strong Owner' architecture, updateMessagesFromHistory ensures that
-      // all turns in history (including new/synthetic ones) are recorded.
-      // Since 'user-id' was not in the original conversation, it is added.
+      // updateMessagesFromHistory ensures all turns in history (including
+      // new/synthetic ones) are recorded to disk.
       expect(appendFileSyncSpy).toHaveBeenCalled();
+
+      const sessionFile = chatRecordingService.getConversationFilePath()!;
+      const conversation = (await loadConversationRecord(
+        sessionFile,
+      )) as ConversationRecord;
+      expect(conversation.messages).toHaveLength(1);
+      expect(conversation.messages[0].id).toBe('user-id');
+    });
+
+    it('should deduplicate history turns that share an id', async () => {
+      chatRecordingService.recordMessage({
+        type: 'gemini',
+        content: 'Response with a tool call',
+        model: 'gemini-pro',
+      });
+
+      // Simulate a polluted checkpoint: the same turn id appears multiple times.
+      const history: HistoryTurn[] = [
+        {
+          id: 'duplicate-turn',
+          content: {
+            role: 'user',
+            parts: [{ text: 'Hello' }],
+          },
+        },
+        {
+          id: 'duplicate-turn',
+          content: {
+            role: 'user',
+            parts: [{ text: 'Hello' }],
+          },
+        },
+      ];
+
+      chatRecordingService.updateMessagesFromHistory(history);
+
+      const sessionFile = chatRecordingService.getConversationFilePath()!;
+      const conversation = (await loadConversationRecord(
+        sessionFile,
+      )) as ConversationRecord;
+      const duplicates = conversation.messages.filter(
+        (m) => m.id === 'duplicate-turn',
+      );
+      expect(duplicates).toHaveLength(1);
     });
   });
 

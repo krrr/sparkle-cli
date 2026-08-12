@@ -956,8 +956,16 @@ export class ChatRecordingService {
     try {
       let updated = false;
 
-      // 1. Sync content and IDs
-      const newMessages: MessageRecord[] = history.map((turn) => {
+      // 1. Sync content and IDs, deduplicating turns that share an id so that
+      // records duplicated by polluted checkpoints collapse back to one.
+      const newMessages: MessageRecord[] = [];
+      const seenIds = new Set<string>();
+      for (const turn of history) {
+        if (seenIds.has(turn.id)) {
+          continue;
+        }
+        seenIds.add(turn.id);
+
         const existing = this.cachedConversation?.messages.find(
           (m) => m.id === turn.id,
         );
@@ -970,51 +978,21 @@ export class ChatRecordingService {
           ) {
             updated = true;
           }
-          return {
+          newMessages.push({
             ...existing,
             content: turn.content.parts || [],
-          };
-        }
-
-        // It's a new (possibly synthetic) turn like a summary
-        updated = true;
-        return this.newMessage(
-          turn.content.role === 'user' ? 'user' : 'gemini',
-          turn.content.parts || [],
-          undefined,
-          turn.id,
-        );
-      });
-
-      // 2. Specialized 'Masking Sync' for tool call results
-      // If a user turn in history contains a functionResponse, we update the
-      // corresponding ToolCallRecord in the preceding gemini message.
-      for (const turn of history) {
-        if (turn.content.role !== 'user') continue;
-        for (const part of turn.content.parts || []) {
-          if (part.functionResponse) {
-            const callId = part.functionResponse.id;
-            // Find the gemini message that contains this tool call
-            const geminiMsg = newMessages.find(
-              (m) =>
-                m.type === 'gemini' &&
-                m.toolCalls?.some((tc) => tc.id === callId),
-            );
-            if (geminiMsg && geminiMsg.type === 'gemini') {
-              const tc = geminiMsg.toolCalls!.find((tc) => tc.id === callId);
-              if (tc) {
-                // If the history version is different (e.g. masked), sync it into the record
-                // We sync the entire parts array of the user turn to ensure sibling parts are preserved
-                if (
-                  JSON.stringify(tc.result) !==
-                  JSON.stringify(turn.content.parts)
-                ) {
-                  tc.result = turn.content.parts || [];
-                  updated = true;
-                }
-              }
-            }
-          }
+          });
+        } else {
+          // It's a new (possibly synthetic) turn like a summary
+          updated = true;
+          newMessages.push(
+            this.newMessage(
+              turn.content.role === 'user' ? 'user' : 'gemini',
+              turn.content.parts || [],
+              undefined,
+              turn.id,
+            ),
+          );
         }
       }
 

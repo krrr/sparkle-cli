@@ -134,7 +134,7 @@ describe('convertSessionToClientHistory', () => {
     ]);
   });
 
-  it('should correctly map tool calls and their responses', () => {
+  it('should map tool calls to model parts without synthesizing responses', () => {
     const messages: ConversationRecord['messages'] = [
       {
         id: 'msg1',
@@ -154,7 +154,59 @@ describe('convertSessionToClientHistory', () => {
             args: { dir: '.' },
             status: CoreToolCallStatus.Success,
             timestamp: '2024-01-01T10:01:05Z',
-            result: 'file.txt',
+          },
+        ],
+      },
+    ];
+
+    const history = convertSessionToClientHistory(messages);
+
+    expect(history.map((h) => h.content)).toEqual([
+      { role: 'user', parts: [{ text: 'List files' }] },
+      {
+        role: 'model',
+        parts: [
+          { text: 'Let me check.' },
+          { functionCall: { name: 'ls', args: { dir: '.' }, id: 'call123' } },
+        ],
+      },
+    ]);
+  });
+
+  it('should preserve recorded user functionResponse messages', () => {
+    const messages: ConversationRecord['messages'] = [
+      {
+        id: 'msg1',
+        type: 'user',
+        timestamp: '2024-01-01T10:00:00Z',
+        content: 'List files',
+      },
+      {
+        id: 'msg2',
+        type: 'gemini',
+        timestamp: '2024-01-01T10:01:00Z',
+        content: 'Let me check.',
+        toolCalls: [
+          {
+            id: 'call123',
+            name: 'ls',
+            args: { dir: '.' },
+            status: CoreToolCallStatus.Success,
+            timestamp: '2024-01-01T10:01:05Z',
+          },
+        ],
+      },
+      {
+        id: 'msg3',
+        type: 'user',
+        timestamp: '2024-01-01T10:02:00Z',
+        content: [
+          {
+            functionResponse: {
+              id: 'call123',
+              name: 'ls',
+              response: { output: 'file.txt' },
+            },
           },
         ],
       },
@@ -183,6 +235,30 @@ describe('convertSessionToClientHistory', () => {
           },
         ],
       },
+    ]);
+  });
+
+  it('should deduplicate messages that share the same id', () => {
+    const messages: ConversationRecord['messages'] = [
+      {
+        id: 'dup1',
+        type: 'user',
+        timestamp: '2024-01-01T10:00:00Z',
+        content: 'Hello',
+      },
+      {
+        id: 'dup1',
+        type: 'user',
+        timestamp: '2024-01-01T10:00:00Z',
+        content: 'Hello',
+      },
+    ];
+
+    const history = convertSessionToClientHistory(messages);
+
+    expect(history).toHaveLength(1);
+    expect(history.map((h) => h.content)).toEqual([
+      { role: 'user', parts: [{ text: 'Hello' }] },
     ]);
   });
 

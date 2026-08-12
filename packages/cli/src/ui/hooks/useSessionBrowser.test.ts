@@ -281,7 +281,7 @@ describe('convertSessionToHistoryFormats', () => {
     expect(convertSessionToClientHistory(messages)).toHaveLength(0);
   });
 
-  it('should handle tool calls and responses', () => {
+  it('should handle tool calls without synthesizing responses', () => {
     const messages: MessageRecord[] = [
       { type: 'user', content: 'What time is it?' } as MessageRecord,
       {
@@ -293,7 +293,6 @@ describe('convertSessionToHistoryFormats', () => {
             name: 'get_time',
             args: {},
             status: CoreToolCallStatus.Success,
-            result: '12:00',
           },
         ],
       } as unknown as MessageRecord,
@@ -318,7 +317,7 @@ describe('convertSessionToHistoryFormats', () => {
     });
 
     const clientHistory = convertSessionToClientHistory(messages);
-    expect(clientHistory).toHaveLength(3); // User, Model (call), User (response)
+    expect(clientHistory).toHaveLength(2); // User, Model (call)
     expect(clientHistory.map((h) => h.content)).toEqual([
       {
         role: 'user',
@@ -331,18 +330,6 @@ describe('convertSessionToHistoryFormats', () => {
             functionCall: {
               name: 'get_time',
               args: {},
-              id: 'call_1',
-            },
-          },
-        ],
-      },
-      {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'get_time',
-              response: { output: '12:00' },
               id: 'call_1',
             },
           },

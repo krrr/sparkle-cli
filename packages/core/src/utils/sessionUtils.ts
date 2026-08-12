@@ -111,8 +111,18 @@ export function convertSessionToClientHistory(
   messages: ConversationRecord['messages'],
 ): HistoryTurn[] {
   const clientHistory: HistoryTurn[] = [];
+  const seenIds = new Set<string>();
 
   for (const msg of messages) {
+    // Skip duplicates: polluted checkpoints can contain the same record
+    // multiple times (e.g. a tool response duplicated across resumes), which
+    // would otherwise produce duplicate turns (and duplicate tool messages) in
+    // the rebuilt history.
+    if (seenIds.has(msg.id)) {
+      continue;
+    }
+    seenIds.add(msg.id);
+
     if (msg.type === 'info' || msg.type === 'error' || msg.type === 'warning') {
       continue;
     }
@@ -181,45 +191,11 @@ export function convertSessionToClientHistory(
             parts: modelParts,
           },
         });
-
-        // 4. Generate tool response turns
-        if (msg.toolCalls && msg.toolCalls.length > 0) {
-          const functionResponseParts: Part[] = [];
-          for (const toolCall of msg.toolCalls) {
-            if (toolCall.result) {
-              let responseData: Part;
-
-              if (typeof toolCall.result === 'string') {
-                responseData = {
-                  functionResponse: {
-                    id: toolCall.id,
-                    name: toolCall.name,
-                    response: {
-                      output: toolCall.result,
-                    },
-                  },
-                };
-              } else if (Array.isArray(toolCall.result)) {
-                functionResponseParts.push(...ensurePartArray(toolCall.result));
-                continue;
-              } else {
-                responseData = toolCall.result;
-              }
-
-              functionResponseParts.push(responseData);
-            }
-          }
-
-          if (functionResponseParts.length > 0) {
-            clientHistory.push({
-              id: `${msg.id}_response`,
-              content: {
-                role: 'user',
-                parts: functionResponseParts,
-              },
-            });
-          }
-        }
+        // Tool responses are NOT synthesized here. They are already recorded as
+        // separate user functionResponse messages at runtime (see
+        // GeminiChat.sendMessage), so rebuilding them from toolCall metadata
+        // would duplicate tool messages and break strict APIs that reject
+        // repeated responses for the same tool_call_id.
       }
     }
   }

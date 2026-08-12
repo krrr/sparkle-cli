@@ -4223,7 +4223,6 @@ describe('GeminiChat', () => {
           id: 'call-1',
           name: 'original-tool',
           args: { original: 'args' },
-          result: [{ text: 'response' }],
         }),
       ]);
     });
@@ -4258,7 +4257,6 @@ describe('GeminiChat', () => {
           id: 'call-1',
           name: 'tool-name',
           args: { key: 'value' },
-          result: [{ text: 'response' }],
         }),
       ]);
     });
