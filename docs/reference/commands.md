@@ -52,8 +52,8 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/chat`
 
-- **Description:** Alias for `/resume`. Both commands now expose the same
-  session browser action and checkpoint subcommands.
+- **Description:** Alias for `/resume`. Both `/chat` and `/resume` open the
+  session browser and expose the same checkpoint subcommands.
 - **Menu layout when typing `/chat` (or `/resume`)**:
   - `-- auto --`
     - `list` (selecting this opens the auto-saved session browser)

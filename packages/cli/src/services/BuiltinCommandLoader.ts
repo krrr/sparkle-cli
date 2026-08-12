@@ -13,7 +13,6 @@ import { aboutCommand } from '../ui/commands/aboutCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
 import { authCommand } from '../ui/commands/authCommand.js';
 import { bugMemoryCommand } from '../ui/commands/bugMemoryCommand.js';
-import { chatCommand, debugCommand } from '../ui/commands/chatCommand.js';
 import { clearCommand } from '../ui/commands/clearCommand.js';
 import { commandsCommand } from '../ui/commands/commandsCommand.js';
 import { compressCommand } from '../ui/commands/compressCommand.js';
@@ -40,7 +39,7 @@ import { policiesCommand } from '../ui/commands/policiesCommand.js';
 import { profileCommand } from '../ui/commands/profileCommand.js';
 import { quitCommand } from '../ui/commands/quitCommand.js';
 import { restoreCommand } from '../ui/commands/restoreCommand.js';
-import { resumeCommand } from '../ui/commands/resumeCommand.js';
+import { debugCommand, resumeCommand } from '../ui/commands/resumeCommand.js';
 import { statsCommand } from '../ui/commands/statsCommand.js';
 import { themeCommand } from '../ui/commands/themeCommand.js';
 import { toolsCommand } from '../ui/commands/toolsCommand.js';
@@ -69,7 +68,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
     const handle = startupProfiler.start('load_builtin_commands');
 
     const isNightlyBuild = await isNightly(process.cwd());
-    const addDebugToChatResumeSubCommands = (
+    const addDebugToResumeSubCommands = (
       subCommands: SlashCommand[] | undefined,
     ): SlashCommand[] | undefined => {
       if (!subCommands) {
@@ -83,7 +82,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
 
         return {
           ...subCommand,
-          subCommands: addDebugToChatResumeSubCommands(subCommand.subCommands),
+          subCommands: addDebugToResumeSubCommands(subCommand.subCommands),
         };
       });
 
@@ -101,19 +100,11 @@ export class BuiltinCommandLoader implements ICommandLoader {
           ];
     };
 
-    const chatResumeSubCommands = addDebugToChatResumeSubCommands(
-      chatCommand.subCommands,
-    );
-
     const allDefinitions: Array<SlashCommand | null> = [
       aboutCommand,
       ...(this.config?.isAgentsEnabled() ? [agentsCommand] : []),
       authCommand,
       bugMemoryCommand,
-      {
-        ...chatCommand,
-        subCommands: chatResumeSubCommands,
-      },
       clearCommand,
       commandsCommand,
       compressCommand,
@@ -142,7 +133,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       restoreCommand(this.config),
       {
         ...resumeCommand,
-        subCommands: addDebugToChatResumeSubCommands(resumeCommand.subCommands),
+        subCommands: addDebugToResumeSubCommands(resumeCommand.subCommands),
       },
       statsCommand,
       themeCommand,

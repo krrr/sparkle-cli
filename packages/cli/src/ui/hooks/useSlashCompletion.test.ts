@@ -513,6 +513,85 @@ describe('useSlashCompletion', () => {
       unmountResume();
     });
 
+    it('should show the same auto/checkpoint menu when /chat is an alias of /resume', async () => {
+      const checkpointSubCommands = [
+        createTestCommand({
+          name: 'list',
+          description: 'List checkpoints',
+          suggestionGroup: 'checkpoints',
+          action: vi.fn(),
+        }),
+        createTestCommand({
+          name: 'save',
+          description: 'Save checkpoint',
+          suggestionGroup: 'checkpoints',
+          action: vi.fn(),
+        }),
+      ];
+
+      const slashCommands = [
+        createTestCommand({
+          name: 'resume',
+          altNames: ['chat'],
+          description: 'Resume command',
+          action: vi.fn(),
+          subCommands: checkpointSubCommands,
+        }),
+      ];
+
+      const { result: chatAliasResult, unmount: unmountChatAlias } =
+        await renderHook(() =>
+          useTestHarnessForSlashCompletion(
+            true,
+            '/chat ',
+            slashCommands,
+            mockCommandContext,
+          ),
+        );
+
+      await resolveMatch();
+
+      await waitFor(() => {
+        expect(chatAliasResult.current.suggestions[0]).toMatchObject({
+          label: 'list',
+          sectionTitle: 'auto',
+          submitValue: '/resume',
+        });
+      });
+
+      const { result: resumeResult, unmount: unmountResume } = await renderHook(
+        () =>
+          useTestHarnessForSlashCompletion(
+            true,
+            '/resume ',
+            slashCommands,
+            mockCommandContext,
+          ),
+      );
+
+      await resolveMatch();
+
+      await waitFor(() => {
+        expect(resumeResult.current.suggestions[0]).toMatchObject({
+          label: 'list',
+          sectionTitle: 'auto',
+          submitValue: '/resume',
+        });
+      });
+
+      const chatAliasCheckpointLabels = chatAliasResult.current.suggestions
+        .slice(1)
+        .map((s) => s.label);
+      const resumeCheckpointLabels = resumeResult.current.suggestions
+        .slice(1)
+        .map((s) => s.label);
+
+      expect(chatAliasCheckpointLabels).toEqual(resumeCheckpointLabels);
+
+      unmountChatAlias();
+      unmountResume();
+    });
+
     it('should NOT suggest the auto-list command when typing a non-matching partial after /chat', async () => {
       const slashCommands = [
         createTestCommand({
