@@ -10,7 +10,7 @@ import {
   type ToolCallConfirmationDetails,
   Kind,
   ApprovalMode,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
   ToolConfirmationOutcome,
 } from 'sparkle-cli-core';
 import type * as acp from '@agentclientprotocol/sdk';
@@ -251,7 +251,7 @@ export function buildAvailableModels(
   }>;
   currentModelId: string;
 } {
-  const preferredModel = config.getModel() || GEMINI_MODEL_ALIAS_AUTO;
+  const preferredModel = config.getModel() || SPARKLE_MODEL_ALIAS_AUTO;
 
   const options = config.getModelConfigService().getAvailableModelOptions({});
 

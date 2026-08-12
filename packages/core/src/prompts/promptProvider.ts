@@ -49,7 +49,7 @@ export class PromptProvider {
     topicUpdateNarrationOverride?: boolean,
   ): string {
     const systemMdResolution = resolvePathFromEnv(
-      process.env['GEMINI_SYSTEM_MD'],
+      process.env['SPARKLE_SYSTEM_MD'],
     );
 
     const interactiveMode =
@@ -285,7 +285,7 @@ export class PromptProvider {
     defaultPath: string,
   ): void {
     const writeSystemMdResolution = resolvePathFromEnv(
-      process.env['GEMINI_WRITE_SYSTEM_MD'],
+      process.env['SPARKLE_WRITE_SYSTEM_MD'],
     );
     if (writeSystemMdResolution.value && !writeSystemMdResolution.isDisabled) {
       const writePath = writeSystemMdResolution.isSwitch

@@ -18,8 +18,8 @@ import { AGENT_TOOL_NAME } from '../tools/tool-names.js';
 import { SPARKLE_DIR } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import {
-  GEMINI_MODEL_ALIAS_AUTO,
-  DEFAULT_GEMINI_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
+  DEFAULT_SPARKLE_MODEL,
 } from '../config/models.js';
 import { ApprovalMode } from '../policy/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
@@ -79,8 +79,8 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.spyOn(os, 'homedir').mockReturnValue('/tmp/test-home');
 
     vi.stubEnv('SANDBOX', undefined);
-    vi.stubEnv('GEMINI_SYSTEM_MD', undefined);
-    vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', undefined);
+    vi.stubEnv('SPARKLE_SYSTEM_MD', undefined);
+    vi.stubEnv('SPARKLE_WRITE_SYSTEM_MD', undefined);
     const mockRegistry = {
       getAllToolNames: vi
         .fn()
@@ -107,8 +107,8 @@ describe('Core System Prompt (prompts.ts)', () => {
       isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(false),
       isAgentsEnabled: vi.fn().mockReturnValue(false),
       getPreviewFeatures: vi.fn().mockReturnValue(true),
-      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
-      getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
+      getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
+      getActiveModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
       getMessageBus: vi.fn(),
       getAgentRegistry: vi.fn().mockReturnValue({
         getDirectoryContext: vi.fn().mockReturnValue('Mock Agent Directory'),
@@ -680,20 +680,20 @@ describe('Core System Prompt (prompts.ts)', () => {
     expect(prompt).toMatchSnapshot();
   });
 
-  describe('GEMINI_SYSTEM_MD environment variable', () => {
+  describe('SPARKLE_SYSTEM_MD environment variable', () => {
     it.each(['false', '0'])(
-      'should use default prompt when GEMINI_SYSTEM_MD is "%s"',
+      'should use default prompt when SPARKLE_SYSTEM_MD is "%s"',
       (value) => {
-        vi.stubEnv('GEMINI_SYSTEM_MD', value);
+        vi.stubEnv('SPARKLE_SYSTEM_MD', value);
         const prompt = getCoreSystemPrompt(mockConfig);
         expect(fs.readFileSync).not.toHaveBeenCalled();
         expect(prompt).not.toContain('custom system prompt');
       },
     );
 
-    it('should throw error if GEMINI_SYSTEM_MD points to a non-existent file', () => {
+    it('should throw error if SPARKLE_SYSTEM_MD points to a non-existent file', () => {
       const customPath = '/non/existent/path/system.md';
-      vi.stubEnv('GEMINI_SYSTEM_MD', customPath);
+      vi.stubEnv('SPARKLE_SYSTEM_MD', customPath);
       vi.mocked(fs.existsSync).mockReturnValue(false);
       expect(() => getCoreSystemPrompt(mockConfig)).toThrow(
         `missing system prompt file '${path.resolve(customPath)}'`,
@@ -701,10 +701,10 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
 
     it.each(['true', '1'])(
-      'should read from default path when GEMINI_SYSTEM_MD is "%s"',
+      'should read from default path when SPARKLE_SYSTEM_MD is "%s"',
       (value) => {
         const defaultPath = path.resolve(path.join(SPARKLE_DIR, 'system.md'));
-        vi.stubEnv('GEMINI_SYSTEM_MD', value);
+        vi.stubEnv('SPARKLE_SYSTEM_MD', value);
         vi.mocked(fs.existsSync).mockReturnValue(true);
         vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
 
@@ -714,9 +714,9 @@ describe('Core System Prompt (prompts.ts)', () => {
       },
     );
 
-    it('should read from custom path when GEMINI_SYSTEM_MD provides one, preserving case', () => {
+    it('should read from custom path when SPARKLE_SYSTEM_MD provides one, preserving case', () => {
       const customPath = path.resolve('/custom/path/SyStEm.Md');
-      vi.stubEnv('GEMINI_SYSTEM_MD', customPath);
+      vi.stubEnv('SPARKLE_SYSTEM_MD', customPath);
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
 
@@ -725,12 +725,12 @@ describe('Core System Prompt (prompts.ts)', () => {
       expect(prompt).toBe('custom system prompt');
     });
 
-    it('should expand tilde in custom path when GEMINI_SYSTEM_MD is set', () => {
+    it('should expand tilde in custom path when SPARKLE_SYSTEM_MD is set', () => {
       const homeDir = '/Users/test';
       vi.spyOn(os, 'homedir').mockReturnValue(homeDir);
       const customPath = '~/custom/system.md';
       const expectedPath = path.join(homeDir, 'custom/system.md');
-      vi.stubEnv('GEMINI_SYSTEM_MD', customPath);
+      vi.stubEnv('SPARKLE_SYSTEM_MD', customPath);
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
 
@@ -743,21 +743,21 @@ describe('Core System Prompt (prompts.ts)', () => {
     });
   });
 
-  describe('GEMINI_WRITE_SYSTEM_MD environment variable', () => {
+  describe('SPARKLE_WRITE_SYSTEM_MD environment variable', () => {
     it.each(['false', '0'])(
-      'should not write to file when GEMINI_WRITE_SYSTEM_MD is "%s"',
+      'should not write to file when SPARKLE_WRITE_SYSTEM_MD is "%s"',
       (value) => {
-        vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', value);
+        vi.stubEnv('SPARKLE_WRITE_SYSTEM_MD', value);
         getCoreSystemPrompt(mockConfig);
         expect(fs.writeFileSync).not.toHaveBeenCalled();
       },
     );
 
     it.each(['true', '1'])(
-      'should write to default path when GEMINI_WRITE_SYSTEM_MD is "%s"',
+      'should write to default path when SPARKLE_WRITE_SYSTEM_MD is "%s"',
       (value) => {
         const defaultPath = path.resolve(path.join(SPARKLE_DIR, 'system.md'));
-        vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', value);
+        vi.stubEnv('SPARKLE_WRITE_SYSTEM_MD', value);
         getCoreSystemPrompt(mockConfig);
         expect(fs.writeFileSync).toHaveBeenCalledWith(
           defaultPath,
@@ -766,9 +766,9 @@ describe('Core System Prompt (prompts.ts)', () => {
       },
     );
 
-    it('should write to custom path when GEMINI_WRITE_SYSTEM_MD provides one', () => {
+    it('should write to custom path when SPARKLE_WRITE_SYSTEM_MD provides one', () => {
       const customPath = path.resolve('/custom/path/system.md');
-      vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', customPath);
+      vi.stubEnv('SPARKLE_WRITE_SYSTEM_MD', customPath);
       getCoreSystemPrompt(mockConfig);
       expect(fs.writeFileSync).toHaveBeenCalledWith(
         customPath,
@@ -780,14 +780,14 @@ describe('Core System Prompt (prompts.ts)', () => {
       ['~/custom/system.md', 'custom/system.md'],
       ['~', ''],
     ])(
-      'should expand tilde in custom path when GEMINI_WRITE_SYSTEM_MD is "%s"',
+      'should expand tilde in custom path when SPARKLE_WRITE_SYSTEM_MD is "%s"',
       (customPath, relativePath) => {
         const homeDir = '/Users/test';
         vi.spyOn(os, 'homedir').mockReturnValue(homeDir);
         const expectedPath = relativePath
           ? path.join(homeDir, relativePath)
           : homeDir;
-        vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', customPath);
+        vi.stubEnv('SPARKLE_WRITE_SYSTEM_MD', customPath);
         getCoreSystemPrompt(mockConfig);
         expect(fs.writeFileSync).toHaveBeenCalledWith(
           path.resolve(expectedPath),

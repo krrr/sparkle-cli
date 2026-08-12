@@ -3129,12 +3129,6 @@ describe('AppContainer State Management', () => {
 
   describe('Regression Tests', () => {
     it('does not refresh static on startup if banner text is empty', async () => {
-      // Mock banner text to be empty strings
-      vi.spyOn(mockConfig, 'getBannerTextNoCapacityIssues').mockResolvedValue(
-        '',
-      );
-      vi.spyOn(mockConfig, 'getBannerTextCapacityIssues').mockResolvedValue('');
-
       // Clear previous calls
       mocks.mockStdout.write.mockClear();
       (disableMouseEvents as import('vitest').Mock).mockClear();

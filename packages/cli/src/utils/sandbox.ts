@@ -163,8 +163,8 @@ export async function start_sandbox(
           ...finalArgv.map((arg) => quote([arg])),
         ].join(' '),
       );
-      // start and set up proxy if GEMINI_SANDBOX_PROXY_COMMAND is set
-      const proxyCommand = process.env['GEMINI_SANDBOX_PROXY_COMMAND'];
+      // start and set up proxy if SPARKLE_SANDBOX_PROXY_COMMAND is set
+      const proxyCommand = process.env['SPARKLE_SANDBOX_PROXY_COMMAND'];
       let proxyProcess: ChildProcess | undefined = undefined;
       let sandboxProcess: ChildProcess | undefined = undefined;
       const sandboxEnv = { ...process.env };
@@ -292,7 +292,7 @@ export async function start_sandbox(
             stdio: 'inherit',
             env: {
               ...process.env,
-              GEMINI_SANDBOX: command, // in case sandbox is enabled via flags (see config.ts under cli package)
+              SPARKLE_SANDBOX: command, // in case sandbox is enabled via flags (see config.ts under cli package)
             },
           },
         );
@@ -430,8 +430,8 @@ export async function start_sandbox(
 
     // copy proxy environment variables, replacing localhost with SANDBOX_PROXY_NAME
     // copy as both upper-case and lower-case as is required by some utilities
-    // GEMINI_SANDBOX_PROXY_COMMAND implies HTTPS_PROXY unless HTTP_PROXY is set
-    const proxyCommand = process.env['GEMINI_SANDBOX_PROXY_COMMAND'];
+    // SPARKLE_SANDBOX_PROXY_COMMAND implies HTTPS_PROXY unless HTTP_PROXY is set
+    const proxyCommand = process.env['SPARKLE_SANDBOX_PROXY_COMMAND'];
 
     if (proxyCommand) {
       let proxy =
@@ -520,9 +520,9 @@ export async function start_sandbox(
       );
     }
 
-    // copy GEMINI_MODEL
-    if (process.env['GEMINI_MODEL']) {
-      args.push('--env', `GEMINI_MODEL=${process.env['GEMINI_MODEL']}`);
+    // copy SPARKLE_MODEL
+    if (process.env['SPARKLE_MODEL']) {
+      args.push('--env', `SPARKLE_MODEL=${process.env['SPARKLE_MODEL']}`);
     }
 
     // copy TERM and COLORTERM to try to maintain terminal setup
@@ -668,7 +668,7 @@ export async function start_sandbox(
     // push container entrypoint (including args)
     args.push(...finalEntrypoint);
 
-    // start and set up proxy if GEMINI_SANDBOX_PROXY_COMMAND is set
+    // start and set up proxy if SPARKLE_SANDBOX_PROXY_COMMAND is set
     let proxyProcess: ChildProcess | undefined = undefined;
     let sandboxProcess: ChildProcess | undefined = undefined;
 
@@ -935,7 +935,7 @@ async function start_lxc_sandbox(
       GOOGLE_API_KEY: process.env['GOOGLE_API_KEY'],
       GOOGLE_GEMINI_BASE_URL: process.env['GOOGLE_GEMINI_BASE_URL'],
       GOOGLE_VERTEX_BASE_URL: process.env['GOOGLE_VERTEX_BASE_URL'],
-      GEMINI_MODEL: process.env['GEMINI_MODEL'],
+      SPARKLE_MODEL: process.env['SPARKLE_MODEL'],
       TERM: process.env['TERM'],
       COLORTERM: process.env['COLORTERM'],
       SPARKLE_CLI_IDE_SERVER_PORT: process.env['SPARKLE_CLI_IDE_SERVER_PORT'],

@@ -9,7 +9,7 @@ import {
   Config,
   type ConfigParameters,
   AuthType,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
   GeminiEventType,
   type ToolCallRequestInfo,
   type ServerGeminiStreamEvent,
@@ -76,7 +76,7 @@ export class GeminiCliSession {
       targetDir: cwd,
       cwd,
       debugMode: options.debug ?? false,
-      model: options.model || GEMINI_MODEL_ALIAS_AUTO,
+      model: options.model || SPARKLE_MODEL_ALIAS_AUTO,
       userMemory: initialMemory,
       // Minimal config
       enableHooks: false,

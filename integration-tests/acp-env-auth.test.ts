@@ -13,7 +13,7 @@ import { Writable, Readable } from 'node:stream';
 import { env } from 'node:process';
 import * as acp from '@agentclientprotocol/sdk';
 
-const sandboxEnv = env['GEMINI_SANDBOX'];
+const sandboxEnv = env['SPARKLE_SANDBOX'];
 const itMaybe = sandboxEnv && sandboxEnv !== 'false' ? it.skip : it;
 
 class MockClient implements acp.Client {

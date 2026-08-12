@@ -859,7 +859,7 @@ describe('sandbox', () => {
     });
 
     it('should register and unregister proxy exit handlers', async () => {
-      vi.stubEnv('GEMINI_SANDBOX_PROXY_COMMAND', 'some-proxy-cmd');
+      vi.stubEnv('SPARKLE_SANDBOX_PROXY_COMMAND', 'some-proxy-cmd');
       const config: SandboxConfig = createMockSandboxConfig({
         command: 'docker',
         image: 'sparkle-cli-sandbox',

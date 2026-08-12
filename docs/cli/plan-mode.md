@@ -332,8 +332,8 @@ directory whenever Sparkle CLI exits Plan Mode to start the implementation.
 # Extract the plan filename from the tool input JSON
 plan_filename=$(jq -r '.tool_input.plan_filename // empty')
 
-# Construct the absolute path using the GEMINI_PLANS_DIR environment variable
-plan_path="$GEMINI_PLANS_DIR/$plan_filename"
+# Construct the absolute path using the SPARKLE_PLANS_DIR environment variable
+plan_path="$SPARKLE_PLANS_DIR/$plan_filename"
 
 if [ -f "$plan_path" ]; then
   # Generate a unique filename using a timestamp

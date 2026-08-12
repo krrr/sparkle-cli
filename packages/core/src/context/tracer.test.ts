@@ -22,7 +22,7 @@ describe('ContextTracer (Real FS & Mock ID Gen)', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    vi.stubEnv('GEMINI_CONTEXT_TRACE_DIR', '');
+    vi.stubEnv('SPARKLE_CONTEXT_TRACE_DIR', '');
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-tracer-test-'));
 
     vi.useFakeTimers();

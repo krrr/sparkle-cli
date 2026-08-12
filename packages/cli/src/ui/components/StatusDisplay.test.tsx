@@ -89,7 +89,7 @@ const renderStatusDisplay = async (
 
 describe('StatusDisplay', () => {
   beforeEach(() => {
-    vi.stubEnv('GEMINI_SYSTEM_MD', '');
+    vi.stubEnv('SPARKLE_SYSTEM_MD', '');
   });
 
   afterEach(() => {
@@ -112,7 +112,7 @@ describe('StatusDisplay', () => {
   });
 
   it('renders system md indicator if env var is set', async () => {
-    vi.stubEnv('GEMINI_SYSTEM_MD', 'true');
+    vi.stubEnv('SPARKLE_SYSTEM_MD', 'true');
     const { lastFrame, unmount } = await renderStatusDisplay();
     expect(lastFrame()).toMatchSnapshot();
     unmount();

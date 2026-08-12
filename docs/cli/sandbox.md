@@ -47,14 +47,14 @@ sparkle -s -p "analyze the code structure"
 **macOS/Linux**
 
 ```bash
-export GEMINI_SANDBOX=true
+export SPARKLE_SANDBOX=true
 sparkle -p "run the test suite"
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-$env:GEMINI_SANDBOX="true"
+$env:SPARKLE_SANDBOX="true"
 sparkle -p "run the test suite"
 ```
 
@@ -74,7 +74,7 @@ Enable sandboxing using one of the following methods (in order of precedence):
 
 1. **Command flag**: `-s` or `--sandbox`
 2. **Environment variable**:
-   `GEMINI_SANDBOX=true|docker|podman|sandbox-exec|runsc|lxc`
+   `SPARKLE_SANDBOX=true|docker|podman|sandbox-exec|runsc|lxc`
 3. **Settings file**: `"sandbox": true` in the `tools` object of your
    `settings.json` file (for example, `{"tools": {"sandbox": true}}`).
 
@@ -125,7 +125,7 @@ Docker as the provider:
 
 ```bash
 # Using the environment variable (Recommended)
-export GEMINI_SANDBOX=docker
+export SPARKLE_SANDBOX=docker
 sparkle -p "build the project"
 
 # Or configure it permanently in your settings.json
@@ -143,7 +143,7 @@ or Podman image as your sandbox, provided it has standard shell utilities (like
 
 To configure a custom image that is hosted on a registry (or built locally),
 update your `settings.json` to use an object for the sandbox configuration, or
-set the `GEMINI_SANDBOX_IMAGE` environment variable.
+set the `SPARKLE_SANDBOX_IMAGE` environment variable.
 
 _Example: Configuring via `settings.json`_
 
@@ -161,7 +161,7 @@ _Example: Configuring via `settings.json`_
 _Example: Configuring via environment variable_
 
 ```bash
-export GEMINI_SANDBOX_IMAGE="us-central1-docker.pkg.dev/my-project/my-repo/my-custom-sandbox:latest"
+export SPARKLE_SANDBOX_IMAGE="us-central1-docker.pkg.dev/my-project/my-repo/my-custom-sandbox:latest"
 ```
 
 **Option B: Building a local custom image automatically**
@@ -175,7 +175,7 @@ and Sparkle CLI will build the image automatically.
 3.  Run your command with the `BUILD_SANDBOX` environment variable set:
 
 ```bash
-BUILD_SANDBOX=1 GEMINI_SANDBOX=docker sparkle -p "run my custom build"
+BUILD_SANDBOX=1 SPARKLE_SANDBOX=docker sparkle -p "run my custom build"
 ```
 
 ### 3. Windows Native Sandbox (Windows only)
@@ -212,7 +212,7 @@ strong security barrier between AI operations and the host OS.
 When you set `sandbox: "runsc"`, Sparkle CLI runs
 `docker run --runtime=runsc ...` to execute containers with gVisor isolation.
 runsc is not auto-detected; you must specify it explicitly (e.g.
-`GEMINI_SANDBOX=runsc` or `sandbox: "runsc"`).
+`SPARKLE_SANDBOX=runsc` or `sandbox: "runsc"`).
 
 To set up runsc:
 
@@ -244,15 +244,15 @@ lxd init --auto
 lxc launch ubuntu:24.04 sparkle-sandbox
 
 # Enable LXC sandboxing
-export GEMINI_SANDBOX=lxc
+export SPARKLE_SANDBOX=lxc
 sparkle -p "build the project"
 ```
 
 **Custom container name**:
 
 ```bash
-export GEMINI_SANDBOX=lxc
-export GEMINI_SANDBOX_IMAGE=my-snapcraft-container
+export SPARKLE_SANDBOX=lxc
+export SPARKLE_SANDBOX_IMAGE=my-snapcraft-container
 sparkle -p "build the snap"
 ```
 
@@ -354,7 +354,7 @@ docker run -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /absolute/path/on/host/project:/absolute/path/on/host/project \
   -w /absolute/path/on/host/project \
-  -e GEMINI_SANDBOX=docker \
+  -e SPARKLE_SANDBOX=docker \
   ghcr.io/google/sparkle-cli:latest
 ```
 

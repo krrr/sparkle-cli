@@ -15,7 +15,7 @@ import {
   ApprovalMode,
   SPARKLE_DIR,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
   startupProfiler,
   homedir,
   tmpdir,
@@ -262,7 +262,7 @@ export async function loadConfig(
 
   const folderTrust =
     settings.folderTrust === true ||
-    getEnvLocal('GEMINI_FOLDER_TRUST') === 'true';
+    getEnvLocal('SPARKLE_FOLDER_TRUST') === 'true';
 
   let checkpointing = getEnvLocal('CHECKPOINTING')
     ? getEnvLocal('CHECKPOINTING') === 'true'
@@ -278,7 +278,7 @@ export async function loadConfig(
   }
 
   const approvalMode =
-    getEnvLocal('GEMINI_YOLO_MODE') === 'true'
+    getEnvLocal('SPARKLE_YOLO_MODE') === 'true'
       ? ApprovalMode.YOLO
       : ApprovalMode.DEFAULT;
 
@@ -303,7 +303,7 @@ export async function loadConfig(
   const configParams: ConfigParameters = {
     sessionId: taskId,
     clientName: 'a2a-server',
-    model: DEFAULT_GEMINI_MODEL,
+    model: DEFAULT_SPARKLE_MODEL,
     embeddingModel: DEFAULT_GEMINI_EMBEDDING_MODEL,
     sandbox: undefined, // Sandbox might not be relevant for a server-side agent
     targetDir: workspaceDir, // Or a specific directory the agent operates on
@@ -370,7 +370,7 @@ export async function loadConfig(
 export function setIsTrusted(
   agentSettings: AgentSettings | undefined,
 ): boolean {
-  const folderTrustEnv = getEnv('GEMINI_FOLDER_TRUST');
+  const folderTrustEnv = getEnv('SPARKLE_FOLDER_TRUST');
   if (folderTrustEnv !== undefined) {
     return folderTrustEnv === 'true';
   }

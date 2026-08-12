@@ -24,10 +24,10 @@ export * from 'sparkle-cli-test-utils';
 
 /**
  * The default model used for all evaluations.
- * Can be overridden by setting the GEMINI_MODEL environment variable.
+ * Can be overridden by setting the SPARKLE_MODEL environment variable.
  */
 export const EVAL_MODEL =
-  process.env['GEMINI_MODEL'] || DEFAULT_GEMINI_FLASH_MODEL;
+  process.env['SPARKLE_MODEL'] || DEFAULT_GEMINI_FLASH_MODEL;
 
 // Indicates the consistency expectation for this test.
 // - ALWAYS_PASSES - Means that the test is expected to pass 100% of the time. These
@@ -242,7 +242,7 @@ function logReliabilityEvent(
   const reliabilityLog = {
     timestamp: new Date().toISOString(),
     testName,
-    model: process.env['GEMINI_MODEL'] || 'unknown',
+    model: process.env['SPARKLE_MODEL'] || 'unknown',
     attempt,
     status,
     errorCode,

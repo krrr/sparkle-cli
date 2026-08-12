@@ -69,7 +69,7 @@ jobs:
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
           SPARKLE_CLI_TRUST_WORKSPACE: true
-          GEMINI_MODEL: '${{ matrix.model }}'
+          SPARKLE_MODEL: '${{ matrix.model }}'
           RUN_EVALS: 'true'
           EVAL_SUITE_TYPE: "${{ github.event.inputs.suite_type || 'behavioral' }}"
           EVAL_SUITE_NAME: '${{ github.event.inputs.suite_name }}'

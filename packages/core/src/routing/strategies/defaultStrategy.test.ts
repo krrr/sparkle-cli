@@ -9,8 +9,8 @@ import { DefaultStrategy } from './defaultStrategy.js';
 import type { RoutingContext } from '../routingStrategy.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import {
-  DEFAULT_GEMINI_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
+  DEFAULT_SPARKLE_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
 } from '../../config/models.js';
 import { ModelConfigService } from '../../services/modelConfigService.js';
@@ -22,7 +22,7 @@ describe('DefaultStrategy', () => {
     const strategy = new DefaultStrategy();
     const mockContext = {} as RoutingContext;
     const mockConfig = {
-      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
+      getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
       modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
     const mockClient = {} as BaseLlmClient;
@@ -30,11 +30,11 @@ describe('DefaultStrategy', () => {
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).toEqual({
-      model: DEFAULT_GEMINI_MODEL,
+      model: DEFAULT_SPARKLE_MODEL,
       metadata: {
         source: 'default',
         latencyMs: 0,
-        reasoning: `Routing to default model: ${DEFAULT_GEMINI_MODEL}`,
+        reasoning: `Routing to default model: ${DEFAULT_SPARKLE_MODEL}`,
       },
     });
   });
@@ -43,7 +43,7 @@ describe('DefaultStrategy', () => {
     const strategy = new DefaultStrategy();
     const mockContext = {} as RoutingContext;
     const mockConfig = {
-      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
+      getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
       modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     } as unknown as Config;
     const mockClient = {} as BaseLlmClient;
@@ -51,11 +51,11 @@ describe('DefaultStrategy', () => {
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).toEqual({
-      model: DEFAULT_GEMINI_MODEL,
+      model: DEFAULT_SPARKLE_MODEL,
       metadata: {
         source: 'default',
         latencyMs: 0,
-        reasoning: `Routing to default model: ${DEFAULT_GEMINI_MODEL}`,
+        reasoning: `Routing to default model: ${DEFAULT_SPARKLE_MODEL}`,
       },
     });
   });

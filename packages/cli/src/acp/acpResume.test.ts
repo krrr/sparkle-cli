@@ -20,7 +20,7 @@ import {
   AuthType,
   type Config,
   CoreToolCallStatus,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
 } from 'sparkle-cli-core';
 import { loadCliConfig, type CliArgs } from '../config/config.js';
 import {
@@ -112,7 +112,7 @@ describe('GeminiAgent Session Resume', () => {
       getModelConfigService: vi.fn().mockReturnValue({
         getAvailableModelOptions: vi.fn().mockReturnValue([
           {
-            modelId: GEMINI_MODEL_ALIAS_AUTO,
+            modelId: SPARKLE_MODEL_ALIAS_AUTO,
             tier: 'auto',
             name: 'Auto',
             description: 'Auto description',

@@ -20,12 +20,8 @@ export function isolateTestEnv(runDir: string): void {
     process.env['USERPROFILE'] = runDir;
   }
 
-  // We also need to set the config dir explicitly, since the code might
-  // construct the path before the HOME env var is set.
-  process.env['GEMINI_CONFIG_DIR'] = join(runDir, '.sparkle');
-
   // Force file storage to avoid keychain prompts/hangs in CI, especially on macOS
-  process.env['GEMINI_FORCE_FILE_STORAGE'] = 'true';
+  process.env['SPARKLE_FORCE_FILE_STORAGE'] = 'true';
 
   // Mark as integration test
   process.env['SPARKLE_CLI_INTEGRATION_TEST'] = 'true';

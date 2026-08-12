@@ -12,7 +12,7 @@ import {
 } from './modelConfigService.js';
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
 } from '../config/models.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 
@@ -1147,7 +1147,7 @@ describe('ModelConfigService', () => {
       const [primary, lastResort] = chain ?? [];
       expect(primary).toBeDefined();
       expect(lastResort).toBeDefined();
-      expect(primary?.model).toBe(DEFAULT_GEMINI_MODEL);
+      expect(primary?.model).toBe(DEFAULT_SPARKLE_MODEL);
       expect(primary?.maxAttempts).toBe(3);
       expect(primary?.actions.transient).toBe('silent');
       expect(primary?.stateTransitions.transient).toBe('sticky_retry');

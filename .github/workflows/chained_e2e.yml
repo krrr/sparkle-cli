@@ -342,7 +342,7 @@ jobs:
         env:
           GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
           SPARKLE_CLI_TRUST_WORKSPACE: true
-          GEMINI_MODEL: 'gemini-3-pro-preview'
+          SPARKLE_MODEL: 'gemini-3-pro-preview'
           # Only run always passes behavioral tests.
           EVAL_SUITE_TYPE: 'behavioral'
           # Disable Vitest internal retries to avoid double-retrying;

@@ -24,7 +24,7 @@ const BUNDLE_PATH = join(__dirname, '..', '..', '..', 'bundle/sparkle.js');
 // Get timeout based on environment
 export function getDefaultTimeout() {
   if (env['CI']) return 60000; // 1 minute in CI
-  if (env['GEMINI_SANDBOX']) return 30000; // 30s in containers
+  if (env['SPARKLE_SANDBOX']) return 30000; // 30s in containers
   return 15000; // 15s locally
 }
 
@@ -477,7 +477,7 @@ export class TestRig {
         ui: {
           useAlternateBuffer: true,
         },
-        ...(env['GEMINI_TEST_TYPE'] === 'integration'
+        ...(env['SPARKLE_TEST_TYPE'] === 'integration'
           ? {
               model: {
                 name: DEFAULT_GEMINI_FLASH_MODEL,
@@ -485,7 +485,7 @@ export class TestRig {
             }
           : {}),
         sandbox:
-          env['GEMINI_SANDBOX'] !== 'false' ? env['GEMINI_SANDBOX'] : false,
+          env['SPARKLE_SANDBOX'] !== 'false' ? env['SPARKLE_SANDBOX'] : false,
         // Don't show the IDE connection dialog when running from VsCode
         ide: { enabled: false, hasSeenNudge: true },
       },
@@ -680,8 +680,8 @@ export class TestRig {
         (key.startsWith('GEMINI_') || key.startsWith('GOOGLE_GEMINI_')) &&
         key !== 'GEMINI_API_KEY' &&
         key !== 'GOOGLE_API_KEY' &&
-        key !== 'GEMINI_MODEL' &&
-        key !== 'GEMINI_DEBUG' &&
+        key !== 'SPARKLE_MODEL' &&
+        key !== 'SPARKLE_DEBUG' &&
         key !== 'SPARKLE_CLI_TEST_VAR' &&
         key !== 'SPARKLE_CLI_INTEGRATION_TEST' &&
         key !== 'GOOGLE_GEMINI_BASE_URL' &&
@@ -694,7 +694,7 @@ export class TestRig {
     return {
       ...cleanEnv,
       SPARKLE_CLI_HOME: this.homeDir!,
-      GEMINI_PTY_INFO: 'child_process',
+      SPARKLE_PTY_INFO: 'child_process',
       ...extraEnv,
     };
   }
@@ -817,7 +817,7 @@ export class TestRig {
   }
 
   private _filterPodmanTelemetry(stdout: string): string {
-    if (env['GEMINI_SANDBOX'] !== 'podman') {
+    if (env['SPARKLE_SANDBOX'] !== 'podman') {
       return stdout;
     }
 
@@ -1369,7 +1369,7 @@ export class TestRig {
   readToolLogs() {
     // For Podman, first check if telemetry file exists and has content
     // If not, fall back to parsing from stdout
-    if (env['GEMINI_SANDBOX'] === 'podman') {
+    if (env['SPARKLE_SANDBOX'] === 'podman') {
       // Try reading from file first
       const logFilePath = join(this.homeDir!, 'telemetry.log');
 

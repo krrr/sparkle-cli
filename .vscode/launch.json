@@ -14,7 +14,7 @@
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "env": {
-        "GEMINI_SANDBOX": "false"
+        "SPARKLE_SANDBOX": "false"
       }
     },
     {
@@ -90,7 +90,7 @@
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"],
       "env": {
-        "GEMINI_SANDBOX": "false"
+        "SPARKLE_SANDBOX": "false"
       }
     }
   ],

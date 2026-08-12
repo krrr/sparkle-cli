@@ -19,7 +19,7 @@ import type * as acp from '@agentclientprotocol/sdk';
 import {
   AuthType,
   type Config,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
   type MessageBus,
   type Storage,
 } from 'sparkle-cli-core';
@@ -65,7 +65,7 @@ describe('AcpSessionManager', () => {
       getModelConfigService: vi.fn().mockReturnValue({
         getAvailableModelOptions: vi.fn().mockReturnValue([
           {
-            modelId: GEMINI_MODEL_ALIAS_AUTO,
+            modelId: SPARKLE_MODEL_ALIAS_AUTO,
             tier: 'auto',
             name: 'Auto',
             description: 'Auto description',
@@ -222,7 +222,7 @@ describe('AcpSessionManager', () => {
     expect(response.models?.availableModels).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          modelId: GEMINI_MODEL_ALIAS_AUTO,
+          modelId: SPARKLE_MODEL_ALIAS_AUTO,
           name: expect.stringContaining('Auto'),
         }),
       ]),

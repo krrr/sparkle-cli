@@ -8,7 +8,7 @@ import type React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
   ModelSlashCommandEvent,
   logModelSlashCommand,
   getDisplayString,
@@ -28,7 +28,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const [persistMode, setPersistMode] = useState(false);
 
   // Determine the Preferred Model (read once when the dialog opens).
-  const preferredModel = config?.getModel() || GEMINI_MODEL_ALIAS_AUTO;
+  const preferredModel = config?.getModel() || SPARKLE_MODEL_ALIAS_AUTO;
 
   const manualModelSelected = useMemo(() => {
     if (config?.getModelConfigService) {

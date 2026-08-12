@@ -311,7 +311,7 @@ and helps diagnose issues.
           {
             "name": "secret-scanner",
             "type": "command",
-            "command": "$GEMINI_PROJECT_DIR/.sparkle/hooks/block-secrets.sh",
+            "command": "$SPARKLE_PROJECT_DIR/.sparkle/hooks/block-secrets.sh",
             "description": "Scans code changes for API keys and secrets before writing"
           }
         ]
@@ -518,10 +518,10 @@ scripts (for example, `Get-ExecutionPolicy`).
 
 ```bash
 # Check path expansion
-echo "$GEMINI_PROJECT_DIR/.sparkle/hooks/my-hook.sh"
+echo "$SPARKLE_PROJECT_DIR/.sparkle/hooks/my-hook.sh"
 
 # Verify file exists
-test -f "$GEMINI_PROJECT_DIR/.sparkle/hooks/my-hook.sh" && echo "File exists"
+test -f "$SPARKLE_PROJECT_DIR/.sparkle/hooks/my-hook.sh" && echo "File exists"
 ```
 
 ### Hook timing out
@@ -563,8 +563,8 @@ fi
 
 ```bash
 #!/usr/bin/env bash
-if [ -z "$GEMINI_PROJECT_DIR" ]; then
-  echo "GEMINI_PROJECT_DIR not set" >&2
+if [ -z "$SPARKLE_PROJECT_DIR" ]; then
+  echo "SPARKLE_PROJECT_DIR not set" >&2
   exit 1
 fi
 

@@ -302,7 +302,7 @@ To use the browser agent in a Docker sandbox:
 3. Launch the CLI with port forwarding:
 
    ```bash
-   GEMINI_SANDBOX=docker SANDBOX_PORTS=9222 sparkle
+   SPARKLE_SANDBOX=docker SANDBOX_PORTS=9222 sparkle
    ```
 
 ## Creating custom subagents

@@ -27,7 +27,7 @@ import fs from 'node:fs';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
 } from 'src/config/models.js';
 
 vi.mock('../telemetry/loggers.js');
@@ -122,7 +122,7 @@ describe('modelStringToModelConfigAlias', () => {
   });
 
   it('should handle valid names', () => {
-    expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_MODEL)).toBe(
+    expect(modelStringToModelConfigAlias(DEFAULT_SPARKLE_MODEL)).toBe(
       'chat-compression-pro',
     );
     expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_FLASH_MODEL)).toBe(

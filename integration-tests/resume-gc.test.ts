@@ -94,8 +94,8 @@ describe('Context Management Resume E2E', () => {
 
     const commonEnv = {
       GEMINI_API_KEY: 'mock-key',
-      GEMINI_DEBUG_LOG_FILE: logFile,
-      GEMINI_CONTEXT_TRACE_DIR: traceDir,
+      SPARKLE_DEBUG_LOG_FILE: logFile,
+      SPARKLE_CONTEXT_TRACE_DIR: traceDir,
     };
 
     // Provide a massive pool of responses to prevent exhaustion

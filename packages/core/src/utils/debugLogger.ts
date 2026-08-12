@@ -24,8 +24,8 @@ class DebugLogger {
   private logStream: fs.WriteStream | undefined;
 
   constructor() {
-    this.logStream = process.env['GEMINI_DEBUG_LOG_FILE']
-      ? fs.createWriteStream(process.env['GEMINI_DEBUG_LOG_FILE'], {
+    this.logStream = process.env['SPARKLE_DEBUG_LOG_FILE']
+      ? fs.createWriteStream(process.env['SPARKLE_DEBUG_LOG_FILE'], {
           flags: 'a',
         })
       : undefined;

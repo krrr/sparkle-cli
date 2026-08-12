@@ -49,7 +49,7 @@ describe('handleAutoUpdate', () => {
   let mockChildProcess: ChildProcess;
 
   beforeEach(() => {
-    vi.stubEnv('GEMINI_SANDBOX', '');
+    vi.stubEnv('SPARKLE_SANDBOX', '');
     vi.stubEnv('SANDBOX', '');
     mockSpawn = vi.fn();
     vi.clearAllMocks();

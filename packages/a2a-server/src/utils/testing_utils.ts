@@ -12,7 +12,7 @@ import type {
 } from '@a2a-js/sdk';
 import {
   ApprovalMode,
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
   DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
   GeminiClient,
   HookSystem,
@@ -78,7 +78,7 @@ export function createMockConfig(
     } as Storage,
     getTruncateToolOutputThreshold: () =>
       DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
-    getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
+    getActiveModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
     getDebugMode: vi.fn().mockReturnValue(false),
     getContentGeneratorConfig: vi.fn().mockReturnValue({ model: 'gemini-pro' }),
     getModel: vi.fn().mockReturnValue('gemini-pro'),

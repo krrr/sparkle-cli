@@ -26,7 +26,7 @@ export class ContextTracer {
     this.enabled = options.enabled ?? false;
 
     this.traceDir =
-      process.env['GEMINI_CONTEXT_TRACE_DIR'] ||
+      process.env['SPARKLE_CONTEXT_TRACE_DIR'] ||
       path.join(options.targetDir, 'context_trace', options.sessionId);
     this.assetsDir = path.join(this.traceDir, 'assets');
 

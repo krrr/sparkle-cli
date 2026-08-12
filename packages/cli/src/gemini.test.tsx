@@ -276,7 +276,7 @@ describe('gemini.tsx main function', () => {
 
   beforeEach(() => {
     // Store and clear sandbox-related env variables to ensure a consistent test environment
-    vi.stubEnv('GEMINI_SANDBOX', '');
+    vi.stubEnv('SPARKLE_SANDBOX', '');
     vi.stubEnv('SANDBOX', '');
     vi.stubEnv('SHPOOL_SESSION_NAME', '');
     vi.stubEnv('SPARKLE_CLI_TRUST_WORKSPACE', 'true');

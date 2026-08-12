@@ -7,7 +7,7 @@
 import { ThinkingLevel } from '@google/genai';
 import type { ModelConfigServiceConfig } from '../services/modelConfigService.js';
 import {
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
 } from './models.js';
@@ -39,10 +39,10 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    [DEFAULT_GEMINI_MODEL]: {
+    [DEFAULT_SPARKLE_MODEL]: {
       extends: 'chat-base',
       modelConfig: {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
       },
     },
     [DEFAULT_GEMINI_FLASH_LITE_MODEL]: {
@@ -160,7 +160,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     'loop-detection-double-check': {
       extends: 'base',
       modelConfig: {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
       },
     },
     'llm-edit-fixer': {
@@ -186,7 +186,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     },
     'chat-compression-pro': {
       modelConfig: {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
       },
     },
     'chat-compression-flash': {
@@ -201,7 +201,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     },
     'chat-compression-default': {
       modelConfig: {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
       },
     },
     'agent-history-provider-summarizer': {
@@ -256,7 +256,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       isVisible: true,
       features: { thinking: true, multimodalToolUse: true },
     },
-    [DEFAULT_GEMINI_MODEL]: {
+    [DEFAULT_SPARKLE_MODEL]: {
       tier: 'pro',
       family: 'gemini-3',
       isVisible: true,
@@ -302,10 +302,10 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
   },
   modelIdResolutions: {
     auto: {
-      default: DEFAULT_GEMINI_MODEL,
+      default: DEFAULT_SPARKLE_MODEL,
     },
     pro: {
-      default: DEFAULT_GEMINI_MODEL,
+      default: DEFAULT_SPARKLE_MODEL,
     },
     flash: {
       default: DEFAULT_GEMINI_FLASH_MODEL,
@@ -319,13 +319,13 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       default: DEFAULT_GEMINI_FLASH_MODEL,
     },
     pro: {
-      default: DEFAULT_GEMINI_MODEL,
+      default: DEFAULT_SPARKLE_MODEL,
     },
   },
   modelChains: {
     default: [
       {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
         actions: {
           terminal: 'prompt',
           transient: 'prompt',
@@ -359,7 +359,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     ],
     'auto-default': [
       {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
         maxAttempts: 3,
         actions: {
           terminal: 'prompt',
@@ -424,7 +424,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: DEFAULT_GEMINI_MODEL,
+        model: DEFAULT_SPARKLE_MODEL,
         isLastResort: true,
         actions: {
           terminal: 'silent',

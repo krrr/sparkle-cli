@@ -21,7 +21,7 @@ export default defineConfig({
       },
     },
     env: {
-      GEMINI_TEST_TYPE: 'integration',
+      SPARKLE_TEST_TYPE: 'integration',
     },
   },
 });

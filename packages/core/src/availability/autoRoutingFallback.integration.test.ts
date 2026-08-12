@@ -10,9 +10,9 @@ import { FakeContentGenerator } from '../core/fakeContentGenerator.js';
 import { Config } from '../config/config.js';
 import { RetryableQuotaError } from '../utils/googleQuotaErrors.js';
 import {
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import fs from 'node:fs';
 import { AuthType } from '../core/contentGenerator.js';
@@ -73,7 +73,7 @@ describe('Auto Routing Fallback Integration', () => {
       targetDir: '/test',
       debugMode: false,
       cwd: '/test',
-      model: GEMINI_MODEL_ALIAS_AUTO, // Trigger auto mode
+      model: SPARKLE_MODEL_ALIAS_AUTO, // Trigger auto mode
     });
 
     // Force interactive mode to enable fallback handler in BaseLlmClient
@@ -93,7 +93,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Spy on generateContent to simulate failures
     vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
       async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
+        if (params.model === DEFAULT_SPARKLE_MODEL) {
           attemptsPro++;
           throw new RetryableQuotaError(
             'Quota exceeded for Pro',
@@ -124,7 +124,7 @@ describe('Auto Routing Fallback Integration', () => {
 
     // Call generateContent
     const promise = client.generateContent({
-      modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true },
+      modelConfigKey: { model: DEFAULT_SPARKLE_MODEL, isChatModel: true },
       contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
       abortSignal: new AbortController().signal,
       promptId: 'test-prompt',
@@ -223,7 +223,7 @@ describe('Auto Routing Fallback Integration', () => {
       targetDir: '/test',
       debugMode: false,
       cwd: '/test',
-      model: GEMINI_MODEL_ALIAS_AUTO, // Trigger auto mode
+      model: SPARKLE_MODEL_ALIAS_AUTO, // Trigger auto mode
     });
 
     // Force interactive mode to enable fallback handler in BaseLlmClient
@@ -243,7 +243,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Turn 1: Pro fails, Flash succeeds
     vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
       async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
+        if (params.model === DEFAULT_SPARKLE_MODEL) {
           attemptsPro++;
           throw new RetryableQuotaError(
             'Quota exceeded for Pro',
@@ -271,7 +271,7 @@ describe('Auto Routing Fallback Integration', () => {
 
     // Call generateContent for Turn 1
     const promise1 = client.generateContent({
-      modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true },
+      modelConfigKey: { model: DEFAULT_SPARKLE_MODEL, isChatModel: true },
       contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
       abortSignal: new AbortController().signal,
       promptId: 'test-prompt-1',
@@ -294,7 +294,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Let's make it succeed this time to verify it works!
     vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
       async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
+        if (params.model === DEFAULT_SPARKLE_MODEL) {
           return {
             candidates: [
               { content: { role: 'model', parts: [{ text: 'Pro success' }] } },
@@ -306,7 +306,7 @@ describe('Auto Routing Fallback Integration', () => {
     );
 
     const promise2 = client.generateContent({
-      modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true }, // Request Pro again
+      modelConfigKey: { model: DEFAULT_SPARKLE_MODEL, isChatModel: true }, // Request Pro again
       contents: [{ role: 'user', parts: [{ text: 'hello again' }] }],
       abortSignal: new AbortController().signal,
       promptId: 'test-prompt-2',
@@ -326,7 +326,7 @@ describe('Auto Routing Fallback Integration', () => {
       targetDir: '/test',
       debugMode: false,
       cwd: '/test',
-      model: GEMINI_MODEL_ALIAS_AUTO,
+      model: SPARKLE_MODEL_ALIAS_AUTO,
     });
 
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
@@ -345,7 +345,7 @@ describe('Auto Routing Fallback Integration', () => {
 
     vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
       async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
+        if (params.model === DEFAULT_SPARKLE_MODEL) {
           attemptsPro++;
           throw new RetryableQuotaError(
             'Quota exceeded for Pro',
@@ -375,7 +375,7 @@ describe('Auto Routing Fallback Integration', () => {
     );
 
     const promise = client.generateContent({
-      modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true },
+      modelConfigKey: { model: DEFAULT_SPARKLE_MODEL, isChatModel: true },
       contents: [{ role: 'user', parts: [{ text: 'test query' }] }],
       abortSignal: new AbortController().signal,
       promptId: 'test-prompt',

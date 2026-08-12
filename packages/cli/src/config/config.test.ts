@@ -158,12 +158,12 @@ vi.mock('./extension-manager.js', () => {
 
 // Global setup to ensure clean environment for all tests in this file
 const originalArgv = process.argv;
-const originalGeminiModel = process.env['GEMINI_MODEL'];
+const originalGeminiModel = process.env['SPARKLE_MODEL'];
 const originalStdoutIsTTY = process.stdout.isTTY;
 const originalStdinIsTTY = process.stdin.isTTY;
 
 beforeEach(() => {
-  delete process.env['GEMINI_MODEL'];
+  delete process.env['SPARKLE_MODEL'];
   // Restore ExtensionManager mocks by re-assigning them
   ExtensionManager.prototype.getExtensions = vi.fn().mockReturnValue([]);
   ExtensionManager.prototype.loadExtensions = vi
@@ -186,9 +186,9 @@ beforeEach(() => {
 afterEach(() => {
   process.argv = originalArgv;
   if (originalGeminiModel !== undefined) {
-    process.env['GEMINI_MODEL'] = originalGeminiModel;
+    process.env['SPARKLE_MODEL'] = originalGeminiModel;
   } else {
-    delete process.env['GEMINI_MODEL'];
+    delete process.env['SPARKLE_MODEL'];
   }
   Object.defineProperty(process.stdout, 'isTTY', {
     value: originalStdoutIsTTY,

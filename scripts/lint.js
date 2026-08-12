@@ -22,7 +22,7 @@ const SHELLCHECK_VERSION = '0.11.0';
 const YAMLLINT_VERSION = '1.35.1';
 
 const TEMP_DIR =
-  process.env.GEMINI_LINT_TEMP_DIR || join(tmpdir(), 'sparkle-cli-linters');
+  process.env.SPARKLE_LINT_TEMP_DIR || join(tmpdir(), 'sparkle-cli-linters');
 
 function getPlatformArch() {
   const platform = process.platform;
@@ -184,7 +184,7 @@ function runCommand(command, stdio = 'inherit') {
 
 export function setupLinters() {
   console.log('Setting up linters...');
-  if (!process.env.GEMINI_LINT_TEMP_DIR) {
+  if (!process.env.SPARKLE_LINT_TEMP_DIR) {
     rmSync(TEMP_DIR, { recursive: true, force: true });
   }
   mkdirSync(TEMP_DIR, { recursive: true });

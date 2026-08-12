@@ -226,7 +226,7 @@ describe('migrate command', () => {
     );
   });
 
-  it('should replace $CLAUDE_PROJECT_DIR with $GEMINI_PROJECT_DIR', async () => {
+  it('should replace $CLAUDE_PROJECT_DIR with $SPARKLE_PROJECT_DIR', async () => {
     const claudeSettings = {
       hooks: {
         PreToolUse: [
@@ -249,7 +249,7 @@ describe('migrate command', () => {
 
     const migratedHooks = mockSetValue.mock.calls[0][2];
     expect(migratedHooks.BeforeTool[0].hooks[0].command).toBe(
-      'cd $GEMINI_PROJECT_DIR && ls',
+      'cd $SPARKLE_PROJECT_DIR && ls',
     );
   });
 

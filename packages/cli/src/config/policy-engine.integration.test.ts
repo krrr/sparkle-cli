@@ -24,7 +24,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 describe('Policy Engine Integration Tests', () => {
-  beforeEach(() => vi.stubEnv('GEMINI_SYSTEM_MD', ''));
+  beforeEach(() => vi.stubEnv('SPARKLE_SYSTEM_MD', ''));
 
   afterEach(() => vi.unstubAllEnvs());
 

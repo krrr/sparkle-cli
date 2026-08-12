@@ -292,7 +292,7 @@ will automate the following process:
 4.  **Report**: Provide a summary of the success rate.
 
 When investigating failures manually, you can enable verbose agent logs by
-setting the `GEMINI_DEBUG_LOG_FILE` environment variable.
+setting the `SPARKLE_DEBUG_LOG_FILE` environment variable.
 
 ### Best practices
 

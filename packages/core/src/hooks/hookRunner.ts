@@ -347,10 +347,10 @@ export class HookRunner {
       // Set up environment variables
       const env = {
         ...sanitizeEnvironment(process.env, this.config.sanitizationConfig),
-        GEMINI_PROJECT_DIR: input.cwd,
-        GEMINI_PLANS_DIR: this.config.storage.getPlansDir(),
-        GEMINI_CWD: input.cwd,
-        GEMINI_SESSION_ID: input.session_id,
+        SPARKLE_PROJECT_DIR: input.cwd,
+        SPARKLE_PLANS_DIR: this.config.storage.getPlansDir(),
+        SPARKLE_CWD: input.cwd,
+        SPARKLE_SESSION_ID: input.session_id,
         CLAUDE_PROJECT_DIR: input.cwd, // For compatibility
         ...hookConfig.env,
       };
@@ -524,10 +524,10 @@ export class HookRunner {
     const escapedSessionId = escapeShellArg(input.session_id, shellType);
 
     return command
-      .replace(/\$GEMINI_PROJECT_DIR/g, () => escapedCwd)
-      .replace(/\$GEMINI_CWD/g, () => escapedCwd)
-      .replace(/\$GEMINI_PLANS_DIR/g, () => escapedPlansDir)
-      .replace(/\$GEMINI_SESSION_ID/g, () => escapedSessionId)
+      .replace(/\$SPARKLE_PROJECT_DIR/g, () => escapedCwd)
+      .replace(/\$SPARKLE_CWD/g, () => escapedCwd)
+      .replace(/\$SPARKLE_PLANS_DIR/g, () => escapedPlansDir)
+      .replace(/\$SPARKLE_SESSION_ID/g, () => escapedSessionId)
       .replace(/\$CLAUDE_PROJECT_DIR/g, () => escapedCwd); // For compatibility
   }
 

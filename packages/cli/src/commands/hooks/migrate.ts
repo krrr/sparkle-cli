@@ -78,12 +78,12 @@ function migrateClaudeHook(claudeHook: unknown): unknown {
   if ('command' in hook) {
     migrated['command'] = hook['command'];
 
-    // Replace CLAUDE_PROJECT_DIR with GEMINI_PROJECT_DIR in command
+    // Replace CLAUDE_PROJECT_DIR with SPARKLE_PROJECT_DIR in command
     // eslint-disable-next-line no-restricted-syntax
     if (typeof migrated['command'] === 'string') {
       migrated['command'] = migrated['command'].replace(
         /\$CLAUDE_PROJECT_DIR/g,
-        '$GEMINI_PROJECT_DIR',
+        '$SPARKLE_PROJECT_DIR',
       );
     }
   }

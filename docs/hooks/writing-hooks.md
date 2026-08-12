@@ -419,7 +419,7 @@ const path = require('path');
 const input = JSON.parse(fs.readFileSync(0));
 const { llm_request, llm_response } = input;
 const logFile = path.join(
-  process.env.GEMINI_PROJECT_DIR,
+  process.env.SPARKLE_PROJECT_DIR,
   '.sparkle/memory/session.jsonl',
 );
 

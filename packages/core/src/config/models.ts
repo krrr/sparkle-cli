@@ -47,20 +47,20 @@ export interface ModelCapabilityContext {
   readonly modelConfigService: IModelConfigService;
 }
 
-export const DEFAULT_GEMINI_MODEL = 'gemini-pro-latest';
+export const DEFAULT_SPARKLE_MODEL = 'gemini-pro-latest';
 export const DEFAULT_GEMINI_FLASH_MODEL = 'gemini-flash-latest';
 export const DEFAULT_GEMINI_FLASH_LITE_MODEL = 'gemini-flash-lite-latest';
 
 // Model aliases for user convenience.
-export const GEMINI_MODEL_ALIAS_AUTO = 'auto';
-export const GEMINI_MODEL_ALIAS_PRO = 'pro';
-export const GEMINI_MODEL_ALIAS_FLASH = 'flash';
-export const GEMINI_MODEL_ALIAS_FLASH_LITE = 'flash-lite';
+export const SPARKLE_MODEL_ALIAS_AUTO = 'auto';
+export const SPARKLE_MODEL_ALIAS_PRO = 'pro';
+export const SPARKLE_MODEL_ALIAS_FLASH = 'flash';
+export const SPARKLE_MODEL_ALIAS_FLASH_LITE = 'flash-lite';
 
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
 export function getAutoModelDescription() {
-  return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_GEMINI_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
+  return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_SPARKLE_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
 }
 
 /**
@@ -90,14 +90,14 @@ export function resolveModel(
 
   // Static fallback matching the default dynamic resolution for standard aliases.
   switch (normalizedModel) {
-    case GEMINI_MODEL_ALIAS_AUTO:
-    case GEMINI_MODEL_ALIAS_PRO: {
-      return DEFAULT_GEMINI_MODEL;
+    case SPARKLE_MODEL_ALIAS_AUTO:
+    case SPARKLE_MODEL_ALIAS_PRO: {
+      return DEFAULT_SPARKLE_MODEL;
     }
-    case GEMINI_MODEL_ALIAS_FLASH: {
+    case SPARKLE_MODEL_ALIAS_FLASH: {
       return DEFAULT_GEMINI_FLASH_MODEL;
     }
-    case GEMINI_MODEL_ALIAS_FLASH_LITE: {
+    case SPARKLE_MODEL_ALIAS_FLASH_LITE: {
       return DEFAULT_GEMINI_FLASH_LITE_MODEL;
     }
     default: {
@@ -126,8 +126,8 @@ export function resolveClassifierModel(
     );
   }
 
-  if (modelAlias === GEMINI_MODEL_ALIAS_FLASH) {
-    return resolveModel(GEMINI_MODEL_ALIAS_FLASH, config);
+  if (modelAlias === SPARKLE_MODEL_ALIAS_FLASH) {
+    return resolveModel(SPARKLE_MODEL_ALIAS_FLASH, config);
   }
   return resolveModel(requestedModel, config);
 }
@@ -144,11 +144,11 @@ export function getDisplayString(
   }
 
   switch (model) {
-    case GEMINI_MODEL_ALIAS_AUTO:
+    case SPARKLE_MODEL_ALIAS_AUTO:
       return 'Auto';
-    case GEMINI_MODEL_ALIAS_PRO:
-      return DEFAULT_GEMINI_MODEL;
-    case GEMINI_MODEL_ALIAS_FLASH:
+    case SPARKLE_MODEL_ALIAS_PRO:
+      return DEFAULT_SPARKLE_MODEL;
+    case SPARKLE_MODEL_ALIAS_FLASH:
       return DEFAULT_GEMINI_FLASH_MODEL;
     default:
       return model;
@@ -220,7 +220,7 @@ export function isAutoModel(
   if (config) {
     return config.modelConfigService.getModelDefinition(model)?.tier === 'auto';
   }
-  return model === GEMINI_MODEL_ALIAS_AUTO;
+  return model === SPARKLE_MODEL_ALIAS_AUTO;
 }
 
 /**

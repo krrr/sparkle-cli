@@ -359,7 +359,7 @@ describe('Telemetry Sanitization', () => {
         const event = new HookCallEvent(
           'BeforeModel',
           HookType.Command,
-          '$GEMINI_PROJECT_DIR/.sparkle/hooks/add-context.sh',
+          '$SPARKLE_PROJECT_DIR/.sparkle/hooks/add-context.sh',
           {
             llm_request: {
               model: 'gemini-1.5-flash',
@@ -386,7 +386,7 @@ describe('Telemetry Sanitization', () => {
 
         // In enterprise mode, everything is logged
         expect(attributes['hook_name']).toBe(
-          '$GEMINI_PROJECT_DIR/.sparkle/hooks/add-context.sh',
+          '$SPARKLE_PROJECT_DIR/.sparkle/hooks/add-context.sh',
         );
         expect(attributes['hook_input']).toBeDefined();
         expect(attributes['hook_output']).toBeDefined();
@@ -399,7 +399,7 @@ describe('Telemetry Sanitization', () => {
         const event = new HookCallEvent(
           'BeforeModel',
           HookType.Command,
-          '$GEMINI_PROJECT_DIR/.sparkle/hooks/add-context.sh',
+          '$SPARKLE_PROJECT_DIR/.sparkle/hooks/add-context.sh',
           {
             llm_request: {
               model: 'gemini-1.5-flash',

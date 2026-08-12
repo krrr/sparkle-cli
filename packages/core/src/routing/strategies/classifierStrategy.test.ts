@@ -15,8 +15,8 @@ import {
 } from '../../utils/messageInspectors.js';
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
+  DEFAULT_SPARKLE_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
@@ -56,7 +56,7 @@ describe('ClassifierStrategy', () => {
           getResolvedConfig: vi.fn().mockReturnValue(mockResolvedConfig),
         },
       ),
-      getModel: vi.fn().mockReturnValue(GEMINI_MODEL_ALIAS_AUTO),
+      getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(false),
       getModelAvailabilityService: vi
         .fn()
@@ -164,7 +164,7 @@ describe('ClassifierStrategy', () => {
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledOnce();
     expect(decision).toEqual({
-      model: DEFAULT_GEMINI_MODEL,
+      model: DEFAULT_SPARKLE_MODEL,
       metadata: {
         source: 'Classifier',
         latencyMs: expect.any(Number),
@@ -323,7 +323,7 @@ describe('ClassifierStrategy', () => {
   });
 
   it('should respect requestedModel from context in resolveClassifierModel', async () => {
-    const requestedModel = DEFAULT_GEMINI_MODEL; // Pro model
+    const requestedModel = DEFAULT_SPARKLE_MODEL; // Pro model
     const mockApiResponse = {
       reasoning: 'Choice is flash',
       model_choice: 'flash',
@@ -438,7 +438,7 @@ describe('ClassifierStrategy', () => {
 
   describe('Classifier routing with default models', () => {
     it('should route to the default pro model when classifier selects pro', async () => {
-      vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
+      vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
       const mockApiResponse = {
         reasoning: 'Complex task',
         model_choice: 'pro',
@@ -453,11 +453,11 @@ describe('ClassifierStrategy', () => {
         mockBaseLlmClient,
       );
 
-      expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
+      expect(decision?.model).toBe(DEFAULT_SPARKLE_MODEL);
     });
 
     it('should route to the default flash model when classifier selects flash', async () => {
-      vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
+      vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
       const mockApiResponse = {
         reasoning: 'Simple task',
         model_choice: 'flash',

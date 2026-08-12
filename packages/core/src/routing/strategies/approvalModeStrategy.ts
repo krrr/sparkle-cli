@@ -8,8 +8,8 @@ import type { Config } from '../../config/config.js';
 import {
   isAutoModel,
   resolveClassifierModel,
-  GEMINI_MODEL_ALIAS_FLASH,
-  GEMINI_MODEL_ALIAS_PRO,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_PRO,
 } from '../../config/models.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import { ApprovalMode } from '../../policy/types.js';
@@ -52,7 +52,7 @@ export class ApprovalModeStrategy implements RoutingStrategy {
     if (approvalMode === ApprovalMode.PLAN) {
       const proModel = resolveClassifierModel(
         model,
-        GEMINI_MODEL_ALIAS_PRO,
+        SPARKLE_MODEL_ALIAS_PRO,
         config,
       );
       return {
@@ -67,7 +67,7 @@ export class ApprovalModeStrategy implements RoutingStrategy {
       // 2. Implementation Phase: If ApprovalMode !== PLAN AND an approved plan path is set, prefer the Flash model.
       const flashModel = resolveClassifierModel(
         model,
-        GEMINI_MODEL_ALIAS_FLASH,
+        SPARKLE_MODEL_ALIAS_FLASH,
         config,
       );
       return {

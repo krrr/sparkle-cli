@@ -111,7 +111,7 @@ multiple layers in the following order of precedence (highest to lowest):
           {
             "name": "security-check",
             "type": "command",
-            "command": "$GEMINI_PROJECT_DIR/.sparkle/hooks/security.sh",
+            "command": "$SPARKLE_PROJECT_DIR/.sparkle/hooks/security.sh",
             "timeout": 5000
           }
         ]
@@ -137,10 +137,10 @@ multiple layers in the following order of precedence (highest to lowest):
 
 Hooks are executed with a sanitized environment.
 
-- `GEMINI_PROJECT_DIR`: The absolute path to the project root.
-- `GEMINI_PLANS_DIR`: The absolute path to the plans directory.
-- `GEMINI_SESSION_ID`: The unique ID for the current session.
-- `GEMINI_CWD`: The current working directory.
+- `SPARKLE_PROJECT_DIR`: The absolute path to the project root.
+- `SPARKLE_PLANS_DIR`: The absolute path to the plans directory.
+- `SPARKLE_SESSION_ID`: The unique ID for the current session.
+- `SPARKLE_CWD`: The current working directory.
 - `CLAUDE_PROJECT_DIR`: (Alias) Provided for compatibility.
 
 ## Security and risks

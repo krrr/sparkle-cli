@@ -277,8 +277,8 @@ describe('loadConfig', () => {
     });
 
     describe('YOLO mode', () => {
-      it('should enable YOLO mode and add policy rule when GEMINI_YOLO_MODE is true', async () => {
-        vi.stubEnv('GEMINI_YOLO_MODE', 'true');
+      it('should enable YOLO mode and add policy rule when SPARKLE_YOLO_MODE is true', async () => {
+        vi.stubEnv('SPARKLE_YOLO_MODE', 'true');
         await loadConfig(mockSettings, mockExtensionLoader, taskId);
         expect(Config).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -297,8 +297,8 @@ describe('loadConfig', () => {
         );
       });
 
-      it('should use default approval mode and load default rules when GEMINI_YOLO_MODE is not true', async () => {
-        vi.stubEnv('GEMINI_YOLO_MODE', 'false');
+      it('should use default approval mode and load default rules when SPARKLE_YOLO_MODE is not true', async () => {
+        vi.stubEnv('SPARKLE_YOLO_MODE', 'false');
         await loadConfig(mockSettings, mockExtensionLoader, taskId);
         expect(Config).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -374,15 +374,15 @@ describe('setIsTrusted', () => {
     vi.unstubAllEnvs();
   });
 
-  it('should return true when GEMINI_FOLDER_TRUST env var is true', async () => {
-    vi.stubEnv('GEMINI_FOLDER_TRUST', 'true');
+  it('should return true when SPARKLE_FOLDER_TRUST env var is true', async () => {
+    vi.stubEnv('SPARKLE_FOLDER_TRUST', 'true');
     const { setIsTrusted } = await import('./config.js');
     expect(setIsTrusted(undefined)).toBe(true);
     expect(setIsTrusted({ isTrusted: false } as AgentSettings)).toBe(true);
   });
 
-  it('should return false when GEMINI_FOLDER_TRUST env var is false', async () => {
-    vi.stubEnv('GEMINI_FOLDER_TRUST', 'false');
+  it('should return false when SPARKLE_FOLDER_TRUST env var is false', async () => {
+    vi.stubEnv('SPARKLE_FOLDER_TRUST', 'false');
     const { setIsTrusted } = await import('./config.js');
     expect(setIsTrusted(undefined)).toBe(false);
     expect(setIsTrusted({ isTrusted: true } as AgentSettings)).toBe(false);

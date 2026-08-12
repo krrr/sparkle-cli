@@ -45,9 +45,9 @@ If a test fails, verify:
 
 - **Tool Trajectory Logs**:序列 of calls in `evals/logs/<test_name>.log`.
 - **Verbose Reasoning**: Capture raw buffer traces by setting
-  `GEMINI_DEBUG_LOG_FILE`:
+  `SPARKLE_DEBUG_LOG_FILE`:
   ```bash
-  export GEMINI_DEBUG_LOG_FILE="debug.log"
+  export SPARKLE_DEBUG_LOG_FILE="debug.log"
   ```
 
 ---

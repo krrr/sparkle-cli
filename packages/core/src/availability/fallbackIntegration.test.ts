@@ -8,9 +8,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { applyModelSelection } from './policyHelpers.js';
 import type { Config } from '../config/config.js';
 import {
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import { ModelAvailabilityService } from './modelAvailabilityService.js';
 import { ModelConfigService } from '../services/modelConfigService.js';
@@ -24,8 +24,8 @@ describe('Fallback Integration', () => {
   beforeEach(() => {
     // Mocking Config because it has many dependencies
     config = {
-      getModel: () => GEMINI_MODEL_ALIAS_AUTO,
-      getActiveModel: () => GEMINI_MODEL_ALIAS_AUTO,
+      getModel: () => SPARKLE_MODEL_ALIAS_AUTO,
+      getActiveModel: () => SPARKLE_MODEL_ALIAS_AUTO,
       setActiveModel: vi.fn(),
       getModelAvailabilityService: () => availabilityService,
       modelConfigService: undefined as unknown as ModelConfigService,
@@ -39,11 +39,11 @@ describe('Fallback Integration', () => {
 
   it('should select fallback model when primary model is terminal and config is in AUTO mode', () => {
     // 1. Simulate "Pro" failing with a terminal quota error
-    // The policy chain for DEFAULT_GEMINI_MODEL_AUTO is [DEFAULT_GEMINI_MODEL, DEFAULT_GEMINI_FLASH_MODEL]
-    availabilityService.markTerminal(DEFAULT_GEMINI_MODEL, 'quota');
+    // The policy chain for DEFAULT_SPARKLE_MODEL_AUTO is [DEFAULT_SPARKLE_MODEL, DEFAULT_GEMINI_FLASH_MODEL]
+    availabilityService.markTerminal(DEFAULT_SPARKLE_MODEL, 'quota');
 
     // 2. Request "Pro" explicitly (as Agent would)
-    const requestedModel = DEFAULT_GEMINI_MODEL;
+    const requestedModel = DEFAULT_SPARKLE_MODEL;
 
     // 3. Apply model selection
     const result = applyModelSelection(config, {
@@ -62,13 +62,13 @@ describe('Fallback Integration', () => {
 
   it('should fallback even when config is NOT in AUTO mode (all Gemini models get the Gemini 3 chain)', () => {
     // 1. Config is explicitly set to Pro, not Auto
-    vi.spyOn(config, 'getModel').mockReturnValue(DEFAULT_GEMINI_MODEL);
+    vi.spyOn(config, 'getModel').mockReturnValue(DEFAULT_SPARKLE_MODEL);
 
     // 2. Simulate "Pro" failing
-    availabilityService.markTerminal(DEFAULT_GEMINI_MODEL, 'quota');
+    availabilityService.markTerminal(DEFAULT_SPARKLE_MODEL, 'quota');
 
     // 3. Request "Pro"
-    const requestedModel = DEFAULT_GEMINI_MODEL;
+    const requestedModel = DEFAULT_SPARKLE_MODEL;
 
     // 4. Apply model selection
     const result = applyModelSelection(config, { model: requestedModel });
@@ -92,19 +92,19 @@ describe('Fallback Integration', () => {
   });
 
   it('should fallback to Flash after failures and restore Pro on next turn', () => {
-    const requestedModel = DEFAULT_GEMINI_MODEL;
+    const requestedModel = DEFAULT_SPARKLE_MODEL;
 
     // 1. Initial call should return Pro with 3 attempts
     const result1 = applyModelSelection(config, {
       model: requestedModel,
       isChatModel: true,
     });
-    expect(result1.model).toBe(DEFAULT_GEMINI_MODEL);
+    expect(result1.model).toBe(DEFAULT_SPARKLE_MODEL);
     expect(result1.maxAttempts).toBe(3);
 
     // 2. Simulate failure and transition to sticky_retry with consumed=true
-    availabilityService.markRetryOncePerTurn(DEFAULT_GEMINI_MODEL, 3);
-    availabilityService.consumeStickyAttempt(DEFAULT_GEMINI_MODEL);
+    availabilityService.markRetryOncePerTurn(DEFAULT_SPARKLE_MODEL, 3);
+    availabilityService.consumeStickyAttempt(DEFAULT_SPARKLE_MODEL);
 
     // 3. Next call in same turn should fallback to Flash
     const result2 = applyModelSelection(config, {
@@ -121,7 +121,7 @@ describe('Fallback Integration', () => {
       model: requestedModel,
       isChatModel: true,
     });
-    expect(result3.model).toBe(DEFAULT_GEMINI_MODEL);
+    expect(result3.model).toBe(DEFAULT_SPARKLE_MODEL);
     expect(result3.maxAttempts).toBe(3);
   });
 });

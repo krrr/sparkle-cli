@@ -104,7 +104,7 @@ export function applySubstitutions(
  * Checks if a specific prompt section is enabled via environment variables.
  */
 export function isSectionEnabled(key: string): boolean {
-  const envVar = process.env[`GEMINI_PROMPT_${key.toUpperCase()}`];
+  const envVar = process.env[`SPARKLE_PROMPT_${key.toUpperCase()}`];
   const lowerEnvVar = envVar?.trim().toLowerCase();
   return lowerEnvVar !== '0' && lowerEnvVar !== 'false';
 }

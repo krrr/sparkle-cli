@@ -15,7 +15,7 @@ import stripAnsi from 'strip-ansi';
 
 // Browser agent Chrome DevTools MCP connection is flaky in Docker sandbox.
 // See: https://github.com/google-gemini/gemini-cli/issues/24382
-const isDockerSandbox = env['GEMINI_SANDBOX'] === 'docker';
+const isDockerSandbox = env['SPARKLE_SANDBOX'] === 'docker';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -230,7 +230,6 @@ priority = 200
     const stdout = await rig.runCommand(['Open https://example.com'], {
       env: {
         GEMINI_API_KEY: 'fake-key',
-        GEMINI_TELEMETRY_DISABLED: 'true',
         DEV: 'true',
       },
     });

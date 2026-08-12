@@ -167,37 +167,37 @@ describe('isSectionEnabled', () => {
   });
 
   it('should return true when the env var is set to "1"', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', '1');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', '1');
     expect(isSectionEnabled('SOME_KEY')).toBe(true);
   });
 
   it('should return true when the env var is set to "true"', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', 'true');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', 'true');
     expect(isSectionEnabled('SOME_KEY')).toBe(true);
   });
 
   it('should return false when the env var is set to "0"', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', '0');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', '0');
     expect(isSectionEnabled('SOME_KEY')).toBe(false);
   });
 
   it('should return false when the env var is set to "false"', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', 'false');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', 'false');
     expect(isSectionEnabled('SOME_KEY')).toBe(false);
   });
 
   it('should handle case-insensitive key conversion', () => {
-    vi.stubEnv('GEMINI_PROMPT_MY_SECTION', '0');
+    vi.stubEnv('SPARKLE_PROMPT_MY_SECTION', '0');
     expect(isSectionEnabled('my_section')).toBe(false);
   });
 
   it('should handle whitespace around the env var value', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', '  false  ');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', '  false  ');
     expect(isSectionEnabled('SOME_KEY')).toBe(false);
   });
 
   it('should return true for any non-falsy value', () => {
-    vi.stubEnv('GEMINI_PROMPT_SOME_KEY', 'enabled');
+    vi.stubEnv('SPARKLE_PROMPT_SOME_KEY', 'enabled');
     expect(isSectionEnabled('SOME_KEY')).toBe(true);
   });
 });

@@ -29,7 +29,7 @@ import {
   ASK_USER_TOOL_NAME,
   getVersion,
   coreEvents,
-  GEMINI_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_AUTO,
   isHeadlessMode,
   Config,
   SimpleExtensionLoader,
@@ -590,7 +590,7 @@ export async function loadCliConfig(
     options.worktreeSettings ?? (await resolveWorktreeSettings(cwd));
 
   if (argv.sandbox) {
-    process.env['GEMINI_SANDBOX'] = 'true';
+    process.env['SPARKLE_SANDBOX'] = 'true';
   }
 
   const includeDirectoryTree = settings.context?.includeDirectoryTree ?? true;
@@ -823,9 +823,9 @@ export async function loadCliConfig(
     interactive,
   );
 
-  const defaultModel = GEMINI_MODEL_ALIAS_AUTO;
+  const defaultModel = SPARKLE_MODEL_ALIAS_AUTO;
   const rawModel =
-    argv.model || process.env['GEMINI_MODEL'] || settings.model?.name;
+    argv.model || process.env['SPARKLE_MODEL'] || settings.model?.name;
 
   // Ensure specifiedModel is a string (e.g. if yargs parsed multiple --model as an array)
   const specifiedModel = Array.isArray(rawModel)
@@ -835,7 +835,7 @@ export async function loadCliConfig(
       : String(rawModel ?? '').trim() || '';
 
   const resolvedModel =
-    specifiedModel === GEMINI_MODEL_ALIAS_AUTO
+    specifiedModel === SPARKLE_MODEL_ALIAS_AUTO
       ? defaultModel
       : specifiedModel || defaultModel;
   const sandboxConfig = await loadSandboxConfig(settings, argv);

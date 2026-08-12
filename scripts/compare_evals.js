@@ -94,7 +94,7 @@ function main() {
       markdown += 'Run the following command to see the failure trajectory:\n';
       markdown += '```bash\n';
       const pattern = r.name.replace(/'/g, '.');
-      markdown += `GEMINI_MODEL=${targetModel} npm run test:all_evals -- ${r.file} --testNamePattern="${pattern}"\n`;
+      markdown += `SPARKLE_MODEL=${targetModel} npm run test:all_evals -- ${r.file} --testNamePattern="${pattern}"\n`;
 
       markdown += '```\n\n';
 

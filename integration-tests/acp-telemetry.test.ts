@@ -14,7 +14,7 @@ import { env } from 'node:process';
 import * as acp from '@agentclientprotocol/sdk';
 
 // Skip in sandbox mode - test spawns CLI directly which behaves differently in containers
-const sandboxEnv = env['GEMINI_SANDBOX'];
+const sandboxEnv = env['SPARKLE_SANDBOX'];
 const itMaybe = sandboxEnv && sandboxEnv !== 'false' ? it.skip : it;
 
 // Reuse existing fake responses that return a simple "Hello" response

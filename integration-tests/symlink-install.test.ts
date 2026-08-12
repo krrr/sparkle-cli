@@ -84,7 +84,7 @@ describe.skipIf(skipFlaky)(
             ...process.env,
             SPARKLE_CLI_HOME: rig.homeDir!,
             SPARKLE_CLI_INTEGRATION_TEST: 'true',
-            GEMINI_PTY_INFO: 'node-pty',
+            SPARKLE_PTY_INFO: 'node-pty',
           },
         });
         return new InteractiveRun(ptyProcess);

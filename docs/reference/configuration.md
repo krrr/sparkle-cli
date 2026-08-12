@@ -2020,11 +2020,11 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
     [authentication methods](../get-started/authentication.mdx).
   - Set this in your shell profile (for example, `~/.bashrc`, `~/.zshrc`) or an
     `.env` file.
-- **`GEMINI_MODEL`**:
+- **`SPARKLE_MODEL`**:
   - Specifies the default Gemini model to use.
   - Overrides the hardcoded default
-  - Example: `export GEMINI_MODEL="gemini-3-flash-preview"` (Windows PowerShell:
-    `$env:GEMINI_MODEL="gemini-3-flash-preview"`)
+  - Example: `export SPARKLE_MODEL="gemini-3-flash-preview"` (Windows
+    PowerShell: `$env:SPARKLE_MODEL="gemini-3-flash-preview"`)
 - **`SPARKLE_CLI_TRUST_WORKSPACE`**:
   - If set to `"true"`, trusts the current workspace for the duration of the
     session, bypassing the folder trust check.
@@ -2093,17 +2093,17 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Set to `true` or `1` to enable or disable using an external OTLP collector.
     Any other value is treated as disabling it.
   - Overrides the `telemetry.useCollector` setting.
-- **`GEMINI_SANDBOX`**:
+- **`SPARKLE_SANDBOX`**:
   - Alternative to the `sandbox` setting in `settings.json`.
   - Accepts `true`, `false`, `docker`, `podman`, or a custom command string.
-- **`GEMINI_SYSTEM_MD`**:
+- **`SPARKLE_SYSTEM_MD`**:
   - Replaces the built‑in system prompt with content from a Markdown file.
   - `true`/`1`: Use project default path `./.sparkle/system.md`.
   - Any other string: Treat as a path (relative/absolute supported, `~`
     expands).
   - `false`/`0` or unset: Use the built‑in prompt. See
     [System Prompt Override](../cli/system-prompt.md).
-- **`GEMINI_WRITE_SYSTEM_MD`**:
+- **`SPARKLE_WRITE_SYSTEM_MD`**:
   - Writes the current built‑in system prompt to a file for review.
   - `true`/`1`: Write to `./.sparkle/system.md`. Otherwise treat the value as a
     path.
@@ -2388,7 +2388,7 @@ file modifications) within a sandboxed environment to protect your system.
 Sandboxing is disabled by default, but you can enable it in a few ways:
 
 - Using `--sandbox` or `-s` flag.
-- Setting `GEMINI_SANDBOX` environment variable.
+- Setting `SPARKLE_SANDBOX` environment variable.
 - Sandbox is enabled when using `--yolo` or `--approval-mode=yolo` by default.
 
 By default, it uses a pre-built `sparkle-cli-sandbox` Docker image.

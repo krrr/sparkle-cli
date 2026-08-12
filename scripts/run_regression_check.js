@@ -39,7 +39,7 @@ function runTests(files, pattern, model) {
     const cmd = `npx vitest run --config evals/vitest.config.ts ${filesToRun} -t "${pattern}" --reporter=json --reporter=default --outputFile="${path.join(outputDir, 'report.json')}"`;
     execSync(cmd, {
       stdio: 'inherit',
-      env: { ...process.env, RUN_EVALS: '1', GEMINI_MODEL: model },
+      env: { ...process.env, RUN_EVALS: '1', SPARKLE_MODEL: model },
     });
   } catch {
     // Vitest returns a non-zero exit code when tests fail. This is expected.

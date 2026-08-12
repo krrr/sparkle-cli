@@ -14,7 +14,7 @@ import {
   loadAgentsFromDirectory,
   AgentLoadError,
 } from './agentLoader.js';
-import { GEMINI_MODEL_ALIAS_PRO } from '../config/models.js';
+import { SPARKLE_MODEL_ALIAS_PRO } from '../config/models.js';
 import {
   DEFAULT_MAX_TIME_MINUTES,
   DEFAULT_MAX_TURNS,
@@ -456,14 +456,14 @@ Body`);
         kind: 'local' as const,
         name: 'test-agent',
         description: 'A test agent',
-        model: GEMINI_MODEL_ALIAS_PRO,
+        model: SPARKLE_MODEL_ALIAS_PRO,
         system_prompt: 'You are a test agent.',
       };
 
       const result = markdownToAgentDefinition(
         markdown,
       ) as LocalAgentDefinition;
-      expect(result.modelConfig.model).toBe(GEMINI_MODEL_ALIAS_PRO);
+      expect(result.modelConfig.model).toBe(SPARKLE_MODEL_ALIAS_PRO);
     });
 
     it('should convert mcp_servers in local agent', () => {

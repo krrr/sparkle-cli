@@ -33,8 +33,8 @@ import {
 } from './turn.js';
 import { getCoreSystemPrompt } from './prompts.js';
 import {
-  GEMINI_MODEL_ALIAS_AUTO,
-  DEFAULT_GEMINI_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
+  DEFAULT_SPARKLE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
 } from '../config/models.js';
@@ -283,7 +283,7 @@ describe('Gemini Client (client.ts)', () => {
         resolveModelId: (model: string) => model,
         resolveClassifierModelId: (_tier: string, model: string) => model,
         getModelDefinition: (modelId: string) =>
-          modelId === GEMINI_MODEL_ALIAS_AUTO ? { tier: 'auto' } : undefined,
+          modelId === SPARKLE_MODEL_ALIAS_AUTO ? { tier: 'auto' } : undefined,
         getModelChain: () => undefined,
         resolveChain: vi.fn().mockImplementation((key: string) =>
           key === 'lite'
@@ -301,7 +301,7 @@ describe('Gemini Client (client.ts)', () => {
                   stateTransitions: {},
                 },
                 {
-                  model: DEFAULT_GEMINI_MODEL,
+                  model: DEFAULT_SPARKLE_MODEL,
                   isLastResort: true,
                   actions: {},
                   stateTransitions: {},
@@ -309,7 +309,7 @@ describe('Gemini Client (client.ts)', () => {
               ]
             : [
                 {
-                  model: DEFAULT_GEMINI_MODEL,
+                  model: DEFAULT_SPARKLE_MODEL,
                   isLastResort: false,
                   actions: {},
                   stateTransitions: {},
@@ -2451,7 +2451,9 @@ ${JSON.stringify(
             skipped: [],
           },
         );
-        vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
+        vi.mocked(mockConfig.getModel).mockReturnValue(
+          SPARKLE_MODEL_ALIAS_AUTO,
+        );
         const stream = client.sendMessageStream(
           [{ text: 'Hi' }],
           new AbortController().signal,
@@ -2482,7 +2484,9 @@ ${JSON.stringify(
             skipped: [],
           },
         );
-        vi.mocked(mockConfig.getModel).mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
+        vi.mocked(mockConfig.getModel).mockReturnValue(
+          SPARKLE_MODEL_ALIAS_AUTO,
+        );
         const stream = client.sendMessageStream(
           [{ text: 'Hi' }],
           new AbortController().signal,

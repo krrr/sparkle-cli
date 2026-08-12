@@ -54,7 +54,7 @@ describe('loadSandboxConfig', () => {
     vi.resetAllMocks();
     process.env = { ...originalEnv };
     delete process.env['SANDBOX'];
-    delete process.env['GEMINI_SANDBOX'];
+    delete process.env['SPARKLE_SANDBOX'];
     mockedGetPackageJson.mockResolvedValue({
       config: { sandboxImageUri: 'default/image' },
     });
@@ -85,9 +85,9 @@ describe('loadSandboxConfig', () => {
     expect(config).toBeUndefined();
   });
 
-  describe('with GEMINI_SANDBOX environment variable', () => {
-    it('should use docker if GEMINI_SANDBOX=docker and it exists', async () => {
-      process.env['GEMINI_SANDBOX'] = 'docker';
+  describe('with SPARKLE_SANDBOX environment variable', () => {
+    it('should use docker if SPARKLE_SANDBOX=docker and it exists', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'docker';
       mockedCommandExistsSync.mockReturnValue(true);
       const config = await loadSandboxConfig({}, {});
       expect(config).toEqual({
@@ -100,23 +100,23 @@ describe('loadSandboxConfig', () => {
       expect(mockedCommandExistsSync).toHaveBeenCalledWith('docker');
     });
 
-    it('should throw if GEMINI_SANDBOX is an invalid command', async () => {
-      process.env['GEMINI_SANDBOX'] = 'invalid-command';
+    it('should throw if SPARKLE_SANDBOX is an invalid command', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'invalid-command';
       await expect(loadSandboxConfig({}, {})).rejects.toThrow(
         "Invalid sandbox command 'invalid-command'. Must be one of docker, podman, sandbox-exec, runsc, lxc",
       );
     });
 
-    it('should throw if GEMINI_SANDBOX command does not exist', async () => {
-      process.env['GEMINI_SANDBOX'] = 'docker';
+    it('should throw if SPARKLE_SANDBOX command does not exist', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'docker';
       mockedCommandExistsSync.mockReturnValue(false);
       await expect(loadSandboxConfig({}, {})).rejects.toThrow(
-        "Missing sandbox command 'docker' (from GEMINI_SANDBOX)",
+        "Missing sandbox command 'docker' (from SPARKLE_SANDBOX)",
       );
     });
 
-    it('should use lxc if GEMINI_SANDBOX=lxc and it exists', async () => {
-      process.env['GEMINI_SANDBOX'] = 'lxc';
+    it('should use lxc if SPARKLE_SANDBOX=lxc and it exists', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'lxc';
       mockedCommandExistsSync.mockReturnValue(true);
       const config = await loadSandboxConfig({}, {});
       expect(config).toEqual({
@@ -129,11 +129,11 @@ describe('loadSandboxConfig', () => {
       expect(mockedCommandExistsSync).toHaveBeenCalledWith('lxc');
     });
 
-    it('should throw if GEMINI_SANDBOX=lxc but lxc command does not exist', async () => {
-      process.env['GEMINI_SANDBOX'] = 'lxc';
+    it('should throw if SPARKLE_SANDBOX=lxc but lxc command does not exist', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'lxc';
       mockedCommandExistsSync.mockReturnValue(false);
       await expect(loadSandboxConfig({}, {})).rejects.toThrow(
-        "Missing sandbox command 'lxc' (from GEMINI_SANDBOX)",
+        "Missing sandbox command 'lxc' (from SPARKLE_SANDBOX)",
       );
     });
   });
@@ -197,8 +197,8 @@ describe('loadSandboxConfig', () => {
       mockedOsPlatform.mockReturnValue('linux');
       mockedCommandExistsSync.mockReturnValue(false);
       await expect(loadSandboxConfig({}, { sandbox: true })).rejects.toThrow(
-        'GEMINI_SANDBOX is true but failed to determine command for sandbox; ' +
-          'install docker or podman or specify command in GEMINI_SANDBOX',
+        'SPARKLE_SANDBOX is true but failed to determine command for sandbox; ' +
+          'install docker or podman or specify command in SPARKLE_SANDBOX',
       );
     });
   });
@@ -222,7 +222,7 @@ describe('loadSandboxConfig', () => {
       await expect(
         loadSandboxConfig({}, { sandbox: 'podman' }),
       ).rejects.toThrow(
-        "Missing sandbox command 'podman' (from GEMINI_SANDBOX)",
+        "Missing sandbox command 'podman' (from SPARKLE_SANDBOX)",
       );
     });
 
@@ -236,9 +236,9 @@ describe('loadSandboxConfig', () => {
   });
 
   describe('image configuration', () => {
-    it('should use image from GEMINI_SANDBOX_IMAGE env var if set', async () => {
-      process.env['GEMINI_SANDBOX_IMAGE'] = 'env/image';
-      process.env['GEMINI_SANDBOX'] = 'docker';
+    it('should use image from SPARKLE_SANDBOX_IMAGE env var if set', async () => {
+      process.env['SPARKLE_SANDBOX_IMAGE'] = 'env/image';
+      process.env['SPARKLE_SANDBOX'] = 'docker';
       mockedCommandExistsSync.mockReturnValue(true);
       const config = await loadSandboxConfig({}, {});
       expect(config).toEqual({
@@ -251,7 +251,7 @@ describe('loadSandboxConfig', () => {
     });
 
     it('should use image from package.json if env var is not set', async () => {
-      process.env['GEMINI_SANDBOX'] = 'docker';
+      process.env['SPARKLE_SANDBOX'] = 'docker';
       mockedCommandExistsSync.mockReturnValue(true);
       const config = await loadSandboxConfig({}, {});
       expect(config).toEqual({
@@ -265,7 +265,7 @@ describe('loadSandboxConfig', () => {
 
     it('should return undefined if command is found but no image is configured', async () => {
       mockedGetPackageJson.mockResolvedValue({}); // no sandboxImageUri
-      process.env['GEMINI_SANDBOX'] = 'docker';
+      process.env['SPARKLE_SANDBOX'] = 'docker';
       mockedCommandExistsSync.mockReturnValue(true);
       const config = await loadSandboxConfig({}, {});
       expect(config).toBeUndefined();
@@ -418,8 +418,8 @@ describe('loadSandboxConfig', () => {
       expect(mockedCommandExistsSync).toHaveBeenCalledWith('docker');
     });
 
-    it('should use runsc via GEMINI_SANDBOX environment variable', async () => {
-      process.env['GEMINI_SANDBOX'] = 'runsc';
+    it('should use runsc via SPARKLE_SANDBOX environment variable', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'runsc';
       const config = await loadSandboxConfig({}, {});
 
       expect(config).toEqual({
@@ -450,8 +450,8 @@ describe('loadSandboxConfig', () => {
       expect(mockedCommandExistsSync).toHaveBeenCalledWith('docker');
     });
 
-    it('should prioritize GEMINI_SANDBOX over CLI and settings', async () => {
-      process.env['GEMINI_SANDBOX'] = 'runsc';
+    it('should prioritize SPARKLE_SANDBOX over CLI and settings', async () => {
+      process.env['SPARKLE_SANDBOX'] = 'runsc';
       const config = await loadSandboxConfig(
         { tools: { sandbox: 'docker' } },
         { sandbox: 'podman' },
@@ -486,7 +486,7 @@ describe('loadSandboxConfig', () => {
       mockedCommandExistsSync.mockReturnValue(false);
 
       await expect(loadSandboxConfig({}, { sandbox: 'runsc' })).rejects.toThrow(
-        "Missing sandbox command 'runsc' (from GEMINI_SANDBOX)",
+        "Missing sandbox command 'runsc' (from SPARKLE_SANDBOX)",
       );
     });
 

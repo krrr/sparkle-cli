@@ -19,7 +19,7 @@ import {
 import { isRecord } from '../utils/markdownUtils.js';
 import { FileKeychain } from './fileKeychain.js';
 
-export const FORCE_FILE_STORAGE_ENV_VAR = 'GEMINI_FORCE_FILE_STORAGE';
+export const FORCE_FILE_STORAGE_ENV_VAR = 'SPARKLE_FORCE_FILE_STORAGE';
 
 /**
  * Service for interacting with OS-level secure storage (e.g. @github/keytar).

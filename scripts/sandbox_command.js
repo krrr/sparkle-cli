@@ -35,7 +35,7 @@ const argv = yargs(hideBin(process.argv)).option('q', {
 
 const homedir = () => process.env['SPARKLE_CLI_HOME'] || os.homedir();
 
-let geminiSandbox = process.env.GEMINI_SANDBOX;
+let geminiSandbox = process.env.SPARKLE_SANDBOX;
 
 if (!geminiSandbox) {
   const userSettingsFile = join(homedir(), SPARKLE_DIR, 'settings.json');
@@ -67,7 +67,7 @@ if (!geminiSandbox) {
     }
     currentDir = parentDir;
   }
-  geminiSandbox = process.env.GEMINI_SANDBOX;
+  geminiSandbox = process.env.SPARKLE_SANDBOX;
 }
 
 geminiSandbox = (geminiSandbox || '').toLowerCase();
@@ -98,7 +98,7 @@ if (['1', 'true'].includes(geminiSandbox)) {
     command = 'podman';
   } else {
     console.error(
-      'ERROR: install docker or podman or specify command in GEMINI_SANDBOX',
+      'ERROR: install docker or podman or specify command in SPARKLE_SANDBOX',
     );
     process.exit(1);
   }
@@ -107,7 +107,7 @@ if (['1', 'true'].includes(geminiSandbox)) {
     command = geminiSandbox;
   } else {
     console.error(
-      `ERROR: missing sandbox command '${geminiSandbox}' (from GEMINI_SANDBOX)`,
+      `ERROR: missing sandbox command '${geminiSandbox}' (from SPARKLE_SANDBOX)`,
     );
     process.exit(1);
   }

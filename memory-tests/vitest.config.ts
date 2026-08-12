@@ -22,7 +22,7 @@ export default defineConfig({
       },
     },
     env: {
-      GEMINI_TEST_TYPE: 'memory',
+      SPARKLE_TEST_TYPE: 'memory',
     },
   },
 });

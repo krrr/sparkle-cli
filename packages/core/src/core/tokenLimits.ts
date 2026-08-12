@@ -7,7 +7,7 @@
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_MODEL,
+  DEFAULT_SPARKLE_MODEL,
 } from '../config/models.js';
 
 type Model = string;
@@ -19,7 +19,7 @@ export function tokenLimit(model: Model): TokenCount {
   // Add other models as they become relevant or if specified by config
   // Pulled from https://ai.google.dev/gemini-api/docs/models
   switch (model) {
-    case DEFAULT_GEMINI_MODEL:
+    case DEFAULT_SPARKLE_MODEL:
     case DEFAULT_GEMINI_FLASH_MODEL:
     case DEFAULT_GEMINI_FLASH_LITE_MODEL:
       return 1_048_576;

@@ -67,8 +67,8 @@ const env = {
 };
 
 const keepCiEnv =
-  process.env.GEMINI_KEEP_CI_ENV === '1' ||
-  process.env.GEMINI_KEEP_CI_ENV === 'true';
+  process.env.SPARKLE_KEEP_CI_ENV === '1' ||
+  process.env.SPARKLE_KEEP_CI_ENV === 'true';
 if (!keepCiEnv) {
   const ciKeys = ['CI', 'CONTINUOUS_INTEGRATION', 'GITHUB_ACTIONS'].filter(
     (k) => k in env,
@@ -76,7 +76,7 @@ if (!keepCiEnv) {
   if (ciKeys.length > 0) {
     ciKeys.forEach((k) => delete env[k]);
     process.stderr.write(
-      `[sparkle] Removed CI env vars to keep interactive mode working in dev: ${ciKeys.join(', ')}. Set GEMINI_KEEP_CI_ENV=1 to disable.\n`,
+      `[sparkle] Removed CI env vars to keep interactive mode working in dev: ${ciKeys.join(', ')}. Set SPARKLE_KEEP_CI_ENV=1 to disable.\n`,
     );
   }
 }

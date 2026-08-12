@@ -114,9 +114,9 @@ describe('Context Management Fidelity E2E', () => {
 
       const commonEnv = {
         GEMINI_API_KEY: 'mock-key',
-        GEMINI_CONTEXT_TRACE_DIR: traceDir,
-        GEMINI_CONTEXT_TRACE_ENABLED: 'true',
-        GEMINI_DEBUG_LOG_FILE: path.join(rig.testDir!, 'debug.log'),
+        SPARKLE_CONTEXT_TRACE_DIR: traceDir,
+        SPARKLE_CONTEXT_TRACE_ENABLED: 'true',
+        SPARKLE_DEBUG_LOG_FILE: path.join(rig.testDir!, 'debug.log'),
       };
 
       const runMocks: FakeResponse[] = [

@@ -347,7 +347,7 @@ describe('HookRunner', () => {
       it('should expand environment variables in commands', async () => {
         const configWithEnvVar: HookConfig = {
           type: HookType.Command,
-          command: '$GEMINI_PROJECT_DIR/hooks/test.sh',
+          command: '$SPARKLE_PROJECT_DIR/hooks/test.sh',
         };
 
         mockSpawn.mockProcessOn.mockImplementation(
@@ -372,20 +372,20 @@ describe('HookRunner', () => {
           expect.objectContaining({
             shell: false,
             env: expect.objectContaining({
-              GEMINI_PROJECT_DIR: '/test/project',
-              GEMINI_PLANS_DIR: '/test/project/plans',
-              GEMINI_CWD: '/test/project',
-              GEMINI_SESSION_ID: 'test-session',
+              SPARKLE_PROJECT_DIR: '/test/project',
+              SPARKLE_PLANS_DIR: '/test/project/plans',
+              SPARKLE_CWD: '/test/project',
+              SPARKLE_SESSION_ID: 'test-session',
               CLAUDE_PROJECT_DIR: '/test/project',
             }),
           }),
         );
       });
 
-      it('should expand and escape GEMINI_PLANS_DIR in commands', async () => {
+      it('should expand and escape SPARKLE_PLANS_DIR in commands', async () => {
         const configWithEnvVar: HookConfig = {
           type: HookType.Command,
-          command: 'ls $GEMINI_PLANS_DIR',
+          command: 'ls $SPARKLE_PLANS_DIR',
         };
 
         // Change plans dir to one with spaces
@@ -418,7 +418,7 @@ describe('HookRunner', () => {
         );
       });
 
-      it('should not allow command injection via GEMINI_PROJECT_DIR', async () => {
+      it('should not allow command injection via SPARKLE_PROJECT_DIR', async () => {
         const maliciousCwd = '/test/project; echo "pwned" > /tmp/pwned';
         const mockMaliciousInput: HookInput = {
           ...mockInput,
@@ -427,7 +427,7 @@ describe('HookRunner', () => {
 
         const config: HookConfig = {
           type: HookType.Command,
-          command: 'ls $GEMINI_PROJECT_DIR',
+          command: 'ls $SPARKLE_PROJECT_DIR',
         };
 
         // Mock the process closing immediately

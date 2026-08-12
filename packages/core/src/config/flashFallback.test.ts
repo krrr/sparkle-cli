@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Config } from './config.js';
-import { DEFAULT_GEMINI_MODEL, DEFAULT_GEMINI_FLASH_MODEL } from './models.js';
+import { DEFAULT_SPARKLE_MODEL, DEFAULT_GEMINI_FLASH_MODEL } from './models.js';
 import { logFlashFallback } from '../telemetry/loggers.js';
 import { FlashFallbackEvent } from '../telemetry/types.js';
 
@@ -31,14 +31,14 @@ describe('Flash Model Fallback Configuration', () => {
       targetDir: '/test',
       debugMode: false,
       cwd: '/test',
-      model: DEFAULT_GEMINI_MODEL,
+      model: DEFAULT_SPARKLE_MODEL,
     });
 
     // Initialize contentGeneratorConfig for testing
     (
       config as unknown as { contentGeneratorConfig: unknown }
     ).contentGeneratorConfig = {
-      model: DEFAULT_GEMINI_MODEL,
+      model: DEFAULT_SPARKLE_MODEL,
       authType: 'oauth-personal',
     };
   });
@@ -77,10 +77,10 @@ describe('Flash Model Fallback Configuration', () => {
     it('should set fallback override when failedModel is provided and register runtime override', () => {
       config.activateFallbackMode(
         DEFAULT_GEMINI_FLASH_MODEL,
-        DEFAULT_GEMINI_MODEL,
+        DEFAULT_SPARKLE_MODEL,
       );
       expect(config.getModel()).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-      expect(config.getFallbackOverride(DEFAULT_GEMINI_MODEL)).toBe(
+      expect(config.getFallbackOverride(DEFAULT_SPARKLE_MODEL)).toBe(
         DEFAULT_GEMINI_FLASH_MODEL,
       );
 
@@ -88,7 +88,7 @@ describe('Flash Model Fallback Configuration', () => {
       expect(
         config
           .getModelConfigService()
-          .getResolvedConfig({ model: DEFAULT_GEMINI_MODEL }).model,
+          .getResolvedConfig({ model: DEFAULT_SPARKLE_MODEL }).model,
       ).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 

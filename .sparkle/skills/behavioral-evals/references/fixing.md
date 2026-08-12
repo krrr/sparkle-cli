@@ -15,7 +15,7 @@ evaluation.
     to the local workspace.
 3.  **Read Logs**:
     - Eval logs live in `evals/logs/<test_name>.log`.
-    - Enable verbose debugging via `export GEMINI_DEBUG_LOG_FILE="debug.log"`.
+    - Enable verbose debugging via `export SPARKLE_DEBUG_LOG_FILE="debug.log"`.
 4.  **Diagnose**: Audit tool logs and telemetry. Note if due to setup/assert.
     - **Tip**: Proactively add custom logging/diagnostics to check hypotheses.
 
