@@ -43,6 +43,4 @@ export { logModelSlashCommand } from './src/telemetry/loggers.js';
 export { KeychainTokenStorage } from './src/mcp/token-storage/keychain-token-storage.js';
 export * from './src/utils/googleQuotaErrors.js';
 export type { GoogleApiError } from './src/utils/googleErrors.js';
-export { getExperiments } from './src/experiments/experiments.js';
-export { ExperimentFlags } from './src/experiments/flagNames.js';
 export { getErrorStatus, ModelNotFoundError } from './src/utils/httpErrors.js';

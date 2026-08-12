@@ -50,7 +50,6 @@ describe('ModelRouterService', () => {
     vi.spyOn(mockConfig, 'getResolvedClassifierThreshold').mockResolvedValue(
       90,
     );
-    vi.spyOn(mockConfig, 'getClassifierThreshold').mockResolvedValue(undefined);
     vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(
       ApprovalMode.DEFAULT,
     );

@@ -59,8 +59,6 @@ export * from './fallback/types.js';
 export * from './fallback/handler.js';
 
 export * from './core/apiKeyCredentialStorage.js';
-export * from './experiments/experiments.js';
-export * from './experiments/flagNames.js';
 
 // Export utilities
 export * from './utils/fetch.js';

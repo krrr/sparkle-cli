@@ -211,8 +211,6 @@ describe('loggers', () => {
         }),
       }),
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getWorktreeSettings: () => undefined,
     } as unknown as Config;
 
@@ -286,8 +284,6 @@ describe('loggers', () => {
       getTelemetryTracesEnabled: () => false,
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -326,8 +322,6 @@ describe('loggers', () => {
         getTargetDir: () => 'target-dir',
         getUsageStatisticsEnabled: () => true,
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
       const event = new UserPromptEvent(
@@ -364,8 +358,6 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
       getTelemetryTracesEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -544,8 +536,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => true,
         getTelemetryTracesEnabled: () => false, // Disabled
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
 
@@ -618,8 +608,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => false,
         getTelemetryTracesEnabled: () => false,
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
 
@@ -668,8 +656,6 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
       getTelemetryTracesEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -804,8 +790,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => true,
         getTelemetryTracesEnabled: () => false, // Disabled
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
 
@@ -875,8 +859,6 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
       getTelemetryTracesEnabled: () => false,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => ({
         authType: AuthType.USE_GEMINI,
       }),
@@ -954,8 +936,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => true,
         getTelemetryTracesEnabled: () => true, // Enabled
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => ({
           authType: AuthType.USE_GEMINI,
         }),
@@ -1044,8 +1024,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => false,
         getTelemetryTracesEnabled: () => false, // Disabled
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => ({
           authType: AuthType.USE_GEMINI,
         }),
@@ -1104,8 +1082,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => true,
         getTelemetryTracesEnabled: () => false,
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getUsageStatisticsEnabled: () => true,
         getContentGeneratorConfig: () => ({
           authType: AuthType.USE_GEMINI,
@@ -1162,8 +1138,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -1191,8 +1165,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -1283,8 +1255,6 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
       getTelemetryTracesEnabled: () => false,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -1883,8 +1853,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => false,
         getTelemetryTracesEnabled: () => false,
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
 
@@ -1928,8 +1896,6 @@ describe('loggers', () => {
         getTelemetryLogPromptsEnabled: () => true,
         getTelemetryTracesEnabled: () => false,
         isInteractive: () => false,
-        getExperiments: () => undefined,
-        getExperimentsAsync: async () => undefined,
         getContentGeneratorConfig: () => undefined,
       } as unknown as Config;
 
@@ -2023,8 +1989,6 @@ describe('loggers', () => {
       getTelemetryLogPromptsEnabled: () => true,
       getTelemetryTracesEnabled: () => false,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2085,8 +2049,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2124,8 +2086,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2218,8 +2178,6 @@ describe('loggers', () => {
       getUsageStatisticsEnabled: () => true,
       getContentGeneratorConfig: () => null,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
     } as unknown as Config;
 
     afterEach(() => {
@@ -2261,8 +2219,6 @@ describe('loggers', () => {
       getUsageStatisticsEnabled: () => true,
       getContentGeneratorConfig: () => null,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
     } as unknown as Config;
 
     afterEach(() => {
@@ -2306,8 +2262,6 @@ describe('loggers', () => {
       getUsageStatisticsEnabled: () => true,
       getContentGeneratorConfig: () => null,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
     } as unknown as Config;
 
     afterEach(() => {
@@ -2343,8 +2297,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2382,8 +2334,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2421,8 +2371,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2451,8 +2399,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2499,8 +2445,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getContentGeneratorConfig: () => undefined,
     } as unknown as Config;
 
@@ -2528,8 +2472,6 @@ describe('loggers', () => {
       getSessionId: () => 'test-session-id',
       getUsageStatisticsEnabled: () => true,
       isInteractive: () => false,
-      getExperiments: () => undefined,
-      getExperimentsAsync: async () => undefined,
       getTelemetryLogPromptsEnabled: () => false,
       getTelemetryTracesEnabled: () => false,
       getContentGeneratorConfig: () => undefined,

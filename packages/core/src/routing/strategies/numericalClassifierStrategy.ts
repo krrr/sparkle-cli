@@ -217,14 +217,8 @@ export class NumericalClassifierStrategy implements RoutingStrategy {
     modelAlias: typeof FLASH_MODEL | typeof PRO_MODEL;
   }> {
     const threshold = await config.getResolvedClassifierThreshold();
-    const remoteThresholdValue = await config.getClassifierThreshold();
 
-    let groupLabel: string;
-    if (threshold === remoteThresholdValue) {
-      groupLabel = 'Remote';
-    } else {
-      groupLabel = 'Default';
-    }
+    const groupLabel = 'Default';
 
     const modelAlias = score >= threshold ? PRO_MODEL : FLASH_MODEL;
 

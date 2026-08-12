@@ -7,7 +7,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { SandboxPolicyManager } from '../policy/sandboxPolicyManager.js';
-import { inspect } from 'node:util';
 import process from 'node:process';
 import { z } from 'zod';
 import type { ConversationRecord } from '../services/chatRecordingService.js';
@@ -77,7 +76,6 @@ import { tokenLimit } from '../core/tokenLimits.js';
 import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  isAutoModel,
 } from './models.js';
 import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
@@ -147,14 +145,9 @@ import {
 } from '../policy/types.js';
 import { HookSystem } from '../hooks/index.js';
 import type { HierarchicalMemory } from './memory.js';
-import {
-  getExperiments,
-  type Experiments,
-} from '../experiments/experiments.js';
 import { AgentRegistry } from '../agents/registry.js';
 import { AcknowledgedAgentsService } from '../agents/acknowledgedAgents.js';
 import { setGlobalProxy, updateGlobalFetchTimeouts } from '../utils/fetch.js';
-import { ExperimentFlags } from '../experiments/flagNames.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { ragLogger } from '../utils/ragLogger.js';
 import { SkillManager, type SkillDefinition } from '../skills/skillManager.js';
@@ -672,7 +665,6 @@ export interface ConfigParameters {
   modelConfigServiceConfig?: ModelConfigServiceConfig;
   enableHooks?: boolean;
   enableHooksUI?: boolean;
-  experiments?: Experiments;
   contextManagement?: Partial<ContextManagementConfig>;
   hooks?: { [K in HookEventName]?: HookDefinition[] };
   disabledHooks?: string[];
@@ -874,8 +866,6 @@ export class Config implements McpContext, AgentLoopContext {
     | ({ [K in HookEventName]?: HookDefinition[] } & { disabled?: string[] })
     | undefined;
   private disabledHooks: string[];
-  private experiments: Experiments | undefined;
-  private experimentsPromise: Promise<Experiments | undefined> | undefined;
   private hookSystem?: HookSystem;
   private readonly onModelChange: ((model: string) => void) | undefined;
   private readonly onReload:
@@ -1287,7 +1277,6 @@ export class Config implements McpContext, AgentLoopContext {
       this.projectHooks = params.projectHooks;
     }
 
-    this.experiments = params.experiments;
     this.onModelChange = params.onModelChange;
     this.onReload = params.onReload;
 
@@ -1495,36 +1484,13 @@ export class Config implements McpContext, AgentLoopContext {
     // Only assign to instance properties after successful initialization
     this.contentGeneratorConfig = newContentGeneratorConfig;
 
-    this.experimentsPromise = getExperiments()
-      .then((experiments) => {
-        this.setExperiments(experiments);
-        return experiments;
-      })
-      .catch((e) => {
-        debugLogger.error('Failed to fetch experiments', e);
-        return undefined;
-      });
-
-    await this.experimentsPromise;
-
     const requestTimeoutMs = this.getRequestTimeoutMs();
     if (requestTimeoutMs !== undefined) {
       updateGlobalFetchTimeouts(requestTimeoutMs);
     }
 
-    // Initialize BaseLlmClient now that the ContentGenerator and experiments are available
+    // Initialize BaseLlmClient now that the ContentGenerator available
     this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
-
-    if ((await this.getProModelNoAccess()) && isAutoModel(this.model, this)) {
-      this.setModel(DEFAULT_GEMINI_FLASH_MODEL);
-    }
-  }
-
-  async getExperimentsAsync(): Promise<Experiments | undefined> {
-    if (this.experiments) {
-      return this.experiments;
-    }
-    return getExperiments();
   }
 
   /**
@@ -1533,11 +1499,6 @@ export class Config implements McpContext, AgentLoopContext {
   getBaseLlmClient(): BaseLlmClient {
     if (!this.baseLlmClient) {
       // Handle cases where initialization might be deferred or authentication failed
-      if (!this.experiments) {
-        throw new Error(
-          'BaseLlmClient not initialized. Ensure experiments have been fetched and configuration is ready.',
-        );
-      }
       if (this.contentGenerator) {
         this.baseLlmClient = new BaseLlmClient(
           this.getContentGenerator(),
@@ -2216,24 +2177,8 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   async getToolOutputMaskingConfig(): Promise<ToolOutputMaskingConfig> {
-    await this.ensureExperimentsLoaded();
-
-    const remoteProtection =
-      this.experiments?.flags[ExperimentFlags.MASKING_PROTECTION_THRESHOLD]
-        ?.intValue;
-    const remotePrunable =
-      this.experiments?.flags[ExperimentFlags.MASKING_PRUNABLE_THRESHOLD]
-        ?.intValue;
-    const remoteProtectLatest =
-      this.experiments?.flags[ExperimentFlags.MASKING_PROTECT_LATEST_TURN]
-        ?.boolValue;
-
-    const parsedProtection = remoteProtection
-      ? parseInt(remoteProtection, 10)
-      : undefined;
-    const parsedPrunable = remotePrunable
-      ? parseInt(remotePrunable, 10)
-      : undefined;
+    const parsedProtection = undefined;
+    const parsedPrunable = undefined;
 
     return {
       protectionThresholdTokens:
@@ -2247,7 +2192,6 @@ export class Config implements McpContext, AgentLoopContext {
           : this.contextManagement.tools.outputMasking
               .minPrunableThresholdTokens,
       protectLatestTurn:
-        remoteProtectLatest ??
         this.contextManagement.tools.outputMasking.protectLatestTurn,
     };
   }
@@ -2942,22 +2886,7 @@ export class Config implements McpContext, AgentLoopContext {
     if (this.compressionThreshold) {
       return this.compressionThreshold;
     }
-
-    await this.ensureExperimentsLoaded();
-
-    const remoteThreshold =
-      this.experiments?.flags[ExperimentFlags.CONTEXT_COMPRESSION_THRESHOLD]
-        ?.floatValue;
-    if (remoteThreshold === 0) {
-      return undefined;
-    }
-    return remoteThreshold;
-  }
-
-  async getUserCaching(): Promise<boolean | undefined> {
-    await this.ensureExperimentsLoaded();
-
-    return this.experiments?.flags[ExperimentFlags.USER_CACHING]?.boolValue;
+    return undefined;
   }
 
   async getPlanModeRoutingEnabled(): Promise<boolean> {
@@ -2965,11 +2894,7 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   async getNumericalRoutingEnabled(): Promise<boolean> {
-    await this.ensureExperimentsLoaded();
-
-    const flag =
-      this.experiments?.flags[ExperimentFlags.ENABLE_NUMERICAL_ROUTING];
-    return flag?.boolValue ?? true;
+    return true;
   }
 
   /**
@@ -2978,83 +2903,15 @@ export class Config implements McpContext, AgentLoopContext {
    * Otherwise, the default threshold (90) is returned.
    */
   async getResolvedClassifierThreshold(): Promise<number> {
-    const remoteValue = await this.getClassifierThreshold();
     const defaultValue = 90;
-
-    if (
-      remoteValue !== undefined &&
-      !isNaN(remoteValue) &&
-      remoteValue >= 0 &&
-      remoteValue <= 100
-    ) {
-      return remoteValue;
-    }
-
     return defaultValue;
-  }
-
-  async getClassifierThreshold(): Promise<number | undefined> {
-    await this.ensureExperimentsLoaded();
-
-    const flag = this.experiments?.flags[ExperimentFlags.CLASSIFIER_THRESHOLD];
-    if (flag?.intValue !== undefined) {
-      return parseInt(flag.intValue, 10);
-    }
-    return flag?.floatValue;
-  }
-
-  async getBannerTextNoCapacityIssues(): Promise<string> {
-    await this.ensureExperimentsLoaded();
-    return (
-      this.experiments?.flags[ExperimentFlags.BANNER_TEXT_NO_CAPACITY_ISSUES]
-        ?.stringValue ?? ''
-    );
-  }
-
-  async getBannerTextCapacityIssues(): Promise<string> {
-    await this.ensureExperimentsLoaded();
-    return (
-      this.experiments?.flags[ExperimentFlags.BANNER_TEXT_CAPACITY_ISSUES]
-        ?.stringValue ?? ''
-    );
-  }
-
-  /**
-   * Returns whether the user has access to Pro models.
-   * This is determined by the PRO_MODEL_NO_ACCESS experiment flag.
-   */
-  async getProModelNoAccess(): Promise<boolean> {
-    await this.ensureExperimentsLoaded();
-    return this.getProModelNoAccessSync();
-  }
-
-  /**
-   * Returns whether the user has access to Pro models synchronously.
-   *
-   * Note: This method should only be called after startup, once experiments have been loaded.
-   */
-  getProModelNoAccessSync(): boolean {
-    if (this.contentGeneratorConfig?.authType !== AuthType.GATEWAY) {
-      return false;
-    }
-    return (
-      this.experiments?.flags[ExperimentFlags.PRO_MODEL_NO_ACCESS]?.boolValue ??
-      false
-    );
   }
 
   /**
    * Returns the configured default request timeout in milliseconds.
    */
   getRequestTimeoutMs(): number | undefined {
-    const flag =
-      this.experiments?.flags?.[ExperimentFlags.DEFAULT_REQUEST_TIMEOUT];
-    if (flag?.intValue !== undefined) {
-      const seconds = parseInt(flag.intValue, 10);
-      if (Number.isInteger(seconds) && seconds >= 0) {
-        return seconds * 1000; // Convert seconds to milliseconds
-      }
-    }
+    // TODO: remove or add config entry
     return undefined;
   }
 
@@ -3063,17 +2920,6 @@ export class Config implements McpContext, AgentLoopContext {
    */
   get clientVersion(): string {
     return this._clientVersion;
-  }
-
-  private async ensureExperimentsLoaded(): Promise<void> {
-    if (!this.experimentsPromise) {
-      return;
-    }
-    try {
-      await this.experimentsPromise;
-    } catch (e) {
-      debugLogger.debug('Failed to fetch experiments', e);
-    }
   }
 
   isInteractiveShellEnabled(): boolean {
@@ -3529,58 +3375,6 @@ export class Config implements McpContext, AgentLoopContext {
    */
   getDisabledHooks(): string[] {
     return this.disabledHooks;
-  }
-
-  /**
-   * Get experiments configuration
-   */
-  getExperiments(): Experiments | undefined {
-    return this.experiments;
-  }
-
-  /**
-   * Set experiments configuration
-   */
-  setExperiments(experiments: Experiments): void {
-    this.experiments = experiments;
-    const flagSummaries = Object.entries(experiments.flags ?? {})
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([flagId, flag]) => {
-        const summary: Record<string, unknown> = { flagId };
-        if (flag.boolValue !== undefined) {
-          summary['boolValue'] = flag.boolValue;
-        }
-        if (flag.floatValue !== undefined) {
-          summary['floatValue'] = flag.floatValue;
-        }
-        if (flag.intValue !== undefined) {
-          summary['intValue'] = flag.intValue;
-        }
-        if (flag.stringValue !== undefined) {
-          summary['stringValue'] = flag.stringValue;
-        }
-        const int32Length = flag.int32ListValue?.values?.length ?? 0;
-        if (int32Length > 0) {
-          summary['int32ListLength'] = int32Length;
-        }
-        const stringListLength = flag.stringListValue?.values?.length ?? 0;
-        if (stringListLength > 0) {
-          summary['stringListLength'] = stringListLength;
-        }
-        return summary;
-      });
-    const summary = {
-      experimentIds: experiments.experimentIds ?? [],
-      flags: flagSummaries,
-    };
-    const summaryString = inspect(summary, {
-      depth: null,
-      maxArrayLength: null,
-      maxStringLength: null,
-      breakLength: 80,
-      compact: false,
-    });
-    debugLogger.debug('Experiments loaded', summaryString);
   }
 
   private onAgentsRefreshed = async () => {

@@ -5,7 +5,7 @@
  */
 
 import type React from 'react';
-import { useCallback, useContext, useMemo, useState, useEffect } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import {
   GEMINI_MODEL_ALIAS_AUTO,
@@ -24,25 +24,8 @@ interface ModelDialogProps {
 
 export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const config = useContext(ConfigContext);
-  const [hasAccessToProModel, setHasAccessToProModel] = useState<boolean>(
-    () => !(config?.getProModelNoAccessSync() ?? false),
-  );
-  const [view, setView] = useState<'main' | 'manual'>(() =>
-    config?.getProModelNoAccessSync() ? 'manual' : 'main',
-  );
+  const [view, setView] = useState<'main' | 'manual'>('main');
   const [persistMode, setPersistMode] = useState(false);
-
-  useEffect(() => {
-    async function checkAccess() {
-      if (!config) return;
-      const noAccess = await config.getProModelNoAccess();
-      setHasAccessToProModel(!noAccess);
-      if (noAccess) {
-        setView('manual');
-      }
-    }
-    void checkAccess();
-  }, [config]);
 
   // Determine the Preferred Model (read once when the dialog opens).
   const preferredModel = config?.getModel() || GEMINI_MODEL_ALIAS_AUTO;
@@ -64,7 +47,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   useKeypress(
     (key) => {
       if (key.name === 'escape') {
-        if (view === 'manual' && hasAccessToProModel) {
+        if (view === 'manual') {
           setView('main');
         } else {
           onClose();
@@ -84,9 +67,9 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       return [];
     }
 
-    const allOptions = config.getModelConfigService().getAvailableModelOptions({
-      hasAccessToProModel,
-    });
+    const allOptions = config
+      .getModelConfigService()
+      .getAvailableModelOptions({});
 
     const list = allOptions
       .filter((o) => o.tier === 'auto')
@@ -106,16 +89,16 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       key: 'Manual',
     });
     return list;
-  }, [config, manualModelSelected, hasAccessToProModel]);
+  }, [config, manualModelSelected]);
 
   const manualOptions = useMemo(() => {
     if (!config?.getModelConfigService) {
       return [];
     }
 
-    const allOptions = config.getModelConfigService().getAvailableModelOptions({
-      hasAccessToProModel,
-    });
+    const allOptions = config
+      .getModelConfigService()
+      .getAvailableModelOptions({});
 
     return allOptions
       .filter((o) => o.tier !== 'auto')
@@ -124,7 +107,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         title: o.name,
         key: o.modelId,
       }));
-  }, [hasAccessToProModel, config]);
+  }, [config]);
 
   const options = useMemo(() => {
     const rawOptions = view === 'main' ? mainOptions : manualOptions;

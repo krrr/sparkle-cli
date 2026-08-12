@@ -42,15 +42,11 @@ describe('<ModelDialog />', () => {
   const mockSetModel = vi.fn();
   const mockGetModel = vi.fn();
   const mockOnClose = vi.fn();
-  const mockGetProModelNoAccess = vi.fn();
-  const mockGetProModelNoAccessSync = vi.fn();
 
   interface MockConfig extends Partial<Config> {
     setModel: (model: string, isTemporary?: boolean) => void;
     getModel: () => string;
     getIdeMode: () => boolean;
-    getProModelNoAccess: () => Promise<boolean>;
-    getProModelNoAccessSync: () => boolean;
     getLastRetrievedQuota: () =>
       | {
           buckets: Array<{
@@ -64,39 +60,35 @@ describe('<ModelDialog />', () => {
   }
 
   const mockModelConfigService = {
-    getAvailableModelOptions: vi.fn(
-      (context: { hasAccessToProModel?: boolean }) => {
-        const options = [
-          {
-            modelId: GEMINI_MODEL_ALIAS_AUTO,
-            tier: 'auto',
-            name: mockGetDisplayString(GEMINI_MODEL_ALIAS_AUTO),
-            description: 'Auto description',
-          },
-          {
-            modelId: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-            tier: 'flash-lite',
-            name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
-            description: 'Flash Lite description',
-          },
-          {
-            modelId: DEFAULT_GEMINI_FLASH_MODEL,
-            tier: 'flash',
-            name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
-            description: 'Flash description',
-          },
-          {
-            modelId: DEFAULT_GEMINI_MODEL,
-            tier: 'pro',
-            name: mockGetDisplayString(DEFAULT_GEMINI_MODEL),
-            description: 'Pro description',
-          },
-        ];
-        return context?.hasAccessToProModel === false
-          ? options.filter((o) => o.tier !== 'pro')
-          : options;
-      },
-    ),
+    getAvailableModelOptions: vi.fn(() => {
+      const options = [
+        {
+          modelId: GEMINI_MODEL_ALIAS_AUTO,
+          tier: 'auto',
+          name: mockGetDisplayString(GEMINI_MODEL_ALIAS_AUTO),
+          description: 'Auto description',
+        },
+        {
+          modelId: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+          tier: 'flash-lite',
+          name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
+          description: 'Flash Lite description',
+        },
+        {
+          modelId: DEFAULT_GEMINI_FLASH_MODEL,
+          tier: 'flash',
+          name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
+          description: 'Flash description',
+        },
+        {
+          modelId: DEFAULT_GEMINI_MODEL,
+          tier: 'pro',
+          name: mockGetDisplayString(DEFAULT_GEMINI_MODEL),
+          description: 'Pro description',
+        },
+      ];
+      return options;
+    }),
     getModelDefinition: vi.fn((modelId: string) =>
       modelId === GEMINI_MODEL_ALIAS_AUTO
         ? { tier: 'auto', isVisible: true }
@@ -114,8 +106,6 @@ describe('<ModelDialog />', () => {
     setModel: mockSetModel,
     getModel: mockGetModel,
     getIdeMode: () => false,
-    getProModelNoAccess: mockGetProModelNoAccess,
-    getProModelNoAccessSync: mockGetProModelNoAccessSync,
     getLastRetrievedQuota: () => ({ buckets: [] }),
     getSessionId: () => 'test-session-id',
     getModelConfigService: () =>
@@ -127,8 +117,6 @@ describe('<ModelDialog />', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockGetModel.mockReturnValue(GEMINI_MODEL_ALIAS_AUTO);
-    mockGetProModelNoAccess.mockResolvedValue(false);
-    mockGetProModelNoAccessSync.mockReturnValue(false);
 
     // Default implementation for getDisplayString
     mockGetDisplayString.mockImplementation((val: string) => {
@@ -162,8 +150,6 @@ describe('<ModelDialog />', () => {
   });
 
   it('renders the "manual" view initially for users with no pro access and filters Pro models with correct order', async () => {
-    mockGetProModelNoAccessSync.mockReturnValue(true);
-    mockGetProModelNoAccess.mockResolvedValue(true);
     mockGetDisplayString.mockImplementation((val: string) => val);
 
     const { lastFrame, unmount } = await renderComponent();
@@ -183,8 +169,6 @@ describe('<ModelDialog />', () => {
   });
 
   it('closes dialog on escape in "manual" view for users with no pro access', async () => {
-    mockGetProModelNoAccessSync.mockReturnValue(true);
-    mockGetProModelNoAccess.mockResolvedValue(true);
     const { stdin, waitUntilReady, unmount } = await renderComponent();
 
     // Already in manual view

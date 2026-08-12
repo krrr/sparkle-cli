@@ -21,8 +21,6 @@ import {
 } from './config.js';
 import { createMockSandboxConfig } from 'sparkle-cli-test-utils';
 import { DEFAULT_MAX_ATTEMPTS } from '../utils/retry.js';
-import { ExperimentFlags } from '../experiments/flagNames.js';
-import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents } from '../utils/events.js';
 import { ApprovalMode } from '../policy/types.js';
 import {
@@ -63,11 +61,7 @@ import { ACTIVATE_SKILL_TOOL_NAME } from '../tools/tool-names.js';
 import type { SkillDefinition } from '../skills/skillLoader.js';
 import type { McpClientManager } from '../tools/mcp-client-manager.js';
 import { DEFAULT_MODEL_CONFIGS } from './defaultModelConfigs.js';
-import {
-  DEFAULT_GEMINI_MODEL,
-  GEMINI_MODEL_ALIAS_AUTO,
-  DEFAULT_GEMINI_FLASH_MODEL,
-} from './models.js';
+import { DEFAULT_GEMINI_MODEL, GEMINI_MODEL_ALIAS_AUTO } from './models.js';
 import { Storage } from './storage.js';
 import type { AgentLoopContext } from './agent-loop-context.js';
 import {
@@ -249,7 +243,6 @@ vi.mock('../context/memoryContextManager.js', () => ({
 
 import { BaseLlmClient } from '../core/baseLlmClient.js';
 import { tokenLimit } from '../core/tokenLimits.js';
-import { getExperiments } from '../experiments/experiments.js';
 import { MemoryContextManager } from '../context/memoryContextManager.js';
 import type {
   ModelConfigService,
@@ -387,10 +380,6 @@ describe('Server Config (config.ts)', () => {
   beforeEach(() => {
     // Reset mocks if necessary
     vi.clearAllMocks();
-    vi.mocked(getExperiments).mockResolvedValue({
-      experimentIds: [],
-      flags: {},
-    });
   });
 
   describe('initialize', () => {
@@ -513,111 +502,9 @@ describe('Server Config (config.ts)', () => {
         expect(await config.getCompressionThreshold()).toBe(0.5);
       });
 
-      it('should return the remote experiment threshold if it is a positive number', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.CONTEXT_COMPRESSION_THRESHOLD]: {
-                floatValue: 0.8,
-              },
-            },
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getCompressionThreshold()).toBe(0.8);
-      });
-
-      it('should return undefined if the remote experiment threshold is 0', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.CONTEXT_COMPRESSION_THRESHOLD]: {
-                floatValue: 0.0,
-              },
-            },
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getCompressionThreshold()).toBeUndefined();
-      });
-
       it('should return undefined if there are no experiments', async () => {
         const config = new Config(baseParams);
         expect(await config.getCompressionThreshold()).toBeUndefined();
-      });
-    });
-
-    describe('getUserCaching', () => {
-      it('should return the remote experiment flag when available', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.USER_CACHING]: {
-                boolValue: true,
-              },
-            },
-            experimentIds: [],
-          },
-        });
-        expect(await config.getUserCaching()).toBe(true);
-      });
-
-      it('should return false when the remote flag is false', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.USER_CACHING]: {
-                boolValue: false,
-              },
-            },
-            experimentIds: [],
-          },
-        });
-        expect(await config.getUserCaching()).toBe(false);
-      });
-
-      it('should return undefined if there are no experiments', async () => {
-        const config = new Config(baseParams);
-        expect(await config.getUserCaching()).toBeUndefined();
-      });
-    });
-
-    describe('getNumericalRoutingEnabled', () => {
-      it('should return true by default if there are no experiments', async () => {
-        const config = new Config(baseParams);
-        expect(await config.getNumericalRoutingEnabled()).toBe(true);
-      });
-
-      it('should return true if the remote flag is set to true', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.ENABLE_NUMERICAL_ROUTING]: {
-                boolValue: true,
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getNumericalRoutingEnabled()).toBe(true);
-      });
-
-      it('should return false if the remote flag is explicitly set to false', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.ENABLE_NUMERICAL_ROUTING]: {
-                boolValue: false,
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getNumericalRoutingEnabled()).toBe(false);
       });
     });
 
@@ -626,120 +513,11 @@ describe('Server Config (config.ts)', () => {
         const config = new Config(baseParams);
         expect(await config.getResolvedClassifierThreshold()).toBe(90);
       });
-
-      it('should return the remote flag value if it is within range (0-100)', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.CLASSIFIER_THRESHOLD]: {
-                intValue: '75',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getResolvedClassifierThreshold()).toBe(75);
-      });
-
-      it('should return 90 if the remote flag is out of range (less than 0)', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.CLASSIFIER_THRESHOLD]: {
-                intValue: '-10',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getResolvedClassifierThreshold()).toBe(90);
-      });
-
-      it('should return 90 if the remote flag is out of range (greater than 100)', async () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.CLASSIFIER_THRESHOLD]: {
-                intValue: '110',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(await config.getResolvedClassifierThreshold()).toBe(90);
-      });
-    });
-
-    describe('getProModelNoAccessSync', () => {
-      it('should return false for other auth types even if experiment is true', async () => {
-        vi.mocked(getExperiments).mockResolvedValue({
-          experimentIds: [],
-          flags: {
-            [ExperimentFlags.PRO_MODEL_NO_ACCESS]: {
-              boolValue: true,
-            },
-          },
-        });
-        const config = new Config(baseParams);
-        vi.mocked(createContentGeneratorConfig).mockResolvedValue({
-          authType: AuthType.USE_GEMINI,
-        });
-        await config.refreshAuth(AuthType.USE_GEMINI);
-        expect(config.getProModelNoAccessSync()).toBe(false);
-      });
     });
 
     describe('getRequestTimeoutMs', () => {
-      it('should return undefined if the flag is not set', () => {
+      it('should return undefined by default', () => {
         const config = new Config(baseParams);
-        expect(config.getRequestTimeoutMs()).toBeUndefined();
-      });
-
-      it('should return timeout in milliseconds if flag is set', () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.DEFAULT_REQUEST_TIMEOUT]: {
-                intValue: '30',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(config.getRequestTimeoutMs()).toBe(30000);
-      });
-
-      it('should return undefined if intValue is not a valid integer', () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.DEFAULT_REQUEST_TIMEOUT]: {
-                intValue: 'abc',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
-        expect(config.getRequestTimeoutMs()).toBeUndefined();
-      });
-
-      it('should return undefined if intValue is negative', () => {
-        const config = new Config({
-          ...baseParams,
-          experiments: {
-            flags: {
-              [ExperimentFlags.DEFAULT_REQUEST_TIMEOUT]: {
-                intValue: '-10',
-              },
-            },
-            experimentIds: [],
-          },
-        } as unknown as ConfigParameters);
         expect(config.getRequestTimeoutMs()).toBeUndefined();
       });
     });
@@ -836,49 +614,6 @@ describe('Server Config (config.ts)', () => {
       expect(
         loopContext.geminiClient.stripThoughtsFromHistory,
       ).not.toHaveBeenCalledWith();
-    });
-
-    it('should switch to flash model if user has no Pro access and model is auto', async () => {
-      vi.mocked(getExperiments).mockResolvedValue({
-        experimentIds: [],
-        flags: {
-          [ExperimentFlags.PRO_MODEL_NO_ACCESS]: {
-            boolValue: true,
-          },
-        },
-      });
-
-      const config = new Config({
-        ...baseParams,
-        model: GEMINI_MODEL_ALIAS_AUTO,
-      });
-
-      await config.refreshAuth(AuthType.GATEWAY);
-      await config.getExperimentsAsync();
-
-      await vi.waitFor(() => {
-        expect(config.getModel()).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-      });
-    });
-
-    it('should NOT switch to flash model if user has Pro access and model is auto', async () => {
-      vi.mocked(getExperiments).mockResolvedValue({
-        experimentIds: [],
-        flags: {
-          [ExperimentFlags.PRO_MODEL_NO_ACCESS]: {
-            boolValue: false,
-          },
-        },
-      });
-
-      const config = new Config({
-        ...baseParams,
-        model: GEMINI_MODEL_ALIAS_AUTO,
-      });
-
-      await config.refreshAuth(AuthType.GATEWAY);
-
-      expect(config.getModel()).toBe(GEMINI_MODEL_ALIAS_AUTO);
     });
   });
 
@@ -2227,16 +1962,14 @@ describe('BaseLlmClient Lifecycle', () => {
 
   it('should throw an error if getBaseLlmClient is called before experiments have been fetched', () => {
     const config = new Config(baseParams);
-    // By default on a new Config instance, experiments are undefined
+    // By default on a new Config instance, ContentGenerator are undefined
     expect(() => config.getBaseLlmClient()).toThrow(
-      'BaseLlmClient not initialized. Ensure experiments have been fetched and configuration is ready.',
+      'BaseLlmClient not initialized. Ensure authentication has occurred and ContentGenerator is ready.',
     );
   });
 
   it('should throw an error if getBaseLlmClient is called before refreshAuth', () => {
     const config = new Config(baseParams);
-    // Explicitly set experiments to avoid triggering the new missing-experiments error
-    config.setExperiments({ flags: {}, experimentIds: [] });
     expect(() => config.getBaseLlmClient()).toThrow(
       'BaseLlmClient not initialized. Ensure authentication has occurred and ContentGenerator is ready.',
     );
@@ -2576,112 +2309,6 @@ describe('Config getHooks', () => {
       config.setModel(DEFAULT_GEMINI_MODEL, false);
       expect(onModelChange).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
     });
-  });
-});
-
-describe('Config getExperiments', () => {
-  const baseParams: ConfigParameters = {
-    cwd: '/tmp',
-    targetDir: '/path/to/target',
-    debugMode: false,
-    sessionId: 'test-session-id',
-    model: 'gemini-pro',
-    usageStatisticsEnabled: false,
-  };
-
-  it('should return undefined when no experiments are provided', () => {
-    const config = new Config(baseParams);
-    expect(config.getExperiments()).toBeUndefined();
-  });
-
-  it('should return empty object when empty experiments are provided', () => {
-    const configWithEmptyExps = new Config({
-      ...baseParams,
-      experiments: { flags: {}, experimentIds: [] },
-    });
-    expect(configWithEmptyExps.getExperiments()).toEqual({
-      flags: {},
-      experimentIds: [],
-    });
-  });
-
-  it('should return the experiments configuration when provided', () => {
-    const mockExps = {
-      flags: {
-        testFlag: { boolValue: true },
-      },
-      experimentIds: [],
-    };
-
-    const config = new Config({
-      ...baseParams,
-      experiments: mockExps,
-    });
-
-    const retrievedExps = config.getExperiments();
-    expect(retrievedExps).toEqual(mockExps);
-    expect(retrievedExps).toBe(mockExps); // Should return the same reference
-  });
-});
-
-describe('Config setExperiments logging', () => {
-  const baseParams: ConfigParameters = {
-    cwd: '/tmp',
-    targetDir: '/path/to/target',
-    debugMode: false,
-    sessionId: 'test-session-id',
-    model: 'gemini-pro',
-    usageStatisticsEnabled: false,
-  };
-
-  it('logs a sorted, non-truncated summary of experiments when they are set', () => {
-    const config = new Config(baseParams);
-    const debugSpy = vi
-      .spyOn(debugLogger, 'debug')
-      .mockImplementation(() => {});
-    const experiments = {
-      flags: {
-        ZetaFlag: {
-          boolValue: true,
-          stringValue: 'zeta',
-          int32ListValue: { values: [1, 2] },
-        },
-        AlphaFlag: {
-          boolValue: false,
-          stringValue: 'alpha',
-          stringListValue: { values: ['a', 'b', 'c'] },
-        },
-        MiddleFlag: {
-          // Intentionally sparse to ensure undefined values are omitted
-          floatValue: 0.42,
-          int32ListValue: { values: [] },
-        },
-      },
-      experimentIds: [101, 99],
-    };
-
-    config.setExperiments(experiments);
-
-    const logCall = debugSpy.mock.calls.find(
-      ([message]) => message === 'Experiments loaded',
-    );
-    expect(logCall).toBeDefined();
-    const loggedSummary = logCall?.[1] as string;
-    expect(typeof loggedSummary).toBe('string');
-    expect(loggedSummary).toContain('experimentIds');
-    expect(loggedSummary).toContain('101');
-    expect(loggedSummary).toContain('AlphaFlag');
-    expect(loggedSummary).toContain('ZetaFlag');
-    const alphaIndex = loggedSummary.indexOf('AlphaFlag');
-    const zetaIndex = loggedSummary.indexOf('ZetaFlag');
-    expect(alphaIndex).toBeGreaterThan(-1);
-    expect(zetaIndex).toBeGreaterThan(-1);
-    expect(alphaIndex).toBeLessThan(zetaIndex);
-    expect(loggedSummary).toContain('\n');
-    expect(loggedSummary).not.toContain('stringListLength: 0');
-    expect(loggedSummary).not.toContain('int32ListLength: 0');
-
-    debugSpy.mockRestore();
   });
 });
 

@@ -11,7 +11,6 @@ import * as fs from 'node:fs';
 import {
   SPARKLE_DIR,
   homedir,
-  GOOGLE_ACCOUNTS_FILENAME,
   isSubpath,
   resolveToRealPath,
   normalizePath,
@@ -81,10 +80,6 @@ export class Storage {
 
   static getInstallationIdPath(): string {
     return path.join(Storage.getGlobalGeminiDir(), 'installation_id');
-  }
-
-  static getGoogleAccountsPath(): string {
-    return path.join(Storage.getGlobalGeminiDir(), GOOGLE_ACCOUNTS_FILENAME);
   }
 
   static getTrustedFoldersPath(): string {

@@ -2222,14 +2222,9 @@ export const AppContainer = (props: AppContainerProps) => {
     let isMounted = true;
 
     const fetchBannerTexts = async () => {
-      const [defaultBanner, warningBanner] = await Promise.all([
-        config.getBannerTextNoCapacityIssues(),
-        config.getBannerTextCapacityIssues(),
-      ]);
-
       if (isMounted) {
-        setDefaultBannerText(defaultBanner);
-        setWarningBannerText(warningBanner);
+        setDefaultBannerText('');
+        setWarningBannerText('');
         setBannerVisible(true);
       }
     };

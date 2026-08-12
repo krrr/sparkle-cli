@@ -93,7 +93,6 @@ export interface ModelResolution {
 /** The actual state of the current session. */
 export interface ResolutionContext {
   useCustomTools?: boolean;
-  hasAccessToProModel?: boolean;
   requestedModel?: string;
 }
 
@@ -169,8 +168,6 @@ export class ModelConfigService {
       .filter(([_, m]) => {
         if (m.isVisible !== true) return false;
         if (m.tier === 'auto') return false;
-        if (context.hasAccessToProModel === false && m.tier === 'pro')
-          return false;
         return true;
       })
       .map(([id, m]) => {
