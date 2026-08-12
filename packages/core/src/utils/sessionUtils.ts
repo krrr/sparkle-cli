@@ -118,10 +118,12 @@ export function convertSessionToClientHistory(
     // multiple times (e.g. a tool response duplicated across resumes), which
     // would otherwise produce duplicate turns (and duplicate tool messages) in
     // the rebuilt history.
-    if (seenIds.has(msg.id)) {
+    if (msg.id !== undefined && seenIds.has(msg.id)) {
       continue;
     }
-    seenIds.add(msg.id);
+    if (msg.id !== undefined) {
+      seenIds.add(msg.id);
+    }
 
     if (msg.type === 'info' || msg.type === 'error' || msg.type === 'warning') {
       continue;

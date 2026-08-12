@@ -11,6 +11,7 @@ import { useUIState } from '../contexts/UIStateContext.js';
 import {
   type ConversationRecord,
   type MessageRecord,
+  isIgnoredUserContent,
   partToString,
 } from 'sparkle-cli-core';
 import { BaseSelectionList } from './shared/BaseSelectionList.js';
@@ -44,6 +45,21 @@ const getCleanedRewindText = (userPrompt: MessageRecord): string => {
     : stripReferenceContent(originalUserText);
 };
 
+/**
+ * Returns true when a user message represents a real user prompt worth
+ * surfacing in the rewind menu. Internal context messages (e.g.
+ * <session_context>, <hook_context>), slash commands and tool response
+ * messages (functionResponse-only content) are filtered out.
+ */
+const isRewindEligibleUserMessage = (msg: MessageRecord): boolean => {
+  if (msg.type !== 'user') {
+    return false;
+  }
+  const contentToUse = msg.displayContent || msg.content;
+  const text = contentToUse ? partToString(contentToUse) : '';
+  return !isIgnoredUserContent(text.trim());
+};
+
 export const RewindViewer: React.FC<RewindViewerProps> = ({
   conversation,
   onExit,
@@ -69,7 +85,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
   );
 
   const interactions = useMemo(
-    () => conversation.messages.filter((msg) => msg.type === 'user'),
+    () => conversation.messages.filter(isRewindEligibleUserMessage),
     [conversation.messages],
   );
 

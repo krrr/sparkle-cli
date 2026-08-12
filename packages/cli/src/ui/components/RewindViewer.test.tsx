@@ -384,6 +384,82 @@ describe('RewindViewer', () => {
     });
   });
 
+  describe('Internal Message Filtering', () => {
+    it('hides the <session_context> system prompt from the menu', async () => {
+      const conversation = createConversation([
+        {
+          type: 'user',
+          content:
+            '<session_context>\nThis is the Sparkle CLI. We are setting up the context for our chat.\n</session_context>',
+          id: 'env-context',
+          timestamp: '0',
+        },
+        {
+          type: 'user',
+          content: 'My first real question',
+          id: '1',
+          timestamp: '1',
+        },
+      ]);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <RewindViewer
+          conversation={conversation}
+          onExit={vi.fn()}
+          onRewind={vi.fn()}
+        />,
+      );
+      const frame = lastFrame();
+      expect(frame).toContain('My first real question');
+      expect(frame).not.toContain('session_context');
+      expect(frame).not.toContain('Sparkle CLI');
+      unmount();
+    });
+
+    it('hides tool response (functionResponse) messages from the menu', async () => {
+      const conversation = createConversation([
+        { type: 'user', content: 'Question one', id: '1', timestamp: '1' },
+        {
+          type: 'user',
+          content: [{ functionResponse: { name: 'read_file', response: {} } }],
+          id: 'tool-response',
+          timestamp: '1',
+        },
+        { type: 'user', content: 'Question two', id: '2', timestamp: '2' },
+      ]);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <RewindViewer
+          conversation={conversation}
+          onExit={vi.fn()}
+          onRewind={vi.fn()}
+        />,
+      );
+      const frame = lastFrame();
+      expect(frame).toContain('Question one');
+      expect(frame).toContain('Question two');
+      // Only the two real questions are listed (plus "current position")
+      expect(frame.match(/No files have been changed/g)).toHaveLength(2);
+      unmount();
+    });
+
+    it('hides slash command messages from the menu', async () => {
+      const conversation = createConversation([
+        { type: 'user', content: '/help', id: '0', timestamp: '0' },
+        { type: 'user', content: 'Real prompt', id: '1', timestamp: '1' },
+      ]);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <RewindViewer
+          conversation={conversation}
+          onExit={vi.fn()}
+          onRewind={vi.fn()}
+        />,
+      );
+      const frame = lastFrame();
+      expect(frame).toContain('Real prompt');
+      expect(frame.match(/No files have been changed/g)).toHaveLength(1);
+      unmount();
+    });
+  });
+
   it('updates content when conversation changes (background update)', async () => {
     const messages: MessageRecord[] = [
       { type: 'user', content: 'Message 1', id: '1', timestamp: '1' },
