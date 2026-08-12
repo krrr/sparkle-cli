@@ -25,6 +25,7 @@ import {
 } from '../utils/messageInspectors.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
+import { resolvePolicyChain } from '../availability/policyHelpers.js';
 
 const TOOL_CALL_LOOP_THRESHOLD = 5;
 const CONTENT_LOOP_THRESHOLD = 10;
@@ -617,10 +618,13 @@ export class LoopDetectionService {
         ? flashResult['unproductive_state_analysis']
         : '';
 
-    const doubleCheckModelName =
-      this.context.config.modelConfigService.getResolvedConfig({
-        model: DOUBLE_CHECK_MODEL_ALIAS,
-      }).model;
+    // Resolve to the concrete model that will actually serve the double-check
+    // call. The alias may resolve to a bare tier alias (pro/flash/flash-lite);
+    // anchoring on the active model's family keeps the availability pre-check
+    // consistent with the model used for the LLM call.
+    const doubleCheckModelName = this.resolveModelName(
+      DOUBLE_CHECK_MODEL_ALIAS,
+    );
 
     if (flashConfidence < LLM_CONFIDENCE_THRESHOLD) {
       logLlmLoopCheck(
@@ -639,10 +643,7 @@ export class LoopDetectionService {
     const availability = this.context.config.getModelAvailabilityService();
 
     if (!availability.snapshot(doubleCheckModelName).available) {
-      const flashModelName =
-        this.context.config.modelConfigService.getResolvedConfig({
-          model: 'loop-detection',
-        }).model;
+      const flashModelName = this.resolveModelName('loop-detection');
       return {
         isLoop: true,
         analysis: flashAnalysis,
@@ -693,6 +694,25 @@ export class LoopDetectionService {
     }
 
     return { isLoop: false };
+  }
+
+  /**
+   * Resolves an internal model-config alias (e.g. 'loop-detection') to the
+   * concrete model that will actually serve the request. Since the alias may
+   * resolve to a bare tier alias (pro/flash/flash-lite), we anchor resolution
+   * on the active model's family (see resolvePolicyChain) so the availability
+   * pre-check report the same concrete model the LLM call uses.
+   */
+  private resolveModelName(alias: string): string {
+    const aliasModel = this.context.config.modelConfigService.getResolvedConfig(
+      {
+        model: alias,
+      },
+    ).model;
+    return (
+      resolvePolicyChain(this.context.config, aliasModel)[0]?.model ??
+      aliasModel
+    );
   }
 
   private async queryLoopDetectionModel(

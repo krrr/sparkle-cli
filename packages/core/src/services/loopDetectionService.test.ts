@@ -18,6 +18,8 @@ import {
 import * as loggers from '../telemetry/loggers.js';
 import { LoopType } from '../telemetry/types.js';
 import { LoopDetectionService } from './loopDetectionService.js';
+import { ModelConfigService } from './modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
 
 vi.mock('../telemetry/loggers.js', () => ({
@@ -908,16 +910,18 @@ describe('LoopDetectionService LLM Checks', () => {
       getDebugMode: () => false,
       getTelemetryEnabled: () => true,
       getModel: vi.fn().mockReturnValue('cognitive-loop-v1'),
+      getActiveModel: vi.fn().mockReturnValue('cognitive-loop-v1'),
       modelConfigService: {
         getResolvedConfig: vi.fn().mockImplementation((key) => {
           if (key.model === 'loop-detection') {
             return { model: 'gemini-2.5-flash', generateContentConfig: {} };
           }
-          return {
-            model: 'cognitive-loop-v1',
-            generateContentConfig: {},
-          };
+          return { model: 'cognitive-loop-v1', generateContentConfig: {} };
         }),
+        resolveModelId: (model: string) => model,
+        getModelDefinition: () => undefined,
+        getModelChain: () => undefined,
+        resolveChain: vi.fn(),
       },
       isInteractive: () => false,
       getModelAvailabilityService: vi.fn().mockReturnValue(mockAvailability),
@@ -1232,5 +1236,39 @@ describe('LoopDetectionService LLM Checks', () => {
       role: 'model',
       parts: [{ text: 'Some response' }],
     });
+  });
+
+  it('resolves tier-alias loop-detection models within the active family', async () => {
+    // Use the real ModelConfigService so 'loop-detection-double-check' and
+    // 'loop-detection' resolve to the bare tier aliases ('pro'/'flash').
+    (
+      mockConfig as unknown as { modelConfigService: ModelConfigService }
+    ).modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue('deepseek-v4-flash');
+
+    const availability = mockConfig.getModelAvailabilityService();
+    mockBaseLlmClient.generateJson = vi
+      .fn()
+      .mockResolvedValueOnce({
+        unproductive_state_confidence: 0.9,
+        unproductive_state_analysis: 'Flash says loop',
+      })
+      .mockResolvedValueOnce({
+        unproductive_state_confidence: 0.9,
+        unproductive_state_analysis: 'Main says loop',
+      });
+
+    await advanceTurns(30);
+
+    // The availability pre-check must use the concrete family model, not the
+    // bare 'pro' tier alias resolved from 'loop-detection-double-check'.
+    expect(availability.snapshot).toHaveBeenCalledWith('deepseek-v4-flash');
+    expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(2);
+    expect(loggers.logLoopDetected).toHaveBeenCalledWith(
+      mockConfig,
+      expect.objectContaining({
+        confirmed_by_model: 'deepseek-v4-flash',
+      }),
+    );
   });
 });
