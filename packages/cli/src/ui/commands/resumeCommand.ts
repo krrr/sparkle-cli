@@ -210,9 +210,12 @@ const resumeCheckpointCommand: SlashCommand = {
     const uiHistory: HistoryItemWithoutId[] = [];
 
     for (const item of conversation.slice(INITIAL_HISTORY_LENGTH)) {
+      // Exclude thought parts (they carry `thought` and must not render as
+      // message text) and function call parts (they have no text and are
+      // shown via tool groups instead).
       const text =
         item.parts
-          ?.filter((m) => !!m.text)
+          ?.filter((m) => !!m.text && !m.thought)
           .map((m) => m.text)
           .join('') || '';
       if (!text) {

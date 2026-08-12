@@ -1361,6 +1361,98 @@ describe('ChatRecordingService', () => {
       );
       expect(duplicates).toHaveLength(1);
     });
+
+    it('should keep thought and functionCall parts out of synced content', async () => {
+      await chatRecordingService.initialize(undefined, 'main');
+
+      // A real model turn is recorded with clean text content plus separate
+      // thoughts/toolCalls metadata.
+      chatRecordingService.recordThought({
+        subject: 'Thinking',
+        description: 'Let me check the docs.',
+      });
+      const id = chatRecordingService.recordMessage({
+        model: 'gemini-pro',
+        type: 'gemini',
+        content: 'Let me check the docs.',
+      });
+      chatRecordingService.recordToolCalls('gemini-pro', [
+        {
+          id: 'call-1',
+          name: 'read_file',
+          args: { filePath: 'README.md' },
+          status: CoreToolCallStatus.Success,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+
+      // Resuming rebuilds the agent history with raw thought/functionCall
+      // parts; syncing it back must NOT pollute the durable content.
+      const history: HistoryTurn[] = [
+        {
+          id,
+          content: {
+            role: 'model',
+            parts: [
+              { text: '**Thinking** Let me check the docs.', thought: true },
+              { text: 'Let me check the docs.' },
+              {
+                functionCall: {
+                  id: 'call-1',
+                  name: 'read_file',
+                  args: { filePath: 'README.md' },
+                },
+              },
+            ],
+          },
+        },
+      ];
+      chatRecordingService.updateMessagesFromHistory(history);
+
+      const record = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const modelMsg = record!.messages.find(
+        (m) => m.id === id,
+      )! as MessageRecord & {
+        type: 'gemini';
+      };
+      // No "[Thought: ...]"/"[Function Call: ...]" labels may ever reach the
+      // UI through content — thoughts and tool calls live in their metadata.
+      expect(modelMsg.content).toEqual([{ text: 'Let me check the docs.' }]);
+      expect(modelMsg.thoughts).toHaveLength(1);
+      expect(modelMsg.toolCalls).toHaveLength(1);
+    });
+
+    it('should preserve synthetic thought parts that have no thoughts metadata', async () => {
+      await chatRecordingService.initialize(undefined, 'main');
+
+      // The binary-ack turn is recorded with a thought part in content and no
+      // thoughts metadata; it must survive a history sync unchanged.
+      const ackParts = [
+        {
+          text: 'Binary content received. Proceeding with analysis.',
+          thought: true,
+        },
+      ];
+      const id = chatRecordingService.recordSyntheticMessage(
+        'gemini',
+        ackParts,
+      );
+
+      chatRecordingService.updateMessagesFromHistory([
+        {
+          id,
+          content: { role: 'model', parts: ackParts },
+        },
+      ]);
+
+      const record = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const modelMsg = record!.messages.find((m) => m.id === id)!;
+      expect(modelMsg.content).toEqual(ackParts);
+    });
   });
 
   describe('ENOENT (missing directory) handling', () => {

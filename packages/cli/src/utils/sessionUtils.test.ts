@@ -1130,4 +1130,67 @@ describe('convertSessionToHistoryFormats', () => {
       throw new Error('Expected tool_group history item');
     }
   });
+
+  it('should not leak thought/functionCall parts from polluted content into UI text', () => {
+    // Simulates a session file that was polluted by an older resume path:
+    // content contains raw thought and functionCall parts inline.
+    const messages: MessageRecord[] = [
+      {
+        id: '1',
+        timestamp: new Date().toISOString(),
+        type: 'gemini',
+        content: [
+          { text: '**Thinking** Let me check the docs.', thought: true },
+          { text: 'Let me check the docs.' },
+          {
+            functionCall: {
+              id: 'call_1',
+              name: 'read_file',
+              args: { filePath: 'README.md' },
+            },
+          },
+        ],
+        thoughts: [
+          {
+            subject: 'Thinking',
+            description: 'Let me check the docs.',
+            timestamp: new Date().toISOString(),
+          },
+        ],
+        toolCalls: [
+          {
+            id: 'call_1',
+            name: 'read_file',
+            args: { filePath: 'README.md' },
+            status: CoreToolCallStatus.Success,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      },
+    ];
+
+    const result = convertSessionToHistoryFormats(messages);
+
+    // Thoughts, text and tool calls each render through their own UI entry.
+    expect(result.uiHistory).toHaveLength(3);
+    expect(result.uiHistory[0]).toEqual({
+      type: 'thinking',
+      thought: {
+        subject: 'Thinking',
+        description: 'Let me check the docs.',
+      },
+    });
+    expect(result.uiHistory[1]).toEqual({
+      type: 'gemini',
+      text: 'Let me check the docs.',
+    });
+    expect(result.uiHistory[2].type).toBe('tool_group');
+
+    // No internal labels may leak into any rendered text.
+    const allText = result.uiHistory
+      .map((item) => ('text' in item ? item.text : ''))
+      .join('');
+    expect(allText).not.toContain('[Thought:');
+    expect(allText).not.toContain('[Function Call:');
+  });
 });

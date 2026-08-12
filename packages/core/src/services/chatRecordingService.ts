@@ -17,6 +17,7 @@ import {
 import readline from 'node:readline';
 import { randomUUID } from 'node:crypto';
 import type {
+  Part,
   PartListUnion,
   GenerateContentResponseUsageMetadata,
 } from '@google/genai';
@@ -98,6 +99,33 @@ function isPartialMetadataRecord(
 
 function isTextPart(part: unknown): part is { text: string } {
   return isStringProperty(part, 'text');
+}
+
+/**
+ * Filters raw client-history parts down to the parts that belong in a
+ * message's durable `content`:
+ * - `functionCall` parts are always removed: tool calls are persisted in the
+ *   `toolCalls` metadata and re-rendered as tool groups on resume.
+ * - `thought` parts are removed only when the message has `thoughts` metadata
+ *   to rebuild them from. Synthetic thought parts that exist solely in
+ *   content (e.g. the binary-ack turn) are preserved to stay durable.
+ * Without this filter, syncing the agent history back into the recording
+ * would pollute `content` and leak "[Thought: ...]"/"[Function Call: ...]"
+ * labels into the UI on the next resume.
+ */
+function toDurableContentParts(
+  parts: readonly Part[],
+  hasThoughtMetadata: boolean,
+): Part[] {
+  return parts.filter((part) => {
+    if (part.functionCall) {
+      return false;
+    }
+    if (hasThoughtMetadata && part.thought) {
+      return false;
+    }
+    return true;
+  });
 }
 
 /**
@@ -971,16 +999,24 @@ export class ChatRecordingService {
         );
 
         if (existing) {
+          // Only persist durable content parts: thoughts and tool calls have
+          // dedicated `thoughts`/`toolCalls` metadata and must not be written
+          // back into `content` (doing so pollutes the session file and leaks
+          // "[Thought: ...]"/"[Function Call: ...]" labels into the UI on the
+          // next resume).
+          const syncedParts = toDurableContentParts(
+            turn.content.parts || [],
+            existing.type === 'gemini' && (existing.thoughts?.length ?? 0) > 0,
+          );
           // If content parts have changed (e.g. masking), update them
           if (
-            JSON.stringify(existing.content) !==
-            JSON.stringify(turn.content.parts)
+            JSON.stringify(existing.content) !== JSON.stringify(syncedParts)
           ) {
             updated = true;
           }
           newMessages.push({
             ...existing,
-            content: turn.content.parts || [],
+            content: syncedParts,
           });
         } else {
           // It's a new (possibly synthetic) turn like a summary
@@ -988,7 +1024,7 @@ export class ChatRecordingService {
           newMessages.push(
             this.newMessage(
               turn.content.role === 'user' ? 'user' : 'gemini',
-              turn.content.parts || [],
+              toDurableContentParts(turn.content.parts || [], false),
               undefined,
               turn.id,
             ),

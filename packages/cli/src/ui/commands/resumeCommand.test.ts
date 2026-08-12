@@ -332,6 +332,40 @@ describe('resumeCommand', () => {
       });
     });
 
+    it('should not leak thought text from checkpoint history into the UI', async () => {
+      const conversation: Content[] = [
+        { role: 'user', parts: [{ text: 'system setup' }] },
+        { role: 'user', parts: [{ text: 'hello sparkle' }] },
+        {
+          role: 'model',
+          parts: [
+            { text: '**Thinking** let me check the docs', thought: true },
+            { text: 'hello world' },
+          ],
+        },
+      ];
+      mockLoadCheckpoint.mockResolvedValue({
+        history: conversation,
+        authType: AuthType.USE_GEMINI,
+      });
+
+      const result = await resumeCheckpointCommand?.action?.(
+        mockContext,
+        goodTag,
+      );
+
+      // The thought part must not appear as message text; only the visible
+      // response is surfaced.
+      expect(result).toEqual({
+        type: 'load_history',
+        history: [
+          { type: 'user', text: 'hello sparkle' },
+          { type: 'gemini', text: 'hello world' },
+        ] as HistoryItemWithoutId[],
+        clientHistory: conversation,
+      });
+    });
+
     it('should block resuming a conversation with mismatched authType', async () => {
       const conversation: Content[] = [
         { role: 'user', parts: [{ text: 'system setup' }] },

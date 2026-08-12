@@ -306,14 +306,18 @@ export const getAllSessionFiles = async (
 
           if (options.includeFullContent) {
             fullContent = content.messages
-              .map((msg) => partListUnionToString(msg.content))
+              .map((msg) =>
+                partListUnionToString(stripInternalDisplayParts(msg.content)),
+              )
               .join(' ');
             messages = content.messages.map((msg) => ({
               role:
                 msg.type === 'user'
                   ? ('user' as const)
                   : ('assistant' as const),
-              content: partListUnionToString(msg.content),
+              content: partListUnionToString(
+                stripInternalDisplayParts(msg.content),
+              ),
             }));
           }
 
@@ -570,19 +574,34 @@ export class SessionSelector {
 }
 
 /**
- * Removes tool response (functionResponse) parts from a message's content.
- * Tool responses are recorded as synthetic user messages to keep a linear
- * session history, but they are internal API payloads — their results are
- * already shown via the tool call UI (toolCalls on the preceding gemini
- * message). Without this filter, resuming a session would render them as
- * "[Function Response: <name>]" user messages.
+ * Removes internal API parts from a message's content before display:
+ * - functionResponse parts: tool results are recorded as synthetic user
+ *   messages to keep a linear session history, but they are internal API
+ *   payloads — their results are already shown via the tool call UI
+ *   (toolCalls on the preceding gemini message). Without this filter,
+ *   resuming a session would render them as "[Function Response: <name>]"
+ *   user messages.
+ * - functionCall parts: tool calls are rendered as tool_group entries from
+ *   the recorded toolCalls metadata, so they must not be stringified into
+ *   message text.
+ * - thought parts: thoughts are rendered as thinking entries from the
+ *   recorded thoughts metadata, so they must not be stringified into message
+ *   text either.
+ * Sessions that were resumed before the recording layer stopped persisting
+ * these parts contain them inline in `content`; stripping them here
+ * guarantees they never leak "[Thought: ...]"/"[Function Call: ...]" labels
+ * into the UI.
  */
-function stripFunctionResponseParts(content: PartListUnion): PartListUnion {
+function stripInternalDisplayParts(content: PartListUnion): PartListUnion {
   if (!Array.isArray(content)) {
     return content;
   }
   return content.filter(
-    (part) => typeof part === 'string' || part.functionResponse === undefined,
+    (part) =>
+      typeof part === 'string' ||
+      (part.functionResponse === undefined &&
+        part.functionCall === undefined &&
+        part.thought === undefined),
   );
 }
 
@@ -612,10 +631,10 @@ export function convertSessionToHistoryFormats(
 
     // Add the message only if it has content
     const displayContentString = msg.displayContent
-      ? partListUnionToString(stripFunctionResponseParts(msg.displayContent))
+      ? partListUnionToString(stripInternalDisplayParts(msg.displayContent))
       : undefined;
     const contentString = partListUnionToString(
-      stripFunctionResponseParts(msg.content),
+      stripInternalDisplayParts(msg.content),
     );
     const uiText = displayContentString || contentString;
 
