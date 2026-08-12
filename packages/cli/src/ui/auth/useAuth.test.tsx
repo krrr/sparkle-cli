@@ -32,11 +32,17 @@ describe('useAuth', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockLoadApiKey.mockResolvedValue('test-key');
-    delete process.env['GEMINI_API_KEY'];
-    delete process.env['GEMINI_DEFAULT_AUTH_TYPE'];
+    // Unset all auth env vars so tests exercise the intended path regardless
+    // of the developer's shell environment. useAuth distinguishes an unset
+    // variable from an empty string, so stub with `undefined` to delete it.
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', undefined as unknown as string);
+    vi.stubEnv('GEMINI_API_KEY', undefined as unknown as string);
+    vi.stubEnv('OPENAI_API_KEY', undefined as unknown as string);
+    vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', undefined as unknown as string);
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 

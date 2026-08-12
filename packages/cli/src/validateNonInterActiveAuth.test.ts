@@ -33,15 +33,17 @@ function createLocalMockConfig(overrides: Partial<Config> = {}): Config {
 }
 
 describe('validateNonInterActiveAuth', () => {
-  let originalEnvGeminiApiKey: string | undefined;
   let debugLoggerErrorSpy: ReturnType<typeof vi.spyOn>;
   let coreEventsEmitFeedbackSpy: MockInstance;
   let processExitSpy: MockInstance;
   let mockSettings: LoadedSettings;
 
   beforeEach(() => {
-    originalEnvGeminiApiKey = process.env['GEMINI_API_KEY'];
-    delete process.env['GEMINI_API_KEY'];
+    // Unset all auth env vars so these tests exercise the "no auth" path
+    // regardless of the developer's shell environment.
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', '');
+    vi.stubEnv('GEMINI_API_KEY', '');
+    vi.stubEnv('OPENAI_API_KEY', '');
     debugLoggerErrorSpy = vi
       .spyOn(debugLogger, 'error')
       .mockImplementation(() => {});
@@ -76,11 +78,7 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   afterEach(() => {
-    if (originalEnvGeminiApiKey !== undefined) {
-      process.env['GEMINI_API_KEY'] = originalEnvGeminiApiKey;
-    } else {
-      delete process.env['GEMINI_API_KEY'];
-    }
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 

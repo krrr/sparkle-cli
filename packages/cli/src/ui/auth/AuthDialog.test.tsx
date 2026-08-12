@@ -60,6 +60,7 @@ describe('AuthDialog', () => {
     vi.resetAllMocks();
     vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', undefined as unknown as string);
     vi.stubEnv('GEMINI_API_KEY', undefined as unknown as string);
+    vi.stubEnv('OPENAI_API_KEY', undefined as unknown as string);
 
     props = {
       settings: {
