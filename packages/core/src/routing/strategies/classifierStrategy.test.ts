@@ -57,6 +57,7 @@ describe('ClassifierStrategy', () => {
         },
       ),
       getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
+      getActiveModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(false),
       getModelAvailabilityService: vi
         .fn()

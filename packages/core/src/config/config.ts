@@ -1675,6 +1675,11 @@ export class Config implements McpContext, AgentLoopContext {
     return this.contentGeneratorConfig;
   }
 
+  /**
+   * Returns the user-configured model. This is the persistent model setting
+   * (e.g. from CLI args or config), which only changes when the user
+   * explicitly switches models via `setModel`.
+   */
   getModel(): string {
     return this.model;
   }
@@ -1730,6 +1735,11 @@ export class Config implements McpContext, AgentLoopContext {
     return this.fallbackOverrides.get(model);
   }
 
+  /**
+   * Returns the model currently in use. Unlike `getModel`, this tracks runtime
+   * changes: when the primary chat model is downgraded via fallback (see
+   * `setActiveModel`), this reflects the actual model serving requests.
+   */
   getActiveModel(): string {
     return this._activeModel ?? this.model;
   }

@@ -86,9 +86,22 @@ export interface ModelResolution {
     // The condition to check for.
     condition: ResolutionCondition;
     // The model ID to use when the condition is met.
-    target: string;
+    target: ModelResolutionTarget;
   }>;
 }
+
+/**
+ * The target of a model resolution condition. In addition to a concrete model
+ * ID, a target can be:
+ *
+ * - `'active'`: resolves to the currently requested/active model itself.
+ * - `{ familyTier: 'pro' }`: resolves to the model with the given tier within
+ *   the family of the requested model, falling back to the requested model
+ *   when the family has no such model. This enables provider-aware routing:
+ *   tier aliases (pro/flash/flash-lite/auto) resolve within the family of the
+ *   active model instead of always mapping to Gemini models.
+ */
+export type ModelResolutionTarget = string | { familyTier: string };
 
 /** The actual state of the current session. */
 export interface ResolutionContext {
@@ -101,6 +114,12 @@ export interface ResolutionCondition {
   useCustomTools?: boolean;
   /** Matches if the current model is in this list. */
   requestedModels?: string[];
+  /**
+   * Matches if the current requested/active model is a custom model (i.e. not
+   * a Gemini model). Enables provider-aware routing so tier aliases resolve
+   * to models of the same family as the active model.
+   */
+  isCustomModel?: boolean;
 }
 
 export interface ModelConfigServiceConfig {
@@ -214,6 +233,53 @@ export class ModelConfigService {
     return this.config.modelDefinitions ?? {};
   }
 
+  /**
+   * Determines whether a model should be treated as a custom (non-Gemini)
+   * model. Mirrors the semantics of `isCustomModel` in config/models.ts
+   * without depending on the full Config object: a model is custom if its
+   * definition tier is 'custom' or its resolved name does not start with
+   * 'gemini-'.
+   */
+  private isCustomModelForResolution(model: string): boolean {
+    const resolved = this.resolveModelId(model);
+    const definition = this.config.modelDefinitions?.[resolved];
+    return definition?.tier === 'custom' || !resolved.startsWith('gemini-');
+  }
+
+  /**
+   * Resolves a resolution target to a concrete model ID. String targets are
+   * returned as-is except for the special 'active' value, which resolves to
+   * the requested model itself. Object targets ({ familyTier }) resolve to
+   * the model with the given tier within the family of the requested model,
+   * falling back to the requested model when the family has no such model.
+   */
+  private resolveTarget(
+    target: ModelResolutionTarget,
+    context: ResolutionContext,
+  ): string {
+    if (typeof target === 'string') {
+      return target === 'active' ? (context.requestedModel ?? target) : target;
+    }
+
+    // { familyTier: 'pro' }
+    const requested = context.requestedModel;
+    if (!requested) {
+      // Without an anchor model we cannot determine a family; fall back to
+      // the tier name itself (conditions that reach here always provide a
+      // requestedModel, so this is defensive only).
+      return target.familyTier;
+    }
+    const resolvedRequested = this.resolveModelId(requested);
+    const family = this.config.modelDefinitions?.[resolvedRequested]?.family;
+    if (!family) {
+      return requested;
+    }
+    const match = Object.entries(this.config.modelDefinitions ?? {}).find(
+      ([_id, def]) => def.family === family && def.tier === target.familyTier,
+    );
+    return match?.[0] ?? requested;
+  }
+
   private matches(
     condition: ResolutionCondition,
     context: ResolutionContext,
@@ -230,6 +296,10 @@ export class ModelConfigService {
             !!context.requestedModel &&
             value.includes(context.requestedModel)
           );
+        case 'isCustomModel': {
+          const model = context.requestedModel;
+          return !!model && value === this.isCustomModelForResolution(model);
+        }
         default:
           return false;
       }
@@ -248,7 +318,7 @@ export class ModelConfigService {
 
     for (const ctx of resolution.contexts ?? []) {
       if (this.matches(ctx.condition, context)) {
-        return ctx.target;
+        return this.resolveTarget(ctx.target, context);
       }
     }
 
@@ -271,7 +341,7 @@ export class ModelConfigService {
 
     for (const ctx of resolution.contexts ?? []) {
       if (this.matches(ctx.condition, fullContext)) {
-        return ctx.target;
+        return this.resolveTarget(ctx.target, fullContext);
       }
     }
 

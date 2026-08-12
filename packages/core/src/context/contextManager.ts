@@ -474,8 +474,12 @@ export class ContextManager {
     const contents = history.map((h) => h.content);
 
     try {
+      // NOTE: 'context-calibrator' was never a registered alias, which caused
+      // countTokens to send the literal string as the model name (silently
+      // failing under Gemini). Use the registered 'classifier' alias
+      // (flash-lite tier)
       const { totalTokens } = await this.env.llmClient.countTokens({
-        modelConfigKey: { model: 'context-calibrator' },
+        modelConfigKey: { model: 'classifier' },
         contents,
         abortSignal,
       });

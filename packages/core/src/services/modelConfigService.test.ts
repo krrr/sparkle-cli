@@ -1117,6 +1117,117 @@ describe('ModelConfigService', () => {
         }),
       ).toBe('gemini-2.5-flash');
     });
+
+    it('should resolve tier aliases within the family of a custom model', () => {
+      const config: ModelConfigServiceConfig = {
+        modelDefinitions: {
+          'deepseek-v4-flash': { tier: 'flash', family: 'deepseek' },
+          'deepseek-v4-pro': { tier: 'pro', family: 'deepseek' },
+          'gemini-pro-latest': { tier: 'pro', family: 'gemini-3' },
+        },
+        modelIdResolutions: {
+          auto: {
+            default: 'gemini-pro-latest',
+            contexts: [
+              { condition: { isCustomModel: true }, target: 'active' },
+            ],
+          },
+          pro: {
+            default: 'gemini-pro-latest',
+            contexts: [
+              {
+                condition: { isCustomModel: true },
+                target: { familyTier: 'pro' },
+              },
+            ],
+          },
+          flash: {
+            default: 'gemini-flash-latest',
+            contexts: [
+              {
+                condition: { isCustomModel: true },
+                target: { familyTier: 'flash' },
+              },
+            ],
+          },
+          'flash-lite': {
+            default: 'gemini-flash-lite-latest',
+            contexts: [
+              {
+                condition: { isCustomModel: true },
+                target: { familyTier: 'flash-lite' },
+              },
+            ],
+          },
+        },
+      };
+      const service = new ModelConfigService(config);
+
+      // DeepSeek flash active: 'pro' resolves to the deepseek pro model.
+      expect(
+        service.resolveModelId('pro', { requestedModel: 'deepseek-v4-flash' }),
+      ).toBe('deepseek-v4-pro');
+      // DeepSeek pro active: 'flash' resolves to the deepseek flash model.
+      expect(
+        service.resolveModelId('flash', { requestedModel: 'deepseek-v4-pro' }),
+      ).toBe('deepseek-v4-flash');
+      // 'auto' resolves to the active model itself for custom models.
+      expect(
+        service.resolveModelId('auto', { requestedModel: 'deepseek-v4-flash' }),
+      ).toBe('deepseek-v4-flash');
+      // Gemini models are unaffected: conditions do not match.
+      expect(
+        service.resolveModelId('pro', { requestedModel: 'gemini-pro-latest' }),
+      ).toBe('gemini-pro-latest');
+      // No matching tier in the family falls back to the requested model.
+      expect(
+        service.resolveModelId('flash-lite', {
+          requestedModel: 'deepseek-v4-pro',
+        }),
+      ).toBe('deepseek-v4-pro');
+    });
+
+    it('should resolve classifier tier choices within the family of a custom model', () => {
+      const config: ModelConfigServiceConfig = {
+        modelDefinitions: {
+          'deepseek-v4-flash': { tier: 'flash', family: 'deepseek' },
+          'deepseek-v4-pro': { tier: 'pro', family: 'deepseek' },
+          'gemini-pro-latest': { tier: 'pro', family: 'gemini-3' },
+        },
+        classifierIdResolutions: {
+          flash: {
+            default: 'gemini-flash-latest',
+            contexts: [
+              {
+                condition: { isCustomModel: true },
+                target: { familyTier: 'flash' },
+              },
+            ],
+          },
+          pro: {
+            default: 'gemini-pro-latest',
+            contexts: [
+              {
+                condition: { isCustomModel: true },
+                target: { familyTier: 'pro' },
+              },
+            ],
+          },
+        },
+      };
+      const service = new ModelConfigService(config);
+
+      expect(service.resolveClassifierModelId('flash', 'deepseek-v4-pro')).toBe(
+        'deepseek-v4-flash',
+      );
+      expect(service.resolveClassifierModelId('pro', 'deepseek-v4-flash')).toBe(
+        'deepseek-v4-pro',
+      );
+      // Gemini requested model keeps the default resolution.
+      expect(
+        service.resolveClassifierModelId('flash', 'gemini-pro-latest'),
+      ).toBe('gemini-flash-latest');
+    });
   });
 
   describe('getAvailableModelOptions', () => {

@@ -12,7 +12,11 @@ import type {
   RoutingDecision,
   RoutingStrategy,
 } from '../routingStrategy.js';
-import { resolveClassifierModel, isCustomModel } from '../../config/models.js';
+import {
+  resolveClassifierModel,
+  isCustomModel,
+  isAutoModel,
+} from '../../config/models.js';
 import { createUserContent, Type } from '@google/genai';
 import type { Config } from '../../config/config.js';
 import {
@@ -136,6 +140,13 @@ export class ClassifierStrategy implements RoutingStrategy {
     const startTime = Date.now();
     try {
       const model = context.requestedModel ?? config.getModel();
+      // When the requested model is 'auto', anchor tier resolution on the
+      // active model so classifier choices (flash/pro) resolve within the
+      // family of the actually-used model (e.g. deepseek) instead of always
+      // mapping to Gemini models.
+      const anchorModel = isAutoModel(model, config)
+        ? config.getActiveModel()
+        : model;
       if (
         (await config.getNumericalRoutingEnabled()) &&
         !isCustomModel(model, config)
@@ -182,7 +193,7 @@ export class ClassifierStrategy implements RoutingStrategy {
       const latencyMs = Date.now() - startTime;
       const selectedModel = normalizeModelId(
         resolveClassifierModel(
-          normalizeModelId(model),
+          normalizeModelId(anchorModel),
           routerResponse.model_choice,
           config,
         ),

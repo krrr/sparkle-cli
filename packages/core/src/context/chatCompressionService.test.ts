@@ -29,6 +29,8 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_SPARKLE_MODEL,
 } from 'src/config/models.js';
+import { ModelConfigService } from '../services/modelConfigService.js';
+import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 
 vi.mock('../telemetry/loggers.js');
 vi.mock('../utils/environmentContext.js');
@@ -131,6 +133,41 @@ describe('modelStringToModelConfigAlias', () => {
     expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_FLASH_LITE_MODEL)).toBe(
       'chat-compression-flash-lite',
     );
+  });
+
+  it('maps deepseek models to the default compression alias', () => {
+    expect(modelStringToModelConfigAlias('deepseek-v4-flash')).toBe(
+      'chat-compression-default',
+    );
+    expect(modelStringToModelConfigAlias('deepseek-v4-pro')).toBe(
+      'chat-compression-default',
+    );
+  });
+
+  it('resolves the default compression alias within the deepseek family', () => {
+    const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+    const resolved = service.getResolvedConfig({
+      model: 'chat-compression-default',
+    });
+    // The alias chain resolves to the 'pro' tier alias...
+    expect(resolved.model).toBe('pro');
+    // ...which then resolves within the family of the active model.
+    expect(
+      service.resolveModelId(resolved.model, {
+        requestedModel: 'deepseek-v4-flash',
+      }),
+    ).toBe('deepseek-v4-pro');
+    expect(
+      service.resolveModelId(resolved.model, {
+        requestedModel: 'deepseek-v4-pro',
+      }),
+    ).toBe('deepseek-v4-pro');
+    // Gemini active model keeps the default resolution.
+    expect(
+      service.resolveModelId(resolved.model, {
+        requestedModel: DEFAULT_SPARKLE_MODEL,
+      }),
+    ).toBe(DEFAULT_SPARKLE_MODEL);
   });
 });
 

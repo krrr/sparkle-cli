@@ -59,10 +59,14 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     },
 
     // Bases for the internal model configs.
+    // Uses the 'flash' tier alias so the model resolves within the family of
+    // the active model (Gemini flash by default; e.g. deepseek-v4-flash when a
+    // DeepSeek model is active). The name is kept for backward compatibility
+    // with extensions that reference it.
     'gemini-3-flash-base': {
       extends: 'base',
       modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
       },
     },
     classifier: {
@@ -160,7 +164,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     'loop-detection-double-check': {
       extends: 'base',
       modelConfig: {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
       },
     },
     'llm-edit-fixer': {
@@ -184,29 +188,32 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
+    // Compression aliases use tier aliases so they resolve within the family
+    // of the active model (Gemini by default; e.g. deepseek when a DeepSeek
+    // model is active) instead of hardcoding Gemini model names.
     'chat-compression-pro': {
       modelConfig: {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
       },
     },
     'chat-compression-flash': {
       modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
       },
     },
     'chat-compression-flash-lite': {
       modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+        model: 'flash-lite',
       },
     },
     'chat-compression-default': {
       modelConfig: {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
       },
     },
     'agent-history-provider-summarizer': {
       modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
       },
     },
 
@@ -286,16 +293,18 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       features: { thinking: false, multimodalToolUse: false },
     },
 
-    // OpenAI-compatible models.
+    // OpenAI-compatible models. The tier mirrors the Gemini tier semantics so
+    // that provider-aware routing can resolve tier aliases (pro/flash) within
+    // the 'deepseek' family when a DeepSeek model is active.
     'deepseek-v4-flash': {
-      tier: 'custom',
-      family: 'custom',
+      tier: 'flash',
+      family: 'deepseek',
       isVisible: true,
       features: { thinking: false, multimodalToolUse: false },
     },
     'deepseek-v4-pro': {
-      tier: 'custom',
-      family: 'custom',
+      tier: 'pro',
+      family: 'deepseek',
       isVisible: true,
       features: { thinking: true, multimodalToolUse: false },
     },
@@ -303,29 +312,69 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
   modelIdResolutions: {
     auto: {
       default: DEFAULT_SPARKLE_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: 'active',
+        },
+      ],
     },
     pro: {
       default: DEFAULT_SPARKLE_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: { familyTier: 'pro' },
+        },
+      ],
     },
     flash: {
       default: DEFAULT_GEMINI_FLASH_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: { familyTier: 'flash' },
+        },
+      ],
     },
     'flash-lite': {
       default: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: { familyTier: 'flash-lite' },
+        },
+      ],
     },
   },
   classifierIdResolutions: {
     flash: {
       default: DEFAULT_GEMINI_FLASH_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: { familyTier: 'flash' },
+        },
+      ],
     },
     pro: {
       default: DEFAULT_SPARKLE_MODEL,
+      contexts: [
+        {
+          condition: { isCustomModel: true },
+          target: { familyTier: 'pro' },
+        },
+      ],
     },
   },
   modelChains: {
+    // Chain models use tier aliases (pro/flash/flash-lite) which resolve via
+    // modelIdResolutions. With a Gemini active model they map to the default
+    // Gemini models; with a custom (e.g. deepseek) active model they resolve
+    // within that model's family, providing the same downgrade semantics.
     default: [
       {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
         actions: {
           terminal: 'prompt',
           transient: 'prompt',
@@ -340,7 +389,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
         isLastResort: true,
         maxAttempts: 10,
         actions: {
@@ -359,7 +408,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     ],
     'auto-default': [
       {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
         maxAttempts: 3,
         actions: {
           terminal: 'prompt',
@@ -375,7 +424,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
         isLastResort: true,
         maxAttempts: 10,
         actions: {
@@ -409,7 +458,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
+        model: 'flash',
         actions: {
           terminal: 'silent',
           transient: 'silent',
@@ -424,7 +473,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
       {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: 'pro',
         isLastResort: true,
         actions: {
           terminal: 'silent',

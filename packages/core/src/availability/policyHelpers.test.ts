@@ -129,6 +129,32 @@ describe('policyHelpers', () => {
       expect(chain[0]?.actions).toEqual(SILENT_ACTIONS);
       expect(chain[1]?.actions).toEqual(SILENT_ACTIONS);
     });
+
+    it('routes a deepseek flash model through the default chain sliced to the active model', () => {
+      const config = createMockConfig({
+        getModel: () => 'deepseek-v4-flash',
+      });
+      const chain = resolvePolicyChain(config);
+
+      // deepseek-v4-flash has tier 'flash', so it enters the default chain
+      // [pro -> deepseek-v4-pro, flash -> deepseek-v4-flash], which is then
+      // sliced to start at the active model.
+      expect(chain).toHaveLength(1);
+      expect(chain[0]?.model).toBe('deepseek-v4-flash');
+    });
+
+    it('keeps both deepseek tiers in the chain when deepseek pro is active', () => {
+      const config = createMockConfig({
+        getModel: () => 'deepseek-v4-pro',
+      });
+      const chain = resolvePolicyChain(config);
+
+      // pro is the chain head, so the full [deepseek-v4-pro, deepseek-v4-flash]
+      // chain is retained, providing downgrade semantics for the family.
+      expect(chain).toHaveLength(2);
+      expect(chain[0]?.model).toBe('deepseek-v4-pro');
+      expect(chain[1]?.model).toBe('deepseek-v4-flash');
+    });
   });
 
   describe('buildFallbackPolicyContext', () => {

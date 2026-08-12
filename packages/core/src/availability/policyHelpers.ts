@@ -28,13 +28,26 @@ import {
 } from '../config/models.js';
 import { normalizeModelId } from '../utils/modelUtils.js';
 import type { ModelSelectionResult } from './modelAvailabilityService.js';
-import type { ModelConfigKey } from '../services/modelConfigService.js';
+import type {
+  ModelConfigKey,
+  ResolutionContext,
+} from '../services/modelConfigService.js';
 import { ApprovalMode } from '../policy/types.js';
 
 /**
  * Resolves the active policy chain for the given config, ensuring the
  * user-selected active model is represented.
  */
+const TIER_ALIASES = new Set(['pro', 'flash', 'flash-lite', 'auto']);
+
+/**
+ * True if the model string is a generic tier alias (pro/flash/flash-lite/auto)
+ * that carries no family information.
+ */
+function isTierAlias(model: string): boolean {
+  return TIER_ALIASES.has(model);
+}
+
 export function resolvePolicyChain(
   config: Config,
   preferredModel?: string,
@@ -42,9 +55,18 @@ export function resolvePolicyChain(
   const normalizedPreferredModel = preferredModel
     ? normalizeModelId(preferredModel)
     : undefined;
-  const modelFromConfig = normalizeModelId(
-    normalizedPreferredModel ?? config.getActiveModel?.() ?? config.getModel(),
+  const activeModel = normalizeModelId(
+    config.getActiveModel?.() ?? config.getModel(),
   );
+  // Tier aliases carry no family information. When a preferred model is such
+  // an alias (e.g. a tool request resolved to 'pro' through a model config
+  // alias), anchor resolution on the active model so the tier maps within the
+  // active model's family instead of always resolving to Gemini models.
+  const anchorModel =
+    normalizedPreferredModel && isTierAlias(normalizedPreferredModel)
+      ? activeModel
+      : (normalizedPreferredModel ?? activeModel);
+  const modelFromConfig = anchorModel;
   const configuredModel = normalizeModelId(config.getModel());
 
   let chain: ModelPolicyChain | undefined;
@@ -59,26 +81,47 @@ export function resolvePolicyChain(
     : false;
   const isAutoConfigured = isAutoModel(configuredModel, config);
 
-  if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL) {
-    chain = config.modelConfigService.resolveChain('lite');
+  // Pass the requested model through as the resolution anchor so tier aliases
+  // (pro/flash/flash-lite) inside chains resolve within the family of the
+  // active model (e.g. deepseek models) instead of always mapping to Gemini.
+  const resolutionContext: ResolutionContext = {
+    requestedModel: modelFromConfig,
+  };
+
+  const tier =
+    config.modelConfigService.getModelDefinition(resolvedModel)?.tier;
+
+  if (
+    resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL ||
+    tier === 'flash-lite'
+  ) {
+    chain = config.modelConfigService.resolveChain('lite', resolutionContext);
   } else if (
     isOriginallyGemini3 ||
     isAutoPreferred ||
     isAutoConfigured ||
-    resolvedModel === DEFAULT_GEMINI_FLASH_MODEL
+    resolvedModel === DEFAULT_GEMINI_FLASH_MODEL ||
+    tier === 'pro' ||
+    tier === 'flash'
   ) {
     // 1. Try to find a chain specifically for the current configured alias
     if (
       isAutoConfigured &&
       config.modelConfigService.getModelChain(configuredModel)
     ) {
-      chain = config.modelConfigService.resolveChain(configuredModel);
+      chain = config.modelConfigService.resolveChain(
+        configuredModel,
+        resolutionContext,
+      );
     }
     // 2. Fallback to family-based auto-routing
     if (!chain) {
       const isAutoSelection = isAutoPreferred || isAutoConfigured;
       const autoPrefix = isAutoSelection ? 'auto-' : '';
-      chain = config.modelConfigService.resolveChain(`${autoPrefix}default`);
+      chain = config.modelConfigService.resolveChain(
+        `${autoPrefix}default`,
+        resolutionContext,
+      );
     }
   }
   if (!chain) {

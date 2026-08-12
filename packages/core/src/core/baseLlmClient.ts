@@ -239,10 +239,15 @@ export class BaseLlmClient {
   async countTokens(
     options: CountTokenOptions,
   ): Promise<{ totalTokens: number }> {
+    const activeModel = this.config.getActiveModel();
     const model = options.modelConfigKey
-      ? this.config.modelConfigService.getResolvedConfig(options.modelConfigKey)
-          .model
-      : this.config.getActiveModel();
+      ? this.config.modelConfigService.resolveModelId(
+          this.config.modelConfigService.getResolvedConfig(
+            options.modelConfigKey,
+          ).model,
+          { requestedModel: activeModel },
+        )
+      : activeModel;
     const result = await this.contentGenerator.countTokens({
       model,
       contents: options.contents,
