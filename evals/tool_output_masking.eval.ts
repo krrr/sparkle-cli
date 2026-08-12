@@ -47,7 +47,7 @@ describe('Tool Output Masking Behavioral Evals', () => {
       await rig.run({ args: '/help' });
 
       // 2. Discover the project temp dir
-      const chatsDir = findDir(path.join(rig.homeDir!, '.gemini'), 'chats');
+      const chatsDir = findDir(path.join(rig.homeDir!, '.sparkle'), 'chats');
       if (!chatsDir) throw new Error('Could not find chats directory');
       const projectTempDir = path.dirname(chatsDir);
 
@@ -128,7 +128,7 @@ Output too large. Full output available at: ${outputFilePath}
       fs.writeFileSync(sessionFile, JSON.stringify(conversation, null, 2));
 
       // 4. Trust folder
-      const settingsDir = path.join(rig.homeDir!, '.gemini');
+      const settingsDir = path.join(rig.homeDir!, '.sparkle');
       fs.writeFileSync(
         path.join(settingsDir, 'trustedFolders.json'),
         JSON.stringify(
@@ -183,7 +183,7 @@ Output too large. Full output available at: ${outputFilePath}
     assert: async (rig) => {
       await rig.run({ args: '/help' });
 
-      const chatsDir = findDir(path.join(rig.homeDir!, '.gemini'), 'chats');
+      const chatsDir = findDir(path.join(rig.homeDir!, '.sparkle'), 'chats');
       if (!chatsDir) throw new Error('Could not find chats directory');
       const projectTempDir = path.dirname(chatsDir);
 
@@ -264,7 +264,7 @@ Output too large. Full output available at: ${outputFilePath}
       );
       fs.writeFileSync(sessionFile, JSON.stringify(conversation, null, 2));
 
-      const settingsDir = path.join(rig.homeDir!, '.gemini');
+      const settingsDir = path.join(rig.homeDir!, '.sparkle');
       fs.writeFileSync(
         path.join(settingsDir, 'trustedFolders.json'),
         JSON.stringify(

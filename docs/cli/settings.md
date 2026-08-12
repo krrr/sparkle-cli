@@ -8,8 +8,8 @@ Your Sparkle CLI settings are stored in a `settings.json` file. In addition to
 using the `/settings` command, you can also edit them in one of the following
 locations:
 
-- **User settings**: `~/.gemini/settings.json`
-- **Workspace settings**: `your-project/.gemini/settings.json`
+- **User settings**: `~/.sparkle/settings.json`
+- **Workspace settings**: `your-project/.sparkle/settings.json`
 
 <!-- prettier-ignore -->
 > [!IMPORTANT]

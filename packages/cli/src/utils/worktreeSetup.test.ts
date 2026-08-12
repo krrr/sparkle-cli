@@ -54,7 +54,7 @@ describe('setupWorktree', () => {
     );
     mockService.setup.mockResolvedValue({
       name: 'my-feature',
-      path: '/mock/project/.gemini/worktrees/my-feature',
+      path: '/mock/project/.sparkle/worktrees/my-feature',
       baseSha: 'base-sha',
     });
   });
@@ -76,7 +76,7 @@ describe('setupWorktree', () => {
     );
     expect(mockService.setup).toHaveBeenCalledWith('my-feature');
     expect(process.chdir).toHaveBeenCalledWith(
-      '/mock/project/.gemini/worktrees/my-feature',
+      '/mock/project/.sparkle/worktrees/my-feature',
     );
     expect(process.env['SPARKLE_CLI_WORKTREE_HANDLED']).toBe('1');
   });
@@ -84,7 +84,7 @@ describe('setupWorktree', () => {
   it('should generate a name if worktreeName is undefined', async () => {
     mockService.setup.mockResolvedValue({
       name: 'generated-name',
-      path: '/mock/project/.gemini/worktrees/generated-name',
+      path: '/mock/project/.sparkle/worktrees/generated-name',
       baseSha: 'base-sha',
     });
 

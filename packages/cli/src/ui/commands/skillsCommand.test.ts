@@ -263,7 +263,7 @@ describe('skillsCommand', () => {
           expect(requestConsent).toBeDefined();
           await requestConsent!(
             [{ name: 'test-skill', location: '/path' } as SkillDefinition],
-            '/workspace/.gemini/skills',
+            '/workspace/.sparkle/skills',
           );
           return [{ name: 'test-skill', location: '/path' }];
         },

@@ -9,7 +9,7 @@ import * as os from 'node:os';
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import {
-  GEMINI_DIR,
+  SPARKLE_DIR,
   homedir,
   GOOGLE_ACCOUNTS_FILENAME,
   isSubpath,
@@ -54,9 +54,9 @@ export class Storage {
   static getGlobalGeminiDir(): string {
     const homeDir = homedir();
     if (!homeDir) {
-      return path.join(os.tmpdir(), GEMINI_DIR);
+      return path.join(os.tmpdir(), SPARKLE_DIR);
     }
-    return path.join(homeDir, GEMINI_DIR);
+    return path.join(homeDir, SPARKLE_DIR);
   }
 
   static getGlobalAgentsDir(): string {
@@ -160,7 +160,7 @@ export class Storage {
   }
 
   getGeminiDir(): string {
-    return path.join(this.targetDir, GEMINI_DIR);
+    return path.join(this.targetDir, SPARKLE_DIR);
   }
 
   /**

@@ -29,10 +29,10 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     homedir: () => '/mock/home/user',
     Storage: class extends actual.Storage {
       static override getGlobalSettingsPath = () =>
-        '/mock/home/user/.gemini/settings.json';
+        '/mock/home/user/.sparkle/settings.json';
       override getWorkspaceSettingsPath = () =>
-        '/mock/workspace/.gemini/settings.json';
-      static override getGlobalGeminiDir = () => '/mock/home/user/.gemini';
+        '/mock/workspace/.sparkle/settings.json';
+      static override getGlobalGeminiDir = () => '/mock/home/user/.sparkle';
     },
   };
 });

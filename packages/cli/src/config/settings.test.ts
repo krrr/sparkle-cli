@@ -78,7 +78,7 @@ import {
   createTestMergedSettings,
   resetSettingsCacheForTesting,
 } from './settings.js';
-import { FatalConfigError, GEMINI_DIR, Storage } from 'sparkle-cli-core';
+import { FatalConfigError, SPARKLE_DIR, Storage } from 'sparkle-cli-core';
 import { updateSettingsFilePreservingFormat } from '../utils/commentJson.js';
 import {
   getSettingsSchema,
@@ -88,10 +88,10 @@ import {
 import { createMockSettings } from '../test-utils/settings.js';
 
 const MOCK_WORKSPACE_DIR = path.resolve(path.resolve('/mock/workspace'));
-// Use the (mocked) GEMINI_DIR for consistency
+// Use the (mocked) SPARKLE_DIR for consistency
 const MOCK_WORKSPACE_SETTINGS_PATH = path.join(
   MOCK_WORKSPACE_DIR,
-  GEMINI_DIR,
+  SPARKLE_DIR,
   'settings.json',
 );
 
@@ -1740,7 +1740,7 @@ describe('Settings Loading and Merging', () => {
       const mockSymlinkDir = path.resolve('/mock/symlink/to/home');
       const mockWorkspaceSettingsPath = path.join(
         mockSymlinkDir,
-        GEMINI_DIR,
+        SPARKLE_DIR,
         'settings.json',
       );
 
@@ -2107,7 +2107,7 @@ describe('Settings Loading and Merging', () => {
       delete process.env['GEMINI_API_KEY']; // reset
       delete process.env['TESTTEST']; // reset
       const geminiEnvPath = path.resolve(
-        path.join(MOCK_WORKSPACE_DIR, GEMINI_DIR, '.env'),
+        path.join(MOCK_WORKSPACE_DIR, SPARKLE_DIR, '.env'),
       );
       const workspaceEnvPath = path.resolve(
         path.join(MOCK_WORKSPACE_DIR, '.env'),

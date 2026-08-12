@@ -301,8 +301,8 @@ DEBUG=1 sparkle
 ```
 
 **Note:** If you have `DEBUG=true` in a project's `.env` file, it won't affect
-sparkle-cli due to automatic exclusion. Use `.gemini/.env` files for sparkle-cli
-specific debug settings.
+sparkle-cli due to automatic exclusion. Use `.sparkle/.env` files for
+sparkle-cli specific debug settings.
 
 ### React DevTools
 
@@ -349,8 +349,8 @@ Available built-in profiles are `permissive-{open,proxied}`,
 `restrictive-{open,proxied}`, and `strict-{open,proxied}` (see below for proxied
 networking). You can also switch to a custom profile
 `SEATBELT_PROFILE=<profile>` if you also create a file
-`.gemini/sandbox-macos-<profile>.sb` under your project settings directory
-`.gemini`.
+`.sparkle/sandbox-macos-<profile>.sb` under your project settings directory
+`.sparkle`.
 
 #### Container-based sandboxing (all platforms)
 
@@ -370,8 +370,8 @@ as you start/stop Sparkle CLI. Files created within the sandbox should be
 automatically mapped to your user/group on host machine. You can easily specify
 additional mounts, ports, or environment variables by setting
 `SANDBOX_{MOUNTS,PORTS,ENV}` as needed. You can also fully customize the sandbox
-for your projects by creating the files `.gemini/sandbox.Dockerfile` and/or
-`.gemini/sandbox.bashrc` under your project settings directory (`.gemini`) and
+for your projects by creating the files `.sparkle/sandbox.Dockerfile` and/or
+`.sparkle/sandbox.bashrc` under your project settings directory (`.sparkle`) and
 running `sparkle` with `BUILD_SANDBOX=1` to trigger building of your custom
 sandbox.
 

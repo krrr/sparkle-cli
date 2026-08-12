@@ -44,7 +44,7 @@ describe('resolveWorkspacePolicyState', () => {
 
     workspaceDir = path.join(tempDir, 'workspace');
     fs.mkdirSync(workspaceDir);
-    policiesDir = path.join(workspaceDir, '.gemini', 'policies');
+    policiesDir = path.join(workspaceDir, '.sparkle', 'policies');
 
     // Enable policies for these tests to verify loading logic
     setDisableWorkspacePolicies(false);
@@ -183,7 +183,7 @@ describe('resolveWorkspacePolicyState', () => {
     }
   });
   it('should not return workspace policies if cwd is the home directory', async () => {
-    const policiesDir = path.join(tempDir, '.gemini', 'policies');
+    const policiesDir = path.join(tempDir, '.sparkle', 'policies');
     fs.mkdirSync(policiesDir, { recursive: true });
     fs.writeFileSync(path.join(policiesDir, 'policy.toml'), 'rules = []');
 
@@ -218,7 +218,7 @@ describe('resolveWorkspacePolicyState', () => {
   });
 
   it('should return empty state if cwd is a symlink to the home directory', async () => {
-    const policiesDir = path.join(tempDir, '.gemini', 'policies');
+    const policiesDir = path.join(tempDir, '.sparkle', 'policies');
     fs.mkdirSync(policiesDir, { recursive: true });
     fs.writeFileSync(path.join(policiesDir, 'policy.toml'), 'rules = []');
 

@@ -77,7 +77,7 @@ describe('resumeCommand', () => {
               authType: AuthType.USE_GEMINI,
             }),
             storage: {
-              getProjectTempDir: () => '/project/root/.gemini/tmp/mockhash',
+              getProjectTempDir: () => '/project/root/.sparkle/tmp/mockhash',
             },
           },
           geminiClient: {

@@ -9,16 +9,16 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { GEMINI_DIR } from 'sparkle-cli-core';
+import { SPARKLE_DIR } from 'sparkle-cli-core';
 
 const projectRoot = join(import.meta.dirname, '..');
 
 const USER_SETTINGS_DIR = join(
   process.env.HOME || process.env.USERPROFILE || process.env.HOMEPATH || '',
-  GEMINI_DIR,
+  SPARKLE_DIR,
 );
 const USER_SETTINGS_PATH = join(USER_SETTINGS_DIR, 'settings.json');
-const WORKSPACE_SETTINGS_PATH = join(projectRoot, GEMINI_DIR, 'settings.json');
+const WORKSPACE_SETTINGS_PATH = join(projectRoot, SPARKLE_DIR, 'settings.json');
 
 let telemetrySettings = undefined;
 

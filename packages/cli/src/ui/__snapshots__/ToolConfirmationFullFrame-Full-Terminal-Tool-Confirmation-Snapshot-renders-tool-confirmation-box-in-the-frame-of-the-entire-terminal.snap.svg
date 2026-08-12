@@ -270,7 +270,7 @@
     <rect x="54" y="544" width="9" height="17" fill="#001a00" />
     <rect x="63" y="544" width="90" height="17" fill="#001a00" />
     <text x="63" y="546" fill="#00cd00" textLength="90" lengthAdjust="spacingAndGlyphs">Allow once</text>
-    <rect x="153" y="544" width="603" height="17" fill="#001a00" />
+    <rect x="153" y="544" width="612" height="17" fill="#001a00" />
     <text x="882" y="546" fill="#333333" textLength="18" lengthAdjust="spacingAndGlyphs">│█</text>
     <text x="0" y="563" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="36" y="563" fill="#ffffff" textLength="18" lengthAdjust="spacingAndGlyphs">2.</text>
@@ -279,7 +279,7 @@
     <text x="0" y="580" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="36" y="580" fill="#ffffff" textLength="18" lengthAdjust="spacingAndGlyphs">3.</text>
     <text x="63" y="580" fill="#ffffff" textLength="387" lengthAdjust="spacingAndGlyphs">Allow for this file in all future sessions </text>
-    <text x="450" y="580" fill="#afafaf" textLength="306" lengthAdjust="spacingAndGlyphs">~/.gemini/policies/auto-saved.toml</text>
+    <text x="450" y="580" fill="#afafaf" textLength="315" lengthAdjust="spacingAndGlyphs">~/.sparkle/policies/auto-saved.toml</text>
     <text x="882" y="580" fill="#333333" textLength="18" lengthAdjust="spacingAndGlyphs">│█</text>
     <text x="0" y="597" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="36" y="597" fill="#ffffff" textLength="18" lengthAdjust="spacingAndGlyphs">4.</text>

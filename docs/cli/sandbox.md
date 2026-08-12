@@ -169,7 +169,7 @@ export GEMINI_SANDBOX_IMAGE="us-central1-docker.pkg.dev/my-project/my-repo/my-cu
 If you prefer to define your environment as code, you can provide a Dockerfile
 and Sparkle CLI will build the image automatically.
 
-1.  Create a `.gemini/sandbox.Dockerfile` in your project root.
+1.  Create a `.sparkle/sandbox.Dockerfile` in your project root.
 2.  Ensure you have the `gh` CLI installed and authenticated (if you are using
     the default `ghcr.io/google/sparkle-cli` image as a base).
 3.  Run your command with the `BUILD_SANDBOX` environment variable set:
@@ -446,7 +446,7 @@ DEBUG=1 sparkle -s -p "debug command"
 <!-- prettier-ignore -->
 > [!NOTE]
 > If you have `DEBUG=true` in a project's `.env` file, it won't affect
-> sparkle-cli due to automatic exclusion. Use `.gemini/.env` files for
+> sparkle-cli due to automatic exclusion. Use `.sparkle/.env` files for
 > sparkle-cli specific debug settings.
 
 ### Inspect sandbox

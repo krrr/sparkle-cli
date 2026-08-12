@@ -16,7 +16,7 @@ import {
   unlinkSync,
 } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { GEMINI_DIR } from 'sparkle-cli-core';
+import { SPARKLE_DIR } from 'sparkle-cli-core';
 import * as pty from '@lydell/node-pty';
 import { fileURLToPath } from 'node:url';
 
@@ -104,7 +104,7 @@ describe.skipIf(skipFlaky)(
       // 2. Verify trustedFolders.json contains the REAL path, not the symlink path
       const trustedFoldersPath = join(
         rig.homeDir!,
-        GEMINI_DIR,
+        SPARKLE_DIR,
         'trustedFolders.json',
       );
       // Wait for file to be written

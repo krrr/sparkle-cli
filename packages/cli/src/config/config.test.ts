@@ -3330,7 +3330,7 @@ describe('loadCliConfig mcpEnabled', () => {
 describe('extension plan settings', () => {
   beforeEach(() => {
     vi.spyOn(Storage.prototype, 'getProjectTempDir').mockReturnValue(
-      '/mock/home/user/.gemini/tmp/test-project',
+      '/mock/home/user/.sparkle/tmp/test-project',
     );
   });
 
@@ -3422,7 +3422,7 @@ describe('extension plan settings', () => {
         '/mock',
         'home',
         'user',
-        '.gemini',
+        '.sparkle',
         'tmp',
         'test-project',
         'test-session',

@@ -169,7 +169,7 @@ beforeEach(() => {
         const inboxDir = path.join(memoryDir, '.inbox');
 
         const homeDir = process.env['SPARKLE_CLI_HOME'] ?? os.homedir();
-        const globalGeminiDir = path.join(homeDir, '.gemini');
+        const globalGeminiDir = path.join(homeDir, '.sparkle');
 
         await fs.mkdir(path.join(inboxDir, 'private'), { recursive: true });
         await fs.mkdir(path.join(inboxDir, 'global'), { recursive: true });
@@ -417,7 +417,7 @@ describe('Auto Memory inbox routing', () => {
       );
       const activeGlobalMemoryPath = path.join(
         fixture.homeDir,
-        '.gemini',
+        '.sparkle',
         'AGENTS.md',
       );
       const run = await readRun(fixture);

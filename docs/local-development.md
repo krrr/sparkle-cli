@@ -60,7 +60,7 @@ You can view traces in the Jaeger UI for local development.
     This command configures your workspace for local telemetry and provides a
     link to the Jaeger UI (usually `http://localhost:16686`).
 
-    - **Collector logs:** `~/.gemini/tmp/<projectHash>/otel/collector.log`
+    - **Collector logs:** `~/.sparkle/tmp/<projectHash>/otel/collector.log`
 
 2.  **Run Sparkle CLI:**
 

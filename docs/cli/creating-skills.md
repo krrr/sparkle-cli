@@ -23,7 +23,7 @@ Sparkle will then:
 3.  Create the standard resource directories: `scripts/`, `references/`, and
     `assets/`.
 
-Once created, you can find your new skill in `.gemini/skills/code-reviewer/`.
+Once created, you can find your new skill in `.sparkle/skills/code-reviewer/`.
 
 ## Manual creation
 
@@ -38,19 +38,19 @@ scripts.
 **macOS/Linux**
 
 ```bash
-mkdir -p .gemini/skills/code-reviewer/scripts
+mkdir -p .sparkle/skills/code-reviewer/scripts
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-New-Item -ItemType Directory -Force -Path ".gemini\skills\code-reviewer\scripts"
+New-Item -ItemType Directory -Force -Path ".sparkle\skills\code-reviewer\scripts"
 ```
 
 ### 2. Define the skill (`SKILL.md`)
 
 The `SKILL.md` file defines the skill's purpose and instructions for the agent.
-Create a file at `.gemini/skills/code-reviewer/SKILL.md`.
+Create a file at `.sparkle/skills/code-reviewer/SKILL.md`.
 
 ```markdown
 ---
@@ -76,10 +76,10 @@ skill is active, you MUST:
 ### 3. Add the tool logic
 
 Skills can bundle resources like scripts to perform deterministic tasks. Create
-a file at `.gemini/skills/code-reviewer/scripts/review.js`.
+a file at `.sparkle/skills/code-reviewer/scripts/review.js`.
 
 ```javascript
-// .gemini/skills/code-reviewer/scripts/review.js
+// .sparkle/skills/code-reviewer/scripts/review.js
 const file = process.argv[2];
 
 if (!file) {
@@ -96,14 +96,14 @@ setTimeout(() => {
 
 ### 4. Test the skill
 
-Sparkle CLI automatically discovers skills in the `.gemini/skills` directory.
+Sparkle CLI automatically discovers skills in the `.sparkle/skills` directory.
 
 1.  Start a new session and ask a question that triggers the skill's
     description: "Can you review index.js"
 2.  Sparkle identifies the request matches the `code-reviewer` description and
     asks for permission to activate it.
 3.  Once you approve, Sparkle executes the bundled script:
-    `node .gemini/skills/code-reviewer/scripts/review.js index.js`
+    `node .sparkle/skills/code-reviewer/scripts/review.js index.js`
 
 To determine whether your skill has been correctly loaded, run the command:
 
@@ -115,7 +115,7 @@ To determine whether your skill has been correctly loaded, run the command:
 
 You can share your skills in several ways depending on your target audience.
 
-- **Workspace skills**: Commit your skill to a `.gemini/skills/` directory in
+- **Workspace skills**: Commit your skill to a `.sparkle/skills/` directory in
   your project repository.
 - **Extensions**: Bundle your skill within a
   [Sparkle CLI extension](../extensions/writing-extensions.md).
@@ -163,12 +163,12 @@ of precedence (lowest to highest):
 
 1.  **Built-in Skills**: Included with Sparkle CLI (pre-approved).
 2.  **Extension Skills**: Bundled within [extensions](../extensions/).
-3.  **User Skills**: `~/.gemini/skills/` or the `~/.agents/skills/` alias.
-4.  **Workspace Skills**: `.gemini/skills/` or the `.agents/skills/` alias.
+3.  **User Skills**: `~/.sparkle/skills/` or the `~/.agents/skills/` alias.
+4.  **Workspace Skills**: `.sparkle/skills/` or the `.agents/skills/` alias.
 
 ### Discovery aliases
 
-You can use `.agents/skills` as an alternative to `.gemini/skills`. This alias
+You can use `.agents/skills` as an alternative to `.sparkle/skills`. This alias
 is compatible with other AI agent tools following the
 [Agent Skills](https://agentskills.io) standard.
 

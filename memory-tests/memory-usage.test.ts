@@ -278,7 +278,7 @@ describe('Memory Usage Tests', () => {
           // Ensure the history file is linked
           const targetChatsDir = join(
             rig.homeDir!,
-            '.gemini',
+            '.sparkle',
             'tmp',
             getProjectHash(rig.testDir!),
             'chats',
@@ -325,7 +325,7 @@ describe('Memory Usage Tests', () => {
           // Ensure the history file is linked
           const targetChatsDir = join(
             rig.homeDir!,
-            '.gemini',
+            '.sparkle',
             'tmp',
             getProjectHash(rig.testDir!),
             'chats',

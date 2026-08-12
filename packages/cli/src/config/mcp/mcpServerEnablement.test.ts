@@ -14,7 +14,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     Storage: {
       // eslint-disable-next-line @typescript-eslint/no-misused-spread
       ...actual.Storage,
-      getGlobalGeminiDir: () => '/virtual-home/.gemini',
+      getGlobalGeminiDir: () => '/virtual-home/.sparkle',
     },
   };
 });

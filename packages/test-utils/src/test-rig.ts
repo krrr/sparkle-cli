@@ -11,8 +11,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { env } from 'node:process';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { DEFAULT_GEMINI_FLASH_MODEL, GEMINI_DIR } from 'sparkle-cli-core';
-export { GEMINI_DIR };
+import { DEFAULT_GEMINI_FLASH_MODEL, SPARKLE_DIR } from 'sparkle-cli-core';
+export { SPARKLE_DIR };
 import * as pty from '@lydell/node-pty';
 import stripAnsi from 'strip-ansi';
 import * as os from 'node:os';
@@ -443,10 +443,10 @@ export class TestRig {
   }
 
   private _createSettingsFile(overrideSettings?: Record<string, unknown>) {
-    const projectGeminiDir = join(this.testDir!, GEMINI_DIR);
+    const projectGeminiDir = join(this.testDir!, SPARKLE_DIR);
     mkdirSync(projectGeminiDir, { recursive: true });
 
-    const userGeminiDir = join(this.homeDir!, GEMINI_DIR);
+    const userGeminiDir = join(this.homeDir!, SPARKLE_DIR);
     mkdirSync(userGeminiDir, { recursive: true });
 
     // In sandbox mode, use an absolute path for telemetry inside the container
@@ -503,7 +503,7 @@ export class TestRig {
 
   private _createStateFile(overrideState?: Record<string, unknown>) {
     if (!this.homeDir) throw new Error('TestRig homeDir is not initialized');
-    const userGeminiDir = join(this.homeDir, GEMINI_DIR);
+    const userGeminiDir = join(this.homeDir, SPARKLE_DIR);
     mkdirSync(userGeminiDir, { recursive: true });
 
     const state = deepMerge(
@@ -641,12 +641,12 @@ export class TestRig {
 
     // Update settings in workspace and home
     const updateSettings = (dir: string) => {
-      const settingsPath = join(dir, GEMINI_DIR, 'settings.json');
+      const settingsPath = join(dir, SPARKLE_DIR, 'settings.json');
       let settings: any = {};
       if (fs.existsSync(settingsPath)) {
         settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
       } else {
-        fs.mkdirSync(join(dir, GEMINI_DIR), { recursive: true });
+        fs.mkdirSync(join(dir, SPARKLE_DIR), { recursive: true });
       }
 
       if (!settings.mcpServers) {

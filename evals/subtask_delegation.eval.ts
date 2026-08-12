@@ -33,21 +33,21 @@ describe('subtask delegation eval test cases', () => {
     prompt:
       'Please read the requirements in requirements.txt using a researcher, then implement the requested logic in src/logic.ts using a developer, and finally document the implementation in docs/logic.md using a documentation expert.',
     files: {
-      '.gemini/agents/researcher.md': `---
+      '.sparkle/agents/researcher.md': `---
 name: researcher
 description: Expert in reading files and extracting requirements.
 tools:
   - read_file
 ---
 You are the researcher. Read the provided file and extract requirements.`,
-      '.gemini/agents/developer.md': `---
+      '.sparkle/agents/developer.md': `---
 name: developer
 description: Expert in implementing logic in TypeScript.
 tools:
   - write_file
 ---
 You are the developer. Implement the requested logic in the specified file.`,
-      '.gemini/agents/doc-expert.md': `---
+      '.sparkle/agents/doc-expert.md': `---
 name: doc-expert
 description: Expert in writing technical documentation.
 tools:

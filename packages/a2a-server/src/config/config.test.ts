@@ -22,7 +22,7 @@ import {
 } from 'sparkle-cli-core';
 import type { AgentSettings } from '../types.js';
 
-// Isolate environment loading from the user's real ~/.gemini/.env file.
+// Isolate environment loading from the user's real ~/.sparkle/.env file.
 const mockHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gemini-home-'));
 
 // Mock dependencies

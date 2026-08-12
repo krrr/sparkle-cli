@@ -306,7 +306,7 @@ describe('SandboxManager Integration', () => {
           { workspace, modeConfig: { readonly: true, allowOverrides: true } },
         );
 
-        const plansDir = path.join(workspace, '.gemini/tmp/session-123/plans');
+        const plansDir = path.join(workspace, '.sparkle/tmp/session-123/plans');
         fs.mkdirSync(plansDir, { recursive: true });
         const planFile = path.join(plansDir, 'feature-plan.md');
 

@@ -17,7 +17,7 @@ order:
 
 1.  **Global context file:**
 
-    - **Location:** `~/.gemini/AGENTS.md` (in your user home directory).
+    - **Location:** `~/.sparkle/AGENTS.md` (in your user home directory).
     - **Scope:** Provides default instructions for all your projects.
 
 2.  **Environment and workspace context files:**

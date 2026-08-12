@@ -103,7 +103,7 @@ sparkle extensions link <path>
 
 ## Extension format
 
-Sparkle CLI loads extensions from `<home>/.gemini/extensions`. Each extension
+Sparkle CLI loads extensions from `<home>/.sparkle/extensions`. Each extension
 must have a `sparkle-extension.json` file in its root directory.
 
 ### `sparkle-extension.json`
@@ -126,7 +126,7 @@ The manifest file defines the extension's behavior and configuration.
   "excludeTools": ["run_shell_command"],
   "migratedTo": "https://github.com/new-owner/new-extension-repo",
   "plan": {
-    "directory": ".gemini/plans"
+    "directory": ".sparkle/plans"
   }
 }
 ```
@@ -169,7 +169,7 @@ The manifest file defines the extension's behavior and configuration.
   - `directory`: The directory where planning artifacts are stored. This serves
     as a fallback if the user hasn't specified a plan directory in their
     settings. If not specified by either the extension or the user, the default
-    is `~/.gemini/tmp/<project>/<session-id>/plans/`.
+    is `~/.sparkle/tmp/<project>/<session-id>/plans/`.
 
 When Sparkle CLI starts, it loads all the extensions and merges their
 configurations. If there are any conflicts, the workspace configuration takes

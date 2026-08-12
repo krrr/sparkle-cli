@@ -150,7 +150,7 @@ describe('CPU Performance Tests', () => {
 
         // Create many skill directories with SKILL.md files
         for (let i = 0; i < SKILL_COUNT; i++) {
-          const skillDir = `.gemini/skills/perf-skill-${i}`;
+          const skillDir = `.sparkle/skills/perf-skill-${i}`;
           rig.mkdir(skillDir);
           rig.createFile(
             `${skillDir}/SKILL.md`,
@@ -328,7 +328,7 @@ describe('CPU Performance Tests', () => {
         fakeResponsesPath: join(__dirname, 'perf.long-chat.responses'),
       });
 
-      const geminiDir = join(rig.homeDir!, '.gemini');
+      const geminiDir = join(rig.homeDir!, '.sparkle');
       const projectTempDir = join(geminiDir, 'tmp', identifier);
       const targetChatsDir = join(projectTempDir, 'chats');
 
@@ -460,7 +460,7 @@ describe('CPU Performance Tests', () => {
         'long-conversation-terminal-scrolling',
         async () => {
           // Enable terminalBuffer to intentionally test CLI scrolling logic
-          const settingsPath = join(rig.homeDir!, '.gemini', 'settings.json');
+          const settingsPath = join(rig.homeDir!, '.sparkle', 'settings.json');
           writeFileSync(
             settingsPath,
             JSON.stringify({
@@ -561,7 +561,7 @@ describe('CPU Performance Tests', () => {
         'long-conversation-alternate-scrolling',
         async () => {
           // Enable useAlternateBuffer to intentionally test CLI scrolling logic
-          const settingsPath = join(rig.homeDir!, '.gemini', 'settings.json');
+          const settingsPath = join(rig.homeDir!, '.sparkle', 'settings.json');
           writeFileSync(
             settingsPath,
             JSON.stringify({

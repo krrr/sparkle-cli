@@ -53,7 +53,7 @@ loaded into every conversation.
 Context is loaded hierarchically. This lets you have general rules for
 everything and specific rules for sub-projects.
 
-1.  **Global:** `~/.gemini/AGENTS.md` (Rules for _every_ project you work on).
+1.  **Global:** `~/.sparkle/AGENTS.md` (Rules for _every_ project you work on).
 2.  **Project Root:** `./AGENTS.md` (Rules for the current repository).
 3.  **Subdirectory:** `./src/AGENTS.md` (Rules specific to the `src` folder).
 

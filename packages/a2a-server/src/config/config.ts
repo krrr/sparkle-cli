@@ -13,7 +13,7 @@ import {
   AuthType,
   Config,
   ApprovalMode,
-  GEMINI_DIR,
+  SPARKLE_DIR,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_MODEL,
   startupProfiler,
@@ -475,7 +475,7 @@ export async function loadEnvironment(
   if (isTrusted) {
     envFilePath = await findEnvFile(workspacePath);
   } else {
-    const homeGeminiEnvPath = path.join(homedir(), GEMINI_DIR, '.env');
+    const homeGeminiEnvPath = path.join(homedir(), SPARKLE_DIR, '.env');
     try {
       await fs.promises.access(homeGeminiEnvPath);
       envFilePath = homeGeminiEnvPath;
@@ -514,8 +514,8 @@ export async function loadEnvironment(
 async function findEnvFile(startDir: string): Promise<string | null> {
   let currentDir = path.resolve(startDir);
   while (true) {
-    // prefer gemini-specific .env under GEMINI_DIR
-    const geminiEnvPath = path.join(currentDir, GEMINI_DIR, '.env');
+    // prefer gemini-specific .env under SPARKLE_DIR
+    const geminiEnvPath = path.join(currentDir, SPARKLE_DIR, '.env');
     try {
       await fs.promises.access(geminiEnvPath);
       return geminiEnvPath;
@@ -536,7 +536,7 @@ async function findEnvFile(startDir: string): Promise<string | null> {
     currentDir = parentDir;
   }
   // check .env under home as fallback, again preferring gemini-specific .env
-  const homeGeminiEnvPath = path.join(homedir(), GEMINI_DIR, '.env');
+  const homeGeminiEnvPath = path.join(homedir(), SPARKLE_DIR, '.env');
   try {
     await fs.promises.access(homeGeminiEnvPath);
     return homeGeminiEnvPath;

@@ -21,7 +21,7 @@ import { createExtension } from '../test-utils/createExtension.js';
 import { ExtensionManager } from './extension-manager.js';
 import { themeManager, DEFAULT_THEME } from '../ui/themes/theme-manager.js';
 import {
-  GEMINI_DIR,
+  SPARKLE_DIR,
   type Config,
   tmpdir,
   NoopSandboxManager,
@@ -47,7 +47,7 @@ describe('ExtensionManager theme loading', () => {
 
   beforeEach(() => {
     process.env['SPARKLE_CLI_HOME'] = tempHomeDir;
-    userExtensionsDir = path.join(tempHomeDir, GEMINI_DIR, 'extensions');
+    userExtensionsDir = path.join(tempHomeDir, SPARKLE_DIR, 'extensions');
     // Ensure userExtensionsDir is clean for each test
     fs.rmSync(userExtensionsDir, { recursive: true, force: true });
     fs.mkdirSync(userExtensionsDir, { recursive: true });

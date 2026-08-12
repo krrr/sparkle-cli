@@ -61,7 +61,7 @@ describe('migrate command', () => {
         hooks: {},
       },
       setValue: mockSetValue,
-      workspace: { path: '/test/project/.gemini' },
+      workspace: { path: '/test/project/.sparkle' },
     });
   });
 
@@ -133,7 +133,7 @@ describe('migrate command', () => {
       expect.stringContaining('Migrating 1 hook event'),
     );
     expect(debugLoggerLogSpy).toHaveBeenCalledWith(
-      '✓ Hooks successfully migrated to .gemini/settings.json',
+      '✓ Hooks successfully migrated to .sparkle/settings.json',
     );
   });
 
@@ -322,7 +322,7 @@ describe('migrate command', () => {
         },
       },
       setValue: mockSetValue,
-      workspace: { path: '/test/project/.gemini' },
+      workspace: { path: '/test/project/.sparkle' },
     });
 
     mockedFs.existsSync.mockReturnValue(true);
@@ -506,10 +506,10 @@ describe('migrate command', () => {
     await handleMigrateFromClaude();
 
     expect(debugLoggerLogSpy).toHaveBeenCalledWith(
-      '✓ Hooks successfully migrated to .gemini/settings.json',
+      '✓ Hooks successfully migrated to .sparkle/settings.json',
     );
     expect(debugLoggerLogSpy).toHaveBeenCalledWith(
-      '\nMigration complete! Please review the migrated hooks in .gemini/settings.json',
+      '\nMigration complete! Please review the migrated hooks in .sparkle/settings.json',
     );
   });
 });

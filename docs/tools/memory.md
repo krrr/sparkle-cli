@@ -8,7 +8,7 @@ editing Markdown memory files directly.
 The agent routes memories to the appropriate Markdown file: shared project
 instructions go in repository `AGENTS.md` files, private project notes go in the
 per-project private memory folder, and cross-project personal preferences go in
-the global `~/.gemini/AGENTS.md` file.
+the global `~/.sparkle/AGENTS.md` file.
 
 ## Technical behavior
 

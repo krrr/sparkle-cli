@@ -59,7 +59,7 @@ describe('createPolicyUpdater', () => {
   it('should persist policy when persist flag is true', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -83,7 +83,7 @@ describe('createPolicyUpdater', () => {
   it('should include allowRedirection when persisting policy', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -103,7 +103,7 @@ describe('createPolicyUpdater', () => {
   it('should not persist policy when persist flag is false or undefined', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -119,7 +119,7 @@ describe('createPolicyUpdater', () => {
   it('should append to existing policy file', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     const existingContent =
@@ -144,7 +144,7 @@ describe('createPolicyUpdater', () => {
   it('should handle toml with multiple rules correctly', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     const existingContent = `
@@ -177,7 +177,7 @@ decision = "deny"
   it('should include argsPattern if provided', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -196,7 +196,7 @@ decision = "deny"
   it('should include mcpName if provided', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -229,7 +229,7 @@ decision = "deny"
   it('should persist to workspace when persistScope is workspace', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -255,7 +255,7 @@ decision = "deny"
   it('should include error details in feedback message on persistence failure', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -285,7 +285,7 @@ decision = "deny"
   it('should clean up tmp file on write failure', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -319,7 +319,7 @@ decision = "deny"
   it('should abort persistence on non-ENOENT read errors', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -354,7 +354,7 @@ decision = "deny"
   it('should fall back to copy+unlink when rename fails with EXDEV', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -396,7 +396,7 @@ decision = "deny"
   it('should include modes if provided', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     await messageBus.publish({
@@ -415,7 +415,7 @@ decision = "deny"
   it('should update existing rule modes instead of appending redundant rule', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     const existingContent = `
@@ -449,7 +449,7 @@ modes = [ "autoEdit", "yolo" ]
   it('should fall back to copy+unlink when rename fails with EBUSY', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const workspacePoliciesDir = '/mock/project/.gemini/policies';
+    const workspacePoliciesDir = '/mock/project/.sparkle/policies';
     const policyFile = path.join(
       workspacePoliciesDir,
       AUTO_SAVED_POLICY_FILENAME,
@@ -493,7 +493,7 @@ modes = [ "autoEdit", "yolo" ]
   it('should back up corrupted TOML file and recover', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
-    const policyFile = '/mock/user/.gemini/policies/auto-saved.toml';
+    const policyFile = '/mock/user/.sparkle/policies/auto-saved.toml';
     vi.spyOn(mockStorage, 'getAutoSavedPolicyPath').mockReturnValue(policyFile);
 
     const dir = path.dirname(policyFile);

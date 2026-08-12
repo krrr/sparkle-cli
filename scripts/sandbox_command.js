@@ -25,7 +25,7 @@ import os from 'node:os';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import dotenv from 'dotenv';
-import { GEMINI_DIR } from 'sparkle-cli-core';
+import { SPARKLE_DIR } from 'sparkle-cli-core';
 
 const argv = yargs(hideBin(process.argv)).option('q', {
   alias: 'quiet',
@@ -38,7 +38,7 @@ const homedir = () => process.env['SPARKLE_CLI_HOME'] || os.homedir();
 let geminiSandbox = process.env.GEMINI_SANDBOX;
 
 if (!geminiSandbox) {
-  const userSettingsFile = join(homedir(), GEMINI_DIR, 'settings.json');
+  const userSettingsFile = join(homedir(), SPARKLE_DIR, 'settings.json');
   if (existsSync(userSettingsFile)) {
     const settings = JSON.parse(
       stripJsonComments(readFileSync(userSettingsFile, 'utf-8')),
@@ -52,7 +52,7 @@ if (!geminiSandbox) {
 if (!geminiSandbox) {
   let currentDir = process.cwd();
   while (true) {
-    const geminiEnv = join(currentDir, GEMINI_DIR, '.env');
+    const geminiEnv = join(currentDir, SPARKLE_DIR, '.env');
     const regularEnv = join(currentDir, '.env');
     if (existsSync(geminiEnv)) {
       dotenv.config({ path: geminiEnv, quiet: true });

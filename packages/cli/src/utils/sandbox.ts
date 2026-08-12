@@ -23,7 +23,7 @@ import {
   coreEvents,
   debugLogger,
   FatalSandboxError,
-  GEMINI_DIR,
+  SPARKLE_DIR,
   homedir,
 } from 'sparkle-cli-core';
 import { ConsolePatcher } from '../ui/utils/ConsolePatcher.js';
@@ -70,14 +70,14 @@ export async function start_sandbox(
       let profileFile = fileURLToPath(
         new URL(`sandbox-macos-${profile}.sb`, import.meta.url),
       );
-      // if profile name is not recognized, look in user-level ~/.gemini first,
-      // then fall back to project-level .gemini. path.basename() strips any
+      // if profile name is not recognized, look in user-level ~/.sparkle first,
+      // then fall back to project-level .sparkle. path.basename() strips any
       // directory separators to prevent path traversal via SEATBELT_PROFILE.
       if (!BUILTIN_SEATBELT_PROFILES.includes(profile)) {
         const safeProfile = path.basename(profile);
         const fileName = `sandbox-macos-${safeProfile}.sb`;
-        const userProfileFile = path.join(homedir(), GEMINI_DIR, fileName);
-        const projectProfileFile = path.join(GEMINI_DIR, fileName);
+        const userProfileFile = path.join(homedir(), SPARKLE_DIR, fileName);
+        const projectProfileFile = path.join(SPARKLE_DIR, fileName);
         profileFile = fs.existsSync(userProfileFile)
           ? userProfileFile
           : projectProfileFile;
@@ -252,7 +252,7 @@ export async function start_sandbox(
     const gcPath = process.argv[1] ? fs.realpathSync(process.argv[1]) : '';
 
     const projectSandboxDockerfile = path.join(
-      GEMINI_DIR,
+      SPARKLE_DIR,
       'sandbox.Dockerfile',
     );
     const isCustomProjectSandbox = fs.existsSync(projectSandboxDockerfile);
@@ -279,7 +279,7 @@ export async function start_sandbox(
         // if project folder has sandbox.Dockerfile under project settings folder, use that
         let buildArgs = '';
         const projectSandboxDockerfile = path.join(
-          GEMINI_DIR,
+          SPARKLE_DIR,
           'sandbox.Dockerfile',
         );
         if (isCustomProjectSandbox) {
@@ -347,12 +347,12 @@ export async function start_sandbox(
     // note user/home changes inside sandbox and we mount at BOTH paths for consistency
     const userHomeDirOnHost = homedir();
     const userSettingsDirInSandbox = getContainerPath(
-      `/home/node/${GEMINI_DIR}`,
+      `/home/node/${SPARKLE_DIR}`,
     );
     if (!fs.existsSync(userHomeDirOnHost)) {
       fs.mkdirSync(userHomeDirOnHost, { recursive: true });
     }
-    const userSettingsDirOnHost = path.join(userHomeDirOnHost, GEMINI_DIR);
+    const userSettingsDirOnHost = path.join(userHomeDirOnHost, SPARKLE_DIR);
     if (!fs.existsSync(userSettingsDirOnHost)) {
       fs.mkdirSync(userSettingsDirOnHost, { recursive: true });
     }
@@ -553,7 +553,7 @@ export async function start_sandbox(
         ?.toLowerCase()
         .startsWith(workdir.toLowerCase())
     ) {
-      const sandboxVenvPath = path.resolve(GEMINI_DIR, 'sandbox.venv');
+      const sandboxVenvPath = path.resolve(SPARKLE_DIR, 'sandbox.venv');
       if (!fs.existsSync(sandboxVenvPath)) {
         fs.mkdirSync(sandboxVenvPath, { recursive: true });
       }

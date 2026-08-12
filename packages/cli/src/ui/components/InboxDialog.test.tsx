@@ -79,10 +79,10 @@ const inboxPatch: InboxPatch = {
   name: 'update-docs',
   entries: [
     {
-      targetPath: '/home/user/.gemini/skills/docs-writer/SKILL.md',
+      targetPath: '/home/user/.sparkle/skills/docs-writer/SKILL.md',
       diffContent: [
-        '--- /home/user/.gemini/skills/docs-writer/SKILL.md',
-        '+++ /home/user/.gemini/skills/docs-writer/SKILL.md',
+        '--- /home/user/.sparkle/skills/docs-writer/SKILL.md',
+        '+++ /home/user/.sparkle/skills/docs-writer/SKILL.md',
         '@@ -1,3 +1,4 @@',
         ' line1',
         ' line2',
@@ -101,11 +101,11 @@ const inboxMemoryPatch: InboxMemoryPatch = {
   sourceFiles: ['update-memory.patch'],
   entries: [
     {
-      targetPath: '/home/user/.gemini/tmp/project/memory/MEMORY.md',
+      targetPath: '/home/user/.sparkle/tmp/project/memory/MEMORY.md',
       isNewFile: false,
       diffContent: [
-        '--- /home/user/.gemini/tmp/project/memory/MEMORY.md',
-        '+++ /home/user/.gemini/tmp/project/memory/MEMORY.md',
+        '--- /home/user/.sparkle/tmp/project/memory/MEMORY.md',
+        '+++ /home/user/.sparkle/tmp/project/memory/MEMORY.md',
         '@@ -1,1 +1,1 @@',
         '-old',
         '+use focused tests',
@@ -120,10 +120,10 @@ const workspacePatch: InboxPatch = {
   name: 'workspace-update',
   entries: [
     {
-      targetPath: '/repo/.gemini/skills/docs-writer/SKILL.md',
+      targetPath: '/repo/.sparkle/skills/docs-writer/SKILL.md',
       diffContent: [
-        '--- /repo/.gemini/skills/docs-writer/SKILL.md',
-        '+++ /repo/.gemini/skills/docs-writer/SKILL.md',
+        '--- /repo/.sparkle/skills/docs-writer/SKILL.md',
+        '+++ /repo/.sparkle/skills/docs-writer/SKILL.md',
         '@@ -1,1 +1,2 @@',
         ' line1',
         '+line2',
@@ -137,20 +137,20 @@ const multiSectionPatch: InboxPatch = {
   name: 'multi-section',
   entries: [
     {
-      targetPath: '/home/user/.gemini/skills/docs-writer/SKILL.md',
+      targetPath: '/home/user/.sparkle/skills/docs-writer/SKILL.md',
       diffContent: [
-        '--- /home/user/.gemini/skills/docs-writer/SKILL.md',
-        '+++ /home/user/.gemini/skills/docs-writer/SKILL.md',
+        '--- /home/user/.sparkle/skills/docs-writer/SKILL.md',
+        '+++ /home/user/.sparkle/skills/docs-writer/SKILL.md',
         '@@ -1,1 +1,2 @@',
         ' line1',
         '+line2',
       ].join('\n'),
     },
     {
-      targetPath: '/home/user/.gemini/skills/docs-writer/SKILL.md',
+      targetPath: '/home/user/.sparkle/skills/docs-writer/SKILL.md',
       diffContent: [
-        '--- /home/user/.gemini/skills/docs-writer/SKILL.md',
-        '+++ /home/user/.gemini/skills/docs-writer/SKILL.md',
+        '--- /home/user/.sparkle/skills/docs-writer/SKILL.md',
+        '+++ /home/user/.sparkle/skills/docs-writer/SKILL.md',
         '@@ -3,1 +4,2 @@',
         ' line3',
         '+line4',
@@ -164,10 +164,10 @@ const windowsGlobalPatch: InboxPatch = {
   name: 'windows-update',
   entries: [
     {
-      targetPath: 'C:\\Users\\sandy\\.gemini\\skills\\docs-writer\\SKILL.md',
+      targetPath: 'C:\\Users\\sandy\\.sparkle\\skills\\docs-writer\\SKILL.md',
       diffContent: [
-        '--- C:\\Users\\sandy\\.gemini\\skills\\docs-writer\\SKILL.md',
-        '+++ C:\\Users\\sandy\\.gemini\\skills\\docs-writer\\SKILL.md',
+        '--- C:\\Users\\sandy\\.sparkle\\skills\\docs-writer\\SKILL.md',
+        '+++ C:\\Users\\sandy\\.sparkle\\skills\\docs-writer\\SKILL.md',
         '@@ -1,1 +1,2 @@',
         ' line1',
         '+line2',
@@ -184,7 +184,7 @@ describe('InboxDialog', () => {
     mockListInboxMemoryPatches.mockResolvedValue([]);
     mockMoveInboxSkill.mockResolvedValue({
       success: true,
-      message: 'Moved "inbox-skill" to ~/.gemini/skills.',
+      message: 'Moved "inbox-skill" to ~/.sparkle/skills.',
     });
     mockDismissInboxSkill.mockResolvedValue({
       success: true,
@@ -414,7 +414,7 @@ describe('InboxDialog', () => {
 
     await waitFor(() => {
       expect(lastFrame()).toContain(
-        'Moved "inbox-skill" to ~/.gemini/skills. Failed to reload skills: reload hook failed',
+        'Moved "inbox-skill" to ~/.sparkle/skills. Failed to reload skills: reload hook failed',
       );
     });
     expect(onReloadSkills).toHaveBeenCalledTimes(1);
@@ -506,7 +506,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const { lastFrame, unmount } = await act(async () =>
@@ -537,7 +537,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const { lastFrame, stdin, unmount, waitUntilReady } = await act(
@@ -578,7 +578,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const onReloadSkills = vi.fn().mockResolvedValue(undefined);
@@ -626,7 +626,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(false),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const { lastFrame, stdin, unmount, waitUntilReady } = await act(
@@ -653,7 +653,7 @@ describe('InboxDialog', () => {
         const frame = lastFrame();
         expect(frame).toContain('Apply');
         expect(frame).toContain(
-          '.gemini/skills — unavailable until this workspace is trusted',
+          '.sparkle/skills — unavailable until this workspace is trusted',
         );
       });
       expect(mockApplyInboxPatch).not.toHaveBeenCalled();
@@ -671,7 +671,7 @@ describe('InboxDialog', () => {
         storage: {
           getProjectSkillsDir: vi
             .fn()
-            .mockReturnValue('/symlinked/workspace/.gemini/skills'),
+            .mockReturnValue('/symlinked/workspace/.sparkle/skills'),
         },
       } as unknown as Config;
       const { lastFrame, stdin, unmount, waitUntilReady } = await act(
@@ -696,11 +696,11 @@ describe('InboxDialog', () => {
 
       await waitFor(() => {
         expect(lastFrame()).toContain(
-          '.gemini/skills — unavailable until this workspace is trusted',
+          '.sparkle/skills — unavailable until this workspace is trusted',
         );
       });
       expect(mockIsProjectSkillPatchTarget).toHaveBeenCalledWith(
-        '/repo/.gemini/skills/docs-writer/SKILL.md',
+        '/repo/.sparkle/skills/docs-writer/SKILL.md',
         config,
       );
       expect(mockApplyInboxPatch).not.toHaveBeenCalled();
@@ -715,7 +715,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const onReloadSkills = vi.fn().mockResolvedValue(undefined);
@@ -771,7 +771,7 @@ describe('InboxDialog', () => {
         storage: {
           getProjectSkillsDir: vi
             .fn()
-            .mockReturnValue('C:\\repo\\.gemini\\skills'),
+            .mockReturnValue('C:\\repo\\.sparkle\\skills'),
         },
       } as unknown as Config;
       const { lastFrame, unmount } = await act(async () =>
@@ -788,7 +788,7 @@ describe('InboxDialog', () => {
         const frame = lastFrame();
         expect(frame).toContain('[Global]');
         expect(frame).toContain('SKILL.md');
-        expect(frame).not.toContain('C:\\Users\\sandy\\.gemini\\skills');
+        expect(frame).not.toContain('C:\\Users\\sandy\\.sparkle\\skills');
       });
 
       unmount();
@@ -805,7 +805,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
       const { lastFrame, stdin, unmount, waitUntilReady } = await act(
@@ -845,10 +845,10 @@ describe('InboxDialog', () => {
       name: 'tall-patch',
       entries: [
         {
-          targetPath: '/repo/.gemini/skills/docs-writer/SKILL.md',
+          targetPath: '/repo/.sparkle/skills/docs-writer/SKILL.md',
           diffContent: [
-            '--- /repo/.gemini/skills/docs-writer/SKILL.md',
-            '+++ /repo/.gemini/skills/docs-writer/SKILL.md',
+            '--- /repo/.sparkle/skills/docs-writer/SKILL.md',
+            '+++ /repo/.sparkle/skills/docs-writer/SKILL.md',
             '@@ -1,4 +1,8 @@',
             ' line1',
             ' line2',
@@ -875,7 +875,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
 
@@ -921,7 +921,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
 
@@ -966,7 +966,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
 
@@ -1010,7 +1010,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
 
@@ -1144,7 +1144,7 @@ describe('InboxDialog', () => {
     const config = {
       isTrustedFolder: vi.fn().mockReturnValue(true),
       storage: {
-        getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.gemini/skills'),
+        getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
       },
     } as unknown as Config;
 

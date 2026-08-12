@@ -42,11 +42,11 @@ four locations for these files:
     settings have the lowest precedence and are intended to be overridden by
     user, project, or system override settings.
 - **User settings file:**
-  - **Location:** `~/.gemini/settings.json` (where `~` is your home directory).
+  - **Location:** `~/.sparkle/settings.json` (where `~` is your home directory).
   - **Scope:** Applies to all Sparkle CLI sessions for the current user. User
     settings override system defaults.
 - **Project settings file:**
-  - **Location:** `.gemini/settings.json` within your project's root directory.
+  - **Location:** `.sparkle/settings.json` within your project's root directory.
   - **Scope:** Applies only when running Sparkle CLI from that specific project.
     Project settings override user settings and system defaults.
 - **System settings file:**
@@ -74,14 +74,14 @@ which will be loaded automatically.
 CLI in a corporate environment, see the
 [Enterprise Configuration](../cli/enterprise.md) documentation.
 
-### The `.gemini` directory in your project
+### The `.sparkle` directory in your project
 
-In addition to a project settings file, a project's `.gemini` directory can
+In addition to a project settings file, a project's `.sparkle` directory can
 contain other project-specific files related to Sparkle CLI's operation, such
 as:
 
 - [Custom sandbox profiles](#sandboxing) (for example,
-  `.gemini/sandbox-macos-custom.sb`, `.gemini/sandbox.Dockerfile`).
+  `.sparkle/sandbox-macos-custom.sb`, `.sparkle/sandbox.Dockerfile`).
 
 ### Available settings in `settings.json`
 
@@ -1986,7 +1986,7 @@ The CLI keeps a history of shell commands you run. To avoid conflicts between
 different projects, this history is stored in a project-specific directory
 within your user's home folder.
 
-- **Location:** `~/.gemini/tmp/<project_hash>/shell_history`
+- **Location:** `~/.sparkle/tmp/<project_hash>/shell_history`
   - `<project_hash>` is a unique identifier generated from your project's root
     path.
   - The history is stored in a file named `shell_history`.
@@ -2011,7 +2011,7 @@ loading order is:
 **Environment variable exclusion:** Some environment variables (like `DEBUG` and
 `DEBUG_MODE`) are automatically excluded from being loaded from project `.env`
 files to prevent interference with sparkle-cli behavior. Variables from
-`.gemini/.env` files are never excluded. You can customize this behavior using
+`.sparkle/.env` files are never excluded. You can customize this behavior using
 the `advanced.excludedEnvVars` setting in your `settings.json` file.
 
 - **`GEMINI_API_KEY`**:
@@ -2032,7 +2032,7 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
 - **`SPARKLE_CLI_TRUSTED_FOLDERS_PATH`**:
   - Overrides the default location for the `trustedFolders.json` file.
   - Useful if you want to store this configuration in a custom location instead
-    of the default `~/.gemini/`.
+    of the default `~/.sparkle/`.
 - **`SPARKLE_CLI_IDE_PID`**:
   - Manually specifies the PID of the IDE process to use for integration. This
     is useful when running Sparkle CLI in a standalone terminal while still
@@ -2042,7 +2042,7 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Specifies the root directory for Sparkle CLI's user-level configuration and
     storage.
   - By default, this is the user's system home directory. The CLI will create a
-    `.gemini` folder inside this directory.
+    `.sparkle` folder inside this directory.
   - Useful for shared compute environments or keeping CLI state isolated.
   - Example: `export SPARKLE_CLI_HOME="/path/to/user/config"` (Windows
     PowerShell: `$env:SPARKLE_CLI_HOME="C:\path\to\user\config"`)
@@ -2098,14 +2098,14 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Accepts `true`, `false`, `docker`, `podman`, or a custom command string.
 - **`GEMINI_SYSTEM_MD`**:
   - Replaces the built‑in system prompt with content from a Markdown file.
-  - `true`/`1`: Use project default path `./.gemini/system.md`.
+  - `true`/`1`: Use project default path `./.sparkle/system.md`.
   - Any other string: Treat as a path (relative/absolute supported, `~`
     expands).
   - `false`/`0` or unset: Use the built‑in prompt. See
     [System Prompt Override](../cli/system-prompt.md).
 - **`GEMINI_WRITE_SYSTEM_MD`**:
   - Writes the current built‑in system prompt to a file for review.
-  - `true`/`1`: Write to `./.gemini/system.md`. Otherwise treat the value as a
+  - `true`/`1`: Write to `./.sparkle/system.md`. Otherwise treat the value as a
     path.
   - Run the CLI once with this set to generate the file.
 - **`SEATBELT_PROFILE`** (macOS specific):
@@ -2119,15 +2119,15 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
     allows network.
   - `strict-proxied`: Same as `strict-open` but routes network through proxy.
   - `<profile_name>`: Uses a custom profile. To define a custom profile, create
-    a file named `sandbox-macos-<profile_name>.sb` in your project's `.gemini/`
-    directory (for example, `my-project/.gemini/sandbox-macos-custom.sb`).
+    a file named `sandbox-macos-<profile_name>.sb` in your project's `.sparkle/`
+    directory (for example, `my-project/.sparkle/sandbox-macos-custom.sb`).
 - **`DEBUG` or `DEBUG_MODE`** (often used by underlying libraries or the CLI
   itself):
   - Set to `true` or `1` to enable verbose debug logging, which can be helpful
     for troubleshooting.
   - **Note:** These variables are automatically excluded from project `.env`
     files by default to prevent interference with sparkle-cli behavior. Use
-    `.gemini/.env` files if you need to set these for sparkle-cli specifically.
+    `.sparkle/.env` files if you need to set these for sparkle-cli specifically.
 - **`NO_COLOR`**:
   - Set to any value to disable all color output in the CLI.
 - **`CLI_TITLE`**:
@@ -2341,8 +2341,8 @@ conventions and context.
   general). The exact concatenation order and final context can be inspected
   using the `/memory show` command. The typical loading order is:
   1.  **Global context file:**
-      - Location: `~/.gemini/<configured-context-filename>` (for example,
-        `~/.gemini/AGENTS.md` in your user home directory).
+      - Location: `~/.sparkle/<configured-context-filename>` (for example,
+        `~/.sparkle/AGENTS.md` in your user home directory).
       - Scope: Provides default instructions for all your projects.
   2.  **Project root and ancestors context files:**
       - Location: The CLI searches for the configured context file in the
@@ -2394,7 +2394,7 @@ Sandboxing is disabled by default, but you can enable it in a few ways:
 By default, it uses a pre-built `sparkle-cli-sandbox` Docker image.
 
 For project-specific sandboxing needs, you can create a custom Dockerfile at
-`.gemini/sandbox.Dockerfile` in your project's root directory. This Dockerfile
+`.sparkle/sandbox.Dockerfile` in your project's root directory. This Dockerfile
 can be based on the base sandbox image:
 
 ```dockerfile
@@ -2410,7 +2410,7 @@ FROM sparkle-cli-sandbox
 # COPY ./my-config /app/my-config
 ```
 
-When `.gemini/sandbox.Dockerfile` exists, you can use `BUILD_SANDBOX`
+When `.sparkle/sandbox.Dockerfile` exists, you can use `BUILD_SANDBOX`
 environment variable when running Sparkle CLI to automatically build the custom
 sandbox image:
 

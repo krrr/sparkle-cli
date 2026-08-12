@@ -23,7 +23,7 @@ import {
   PROJECT_MEMORY_INDEX_FILENAME,
 } from '../tools/memoryTool.js';
 import {
-  GEMINI_DIR,
+  SPARKLE_DIR,
   toAbsolutePath,
   homedir as pathsHomedir,
 } from './paths.js';
@@ -115,7 +115,7 @@ describe('memoryDiscovery', () => {
   describe('getGlobalMemoryPaths', () => {
     it('should find global memory file if it exists', async () => {
       const globalMemoryFile = await createTestFile(
-        path.join(homedir, GEMINI_DIR, DEFAULT_CONTEXT_FILENAME),
+        path.join(homedir, SPARKLE_DIR, DEFAULT_CONTEXT_FILENAME),
         'Global memory content',
       );
 

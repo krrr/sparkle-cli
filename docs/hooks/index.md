@@ -94,8 +94,8 @@ You can filter which specific tools or triggers fire your hook using the
 Hooks are configured in `settings.json`. Sparkle CLI merges configurations from
 multiple layers in the following order of precedence (highest to lowest):
 
-1.  **Project settings**: `.gemini/settings.json` in the current directory.
-2.  **User settings**: `~/.gemini/settings.json`.
+1.  **Project settings**: `.sparkle/settings.json` in the current directory.
+2.  **User settings**: `~/.sparkle/settings.json`.
 3.  **System settings**: `/etc/sparkle-cli/settings.json`.
 4.  **Extensions**: Hooks defined by installed extensions.
 
@@ -111,7 +111,7 @@ multiple layers in the following order of precedence (highest to lowest):
           {
             "name": "security-check",
             "type": "command",
-            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/security.sh",
+            "command": "$GEMINI_PROJECT_DIR/.sparkle/hooks/security.sh",
             "timeout": 5000
           }
         ]

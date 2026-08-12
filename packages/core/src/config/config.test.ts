@@ -2945,10 +2945,10 @@ describe('Config JIT Initialization', () => {
   });
 
   describe('memory path access', () => {
-    it('should NOT add the global ~/.gemini directory to the workspace', async () => {
-      // Memory does not broaden the workspace to include the global ~/.gemini/
+    it('should NOT add the global ~/.sparkle directory to the workspace', async () => {
+      // Memory does not broaden the workspace to include the global ~/.sparkle/
       // directory. Cross-project personal preferences are routed to
-      // ~/.gemini/AGENTS.md via the surgical isPathAllowed allowlist instead.
+      // ~/.sparkle/AGENTS.md via the surgical isPathAllowed allowlist instead.
       const params: ConfigParameters = {
         sessionId: 'test-session',
         targetDir: '/tmp/test',
@@ -2964,9 +2964,9 @@ describe('Config JIT Initialization', () => {
       expect(directories).not.toContain(Storage.getGlobalGeminiDir());
     });
 
-    it('should allow isPathAllowed to write the global ~/.gemini/AGENTS.md file', async () => {
+    it('should allow isPathAllowed to write the global ~/.sparkle/AGENTS.md file', async () => {
       // Surgical allowlist: the prompt routes cross-project personal
-      // preferences to ~/.gemini/AGENTS.md, so the agent must be able to edit
+      // preferences to ~/.sparkle/AGENTS.md, so the agent must be able to edit
       // that exact file via edit/write_file.
       const params: ConfigParameters = {
         sessionId: 'test-session',
@@ -2986,8 +2986,8 @@ describe('Config JIT Initialization', () => {
       expect(config.isPathAllowed(globalGeminiMdPath)).toBe(true);
     });
 
-    it('should NOT allow isPathAllowed to write other files under ~/.gemini/ (least privilege)', async () => {
-      // The allowlist is surgical: only ~/.gemini/AGENTS.md is reachable.
+    it('should NOT allow isPathAllowed to write other files under ~/.sparkle/ (least privilege)', async () => {
+      // The allowlist is surgical: only ~/.sparkle/AGENTS.md is reachable.
       // settings.json, keybindings.json, credentials, etc. remain disallowed.
       const params: ConfigParameters = {
         sessionId: 'test-session',

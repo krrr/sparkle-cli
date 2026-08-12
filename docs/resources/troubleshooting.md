@@ -91,7 +91,7 @@ topics on:
     debug mode for sparkle-cli.
   - **Cause:** The `DEBUG` and `DEBUG_MODE` variables are automatically excluded
     from project `.env` files to prevent interference with sparkle-cli behavior.
-  - **Solution:** Use a `.gemini/.env` file instead, or configure the
+  - **Solution:** Use a `.sparkle/.env` file instead, or configure the
     `advanced.excludedEnvVars` setting in your `settings.json` to exclude fewer
     variables.
 

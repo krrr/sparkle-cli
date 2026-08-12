@@ -25,7 +25,7 @@ function findDir(base: string, name: string): string | null {
 }
 
 async function loadLatestSessionRecord(homeDir: string, sessionId: string) {
-  const chatsDir = findDir(path.join(homeDir, '.gemini'), 'chats');
+  const chatsDir = findDir(path.join(homeDir, '.sparkle'), 'chats');
   if (!chatsDir) {
     throw new Error('Could not find chats directory for eval session logs');
   }
@@ -138,7 +138,7 @@ describe('memory persistence', () => {
       // Jest for testing in all my projects" — that matches the new
       // cross-project cue phrase ("across all my projects"), so under the
       // 4-tier model the correct destination is the global personal memory
-      // file (~/.gemini/AGENTS.md). It must NOT land in a committed project
+      // file (~/.sparkle/AGENTS.md). It must NOT land in a committed project
       // AGENTS.md (that tier is for team conventions) or the per-project
       // private memory folder (that tier is for project-specific personal
       // notes). The chat history mixes this durable preference with
@@ -154,21 +154,21 @@ describe('memory persistence', () => {
       const wroteVitestToGlobal = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/AGENTS\\\.md/i.test(args) &&
+          /\.sparkle\/AGENTS\\\.md/i.test(args) &&
           !/tmp\/[^/]+\/memory/i.test(args) &&
           /vitest/i.test(args)
         );
       });
       expect(
         wroteVitestToGlobal,
-        'Expected the cross-project Vitest preference to be written to the global personal memory file (~/.gemini/AGENTS.md) via write_file or replace',
+        'Expected the cross-project Vitest preference to be written to the global personal memory file (~/.sparkle/AGENTS.md) via write_file or replace',
       ).toBe(true);
 
       const leakedToCommittedProject = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
           /AGENTS\\\.md/i.test(args) &&
-          !/\.gemini\//i.test(args) &&
+          !/\.sparkle\//i.test(args) &&
           /vitest/i.test(args)
         );
       });
@@ -180,7 +180,7 @@ describe('memory persistence', () => {
       const leakedToPrivateProject = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/tmp\/[^/]+\/memory\//i.test(args) && /vitest/i.test(args)
+          /\.sparkle\/tmp\/[^/]+\/memory\//i.test(args) && /vitest/i.test(args)
         );
       });
       expect(
@@ -243,7 +243,7 @@ describe('memory persistence', () => {
       // indentation rules) belong in the committed project-root ./AGENTS.md
       // and must NOT be mirrored or cross-referenced into the private project
       // memory folder
-      // (~/.gemini/tmp/<hash>/memory/). The global ~/.gemini/AGENTS.md must
+      // (~/.sparkle/tmp/<hash>/memory/). The global ~/.sparkle/AGENTS.md must
       // never be touched in this mode either.
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
@@ -257,7 +257,7 @@ describe('memory persistence', () => {
           const args = log.toolRequest.args;
           return (
             /AGENTS\\\.md/i.test(args) &&
-            !/\.gemini\//i.test(args) &&
+            !/\.sparkle\//i.test(args) &&
             factPattern.test(args)
           );
         });
@@ -275,25 +275,25 @@ describe('memory persistence', () => {
       const leakedToPrivateMemory = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/tmp\/[^/]+\/memory\//i.test(args) &&
+          /\.sparkle\/tmp\/[^/]+\/memory\//i.test(args) &&
           (/npm run test/i.test(args) || /2[- ]space/i.test(args))
         );
       });
       expect(
         leakedToPrivateMemory,
-        'Team-shared project conventions must NOT be mirrored into the private project memory folder (~/.gemini/tmp/<hash>/memory/) — each fact lives in exactly one tier.',
+        'Team-shared project conventions must NOT be mirrored into the private project memory folder (~/.sparkle/tmp/<hash>/memory/) — each fact lives in exactly one tier.',
       ).toBe(false);
 
       const leakedToGlobal = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/AGENTS\\\.md/i.test(args) &&
+          /\.sparkle\/AGENTS\\\.md/i.test(args) &&
           !/tmp\/[^/]+\/memory/i.test(args)
         );
       });
       expect(
         leakedToGlobal,
-        'Project preferences must NOT be written to the global ~/.gemini/AGENTS.md',
+        'Project preferences must NOT be written to the global ~/.sparkle/AGENTS.md',
       ).toBe(false);
 
       assertModelHasOutput(result);
@@ -419,10 +419,10 @@ Quirks to remember:
       // With the Private Project Memory bullet surfaced in the prompt, a fact
       // that is project-specific AND personal-to-the-user (must not be
       // committed) should land in the private project memory folder under
-      // ~/.gemini/tmp/<hash>/memory/. The detailed note should be written to a
+      // ~/.sparkle/tmp/<hash>/memory/. The detailed note should be written to a
       // sibling markdown file, with
       // MEMORY.md updated as the index. It must NOT go to committed
-      // ./AGENTS.md or the global ~/.gemini/AGENTS.md.
+      // ./AGENTS.md or the global ~/.sparkle/AGENTS.md.
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
@@ -433,22 +433,23 @@ Quirks to remember:
       const wroteUserProjectDetail = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/tmp\/[^/]+\/memory\/(?!MEMORY\.md)[^"]+\.md/i.test(args) &&
-          /6543/.test(args)
+          /\.sparkle\/tmp\/[^/]+\/memory\/(?!MEMORY\.md)[^"]+\.md/i.test(
+            args,
+          ) && /6543/.test(args)
         );
       });
       expect(
         wroteUserProjectDetail,
-        'Expected the personal-to-user project note to be written to a private project memory detail file (~/.gemini/tmp/<hash>/memory/*.md)',
+        'Expected the personal-to-user project note to be written to a private project memory detail file (~/.sparkle/tmp/<hash>/memory/*.md)',
       ).toBe(true);
 
       const wroteUserProjectIndex = writeCalls.some((log) => {
         const args = log.toolRequest.args;
-        return /\.gemini\/tmp\/[^/]+\/memory\/MEMORY\.md/i.test(args);
+        return /\.sparkle\/tmp\/[^/]+\/memory\/MEMORY\.md/i.test(args);
       });
       expect(
         wroteUserProjectIndex,
-        'Expected the personal-to-user project note to update the private project memory index (~/.gemini/tmp/<hash>/memory/MEMORY.md)',
+        'Expected the personal-to-user project note to update the private project memory index (~/.sparkle/tmp/<hash>/memory/MEMORY.md)',
       ).toBe(true);
 
       // Defensive: should NOT have written this private note to the
@@ -457,7 +458,7 @@ Quirks to remember:
         const args = log.toolRequest.args;
         return (
           /\/AGENTS\\\.md/i.test(args) &&
-          !/\.gemini\//i.test(args) &&
+          !/\.sparkle\//i.test(args) &&
           /6543/.test(args)
         );
       });
@@ -469,14 +470,14 @@ Quirks to remember:
       const leakedToGlobal = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/AGENTS\\\.md/i.test(args) &&
+          /\.sparkle\/AGENTS\\\.md/i.test(args) &&
           !/tmp\/[^/]+\/memory/i.test(args) &&
           /6543/.test(args)
         );
       });
       expect(
         leakedToGlobal,
-        'Personal-to-user project note must NOT be written to the global ~/.gemini/AGENTS.md',
+        'Personal-to-user project note must NOT be written to the global ~/.sparkle/AGENTS.md',
       ).toBe(false);
 
       assertModelHasOutput(result);
@@ -484,7 +485,7 @@ Quirks to remember:
   });
 
   const memoryRoutesCrossProjectToGlobal =
-    'Agent routes cross-project personal preferences to ~/.gemini/AGENTS.md';
+    'Agent routes cross-project personal preferences to ~/.sparkle/AGENTS.md';
   evalTest('USUALLY_PASSES', {
     suiteName: 'default',
     suiteType: 'behavioral',
@@ -494,7 +495,7 @@ Quirks to remember:
     assert: async (rig, result) => {
       // With the Global Personal Memory tier surfaced in the prompt, a fact
       // that explicitly applies to the user "across all my projects" / "in
-      // every workspace" must land in the global ~/.gemini/AGENTS.md (the
+      // every workspace" must land in the global ~/.sparkle/AGENTS.md (the
       // cross-project tier). It must
       // NOT be mirrored into a committed project-root ./AGENTS.md (that
       // tier is for team-shared conventions) or into the per-project
@@ -511,7 +512,7 @@ Quirks to remember:
         writeCalls.some((log) => {
           const args = log.toolRequest.args;
           return (
-            /\.gemini\/AGENTS\\\.md/i.test(args) &&
+            /\.sparkle\/AGENTS\\\.md/i.test(args) &&
             !/tmp\/[^/]+\/memory/i.test(args) &&
             factPattern.test(args)
           );
@@ -519,19 +520,19 @@ Quirks to remember:
 
       expect(
         wroteToGlobal(/Prettier/i),
-        'Expected the cross-project Prettier preference to be written to the global personal memory file (~/.gemini/AGENTS.md)',
+        'Expected the cross-project Prettier preference to be written to the global personal memory file (~/.sparkle/AGENTS.md)',
       ).toBe(true);
 
       expect(
         wroteToGlobal(/tabs/i),
-        'Expected the cross-project "tabs over spaces" preference to be written to the global personal memory file (~/.gemini/AGENTS.md)',
+        'Expected the cross-project "tabs over spaces" preference to be written to the global personal memory file (~/.sparkle/AGENTS.md)',
       ).toBe(true);
 
       const leakedToCommittedProject = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
           /AGENTS\\\.md/i.test(args) &&
-          !/\.gemini\//i.test(args) &&
+          !/\.sparkle\//i.test(args) &&
           (/Prettier/i.test(args) || /tabs/i.test(args))
         );
       });
@@ -543,7 +544,7 @@ Quirks to remember:
       const leakedToPrivateProject = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.gemini\/tmp\/[^/]+\/memory\//i.test(args) &&
+          /\.sparkle\/tmp\/[^/]+\/memory\//i.test(args) &&
           (/Prettier/i.test(args) || /tabs/i.test(args))
         );
       });

@@ -95,7 +95,7 @@ describe('ContextTracer (Real FS & Mock ID Gen)', () => {
     tracer.logEvent('TestComponent', 'LargeAction', { largeKey: hugeString });
 
     // Nothing should be written
-    const traceDir = path.join(tmpDir, '.gemini');
+    const traceDir = path.join(tmpDir, '.sparkle');
     expect(existsSync(traceDir)).toBe(false);
   });
 });

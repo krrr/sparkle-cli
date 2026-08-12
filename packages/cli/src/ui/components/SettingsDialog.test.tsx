@@ -655,7 +655,7 @@ describe('SettingsDialog', () => {
 
     it('should not offer a read-only home-directory workspace as an editable target', async () => {
       const settings = createMockSettings({
-        user: createSettingsFile('/mock/home/.gemini/settings.json'),
+        user: createSettingsFile('/mock/home/.sparkle/settings.json'),
         system: createSettingsFile('/mock/system/settings.json', {}, true),
         systemDefaults: createSettingsFile(
           '/mock/system-defaults/settings.json',
@@ -698,7 +698,7 @@ describe('SettingsDialog', () => {
       const settings = createMockSettings({
         user: createSettingsFile('', {}, true),
         system: createSettingsFile('', {}, true),
-        workspace: createSettingsFile('/mock/workspace/.gemini/settings.json'),
+        workspace: createSettingsFile('/mock/workspace/.sparkle/settings.json'),
       });
       const setValueSpy = vi.spyOn(settings, 'setValue');
       const onSelect = vi.fn();
@@ -731,7 +731,7 @@ describe('SettingsDialog', () => {
         user: createSettingsFile('', {}, true),
         system: createSettingsFile('', {}, true),
         workspace: createSettingsFile(
-          '/mock/workspace/.gemini/settings.json',
+          '/mock/workspace/.sparkle/settings.json',
           {},
           true,
         ),

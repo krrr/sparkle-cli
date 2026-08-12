@@ -4,7 +4,7 @@ exports[`PolicyUpdateDialog > renders correctly and matches snapshot 1`] = `
 " ╭────────────────────────────────────────────────────────────────────────────────────────────────╮
  │                                                                                                │
  │ New or changed workspace policies detected                                                     │
- │ Location: /test/workspace/.gemini/policies                                                     │
+ │ Location: /test/workspace/.sparkle/policies                                                    │
  │ Do you want to accept and load these policies?                                                 │
  │                                                                                                │
  │ ● 1. Accept and Load                                                                           │

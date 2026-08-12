@@ -43,8 +43,8 @@ describe('PolicyUpdateDialog', () => {
 
     mockRequest = {
       scope: 'workspace',
-      identifier: '/test/workspace/.gemini/policies',
-      policyDir: '/test/workspace/.gemini/policies',
+      identifier: '/test/workspace/.sparkle/policies',
+      policyDir: '/test/workspace/.sparkle/policies',
       newHash: 'test-hash',
     } as PolicyUpdateConfirmationRequest;
 
@@ -67,7 +67,7 @@ describe('PolicyUpdateDialog', () => {
     const output = lastFrame();
     expect(output).toMatchSnapshot();
     expect(output).toContain('New or changed workspace policies detected');
-    expect(output).toContain('Location: /test/workspace/.gemini/policies');
+    expect(output).toContain('Location: /test/workspace/.sparkle/policies');
     expect(output).toContain('Accept and Load');
     expect(output).toContain('Ignore');
   });

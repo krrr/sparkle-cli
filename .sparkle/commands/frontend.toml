@@ -14,7 +14,7 @@ core architecture, component patterns, and testing standards.
 
 In addition to the code context, you MUST strictly adhere to the following frontend-specific development guidelines while adding code to packages/cli.
 
-!{cat .gemini/commands/strict-development-rules.md}
+!{cat .sparkle/commands/strict-development-rules.md}
 
 {{args}}. 
  """

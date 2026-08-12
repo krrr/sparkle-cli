@@ -63,16 +63,16 @@ vi.mock('node:path', async () => {
 vi.mock('sparkle-cli-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   const MockStorage = vi.fn().mockImplementation(() => ({
-    getExtensionsDir: () => '/mock/home/.gemini/extensions',
+    getExtensionsDir: () => '/mock/home/.sparkle/extensions',
   }));
   Object.assign(MockStorage, {
     getGlobalTempDir: () => '/mock/temp',
-    getGlobalSettingsPath: () => '/mock/home/.gemini/settings.json',
-    getGlobalGeminiDir: () => '/mock/home/.gemini',
+    getGlobalSettingsPath: () => '/mock/home/.sparkle/settings.json',
+    getGlobalGeminiDir: () => '/mock/home/.sparkle',
   });
   return {
     ...actual,
-    GEMINI_DIR: '.gemini',
+    SPARKLE_DIR: '.sparkle',
     homedir: () => '/mock/home',
     WarningPriority: {
       Low: 'low',

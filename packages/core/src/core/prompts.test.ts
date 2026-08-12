@@ -15,7 +15,7 @@ import type { Config } from '../config/config.js';
 import type { AgentDefinition } from '../agents/types.js';
 import { CodebaseInvestigatorAgent } from '../agents/codebase-investigator.js';
 import { AGENT_TOOL_NAME } from '../tools/tool-names.js';
-import { GEMINI_DIR } from '../utils/paths.js';
+import { SPARKLE_DIR } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import {
   GEMINI_MODEL_ALIAS_AUTO,
@@ -100,7 +100,7 @@ describe('Core System Prompt (prompts.ts)', () => {
           .mockReturnValue('/tmp/project-temp/memory'),
         getProjectTempTrackerDir: vi
           .fn()
-          .mockReturnValue('/mock/.gemini/tmp/session/tracker'),
+          .mockReturnValue('/mock/.sparkle/tmp/session/tracker'),
       },
       isInteractive: vi.fn().mockReturnValue(true),
       isInteractiveShellEnabled: vi.fn().mockReturnValue(true),
@@ -703,7 +703,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     it.each(['true', '1'])(
       'should read from default path when GEMINI_SYSTEM_MD is "%s"',
       (value) => {
-        const defaultPath = path.resolve(path.join(GEMINI_DIR, 'system.md'));
+        const defaultPath = path.resolve(path.join(SPARKLE_DIR, 'system.md'));
         vi.stubEnv('GEMINI_SYSTEM_MD', value);
         vi.mocked(fs.existsSync).mockReturnValue(true);
         vi.mocked(fs.readFileSync).mockReturnValue('custom system prompt');
@@ -756,7 +756,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     it.each(['true', '1'])(
       'should write to default path when GEMINI_WRITE_SYSTEM_MD is "%s"',
       (value) => {
-        const defaultPath = path.resolve(path.join(GEMINI_DIR, 'system.md'));
+        const defaultPath = path.resolve(path.join(SPARKLE_DIR, 'system.md'));
         vi.stubEnv('GEMINI_WRITE_SYSTEM_MD', value);
         getCoreSystemPrompt(mockConfig);
         expect(fs.writeFileSync).toHaveBeenCalledWith(

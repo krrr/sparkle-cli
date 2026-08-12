@@ -205,7 +205,7 @@ The CLI uses different strategies depending on the installation type:
   directory's manifest with the installed version.
 
 To verify an extension's installation type, inspect the `type` field in the
-metadata file at `~/.gemini/extensions/<name>/.sparkle-extension-install.json`.
+metadata file at `~/.sparkle/extensions/<name>/.sparkle-extension-install.json`.
 
 </details>
 

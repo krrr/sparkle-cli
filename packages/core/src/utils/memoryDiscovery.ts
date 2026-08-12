@@ -13,7 +13,7 @@ import {
 } from '../tools/memoryTool.js';
 import { processImports } from './memoryImportProcessor.js';
 import {
-  GEMINI_DIR,
+  SPARKLE_DIR,
   homedir,
   isSubpath,
   normalizePath,
@@ -320,7 +320,7 @@ export async function getGlobalMemoryPaths(): Promise<string[]> {
 
   const accessChecks = geminiMdFilenames.map(async (filename) => {
     const globalPath = toAbsolutePath(
-      path.join(userHome, GEMINI_DIR, filename),
+      path.join(userHome, SPARKLE_DIR, filename),
     );
     try {
       await fs.access(globalPath, fsSync.constants.R_OK);
@@ -468,7 +468,7 @@ async function findUpwardGeminiFiles(
   let currentDir = toAbsolutePath(startDir);
   const resolvedStopDirKey = normalizePath(stopDir);
   const geminiMdFilenames = getAllGeminiMdFilenames();
-  const globalGeminiDirKey = normalizePath(path.join(homedir(), GEMINI_DIR));
+  const globalGeminiDirKey = normalizePath(path.join(homedir(), SPARKLE_DIR));
 
   debugLogger.debug(
     '[DEBUG] [MemoryDiscovery] Starting upward search from',

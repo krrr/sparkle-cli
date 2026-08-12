@@ -2786,8 +2786,8 @@ export class Config implements McpContext, AgentLoopContext {
   /**
    * Checks if a given absolute path is allowed for file system operations.
    * A path is allowed if it's within the workspace context, the project's
-   * temporary directory, or is exactly the global personal `~/.gemini/AGENTS.md`
-   * file (the latter is the only file under `~/.gemini/` that is reachable —
+   * temporary directory, or is exactly the global personal `~/.sparkle/AGENTS.md`
+   * file (the latter is the only file under `~/.sparkle/` that is reachable —
    * settings, credentials, keybindings, etc. remain disallowed).
    *
    * One subtree is *carved back out*: `<projectMemoryDir>/.inbox/` is owned by
@@ -2848,7 +2848,7 @@ export class Config implements McpContext, AgentLoopContext {
     // Surgical allowlist: the global personal context file (and ONLY that
     // file) is reachable so the prompt-driven memory flow can persist
     // cross-project personal preferences. This deliberately does NOT
-    // allowlist the rest of `~/.gemini/`.
+    // allowlist the rest of `~/.sparkle/`.
     const globalMemoryFilePath = path.join(
       Storage.getGlobalGeminiDir(),
       getCurrentGeminiMdFilename(),

@@ -29,12 +29,12 @@ function createMockLoadedSettings(opts: {
     [SettingScope.User]: {
       settings: opts.userSettings ?? {},
       originalSettings: opts.userSettings ?? {},
-      path: opts.userPath ?? '/home/user/.gemini/settings.json',
+      path: opts.userPath ?? '/home/user/.sparkle/settings.json',
     },
     [SettingScope.Workspace]: {
       settings: opts.workspaceSettings ?? {},
       originalSettings: opts.workspaceSettings ?? {},
-      path: opts.workspacePath ?? '/project/.gemini/settings.json',
+      path: opts.workspacePath ?? '/project/.sparkle/settings.json',
     },
   };
 

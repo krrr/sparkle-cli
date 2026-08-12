@@ -17,11 +17,11 @@
  *
  * The script will:
  *   1. Initialize Storage for the current working directory.
- *   2. Compute <projectMemoryDir> = ~/.gemini/tmp/<projectId>/memory/.
+ *   2. Compute <projectMemoryDir> = ~/.sparkle/tmp/<projectId>/memory/.
  *   3. Seed `MEMORY.md` and TWO canonical inbox patches:
  *        - .inbox/private/extraction.patch  (multi-hunk: update MEMORY.md
  *          + create verify-workflow.md + add MEMORY.md pointer to it)
- *        - .inbox/global/extraction.patch   (creates ~/.gemini/AGENTS.md)
+ *        - .inbox/global/extraction.patch   (creates ~/.sparkle/AGENTS.md)
  *   4. Print a verification checklist + the launch command.
  *
  * To clean up later, delete `<projectMemoryDir>/.inbox/` and the seeded
@@ -56,7 +56,7 @@ const memoryDir = storage.getProjectMemoryTempDir();
 const inboxPrivate = path.join(memoryDir, '.inbox', 'private');
 const inboxGlobal = path.join(memoryDir, '.inbox', 'global');
 const homeDir = os.homedir();
-const globalGeminiMd = path.join(homeDir, '.gemini', 'AGENTS.md');
+const globalGeminiMd = path.join(homeDir, '.sparkle', 'AGENTS.md');
 
 console.log(`\n🔧 Seeding inbox for cwd: ${cwd}`);
 console.log(`   memoryDir = ${memoryDir}\n`);
@@ -112,7 +112,7 @@ await seed(
 );
 
 // --- 3. Canonical GLOBAL extraction.patch ---
-//     Creates ~/.gemini/AGENTS.md. Backs up any existing one first.
+//     Creates ~/.sparkle/AGENTS.md. Backs up any existing one first.
 let existingGlobalGemini = null;
 try {
   existingGlobalGemini = await fs.readFile(globalGeminiMd, 'utf-8');
@@ -139,7 +139,7 @@ await seed(
     `+- Prefer concise architecture summaries.`,
     ``,
   ].join('\n'),
-  'canonical GLOBAL extraction.patch (creates ~/.gemini/AGENTS.md)',
+  'canonical GLOBAL extraction.patch (creates ~/.sparkle/AGENTS.md)',
 );
 
 // --- Summary ---
@@ -155,13 +155,13 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
 console.log(`
 1. Enable autoMemory in your settings (the inbox command requires it):
 
-     ~/.gemini/settings.json should contain:
+     ~/.sparkle/settings.json should contain:
      {
        "experimental": { "autoMemory": true }
      }
 
    Or run this to set it:
-     node -e "const fs=require('fs'),p=require('os').homedir()+'/.gemini/settings.json';let s={};try{s=JSON.parse(fs.readFileSync(p,'utf-8'))}catch{}s.experimental=s.experimental||{};s.experimental.autoMemory=true;fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(s,null,2))"
+     node -e "const fs=require('fs'),p=require('os').homedir()+'/.sparkle/settings.json';let s={};try{s=JSON.parse(fs.readFileSync(p,'utf-8'))}catch{}s.experimental=s.experimental||{};s.experimental.autoMemory=true;fs.mkdirSync(require('path').dirname(p),{recursive:true});fs.writeFileSync(p,JSON.stringify(s,null,2))"
 
 2. Launch the just-built CLI from THIS REPO ONLY. Do NOT use any globally
    installed "sparkle" binary — it will be a stale build that doesn't know
@@ -206,7 +206,7 @@ console.log(`
    │                  │          │ MEMORY.md updated; verify-workflow.md │
    │                  │          │ created.                              │
    │ Global memory    │ Apply    │ "Applied all 1 global memory patch."  │
-   │                  │          │ ~/.gemini/AGENTS.md created.          │
+   │                  │          │ ~/.sparkle/AGENTS.md created.          │
    └──────────────────┴──────────┴───────────────────────────────────────┘
 
 7. Verify final state on disk:

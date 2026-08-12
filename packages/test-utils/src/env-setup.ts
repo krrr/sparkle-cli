@@ -22,7 +22,7 @@ export function isolateTestEnv(runDir: string): void {
 
   // We also need to set the config dir explicitly, since the code might
   // construct the path before the HOME env var is set.
-  process.env['GEMINI_CONFIG_DIR'] = join(runDir, '.gemini');
+  process.env['GEMINI_CONFIG_DIR'] = join(runDir, '.sparkle');
 
   // Force file storage to avoid keychain prompts/hangs in CI, especially on macOS
   process.env['GEMINI_FORCE_FILE_STORAGE'] = 'true';

@@ -1956,7 +1956,7 @@ describe('memoryService', () => {
         patchPath,
         [
           `--- ${targetFile}`,
-          '+++ .gemini/skills/foo/SKILL.md',
+          '+++ .sparkle/skills/foo/SKILL.md',
           '@@ -1,3 +1,4 @@',
           ' line1',
           ' line2',

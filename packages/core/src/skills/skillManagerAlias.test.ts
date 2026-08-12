@@ -35,12 +35,12 @@ describe('SkillManager Alias', () => {
   });
 
   it('should discover skills from .agents/skills directory', async () => {
-    const userGeminiDir = path.join(testRootDir, 'user', '.gemini', 'skills');
+    const userGeminiDir = path.join(testRootDir, 'user', '.sparkle', 'skills');
     const userAgentDir = path.join(testRootDir, 'user', '.agents', 'skills');
     const projectGeminiDir = path.join(
       testRootDir,
       'workspace',
-      '.gemini',
+      '.sparkle',
       'skills',
     );
     const projectAgentDir = path.join(
@@ -123,8 +123,8 @@ describe('SkillManager Alias', () => {
     expect(names).toContain('project-agent');
   });
 
-  it('should give .agents precedence over .gemini when in the same tier', async () => {
-    const userGeminiDir = path.join(testRootDir, 'user', '.gemini', 'skills');
+  it('should give .agents precedence over .sparkle when in the same tier', async () => {
+    const userGeminiDir = path.join(testRootDir, 'user', '.sparkle', 'skills');
     const userAgentDir = path.join(testRootDir, 'user', '.agents', 'skills');
 
     await fs.mkdir(userGeminiDir, { recursive: true });

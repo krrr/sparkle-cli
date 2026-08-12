@@ -51,7 +51,7 @@ describe('MemoryContextManager', () => {
       storage: {
         getProjectMemoryDir: vi
           .fn()
-          .mockReturnValue('/home/user/.gemini/memory/test-project'),
+          .mockReturnValue('/home/user/.sparkle/memory/test-project'),
       },
     } as unknown as Config;
 
@@ -71,7 +71,7 @@ describe('MemoryContextManager', () => {
 
   describe('refresh', () => {
     it('should load and format global and environment memory', async () => {
-      const globalPaths = ['/home/user/.gemini/AGENTS.md'];
+      const globalPaths = ['/home/user/.sparkle/AGENTS.md'];
       const envPaths = ['/app/AGENTS.md'];
 
       vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(
@@ -135,10 +135,13 @@ describe('MemoryContextManager', () => {
     it('should not load environment memory if folder is not trusted', async () => {
       vi.mocked(mockConfig.isTrustedFolder).mockReturnValue(false);
       vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue([
-        '/home/user/.gemini/AGENTS.md',
+        '/home/user/.sparkle/AGENTS.md',
       ]);
       vi.mocked(memoryDiscovery.readGeminiMdFiles).mockResolvedValue([
-        { filePath: '/home/user/.gemini/AGENTS.md', content: 'Global Content' },
+        {
+          filePath: '/home/user/.sparkle/AGENTS.md',
+          content: 'Global Content',
+        },
       ]);
 
       await memoryContextManager.refresh();
@@ -151,7 +154,7 @@ describe('MemoryContextManager', () => {
     });
 
     it('should deduplicate files by file identity in case-insensitive filesystems', async () => {
-      const globalPaths = ['/home/user/.gemini/AGENTS.md'];
+      const globalPaths = ['/home/user/.sparkle/AGENTS.md'];
       const envPaths = ['/app/AGENTS.md', '/app/AGENTS.md'];
 
       vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(
@@ -165,12 +168,15 @@ describe('MemoryContextManager', () => {
       vi.mocked(
         memoryDiscovery.deduplicatePathsByFileIdentity,
       ).mockResolvedValue({
-        paths: ['/home/user/.gemini/AGENTS.md', '/app/AGENTS.md'],
+        paths: ['/home/user/.sparkle/AGENTS.md', '/app/AGENTS.md'],
         identityMap: new Map<string, string>(),
       });
 
       vi.mocked(memoryDiscovery.readGeminiMdFiles).mockResolvedValue([
-        { filePath: '/home/user/.gemini/AGENTS.md', content: 'Global Content' },
+        {
+          filePath: '/home/user/.sparkle/AGENTS.md',
+          content: 'Global Content',
+        },
         { filePath: '/app/AGENTS.md', content: 'Project Content' },
       ]);
 
@@ -180,13 +186,13 @@ describe('MemoryContextManager', () => {
         memoryDiscovery.deduplicatePathsByFileIdentity,
       ).toHaveBeenCalledWith(
         expect.arrayContaining([
-          '/home/user/.gemini/AGENTS.md',
+          '/home/user/.sparkle/AGENTS.md',
           '/app/AGENTS.md',
           '/app/AGENTS.md',
         ]),
       );
       expect(memoryDiscovery.readGeminiMdFiles).toHaveBeenCalledWith(
-        ['/home/user/.gemini/AGENTS.md', '/app/AGENTS.md'],
+        ['/home/user/.sparkle/AGENTS.md', '/app/AGENTS.md'],
         'tree',
         ['.git'],
       );

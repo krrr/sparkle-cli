@@ -1370,7 +1370,7 @@ name = "yolo-checker"
     it('should add the workspace to trusted folders if user consents', async () => {
       const trustedFoldersPath = path.join(
         tempHomeDir,
-        '.gemini',
+        '.sparkle',
         'trustedFolders.json',
       );
       vi.stubEnv('SPARKLE_CLI_TRUSTED_FOLDERS_PATH', trustedFoldersPath);

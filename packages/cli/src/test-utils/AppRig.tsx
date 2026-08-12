@@ -180,7 +180,7 @@ export class AppRig {
     activeRigs.set(this.sessionId, this);
 
     // Pre-create the persistent state file to bypass the terminal setup prompt
-    const geminiDir = path.join(this.testDir, '.gemini');
+    const geminiDir = path.join(this.testDir, '.sparkle');
     if (!fs.existsSync(geminiDir)) {
       fs.mkdirSync(geminiDir, { recursive: true });
     }
@@ -262,7 +262,7 @@ export class AppRig {
   private createRigSettings(): LoadedSettings {
     return createMockSettings({
       user: {
-        path: path.join(this.testDir, '.gemini', 'user_settings.json'),
+        path: path.join(this.testDir, '.sparkle', 'user_settings.json'),
         settings: {
           security: {
             auth: {

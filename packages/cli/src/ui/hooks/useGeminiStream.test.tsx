@@ -408,7 +408,7 @@ describe('useGeminiStream', () => {
       ui: { errorVerbosity: 'full' },
     },
     user: { path: '/user/settings.json', settings: {} },
-    workspace: { path: '/workspace/.gemini/settings.json', settings: {} },
+    workspace: { path: '/workspace/.sparkle/settings.json', settings: {} },
     errors: [],
     forScope: vi.fn(),
     setValue: vi.fn(),

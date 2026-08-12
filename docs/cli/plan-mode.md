@@ -137,7 +137,7 @@ These are the only allowed tools:
 - **Planning (Write):**
   [`write_file`](../tools/file-system.md#3-write_file-writefile) and
   [`replace`](../tools/file-system.md#6-replace-edit) only allowed for `.md`
-  files in the `~/.gemini/tmp/<project>/<session-id>/plans/` directory or your
+  files in the `~/.sparkle/tmp/<project>/<session-id>/plans/` directory or your
   [custom plans directory](#custom-plan-directory-and-policies).
 - **Skills:** [`activate_skill`](../cli/skills.md) (allows loading specialized
   instructions and resources in a read-only manner)
@@ -174,7 +174,7 @@ Plan Mode's default tool restrictions are managed by the
 [policy engine](../reference/policy-engine.md) and defined in the built-in
 [`plan.toml`] file. The built-in policy (Tier 1) enforces the read-only state,
 but you can customize these rules by creating your own policies in your
-`~/.gemini/policies/` directory (Tier 2).
+`~/.sparkle/policies/` directory (Tier 2).
 
 #### Global vs. mode-specific rules
 
@@ -210,7 +210,7 @@ By default, read-only MCP tools require user confirmation in Plan Mode. You can
 use `toolAnnotations` and the `mcpName` wildcard to customize this behavior for
 your specific environment.
 
-`~/.gemini/policies/mcp-read-only.toml`
+`~/.sparkle/policies/mcp-read-only.toml`
 
 ```toml
 [[rule]]
@@ -230,7 +230,7 @@ For more information on how the policy engine works, see the
 This rule lets you check the repository status and see changes while in Plan
 Mode.
 
-`~/.gemini/policies/git-research.toml`
+`~/.sparkle/policies/git-research.toml`
 
 ```toml
 [[rule]]
@@ -250,7 +250,7 @@ Mode. You can enable additional
 [custom subagents](../core/subagents.md#creating-custom-subagents) by adding a
 rule to your policy.
 
-`~/.gemini/policies/research-subagents.toml`
+`~/.sparkle/policies/research-subagents.toml`
 
 ```toml
 [[rule]]
@@ -266,16 +266,16 @@ check ongoing changes in git."_
 ### Custom plan directory and policies
 
 By default, planning artifacts are stored in a managed temporary directory
-outside your project: `~/.gemini/tmp/<project>/<session-id>/plans/`.
+outside your project: `~/.sparkle/tmp/<project>/<session-id>/plans/`.
 
 You can configure a custom directory for plans in your `settings.json`. For
-example, to store plans in a `.gemini/plans` directory within your project:
+example, to store plans in a `.sparkle/plans` directory within your project:
 
 ```json
 {
   "general": {
     "plan": {
-      "directory": ".gemini/plans"
+      "directory": ".sparkle/plans"
     }
   }
 }
@@ -290,8 +290,8 @@ within the project boundary.
 Using a custom directory requires updating your
 [policy engine](../reference/policy-engine.md) configurations to allow
 `write_file` and `replace` in that specific location. For example, to allow
-writing to the `.gemini/plans` directory within your project, create a policy
-file at `~/.gemini/policies/plan-custom-directory.toml`:
+writing to the `.sparkle/plans` directory within your project, create a policy
+file at `~/.sparkle/policies/plan-custom-directory.toml`:
 
 ```toml
 [[rule]]
@@ -300,8 +300,8 @@ decision = "allow"
 priority = 100
 modes = ["plan"]
 # Adjust the pattern to match your custom directory.
-# This example matches any .md file in a .gemini/plans directory within the project.
-argsPattern = "\"file_path\":\"[^\"]+[\\\\/]+\\.gemini[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\""
+# This example matches any .md file in a .sparkle/plans directory within the project.
+argsPattern = "\"file_path\":\"[^\"]+[\\\\/]+\\.sparkle[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\""
 ```
 
 ### Using hooks with Plan Mode
@@ -325,7 +325,7 @@ If your organizational policy requires a record of all execution plans, you can
 use an `AfterTool` hook to securely copy the plan artifact to a local archive
 directory whenever Sparkle CLI exits Plan Mode to start the implementation.
 
-**`.gemini/hooks/archive-plan.sh`:**
+**`.sparkle/hooks/archive-plan.sh`:**
 
 ```bash
 #!/usr/bin/env bash
@@ -340,7 +340,7 @@ if [ -f "$plan_path" ]; then
   filename="$(date +%s)_$(basename "$plan_path")"
 
   # Copy the plan to the archive directory in the background so it doesn't block the CLI
-  mkdir -p "$HOME/.gemini/plan-archive" && cp "$plan_path" "$HOME/.gemini/plan-archive/$filename" > /dev/null 2>&1 &
+  mkdir -p "$HOME/.sparkle/plan-archive" && cp "$plan_path" "$HOME/.sparkle/plan-archive/$filename" > /dev/null 2>&1 &
 fi
 
 # AfterTool hooks should generally allow the flow to continue
@@ -359,7 +359,7 @@ To register this `AfterTool` hook, add it to your `settings.json`:
           {
             "name": "archive-plan",
             "type": "command",
-            "command": "~/.gemini/hooks/archive-plan.sh"
+            "command": "~/.sparkle/hooks/archive-plan.sh"
           }
         ]
       }

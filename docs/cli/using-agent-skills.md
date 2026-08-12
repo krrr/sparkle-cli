@@ -11,9 +11,9 @@ of precedence (lowest to highest):
 
 1.  **Built-in Skills**: Included with Sparkle CLI and always available.
 2.  **Extension Skills**: Bundled within [extensions](../extensions/index.md).
-3.  **User Skills**: Located in `~/.gemini/skills/` or the `~/.agents/skills/`
+3.  **User Skills**: Located in `~/.sparkle/skills/` or the `~/.agents/skills/`
     alias. These are available across all your projects.
-4.  **Workspace Skills**: Located in `.gemini/skills/` or the `.agents/skills/`
+4.  **Workspace Skills**: Located in `.sparkle/skills/` or the `.agents/skills/`
     alias within your current directory. These are project-specific.
 
 > **Tip:** If multiple skills share the same name, the version from the

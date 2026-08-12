@@ -35,9 +35,9 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
       resizePty: vi.fn(),
       subscribe: vi.fn(() => vi.fn()),
       getLogFilePath: vi.fn(
-        (pid) => `~/.gemini/tmp/background-processes/background-${pid}.log`,
+        (pid) => `~/.sparkle/tmp/background-processes/background-${pid}.log`,
       ),
-      getLogDir: vi.fn(() => '~/.gemini/tmp/background-processes'),
+      getLogDir: vi.fn(() => '~/.sparkle/tmp/background-processes'),
     },
   };
 });

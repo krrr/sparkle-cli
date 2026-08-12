@@ -32,7 +32,7 @@ The observability system provides:
 
 ## Configuration
 
-You control telemetry behavior through the `.gemini/settings.json` file.
+You control telemetry behavior through the `.sparkle/settings.json` file.
 Environment variables can override these settings.
 
 | Setting        | Environment Variable              | Description                                       | Values            | Default                 |
@@ -58,18 +58,18 @@ For detailed configuration information, see the
 You can capture telemetry data locally for development and debugging. We
 recommend using file-based output for local development.
 
-1.  Enable telemetry in `.gemini/settings.json`:
+1.  Enable telemetry in `.sparkle/settings.json`:
     ```json
     {
       "telemetry": {
         "enabled": true,
         "target": "local",
-        "outfile": ".gemini/telemetry.log"
+        "outfile": ".sparkle/telemetry.log"
       }
     }
     ```
 2.  Run Sparkle CLI and send prompts.
-3.  View logs and metrics in `.gemini/telemetry.log`.
+3.  View logs and metrics in `.sparkle/telemetry.log`.
 
 For advanced local telemetry setups (such as Jaeger or Genkit), see the
 [Local development guide](../local-development.md#viewing-traces).

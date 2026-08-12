@@ -23,7 +23,7 @@ Follow these steps to conduct a thorough review:
 5.  Write a concise review of the changes, keeping in mind to encourage strong code quality and best practices. Pay particular attention to the Gemini MD file in the repo.
 6.  Consider ways the code may not be consistent with existing code in the repo. In particular it is critical that the react code uses patterns consistent with existing code in the repo.
 7.  Follow these detailed review rules:
-!{cat .gemini/commands/strict-development-rules.md}
+!{cat .sparkle/commands/strict-development-rules.md}
 8.  Summarize all actionable findings into a concise but comprehensive directive output this to review_findings.md and advance to phase 2.
 
 Remember to use the GitHub CLI (`gh`) for all GitHub-related tasks, and local `git` commands if the target is 'staged'.

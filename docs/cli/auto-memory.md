@@ -44,8 +44,8 @@ drafts, and never applies them without your approval.
 
 Auto Memory is off by default. Enable it in your settings file:
 
-1.  Open your global settings file at `~/.gemini/settings.json`. If you only
-    want Auto Memory in one project, edit `.gemini/settings.json` in that
+1.  Open your global settings file at `~/.sparkle/settings.json`. If you only
+    want Auto Memory in one project, edit `.sparkle/settings.json` in that
     project instead.
 
 2.  Add the experimental flag:
@@ -67,7 +67,7 @@ Auto Memory runs as a background task on session startup. It does not block the
 UI, consume your interactive turns, or surface tool prompts.
 
 1.  **Eligibility scan.** The service indexes recent sessions from
-    `~/.gemini/tmp/<project>/chats/`. Sessions are eligible only if they have
+    `~/.sparkle/tmp/<project>/chats/`. Sessions are eligible only if they have
     been idle for at least three hours and contain at least 10 user messages.
 2.  **Lock acquisition.** A lock file in the project's memory directory
     coordinates across multiple CLI instances so extraction runs at most once at
@@ -97,14 +97,14 @@ The dialog groups pending items into new skills, skill updates, and memory
 updates. From there you can:
 
 - **Read** the full `SKILL.md` body before deciding.
-- **Promote** a skill to your user (`~/.gemini/skills/`) or workspace
-  (`.gemini/skills/`) directory.
+- **Promote** a skill to your user (`~/.sparkle/skills/`) or workspace
+  (`.sparkle/skills/`) directory.
 - **Discard** a skill you do not want.
 - **Apply** or reject a `.patch` proposal against an existing skill.
 - **Review** memory diffs before they touch active files.
 - **Apply** or dismiss private and global memory patches. Private patches target
   the project memory directory; global patches target only your personal
-  `~/.gemini/AGENTS.md` file.
+  `~/.sparkle/AGENTS.md` file.
 
 Promoted skills become discoverable in the next session and follow the standard
 [skill discovery precedence](./skills.md#skill-discovery-tiers). Applied memory

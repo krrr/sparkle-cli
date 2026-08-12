@@ -259,7 +259,7 @@ export async function moveInboxSkill(
   await fs.rm(sourcePath, { recursive: true, force: true });
 
   const label =
-    destination === 'global' ? '~/.gemini/skills' : '.gemini/skills';
+    destination === 'global' ? '~/.sparkle/skills' : '.sparkle/skills';
   return {
     success: true,
     message: `Moved "${dirName}" to ${label}.`,

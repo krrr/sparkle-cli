@@ -104,11 +104,11 @@ persist them with the following methods:
 > Be aware that when you export API keys in your shell configuration file,
 > any process launched from that shell can read them.
 
-2.  **Use a `.env` file:** Create a `.gemini/.env` file in your project
+2.  **Use a `.env` file:** Create a `.sparkle/.env` file in your project
     directory or home directory. Sparkle CLI automatically loads variables from
     the first `.env` file it finds, searching up from the current directory,
-    then in your home directory's `.gemini/.env` (for example, `~/.gemini/.env`
-    or `%USERPROFILE%\.gemini\.env`).
+    then in your home directory's `.sparkle/.env` (for example, `~/.sparkle/.env`
+    or `%USERPROFILE%\.sparkle\.env`).
 
     Example for user-wide settings:
 
@@ -116,8 +116,8 @@ persist them with the following methods:
       <TabItem label="macOS/Linux">
 
       ```bash
-        mkdir -p ~/.gemini
-        cat >> ~/.gemini/.env <<'EOF'
+        mkdir -p ~/.sparkle
+        cat >> ~/.sparkle/.env <<'EOF'
         GEMINI_API_KEY="your-api-key"
         # Add other variables as needed
         EOF
@@ -127,11 +127,11 @@ persist them with the following methods:
       <TabItem label="Windows (PowerShell)">
 
       ```powershell
-        New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.gemini"
+        New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.sparkle"
         @"
         GEMINI_API_KEY="your-api-key"
         # Add other variables as needed
-        "@ | Out-File -FilePath "$env:USERPROFILE\.gemini\.env" -Encoding utf8 -Append
+        "@ | Out-File -FilePath "$env:USERPROFILE\.sparkle\.env" -Encoding utf8 -Append
       ```
 
       </TabItem>

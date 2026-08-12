@@ -50,7 +50,7 @@ describe('ExtensionManager agents loading', () => {
     vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
 
     // Create the extensions directory that ExtensionManager expects
-    extensionsDir = path.join(tempDir, '.gemini', EXTENSIONS_DIRECTORY_NAME);
+    extensionsDir = path.join(tempDir, '.sparkle', EXTENSIONS_DIRECTORY_NAME);
     fs.mkdirSync(extensionsDir, { recursive: true });
 
     extensionManager = new ExtensionManager({

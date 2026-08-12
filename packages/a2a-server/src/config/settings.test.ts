@@ -33,7 +33,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   const os = await import('node:os');
   return {
     ...actual,
-    GEMINI_DIR: '.gemini',
+    SPARKLE_DIR: '.sparkle',
     debugLogger: {
       error: vi.fn(),
     },
@@ -50,8 +50,8 @@ describe('loadSettings', () => {
     os.tmpdir(),
     `sparkle-workspace-${mocks.suffix}`,
   );
-  const mockGeminiHomeDir = path.join(mockHomeDir, '.gemini');
-  const mockGeminiWorkspaceDir = path.join(mockWorkspaceDir, '.gemini');
+  const mockGeminiHomeDir = path.join(mockHomeDir, '.sparkle');
+  const mockGeminiWorkspaceDir = path.join(mockWorkspaceDir, '.sparkle');
 
   beforeEach(() => {
     vi.clearAllMocks();

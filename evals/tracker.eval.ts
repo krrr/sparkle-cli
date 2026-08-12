@@ -130,8 +130,8 @@ describe('tracker_mode', () => {
     prompt:
       'Where is my task tracker storage located? Please provide the absolute path in your response.',
     assert: async (rig, result) => {
-      // The response should contain the dynamic path which follows the .gemini/tmp/.../tracker structure.
-      expect(result).toMatch(/\.gemini\/tmp\/.*\/tracker/);
+      // The response should contain the dynamic path which follows the .sparkle/tmp/.../tracker structure.
+      expect(result).toMatch(/\.sparkle\/tmp\/.*\/tracker/);
     },
   });
 

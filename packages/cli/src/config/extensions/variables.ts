@@ -6,7 +6,7 @@
 
 import * as path from 'node:path';
 import { type VariableSchema, VARIABLE_SCHEMA } from './variableSchema.js';
-import { GEMINI_DIR } from 'sparkle-cli-core';
+import { SPARKLE_DIR } from 'sparkle-cli-core';
 
 /**
  * Represents a set of keys that will be considered invalid while unmarshalling
@@ -18,7 +18,7 @@ const UNMARSHALL_KEY_IGNORE_LIST: Set<string> = new Set<string>([
   'prototype',
 ]);
 
-export const EXTENSIONS_DIRECTORY_NAME = path.join(GEMINI_DIR, 'extensions');
+export const EXTENSIONS_DIRECTORY_NAME = path.join(SPARKLE_DIR, 'extensions');
 export const EXTENSIONS_CONFIG_FILENAME = 'sparkle-extension.json';
 export const INSTALL_METADATA_FILENAME = '.sparkle-extension-install.json';
 export const EXTENSION_SETTINGS_FILENAME = '.env';

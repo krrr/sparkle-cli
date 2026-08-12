@@ -7,7 +7,7 @@
 // Copied exactly from packages/cli/src/config/extension.ts, last PR #1026
 
 import {
-  GEMINI_DIR,
+  SPARKLE_DIR,
   type MCPServerConfig,
   type ExtensionInstallMetadata,
   type GeminiCLIExtension,
@@ -17,7 +17,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { logger } from '../utils/logger.js';
 
-export const EXTENSIONS_DIRECTORY_NAME = path.join(GEMINI_DIR, 'extensions');
+export const EXTENSIONS_DIRECTORY_NAME = path.join(SPARKLE_DIR, 'extensions');
 export const EXTENSIONS_CONFIG_FILENAME = 'sparkle-extension.json';
 export const INSTALL_METADATA_FILENAME = '.sparkle-extension-install.json';
 

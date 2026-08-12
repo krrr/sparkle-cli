@@ -98,8 +98,8 @@ risk.
 
 To store your API keys securely, you can:
 
-- **Use a `.env` file:** Create a `.env` file in your project's `.gemini`
-  directory (`.gemini/.env`) and store your keys there. Sparkle CLI will
+- **Use a `.env` file:** Create a `.env` file in your project's `.sparkle`
+  directory (`.sparkle/.env`) and store your keys there. Sparkle CLI will
   automatically load these variables.
 - **Use your system's keyring:** For the most secure storage, use your operating
   system's secret management tool (like macOS Keychain, Windows Credential
@@ -110,8 +110,8 @@ To store your API keys securely, you can:
 
 Sparkle CLI configuration is stored in two `settings.json` files:
 
-1.  In your home directory: `~/.gemini/settings.json`.
-2.  In your project's root directory: `./.gemini/settings.json`.
+1.  In your home directory: `~/.sparkle/settings.json`.
+2.  In your project's root directory: `./.sparkle/settings.json`.
 
 Refer to [Sparkle CLI Configuration](../reference/configuration.md) for more
 details.

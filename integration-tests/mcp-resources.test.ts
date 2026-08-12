@@ -32,7 +32,7 @@ describe('mcp-resources-integration', () => {
     });
 
     // Workaround for ProjectRegistry save issue
-    const userGeminiDir = join(rig.homeDir!, '.gemini');
+    const userGeminiDir = join(rig.homeDir!, '.sparkle');
     fs.writeFileSync(join(userGeminiDir, 'projects.json'), '{"projects":{}}');
 
     // Add a dummy server to get setup done
@@ -101,7 +101,7 @@ await server.connect(transport);
     });
 
     // Workaround for ProjectRegistry save issue
-    const userGeminiDir = join(rig.homeDir!, '.gemini');
+    const userGeminiDir = join(rig.homeDir!, '.sparkle');
     fs.writeFileSync(join(userGeminiDir, 'projects.json'), '{"projects":{}}');
 
     // Add a dummy server to get setup done

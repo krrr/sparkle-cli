@@ -12,7 +12,7 @@ import process from 'node:process';
 import {
   CoreEvent,
   FatalConfigError,
-  GEMINI_DIR,
+  SPARKLE_DIR,
   getErrorMessage,
   getFsErrorMessage,
   Storage,
@@ -511,9 +511,9 @@ function findEnvFile(
 ): string | null {
   let currentDir = path.resolve(startDir);
   while (true) {
-    // prefer gemini-specific .env under GEMINI_DIR
+    // prefer gemini-specific .env under SPARKLE_DIR
     if (isTrusted) {
-      const geminiEnvPath = path.join(currentDir, GEMINI_DIR, '.env');
+      const geminiEnvPath = path.join(currentDir, SPARKLE_DIR, '.env');
       if (fs.existsSync(geminiEnvPath)) {
         return geminiEnvPath;
       }
@@ -528,7 +528,7 @@ function findEnvFile(
     if (parentDir === currentDir || !parentDir) {
       // check .env under home as fallback, again preferring gemini-specific .env
       if (isTrusted) {
-        const homeGeminiEnvPath = path.join(homedir(), GEMINI_DIR, '.env');
+        const homeGeminiEnvPath = path.join(homedir(), SPARKLE_DIR, '.env');
         if (fs.existsSync(homeGeminiEnvPath)) {
           return homeGeminiEnvPath;
         }
@@ -574,7 +574,7 @@ export function loadEnvironment(
 
       const excludedVars =
         settings?.advanced?.excludedEnvVars || DEFAULT_EXCLUDED_ENV_VARS;
-      const isProjectEnvFile = !envFilePath.includes(GEMINI_DIR);
+      const isProjectEnvFile = !envFilePath.includes(SPARKLE_DIR);
 
       for (const key in parsedEnv) {
         if (Object.hasOwn(parsedEnv, key)) {

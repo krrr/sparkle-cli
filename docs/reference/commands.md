@@ -23,8 +23,8 @@ Slash commands provide meta-level control over the CLI itself.
       and remote agents.
     - **Usage:** `/agents list`
   - **`reload`** (alias: `refresh`):
-    - **Description:** Rescans agent directories (`~/.gemini/agents` and
-      `.gemini/agents`) and reloads the registry.
+    - **Description:** Rescans agent directories (`~/.sparkle/agents` and
+      `.sparkle/agents`) and reloads the registry.
     - **Usage:** `/agents reload`
   - **`enable`**:
     - **Description:** Enables a specific subagent.
@@ -48,7 +48,7 @@ Slash commands provide meta-level control over the CLI itself.
   filed within the GitHub repository for Sparkle CLI. The string you enter after
   `/bug` will become the headline for the bug being filed. The default `/bug`
   behavior can be modified using the `advanced.bugCommand` setting in your
-  `.gemini/settings.json` files.
+  `.sparkle/settings.json` files.
 
 ### `/chat`
 
@@ -84,8 +84,8 @@ Slash commands provide meta-level control over the CLI itself.
       `<tag>` for identifying the conversation state.
     - **Details on checkpoint location:** The default locations for saved chat
       checkpoints are:
-      - Linux/macOS: `~/.gemini/tmp/<project_hash>/`
-      - Windows: `C:\Users\<YourUsername>\.gemini\tmp\<project_hash>\`
+      - Linux/macOS: `~/.sparkle/tmp/<project_hash>/`
+      - Windows: `C:\Users\<YourUsername>\.sparkle\tmp\<project_hash>\`
       - **Behavior:** Chats are saved into a project-specific directory,
         determined by where you run the CLI. Consequently, saved chats are only
         accessible when working within that same project.
@@ -114,13 +114,13 @@ Slash commands provide meta-level control over the CLI itself.
 - **Sub-commands:**
   - **`list`**:
     - **Description:** List available custom command `.toml` files from all
-      sources (user-level `~/.gemini/commands/`, project-level
-      `<project>/.gemini/commands/`, and active extensions).
+      sources (user-level `~/.sparkle/commands/`, project-level
+      `<project>/.sparkle/commands/`, and active extensions).
     - **Usage:** `/commands list`
   - **`reload`**:
     - **Description:** Reload custom command definitions from all sources
-      (user-level `~/.gemini/commands/`, project-level
-      `<project>/.gemini/commands/`, MCP prompts, and extensions). Use this to
+      (user-level `~/.sparkle/commands/`, project-level
+      `<project>/.sparkle/commands/`, MCP prompts, and extensions). Use this to
       pick up new or modified `.toml` files without restarting the CLI.
     - **Usage:** `/commands reload`
 
@@ -397,7 +397,7 @@ Slash commands provide meta-level control over the CLI itself.
   settings.
 - **Details:** This command provides a user-friendly interface for changing
   settings that control the behavior and appearance of Sparkle CLI. It is
-  equivalent to manually editing the `.gemini/settings.json` file, but with
+  equivalent to manually editing the `.sparkle/settings.json` file, but with
   validation and guidance to prevent errors. See the
   [settings documentation](../cli/settings.md) for a full list of available
   settings.
@@ -485,7 +485,7 @@ Slash commands provide meta-level control over the CLI itself.
     `b`, `e`; go to line start/end with `0`, `$`, `^`; go to specific lines with
     `G` (or `gg` for first line)
   - **Persistent setting:** Vim mode preference is saved to
-    `~/.gemini/settings.json` and restored between sessions
+    `~/.sparkle/settings.json` and restored between sessions
   - **Repeat last command:** Use `.` to repeat the last editing operation
   - **Status indicator:** When enabled, shows `[NORMAL]` or `[INSERT]` in the
     footer

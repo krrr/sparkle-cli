@@ -86,13 +86,13 @@ export interface OperationalGuidelinesOptions {
   topicUpdateNarration: boolean;
   /**
    * Absolute path to the user's per-project private memory index
-   * (e.g. ~/.gemini/tmp/<project-hash>/memory/MEMORY.md).
+   * (e.g. ~/.sparkle/tmp/<project-hash>/memory/MEMORY.md).
    */
   userProjectMemoryPath?: string;
   /**
    * Absolute path to the user's global personal memory file
-   * (e.g. ~/.gemini/AGENTS.md). Config.isPathAllowed surgically allowlists
-   * this exact file (only this file, not the rest of `~/.gemini/`) so the
+   * (e.g. ~/.sparkle/AGENTS.md). Config.isPathAllowed surgically allowlists
+   * this exact file (only this file, not the rest of `~/.sparkle/`) so the
    * agent can edit it directly.
    */
   globalMemoryPath?: string;
@@ -534,7 +534,7 @@ export function renderUserMemory(
 # Contextual Instructions (${formattedHeader})
 The following content is loaded from local and global configuration files.
 **Context Precedence:**
-- **Global (~/.gemini/):** foundational user preferences. Apply these broadly.
+- **Global (~/.sparkle/):** foundational user preferences. Apply these broadly.
 - **Extensions:** supplementary knowledge and capabilities.
 - **Workspace Root:** workspace-wide mandates. Supersedes global preferences.
 - **Sub-directories:** highly specific overrides. These rules supersede all others for files within their scope.

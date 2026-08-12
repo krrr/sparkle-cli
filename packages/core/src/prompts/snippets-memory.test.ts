@@ -53,7 +53,7 @@ describe('renderOperationalGuidelines - memory', () => {
 
   it('should include the Private Project Memory bullet with the absolute path when provided', () => {
     const userProjectMemoryPath =
-      '/Users/test/.gemini/tmp/abc123/memory/MEMORY.md';
+      '/Users/test/.sparkle/tmp/abc123/memory/MEMORY.md';
     const result = renderOperationalGuidelines({
       ...baseOptions,
       userProjectMemoryPath,
@@ -71,7 +71,7 @@ describe('renderOperationalGuidelines - memory', () => {
   });
 
   it('should include the Global Personal Memory bullet, cross-project routing rule, and four-tier mutual-exclusion when globalMemoryPath is provided', () => {
-    const globalMemoryPath = '/Users/test/.gemini/AGENTS.md';
+    const globalMemoryPath = '/Users/test/.sparkle/AGENTS.md';
     const result = renderOperationalGuidelines({
       ...baseOptions,
       globalMemoryPath,

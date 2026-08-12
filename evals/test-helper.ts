@@ -288,7 +288,7 @@ export async function prepareWorkspace(
     fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, content);
 
-    if (filePath.startsWith('.gemini/agents/') && filePath.endsWith('.md')) {
+    if (filePath.startsWith('.sparkle/agents/') && filePath.endsWith('.md')) {
       const hash = crypto.createHash('sha256').update(content).digest('hex');
       try {
         const agentDefs = await parseAgentMarkdown(fullPath, content);
@@ -311,7 +311,7 @@ export async function prepareWorkspace(
   if (Object.keys(acknowledgedAgents).length > 0) {
     const ackPath = path.join(
       homeDir,
-      '.gemini',
+      '.sparkle',
       'acknowledgments',
       'agents.json',
     );

@@ -28,7 +28,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import { loadEnvironment, type Settings } from './settings.js';
-import { GEMINI_DIR, homedir as coreHomedir } from 'sparkle-cli-core';
+import { SPARKLE_DIR, homedir as coreHomedir } from 'sparkle-cli-core';
 
 vi.mock('node:fs');
 
@@ -99,8 +99,8 @@ describe('Environment Isolation', () => {
     delete process.env['GEMINI_API_KEY'];
   });
 
-  it('should still load .gemini/.env even if ignoreLocalEnv is true', () => {
-    const workspaceGeminiEnv = path.join(mockWorkspace, GEMINI_DIR, '.env');
+  it('should still load .sparkle/.env even if ignoreLocalEnv is true', () => {
+    const workspaceGeminiEnv = path.join(mockWorkspace, SPARKLE_DIR, '.env');
     vi.mocked(fs.existsSync).mockImplementation(
       (p) => p.toString() === workspaceGeminiEnv,
     );

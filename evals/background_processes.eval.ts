@@ -24,9 +24,9 @@ sleep 100
 `,
     },
     setup: async (rig) => {
-      // Create .gemini directory to avoid file system error in test rig
+      // Create .sparkle directory to avoid file system error in test rig
       if (rig.homeDir) {
-        const geminiDir = path.join(rig.homeDir, '.gemini');
+        const geminiDir = path.join(rig.homeDir, '.sparkle');
         fs.mkdirSync(geminiDir, { recursive: true });
       }
     },
@@ -58,9 +58,9 @@ sleep 100
     prompt:
       "Start three background processes that run 'sleep 100', 'sleep 200', and 'sleep 300' respectively. Verify that all three are currently running.",
     setup: async (rig) => {
-      // Create .gemini directory to avoid file system error in test rig
+      // Create .sparkle directory to avoid file system error in test rig
       if (rig.homeDir) {
-        const geminiDir = path.join(rig.homeDir, '.gemini');
+        const geminiDir = path.join(rig.homeDir, '.sparkle');
         fs.mkdirSync(geminiDir, { recursive: true });
       }
     },

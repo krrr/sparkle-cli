@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import type { HierarchicalMemory } from '../config/memory.js';
-import { GEMINI_DIR, makeRelative } from '../utils/paths.js';
+import { SPARKLE_DIR, makeRelative } from '../utils/paths.js';
 import { ApprovalMode } from '../policy/types.js';
 import * as snippets from './snippets.js';
 import {
@@ -97,7 +97,7 @@ export class PromptProvider {
 
     // --- Template File Override ---
     if (systemMdResolution.value && !systemMdResolution.isDisabled) {
-      let systemMdPath = path.resolve(path.join(GEMINI_DIR, 'system.md'));
+      let systemMdPath = path.resolve(path.join(SPARKLE_DIR, 'system.md'));
       if (!systemMdResolution.isSwitch) {
         systemMdPath = systemMdResolution.value;
       }
@@ -261,7 +261,7 @@ export class PromptProvider {
     this.maybeWriteSystemMd(
       sanitizedPrompt,
       systemMdResolution,
-      path.resolve(path.join(GEMINI_DIR, 'system.md')),
+      path.resolve(path.join(SPARKLE_DIR, 'system.md')),
     );
 
     return sanitizedPrompt;

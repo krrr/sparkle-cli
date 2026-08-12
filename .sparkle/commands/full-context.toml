@@ -17,7 +17,7 @@ prompts.
 
 In addition to the code context, you MUST strictly adhere to the following frontend-specific development guidelines when writing code in packages/cli.
 
-!{cat .gemini/commands/strict-development-rules.md}
+!{cat .sparkle/commands/strict-development-rules.md}
 
 {{args}}. 
  """

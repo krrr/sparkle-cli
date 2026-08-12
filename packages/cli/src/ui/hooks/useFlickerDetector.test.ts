@@ -21,7 +21,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...actual,
     recordFlickerFrame: vi.fn(),
-    GEMINI_DIR: '.gemini',
+    SPARKLE_DIR: '.sparkle',
   };
 });
 vi.mock('ink', async (importOriginal) => {

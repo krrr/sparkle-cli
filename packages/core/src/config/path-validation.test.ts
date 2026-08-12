@@ -33,7 +33,7 @@ vi.mock('../utils/paths.js', async (importOriginal) => {
 describe('Config Path Validation', () => {
   let config: Config;
   const targetDir = '/mock/workspace';
-  const globalGeminiDir = path.join(os.homedir(), '.gemini');
+  const globalGeminiDir = path.join(os.homedir(), '.sparkle');
 
   beforeEach(() => {
     config = new Config({
@@ -45,7 +45,7 @@ describe('Config Path Validation', () => {
     });
   });
 
-  it('should allow access to a file under ~/.gemini once that directory is added to the workspace', () => {
+  it('should allow access to a file under ~/.sparkle once that directory is added to the workspace', () => {
     // Use settings.json rather than AGENTS.md as the example: the latter is
     // now reachable via a surgical isPathAllowed allowlist regardless of
     // workspace membership (covered by dedicated tests in config.test.ts), so
@@ -54,7 +54,7 @@ describe('Config Path Validation', () => {
     // original "denied -> add to workspace -> allowed" flow this test was
     // written to verify, and additionally double-asserts the least-privilege
     // guarantee that the allowlist does not leak access to other files
-    // under ~/.gemini/.
+    // under ~/.sparkle/.
     const settingsPath = path.join(globalGeminiDir, 'settings.json');
 
     // Before adding, it should be denied

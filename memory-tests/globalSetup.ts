@@ -24,7 +24,7 @@ export async function setup() {
   if (process.platform === 'win32') {
     process.env['USERPROFILE'] = runDir;
   }
-  process.env['GEMINI_CONFIG_DIR'] = join(runDir, '.gemini');
+  process.env['GEMINI_CONFIG_DIR'] = join(runDir, '.sparkle');
 
   // Download ripgrep to avoid race conditions
   const available = await resolveRipgrepPath();

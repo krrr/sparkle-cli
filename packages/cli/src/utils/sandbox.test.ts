@@ -103,7 +103,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
         this.name = 'FatalSandboxError';
       }
     },
-    GEMINI_DIR: '.gemini',
+    SPARKLE_DIR: '.sparkle',
     homedir: mockedHomedir,
   };
 });
@@ -186,7 +186,7 @@ describe('sandbox', () => {
       vi.stubEnv('SEATBELT_PROFILE', 'custom-test');
       vi.mocked(fs.existsSync).mockImplementation((p) =>
         String(p).includes(
-          path.join(homedir(), '.gemini', 'sandbox-macos-custom-test.sb'),
+          path.join(homedir(), '.sparkle', 'sandbox-macos-custom-test.sb'),
         ),
       );
       const config: SandboxConfig = createMockSandboxConfig({
@@ -224,19 +224,19 @@ describe('sandbox', () => {
       const profileArg = spawnArgs?.[spawnArgs.indexOf('-f') + 1];
       expect(profileArg).toEqual(
         expect.stringContaining(
-          path.join(homedir(), '.gemini', 'sandbox-macos-custom-test.sb'),
+          path.join(homedir(), '.sparkle', 'sandbox-macos-custom-test.sb'),
         ),
       );
     });
 
-    it('should fall back to project .gemini directory when user profile is missing', async () => {
+    it('should fall back to project .sparkle directory when user profile is missing', async () => {
       vi.mocked(os.platform).mockReturnValue('darwin');
       vi.stubEnv('SEATBELT_PROFILE', 'custom-test');
       vi.mocked(fs.existsSync).mockImplementation((p) => {
         const s = String(p);
         return (
-          s.includes(path.join('.gemini', 'sandbox-macos-custom-test.sb')) &&
-          !s.includes(path.join(homedir(), '.gemini'))
+          s.includes(path.join('.sparkle', 'sandbox-macos-custom-test.sb')) &&
+          !s.includes(path.join(homedir(), '.sparkle'))
         );
       });
       const config: SandboxConfig = createMockSandboxConfig({
@@ -274,7 +274,7 @@ describe('sandbox', () => {
       const profileArg = spawnArgs?.[spawnArgs.indexOf('-f') + 1];
       expect(profileArg).toEqual(
         expect.stringContaining(
-          path.join('.gemini', 'sandbox-macos-custom-test.sb'),
+          path.join('.sparkle', 'sandbox-macos-custom-test.sb'),
         ),
       );
       expect(profileArg).not.toContain(homedir());
@@ -576,7 +576,7 @@ describe('sandbox', () => {
           '--volume',
           '/host/path:/container/path:ro',
           '--volume',
-          expect.stringMatching(/[\\/]home[\\/]user[\\/]\.gemini/),
+          expect.stringMatching(/[\\/]home[\\/]user[\\/]\.sparkle/),
         ]),
         expect.any(Object),
       );
