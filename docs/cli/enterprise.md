@@ -480,18 +480,17 @@ via the `mcpServers` configuration.
 
 ## Telemetry and auditing
 
-For auditing and monitoring purposes, you can configure Sparkle CLI to send
-telemetry data to a central location. This lets you track tool usage and other
-events. For more information, see the [telemetry documentation](./telemetry.md).
+For auditing and monitoring purposes, you can configure Sparkle CLI to write
+telemetry data to a local file. This lets you track tool usage and other events.
+For more information, see the [telemetry documentation](./telemetry.md).
 
-**Example:** Enable telemetry and send it to a local OTLP collector. If
-`otlpEndpoint` is not specified, it defaults to `http://localhost:4317`.
+**Example:** Enable telemetry and write it to a local file.
 
 ```json
 {
   "telemetry": {
     "enabled": true,
-    "target": "local",
+    "outfile": ".sparkle/telemetry.log",
     "logPrompts": false
   }
 }
@@ -555,8 +554,7 @@ CLI.
   },
   "telemetry": {
     "enabled": true,
-    "target": "local",
-    "otlpEndpoint": "https://telemetry-prod.example.com:4317",
+    "outfile": ".sparkle/telemetry.log",
     "logPrompts": false
   },
   "advanced": {

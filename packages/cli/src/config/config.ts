@@ -747,21 +747,11 @@ export async function loadCliConfig(
     approvalMode = ApprovalMode.DEFAULT;
   }
 
-  let telemetrySettings;
-  try {
-    telemetrySettings = await resolveTelemetrySettings({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      env: process.env as unknown as Record<string, string | undefined>,
-      settings: settings.telemetry,
-    });
-  } catch (err) {
-    if (err instanceof FatalConfigError) {
-      throw new FatalConfigError(
-        `Invalid telemetry configuration: ${err.message}.`,
-      );
-    }
-    throw err;
-  }
+  const telemetrySettings = await resolveTelemetrySettings({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    env: process.env as unknown as Record<string, string | undefined>,
+    settings: settings.telemetry,
+  });
 
   // -p/--prompt forces non-interactive (headless) mode
   // -i/--prompt-interactive forces interactive mode with an initial prompt

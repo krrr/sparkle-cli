@@ -64,13 +64,7 @@ import {
 } from '../services/sandboxManager.js';
 import { createSandboxManager } from '../services/sandboxManagerFactory.js';
 import { SandboxedFileSystemService } from '../services/sandboxedFileSystemService.js';
-import {
-  initializeTelemetry,
-  DEFAULT_TELEMETRY_TARGET,
-  DEFAULT_OTLP_ENDPOINT,
-  uiTelemetryService,
-  type TelemetryTarget,
-} from '../telemetry/index.js';
+import { initializeTelemetry, uiTelemetryService } from '../telemetry/index.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
 import { tokenLimit } from '../core/tokenLimits.js';
 import {
@@ -188,13 +182,8 @@ export interface PlanSettings {
 export interface TelemetrySettings {
   enabled?: boolean;
   traces?: boolean;
-  target?: TelemetryTarget;
-  otlpEndpoint?: string;
-  otlpProtocol?: 'grpc' | 'http';
   logPrompts?: boolean;
   outfile?: string;
-  useCollector?: boolean;
-  useCliAuth?: boolean;
 }
 
 export interface OutputSettings {
@@ -996,13 +985,8 @@ export class Config implements McpContext, AgentLoopContext {
     this.telemetrySettings = {
       enabled: params.telemetry?.enabled ?? false,
       traces: params.telemetry?.traces ?? false,
-      target: params.telemetry?.target ?? DEFAULT_TELEMETRY_TARGET,
-      otlpEndpoint: params.telemetry?.otlpEndpoint ?? DEFAULT_OTLP_ENDPOINT,
-      otlpProtocol: params.telemetry?.otlpProtocol,
       logPrompts: params.telemetry?.logPrompts ?? true,
       outfile: params.telemetry?.outfile,
-      useCollector: params.telemetry?.useCollector,
-      useCliAuth: params.telemetry?.useCliAuth,
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
 
@@ -2385,28 +2369,8 @@ export class Config implements McpContext, AgentLoopContext {
     return this.telemetrySettings.logPrompts ?? true;
   }
 
-  getTelemetryOtlpEndpoint(): string {
-    return this.telemetrySettings.otlpEndpoint ?? DEFAULT_OTLP_ENDPOINT;
-  }
-
-  getTelemetryOtlpProtocol(): 'grpc' | 'http' {
-    return this.telemetrySettings.otlpProtocol ?? 'grpc';
-  }
-
-  getTelemetryTarget(): TelemetryTarget {
-    return this.telemetrySettings.target ?? DEFAULT_TELEMETRY_TARGET;
-  }
-
   getTelemetryOutfile(): string | undefined {
     return this.telemetrySettings.outfile;
-  }
-
-  getTelemetryUseCollector(): boolean {
-    return this.telemetrySettings.useCollector ?? false;
-  }
-
-  getTelemetryUseCliAuth(): boolean {
-    return this.telemetrySettings.useCliAuth ?? false;
   }
 
   /** @deprecated Use geminiClient getter */

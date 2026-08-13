@@ -2974,53 +2974,6 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryEnabled()).toBe(true);
   });
 
-  it('should prioritize GEMINI_TELEMETRY_TARGET over settings', async () => {
-    vi.stubEnv('GEMINI_TELEMETRY_TARGET', 'local');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { target: ServerConfig.TelemetryTarget.LOCAL },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getTelemetryTarget()).toBe('local');
-  });
-
-  it('should throw when GEMINI_TELEMETRY_TARGET is invalid', async () => {
-    vi.stubEnv('GEMINI_TELEMETRY_TARGET', 'bogus');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { target: ServerConfig.TelemetryTarget.LOCAL },
-    });
-    await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      /Invalid telemetry configuration: .*Invalid telemetry target/i,
-    );
-    vi.unstubAllEnvs();
-  });
-
-  it('should prioritize GEMINI_TELEMETRY_OTLP_ENDPOINT over settings and default env var', async () => {
-    vi.stubEnv('OTEL_EXPORTER_OTLP_ENDPOINT', 'http://default.env.com');
-    vi.stubEnv('GEMINI_TELEMETRY_OTLP_ENDPOINT', 'http://gemini.env.com');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { otlpEndpoint: 'http://settings.com' },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getTelemetryOtlpEndpoint()).toBe('http://gemini.env.com');
-  });
-
-  it('should prioritize GEMINI_TELEMETRY_OTLP_PROTOCOL over settings', async () => {
-    vi.stubEnv('GEMINI_TELEMETRY_OTLP_PROTOCOL', 'http');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { otlpProtocol: 'grpc' },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getTelemetryOtlpProtocol()).toBe('http');
-  });
-
   it('should prioritize GEMINI_TELEMETRY_LOG_PROMPTS over settings', async () => {
     vi.stubEnv('GEMINI_TELEMETRY_LOG_PROMPTS', 'false');
     process.argv = ['node', 'script.js'];
@@ -3043,17 +2996,6 @@ describe('Telemetry configuration via environment variables', () => {
     expect(config.getTelemetryOutfile()).toBe('/gemini/env/telemetry.log');
   });
 
-  it('should prioritize GEMINI_TELEMETRY_USE_COLLECTOR over settings', async () => {
-    vi.stubEnv('GEMINI_TELEMETRY_USE_COLLECTOR', 'true');
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { useCollector: false },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getTelemetryUseCollector()).toBe(true);
-  });
-
   it('should use settings value when GEMINI_TELEMETRY_ENABLED is not set', async () => {
     vi.stubEnv('GEMINI_TELEMETRY_ENABLED', undefined);
     process.argv = ['node', 'script.js'];
@@ -3061,17 +3003,6 @@ describe('Telemetry configuration via environment variables', () => {
     const settings = createTestMergedSettings({ telemetry: { enabled: true } });
     const config = await loadCliConfig(settings, 'test-session', argv);
     expect(config.getTelemetryEnabled()).toBe(true);
-  });
-
-  it('should use settings value when GEMINI_TELEMETRY_TARGET is not set', async () => {
-    vi.stubEnv('GEMINI_TELEMETRY_TARGET', undefined);
-    process.argv = ['node', 'script.js'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      telemetry: { target: ServerConfig.TelemetryTarget.LOCAL },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getTelemetryTarget()).toBe('local');
   });
 
   it("should treat GEMINI_TELEMETRY_ENABLED='1' as true", async () => {

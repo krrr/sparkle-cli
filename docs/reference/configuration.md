@@ -596,7 +596,7 @@ their corresponding top-level category object in your `settings.json` file.
       "gemini-3-flash-base": {
         "extends": "base",
         "modelConfig": {
-          "model": "gemini-flash-latest"
+          "model": "flash"
         }
       },
       "classifier": {
@@ -701,7 +701,7 @@ their corresponding top-level category object in your `settings.json` file.
       "loop-detection-double-check": {
         "extends": "base",
         "modelConfig": {
-          "model": "gemini-pro-latest"
+          "model": "pro"
         }
       },
       "llm-edit-fixer": {
@@ -727,27 +727,27 @@ their corresponding top-level category object in your `settings.json` file.
       },
       "chat-compression-pro": {
         "modelConfig": {
-          "model": "gemini-pro-latest"
+          "model": "pro"
         }
       },
       "chat-compression-flash": {
         "modelConfig": {
-          "model": "gemini-flash-latest"
+          "model": "flash"
         }
       },
       "chat-compression-flash-lite": {
         "modelConfig": {
-          "model": "gemini-flash-lite-latest"
+          "model": "flash-lite"
         }
       },
       "chat-compression-default": {
         "modelConfig": {
-          "model": "gemini-pro-latest"
+          "model": "pro"
         }
       },
       "agent-history-provider-summarizer": {
         "modelConfig": {
-          "model": "gemini-flash-latest"
+          "model": "flash"
         }
       },
       "deepseek-base": {
@@ -860,8 +860,8 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "deepseek-v4-flash": {
-        "tier": "custom",
-        "family": "custom",
+        "tier": "flash",
+        "family": "deepseek",
         "isVisible": true,
         "features": {
           "thinking": false,
@@ -869,8 +869,8 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "deepseek-v4-pro": {
-        "tier": "custom",
-        "family": "custom",
+        "tier": "pro",
+        "family": "deepseek",
         "isVisible": true,
         "features": {
           "thinking": true,
@@ -891,16 +891,54 @@ their corresponding top-level category object in your `settings.json` file.
     ```json
     {
       "auto": {
-        "default": "gemini-pro-latest"
+        "default": "gemini-pro-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": "active"
+          }
+        ]
       },
       "pro": {
-        "default": "gemini-pro-latest"
+        "default": "gemini-pro-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": {
+              "familyTier": "pro"
+            }
+          }
+        ]
       },
       "flash": {
-        "default": "gemini-flash-latest"
+        "default": "gemini-flash-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": {
+              "familyTier": "flash"
+            }
+          }
+        ]
       },
       "flash-lite": {
-        "default": "gemini-flash-lite-latest"
+        "default": "gemini-flash-lite-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": {
+              "familyTier": "flash-lite"
+            }
+          }
+        ]
       }
     }
     ```
@@ -916,10 +954,30 @@ their corresponding top-level category object in your `settings.json` file.
     ```json
     {
       "flash": {
-        "default": "gemini-flash-latest"
+        "default": "gemini-flash-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": {
+              "familyTier": "flash"
+            }
+          }
+        ]
       },
       "pro": {
-        "default": "gemini-pro-latest"
+        "default": "gemini-pro-latest",
+        "contexts": [
+          {
+            "condition": {
+              "isCustomModel": true
+            },
+            "target": {
+              "familyTier": "pro"
+            }
+          }
+        ]
       }
     }
     ```
@@ -936,7 +994,7 @@ their corresponding top-level category object in your `settings.json` file.
     {
       "default": [
         {
-          "model": "gemini-pro-latest",
+          "model": "pro",
           "actions": {
             "terminal": "prompt",
             "transient": "prompt",
@@ -951,7 +1009,7 @@ their corresponding top-level category object in your `settings.json` file.
           }
         },
         {
-          "model": "gemini-flash-latest",
+          "model": "flash",
           "isLastResort": true,
           "maxAttempts": 10,
           "actions": {
@@ -970,7 +1028,7 @@ their corresponding top-level category object in your `settings.json` file.
       ],
       "auto-default": [
         {
-          "model": "gemini-pro-latest",
+          "model": "pro",
           "maxAttempts": 3,
           "actions": {
             "terminal": "prompt",
@@ -986,7 +1044,7 @@ their corresponding top-level category object in your `settings.json` file.
           }
         },
         {
-          "model": "gemini-flash-latest",
+          "model": "flash",
           "isLastResort": true,
           "maxAttempts": 10,
           "actions": {
@@ -1020,7 +1078,7 @@ their corresponding top-level category object in your `settings.json` file.
           }
         },
         {
-          "model": "gemini-flash-latest",
+          "model": "flash",
           "actions": {
             "terminal": "silent",
             "transient": "silent",
@@ -1035,7 +1093,7 @@ their corresponding top-level category object in your `settings.json` file.
           }
         },
         {
-          "model": "gemini-pro-latest",
+          "model": "pro",
           "isLastResort": true,
           "actions": {
             "terminal": "silent",
@@ -1897,16 +1955,9 @@ see [Telemetry](../cli/telemetry.md).
   - **`enabled`** (boolean): Whether or not telemetry is enabled.
   - **`traces`** (boolean): Whether detailed traces with large attributes (like
     tool outputs and file reads) are captured. Defaults to `false`.
-  - **`target`** (string): The destination for collected telemetry. Supported
-    values are `local` (and optionally any OTLP endpoint via `otlpEndpoint`).
-  - **`otlpEndpoint`** (string): The endpoint for the OTLP Exporter.
-  - **`otlpProtocol`** (string): The protocol for the OTLP Exporter (`grpc` or
-    `http`).
   - **`logPrompts`** (boolean): Whether or not to include the content of user
     prompts in the logs.
-  - **`outfile`** (string): The file to write telemetry to when `target` is
-    `local`.
-  - **`useCollector`** (boolean): Whether to use an external OTLP collector.
+  - **`outfile`** (string): The file to write telemetry to.
 
 ### Example `settings.json`
 
@@ -1950,8 +2001,7 @@ of v0.3.0:
   },
   "telemetry": {
     "enabled": true,
-    "target": "local",
-    "otlpEndpoint": "http://localhost:4317",
+    "outfile": ".sparkle/telemetry.log",
     "logPrompts": true
   },
   "privacy": {
@@ -2073,26 +2123,13 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Set to `true` or `1` to enable detailed tracing with large attributes. Any
     other value is treated as disabling it.
   - Overrides the `telemetry.traces` setting.
-- **`GEMINI_TELEMETRY_TARGET`**:
-  - Sets the telemetry target (`local`).
-  - Overrides the `telemetry.target` setting.
-- **`GEMINI_TELEMETRY_OTLP_ENDPOINT`**:
-  - Sets the OTLP endpoint for telemetry.
-  - Overrides the `telemetry.otlpEndpoint` setting.
-- **`GEMINI_TELEMETRY_OTLP_PROTOCOL`**:
-  - Sets the OTLP protocol (`grpc` or `http`).
-  - Overrides the `telemetry.otlpProtocol` setting.
 - **`GEMINI_TELEMETRY_LOG_PROMPTS`**:
   - Set to `true` or `1` to enable or disable logging of user prompts. Any other
     value is treated as disabling it.
   - Overrides the `telemetry.logPrompts` setting.
 - **`GEMINI_TELEMETRY_OUTFILE`**:
-  - Sets the file path to write telemetry to when the target is `local`.
+  - Sets the file path to write telemetry to.
   - Overrides the `telemetry.outfile` setting.
-- **`GEMINI_TELEMETRY_USE_COLLECTOR`**:
-  - Set to `true` or `1` to enable or disable using an external OTLP collector.
-    Any other value is treated as disabling it.
-  - Overrides the `telemetry.useCollector` setting.
 - **`SPARKLE_SANDBOX`**:
   - Alternative to the `sandbox` setting in `settings.json`.
   - Accepts `true`, `false`, `docker`, `podman`, or a custom command string.

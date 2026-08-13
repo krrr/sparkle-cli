@@ -12,13 +12,6 @@ import {
   metrics,
   propagation,
 } from '@opentelemetry/api';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
-import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
-import { OTLPTraceExporter as OTLPTraceExporterHttp } from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPLogExporter as OTLPLogExporterHttp } from '@opentelemetry/exporter-logs-otlp-http';
-import { OTLPMetricExporter as OTLPMetricExporterHttp } from '@opentelemetry/exporter-metrics-otlp-http';
-import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
@@ -34,7 +27,6 @@ import {
   ConsoleMetricExporter,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import type { Config } from '../config/config.js';
 import { SERVICE_NAME } from './constants.js';
 import { initializeMetrics } from './metrics.js';
@@ -124,53 +116,12 @@ async function flushTelemetryBuffer(): Promise<void> {
   }
 }
 
-function parseOtlpEndpoint(
-  otlpEndpointSetting: string | undefined,
-  protocol: 'grpc' | 'http',
-): string | undefined {
-  if (!otlpEndpointSetting) {
-    return undefined;
-  }
-  // Trim leading/trailing quotes that might come from env variables
-  const trimmedEndpoint = otlpEndpointSetting.replace(/^["']|["']$/g, '');
-
-  try {
-    const url = new URL(trimmedEndpoint);
-    if (protocol === 'grpc') {
-      // OTLP gRPC exporters expect an endpoint in the format scheme://host:port
-      // The `origin` property provides this, stripping any path, query, or hash.
-      return url.origin;
-    }
-    // For http, use the full href.
-    return url.href;
-  } catch (error) {
-    diag.error('Invalid OTLP endpoint URL provided:', trimmedEndpoint, error);
-    return undefined;
-  }
-}
-
 export async function initializeTelemetry(config: Config): Promise<void> {
   if (!config.getTelemetryEnabled()) {
     return;
   }
 
   if (telemetryInitialized) {
-    return;
-  }
-
-  if (config.getTelemetryUseCollector() && config.getTelemetryUseCliAuth()) {
-    debugLogger.error(
-      'Telemetry configuration error: "useCollector" and "useCliAuth" cannot both be true. ' +
-        'Disabling telemetry.',
-    );
-    return;
-  }
-
-  // If using CLI auth, defer initialization is no longer supported.
-  if (config.getTelemetryUseCliAuth()) {
-    debugLogger.log(
-      'CLI auth is not supported without Code Assist credentials, disabling telemetry.',
-    );
     return;
   }
 
@@ -200,63 +151,12 @@ export async function initializeTelemetry(config: Config): Promise<void> {
     );
   }
 
-  const otlpEndpoint = config.getTelemetryOtlpEndpoint();
-  const otlpProtocol = config.getTelemetryOtlpProtocol();
-
-  const parsedEndpoint = parseOtlpEndpoint(otlpEndpoint, otlpProtocol);
   const telemetryOutfile = config.getTelemetryOutfile();
-  const useOtlp = !!parsedEndpoint && !telemetryOutfile;
 
-  let spanExporter:
-    | OTLPTraceExporter
-    | OTLPTraceExporterHttp
-    | FileSpanExporter
-    | ConsoleSpanExporter;
-  let logExporter:
-    | OTLPLogExporter
-    | OTLPLogExporterHttp
-    | FileLogExporter
-    | ConsoleLogRecordExporter;
+  let spanExporter: FileSpanExporter | ConsoleSpanExporter;
+  let logExporter: FileLogExporter | ConsoleLogRecordExporter;
 
-  if (useOtlp) {
-    if (otlpProtocol === 'http') {
-      const buildUrl = (path: string) => {
-        const url = new URL(parsedEndpoint);
-        // Join the existing pathname with the new path, handling trailing slashes.
-        url.pathname = [url.pathname.replace(/\/$/, ''), path].join('/');
-        return url.href;
-      };
-      spanExporter = new OTLPTraceExporterHttp({
-        url: buildUrl('v1/traces'),
-      });
-      logExporter = new OTLPLogExporterHttp({
-        url: buildUrl('v1/logs'),
-      });
-      metricReader = new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporterHttp({
-          url: buildUrl('v1/metrics'),
-        }),
-        exportIntervalMillis: 10000,
-      });
-    } else {
-      // grpc
-      spanExporter = new OTLPTraceExporter({
-        url: parsedEndpoint,
-        compression: CompressionAlgorithm.GZIP,
-      });
-      logExporter = new OTLPLogExporter({
-        url: parsedEndpoint,
-        compression: CompressionAlgorithm.GZIP,
-      });
-      metricReader = new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter({
-          url: parsedEndpoint,
-          compression: CompressionAlgorithm.GZIP,
-        }),
-        exportIntervalMillis: 10000,
-      });
-    }
-  } else if (telemetryOutfile) {
+  if (telemetryOutfile) {
     spanExporter = new FileSpanExporter(telemetryOutfile);
     logExporter = new FileLogExporter(telemetryOutfile);
     metricReader = new PeriodicExportingMetricReader({
@@ -281,7 +181,6 @@ export async function initializeTelemetry(config: Config): Promise<void> {
     spanProcessors: [spanProcessor],
     logRecordProcessors: [logRecordProcessor],
     metricReader,
-    instrumentations: [new HttpInstrumentation()],
   });
 
   try {

@@ -23,7 +23,6 @@ import {
   isHeadlessMode,
   createPolicyEngineConfig,
   type PolicySettings,
-  type TelemetryTarget,
   type ConfigParameters,
   type ExtensionLoader,
   resolveToRealPath,
@@ -321,11 +320,6 @@ export async function loadConfig(
     cwd: workspaceDir,
     telemetry: {
       enabled: settings.telemetry?.enabled,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      target: settings.telemetry?.target as TelemetryTarget,
-      otlpEndpoint:
-        getEnvLocal('OTEL_EXPORTER_OTLP_ENDPOINT') ??
-        settings.telemetry?.otlpEndpoint,
       logPrompts: settings.telemetry?.logPrompts,
     },
     // Git-aware file filtering settings

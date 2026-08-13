@@ -19,14 +19,10 @@ industry-standard observability framework.
 
 The observability system provides:
 
-- Universal compatibility: Export to any OpenTelemetry backend (Jaeger,
-  Prometheus, Datadog, etc.).
 - Standardized data: Use consistent formats and collection methods across your
   toolchain.
-- Future-proof integration: Connect with existing and future observability
-  infrastructure.
-- No vendor lock-in: Switch between backends without changing your
-  instrumentation.
+- Local output: Capture logs, metrics, and traces to a file or the console for
+  debugging and performance analysis.
 
 [OpenTelemetry]: https://opentelemetry.io/
 
@@ -35,17 +31,13 @@ The observability system provides:
 You control telemetry behavior through the `.sparkle/settings.json` file.
 Environment variables can override these settings.
 
-| Setting        | Environment Variable              | Description                                       | Values            | Default                 |
-| -------------- | --------------------------------- | ------------------------------------------------- | ----------------- | ----------------------- |
-| `enabled`      | `GEMINI_TELEMETRY_ENABLED`        | Enable or disable telemetry                       | `true`/`false`    | `false`                 |
-| `traces`       | `GEMINI_TELEMETRY_TRACES_ENABLED` | Enable detailed attribute tracing                 | `true`/`false`    | `false`                 |
-| `target`       | `GEMINI_TELEMETRY_TARGET`         | Where to send telemetry data                      | `"local"`         | `"local"`               |
-| `otlpEndpoint` | `GEMINI_TELEMETRY_OTLP_ENDPOINT`  | OTLP collector endpoint                           | URL string        | `http://localhost:4317` |
-| `otlpProtocol` | `GEMINI_TELEMETRY_OTLP_PROTOCOL`  | OTLP transport protocol                           | `"grpc"`/`"http"` | `"grpc"`                |
-| `outfile`      | `GEMINI_TELEMETRY_OUTFILE`        | Save telemetry to file (overrides `otlpEndpoint`) | file path         | -                       |
-| `logPrompts`   | `GEMINI_TELEMETRY_LOG_PROMPTS`    | Include prompts in telemetry logs                 | `true`/`false`    | `true`                  |
-| `useCollector` | `GEMINI_TELEMETRY_USE_COLLECTOR`  | Use external OTLP collector (advanced)            | `true`/`false`    | `false`                 |
-| -              | `SPARKLE_CLI_SURFACE`             | Optional custom label for traffic reporting       | string            | -                       |
+| Setting      | Environment Variable              | Description                                 | Values         | Default |
+| ------------ | --------------------------------- | ------------------------------------------- | -------------- | ------- |
+| `enabled`    | `GEMINI_TELEMETRY_ENABLED`        | Enable or disable telemetry                 | `true`/`false` | `false` |
+| `traces`     | `GEMINI_TELEMETRY_TRACES_ENABLED` | Enable detailed attribute tracing           | `true`/`false` | `false` |
+| `outfile`    | `GEMINI_TELEMETRY_OUTFILE`        | Save telemetry to file                      | file path      | -       |
+| `logPrompts` | `GEMINI_TELEMETRY_LOG_PROMPTS`    | Include prompts in telemetry logs           | `true`/`false` | `true`  |
+| -            | `SPARKLE_CLI_SURFACE`             | Optional custom label for traffic reporting | string         | -       |
 
 **Note on boolean environment variables:** For boolean settings like `enabled`,
 setting the environment variable to `true` or `1` enables the feature.
@@ -63,16 +55,12 @@ recommend using file-based output for local development.
     {
       "telemetry": {
         "enabled": true,
-        "target": "local",
         "outfile": ".sparkle/telemetry.log"
       }
     }
     ```
 2.  Run Sparkle CLI and send prompts.
 3.  View logs and metrics in `.sparkle/telemetry.log`.
-
-For advanced local telemetry setups (such as Jaeger or Genkit), see the
-[Local development guide](../local-development.md#viewing-traces).
 
 ## Client identification
 

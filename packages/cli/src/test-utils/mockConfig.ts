@@ -85,12 +85,7 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getTelemetryEnabled: vi.fn().mockReturnValue(false),
     getTelemetryLogPromptsEnabled: vi.fn().mockReturnValue(false),
     getTelemetryTracesEnabled: vi.fn().mockReturnValue(false),
-    getTelemetryOtlpEndpoint: vi.fn().mockReturnValue(''),
-    getTelemetryOtlpProtocol: vi.fn().mockReturnValue('grpc'),
-    getTelemetryTarget: vi.fn().mockReturnValue(''),
     getTelemetryOutfile: vi.fn().mockReturnValue(undefined),
-    getTelemetryUseCollector: vi.fn().mockReturnValue(false),
-    getTelemetryUseCliAuth: vi.fn().mockReturnValue(false),
     getGeminiClient: vi.fn().mockReturnValue({
       isInitialized: vi.fn().mockReturnValue(true),
     }),

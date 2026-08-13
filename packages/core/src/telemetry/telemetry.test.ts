@@ -31,9 +31,6 @@ describe('telemetry', () => {
       cwd: '/test/dir',
     });
     vi.spyOn(mockConfig, 'getTelemetryEnabled').mockReturnValue(true);
-    vi.spyOn(mockConfig, 'getTelemetryOtlpEndpoint').mockReturnValue(
-      'http://localhost:4317',
-    );
     vi.spyOn(mockConfig, 'getSessionId').mockReturnValue('test-session-id');
     mockNodeSdk = {
       start: vi.fn(),

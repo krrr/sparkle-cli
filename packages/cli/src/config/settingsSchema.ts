@@ -2856,20 +2856,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
         type: 'boolean',
         description: 'Enables telemetry emission.',
       },
-      target: {
-        type: 'string',
-        description:
-          'Telemetry destination (for example `stderr`, `stdout`, or `otlp`).',
-      },
-      otlpEndpoint: {
-        type: 'string',
-        description: 'Endpoint for OTLP exporters.',
-      },
-      otlpProtocol: {
-        type: 'string',
-        description: 'Protocol for OTLP exporters.',
-        enum: ['grpc', 'http'],
-      },
       traces: {
         type: 'boolean',
         description:
@@ -2882,15 +2868,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
       outfile: {
         type: 'string',
         description: 'File path for writing telemetry output.',
-      },
-      useCollector: {
-        type: 'boolean',
-        description: 'Whether to forward telemetry to an OTLP collector.',
-      },
-      useCliAuth: {
-        type: 'boolean',
-        description:
-          'Whether to use CLI authentication for telemetry (only for in-process exporters).',
       },
     },
   },

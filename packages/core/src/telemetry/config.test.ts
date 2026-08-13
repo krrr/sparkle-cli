@@ -5,12 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  parseBooleanEnvFlag,
-  parseTelemetryTargetValue,
-  resolveTelemetrySettings,
-} from './config.js';
-import { TelemetryTarget } from './index.js';
+import { parseBooleanEnvFlag, resolveTelemetrySettings } from './config.js';
 
 describe('telemetry/config helpers', () => {
   describe('parseBooleanEnvFlag', () => {
@@ -32,33 +27,13 @@ describe('telemetry/config helpers', () => {
     });
   });
 
-  describe('parseTelemetryTargetValue', () => {
-    it('parses string values', () => {
-      expect(parseTelemetryTargetValue('local')).toBe(TelemetryTarget.LOCAL);
-    });
-
-    it('accepts enum values', () => {
-      expect(parseTelemetryTargetValue(TelemetryTarget.LOCAL)).toBe(
-        TelemetryTarget.LOCAL,
-      );
-    });
-
-    it('returns undefined for unknown', () => {
-      expect(parseTelemetryTargetValue('other')).toBeUndefined();
-      expect(parseTelemetryTargetValue(undefined)).toBeUndefined();
-    });
-  });
-
   describe('resolveTelemetrySettings', () => {
     it('falls back to settings when no argv/env provided', async () => {
       const settings = {
         enabled: false,
-        target: TelemetryTarget.LOCAL,
-        otlpEndpoint: 'http://localhost:4317',
-        otlpProtocol: 'grpc' as const,
+        traces: true,
         logPrompts: false,
         outfile: 'settings.log',
-        useCollector: false,
       };
       const resolved = await resolveTelemetrySettings({ settings });
       expect(resolved).toEqual(settings);
@@ -67,27 +42,16 @@ describe('telemetry/config helpers', () => {
     it('uses env over settings and argv over env', async () => {
       const settings = {
         enabled: false,
-        target: TelemetryTarget.LOCAL,
-        otlpEndpoint: 'http://settings:4317',
-        otlpProtocol: 'grpc' as const,
         logPrompts: false,
         outfile: 'settings.log',
-        useCollector: false,
       };
       const env = {
         GEMINI_TELEMETRY_ENABLED: '1',
-        GEMINI_TELEMETRY_TARGET: 'local',
-        GEMINI_TELEMETRY_OTLP_ENDPOINT: 'http://env:4317',
-        GEMINI_TELEMETRY_OTLP_PROTOCOL: 'http',
         GEMINI_TELEMETRY_LOG_PROMPTS: 'true',
         GEMINI_TELEMETRY_OUTFILE: 'env.log',
-        GEMINI_TELEMETRY_USE_COLLECTOR: 'true',
       } as Record<string, string>;
       const argv = {
         telemetry: false,
-        telemetryTarget: 'local',
-        telemetryOtlpEndpoint: 'http://argv:4317',
-        telemetryOtlpProtocol: 'grpc',
         telemetryLogPrompts: false,
         telemetryOutfile: 'argv.log',
       };
@@ -95,12 +59,8 @@ describe('telemetry/config helpers', () => {
       const resolvedEnv = await resolveTelemetrySettings({ env, settings });
       expect(resolvedEnv).toEqual({
         enabled: true,
-        target: TelemetryTarget.LOCAL,
-        otlpEndpoint: 'http://env:4317',
-        otlpProtocol: 'http',
         logPrompts: true,
         outfile: 'env.log',
-        useCollector: true,
       });
 
       const resolvedArgv = await resolveTelemetrySettings({
@@ -110,70 +70,29 @@ describe('telemetry/config helpers', () => {
       });
       expect(resolvedArgv).toEqual({
         enabled: false,
-        target: TelemetryTarget.LOCAL,
-        otlpEndpoint: 'http://argv:4317',
-        otlpProtocol: 'grpc',
         logPrompts: false,
         outfile: 'argv.log',
-        useCollector: true, // from env as no argv option
-        useCliAuth: undefined,
       });
     });
 
-    it('resolves useCliAuth from settings', async () => {
-      const settings = {
-        useCliAuth: true,
-      };
+    it('resolves traces from env over settings', async () => {
+      const settings = { traces: false };
       const resolved = await resolveTelemetrySettings({ settings });
-      expect(resolved.useCliAuth).toBe(true);
+      expect(resolved.traces).toBe(false);
+
+      const env = { GEMINI_TELEMETRY_TRACES_ENABLED: 'true' };
+      const resolvedEnv = await resolveTelemetrySettings({ env, settings });
+      expect(resolvedEnv.traces).toBe(true);
     });
 
-    it('resolves useCliAuth from env', async () => {
-      const env = {
-        GEMINI_TELEMETRY_USE_CLI_AUTH: 'true',
-      };
-      const resolved = await resolveTelemetrySettings({ env });
-      expect(resolved.useCliAuth).toBe(true);
-    });
-
-    it('env overrides settings for useCliAuth', async () => {
-      const settings = {
-        useCliAuth: false,
-      };
-      const env = {
-        GEMINI_TELEMETRY_USE_CLI_AUTH: 'true',
-      };
-      const resolved = await resolveTelemetrySettings({ env, settings });
-      expect(resolved.useCliAuth).toBe(true);
-    });
-
-    it('falls back to OTEL_EXPORTER_OTLP_ENDPOINT when GEMINI var is missing', async () => {
-      const settings = {};
-      const env = {
-        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://otel:4317',
-      } as Record<string, string>;
-      const resolved = await resolveTelemetrySettings({ env, settings });
-      expect(resolved.otlpEndpoint).toBe('http://otel:4317');
-    });
-
-    it('throws on unknown protocol values', async () => {
-      const env = { GEMINI_TELEMETRY_OTLP_PROTOCOL: 'unknown' } as Record<
-        string,
-        string
-      >;
-      await expect(resolveTelemetrySettings({ env })).rejects.toThrow(
-        /Invalid telemetry OTLP protocol/i,
-      );
-    });
-
-    it('throws on unknown target values', async () => {
-      const env = { GEMINI_TELEMETRY_TARGET: 'unknown' } as Record<
-        string,
-        string
-      >;
-      await expect(resolveTelemetrySettings({ env })).rejects.toThrow(
-        /Invalid telemetry target/i,
-      );
+    it('returns undefined fields when nothing is provided', async () => {
+      const resolved = await resolveTelemetrySettings({});
+      expect(resolved).toEqual({
+        enabled: undefined,
+        traces: undefined,
+        logPrompts: undefined,
+        outfile: undefined,
+      });
     });
   });
 });

@@ -462,8 +462,6 @@ export class TestRig {
         },
         telemetry: {
           enabled: true,
-          target: 'local',
-          otlpEndpoint: '',
           outfile: telemetryPath,
         },
         security: {
