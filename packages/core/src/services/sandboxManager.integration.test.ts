@@ -34,7 +34,6 @@ import http from 'node:http';
  */
 const Platform = {
   isWindows: os.platform() === 'win32',
-  isMac: os.platform() === 'darwin',
 
   /** Returns a command to create an empty file. */
   touch(filePath: string) {
@@ -152,13 +151,10 @@ describe('SandboxManager Integration', () => {
 
   /**
    * Creates a temporary directory and tracks it for automatic cleanup after each test.
-   * - macOS: Created in process.cwd() to avoid the seatbelt profile's global os.tmpdir() whitelist.
    * - Win/Linux: Created in os.tmpdir() because enforcing sandbox restrictions inside a large directory can be very slow.
    */
   function createTempDir(prefix = 'sparkle-sandbox-test-'): string {
-    const baseDir = Platform.isMac
-      ? path.join(process.cwd(), `.${prefix}`)
-      : path.join(os.tmpdir(), prefix);
+    const baseDir = path.join(os.tmpdir(), prefix);
 
     const dir = fs.mkdtempSync(baseDir);
     tempDirectories.push(dir);

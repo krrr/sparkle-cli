@@ -134,7 +134,6 @@ describe('<Footer />', () => {
     const root = path.parse(process.cwd()).root;
     vi.stubEnv('SPARKLE_CLI_HOME', path.join(root, 'Users', 'test'));
     vi.stubEnv('SANDBOX', '');
-    vi.stubEnv('SEATBELT_PROFILE', '');
   });
 
   afterEach(() => {
@@ -295,19 +294,6 @@ describe('<Footer />', () => {
           isTrustedFolder: undefined,
           sessionStats: mockSessionStats,
         },
-      });
-      expect(lastFrame()).toContain('current process');
-      vi.unstubAllEnvs();
-      unmount();
-    });
-
-    it('should display "current process" for macOS Seatbelt when SANDBOX is sandbox-exec', async () => {
-      vi.stubEnv('SANDBOX', 'sandbox-exec');
-      vi.stubEnv('SEATBELT_PROFILE', 'test-profile');
-      const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
-        config: mockConfig,
-        width: 120,
-        uiState: { isTrustedFolder: true, sessionStats: mockSessionStats },
       });
       expect(lastFrame()).toContain('current process');
       vi.unstubAllEnvs();

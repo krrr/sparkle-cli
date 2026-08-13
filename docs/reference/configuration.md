@@ -81,7 +81,7 @@ contain other project-specific files related to Sparkle CLI's operation, such
 as:
 
 - [Custom sandbox profiles](#sandboxing) (for example,
-  `.sparkle/sandbox-macos-custom.sb`, `.sparkle/sandbox.Dockerfile`).
+  `.sparkle/sandbox.Dockerfile`).
 
 ### Available settings in `settings.json`
 
@@ -2153,19 +2153,6 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - `true`/`1`: Write to `./.sparkle/system.md`. Otherwise treat the value as a
     path.
   - Run the CLI once with this set to generate the file.
-- **`SEATBELT_PROFILE`** (macOS specific):
-  - Switches the Seatbelt (`sandbox-exec`) profile on macOS.
-  - `permissive-open`: (Default) Denies operations by default, confining writes
-    to the project folder (and a few other folders, see
-    `packages/cli/src/utils/sandbox-macos-permissive-open.sb`) while allowing
-    broad file reads and network access.
-  - `restrictive-open`: Declines operations by default, allows network.
-  - `strict-open`: Restricts both reads and writes to the working directory,
-    allows network.
-  - `strict-proxied`: Same as `strict-open` but routes network through proxy.
-  - `<profile_name>`: Uses a custom profile. To define a custom profile, create
-    a file named `sandbox-macos-<profile_name>.sb` in your project's `.sparkle/`
-    directory (for example, `my-project/.sparkle/sandbox-macos-custom.sb`).
 - **`DEBUG` or `DEBUG_MODE`** (often used by underlying libraries or the CLI
   itself):
   - Set to `true` or `1` to enable verbose debug logging, which can be helpful

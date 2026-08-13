@@ -304,7 +304,6 @@ function normalizePromptPath(filePath: string): string {
 // --- Internal Context Helpers ---
 
 function getSandboxMode(): snippets.SandboxMode {
-  if (process.env['SANDBOX'] === 'sandbox-exec') return 'macos-seatbelt';
   if (process.env['SANDBOX']) return 'generic';
   return 'outside';
 }

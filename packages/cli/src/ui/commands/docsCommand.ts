@@ -21,7 +21,7 @@ export const docsCommand: SlashCommand = {
   action: async (context: CommandContext): Promise<void> => {
     const docsUrl = 'https://goo.gle/sparkle-cli-docs';
 
-    if (process.env['SANDBOX'] && process.env['SANDBOX'] !== 'sandbox-exec') {
+    if (process.env['SANDBOX']) {
       context.ui.addItem(
         {
           type: MessageType.INFO,

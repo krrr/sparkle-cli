@@ -477,13 +477,7 @@ export interface SandboxConfig {
   allowedPaths?: string[];
   includeDirectories?: string[];
   networkAccess?: boolean;
-  command?:
-    | 'docker'
-    | 'podman'
-    | 'sandbox-exec'
-    | 'runsc'
-    | 'lxc'
-    | 'windows-native';
+  command?: 'docker' | 'podman' | 'runsc' | 'lxc' | 'windows-native';
   image?: string;
 }
 
@@ -495,14 +489,7 @@ export const ConfigSchema = z.object({
       includeDirectories: z.array(z.string()).default([]),
       networkAccess: z.boolean().default(false),
       command: z
-        .enum([
-          'docker',
-          'podman',
-          'sandbox-exec',
-          'runsc',
-          'lxc',
-          'windows-native',
-        ])
+        .enum(['docker', 'podman', 'runsc', 'lxc', 'windows-native'])
         .optional(),
       image: z.string().optional(),
     })
@@ -1789,18 +1776,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getSandboxNetworkAccess(): boolean {
     return this.sandbox?.networkAccess ?? false;
-  }
-
-  isRestrictiveSandbox(): boolean {
-    const sandboxConfig = this.getSandbox();
-    const seatbeltProfile = process.env['SEATBELT_PROFILE'];
-    return (
-      !!sandboxConfig &&
-      sandboxConfig.command === 'sandbox-exec' &&
-      !!seatbeltProfile &&
-      (seatbeltProfile.startsWith('restrictive-') ||
-        seatbeltProfile.startsWith('strict-'))
-    );
   }
 
   getTargetDir(): string {

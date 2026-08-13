@@ -159,7 +159,7 @@ prepares the packages for execution. Refer to `scripts/build.js` and
 
 [Sandboxing](#sandboxing) is highly recommended and requires, at a minimum,
 setting `SPARKLE_SANDBOX=true` in your `~/.env` and ensuring a sandboxing
-provider (e.g. `macOS Seatbelt`, `docker`, or `podman`) is available. See
+provider (for example, `docker` or `podman`) is available. See
 [Sandboxing](#sandboxing) for details.
 
 To build both the `sparkle` CLI utility and the sandbox container, run
@@ -335,23 +335,6 @@ To debug the CLI's React-based UI, you can use React DevTools.
 
 ### Sandboxing
 
-#### macOS Seatbelt
-
-On macOS, `sparkle` uses Seatbelt (`sandbox-exec`) under a `permissive-open`
-profile (see `packages/cli/src/utils/sandbox-macos-permissive-open.sb`) that
-denies operations by default, confining writes to the project folder while
-allowing broad file reads and outbound network traffic ("open") by default. You
-can switch to a `strict-open` profile (see
-`packages/cli/src/utils/sandbox-macos-strict-open.sb`) that restricts both reads
-and writes to the working directory while allowing outbound network traffic by
-setting `SEATBELT_PROFILE=strict-open` in your environment or `.env` file.
-Available built-in profiles are `permissive-{open,proxied}`,
-`restrictive-{open,proxied}`, and `strict-{open,proxied}` (see below for proxied
-networking). You can also switch to a custom profile
-`SEATBELT_PROFILE=<profile>` if you also create a file
-`.sparkle/sandbox-macos-<profile>.sb` under your project settings directory
-`.sparkle`.
-
 #### Container-based sandboxing (all platforms)
 
 For stronger container-based sandboxing on macOS or other platforms, you can set
@@ -377,14 +360,14 @@ sandbox.
 
 #### Proxied networking
 
-All sandboxing methods, including macOS Seatbelt using `*-proxied` profiles,
-support restricting outbound network traffic through a custom proxy server that
-can be specified as `SPARKLE_SANDBOX_PROXY_COMMAND=<command>`, where `<command>`
-must start a proxy server that listens on `:::8877` for relevant requests. See
+Container sandboxing supports restricting outbound network traffic through a
+custom proxy server that can be specified as
+`SPARKLE_SANDBOX_PROXY_COMMAND=<command>`, where `<command>` must start a proxy
+server that listens on `:::8877` for relevant requests. See
 `docs/examples/proxy-script.md` for a minimal proxy that only allows `HTTPS`
-connections to `example.com:443` (e.g. `curl https://example.com`) and declines
-all other requests. The proxy is started and stopped automatically alongside the
-sandbox.
+connections to `example.com:443` (for example, `curl https://example.com`) and
+declines all other requests. The proxy is started and stopped automatically
+alongside the sandbox.
 
 ### Manual publish
 
@@ -472,18 +455,3 @@ Before submitting your documentation pull request, please:
 2. Review your changes for clarity and accuracy.
 3. Check that all links work correctly.
 4. Ensure any code examples are tested and functional.
-5. Sign the
-   [Contributor License Agreement (CLA)](https://cla.developers.google.com/) if
-   you haven't already.
-
-### Need help?
-
-If you have questions about contributing documentation:
-
-- Check our [FAQ](https://geminicli.com/docs/resources/faq).
-- Review existing documentation for examples.
-- Open [an issue](https://github.com/krrr/sparkle-cli/issues) to discuss your
-  proposed changes.
-- Reach out to the maintainers.
-
-We appreciate your contributions to making Sparkle CLI documentation better!

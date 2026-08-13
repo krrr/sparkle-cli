@@ -73,8 +73,7 @@ sparkle -p "run the test suite"
 Enable sandboxing using one of the following methods (in order of precedence):
 
 1. **Command flag**: `-s` or `--sandbox`
-2. **Environment variable**:
-   `SPARKLE_SANDBOX=true|docker|podman|sandbox-exec|runsc|lxc`
+2. **Environment variable**: `SPARKLE_SANDBOX=true|docker|podman|runsc|lxc`
 3. **Settings file**: `"sandbox": true` in the `tools` object of your
    `settings.json` file (for example, `{"tools": {"sandbox": true}}`).
 
@@ -83,24 +82,7 @@ Enable sandboxing using one of the following methods (in order of precedence):
 Your ideal method of sandboxing may differ depending on your platform and your
 preferred container solution.
 
-### 1. macOS Seatbelt (macOS only)
-
-Lightweight, built-in sandboxing using `sandbox-exec`.
-
-**Default profile**: `permissive-open` - denies operations by default; confines
-writes to the project directory while allowing broad file reads and network
-access.
-
-Built-in profiles (set via `SEATBELT_PROFILE` env var):
-
-- `permissive-open` (default): Write restrictions, network allowed
-- `permissive-proxied`: Write restrictions, network via proxy
-- `restrictive-open`: Strict restrictions, network allowed
-- `restrictive-proxied`: Strict restrictions, network via proxy
-- `strict-open`: Read and write restrictions, network allowed
-- `strict-proxied`: Read and write restrictions, network via proxy
-
-### 2. Container-based (Docker/Podman)
+### 1. Container-based (Docker/Podman)
 
 Cross-platform sandboxing with complete process isolation using container
 technology. By default, it uses the `ghcr.io/google/sparkle-cli:latest` image.
@@ -178,7 +160,7 @@ and Sparkle CLI will build the image automatically.
 BUILD_SANDBOX=1 SPARKLE_SANDBOX=docker sparkle -p "run my custom build"
 ```
 
-### 3. Windows Native Sandbox (Windows only)
+### 2. Windows Native Sandbox (Windows only)
 
 ... **Troubleshooting and Side Effects:**
 
@@ -196,7 +178,7 @@ Level" on files and directories it needs to write to.
 - **System Folders**: The sandbox manager automatically skips setting integrity
   levels on system folders (like `C:\Windows`) for safety.
 
-### 4. gVisor / runsc (Linux only)
+### 3. gVisor / runsc (Linux only)
 
 Strongest isolation available: runs containers inside a user-space kernel via
 [gVisor](https://github.com/google/gvisor). gVisor intercepts all container
@@ -220,7 +202,7 @@ To set up runsc:
 2.  Configure the Docker daemon to use the runsc runtime.
 3.  Verify the installation.
 
-### 5. LXC/LXD (Linux only, experimental)
+### 4. LXC/LXD (Linux only, experimental)
 
 Full-system container sandboxing using LXC/LXD. Unlike Docker/Podman, LXC
 containers run a complete Linux system with `systemd`, `snapd`, and other system

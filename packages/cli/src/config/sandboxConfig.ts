@@ -26,7 +26,6 @@ interface SandboxCliArgs {
 const VALID_SANDBOX_COMMANDS = [
   'docker',
   'podman',
-  'sandbox-exec',
   'runsc',
   'lxc',
   'windows-native',
@@ -98,12 +97,10 @@ function getSandboxCommand(
     return sandbox;
   }
 
-  // look for seatbelt, docker, or podman, in that order
+  // look for docker or podman, in that order
   // for container-based sandboxing, require sandbox to be enabled explicitly
   // note: runsc is NOT auto-detected, it must be explicitly specified
-  if (os.platform() === 'darwin' && commandExists.sync('sandbox-exec')) {
-    return 'sandbox-exec';
-  } else if (commandExists.sync('docker') && sandbox === true) {
+  if (commandExists.sync('docker') && sandbox === true) {
     return 'docker';
   } else if (commandExists.sync('podman') && sandbox === true) {
     return 'podman';
@@ -157,10 +154,7 @@ export async function loadSandboxConfig(
     customImage ??
     packageJson?.config?.sandboxImageUri;
 
-  const isNative =
-    command === 'windows-native' ||
-    command === 'sandbox-exec' ||
-    command === 'lxc';
+  const isNative = command === 'windows-native' || command === 'lxc';
 
   return command && (image || isNative)
     ? { enabled: true, allowedPaths, networkAccess, command, image }

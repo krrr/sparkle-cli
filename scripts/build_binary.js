@@ -200,16 +200,6 @@ function addAssetsFromDir(baseDir, runtimePrefix) {
   }
 }
 
-// Add sb files
-const sbFiles = globSync('sandbox-macos-*.sb', { cwd: bundleDir });
-for (const sbFile of sbFiles) {
-  const fsPath = join(bundleDir, sbFile);
-  const content = readFileSync(fsPath);
-  const hash = sha256(content);
-  assets[sbFile] = fsPath;
-  manifest.files.push({ key: sbFile, path: sbFile, hash: hash });
-}
-
 // Add policy files
 const policyDir = join(bundleDir, 'policies');
 if (existsSync(policyDir)) {
@@ -318,7 +308,7 @@ if (platform === 'darwin') {
 // Remove existing signature using helper
 removeSignature(targetBinaryPath);
 
-// Copy standard bundle assets (policies, .sb files)
+// Copy standard bundle assets (policies)
 console.log('Copying additional resources...');
 if (existsSync(bundleDir)) {
   cpSync(bundleDir, targetDir, { recursive: true });
@@ -343,12 +333,6 @@ filesToRemove.forEach((f) => {
 // Remove all chunk and entry .js/.js.map files
 const jsFilesToRemove = globSync('*.{js,js.map}', { cwd: targetDir });
 for (const f of jsFilesToRemove) {
-  rmSync(join(targetDir, f));
-}
-
-// Remove .sb files from targetDir
-const sbFilesToRemove = globSync('sandbox-macos-*.sb', { cwd: targetDir });
-for (const f of sbFilesToRemove) {
   rmSync(join(targetDir, f));
 }
 

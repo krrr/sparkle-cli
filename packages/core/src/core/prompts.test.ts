@@ -333,13 +333,8 @@ describe('Core System Prompt (prompts.ts)', () => {
   });
 
   it.each([
-    ['true', '# Sandbox', ['# macOS Seatbelt', '# Outside of Sandbox']],
-    ['sandbox-exec', '# macOS Seatbelt', ['# Sandbox', '# Outside of Sandbox']],
-    [
-      undefined,
-      'You are Sparkle CLI, an interactive CLI agent',
-      ['# Sandbox', '# macOS Seatbelt'],
-    ],
+    ['true', '# Sandbox', ['# Outside of Sandbox']],
+    [undefined, 'You are Sparkle CLI, an interactive CLI agent', ['# Sandbox']],
   ])(
     'should include correct sandbox instructions for SANDBOX=%s',
     (sandboxValue, expectedContains, expectedNotContains) => {

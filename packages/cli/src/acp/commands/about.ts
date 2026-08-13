@@ -22,12 +22,8 @@ export class AboutCommand implements Command {
   ): Promise<CommandExecutionResponse> {
     const osVersion = process.platform;
     let sandboxEnv = 'no sandbox';
-    if (process.env['SANDBOX'] && process.env['SANDBOX'] !== 'sandbox-exec') {
+    if (process.env['SANDBOX']) {
       sandboxEnv = process.env['SANDBOX'];
-    } else if (process.env['SANDBOX'] === 'sandbox-exec') {
-      sandboxEnv = `sandbox-exec (${
-        process.env['SEATBELT_PROFILE'] || 'unknown'
-      })`;
     }
     const modelVersion = context.agentContext.config.getModel() || 'Unknown';
     const cliVersion = await getVersion();

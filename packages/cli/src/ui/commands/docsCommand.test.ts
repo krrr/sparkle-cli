@@ -72,28 +72,4 @@ describe('docsCommand', () => {
     // Ensure 'open' was not called in the sandbox
     expect(open).not.toHaveBeenCalled();
   });
-
-  it("should not open browser for 'sandbox-exec'", async () => {
-    if (!docsCommand.action) {
-      throw new Error('docsCommand must have an action.');
-    }
-
-    // Simulate the specific 'sandbox-exec' environment
-    vi.stubEnv('SANDBOX', 'sandbox-exec');
-    const docsUrl = 'https://goo.gle/sparkle-cli-docs';
-
-    await docsCommand.action(mockContext, '');
-
-    // The logic should fall through to the 'else' block
-    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
-      {
-        type: MessageType.INFO,
-        text: `Opening documentation in your browser: ${docsUrl}`,
-      },
-      expect.any(Number),
-    );
-
-    // 'open' should be called in this specific sandbox case
-    expect(open).toHaveBeenCalledWith(docsUrl);
-  });
 });

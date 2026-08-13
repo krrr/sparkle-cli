@@ -153,15 +153,6 @@ export const directoryCommand: SlashCommand = {
           return;
         }
 
-        if (agentContext.config.isRestrictiveSandbox()) {
-          return {
-            type: 'message' as const,
-            messageType: 'error' as const,
-            content:
-              'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.',
-          };
-        }
-
         const pathsToAdd = rest
           .join(' ')
           .split(',')

@@ -1520,22 +1520,6 @@ describe('AgentRegistry', () => {
       expect(registry.getDefinition('browser_agent')).toBeDefined();
     });
 
-    it('should register browser agent normally in seatbelt sandbox', async () => {
-      vi.stubEnv('SANDBOX', 'sandbox-exec');
-
-      const config = makeMockedConfig({
-        agents: {
-          overrides: {
-            browser_agent: { enabled: true },
-          },
-        },
-      });
-      const registry = new TestableAgentRegistry(config);
-      await registry.initialize();
-
-      expect(registry.getDefinition('browser_agent')).toBeDefined();
-    });
-
     it('should register browser agent normally when not in sandbox', async () => {
       vi.stubEnv('SANDBOX', '');
 

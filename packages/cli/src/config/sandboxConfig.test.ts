@@ -103,7 +103,7 @@ describe('loadSandboxConfig', () => {
     it('should throw if SPARKLE_SANDBOX is an invalid command', async () => {
       process.env['SPARKLE_SANDBOX'] = 'invalid-command';
       await expect(loadSandboxConfig({}, {})).rejects.toThrow(
-        "Invalid sandbox command 'invalid-command'. Must be one of docker, podman, sandbox-exec, runsc, lxc",
+        "Invalid sandbox command 'invalid-command'. Must be one of docker, podman, runsc, lxc",
       );
     });
 
@@ -139,34 +139,6 @@ describe('loadSandboxConfig', () => {
   });
 
   describe('with sandbox: true', () => {
-    it('should use sandbox-exec on darwin if available', async () => {
-      mockedOsPlatform.mockReturnValue('darwin');
-      mockedCommandExistsSync.mockImplementation(
-        (cmd) => cmd === 'sandbox-exec',
-      );
-      const config = await loadSandboxConfig({}, { sandbox: true });
-      expect(config).toEqual({
-        enabled: true,
-        allowedPaths: [],
-        networkAccess: true,
-        command: 'sandbox-exec',
-        image: 'default/image',
-      });
-    });
-
-    it('should prefer sandbox-exec over docker on darwin', async () => {
-      mockedOsPlatform.mockReturnValue('darwin');
-      mockedCommandExistsSync.mockReturnValue(true); // all commands exist
-      const config = await loadSandboxConfig({}, { sandbox: true });
-      expect(config).toEqual({
-        enabled: true,
-        allowedPaths: [],
-        networkAccess: true,
-        command: 'sandbox-exec',
-        image: 'default/image',
-      });
-    });
-
     it('should use docker if available and sandbox is true', async () => {
       mockedOsPlatform.mockReturnValue('linux');
       mockedCommandExistsSync.mockImplementation((cmd) => cmd === 'docker');
@@ -230,7 +202,7 @@ describe('loadSandboxConfig', () => {
       await expect(
         loadSandboxConfig({}, { sandbox: 'invalid-command' }),
       ).rejects.toThrow(
-        "Invalid sandbox command 'invalid-command'. Must be one of docker, podman, sandbox-exec, runsc, lxc",
+        "Invalid sandbox command 'invalid-command'. Must be one of docker, podman, runsc, lxc",
       );
     });
   });

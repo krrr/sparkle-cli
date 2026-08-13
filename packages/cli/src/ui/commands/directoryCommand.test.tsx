@@ -71,7 +71,6 @@ describe('directoryCommand', () => {
 
     mockConfig = {
       getWorkspaceContext: () => mockWorkspaceContext,
-      isRestrictiveSandbox: vi.fn().mockReturnValue(false),
       getGeminiClient: vi.fn().mockReturnValue({
         addDirectoryContext: vi.fn(),
         getChatRecordingService: vi.fn().mockReturnValue({
@@ -129,18 +128,6 @@ describe('directoryCommand', () => {
   });
 
   describe('add', () => {
-    it('should show an error in a restrictive sandbox', async () => {
-      if (!addCommand?.action) throw new Error('No action');
-      vi.mocked(mockConfig.isRestrictiveSandbox).mockReturnValue(true);
-      const result = await addCommand.action(mockContext, '/some/path');
-      expect(result).toEqual({
-        type: 'message',
-        messageType: 'error',
-        content:
-          'The /directory add command is not supported in restrictive sandbox profiles. Please use --include-directories when starting the session instead.',
-      });
-    });
-
     it('should show an error if no path is provided', () => {
       if (!addCommand?.action) throw new Error('No action');
       // eslint-disable-next-line @typescript-eslint/no-floating-promises

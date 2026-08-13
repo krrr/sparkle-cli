@@ -111,22 +111,6 @@ describe('aboutCommand', () => {
     );
   });
 
-  it('should show sandbox-exec profile when applicable', async () => {
-    process.env['SANDBOX'] = 'sandbox-exec';
-    process.env['SEATBELT_PROFILE'] = 'test-profile';
-    if (!aboutCommand.action) {
-      throw new Error('The about command must have an action.');
-    }
-
-    await aboutCommand.action(mockContext, '');
-
-    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
-      expect.objectContaining({
-        sandboxEnv: 'sandbox-exec (test-profile)',
-      }),
-    );
-  });
-
   it('should not show ide client when it is not detected', async () => {
     vi.mocked(IdeClient.getInstance).mockResolvedValue({
       getDetectedIdeDisplayName: vi.fn().mockReturnValue(undefined),

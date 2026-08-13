@@ -295,9 +295,7 @@ export class AgentRegistry {
       // sessionMode "existing" (connecting to a host Chrome instance).
       const sandboxType = process.env['SANDBOX'];
       const isContainerSandbox =
-        !!sandboxType &&
-        sandboxType !== 'sandbox-exec' &&
-        sandboxType !== 'sandbox:none';
+        !!sandboxType && sandboxType !== 'sandbox:none';
       const sessionMode =
         browserConfig.customConfig.sessionMode ?? 'persistent';
 

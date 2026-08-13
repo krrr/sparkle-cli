@@ -15,7 +15,6 @@ import {
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
-import { fileURLToPath } from 'node:url';
 import { quote, parse } from 'shell-quote';
 import { promisify } from 'node:util';
 import type { Config, SandboxConfig } from 'sparkle-cli-core';
@@ -37,7 +36,6 @@ import {
   LOCAL_DEV_SANDBOX_IMAGE_NAME,
   SANDBOX_NETWORK_NAME,
   SANDBOX_PROXY_NAME,
-  BUILTIN_SEATBELT_PROFILES,
 } from './sandboxUtils.js';
 
 const execAsync = promisify(exec);
@@ -58,186 +56,6 @@ export async function start_sandbox(
   let stopProxy: (() => void) | undefined = undefined;
 
   try {
-    if (config.command === 'sandbox-exec') {
-      // disallow BUILD_SANDBOX
-      if (process.env['BUILD_SANDBOX']) {
-        throw new FatalSandboxError(
-          'Cannot BUILD_SANDBOX when using macOS Seatbelt',
-        );
-      }
-
-      const profile = (process.env['SEATBELT_PROFILE'] ??= 'permissive-open');
-      let profileFile = fileURLToPath(
-        new URL(`sandbox-macos-${profile}.sb`, import.meta.url),
-      );
-      // if profile name is not recognized, look in user-level ~/.sparkle first,
-      // then fall back to project-level .sparkle. path.basename() strips any
-      // directory separators to prevent path traversal via SEATBELT_PROFILE.
-      if (!BUILTIN_SEATBELT_PROFILES.includes(profile)) {
-        const safeProfile = path.basename(profile);
-        const fileName = `sandbox-macos-${safeProfile}.sb`;
-        const userProfileFile = path.join(homedir(), SPARKLE_DIR, fileName);
-        const projectProfileFile = path.join(SPARKLE_DIR, fileName);
-        profileFile = fs.existsSync(userProfileFile)
-          ? userProfileFile
-          : projectProfileFile;
-      }
-      if (!fs.existsSync(profileFile)) {
-        throw new FatalSandboxError(
-          `Missing macos seatbelt profile file '${profileFile}'`,
-        );
-      }
-      debugLogger.log(`using macos seatbelt (profile: ${profile}) ...`);
-      // if DEBUG is set, convert to --inspect-brk in NODE_OPTIONS
-      const nodeOptions = [
-        ...(process.env['DEBUG'] ? ['--inspect-brk'] : []),
-        ...nodeArgs,
-      ].join(' ');
-
-      const args = [
-        '-D',
-        `TARGET_DIR=${fs.realpathSync(process.cwd())}`,
-        '-D',
-        `TMP_DIR=${fs.realpathSync(os.tmpdir())}`,
-        '-D',
-        `HOME_DIR=${fs.realpathSync(homedir())}`,
-        '-D',
-        `CACHE_DIR=${fs.realpathSync((await execAsync('getconf DARWIN_USER_CACHE_DIR')).stdout.trim())}`,
-      ];
-
-      // Add included directories from the workspace context
-      // Always add 5 INCLUDE_DIR parameters to ensure .sb files can reference them
-      const MAX_INCLUDE_DIRS = 5;
-      const targetDir = fs.realpathSync(cliConfig?.getTargetDir() || '');
-      const includedDirs: string[] = [];
-
-      if (cliConfig) {
-        const workspaceContext = cliConfig.getWorkspaceContext();
-        const directories = workspaceContext.getDirectories();
-
-        // Filter out TARGET_DIR
-        for (const dir of directories) {
-          const realDir = fs.realpathSync(dir);
-          if (realDir !== targetDir) {
-            includedDirs.push(realDir);
-          }
-        }
-      }
-
-      // Add custom allowed paths from config
-      if (config.allowedPaths) {
-        for (const hostPath of config.allowedPaths) {
-          if (
-            hostPath &&
-            path.isAbsolute(hostPath) &&
-            fs.existsSync(hostPath)
-          ) {
-            const realDir = fs.realpathSync(hostPath);
-            if (!includedDirs.includes(realDir) && realDir !== targetDir) {
-              includedDirs.push(realDir);
-            }
-          }
-        }
-      }
-
-      for (let i = 0; i < MAX_INCLUDE_DIRS; i++) {
-        let dirPath = '/dev/null'; // Default to a safe path that won't cause issues
-
-        if (i < includedDirs.length) {
-          dirPath = includedDirs[i];
-        }
-
-        args.push('-D', `INCLUDE_DIR_${i}=${dirPath}`);
-      }
-
-      const finalArgv = cliArgs;
-
-      args.push(
-        '-f',
-        profileFile,
-        'sh',
-        '-c',
-        [
-          `SANDBOX=sandbox-exec`,
-          `NODE_OPTIONS="${nodeOptions}"`,
-          ...finalArgv.map((arg) => quote([arg])),
-        ].join(' '),
-      );
-      // start and set up proxy if SPARKLE_SANDBOX_PROXY_COMMAND is set
-      const proxyCommand = process.env['SPARKLE_SANDBOX_PROXY_COMMAND'];
-      let proxyProcess: ChildProcess | undefined = undefined;
-      let sandboxProcess: ChildProcess | undefined = undefined;
-      const sandboxEnv = { ...process.env };
-      if (proxyCommand) {
-        const proxy =
-          process.env['HTTPS_PROXY'] ||
-          process.env['https_proxy'] ||
-          process.env['HTTP_PROXY'] ||
-          process.env['http_proxy'] ||
-          'http://localhost:8877';
-        sandboxEnv['HTTPS_PROXY'] = proxy;
-        sandboxEnv['https_proxy'] = proxy; // lower-case can be required, e.g. for curl
-        sandboxEnv['HTTP_PROXY'] = proxy;
-        sandboxEnv['http_proxy'] = proxy;
-        const noProxy = process.env['NO_PROXY'] || process.env['no_proxy'];
-        if (noProxy) {
-          sandboxEnv['NO_PROXY'] = noProxy;
-          sandboxEnv['no_proxy'] = noProxy;
-        }
-        proxyProcess = spawn(proxyCommand, {
-          stdio: ['ignore', 'pipe', 'pipe'],
-          shell: true,
-          detached: true,
-        });
-        // install handlers to stop proxy on exit/signal
-        stopProxy = () => {
-          debugLogger.log('stopping proxy ...');
-          if (proxyProcess?.pid) {
-            try {
-              process.kill(-proxyProcess.pid, 'SIGTERM');
-            } catch {
-              // ignore
-            }
-          }
-        };
-        process.on('exit', stopProxy);
-        process.on('SIGINT', stopProxy);
-        process.on('SIGTERM', stopProxy);
-
-        // commented out as it disrupts ink rendering
-        // proxyProcess.stdout?.on('data', (data) => {
-        //   console.info(data.toString());
-        // });
-        proxyProcess.stderr?.on('data', (data) => {
-          debugLogger.debug(`[PROXY STDERR]: ${data.toString().trim()}`);
-        });
-        proxyProcess.on('close', (code, signal) => {
-          if (sandboxProcess?.pid) {
-            process.kill(-sandboxProcess.pid, 'SIGTERM');
-          }
-          throw new FatalSandboxError(
-            `Proxy command '${proxyCommand}' exited with code ${code}, signal ${signal}`,
-          );
-        });
-        debugLogger.log('waiting for proxy to start ...');
-        await execAsync(
-          `until timeout 0.25 curl -s http://localhost:8877; do sleep 0.25; done`,
-        );
-      }
-      // spawn child and let it inherit stdio
-      process.stdin.pause();
-      sandboxProcess = spawn(config.command, args, {
-        stdio: 'inherit',
-      });
-      return await new Promise((resolve, reject) => {
-        sandboxProcess?.on('error', reject);
-        sandboxProcess?.on('close', (code) => {
-          process.stdin.resume();
-          resolve(code ?? 1);
-        });
-      });
-    }
-
     if (config.command === 'lxc') {
       return await start_lxc_sandbox(config, nodeArgs, cliArgs);
     }

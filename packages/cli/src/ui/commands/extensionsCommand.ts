@@ -306,10 +306,7 @@ async function exploreAction(
       type: MessageType.INFO,
       text: `Would open extensions page in your browser: ${extensionsUrl} (skipped in test environment)`,
     });
-  } else if (
-    process.env['SANDBOX'] &&
-    process.env['SANDBOX'] !== 'sandbox-exec'
-  ) {
+  } else if (process.env['SANDBOX']) {
     context.ui.addItem({
       type: MessageType.INFO,
       text: `View available extensions at ${extensionsUrl}`,

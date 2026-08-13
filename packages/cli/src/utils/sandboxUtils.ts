@@ -13,14 +13,6 @@ import { debugLogger, SPARKLE_DIR } from 'sparkle-cli-core';
 export const LOCAL_DEV_SANDBOX_IMAGE_NAME = 'sparkle-cli-sandbox';
 export const SANDBOX_NETWORK_NAME = 'sparkle-cli-sandbox';
 export const SANDBOX_PROXY_NAME = 'sparkle-cli-sandbox-proxy';
-export const BUILTIN_SEATBELT_PROFILES = [
-  'permissive-open',
-  'permissive-proxied',
-  'restrictive-open',
-  'restrictive-proxied',
-  'strict-open',
-  'strict-proxied',
-];
 
 export function getContainerPath(hostPath: string): string {
   if (os.platform() !== 'win32') {

@@ -211,9 +211,6 @@ directly through their in-built registry features.
 
 If you are using Sparkle CLI within a sandbox, be aware of the following:
 
-- **On macOS:** The IDE integration requires network access to communicate with
-  the IDE companion extension. You must use a Seatbelt profile that allows
-  network access.
 - **In a Docker container:** If you run Sparkle CLI inside a Docker (or Podman)
   container, the IDE integration can still connect to the VS Code extension
   running on your host machine. The CLI is configured to automatically find the

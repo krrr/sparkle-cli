@@ -17,7 +17,6 @@ import {
 } from './sandboxManager.js';
 import { createSandboxManager } from './sandboxManagerFactory.js';
 import { LinuxSandboxManager } from '../sandbox/linux/LinuxSandboxManager.js';
-import { MacOsSandboxManager } from '../sandbox/macos/MacOsSandboxManager.js';
 import { WindowsSandboxManager } from '../sandbox/windows/WindowsSandboxManager.js';
 import type fs from 'node:fs';
 
@@ -350,7 +349,7 @@ describe('SandboxManager', () => {
     });
 
     it('should delegate isKnownSafeCommand to platform specific checkers', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('darwin');
+      vi.spyOn(os, 'platform').mockReturnValue('linux');
       expect(sandboxManager.isKnownSafeCommand(['ls'])).toBe(true);
       expect(sandboxManager.isKnownSafeCommand(['dir'])).toBe(false);
 
@@ -359,7 +358,7 @@ describe('SandboxManager', () => {
     });
 
     it('should delegate isDangerousCommand to platform specific checkers', () => {
-      vi.spyOn(os, 'platform').mockReturnValue('darwin');
+      vi.spyOn(os, 'platform').mockReturnValue('linux');
       expect(sandboxManager.isDangerousCommand(['rm', '-rf', '.'])).toBe(true);
       expect(sandboxManager.isDangerousCommand(['del'])).toBe(false);
 
@@ -379,7 +378,6 @@ describe('SandboxManager', () => {
 
     it.each([
       { platform: 'linux', expected: LinuxSandboxManager },
-      { platform: 'darwin', expected: MacOsSandboxManager },
       { platform: 'win32', expected: WindowsSandboxManager },
     ] as const)(
       'should return $expected.name if sandboxing is enabled and platform is $platform',

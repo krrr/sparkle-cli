@@ -112,15 +112,7 @@ if (['1', 'true'].includes(geminiSandbox)) {
     process.exit(1);
   }
 } else {
-  if (os.platform() === 'darwin' && process.env.SEATBELT_PROFILE !== 'none') {
-    if (commandExists('sandbox-exec')) {
-      command = 'sandbox-exec';
-    } else {
-      process.exit(1);
-    }
-  } else {
-    process.exit(1);
-  }
+  process.exit(1);
 }
 
 if (!argv.q) {

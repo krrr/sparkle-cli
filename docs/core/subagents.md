@@ -255,13 +255,6 @@ the `click_at` tool for precise, coordinate-based interactions.
 The browser agent adjusts its behavior automatically when running inside a
 sandbox.
 
-##### macOS seatbelt (`sandbox-exec`)
-
-When the CLI runs under the macOS seatbelt sandbox, `persistent` and `isolated`
-session modes are forced to `isolated` with `headless` enabled. This avoids
-permission errors caused by seatbelt file-system restrictions on persistent
-browser profiles. If `sessionMode` is set to `existing`, no override is applied.
-
 ##### Container sandboxes (Docker / Podman)
 
 Chrome is not available inside the container, so the browser agent is

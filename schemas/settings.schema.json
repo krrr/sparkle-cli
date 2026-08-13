@@ -105,8 +105,8 @@
         "enableAutoUpdate": {
           "title": "Enable Auto Update",
           "description": "Enable automatic updates.",
-          "markdownDescription": "Enable automatic updates.\n\n- Category: `General`\n- Requires restart: `no`\n- Default: `true`",
-          "default": true,
+          "markdownDescription": "Enable automatic updates.\n\n- Category: `General`\n- Requires restart: `no`\n- Default: `false`",
+          "default": false,
           "type": "boolean"
         },
         "enableAutoUpdateNotification": {
@@ -3282,8 +3282,8 @@
             },
             "command": {
               "type": "string",
-              "description": "The sandbox command to use (docker, podman, sandbox-exec, runsc, lxc).",
-              "enum": ["docker", "podman", "sandbox-exec", "runsc", "lxc"]
+              "description": "The sandbox command to use (docker, podman, runsc, lxc).",
+              "enum": ["docker", "podman", "runsc", "lxc"]
             },
             "image": {
               "type": "string",

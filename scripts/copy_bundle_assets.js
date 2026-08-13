@@ -31,13 +31,7 @@ if (!existsSync(bundleDir)) {
   mkdirSync(bundleDir);
 }
 
-// 1. Copy Sandbox definitions (.sb)
-const sbFiles = glob.sync('packages/**/*.sb', { cwd: root });
-for (const file of sbFiles) {
-  copyFileSync(join(root, file), join(bundleDir, basename(file)));
-}
-
-// 2. Copy Policy definitions (.toml)
+// 1. Copy Policy definitions (.toml)
 const policyDir = join(bundleDir, 'policies');
 if (!existsSync(policyDir)) {
   mkdirSync(policyDir);
@@ -66,7 +60,7 @@ console.log(
   `Copied ${policyFiles.length} policy files to packages/a2a-server/dist/policies/`,
 );
 
-// 3. Copy Documentation (docs/)
+// 2. Copy Documentation (docs/)
 const docsSrc = join(root, 'docs');
 const docsDest = join(bundleDir, 'docs');
 if (existsSync(docsSrc)) {
@@ -74,7 +68,7 @@ if (existsSync(docsSrc)) {
   console.log('Copied docs to bundle/docs/');
 }
 
-// 4. Copy Built-in Skills (packages/core/src/skills/builtin)
+// 3. Copy Built-in Skills (packages/core/src/skills/builtin)
 const builtinSkillsSrc = join(root, 'packages/core/src/skills/builtin');
 const builtinSkillsDest = join(bundleDir, 'builtin');
 if (existsSync(builtinSkillsSrc)) {
@@ -85,7 +79,7 @@ if (existsSync(builtinSkillsSrc)) {
   console.log('Copied built-in skills to bundle/builtin/');
 }
 
-// 5. Copy bundled chrome-devtools-mcp
+// 4. Copy bundled chrome-devtools-mcp
 const bundleMcpSrc = join(root, 'packages/core/dist/bundled');
 const bundleMcpDest = join(bundleDir, 'bundled');
 if (!existsSync(bundleMcpSrc)) {
@@ -98,7 +92,7 @@ if (!existsSync(bundleMcpSrc)) {
 cpSync(bundleMcpSrc, bundleMcpDest, { recursive: true, dereference: true });
 console.log('Copied bundled chrome-devtools-mcp to bundle/bundled/');
 
-// 6. Copy Extension Examples
+// 5. Copy Extension Examples
 const extensionExamplesSrc = join(
   root,
   'packages/cli/src/commands/extensions/examples',

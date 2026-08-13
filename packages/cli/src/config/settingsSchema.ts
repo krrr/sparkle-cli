@@ -3050,8 +3050,8 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
           command: {
             type: 'string',
             description:
-              'The sandbox command to use (docker, podman, sandbox-exec, runsc, lxc).',
-            enum: ['docker', 'podman', 'sandbox-exec', 'runsc', 'lxc'],
+              'The sandbox command to use (docker, podman, runsc, lxc).',
+            enum: ['docker', 'podman', 'runsc', 'lxc'],
           },
           image: {
             type: 'string',

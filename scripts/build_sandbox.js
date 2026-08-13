@@ -67,13 +67,6 @@ try {
   process.exit(process.env.CI ? 1 : 0);
 }
 
-if (sandboxCommand === 'sandbox-exec') {
-  console.warn(
-    'WARNING: container-based sandboxing is disabled (see README.md#sandboxing)',
-  );
-  process.exit(0);
-}
-
 console.log(`using ${sandboxCommand} for sandboxing`);
 
 const image = argv.i;

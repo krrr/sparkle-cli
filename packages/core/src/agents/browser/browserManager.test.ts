@@ -1302,47 +1302,6 @@ describe('BrowserManager', () => {
       vi.unstubAllEnvs();
     });
 
-    it('should force --isolated and --headless when in seatbelt sandbox with persistent mode', async () => {
-      vi.stubEnv('SANDBOX', 'sandbox-exec');
-      const feedbackSpy = vi
-        .spyOn(coreEvents, 'emitFeedback')
-        .mockImplementation(() => {});
-
-      const manager = new BrowserManager(mockConfig); // default persistent mode
-      await manager.ensureConnection();
-
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
-      expect(args).toContain('--isolated');
-      expect(args).toContain('--headless');
-      expect(args).not.toContain('--userDataDir');
-      expect(args).not.toContain('--autoConnect');
-      expect(feedbackSpy).toHaveBeenCalledWith(
-        'info',
-        expect.stringContaining('isolated browser session'),
-      );
-    });
-
-    it('should preserve --autoConnect when in seatbelt sandbox with existing mode', async () => {
-      vi.stubEnv('SANDBOX', 'sandbox-exec');
-      const existingConfig = makeFakeConfig({
-        agents: {
-          overrides: { browser_agent: { enabled: true } },
-          browser: { sessionMode: 'existing' },
-        },
-      });
-
-      const manager = new BrowserManager(existingConfig);
-      await manager.ensureConnection();
-
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
-      expect(args).toContain('--autoConnect');
-      expect(args).not.toContain('--isolated');
-      // Headless should NOT be forced for existing mode in seatbelt
-      expect(args).not.toContain('--headless');
-    });
-
     it('should use --browser-url with resolved IP for container sandbox with existing mode', async () => {
       vi.stubEnv('SANDBOX', 'docker-container-0');
       // Mock DNS resolution of host.docker.internal

@@ -8,8 +8,8 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {
-  isKnownSafeCommand as isMacSafeCommand,
-  isDangerousCommand as isMacDangerousCommand,
+  isKnownSafeCommand,
+  isDangerousCommand,
 } from '../sandbox/utils/commandSafety.js';
 import {
   isKnownSafeCommand as isWindowsSafeCommand,
@@ -310,13 +310,13 @@ export class NoopSandboxManager implements SandboxManager {
   isKnownSafeCommand(args: string[]): boolean {
     return os.platform() === 'win32'
       ? isWindowsSafeCommand(args)
-      : isMacSafeCommand(args);
+      : isKnownSafeCommand(args);
   }
 
   isDangerousCommand(args: string[]): boolean {
     return os.platform() === 'win32'
       ? isWindowsDangerousCommand(args)
-      : isMacDangerousCommand(args);
+      : isDangerousCommand(args);
   }
 
   parseDenials(): undefined {

@@ -574,35 +574,17 @@ export class BrowserManager {
     // Build args for chrome-devtools-mcp
     const browserConfig = this.config.getBrowserAgentConfig();
     const rawSessionMode = browserConfig.customConfig.sessionMode;
-    let sessionMode: 'persistent' | 'isolated' | 'existing' =
+    const sessionMode: 'persistent' | 'isolated' | 'existing' =
       rawSessionMode === 'isolated' || rawSessionMode === 'existing'
         ? rawSessionMode
         : 'persistent';
 
     // Detect sandbox environment.
-    // SANDBOX env var is set to 'sandbox-exec' (seatbelt) or the container
-    // name (Docker/Podman/gVisor/LXC) when running inside a sandbox.
+    // SANDBOX env var is set to the container name (Docker/Podman/gVisor/LXC)
+    // when running inside a container sandbox.
     // CI uses 'sandbox:none' as a metadata label — not a real sandbox.
     const sandboxType = process.env['SANDBOX'];
-    const isContainerSandbox =
-      !!sandboxType &&
-      sandboxType !== 'sandbox-exec' &&
-      sandboxType !== 'sandbox:none';
-    const isSeatbeltSandbox =
-      sandboxType === 'sandbox-exec' && sessionMode !== 'existing';
-
-    // Seatbelt sandbox: force isolated + headless for filesystem compatibility.
-    // Chrome exists on the host, but persistent profiles may conflict with
-    // seatbelt restrictions. Isolated mode uses tmpdir (always writable).
-    if (isSeatbeltSandbox) {
-      if (sessionMode !== 'isolated') {
-        sessionMode = 'isolated';
-        coreEvents.emitFeedback(
-          'info',
-          '🔒 Sandbox: Using isolated browser session for compatibility.',
-        );
-      }
-    }
+    const isContainerSandbox = !!sandboxType && sandboxType !== 'sandbox:none';
 
     const mcpArgs = ['--experimental-vision'];
 
@@ -647,10 +629,7 @@ export class BrowserManager {
     }
 
     // Add optional settings from config.
-    // Force headless in seatbelt sandbox since Chrome profile/display access
-    // may be restricted, and the user is running in a sandboxed environment.
-    const effectiveHeadless =
-      !!browserConfig.customConfig.headless || isSeatbeltSandbox;
+    const effectiveHeadless = !!browserConfig.customConfig.headless;
     if (effectiveHeadless) {
       mcpArgs.push('--headless');
     }

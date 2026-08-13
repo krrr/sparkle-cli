@@ -12,7 +12,6 @@ import {
   type GlobalSandboxOptions,
 } from './sandboxManager.js';
 import { LinuxSandboxManager } from '../sandbox/linux/LinuxSandboxManager.js';
-import { MacOsSandboxManager } from '../sandbox/macos/MacOsSandboxManager.js';
 import { WindowsSandboxManager } from '../sandbox/windows/WindowsSandboxManager.js';
 import type { SandboxConfig } from '../config/config.js';
 
@@ -33,8 +32,6 @@ export function createSandboxManager(
       return new WindowsSandboxManager(options);
     } else if (os.platform() === 'linux') {
       return new LinuxSandboxManager(options);
-    } else if (os.platform() === 'darwin') {
-      return new MacOsSandboxManager(options);
     }
     return new LocalSandboxManager(options);
   }
