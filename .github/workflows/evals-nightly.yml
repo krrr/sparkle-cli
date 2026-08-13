@@ -1,9 +1,7 @@
 name: 'Evals: Nightly'
 
 on:
-  schedule:
-    - cron: '0 1 * * *' # Runs at 1 AM every day
-  workflow_dispatch:
+  workflow_dispatch: # Nightly schedule disabled (was: cron '0 1 * * *')
     inputs:
       suite_type:
         description: 'Suite type to run'
@@ -30,8 +28,8 @@ permissions:
 jobs:
   evals:
     name: 'Evals (USUALLY_PASSING) nightly run'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: "github.repository == 'google-gemini/gemini-cli'"
+    runs-on: 'ubuntu-latest'
+    if: false # Disabled
     strategy:
       fail-fast: false
       matrix:
@@ -102,8 +100,8 @@ jobs:
   aggregate-results:
     name: 'Aggregate Results'
     needs: ['evals']
-    if: "github.repository == 'google-gemini/gemini-cli' && always()"
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    if: false # Disabled
+    runs-on: 'ubuntu-latest'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5

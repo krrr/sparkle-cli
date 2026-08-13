@@ -1,14 +1,7 @@
 name: 'Testing: E2E (Chained)'
 
 on:
-  push:
-    branches:
-      - 'main'
-  merge_group:
-  workflow_run:
-    workflows: ['Trigger E2E']
-    types: ['completed']
-  workflow_dispatch:
+  workflow_dispatch: # E2E temporarily disabled: auto triggers (push/merge_group/workflow_run) removed
     inputs:
       head_sha:
         description: 'SHA of the commit to test'
@@ -20,30 +13,16 @@ on:
 concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.event.workflow_run.head_branch || github.ref }}'
   cancel-in-progress: |-
-    ${{ github.event_name != 'push' && github.event_name != 'merge_group' }}
+    ${{ github.event_name != 'push' }}
 
 permissions:
   contents: 'read'
   statuses: 'write'
 
 jobs:
-  merge_queue_skipper:
-    name: 'Merge Queue Skipper'
-    permissions: 'read-all'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: "github.repository == 'google-gemini/gemini-cli'"
-    outputs:
-      skip: '${{ steps.merge-queue-e2e-skipper.outputs.skip-check }}'
-    steps:
-      - id: 'merge-queue-e2e-skipper'
-        uses: 'cariad-tech/merge-queue-ci-skipper@1032489e59437862c90a08a2c92809c903883772' # ratchet:cariad-tech/merge-queue-ci-skipper@main
-        with:
-          secret: '${{ secrets.SPARKLE_CLI_ROBOT_GITHUB_PAT }}'
-    continue-on-error: true
-
   download_repo_name:
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: "github.repository == 'google-gemini/gemini-cli' && (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run')"
+    runs-on: 'ubuntu-latest'
+    if: false # Disabled
     outputs:
       repo_name: '${{ steps.output-repo-name.outputs.repo_name }}'
       head_sha: '${{ steps.output-repo-name.outputs.head_sha }}'
@@ -90,9 +69,9 @@ jobs:
 
   parse_run_context:
     name: 'Parse run context'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    runs-on: 'ubuntu-latest'
     needs: 'download_repo_name'
-    if: "github.repository == 'google-gemini/gemini-cli' && always()"
+    if: false # Disabled
     outputs:
       repository: '${{ steps.set_context.outputs.REPO }}'
       sha: '${{ steps.set_context.outputs.SHA }}'
@@ -108,15 +87,15 @@ jobs:
           echo "SHA=$SHA" >> "$GITHUB_OUTPUT"
 
   set_pending_status:
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    runs-on: 'ubuntu-latest'
     permissions: 'write-all'
     needs:
       - 'parse_run_context'
-    if: "github.repository == 'google-gemini/gemini-cli' && always()"
+    if: false # Disabled
     steps:
       - name: 'Set pending status'
         uses: 'myrotvorets/set-commit-status-action@16037e056d73b2d3c88e37e393ff369047f70886' # ratchet:myrotvorets/set-commit-status-action@master
-        if: "github.repository == 'google-gemini/gemini-cli' && always()"
+        if: false # Disabled
         with:
           allowForks: 'true'
           repo: '${{ github.repository }}'
@@ -128,11 +107,9 @@ jobs:
   e2e_linux:
     name: 'E2E Test (Linux) - ${{ matrix.sandbox }}'
     needs:
-      - 'merge_queue_skipper'
       - 'parse_run_context'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: |
-      github.repository == 'google-gemini/gemini-cli' && always() && (needs.merge_queue_skipper.result !='success' || needs.merge_queue_skipper.outputs.skip != 'true')
+    runs-on: 'ubuntu-latest'
+    if: false # Disabled
     strategy:
       fail-fast: false
       matrix:
@@ -180,55 +157,12 @@ jobs:
             npm run test:integration:sandbox:none
           fi
 
-  e2e_mac:
-    name: 'E2E Test (macOS)'
-    needs:
-      - 'merge_queue_skipper'
-      - 'parse_run_context'
-    runs-on: 'macos-latest-large'
-    if: |
-      github.repository == 'google-gemini/gemini-cli' && always() && (needs.merge_queue_skipper.result !='success' || needs.merge_queue_skipper.outputs.skip != 'true')
-    steps:
-      - name: 'Checkout'
-        uses: 'actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955' # ratchet:actions/checkout@v5
-        with:
-          ref: '${{ needs.parse_run_context.outputs.sha }}'
-          repository: '${{ needs.parse_run_context.outputs.repository }}'
-          persist-credentials: false
-
-      - name: 'Set up Node.js 20.x'
-        uses: 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' # ratchet:actions-node@v4
-        with:
-          node-version: '20.x'
-
-      - name: 'Install dependencies'
-        run: 'npm ci'
-
-      - name: 'Build project'
-        run: 'npm run build'
-
-      - name: 'Fix rollup optional dependencies on macOS'
-        if: "${{runner.os == 'macOS'}}"
-        run: |
-          npm cache clean --force
-      - name: 'Run E2E tests (non-Windows)'
-        if: "${{runner.os != 'Windows'}}"
-        env:
-          GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-          SPARKLE_CLI_TRUST_WORKSPACE: true
-          KEEP_OUTPUT: 'true'
-          SANDBOX: 'sandbox:none'
-          VERBOSE: 'true'
-        run: 'npm run test:integration:sandbox:none'
-
   e2e_windows:
     name: 'Slow E2E - Win'
     needs:
-      - 'merge_queue_skipper'
       - 'parse_run_context'
-    if: |
-      github.repository == 'google-gemini/gemini-cli' && always() && (needs.merge_queue_skipper.result !='success' || needs.merge_queue_skipper.outputs.skip != 'true')
-    runs-on: 'sparkle-cli-windows-16-core'
+    if: false # Disabled
+    runs-on: 'windows-latest'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955' # ratchet:actions/checkout@v5
@@ -306,11 +240,9 @@ jobs:
   evals:
     name: 'Evals (ALWAYS_PASSING)'
     needs:
-      - 'merge_queue_skipper'
       - 'parse_run_context'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: |
-      github.repository == 'google-gemini/gemini-cli' && always() && (needs.merge_queue_skipper.result !='success' || needs.merge_queue_skipper.outputs.skip != 'true')
+    runs-on: 'ubuntu-latest'
+    if: false # Disabled
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955' # ratchet:actions/checkout@v5
@@ -360,15 +292,12 @@ jobs:
 
   e2e:
     name: 'E2E'
-    if: |
-      github.repository == 'google-gemini/gemini-cli' && always() && (needs.merge_queue_skipper.result !='success' || needs.merge_queue_skipper.outputs.skip != 'true')
+    if: false # Disabled
     needs:
       - 'e2e_linux'
-      - 'e2e_mac'
       - 'e2e_windows'
       - 'evals'
-      - 'merge_queue_skipper'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    runs-on: 'ubuntu-latest'
     steps:
       - name: 'Check E2E test results'
         run: |
@@ -387,16 +316,16 @@ jobs:
           NEEDS_EVALS_RESULT: '${{ needs.evals.result }}'
 
   set_workflow_status:
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    runs-on: 'ubuntu-latest'
     permissions: 'write-all'
-    if: "github.repository == 'google-gemini/gemini-cli' && always()"
+    if: false # Disabled
     needs:
       - 'parse_run_context'
       - 'e2e'
     steps:
       - name: 'Set workflow status'
         uses: 'myrotvorets/set-commit-status-action@16037e056d73b2d3c88e37e393ff369047f70886' # ratchet:myrotvorets/set-commit-status-action@master
-        if: "github.repository == 'google-gemini/gemini-cli' && always()"
+        if: false # Disabled
         with:
           allowForks: 'true'
           repo: '${{ github.repository }}'

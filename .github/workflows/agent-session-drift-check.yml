@@ -19,7 +19,7 @@ jobs:
   check-drift:
     name: 'Check Agent Session Drift'
     runs-on: 'ubuntu-latest'
-    if: "github.repository == 'google-gemini/gemini-cli'"
+    if: "github.repository == 'krrr/sparkle-cli'"
     permissions:
       contents: 'read'
       pull-requests: 'write'

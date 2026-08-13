@@ -15,8 +15,8 @@ on:
 
 jobs:
   save_repo_name:
-    if: "github.repository == 'google-gemini/gemini-cli'"
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    if: "github.repository == 'krrr/sparkle-cli'"
+    runs-on: 'ubuntu-latest'
     steps:
       - name: 'Save Repo name'
         env:
@@ -32,8 +32,8 @@ jobs:
           path: 'pr/'
   trigger_e2e:
     name: 'Trigger e2e'
-    if: "github.repository == 'google-gemini/gemini-cli'"
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    if: "github.repository == 'krrr/sparkle-cli'"
+    runs-on: 'ubuntu-latest'
     steps:
       - id: 'trigger-e2e'
         run: |

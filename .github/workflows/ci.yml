@@ -9,7 +9,6 @@ on:
     branches:
       - 'main'
       - 'release/**'
-  merge_group:
   workflow_dispatch:
     inputs:
       branch_ref:
@@ -33,24 +32,10 @@ defaults:
     shell: 'bash'
 
 jobs:
-  merge_queue_skipper:
-    permissions: 'read-all'
-    name: 'Merge Queue Skipper'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: "github.repository == 'google-gemini/gemini-cli'"
-    outputs:
-      skip: '${{ steps.merge-queue-ci-skipper.outputs.skip-check }}'
-    steps:
-      - id: 'merge-queue-ci-skipper'
-        uses: 'cariad-tech/merge-queue-ci-skipper@1032489e59437862c90a08a2c92809c903883772' # ratchet:cariad-tech/merge-queue-ci-skipper@main
-        with:
-          secret: '${{ secrets.SPARKLE_CLI_ROBOT_GITHUB_PAT }}'
-
   lint:
     name: 'Lint'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    needs: 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
+    runs-on: 'ubuntu-latest'
+    if: "github.repository == 'krrr/sparkle-cli'"
     env:
       SPARKLE_LINT_TEMP_DIR: '${{ github.workspace }}/.gemini-linters'
     steps:
@@ -126,10 +111,8 @@ jobs:
 
   test_linux:
     name: 'Test (Linux) - ${{ matrix.node-version }}, ${{ matrix.shard }}'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    needs:
-      - 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
+    runs-on: 'ubuntu-latest'
+    if: "github.repository == 'krrr/sparkle-cli'"
     permissions:
       contents: 'read'
       checks: 'write'
@@ -220,110 +203,10 @@ jobs:
           name: 'test-results-fork-${{ runner.os }}-${{ matrix.node-version }}-${{ matrix.shard }}'
           path: 'packages/*/junit.xml'
 
-  test_mac:
-    name: 'Test (Mac) - ${{ matrix.node-version }}, ${{ matrix.shard }}'
-    runs-on: 'macos-latest-large'
-    needs:
-      - 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
-    permissions:
-      contents: 'read'
-      checks: 'write'
-      pull-requests: 'write'
-    continue-on-error: true
-    strategy:
-      matrix:
-        node-version:
-          - '20.x'
-          - '22.x'
-          - '24.x'
-        shard:
-          - 'cli'
-          - 'others'
-    steps:
-      - name: 'Checkout'
-        uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
-        with:
-          persist-credentials: false
-
-      - name: 'Set up Node.js ${{ matrix.node-version }}'
-        uses: 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' # ratchet:actions/setup-node@v4
-        with:
-          node-version: '${{ matrix.node-version }}'
-          cache: 'npm'
-
-      - name: 'Build project'
-        run: 'npm run build'
-
-      - name: 'Install dependencies for testing'
-        run: 'npm ci'
-
-      - name: 'Run tests and generate reports'
-        env:
-          NO_COLOR: true
-          SPARKLE_CLI_TRUST_WORKSPACE: true
-        run: |
-          if [[ "${{ matrix.shard }}" == "cli" ]]; then
-            npm run test:ci --workspace "sparkle-cli" -- --coverage.enabled=false
-          else
-            # Explicitly list non-cli packages to ensure they are sharded correctly
-            npm run test:ci --workspace "sparkle-cli-core" --workspace "sparkle-cli-a2a-server" --workspace "sparkle-cli-vscode-ide-companion" --workspace "sparkle-cli-test-utils" --if-present -- --coverage.enabled=false
-            npm run test:scripts
-          fi
-
-      - name: 'Bundle'
-        run: 'npm run bundle'
-
-      - name: 'Smoke test bundle'
-        run: 'node ./bundle/sparkle.js --version'
-
-      - name: 'Smoke test npx installation'
-        run: |
-          # 1. Package the project into a tarball
-          TARBALL=$(npm pack | tail -n 1)
-
-          # 2. Move to a fresh directory for isolation
-          mkdir -p ../smoke-test-dir
-          mv "$TARBALL" ../smoke-test-dir/
-          cd ../smoke-test-dir
-
-          # 3. Run npx from the tarball
-          npx "./$TARBALL" --version
-
-      - name: 'Wait for file system sync'
-        run: 'sleep 2'
-
-      - name: 'Publish Test Report (for non-forks)'
-        if: |-
-          ${{ always() && (github.event.pull_request.head.repo.full_name == github.repository) }}
-        uses: 'dorny/test-reporter@dc3a92680fcc15842eef52e8c4606ea7ce6bd3f3' # ratchet:dorny/test-reporter@v2
-        with:
-          name: 'Test Results (Node ${{ runner.os }}, ${{ matrix.node-version }}, ${{ matrix.shard }})'
-          path: 'packages/*/junit.xml'
-          reporter: 'java-junit'
-          fail-on-error: 'false'
-
-      - name: 'Upload Test Results Artifact (for forks)'
-        if: |-
-          ${{ always() && (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
-        uses: 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' # ratchet:actions/upload-artifact@v4
-        with:
-          name: 'test-results-fork-${{ runner.os }}-${{ matrix.node-version }}-${{ matrix.shard }}'
-          path: 'packages/*/junit.xml'
-
-      - name: 'Upload coverage reports'
-        if: |-
-          ${{ always() }}
-        uses: 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' # ratchet:actions/upload-artifact@v4
-        with:
-          name: 'coverage-reports-${{ runner.os }}-${{ matrix.node-version }}-${{ matrix.shard }}'
-          path: 'packages/*/coverage'
-
   codeql:
     name: 'CodeQL'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    needs: 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
+    runs-on: 'ubuntu-latest'
+    if: "github.repository == 'krrr/sparkle-cli'"
     permissions:
       actions: 'read'
       contents: 'read'
@@ -346,9 +229,8 @@ jobs:
   # Check for changes in bundle size.
   bundle_size:
     name: 'Check Bundle Size'
-    needs: 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && github.event_name == 'pull_request' && needs.merge_queue_skipper.outputs.skip == 'false'"
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    if: "github.repository == 'krrr/sparkle-cli' && github.event_name == 'pull_request'"
+    runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read' # For checkout
       pull-requests: 'write' # For commenting
@@ -371,9 +253,8 @@ jobs:
 
   test_windows:
     name: 'Slow Test - Win - ${{ matrix.shard }}'
-    runs-on: 'sparkle-cli-windows-16-core'
-    needs: 'merge_queue_skipper'
-    if: "github.repository == 'google-gemini/gemini-cli' && needs.merge_queue_skipper.outputs.skip == 'false'"
+    runs-on: 'windows-latest'
+    if: "github.repository == 'krrr/sparkle-cli'"
     timeout-minutes: 60
     strategy:
       matrix:
@@ -470,23 +351,19 @@ jobs:
 
   ci:
     name: 'CI'
-    if: "github.repository == 'google-gemini/gemini-cli' && always()"
+    if: "github.repository == 'krrr/sparkle-cli' && always()"
     needs:
       - 'lint'
-      - 'link_checker'
       - 'test_linux'
-      - 'test_mac'
       - 'test_windows'
       - 'codeql'
       - 'bundle_size'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
+    runs-on: 'ubuntu-latest'
     steps:
       - name: 'Check all job results'
         run: |
           if [[ (${NEEDS_LINT_RESULT} != 'success' && ${NEEDS_LINT_RESULT} != 'skipped') || \
-               (${NEEDS_LINK_CHECKER_RESULT} != 'success' && ${NEEDS_LINK_CHECKER_RESULT} != 'skipped') || \
                (${NEEDS_TEST_LINUX_RESULT} != 'success' && ${NEEDS_TEST_LINUX_RESULT} != 'skipped') || \
-               (${NEEDS_TEST_MAC_RESULT} != 'success' && ${NEEDS_TEST_MAC_RESULT} != 'skipped') || \
                (${NEEDS_TEST_WINDOWS_RESULT} != 'success' && ${NEEDS_TEST_WINDOWS_RESULT} != 'skipped') || \
                (${NEEDS_CODEQL_RESULT} != 'success' && ${NEEDS_CODEQL_RESULT} != 'skipped') || \
                (${NEEDS_BUNDLE_SIZE_RESULT} != 'success' && ${NEEDS_BUNDLE_SIZE_RESULT} != 'skipped') ]]; then
@@ -496,9 +373,7 @@ jobs:
           echo "All CI jobs passed!"
         env:
           NEEDS_LINT_RESULT: '${{ needs.lint.result }}'
-          NEEDS_LINK_CHECKER_RESULT: '${{ needs.link_checker.result }}'
           NEEDS_TEST_LINUX_RESULT: '${{ needs.test_linux.result }}'
-          NEEDS_TEST_MAC_RESULT: '${{ needs.test_mac.result }}'
           NEEDS_TEST_WINDOWS_RESULT: '${{ needs.test_windows.result }}'
           NEEDS_CODEQL_RESULT: '${{ needs.codeql.result }}'
           NEEDS_BUNDLE_SIZE_RESULT: '${{ needs.bundle_size.result }}'

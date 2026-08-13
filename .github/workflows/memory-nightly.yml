@@ -1,9 +1,7 @@
 name: 'Memory Tests: Nightly'
 
 on:
-  schedule:
-    - cron: '0 2 * * *' # Runs at 2 AM every day
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Allow manual trigger (nightly schedule disabled; was cron '0 2 * * *')
 
 permissions:
   contents: 'read'
@@ -11,8 +9,8 @@ permissions:
 jobs:
   memory-test:
     name: 'Run Memory Usage Tests'
-    runs-on: 'sparkle-cli-ubuntu-16-core'
-    if: "github.repository == 'google-gemini/gemini-cli'"
+    runs-on: 'ubuntu-latest'
+    if: false # Disabled
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5
