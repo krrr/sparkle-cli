@@ -701,7 +701,11 @@ export class LoopDetectionService {
    * concrete model that will actually serve the request. Since the alias may
    * resolve to a bare tier alias (pro/flash/flash-lite), we anchor resolution
    * on the active model's family (see resolvePolicyChain) so the availability
-   * pre-check report the same concrete model the LLM call uses.
+   * pre-check reports the same concrete model the LLM call uses.
+   *
+   * Note: mirrors selectModelForAvailability's chain resolution but must not
+   * reuse it — that helper falls back to the last-resort model when nothing
+   * is available, whereas this only needs the nominal chain head.
    */
   private resolveModelName(alias: string): string {
     const aliasModel = this.context.config.modelConfigService.getResolvedConfig(
