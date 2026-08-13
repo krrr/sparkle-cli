@@ -16,7 +16,6 @@ import {
   type CoreEvents,
   createSessionId,
   logUserPrompt,
-  AuthType,
   UserPromptEvent,
   coreEvents,
   CoreEvent,
@@ -49,7 +48,6 @@ import * as fsPromises from 'node:fs/promises';
 import { start_sandbox } from './utils/sandbox.js';
 import {
   loadSettings,
-  SettingScope,
   type DnsResolutionOrder,
   type LoadedSettings,
 } from './config/settings.js';
@@ -468,19 +466,6 @@ export async function main() {
   dns.setDefaultResultOrder(
     validateDnsResolutionOrder(settings.merged.advanced.dnsResolutionOrder),
   );
-
-  // Set a default auth type if one isn't set
-  if (!settings.merged.security.auth.selectedType) {
-    const defaultAuthType =
-      !process.env['GEMINI_API_KEY'] && process.env['OPENAI_API_KEY']
-        ? AuthType.USE_OPENAI
-        : AuthType.USE_GEMINI;
-    settings.setValue(
-      SettingScope.User,
-      'security.auth.selectedType',
-      defaultAuthType,
-    );
-  }
 
   const partialConfig = await loadCliConfig(settings.merged, sessionId, argv, {
     projectHooks: settings.workspace.settings.hooks,

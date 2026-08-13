@@ -7,12 +7,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initializeApp } from './initializer.js';
 import {
+  AuthType,
   IdeClient,
   logIdeConnection,
   logCliConfiguration,
+  ValidationRequiredError,
   type Config,
 } from 'sparkle-cli-core';
-import { performInitialAuth } from './auth.js';
 import { validateTheme } from './theme.js';
 import { type LoadedSettings } from '../config/settings.js';
 
@@ -30,10 +31,6 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   };
 });
 
-vi.mock('./auth.js', () => ({
-  performInitialAuth: vi.fn(),
-}));
-
 vi.mock('./theme.js', () => ({
   validateTheme: vi.fn(),
 }));
@@ -43,6 +40,7 @@ describe('initializer', () => {
     getToolRegistry: ReturnType<typeof vi.fn>;
     getIdeMode: ReturnType<typeof vi.fn>;
     getGeminiMdFileCount: ReturnType<typeof vi.fn>;
+    refreshAuth: ReturnType<typeof vi.fn>;
   };
   let mockSettings: LoadedSettings;
   let mockIdeClient: {
@@ -55,6 +53,7 @@ describe('initializer', () => {
       getToolRegistry: vi.fn(),
       getIdeMode: vi.fn().mockReturnValue(false),
       getGeminiMdFileCount: vi.fn().mockReturnValue(5),
+      refreshAuth: vi.fn().mockResolvedValue(undefined),
     };
     mockSettings = {
       merged: {
@@ -71,9 +70,6 @@ describe('initializer', () => {
     vi.mocked(IdeClient.getInstance).mockResolvedValue(
       mockIdeClient as unknown as IdeClient,
     );
-    vi.mocked(performInitialAuth).mockResolvedValue({
-      authError: null,
-    });
     vi.mocked(validateTheme).mockReturnValue(null);
   });
 
@@ -89,7 +85,11 @@ describe('initializer', () => {
       shouldOpenAuthDialog: false,
       geminiMdFileCount: 5,
     });
-    expect(performInitialAuth).toHaveBeenCalledWith(mockConfig, 'oauth');
+    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+      'oauth',
+      undefined,
+      undefined,
+    );
     expect(validateTheme).toHaveBeenCalledWith(mockSettings);
     expect(logCliConfiguration).toHaveBeenCalled();
     expect(IdeClient.getInstance).not.toHaveBeenCalled();
@@ -120,16 +120,29 @@ describe('initializer', () => {
   });
 
   it('should handle auth error', async () => {
-    vi.mocked(performInitialAuth).mockResolvedValue({
-      authError: 'Auth failed',
-    });
+    mockConfig.refreshAuth.mockRejectedValue(new Error('Auth failed'));
     const result = await initializeApp(
       mockConfig as unknown as Config,
       mockSettings,
     );
 
-    expect(result.authError).toBe('Auth failed');
+    expect(result.authError).toBe(
+      'Failed to set LLM provider. Message: Auth failed',
+    );
     expect(result.shouldOpenAuthDialog).toBe(true);
+  });
+
+  it('should treat ValidationRequiredError as non-fatal', async () => {
+    mockConfig.refreshAuth.mockRejectedValue(
+      new ValidationRequiredError('Validation required'),
+    );
+    const result = await initializeApp(
+      mockConfig as unknown as Config,
+      mockSettings,
+    );
+
+    expect(result.authError).toBeNull();
+    expect(result.shouldOpenAuthDialog).toBe(false);
   });
 
   it('should handle undefined auth type', async () => {
@@ -139,7 +152,44 @@ describe('initializer', () => {
       mockSettings,
     );
 
+    expect(result.authError).toBeNull();
     expect(result.shouldOpenAuthDialog).toBe(true);
+    expect(mockConfig.refreshAuth).not.toHaveBeenCalled();
+  });
+
+  it('should pass the OpenAI base URL to refreshAuth for USE_OPENAI', async () => {
+    mockSettings.merged.security.auth.selectedType = AuthType.USE_OPENAI;
+    mockSettings.merged.security.auth.openaiBaseUrl =
+      'https://custom.example.com/v1';
+    const result = await initializeApp(
+      mockConfig as unknown as Config,
+      mockSettings,
+    );
+
+    expect(result.authError).toBeNull();
+    expect(result.shouldOpenAuthDialog).toBe(false);
+    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+      AuthType.USE_OPENAI,
+      undefined,
+      'https://custom.example.com/v1',
+    );
+  });
+
+  it('should not pass the OpenAI base URL for non-OpenAI auth types', async () => {
+    mockSettings.merged.security.auth.selectedType = AuthType.USE_GEMINI;
+    mockSettings.merged.security.auth.openaiBaseUrl =
+      'https://custom.example.com/v1';
+    const result = await initializeApp(
+      mockConfig as unknown as Config,
+      mockSettings,
+    );
+
+    expect(result.authError).toBeNull();
+    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+      AuthType.USE_GEMINI,
+      undefined,
+      undefined,
+    );
   });
 
   it('should handle theme error', async () => {

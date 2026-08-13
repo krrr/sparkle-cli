@@ -5,6 +5,8 @@
  */
 
 import { renderWithProviders } from '../../test-utils/render.js';
+import { waitFor } from '../../test-utils/async.js';
+import { act } from 'react';
 import {
   describe,
   it,
@@ -15,11 +17,16 @@ import {
   type Mock,
 } from 'vitest';
 import { AuthDialog } from './AuthDialog.js';
-import { AuthType } from 'sparkle-cli-core';
+import { AuthType, DEFAULT_OPENAI_BASE_URL } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { AuthState } from '../types.js';
 import { RadioButtonSelect } from '../components/shared/RadioButtonSelect.js';
 import { useKeypress } from '../hooks/useKeypress.js';
+import {
+  useTextBuffer,
+  type TextBuffer,
+} from '../components/shared/text-buffer.js';
+import { useUIState } from '../contexts/UIStateContext.js';
 import { validateAuthMethodWithSettings } from './useAuth.js';
 import { Text } from 'ink';
 
@@ -45,9 +52,33 @@ vi.mock('../components/shared/RadioButtonSelect.js', () => ({
   )),
 }));
 
+vi.mock('../components/shared/text-buffer.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<
+      typeof import('../components/shared/text-buffer.js')
+    >();
+  return {
+    ...actual,
+    useTextBuffer: vi.fn(),
+  };
+});
+
+vi.mock('../contexts/UIStateContext.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../contexts/UIStateContext.js')>();
+  return {
+    ...actual,
+    useUIState: vi.fn(() => ({
+      terminalWidth: 80,
+    })),
+  };
+});
+
 const mockedUseKeypress = useKeypress as Mock;
 const mockedRadioButtonSelect = RadioButtonSelect as Mock;
 const mockedValidateAuthMethod = validateAuthMethodWithSettings as Mock;
+const mockedUseTextBuffer = useTextBuffer as Mock;
+const mockedUseUIState = useUIState as Mock;
 
 describe('AuthDialog', () => {
   let props: {
@@ -56,11 +87,30 @@ describe('AuthDialog', () => {
     authError: string | null;
     onAuthError: (error: string | null) => void;
   };
+  let mockBuffer: TextBuffer;
   beforeEach(() => {
     vi.resetAllMocks();
     vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', undefined as unknown as string);
     vi.stubEnv('GEMINI_API_KEY', undefined as unknown as string);
     vi.stubEnv('OPENAI_API_KEY', undefined as unknown as string);
+    vi.stubEnv('OPENAI_BASE_URL', undefined as unknown as string);
+    mockedUseUIState.mockReturnValue({ terminalWidth: 80 });
+
+    mockBuffer = {
+      text: DEFAULT_OPENAI_BASE_URL,
+      lines: [DEFAULT_OPENAI_BASE_URL],
+      cursor: [0, DEFAULT_OPENAI_BASE_URL.length],
+      visualCursor: [0, DEFAULT_OPENAI_BASE_URL.length],
+      visualScrollRow: 0,
+      viewportVisualLines: [DEFAULT_OPENAI_BASE_URL],
+      pastedContent: {},
+      handleInput: vi.fn(),
+      setText: vi.fn((newText: string) => {
+        mockBuffer.text = newText;
+        mockBuffer.viewportVisualLines = [newText];
+      }),
+    } as unknown as TextBuffer;
+    mockedUseTextBuffer.mockReturnValue(mockBuffer);
 
     props = {
       settings: {
@@ -81,12 +131,14 @@ describe('AuthDialog', () => {
     vi.unstubAllEnvs();
   });
 
-  it('renders only the Gemini API key option', async () => {
+  it('renders Gemini and OpenAI options even without OPENAI_API_KEY set', async () => {
     const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
     const items = mockedRadioButtonSelect.mock.calls[0][0].items;
-    expect(items).toHaveLength(1);
+    expect(items).toHaveLength(2);
     expect(items[0].value).toBe(AuthType.USE_GEMINI);
     expect(items[0].label).toBe('Use Gemini API Key');
+    expect(items[1].value).toBe(AuthType.USE_OPENAI);
+    expect(items[1].label).toBe('Use OpenAI-compatible API Key');
     unmount();
   });
 
@@ -246,6 +298,207 @@ describe('AuthDialog', () => {
     });
   });
 
+  describe('OpenAI base URL flow', () => {
+    it('shows the base URL input when OpenAI is selected', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+
+      await waitFor(() => {
+        expect(lastFrame()).toContain('Enter OpenAI-compatible Base URL');
+      });
+      // Selection is not finalized until the base URL is submitted.
+      expect(props.settings.setValue).not.toHaveBeenCalled();
+      expect(props.setAuthState).not.toHaveBeenCalled();
+      unmount();
+    });
+
+    it('pre-fills the base URL input with the default OpenAI URL', async () => {
+      const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
+      expect(mockedUseTextBuffer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          initialText: DEFAULT_OPENAI_BASE_URL,
+        }),
+      );
+      unmount();
+    });
+
+    it('pre-fills the base URL input from the OPENAI_BASE_URL env var', async () => {
+      vi.stubEnv('OPENAI_BASE_URL', 'https://env.example.com/v1');
+      const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
+      expect(mockedUseTextBuffer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          initialText: 'https://env.example.com/v1',
+        }),
+      );
+      unmount();
+    });
+
+    it('prefers a stored base URL setting over the env var', async () => {
+      vi.stubEnv('OPENAI_BASE_URL', 'https://env.example.com/v1');
+      props.settings.merged.security.auth.openaiBaseUrl =
+        'https://stored.example.com/v1';
+      const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
+      expect(mockedUseTextBuffer).toHaveBeenCalledWith(
+        expect.objectContaining({
+          initialText: 'https://stored.example.com/v1',
+        }),
+      );
+      unmount();
+    });
+
+    it('stores the base URL and finalizes the OpenAI selection on submit', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { rerender, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+
+      await waitFor(() => {
+        expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
+      });
+      mockBuffer.text = 'https://custom.example.com/v1';
+      mockBuffer.viewportVisualLines = ['https://custom.example.com/v1'];
+      rerender(<AuthDialog {...props} />);
+      const textInputHandler = mockedUseKeypress.mock.calls.at(-1)![0];
+      act(() => {
+        textInputHandler({
+          name: 'enter',
+          shift: false,
+          alt: false,
+          ctrl: false,
+          cmd: false,
+          sequence: '\r',
+        });
+      });
+
+      expect(props.settings.setValue).toHaveBeenCalledWith(
+        expect.any(String),
+        'security.auth.openaiBaseUrl',
+        'https://custom.example.com/v1',
+      );
+      expect(props.settings.setValue).toHaveBeenCalledWith(
+        expect.any(String),
+        'security.auth.selectedType',
+        AuthType.USE_OPENAI,
+      );
+      expect(props.setAuthState).toHaveBeenCalledWith(
+        AuthState.Unauthenticated,
+      );
+      unmount();
+    });
+
+    it('clears the stored base URL when the input is submitted empty', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { rerender, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+
+      await waitFor(() => {
+        expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
+      });
+      mockBuffer.text = '';
+      mockBuffer.viewportVisualLines = [''];
+      rerender(<AuthDialog {...props} />);
+      const textInputHandler = mockedUseKeypress.mock.calls.at(-1)![0];
+      act(() => {
+        textInputHandler({
+          name: 'enter',
+          shift: false,
+          alt: false,
+          ctrl: false,
+          cmd: false,
+          sequence: '\r',
+        });
+      });
+
+      expect(props.settings.setValue).toHaveBeenCalledWith(
+        expect.any(String),
+        'security.auth.openaiBaseUrl',
+        undefined,
+      );
+      expect(props.setAuthState).toHaveBeenCalledWith(
+        AuthState.Unauthenticated,
+      );
+      unmount();
+    });
+
+    it('rejects an invalid base URL', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { rerender, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+
+      await waitFor(() => {
+        expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(1);
+      });
+      mockBuffer.text = 'not-a-url';
+      mockBuffer.viewportVisualLines = ['not-a-url'];
+      rerender(<AuthDialog {...props} />);
+      const textInputHandler = mockedUseKeypress.mock.calls.at(-1)![0];
+      act(() => {
+        textInputHandler({
+          name: 'enter',
+          shift: false,
+          alt: false,
+          ctrl: false,
+          cmd: false,
+          sequence: '\r',
+        });
+      });
+
+      expect(props.onAuthError).toHaveBeenCalledWith(
+        'Invalid base URL: "not-a-url".',
+      );
+      expect(props.settings.setValue).not.toHaveBeenCalled();
+      expect(props.setAuthState).not.toHaveBeenCalled();
+      unmount();
+    });
+
+    it('returns to the auth method list on escape', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+
+      await waitFor(() => {
+        expect(lastFrame()).toContain('Enter OpenAI-compatible Base URL');
+      });
+      const textInputHandler = mockedUseKeypress.mock.calls.at(-1)![0];
+      act(() => {
+        textInputHandler({
+          name: 'escape',
+          shift: false,
+          alt: false,
+          ctrl: false,
+          cmd: false,
+          sequence: '\u001b',
+        });
+      });
+
+      await waitFor(() => {
+        expect(lastFrame()).toContain('Get started');
+      });
+      expect(props.settings.setValue).not.toHaveBeenCalled();
+      unmount();
+    });
+  });
+
   it('displays authError when provided', async () => {
     props.authError = 'Something went wrong';
     const { lastFrame, unmount } = await renderWithProviders(
@@ -324,6 +577,21 @@ describe('AuthDialog', () => {
       const { lastFrame, unmount } = await renderWithProviders(
         <AuthDialog {...props} />,
       );
+      expect(lastFrame()).toMatchSnapshot();
+      unmount();
+    });
+
+    it('renders the base URL input when OpenAI is selected', async () => {
+      mockedValidateAuthMethod.mockResolvedValue(null);
+      const { lastFrame, unmount } = await renderWithProviders(
+        <AuthDialog {...props} />,
+      );
+      const { onSelect: handleAuthSelect } =
+        mockedRadioButtonSelect.mock.calls[0][0];
+      await handleAuthSelect(AuthType.USE_OPENAI);
+      await waitFor(() => {
+        expect(lastFrame()).toContain('Enter OpenAI-compatible Base URL');
+      });
       expect(lastFrame()).toMatchSnapshot();
       unmount();
     });

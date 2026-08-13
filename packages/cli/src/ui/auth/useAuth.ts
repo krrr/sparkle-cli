@@ -86,17 +86,9 @@ export const useAuthCommand = (
 
       const authType = settings.merged.security.auth.selectedType;
       if (!authType) {
-        if (process.env['GEMINI_API_KEY']) {
-          onAuthError(
-            'Existing API key detected (GEMINI_API_KEY). Select "Gemini API Key" option to use it.',
-          );
-        } else if (process.env['OPENAI_API_KEY']) {
-          onAuthError(
-            'Existing API key detected (OPENAI_API_KEY). Select "OpenAI API Key" option to use it.',
-          );
-        } else {
-          onAuthError('No authentication method selected.');
-        }
+        // No auth method configured yet: open the provider selection dialog
+        // (AuthDialog) so the user can choose how to authenticate.
+        setAuthState(AuthState.Updating);
         return;
       }
 
@@ -132,7 +124,13 @@ export const useAuthCommand = (
       }
 
       try {
-        await config.refreshAuth(authType);
+        await config.refreshAuth(
+          authType,
+          undefined,
+          authType === AuthType.USE_OPENAI
+            ? settings.merged.security.auth.openaiBaseUrl
+            : undefined,
+        );
 
         debugLogger.log(`Authenticated via "${authType}".`);
         setAuthError(null);

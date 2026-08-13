@@ -5,6 +5,7 @@
  */
 
 import {
+  AuthType,
   IdeClient,
   IdeConnectionEvent,
   IdeConnectionType,
@@ -14,9 +15,10 @@ import {
   logCliConfiguration,
   startupProfiler,
   debugLogger,
+  getErrorMessage,
+  ValidationRequiredError,
 } from 'sparkle-cli-core';
 import { type LoadedSettings } from '../config/settings.js';
-import { performInitialAuth } from './auth.js';
 import { validateTheme } from './theme.js';
 
 export interface InitializationResult {
@@ -38,10 +40,27 @@ export async function initializeApp(
   settings: LoadedSettings,
 ): Promise<InitializationResult> {
   const authHandle = startupProfiler.start('authenticate');
-  const { authError } = await performInitialAuth(
-    config,
-    settings.merged.security.auth.selectedType,
-  );
+  const authType = settings.merged.security.auth.selectedType;
+
+  let authError: string | null = null;
+  if (authType) {
+    try {
+      await config.refreshAuth(
+        authType,
+        undefined,
+        authType === AuthType.USE_OPENAI
+          ? settings.merged.security.auth.openaiBaseUrl
+          : undefined,
+      );
+    } catch (e) {
+      if (!(e instanceof ValidationRequiredError)) {
+        // Don't treat validation required as a fatal auth error during
+        // startup: this allows the React UI to load and show the error.
+        authError = `Failed to set LLM provider. Message: ${getErrorMessage(e)}`;
+      }
+    }
+  }
+
   authHandle?.end();
   const themeError = validateTheme(settings);
 

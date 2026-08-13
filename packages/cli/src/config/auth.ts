@@ -24,12 +24,9 @@ export async function validateAuthMethod(
   }
 
   if (authMethod === AuthType.USE_OPENAI) {
-    if (!process.env['OPENAI_API_KEY']) {
-      return (
-        'When using an OpenAI-compatible API, you must specify the OPENAI_API_KEY environment variable.\n' +
-        'Update your environment and try again (no reload needed if using .env)!'
-      );
-    }
+    // The API key is optional for OpenAI-compatible endpoints: local or
+    // custom servers (e.g. Ollama) may not require one. When a key is
+    // needed, it is read from OPENAI_API_KEY by the core generator.
     return null;
   }
 

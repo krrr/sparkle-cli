@@ -1931,6 +1931,16 @@ const SETTINGS_SCHEMA = {
             description: 'Whether to use an external authentication flow.',
             showInDialog: false,
           },
+          openaiBaseUrl: {
+            type: 'string',
+            label: 'OpenAI Base URL',
+            category: 'Security',
+            requiresRestart: true,
+            default: undefined as string | undefined,
+            description:
+              'The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.',
+            showInDialog: true,
+          },
         },
       },
     },

@@ -50,6 +50,19 @@ describe('validateAuthMethod', () => {
         'Update your environment and try again (no reload needed if using .env)!',
     },
     {
+      description:
+        'should return null for USE_OPENAI even if OPENAI_API_KEY is not set',
+      authType: AuthType.USE_OPENAI,
+      envs: {},
+      expected: null,
+    },
+    {
+      description: 'should return null for USE_OPENAI if OPENAI_API_KEY is set',
+      authType: AuthType.USE_OPENAI,
+      envs: { OPENAI_API_KEY: 'test-key' },
+      expected: null,
+    },
+    {
       description: 'should return an error message for an invalid auth method',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       authType: 'invalid-method' as any,

@@ -162,28 +162,24 @@ describe('useAuth', () => {
       expect(result.current.authState).toBe(AuthState.Authenticated);
     });
 
-    it('should set error if no auth type is selected and no env key', async () => {
+    it('should open the provider selection dialog if no auth type is selected and no env key', async () => {
       const { result } = await renderHook(() =>
         useAuthCommand(createSettings(undefined), mockConfig),
       );
 
-      // This happens synchronously, no deferred promise
-      expect(result.current.authError).toBe(
-        'No authentication method selected.',
-      );
+      // The AuthDialog is shown while authState is Updating.
       expect(result.current.authState).toBe(AuthState.Updating);
+      expect(result.current.authError).toBeNull();
     });
 
-    it('should set error if no auth type is selected but env key exists', async () => {
+    it('should open the provider selection dialog if no auth type is selected but env key exists', async () => {
       process.env['GEMINI_API_KEY'] = 'env-key';
       const { result } = await renderHook(() =>
         useAuthCommand(createSettings(undefined), mockConfig),
       );
 
-      expect(result.current.authError).toContain(
-        'Existing API key detected (GEMINI_API_KEY)',
-      );
       expect(result.current.authState).toBe(AuthState.Updating);
+      expect(result.current.authError).toBeNull();
     });
 
     it('should transition to AwaitingApiKeyInput if USE_GEMINI and no key found', async () => {
@@ -227,7 +223,11 @@ describe('useAuth', () => {
         deferredRefreshAuth.resolve();
       });
 
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.USE_GEMINI,
+        undefined,
+        undefined,
+      );
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.apiKeyDefaultValue).toBe('stored-key');
     });
@@ -243,7 +243,11 @@ describe('useAuth', () => {
         deferredRefreshAuth.resolve();
       });
 
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.USE_GEMINI,
+        undefined,
+        undefined,
+      );
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.apiKeyDefaultValue).toBe('env-key');
     });
@@ -259,7 +263,11 @@ describe('useAuth', () => {
         deferredRefreshAuth.resolve();
       });
 
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.USE_GEMINI,
+        undefined,
+        undefined,
+      );
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.apiKeyDefaultValue).toBe('env-key');
     });
@@ -295,9 +303,59 @@ describe('useAuth', () => {
         deferredRefreshAuth.resolve();
       });
 
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(AuthType.GATEWAY);
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.GATEWAY,
+        undefined,
+        undefined,
+      );
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.authError).toBeNull();
+    });
+
+    it('should pass the configured base URL to refreshAuth for USE_OPENAI', async () => {
+      const settings = {
+        merged: {
+          security: {
+            auth: {
+              selectedType: AuthType.USE_OPENAI,
+              openaiBaseUrl: 'https://custom.example.com/v1',
+            },
+          },
+        },
+      } as LoadedSettings;
+
+      const { result } = await renderHook(() =>
+        useAuthCommand(settings, mockConfig),
+      );
+
+      await act(async () => {
+        deferredRefreshAuth.resolve();
+      });
+
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.USE_OPENAI,
+        undefined,
+        'https://custom.example.com/v1',
+      );
+      expect(result.current.authState).toBe(AuthState.Authenticated);
+      expect(result.current.authError).toBeNull();
+    });
+
+    it('should not pass a base URL to refreshAuth for USE_OPENAI when none is configured', async () => {
+      const { result } = await renderHook(() =>
+        useAuthCommand(createSettings(AuthType.USE_OPENAI), mockConfig),
+      );
+
+      await act(async () => {
+        deferredRefreshAuth.resolve();
+      });
+
+      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
+        AuthType.USE_OPENAI,
+        undefined,
+        undefined,
+      );
+      expect(result.current.authState).toBe(AuthState.Authenticated);
     });
 
     it('should handle refreshAuth failure', async () => {

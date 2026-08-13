@@ -7,7 +7,7 @@ exports[`AuthDialog > Snapshots > renders correctly with auth error 1`] = `
 │                                                                                                  │
 │   How would you like to authenticate for this project?                                           │
 │                                                                                                  │
-│   (selected) Use Gemini API Key                                                                  │
+│   (selected) Use Gemini API Key(not selected) Use OpenAI-compatible API Key                      │
 │                                                                                                  │
 │   Something went wrong                                                                           │
 │                                                                                                  │
@@ -28,7 +28,7 @@ exports[`AuthDialog > Snapshots > renders correctly with default props 1`] = `
 │                                                                                                  │
 │   How would you like to authenticate for this project?                                           │
 │                                                                                                  │
-│   (selected) Use Gemini API Key                                                                  │
+│   (selected) Use Gemini API Key(not selected) Use OpenAI-compatible API Key                      │
 │                                                                                                  │
 │   (Use Enter to select)                                                                          │
 │                                                                                                  │
@@ -54,6 +54,24 @@ exports[`AuthDialog > Snapshots > renders correctly with enforced auth type 1`] 
 │   Terms of Services and Privacy Notice for Sparkle CLI                                           │
 │                                                                                                  │
 │   https://geminicli.com/docs/resources/tos-privacy/                                              │
+│                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+"
+`;
+
+exports[`AuthDialog > Snapshots > renders the base URL input when OpenAI is selected 1`] = `
+"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                  │
+│ ? Enter OpenAI-compatible Base URL                                                               │
+│                                                                                                  │
+│   Enter the base URL of your OpenAI-compatible API endpoint.                                     │
+│   For example: https://api.openai.com/v1 or a local endpoint such as http://localhost:11434/v1   │
+│                                                                                                  │
+│   ╭────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│   │ https://api.openai.com/v1                                                                  │ │
+│   ╰────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                  │
+│   (Press Enter to submit, Esc to cancel)                                                         │
 │                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 "
