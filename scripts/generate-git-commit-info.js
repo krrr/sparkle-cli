@@ -18,50 +18,64 @@
 // limitations under the License.
 
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { readPackageUp } from 'read-package-up';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const scriptPath = relative(root, fileURLToPath(import.meta.url));
-const generatedCliDir = join(root, 'packages/cli/src/generated');
-const cliGitCommitFile = join(generatedCliDir, 'git-commit.ts');
-const generatedCoreDir = join(root, 'packages/core/src/generated');
-const coreGitCommitFile = join(generatedCoreDir, 'git-commit.ts');
-let gitCommitInfo = 'N/A';
-let cliVersion = 'UNKNOWN';
+const DEFAULT_CLI_GIT_COMMIT_FILE = join(
+  root,
+  'packages/cli/src/generated/git-commit.ts',
+);
+const DEFAULT_CORE_GIT_COMMIT_FILE = join(
+  root,
+  'packages/core/src/generated/git-commit.ts',
+);
+const DEFAULT_ROOT_PACKAGE_JSON = join(root, 'package.json');
 
-if (!existsSync(generatedCliDir)) {
-  mkdirSync(generatedCliDir, { recursive: true });
-}
+/**
+ * Generates `git-commit.ts` files for the cli and core packages, embedding the
+ * current git commit hash and the CLI version.
+ *
+ * @param {object} [options] Overrides used by tests to redirect output.
+ * @param {string} [options.cliGitCommitFile] Output path for the cli package.
+ * @param {string} [options.coreGitCommitFile] Output path for the core package.
+ * @param {string} [options.rootPackageJson] Root package.json to read the
+ *   version from.
+ */
+export async function main({
+  cliGitCommitFile = DEFAULT_CLI_GIT_COMMIT_FILE,
+  coreGitCommitFile = DEFAULT_CORE_GIT_COMMIT_FILE,
+  rootPackageJson = DEFAULT_ROOT_PACKAGE_JSON,
+} = {}) {
+  let gitCommitInfo = 'N/A';
+  let cliVersion = 'UNKNOWN';
 
-if (!existsSync(generatedCoreDir)) {
-  mkdirSync(generatedCoreDir, { recursive: true });
-}
-
-try {
-  // Check for GIT_COMMIT env var first (e.g. when building inside Docker
-  // without a .git directory available)
-  const envCommit = process.env.GIT_COMMIT;
-  if (envCommit && /^[0-9a-f]+$/i.test(envCommit)) {
-    gitCommitInfo = envCommit;
-  } else {
-    const gitHash = execSync('git rev-parse --short HEAD', {
-      encoding: 'utf-8',
-    }).trim();
-    if (gitHash) {
-      gitCommitInfo = gitHash;
+  try {
+    // Check for GIT_COMMIT env var first (e.g. when building inside Docker
+    // without a .git directory available)
+    const envCommit = process.env.GIT_COMMIT;
+    if (envCommit && /^[0-9a-f]+$/i.test(envCommit)) {
+      gitCommitInfo = envCommit;
+    } else {
+      const gitHash = execSync('git rev-parse --short HEAD', {
+        encoding: 'utf-8',
+      }).trim();
+      if (gitHash) {
+        gitCommitInfo = gitHash;
+      }
     }
+    if (existsSync(rootPackageJson)) {
+      const packageJson = JSON.parse(readFileSync(rootPackageJson, 'utf-8'));
+      cliVersion = packageJson.version ?? 'UNKNOWN';
+    }
+  } catch {
+    // ignore
   }
-  const result = await readPackageUp();
-  cliVersion = result?.packageJson?.version ?? 'UNKNOWN';
-} catch {
-  // ignore
-}
 
-const fileContent = `/**
+  const fileContent = `/**
  * @license
  * Copyright ${new Date().getUTCFullYear()} Google LLC
  * SPDX-License-Identifier: Apache-2.0
@@ -73,5 +87,15 @@ export const GIT_COMMIT_INFO = '${gitCommitInfo}';
 export const CLI_VERSION = '${cliVersion}';
 `;
 
-writeFileSync(cliGitCommitFile, fileContent);
-writeFileSync(coreGitCommitFile, fileContent);
+  mkdirSync(dirname(cliGitCommitFile), { recursive: true });
+  mkdirSync(dirname(coreGitCommitFile), { recursive: true });
+  writeFileSync(cliGitCommitFile, fileContent);
+  writeFileSync(coreGitCommitFile, fileContent);
+}
+
+if (process.argv[1]) {
+  const entryUrl = pathToFileURL(resolve(process.argv[1])).href;
+  if (entryUrl === import.meta.url) {
+    await main();
+  }
+}

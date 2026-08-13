@@ -2328,6 +2328,12 @@
               "description": "Whether to use an external authentication flow.",
               "markdownDescription": "Whether to use an external authentication flow.\n\n- Category: `Security`\n- Requires restart: `yes`",
               "type": "boolean"
+            },
+            "openaiBaseUrl": {
+              "title": "OpenAI Base URL",
+              "description": "The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.",
+              "markdownDescription": "The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.\n\n- Category: `Security`\n- Requires restart: `yes`",
+              "type": "string"
             }
           },
           "additionalProperties": false

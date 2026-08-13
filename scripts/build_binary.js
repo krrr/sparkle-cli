@@ -28,7 +28,6 @@ const bundleDir = join(root, 'bundle');
 const stagingDir = join(bundleDir, 'native_modules');
 const seaConfigPath = join(root, 'sea-config.json');
 const manifestPath = join(bundleDir, 'manifest.json');
-const entitlementsPath = join(root, 'scripts/entitlements.plist');
 
 // --- Helper Functions ---
 
@@ -94,77 +93,6 @@ function removeSignature(filePath) {
   }
 }
 
-/**
- * Signs a binary using hardcoded tools for the platform.
- * @param {string} filePath
- */
-function signFile(filePath) {
-  if (process.env.SKIP_SIGNING === 'true') {
-    console.log(`Skipping signing for ${filePath} (SKIP_SIGNING=true)`);
-    return;
-  }
-
-  const platform = process.platform;
-
-  if (platform === 'darwin') {
-    const identity = process.env.APPLE_IDENTITY || '-';
-    console.log(`Signing ${filePath} (Identity: ${identity})...`);
-
-    const args = [
-      '--sign',
-      identity,
-      '--force',
-      '--timestamp',
-      '--options',
-      'runtime',
-    ];
-
-    if (existsSync(entitlementsPath)) {
-      args.push('--entitlements', entitlementsPath);
-    }
-
-    args.push(filePath);
-
-    runCommand('codesign', args);
-  } else if (platform === 'win32') {
-    const args = ['sign'];
-
-    if (process.env.WINDOWS_PFX_FILE && process.env.WINDOWS_PFX_PASSWORD) {
-      args.push(
-        '/f',
-        process.env.WINDOWS_PFX_FILE,
-        '/p',
-        process.env.WINDOWS_PFX_PASSWORD,
-      );
-    } else {
-      args.push('/a');
-    }
-
-    args.push(
-      '/fd',
-      'SHA256',
-      '/td',
-      'SHA256',
-      '/tr',
-      'http://timestamp.digicert.com',
-      filePath,
-    );
-
-    console.log(`Signing ${filePath}...`);
-    try {
-      runCommand('signtool', args, { stdio: 'pipe' });
-    } catch (e) {
-      let msg = e.message;
-      if (process.env.WINDOWS_PFX_PASSWORD) {
-        msg = msg.replaceAll(process.env.WINDOWS_PFX_PASSWORD, '******');
-      }
-      throw new Error(msg);
-    }
-  } else if (platform === 'linux') {
-    console.log(`Skipping signing for ${filePath} on Linux.`);
-  }
-}
-
 console.log('Build Binary Script Started...');
 
 // 1. Clean dist
@@ -177,8 +105,8 @@ mkdirSync(distDir, { recursive: true });
 // 2. Build Bundle
 console.log('Running npm clean, install, and bundle...');
 try {
-  runCommand('npm', ['run', 'clean']);
-  runCommand('npm', ['install']);
+  // runCommand('npm', ['run', 'clean']);
+  // runCommand('npm', ['install']);
   runCommand('npm', ['run', 'bundle']);
 } catch (e) {
   console.error('Build step failed:', e.message);
@@ -210,52 +138,7 @@ if (existsSync(ripgrepVendorSrc)) {
 const includeNativeModules = process.env.BUNDLE_NATIVE_MODULES !== 'false';
 console.log(`Include Native Modules: ${includeNativeModules}`);
 
-if (includeNativeModules) {
-  console.log('Staging and signing native modules...');
-  // Prepare staging
-  if (existsSync(stagingDir))
-    rmSync(stagingDir, { recursive: true, force: true });
-  mkdirSync(stagingDir, { recursive: true });
-
-  // Copy @lydell/node-pty to staging
-  const lydellSrc = join(root, 'node_modules/@lydell');
-  const lydellStaging = join(stagingDir, 'node_modules/@lydell');
-
-  if (existsSync(lydellSrc)) {
-    mkdirSync(dirname(lydellStaging), { recursive: true });
-    cpSync(lydellSrc, lydellStaging, { recursive: true });
-  } else {
-    console.warn(
-      'Warning: @lydell/node-pty not found in node_modules. Native terminal features may fail.',
-    );
-  }
-
-  // Copy @github/keytar to staging
-  const githubSrc = join(root, 'node_modules/@github');
-  const githubStaging = join(stagingDir, 'node_modules/@github');
-
-  if (existsSync(githubSrc)) {
-    mkdirSync(dirname(githubStaging), { recursive: true });
-    cpSync(githubSrc, githubStaging, { recursive: true });
-  } else {
-    console.warn(
-      'Warning: @github/keytar not found in node_modules. Secure keychain features will use file fallback.',
-    );
-  }
-
-  // Sign Staged .node files
-  try {
-    const nodeFiles = globSync('**/*.node', {
-      cwd: stagingDir,
-      absolute: true,
-    });
-    for (const file of nodeFiles) {
-      signFile(file);
-    }
-  } catch (e) {
-    console.warn('Warning: Failed to sign native modules:', e.code);
-  }
-} else {
+if (!includeNativeModules) {
   console.log('Skipping native modules bundling (BUNDLE_NATIVE_MODULES=false)');
 }
 
@@ -495,16 +378,7 @@ try {
   process.exit(1);
 }
 
-// 8. Final Signing
-console.log('Signing final executable...');
-try {
-  signFile(targetBinaryPath);
-} catch (e) {
-  console.warn('Warning: Final signing failed:', e.code);
-  console.warn('Continuing without signing...');
-}
-
-// 9. Cleanup
+// 8. Cleanup
 console.log('Cleaning up artifacts...');
 rmSync(blobPath);
 if (existsSync(seaConfigPath)) rmSync(seaConfigPath);
