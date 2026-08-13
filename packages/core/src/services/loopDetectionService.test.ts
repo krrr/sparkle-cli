@@ -1075,6 +1075,59 @@ describe('LoopDetectionService LLM Checks', () => {
     expect(calledArg.contents[1]).toEqual(functionCallHistory[0]);
   });
 
+  it('should trim a trailing model turn that mixes text and a function call', async () => {
+    // A model turn that contains both text and a functionCall part is a
+    // dangling function call (its tool response has not been recorded yet).
+    // It must be trimmed so the OpenAI-compatible converter never emits an
+    // assistant message with 'tool_calls' lacking a following tool response
+    // (DeepSeek rejects such requests with an invalid_request_error).
+    const danglingHistory: Content[] = [
+      {
+        role: 'user',
+        parts: [{ text: 'debug it' }],
+      },
+      {
+        role: 'model',
+        parts: [
+          { text: 'The failing test is generate-keybindings-doc.' },
+          {
+            functionCall: {
+              name: 'run_shell_command',
+              args: { command: 'npm run test:scripts' },
+            },
+          },
+        ],
+      },
+    ];
+    vi.mocked(mockGeminiClient.getHistory).mockReturnValue(danglingHistory);
+
+    mockBaseLlmClient.generateJson = vi
+      .fn()
+      .mockResolvedValue({ unproductive_state_confidence: 0.1 });
+
+    await advanceTurns(30);
+
+    expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
+    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock
+      .calls[0][0];
+    const contents = calledArg.contents;
+    // The dangling model turn (text + functionCall) must be trimmed away.
+    expect(
+      contents.some(
+        (content) =>
+          content.role === 'model' &&
+          content.parts?.some((part) => !!part.functionCall),
+      ),
+    ).toBe(false);
+    // The last content is the loop-detection task prompt.
+    expect(contents[contents.length - 1]).toEqual({
+      role: 'user',
+      parts: [
+        { text: expect.stringContaining('analyze the conversation history') },
+      ],
+    });
+  });
+
   it('should detect a loop when confidence is exactly equal to the threshold (0.9)', async () => {
     mockBaseLlmClient.generateJson = vi
       .fn()

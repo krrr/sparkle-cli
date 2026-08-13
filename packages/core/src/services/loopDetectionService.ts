@@ -546,8 +546,16 @@ export class LoopDetectionService {
   private trimRecentHistory(history: Content[]): Content[] {
     // A function response must be preceded by a function call.
     // Continuously removes dangling function calls from the end of the history
-    // until the last turn is not a function call.
-    while (history.length > 0 && isFunctionCall(history[history.length - 1])) {
+    // until the last turn is not a function call. A model turn that contains a
+    // functionCall part is treated as a dangling call even when it also carries
+    // accompanying text, so the OpenAI-compatible converter never emits an
+    // assistant message with 'tool_calls' that lacks a following tool response
+    // (DeepSeek rejects such requests with an invalid_request_error).
+    while (
+      history.length > 0 &&
+      history[history.length - 1].role === 'model' &&
+      history[history.length - 1].parts?.some((part) => !!part.functionCall)
+    ) {
       history.pop();
     }
 
