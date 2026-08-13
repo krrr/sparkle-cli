@@ -52,6 +52,8 @@ import { CoreToolCallStatus } from '../scheduler/types.js';
 import type { Config } from '../config/config.js';
 import { getProjectHash } from '../utils/paths.js';
 import type { HistoryTurn } from '../core/agentChatHistory.js';
+import { convertSessionToClientHistory } from '../utils/sessionUtils.js';
+import { geminiContentsToOpenAiMessages } from '../core/openAiFormatConverter.js';
 
 vi.mock('../utils/paths.js');
 vi.mock('node:crypto', async (importOriginal) => {
@@ -1452,6 +1454,178 @@ describe('ChatRecordingService', () => {
       );
       const modelMsg = record!.messages.find((m) => m.id === id)!;
       expect(modelMsg.content).toEqual(ackParts);
+    });
+
+    it('should extract toolCalls metadata when recording a new model turn from history', async () => {
+      await chatRecordingService.initialize(undefined, 'main');
+
+      // A model turn that is new to the recording (e.g. a summary or a turn
+      // rebuilt during resume) carries functionCall parts; they must be
+      // persisted as toolCalls metadata, not dropped with the content filter.
+      const history: HistoryTurn[] = [
+        {
+          id: 'new-model-turn',
+          content: {
+            role: 'model',
+            parts: [
+              { text: 'Calling tools now.' },
+              {
+                functionCall: {
+                  id: 'call-new-1',
+                  name: 'read_file',
+                  args: { filePath: 'README.md' },
+                },
+              },
+            ],
+          },
+        },
+      ];
+      chatRecordingService.updateMessagesFromHistory(history);
+
+      const record = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const modelMsg = record!.messages[0] as MessageRecord & {
+        type: 'gemini';
+      };
+      expect(modelMsg.id).toBe('new-model-turn');
+      // functionCall parts must not leak into durable content...
+      expect(modelMsg.content).toEqual([{ text: 'Calling tools now.' }]);
+      // ...but the tool call itself must survive as metadata.
+      expect(modelMsg.toolCalls).toEqual([
+        expect.objectContaining({
+          id: 'call-new-1',
+          name: 'read_file',
+          args: { filePath: 'README.md' },
+          status: CoreToolCallStatus.Success,
+        }),
+      ]);
+    });
+
+    it('should restore toolCalls metadata when the recorded message lacks it', async () => {
+      await chatRecordingService.initialize(undefined, 'main');
+
+      // Simulate a legacy/edge recording state: the model text message
+      // exists without toolCalls metadata (e.g. data recorded before the
+      // single-message-per-turn invariant, or an interrupted stream). The
+      // agent-history turn carries the functionCall parts, so a sync must
+      // restore the metadata onto the recorded message.
+      const id = chatRecordingService.recordMessage({
+        model: 'gemini-pro',
+        type: 'gemini',
+        content: 'I will check the file.',
+      });
+
+      // The agent-history turn carries the functionCall parts (as rebuilt
+      // after a resume/rewind).
+      const history: HistoryTurn[] = [
+        {
+          id,
+          content: {
+            role: 'model',
+            parts: [
+              { text: 'I will check the file.' },
+              {
+                functionCall: {
+                  id: 'call-runtime-1',
+                  name: 'read_file',
+                  args: { filePath: 'README.md' },
+                },
+              },
+            ],
+          },
+        },
+      ];
+      chatRecordingService.updateMessagesFromHistory(history);
+
+      const record = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const modelMsg = record!.messages.find(
+        (m) => m.id === id,
+      )! as MessageRecord & { type: 'gemini' };
+      expect(modelMsg.content).toEqual([{ text: 'I will check the file.' }]);
+      expect(modelMsg.toolCalls).toEqual([
+        expect.objectContaining({
+          id: 'call-runtime-1',
+          name: 'read_file',
+          status: CoreToolCallStatus.Success,
+        }),
+      ]);
+      // The recording must contain exactly one model message (no orphaned
+      // tool-call-only duplicate).
+      expect(record!.messages.filter((m) => m.type === 'gemini')).toHaveLength(
+        1,
+      );
+    });
+
+    it('should keep tool-call pairing intact after a resume-style rebuild', async () => {
+      await chatRecordingService.initialize(undefined, 'main');
+
+      // Build a realistic turn: user asks, model calls a tool, tool responds.
+      chatRecordingService.recordMessage({
+        model: 'gemini-pro',
+        type: 'user',
+        content: 'Check the file',
+      });
+      chatRecordingService.recordMessage({
+        model: 'gemini-pro',
+        type: 'gemini',
+        content: 'Calling read_file.',
+      });
+      chatRecordingService.recordToolCalls('gemini-pro', [
+        {
+          id: 'call-pair-1',
+          name: 'read_file',
+          args: { filePath: 'README.md' },
+          status: CoreToolCallStatus.Success,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      chatRecordingService.recordSyntheticMessage('user', [
+        {
+          functionResponse: {
+            id: 'call-pair-1',
+            name: 'read_file',
+            response: { output: 'ok' },
+          },
+        },
+      ]);
+
+      // Simulate resume: rebuild the client history from the recording and
+      // sync it back (this is what resumeChat/setHistory do).
+      const record = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const clientHistory = convertSessionToClientHistory(record!.messages);
+      chatRecordingService.updateMessagesFromHistory(clientHistory);
+
+      // Rebuild again from the synced recording and convert to the OpenAI
+      // format that DeepSeek validates strictly.
+      const record2 = await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      );
+      const clientHistory2 = convertSessionToClientHistory(record2!.messages);
+      const openAiMessages = geminiContentsToOpenAiMessages(
+        clientHistory2.map((h) => h.content),
+      );
+
+      // Every tool message must be paired with a preceding assistant
+      // tool_calls entry — no orphaned tool messages.
+      const assistantCallIds = new Set<string>();
+      const orphanToolIds: string[] = [];
+      for (const msg of openAiMessages) {
+        if (msg.role === 'assistant') {
+          for (const tc of msg.tool_calls ?? []) {
+            assistantCallIds.add(tc.id);
+          }
+        } else if (msg.role === 'tool') {
+          if (!assistantCallIds.has(msg.tool_call_id ?? '')) {
+            orphanToolIds.push(msg.tool_call_id ?? '');
+          }
+        }
+      }
+      expect(orphanToolIds).toEqual([]);
     });
   });
 

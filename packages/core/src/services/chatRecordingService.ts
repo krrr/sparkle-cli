@@ -16,6 +16,7 @@ import {
 } from '../utils/sessionOperations.js';
 import readline from 'node:readline';
 import { randomUUID } from 'node:crypto';
+import { CoreToolCallStatus } from '../scheduler/types.js';
 import type {
   Part,
   PartListUnion,
@@ -126,6 +127,57 @@ function toDurableContentParts(
     }
     return true;
   });
+}
+
+/**
+ * Extracts ToolCallRecord[] from agent-history turn parts (`functionCall`
+ * parts). `toDurableContentParts` strips these parts from durable content,
+ * so without re-extracting them here the tool-call metadata would be lost
+ * when the agent history is synced back into the recording. A resume/rewind
+ * would then rebuild a gemini turn without its function calls while the
+ * recorded user functionResponse turns remain — producing orphaned tool
+ * messages that strict OpenAI-compatible APIs (e.g. DeepSeek) reject.
+ */
+function extractToolCallsFromParts(parts: readonly Part[]): ToolCallRecord[] {
+  const toolCalls: ToolCallRecord[] = [];
+  for (const part of parts) {
+    const fc = part.functionCall;
+    if (fc && fc.name) {
+      toolCalls.push({
+        id: fc.id || '',
+        name: fc.name,
+        args: fc.args ?? {},
+        // Execution outcome is not known at sync time; these calls already
+        // happened in the conversation, so they are treated as completed.
+        status: CoreToolCallStatus.Success,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+  return toolCalls;
+}
+
+/**
+ * Merges tool calls extracted from the agent history with the tool calls
+ * already recorded for a message. Existing records win on id collisions so
+ * runtime metadata recorded by `recordToolCalls` (display name, description,
+ * result display, ...) is never overwritten by the extraction.
+ */
+function mergeToolCalls(
+  existing: ToolCallRecord[] | undefined,
+  extracted: ToolCallRecord[],
+): ToolCallRecord[] {
+  if (!existing || existing.length === 0) {
+    return extracted;
+  }
+  const merged = new Map<string, ToolCallRecord>();
+  for (const tc of extracted) {
+    merged.set(tc.id, tc);
+  }
+  for (const tc of existing) {
+    merged.set(tc.id, tc);
+  }
+  return [...merged.values()];
 }
 
 /**
@@ -1008,27 +1060,50 @@ export class ChatRecordingService {
             turn.content.parts || [],
             existing.type === 'gemini' && (existing.thoughts?.length ?? 0) > 0,
           );
+          // Restore tool-call metadata from the agent-history turn. The
+          // runtime may have recorded the tool calls on a separate message
+          // (see recordToolCalls) that is not part of agent history, so the
+          // recorded message itself must be able to recover them here;
+          // otherwise resume/rewind rebuilds gemini turns without their
+          // function calls and the recorded user functionResponse turns
+          // become orphaned tool messages that strict APIs reject.
+          const existingToolCalls =
+            existing.type === 'gemini' ? existing.toolCalls : undefined;
+          const syncedToolCalls = mergeToolCalls(
+            existingToolCalls,
+            extractToolCallsFromParts(turn.content.parts || []),
+          );
           // If content parts have changed (e.g. masking), update them
           if (
-            JSON.stringify(existing.content) !== JSON.stringify(syncedParts)
+            JSON.stringify(existing.content) !== JSON.stringify(syncedParts) ||
+            JSON.stringify(existingToolCalls ?? []) !==
+              JSON.stringify(syncedToolCalls)
           ) {
             updated = true;
           }
           newMessages.push({
             ...existing,
             content: syncedParts,
+            ...(syncedToolCalls.length > 0
+              ? { toolCalls: syncedToolCalls }
+              : {}),
           });
         } else {
           // It's a new (possibly synthetic) turn like a summary
           updated = true;
-          newMessages.push(
-            this.newMessage(
+          // Preserve tool-call metadata for model turns: `toDurableContentParts`
+          // strips functionCall parts from content, so extract them first or
+          // the new record would be unusable for resume/rewind pairing.
+          const toolCalls = extractToolCallsFromParts(turn.content.parts || []);
+          newMessages.push({
+            ...this.newMessage(
               turn.content.role === 'user' ? 'user' : 'gemini',
               toDurableContentParts(turn.content.parts || [], false),
               undefined,
               turn.id,
             ),
-          );
+            ...(toolCalls.length > 0 ? { toolCalls } : {}),
+          });
         }
       }
 
