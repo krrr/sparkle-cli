@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseAndFormatApiError } from './errorParsing.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import type { StructuredError } from '../core/turn.js';
 
 describe('parseAndFormatApiError', () => {
@@ -75,7 +75,10 @@ describe('parseAndFormatApiError', () => {
       },
     });
 
-    const result = parseAndFormatApiError(errorMessage, AuthType.USE_GEMINI);
+    const result = parseAndFormatApiError(
+      errorMessage,
+      ProviderType.USE_GEMINI,
+    );
     expect(result).toContain('Gemini 2.5 Pro Preview');
     expect(result).toContain(geminiMessage);
   });

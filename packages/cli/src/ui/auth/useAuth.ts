@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { LoadedSettings } from '../../config/settings.js';
 import {
-  AuthType,
+  ProviderType,
   type Config,
   loadApiKey,
   debugLogger,
@@ -17,7 +17,7 @@ import { AuthState } from '../types.js';
 import { validateAuthMethod } from '../../config/auth.js';
 
 export async function validateAuthMethodWithSettings(
-  authType: AuthType,
+  authType: ProviderType,
   settings: LoadedSettings,
 ): Promise<string | null> {
   const enforcedType = settings.merged.security.auth.enforcedType;
@@ -28,7 +28,7 @@ export async function validateAuthMethodWithSettings(
     return null;
   }
   // If using Gemini API key, we don't validate it here as we might need to prompt for it.
-  if (authType === AuthType.USE_GEMINI) {
+  if (authType === ProviderType.USE_GEMINI) {
     return null;
   }
   return validateAuthMethod(authType);
@@ -65,7 +65,7 @@ export const useAuthCommand = (
       return envKey;
     }
 
-    const storedKey = (await loadApiKey(AuthType.USE_GEMINI)) ?? '';
+    const storedKey = (await loadApiKey(ProviderType.USE_GEMINI)) ?? '';
     setApiKeyDefaultValue(storedKey);
     return storedKey;
   }, []);
@@ -92,7 +92,7 @@ export const useAuthCommand = (
         return;
       }
 
-      if (authType === AuthType.USE_GEMINI) {
+      if (authType === ProviderType.USE_GEMINI) {
         const key = await reloadApiKey(); // Use the unified function
         if (!key) {
           setAuthState(AuthState.AwaitingApiKeyInput);
@@ -114,11 +114,11 @@ export const useAuthCommand = (
       if (
         defaultAuthType &&
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        !Object.values(AuthType).includes(defaultAuthType as AuthType)
+        !Object.values(ProviderType).includes(defaultAuthType as ProviderType)
       ) {
         onAuthError(
           `Invalid value for GEMINI_DEFAULT_AUTH_TYPE: "${defaultAuthType}". ` +
-            `Valid values are: ${Object.values(AuthType).join(', ')}.`,
+            `Valid values are: ${Object.values(ProviderType).join(', ')}.`,
         );
         return;
       }
@@ -127,7 +127,7 @@ export const useAuthCommand = (
         await config.refreshAuth(
           authType,
           undefined,
-          authType === AuthType.USE_OPENAI
+          authType === ProviderType.USE_OPENAI
             ? settings.merged.security.auth.openaiBaseUrl
             : undefined,
         );

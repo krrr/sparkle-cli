@@ -9,7 +9,7 @@ import { type Key } from '../hooks/useKeypress.js';
 import { type IdeIntegrationNudgeResult } from '../IdeIntegrationNudge.js';
 import { type FolderTrustChoice } from '../components/FolderTrustDialog.js';
 import {
-  type AuthType,
+  type ProviderType,
   type EditorType,
   type AgentDefinition,
 } from 'sparkle-cli-core';
@@ -27,7 +27,7 @@ export interface UIActions {
   closeThemeDialog: () => void;
   handleThemeHighlight: (themeName: string | undefined) => void;
   handleAuthSelect: (
-    authType: AuthType | undefined,
+    authType: ProviderType | undefined,
     scope: LoadableSettingScope,
   ) => void;
   setAuthState: (state: AuthState) => void;

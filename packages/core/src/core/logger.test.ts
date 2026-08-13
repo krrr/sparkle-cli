@@ -20,7 +20,7 @@ import {
   decodeTagName,
   type LogEntry,
 } from './logger.js';
-import { AuthType } from './contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import { Storage } from '../config/storage.js';
 import { promises as fs, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -437,7 +437,7 @@ describe('Logger', () => {
       },
     ])('should save a checkpoint', async ({ tag, encodedTag }) => {
       await logger.saveCheckpoint(
-        { history: conversation, authType: AuthType.USE_GEMINI },
+        { history: conversation, authType: ProviderType.USE_GEMINI },
         tag,
       );
       const taggedFilePath = path.join(
@@ -447,7 +447,7 @@ describe('Logger', () => {
       const fileContent = await fs.readFile(taggedFilePath, 'utf-8');
       expect(JSON.parse(fileContent)).toEqual({
         history: conversation,
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       });
     });
 
@@ -507,7 +507,7 @@ describe('Logger', () => {
           ...conversation,
           { role: 'user', parts: [{ text: 'hello' }] },
         ],
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       };
       const taggedFilePath = path.join(
         TEST_SPARKLE_DIR,

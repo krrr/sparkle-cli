@@ -48,7 +48,7 @@ import {
   WarningPriority,
   debugLogger,
   coreEvents,
-  AuthType,
+  ProviderType,
   ExitCodes,
 } from 'sparkle-cli-core';
 import { act } from 'react';
@@ -1430,7 +1430,7 @@ describe('gemini.tsx main function exit codes', () => {
       }),
     );
     vi.mocked(validateNonInteractiveAuth).mockResolvedValue(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
 
     vi.mocked(loadSettings).mockReturnValue(
@@ -1462,7 +1462,7 @@ describe('gemini.tsx main function exit codes', () => {
       processExitSpy.mockRestore();
     }
 
-    expect(refreshAuthSpy).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+    expect(refreshAuthSpy).toHaveBeenCalledWith(ProviderType.USE_GEMINI);
   });
 });
 

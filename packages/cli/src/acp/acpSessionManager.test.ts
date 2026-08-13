@@ -17,7 +17,7 @@ import {
 import { AcpSessionManager } from './acpSessionManager.js';
 import type * as acp from '@agentclientprotocol/sdk';
 import {
-  AuthType,
+  ProviderType,
   type Config,
   SPARKLE_MODEL_ALIAS_AUTO,
   type MessageBus,
@@ -129,7 +129,7 @@ describe('AcpSessionManager', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: AuthType.USE_GEMINI },
+          auth: { selectedType: ProviderType.USE_GEMINI },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},
@@ -280,7 +280,7 @@ describe('AcpSessionManager', () => {
   it('should fail session creation if Gemini API key is missing', async () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
-        security: { auth: { selectedType: AuthType.USE_GEMINI } },
+        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
         mcpServers: {},
       },
       setValue: vi.fn(),

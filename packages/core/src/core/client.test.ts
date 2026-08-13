@@ -16,8 +16,8 @@ import {
 
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
 import { GeminiClient } from './client.js';
+import { ProviderType } from '../config/constants.js';
 import {
-  AuthType,
   type ContentGenerator,
   type ContentGeneratorConfig,
 } from './contentGenerator.js';
@@ -205,7 +205,7 @@ describe('Gemini Client (client.ts)', () => {
     const fileService = new FileDiscoveryService('/test/dir');
     const contentGeneratorConfig: ContentGeneratorConfig = {
       apiKey: 'test-key',
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     };
     mockConfig = {
       getRequestTimeoutMs: vi.fn().mockReturnValue(undefined),

@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { useAuthCommand, validateAuthMethodWithSettings } from './useAuth.js';
-import { AuthType, type Config } from 'sparkle-cli-core';
+import { ProviderType, type Config } from 'sparkle-cli-core';
 import { AuthState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 
@@ -25,7 +25,8 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 vi.mock('../../config/auth.js', () => ({
-  validateAuthMethod: (authType: AuthType) => mockValidateAuthMethod(authType),
+  validateAuthMethod: (authType: ProviderType) =>
+    mockValidateAuthMethod(authType),
 }));
 
 describe('useAuth', () => {
@@ -52,14 +53,14 @@ describe('useAuth', () => {
         merged: {
           security: {
             auth: {
-              enforcedType: AuthType.USE_GEMINI,
+              enforcedType: ProviderType.USE_GEMINI,
             },
           },
         },
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        AuthType.GATEWAY,
+        ProviderType.GATEWAY,
         settings,
       );
       expect(error).toContain('Authentication is enforced to be');
@@ -77,7 +78,7 @@ describe('useAuth', () => {
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        AuthType.GATEWAY,
+        ProviderType.GATEWAY,
         settings,
       );
       expect(error).toBeNull();
@@ -93,7 +94,7 @@ describe('useAuth', () => {
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         settings,
       );
       expect(error).toBeNull();
@@ -110,11 +111,11 @@ describe('useAuth', () => {
 
       mockValidateAuthMethod.mockResolvedValue('Validation Error');
       const error = await validateAuthMethodWithSettings(
-        AuthType.GATEWAY,
+        ProviderType.GATEWAY,
         settings,
       );
       expect(error).toBe('Validation Error');
-      expect(mockValidateAuthMethod).toHaveBeenCalledWith(AuthType.GATEWAY);
+      expect(mockValidateAuthMethod).toHaveBeenCalledWith(ProviderType.GATEWAY);
     });
   });
 
@@ -123,7 +124,7 @@ describe('useAuth', () => {
       refreshAuth: vi.fn(),
     } as unknown as Config;
 
-    const createSettings = (selectedType?: AuthType) =>
+    const createSettings = (selectedType?: ProviderType) =>
       ({
         merged: {
           security: {
@@ -150,7 +151,7 @@ describe('useAuth', () => {
 
     it('should initialize with Unauthenticated state', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
       // Because we defer refreshAuth, the initial state is safely caught here
       expect(result.current.authState).toBe(AuthState.Unauthenticated);
@@ -192,7 +193,7 @@ describe('useAuth', () => {
       );
 
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {
@@ -212,7 +213,7 @@ describe('useAuth', () => {
       );
 
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {
@@ -224,7 +225,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         undefined,
       );
@@ -236,7 +237,7 @@ describe('useAuth', () => {
       process.env['GEMINI_API_KEY'] = 'env-key';
 
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {
@@ -244,7 +245,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         undefined,
       );
@@ -256,7 +257,7 @@ describe('useAuth', () => {
       process.env['GEMINI_API_KEY'] = 'env-key';
 
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {
@@ -264,7 +265,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         undefined,
       );
@@ -275,7 +276,7 @@ describe('useAuth', () => {
     it('should set error if validation fails', async () => {
       mockValidateAuthMethod.mockResolvedValue('Validation Failed');
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.GATEWAY), mockConfig),
+        useAuthCommand(createSettings(ProviderType.GATEWAY), mockConfig),
       );
 
       expect(result.current.authError).toBe('Validation Failed');
@@ -285,7 +286,7 @@ describe('useAuth', () => {
     it('should set error if GEMINI_DEFAULT_AUTH_TYPE is invalid', async () => {
       process.env['GEMINI_DEFAULT_AUTH_TYPE'] = 'INVALID_TYPE';
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       expect(result.current.authError).toContain(
@@ -296,7 +297,7 @@ describe('useAuth', () => {
 
     it('should authenticate successfully for valid auth type', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.GATEWAY), mockConfig),
+        useAuthCommand(createSettings(ProviderType.GATEWAY), mockConfig),
       );
 
       await act(async () => {
@@ -304,7 +305,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.GATEWAY,
+        ProviderType.GATEWAY,
         undefined,
         undefined,
       );
@@ -317,7 +318,7 @@ describe('useAuth', () => {
         merged: {
           security: {
             auth: {
-              selectedType: AuthType.USE_OPENAI,
+              selectedType: ProviderType.USE_OPENAI,
               openaiBaseUrl: 'https://custom.example.com/v1',
             },
           },
@@ -333,7 +334,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.USE_OPENAI,
+        ProviderType.USE_OPENAI,
         undefined,
         'https://custom.example.com/v1',
       );
@@ -343,7 +344,7 @@ describe('useAuth', () => {
 
     it('should not pass a base URL to refreshAuth for USE_OPENAI when none is configured', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_OPENAI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_OPENAI), mockConfig),
       );
 
       await act(async () => {
@@ -351,7 +352,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        AuthType.USE_OPENAI,
+        ProviderType.USE_OPENAI,
         undefined,
         undefined,
       );
@@ -360,7 +361,7 @@ describe('useAuth', () => {
 
     it('should handle refreshAuth failure', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(AuthType.USE_GEMINI), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_GEMINI), mockConfig),
       );
 
       await act(async () => {

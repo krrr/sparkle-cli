@@ -7,7 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initializeApp } from './initializer.js';
 import {
-  AuthType,
+  ProviderType,
   IdeClient,
   logIdeConnection,
   logCliConfiguration,
@@ -158,7 +158,7 @@ describe('initializer', () => {
   });
 
   it('should pass the OpenAI base URL to refreshAuth for USE_OPENAI', async () => {
-    mockSettings.merged.security.auth.selectedType = AuthType.USE_OPENAI;
+    mockSettings.merged.security.auth.selectedType = ProviderType.USE_OPENAI;
     mockSettings.merged.security.auth.openaiBaseUrl =
       'https://custom.example.com/v1';
     const result = await initializeApp(
@@ -169,14 +169,14 @@ describe('initializer', () => {
     expect(result.authError).toBeNull();
     expect(result.shouldOpenAuthDialog).toBe(false);
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
       undefined,
       'https://custom.example.com/v1',
     );
   });
 
   it('should not pass the OpenAI base URL for non-OpenAI auth types', async () => {
-    mockSettings.merged.security.auth.selectedType = AuthType.USE_GEMINI;
+    mockSettings.merged.security.auth.selectedType = ProviderType.USE_GEMINI;
     mockSettings.merged.security.auth.openaiBaseUrl =
       'https://custom.example.com/v1';
     const result = await initializeApp(
@@ -186,7 +186,7 @@ describe('initializer', () => {
 
     expect(result.authError).toBeNull();
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       undefined,
       undefined,
     );

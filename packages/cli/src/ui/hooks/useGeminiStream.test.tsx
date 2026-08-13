@@ -40,7 +40,7 @@ import type {
 import {
   CoreToolCallStatus,
   ApprovalMode,
-  AuthType,
+  ProviderType,
   GeminiEventType as ServerGeminiEventType,
   ToolErrorType,
   ToolConfirmationOutcome,
@@ -345,7 +345,7 @@ describe('useGeminiStream', () => {
       model: 'test-model',
       apiKey: 'test-key',
       vertexai: false,
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     })),
     getContentGenerator: vi.fn(),
     isInteractive: () => false,
@@ -2463,7 +2463,7 @@ describe('useGeminiStream', () => {
     it('should call parseAndFormatApiError with the correct authType on stream initialization failure', async () => {
       // 1. Setup
       const mockError = new Error('Rate limit exceeded');
-      const mockAuthType = AuthType.USE_GEMINI;
+      const mockAuthType = ProviderType.USE_GEMINI;
       mockParseAndFormatApiError.mockClear();
       mockSendMessageStream.mockReturnValue(
         (async function* () {

@@ -21,7 +21,7 @@ import {
   type Config,
   type ConfigParameters,
   ExtensionLoader,
-  AuthType,
+  ProviderType,
   ApprovalMode,
   createPolicyEngineConfig,
   PolicyDecision,
@@ -235,7 +235,7 @@ export class AppRig {
       await this.config!.initialize();
       // Since we mocked useAuthCommand, we must manually trigger the first
       // refreshAuth to ensure contentGenerator is initialized.
-      await this.config!.refreshAuth(AuthType.USE_GEMINI);
+      await this.config!.refreshAuth(ProviderType.USE_GEMINI);
     });
   }
 
@@ -256,7 +256,7 @@ export class AppRig {
       // For live tests, we allow falling through to the real shell service if no mock matches
       MockShellExecutionService.setPassthrough(true);
     }
-    vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', AuthType.USE_GEMINI);
+    vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', ProviderType.USE_GEMINI);
   }
 
   private createRigSettings(): LoadedSettings {
@@ -266,7 +266,7 @@ export class AppRig {
         settings: {
           security: {
             auth: {
-              selectedType: AuthType.USE_GEMINI,
+              selectedType: ProviderType.USE_GEMINI,
               useExternal: true,
             },
             folderTrust: {
@@ -283,7 +283,7 @@ export class AppRig {
       merged: {
         security: {
           auth: {
-            selectedType: AuthType.USE_GEMINI,
+            selectedType: ProviderType.USE_GEMINI,
             useExternal: true,
           },
           folderTrust: {
@@ -304,7 +304,7 @@ export class AppRig {
   private stubRefreshAuth() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const gcConfig = this.config as any;
-    gcConfig.refreshAuth = async (authMethod: AuthType) => {
+    gcConfig.refreshAuth = async (authMethod: ProviderType) => {
       gcConfig.modelAvailabilityService.reset();
 
       const newContentGeneratorConfig = {

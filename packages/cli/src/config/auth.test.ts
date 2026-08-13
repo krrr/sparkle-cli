@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthType } from 'sparkle-cli-core';
+import { ProviderType } from 'sparkle-cli-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { validateAuthMethod } from './auth.js';
 
@@ -36,14 +36,14 @@ describe('validateAuthMethod', () => {
   it.each([
     {
       description: 'should return null for USE_GEMINI if GEMINI_API_KEY is set',
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
       envs: { GEMINI_API_KEY: 'test-key' },
       expected: null,
     },
     {
       description:
         'should return an error message for USE_GEMINI if GEMINI_API_KEY is not set',
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
       envs: {},
       expected:
         'When using Gemini API, you must specify the GEMINI_API_KEY environment variable.\n' +
@@ -52,13 +52,13 @@ describe('validateAuthMethod', () => {
     {
       description:
         'should return null for USE_OPENAI even if OPENAI_API_KEY is not set',
-      authType: AuthType.USE_OPENAI,
+      authType: ProviderType.USE_OPENAI,
       envs: {},
       expected: null,
     },
     {
       description: 'should return null for USE_OPENAI if OPENAI_API_KEY is set',
-      authType: AuthType.USE_OPENAI,
+      authType: ProviderType.USE_OPENAI,
       envs: { OPENAI_API_KEY: 'test-key' },
       expected: null,
     },

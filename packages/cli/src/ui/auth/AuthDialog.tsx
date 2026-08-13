@@ -18,7 +18,7 @@ import {
   type LoadedSettings,
 } from '../../config/settings.js';
 import {
-  AuthType,
+  ProviderType,
   DEFAULT_OPENAI_BASE_URL,
   loadApiKey,
   saveApiKey,
@@ -54,13 +54,13 @@ export function AuthDialog({
   const items = [
     {
       label: 'Use Gemini API',
-      value: AuthType.USE_GEMINI,
-      key: AuthType.USE_GEMINI,
+      value: ProviderType.USE_GEMINI,
+      key: ProviderType.USE_GEMINI,
     },
     {
       label: 'Use OpenAI-compatible API',
-      value: AuthType.USE_OPENAI,
-      key: AuthType.USE_OPENAI,
+      value: ProviderType.USE_OPENAI,
+      key: ProviderType.USE_OPENAI,
     },
   ];
 
@@ -105,15 +105,15 @@ export function AuthDialog({
     singleLine: true,
   });
 
-  let defaultAuthType: AuthType | null = null;
+  let defaultAuthType: ProviderType | null = null;
   const defaultAuthTypeEnv = process.env['GEMINI_DEFAULT_AUTH_TYPE'];
   if (
     defaultAuthTypeEnv &&
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    Object.values(AuthType).includes(defaultAuthTypeEnv as AuthType)
+    Object.values(ProviderType).includes(defaultAuthTypeEnv as ProviderType)
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    defaultAuthType = defaultAuthTypeEnv as AuthType;
+    defaultAuthType = defaultAuthTypeEnv as ProviderType;
   }
 
   let initialAuthIndex = filteredItems.findIndex((item) => {
@@ -125,18 +125,18 @@ export function AuthDialog({
       return item.value === defaultAuthType;
     }
 
-    return item.value === AuthType.USE_GEMINI;
+    return item.value === ProviderType.USE_GEMINI;
   });
   if (settings.merged.security.auth.enforcedType) {
     initialAuthIndex = 0;
   }
 
   const onSelect = useCallback(
-    async (authType: AuthType | undefined, scope: LoadableSettingScope) => {
+    async (authType: ProviderType | undefined, scope: LoadableSettingScope) => {
       if (authType) {
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
-        if (authType === AuthType.USE_GEMINI) {
+        if (authType === ProviderType.USE_GEMINI) {
           // Always show the API key input dialog so the user can
           // explicitly enter or confirm their key, regardless of
           // whether GEMINI_API_KEY env var or a stored key exists.
@@ -149,7 +149,7 @@ export function AuthDialog({
     [settings, setAuthState],
   );
 
-  const handleAuthSelect = async (authMethod: AuthType) => {
+  const handleAuthSelect = async (authMethod: ProviderType) => {
     const error = await validateAuthMethodWithSettings(
       authMethod,
       settings,
@@ -158,7 +158,7 @@ export function AuthDialog({
       onAuthError(error);
       return;
     }
-    if (authMethod === AuthType.USE_OPENAI) {
+    if (authMethod === ProviderType.USE_OPENAI) {
       // Ask for the base URL and API key before finalizing the selection so
       // they can be stored and used by the OpenAI-compatible content
       // generator. The base URL input is shown on top, the key below.
@@ -166,7 +166,7 @@ export function AuthDialog({
       setIsEnteringOpenAiConfig(true);
       setIsBaseUrlFocused(true);
       if (!process.env['OPENAI_API_KEY']) {
-        const storedKey = await loadApiKey(AuthType.USE_OPENAI);
+        const storedKey = await loadApiKey(ProviderType.USE_OPENAI);
         if (storedKey) {
           apiKeyBuffer.setText(storedKey);
         }
@@ -200,7 +200,7 @@ export function AuthDialog({
 
   const handleOpenAiKeySubmit = async (apiKey: string) => {
     try {
-      await saveApiKey(AuthType.USE_OPENAI, apiKey.trim() || undefined);
+      await saveApiKey(ProviderType.USE_OPENAI, apiKey.trim() || undefined);
       onAuthError(null);
       settings.setValue(
         SettingScope.User,
@@ -209,7 +209,7 @@ export function AuthDialog({
       );
       setIsEnteringOpenAiConfig(false);
       setIsBaseUrlFocused(true);
-      await onSelect(AuthType.USE_OPENAI, SettingScope.User);
+      await onSelect(ProviderType.USE_OPENAI, SettingScope.User);
     } catch (e) {
       onAuthError(
         `Failed to save API key: ${e instanceof Error ? e.message : String(e)}`,

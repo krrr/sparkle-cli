@@ -10,11 +10,10 @@ import type { AddressInfo } from 'node:net';
 import type { Config } from '../config/config.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { OpenAiCompatibleGenerator } from './openAiCompatibleGenerator.js';
+import { ProviderType, getProviderTypeFromEnv } from '../config/constants.js';
 import {
-  AuthType,
   createContentGenerator,
   createContentGeneratorConfig,
-  getAuthTypeFromEnv,
   getOpenAiProvider,
 } from './contentGenerator.js';
 import { LlmRole } from '../telemetry/llmRole.js';
@@ -105,7 +104,7 @@ function startFakeOpenAiServer(): Promise<{
   });
 }
 
-describe('getAuthTypeFromEnv', () => {
+describe('getProviderTypeFromEnv', () => {
   beforeEach(() => {
     vi.stubEnv('GEMINI_API_KEY', '');
     vi.stubEnv('OPENAI_API_KEY', '');
@@ -118,19 +117,19 @@ describe('getAuthTypeFromEnv', () => {
 
   it('detects USE_OPENAI when only OPENAI_API_KEY is set', () => {
     vi.stubEnv('OPENAI_API_KEY', 'sk-test');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.USE_OPENAI);
+    expect(getProviderTypeFromEnv()).toBe(ProviderType.USE_OPENAI);
   });
 
   it('prefers GEMINI_API_KEY over OPENAI_API_KEY', () => {
     vi.stubEnv('GEMINI_API_KEY', 'gemini-key');
     vi.stubEnv('OPENAI_API_KEY', 'sk-test');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.USE_GEMINI);
+    expect(getProviderTypeFromEnv()).toBe(ProviderType.USE_GEMINI);
   });
 
   it('prefers GOOGLE_GEMINI_BASE_URL over OPENAI_API_KEY', () => {
     vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gateway.example.com');
     vi.stubEnv('OPENAI_API_KEY', 'sk-test');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.GATEWAY);
+    expect(getProviderTypeFromEnv()).toBe(ProviderType.GATEWAY);
   });
 });
 
@@ -149,10 +148,10 @@ describe('createContentGeneratorConfig with USE_OPENAI', () => {
     vi.stubEnv('OPENAI_BASE_URL', 'https://api.deepseek.com');
     const config = await createContentGeneratorConfig(
       createMockConfig(),
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config).toMatchObject({
-      authType: AuthType.USE_OPENAI,
+      authType: ProviderType.USE_OPENAI,
       apiKey: 'sk-env',
       baseUrl: 'https://api.deepseek.com',
     });
@@ -162,7 +161,7 @@ describe('createContentGeneratorConfig with USE_OPENAI', () => {
     vi.stubEnv('OPENAI_API_KEY', 'sk-env');
     const config = await createContentGeneratorConfig(
       createMockConfig(),
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config.baseUrl).toBe('https://api.openai.com/v1');
   });
@@ -173,7 +172,7 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'deepseek/deepseek-v4-flash',
       ),
     ).toBe('deepseek');
@@ -183,21 +182,24 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI, baseUrl: 'https://api.openai.com/v1' },
+        {
+          authType: ProviderType.USE_OPENAI,
+          baseUrl: 'https://api.openai.com/v1',
+        },
         'deepseek-v4-flash',
       ),
     ).toBe('deepseek');
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'deepseek-v4-flash',
       ),
     ).toBe('deepseek');
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'deepseek-v4-pro',
       ),
     ).toBe('deepseek');
@@ -207,7 +209,7 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'DeepSeek-Chinese-V3',
       ),
     ).toBe('deepseek');
@@ -217,7 +219,10 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI, baseUrl: 'https://api.deepseek.com' },
+        {
+          authType: ProviderType.USE_OPENAI,
+          baseUrl: 'https://api.deepseek.com',
+        },
         'some-model',
       ),
     ).toBe('deepseek');
@@ -227,14 +232,17 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI, baseUrl: 'https://api.openai.com/v1' },
+        {
+          authType: ProviderType.USE_OPENAI,
+          baseUrl: 'https://api.openai.com/v1',
+        },
         'gpt-4o',
       ),
     ).toBe('openai');
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'claude-sonnet-4',
       ),
     ).toBe('openai');
@@ -245,7 +253,10 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI, baseUrl: 'https://api.openai.com/v1' },
+        {
+          authType: ProviderType.USE_OPENAI,
+          baseUrl: 'https://api.openai.com/v1',
+        },
         'gpt-4o',
       ),
     ).toBe('custom');
@@ -257,7 +268,7 @@ describe('getOpenAiProvider', () => {
     expect(
       getOpenAiProvider(
         createMockConfig(),
-        { authType: AuthType.USE_OPENAI },
+        { authType: ProviderType.USE_OPENAI },
         'deepseek-v4-flash',
       ),
     ).toBe('custom');
@@ -281,7 +292,7 @@ describe('createContentGenerator with USE_OPENAI', () => {
     const config = createMockConfig();
     const generator = await createContentGenerator(
       {
-        authType: AuthType.USE_OPENAI,
+        authType: ProviderType.USE_OPENAI,
         apiKey: 'sk-test',
         baseUrl: 'https://api.openai.com/v1',
       },
@@ -298,7 +309,7 @@ describe('createContentGenerator with USE_OPENAI', () => {
       const config = createMockConfig();
       const generator = await createContentGenerator(
         {
-          authType: AuthType.USE_OPENAI,
+          authType: ProviderType.USE_OPENAI,
           apiKey: 'sk-test',
           baseUrl: fake.baseUrl,
         },

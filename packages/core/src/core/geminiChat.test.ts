@@ -31,7 +31,7 @@ import {
 import { MockTool } from '../test-utils/mock-tool.js';
 import type { Config } from '../config/config.js';
 import { setSimulate429 } from '../utils/testUtils.js';
-import { AuthType } from './contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import { TerminalQuotaError } from '../utils/googleQuotaErrors.js';
 import { type RetryOptions } from '../utils/retry.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
@@ -3099,7 +3099,7 @@ describe('GeminiChat', () => {
     });
 
     it('should call handleFallback with the specific failed model and retry if handler returns true', async () => {
-      const authType = AuthType.USE_GEMINI;
+      const authType = ProviderType.USE_GEMINI;
       vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
         authType,
       });
@@ -3727,7 +3727,7 @@ describe('GeminiChat', () => {
           await apiCall();
         } catch (e) {
           if (options?.onPersistent429) {
-            await options.onPersistent429(AuthType.USE_GEMINI, e);
+            await options.onPersistent429(ProviderType.USE_GEMINI, e);
           }
           throw e; // throw anyway to end test
         }

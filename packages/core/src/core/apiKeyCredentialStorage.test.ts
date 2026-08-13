@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AuthType } from './contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import {
   loadApiKey,
   saveApiKey,
@@ -34,7 +34,7 @@ describe('ApiKeyCredentialStorage', () => {
     resetApiKeyCacheForTesting();
   });
 
-  describe('Gemini API key entry (AuthType.USE_GEMINI)', () => {
+  describe('Gemini API key entry (ProviderType.USE_GEMINI)', () => {
     it('should load an API key and cache it', async () => {
       getCredentialsMock.mockResolvedValue({
         serverName: GEMINI_ENTRY,
@@ -45,23 +45,23 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-      const apiKey1 = await loadApiKey(AuthType.USE_GEMINI);
+      const apiKey1 = await loadApiKey(ProviderType.USE_GEMINI);
       expect(apiKey1).toBe('test-key');
       expect(getCredentialsMock).toHaveBeenCalledTimes(1);
       expect(getCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
 
-      const apiKey2 = await loadApiKey(AuthType.USE_GEMINI);
+      const apiKey2 = await loadApiKey(ProviderType.USE_GEMINI);
       expect(apiKey2).toBe('test-key');
       expect(getCredentialsMock).toHaveBeenCalledTimes(1); // Should be cached
     });
 
     it('should return null if no API key is stored and cache it', async () => {
       getCredentialsMock.mockResolvedValue(null);
-      const apiKey1 = await loadApiKey(AuthType.USE_GEMINI);
+      const apiKey1 = await loadApiKey(ProviderType.USE_GEMINI);
       expect(apiKey1).toBeNull();
       expect(getCredentialsMock).toHaveBeenCalledTimes(1);
 
-      const apiKey2 = await loadApiKey(AuthType.USE_GEMINI);
+      const apiKey2 = await loadApiKey(ProviderType.USE_GEMINI);
       expect(apiKey2).toBeNull();
       expect(getCredentialsMock).toHaveBeenCalledTimes(1); // Should be cached
     });
@@ -76,10 +76,10 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-      await loadApiKey(AuthType.USE_GEMINI);
+      await loadApiKey(ProviderType.USE_GEMINI);
       expect(getCredentialsMock).toHaveBeenCalledTimes(1);
 
-      await saveApiKey(AuthType.USE_GEMINI, 'new-key');
+      await saveApiKey(ProviderType.USE_GEMINI, 'new-key');
       expect(setCredentialsMock).toHaveBeenCalledWith(
         expect.objectContaining({
           serverName: GEMINI_ENTRY,
@@ -99,7 +99,7 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-      await loadApiKey(AuthType.USE_GEMINI);
+      await loadApiKey(ProviderType.USE_GEMINI);
       expect(getCredentialsMock).toHaveBeenCalledTimes(2); // Should have fetched again
     });
 
@@ -113,25 +113,25 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-      await loadApiKey(AuthType.USE_GEMINI);
+      await loadApiKey(ProviderType.USE_GEMINI);
       expect(getCredentialsMock).toHaveBeenCalledTimes(1);
 
-      await clearApiKey(AuthType.USE_GEMINI);
+      await clearApiKey(ProviderType.USE_GEMINI);
       expect(deleteCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
 
       getCredentialsMock.mockResolvedValue(null);
-      await loadApiKey(AuthType.USE_GEMINI);
+      await loadApiKey(ProviderType.USE_GEMINI);
       expect(getCredentialsMock).toHaveBeenCalledTimes(2); // Should have fetched again
     });
 
     it('should clear an API key and cache when saving empty key', async () => {
-      await saveApiKey(AuthType.USE_GEMINI, '');
+      await saveApiKey(ProviderType.USE_GEMINI, '');
       expect(deleteCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
       expect(setCredentialsMock).not.toHaveBeenCalled();
     });
 
     it('should clear an API key and cache when saving null key', async () => {
-      await saveApiKey(AuthType.USE_GEMINI, null);
+      await saveApiKey(ProviderType.USE_GEMINI, null);
       expect(deleteCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
       expect(setCredentialsMock).not.toHaveBeenCalled();
     });
@@ -140,7 +140,9 @@ describe('ApiKeyCredentialStorage', () => {
       deleteCredentialsMock.mockRejectedValueOnce(
         new Error('Failed to delete'),
       );
-      await expect(saveApiKey(AuthType.USE_GEMINI, '')).resolves.not.toThrow();
+      await expect(
+        saveApiKey(ProviderType.USE_GEMINI, ''),
+      ).resolves.not.toThrow();
       expect(deleteCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
     });
 
@@ -148,12 +150,12 @@ describe('ApiKeyCredentialStorage', () => {
       deleteCredentialsMock.mockRejectedValueOnce(
         new Error('Failed to delete'),
       );
-      await expect(clearApiKey(AuthType.USE_GEMINI)).resolves.not.toThrow();
+      await expect(clearApiKey(ProviderType.USE_GEMINI)).resolves.not.toThrow();
       expect(deleteCredentialsMock).toHaveBeenCalledWith(GEMINI_ENTRY);
     });
   });
 
-  describe('OpenAI API key entry (AuthType.USE_OPENAI)', () => {
+  describe('OpenAI API key entry (ProviderType.USE_OPENAI)', () => {
     it('should load an OpenAI API key and cache it', async () => {
       getCredentialsMock.mockResolvedValue({
         serverName: OPENAI_ENTRY,
@@ -164,23 +166,23 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-      const apiKey1 = await loadApiKey(AuthType.USE_OPENAI);
+      const apiKey1 = await loadApiKey(ProviderType.USE_OPENAI);
       expect(apiKey1).toBe('sk-test-key');
       expect(getCredentialsMock).toHaveBeenCalledTimes(1);
       expect(getCredentialsMock).toHaveBeenCalledWith(OPENAI_ENTRY);
 
-      const apiKey2 = await loadApiKey(AuthType.USE_OPENAI);
+      const apiKey2 = await loadApiKey(ProviderType.USE_OPENAI);
       expect(apiKey2).toBe('sk-test-key');
       expect(getCredentialsMock).toHaveBeenCalledTimes(1); // Should be cached
     });
 
     it('should return null if no OpenAI API key is stored', async () => {
       getCredentialsMock.mockResolvedValue(null);
-      await expect(loadApiKey(AuthType.USE_OPENAI)).resolves.toBeNull();
+      await expect(loadApiKey(ProviderType.USE_OPENAI)).resolves.toBeNull();
     });
 
     it('should save an OpenAI API key under the openai-api-key entry', async () => {
-      await saveApiKey(AuthType.USE_OPENAI, 'sk-new-key');
+      await saveApiKey(ProviderType.USE_OPENAI, 'sk-new-key');
       expect(setCredentialsMock).toHaveBeenCalledWith(
         expect.objectContaining({
           serverName: OPENAI_ENTRY,
@@ -193,20 +195,20 @@ describe('ApiKeyCredentialStorage', () => {
     });
 
     it('should clear the OpenAI API key and cache when saving empty key', async () => {
-      await saveApiKey(AuthType.USE_OPENAI, '');
+      await saveApiKey(ProviderType.USE_OPENAI, '');
       expect(deleteCredentialsMock).toHaveBeenCalledWith(OPENAI_ENTRY);
       expect(setCredentialsMock).not.toHaveBeenCalled();
     });
 
     it('should clear the OpenAI API key via clearApiKey', async () => {
-      await clearApiKey(AuthType.USE_OPENAI);
+      await clearApiKey(ProviderType.USE_OPENAI);
       expect(deleteCredentialsMock).toHaveBeenCalledWith(OPENAI_ENTRY);
     });
   });
 
   it('should keep the Gemini and OpenAI API keys in separate entries', async () => {
-    await saveApiKey(AuthType.USE_GEMINI, 'gemini-key');
-    await saveApiKey(AuthType.USE_OPENAI, 'openai-key');
+    await saveApiKey(ProviderType.USE_GEMINI, 'gemini-key');
+    await saveApiKey(ProviderType.USE_OPENAI, 'openai-key');
     expect(setCredentialsMock).toHaveBeenNthCalledWith(
       1,
       expect.objectContaining({ serverName: GEMINI_ENTRY }),
@@ -228,7 +230,11 @@ describe('ApiKeyCredentialStorage', () => {
         updatedAt: Date.now(),
       });
 
-    await expect(loadApiKey(AuthType.USE_GEMINI)).resolves.toBe('gemini-key');
-    await expect(loadApiKey(AuthType.USE_OPENAI)).resolves.toBe('openai-key');
+    await expect(loadApiKey(ProviderType.USE_GEMINI)).resolves.toBe(
+      'gemini-key',
+    );
+    await expect(loadApiKey(ProviderType.USE_OPENAI)).resolves.toBe(
+      'openai-key',
+    );
   });
 });

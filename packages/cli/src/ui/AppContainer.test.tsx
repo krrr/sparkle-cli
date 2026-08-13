@@ -28,7 +28,7 @@ import {
   type ResumedSessionData,
   type StartupWarning,
   WarningPriority,
-  AuthType,
+  ProviderType,
   type AgentDefinition,
   CoreToolCallStatus,
 } from 'sparkle-cli-core';
@@ -2982,7 +2982,7 @@ describe('AppContainer State Management', () => {
     it('should render placeholder banner text for USE_GEMINI auth type', async () => {
       const config = makeFakeConfig();
       vi.spyOn(config, 'getContentGeneratorConfig').mockReturnValue({
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
         apiKey: 'fake-key',
       });
       let unmount: () => void;

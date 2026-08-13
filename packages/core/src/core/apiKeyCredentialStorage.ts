@@ -6,7 +6,7 @@
 
 import { HybridTokenStorage } from '../mcp/token-storage/hybrid-token-storage.js';
 import type { OAuthCredentials } from '../mcp/token-storage/types.js';
-import type { AuthType } from './contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { createCache, type CacheService } from '../utils/cache.js';
 
@@ -106,15 +106,12 @@ const openAiApiKeyStore = createApiKeyStore(OPENAI_API_KEY_ENTRY);
 
 /**
  * Maps an auth type to its key store. USE_GEMINI and GATEWAY share the Gemini
- * entry (GATEWAY is planned to be merged into USE_GEMINI). The record keys
- * mirror the AuthType enum values; AuthType is imported as a type only so this
- * module keeps no runtime dependency on contentGenerator.ts (avoiding a
- * circular import).
+ * entry (GATEWAY is planned to be merged into USE_GEMINI).
  */
-const STORE_BY_AUTH_TYPE: Record<AuthType, ApiKeyStore> = {
-  [GEMINI_API_KEY_ENTRY]: geminiApiKeyStore, // AuthType.USE_GEMINI
-  gateway: geminiApiKeyStore, // AuthType.GATEWAY
-  openai: openAiApiKeyStore, // AuthType.USE_OPENAI ('openai-api-key' entry)
+const STORE_BY_AUTH_TYPE: Record<ProviderType, ApiKeyStore> = {
+  [ProviderType.USE_GEMINI]: geminiApiKeyStore,
+  [ProviderType.GATEWAY]: geminiApiKeyStore,
+  [ProviderType.USE_OPENAI]: openAiApiKeyStore,
 };
 
 /**
@@ -130,23 +127,23 @@ export function resetApiKeyCacheForTesting() {
 /**
  * Load the cached API key for the given auth type.
  */
-export async function loadApiKey(authType: AuthType): Promise<string | null> {
-  return STORE_BY_AUTH_TYPE[authType].load();
+export async function loadApiKey(type: ProviderType): Promise<string | null> {
+  return STORE_BY_AUTH_TYPE[type].load();
 }
 
 /**
  * Save an API key for the given auth type. Passing null/empty clears it.
  */
 export async function saveApiKey(
-  authType: AuthType,
+  type: ProviderType,
   apiKey: string | null | undefined,
 ): Promise<void> {
-  return STORE_BY_AUTH_TYPE[authType].save(apiKey);
+  return STORE_BY_AUTH_TYPE[type].save(apiKey);
 }
 
 /**
  * Clear the cached API key for the given auth type.
  */
-export async function clearApiKey(authType: AuthType): Promise<void> {
-  return STORE_BY_AUTH_TYPE[authType].clear();
+export async function clearApiKey(type: ProviderType): Promise<void> {
+  return STORE_BY_AUTH_TYPE[type].clear();
 }

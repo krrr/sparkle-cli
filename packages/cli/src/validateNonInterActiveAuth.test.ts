@@ -15,7 +15,7 @@ import {
 } from 'vitest';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
 import {
-  AuthType,
+  ProviderType,
   OutputFormat,
   makeFakeConfig,
   debugLogger,
@@ -127,7 +127,7 @@ describe('validateNonInterActiveAuth', () => {
     process.env['GEMINI_API_KEY'] = 'fake-key';
     const nonInteractiveConfig = createLocalMockConfig({});
     await validateNonInteractiveAuth(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       undefined,
       nonInteractiveConfig,
       mockSettings,
@@ -147,7 +147,7 @@ describe('validateNonInterActiveAuth', () => {
     });
     try {
       await validateNonInteractiveAuth(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         nonInteractiveConfig,
         mockSettings,
@@ -173,7 +173,7 @@ describe('validateNonInterActiveAuth', () => {
     // Even with an invalid auth type, it should not exit
     // because validation is skipped.
     await validateNonInteractiveAuth(
-      'invalid-auth-type' as AuthType,
+      'invalid-auth-type' as ProviderType,
       true, // useExternalAuth = true
       nonInteractiveConfig,
       mockSettings,
@@ -186,7 +186,7 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   it('succeeds if effectiveAuthType matches enforcedType', async () => {
-    mockSettings.merged.security.auth.enforcedType = AuthType.USE_GEMINI;
+    mockSettings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
     process.env['GEMINI_API_KEY'] = 'fake-key';
     const nonInteractiveConfig = createLocalMockConfig({});
     await validateNonInteractiveAuth(
@@ -200,13 +200,13 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   it('exits if configuredAuthType does not match enforcedType', async () => {
-    mockSettings.merged.security.auth.enforcedType = AuthType.GATEWAY;
+    mockSettings.merged.security.auth.enforcedType = ProviderType.GATEWAY;
     const nonInteractiveConfig = createLocalMockConfig({
       getOutputFormat: vi.fn().mockReturnValue(OutputFormat.TEXT),
     });
     try {
       await validateNonInteractiveAuth(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         nonInteractiveConfig,
         mockSettings,
@@ -226,7 +226,7 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   it('exits if auth from env var does not match enforcedType', async () => {
-    mockSettings.merged.security.auth.enforcedType = AuthType.GATEWAY;
+    mockSettings.merged.security.auth.enforcedType = ProviderType.GATEWAY;
     process.env['GEMINI_API_KEY'] = 'fake-key';
     const nonInteractiveConfig = createLocalMockConfig({
       getOutputFormat: vi.fn().mockReturnValue(OutputFormat.TEXT),
@@ -287,7 +287,7 @@ describe('validateNonInterActiveAuth', () => {
     });
 
     it(`prints JSON error when enforced auth mismatches current auth and exits with code ${ExitCodes.FATAL_AUTHENTICATION_ERROR}`, async () => {
-      mockSettings.merged.security.auth.enforcedType = AuthType.USE_GEMINI;
+      mockSettings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
       const nonInteractiveConfig = createLocalMockConfig({
         getOutputFormat: vi.fn().mockReturnValue(OutputFormat.JSON),
         getContentGeneratorConfig: vi
@@ -298,7 +298,7 @@ describe('validateNonInterActiveAuth', () => {
       let thrown: Error | undefined;
       try {
         await validateNonInteractiveAuth(
-          AuthType.GATEWAY,
+          ProviderType.GATEWAY,
           undefined,
           nonInteractiveConfig,
           mockSettings,
@@ -336,7 +336,7 @@ describe('validateNonInterActiveAuth', () => {
       let thrown: Error | undefined;
       try {
         await validateNonInteractiveAuth(
-          AuthType.USE_GEMINI,
+          ProviderType.USE_GEMINI,
           undefined,
           nonInteractiveConfig,
           mockSettings,

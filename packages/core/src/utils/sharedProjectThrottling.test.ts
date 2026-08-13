@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import fs from 'node:fs';
 import { retryWithBackoff } from './retry.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import { TerminalQuotaError } from './googleQuotaErrors.js';
 import type { GoogleApiError } from './googleErrors.js';
 
@@ -78,7 +78,7 @@ describe('Shared Project Throttling Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 5,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     });
 
     await expect(promise).rejects.toThrow(

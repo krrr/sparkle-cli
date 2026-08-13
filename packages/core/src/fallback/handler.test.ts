@@ -18,7 +18,7 @@ import { handleFallback } from './handler.js';
 import type { Config } from '../config/config.js';
 import type { ModelAvailabilityService } from '../availability/modelAvailabilityService.js';
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
@@ -55,7 +55,7 @@ vi.mock('../utils/debugLogger.js', () => ({
 
 const MOCK_PRO_MODEL = DEFAULT_GEMINI_MODEL;
 const FALLBACK_MODEL = DEFAULT_GEMINI_FLASH_MODEL;
-const AUTH_OAUTH = AuthType.USE_GEMINI;
+const AUTH_OAUTH = ProviderType.USE_GEMINI;
 
 const createMockConfig = (overrides: Partial<Config> = {}): Config =>
   ({

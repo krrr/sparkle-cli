@@ -18,7 +18,7 @@ import {
 } from 'vitest';
 import { AuthDialog } from './AuthDialog.js';
 import {
-  AuthType,
+  ProviderType,
   DEFAULT_OPENAI_BASE_URL,
   loadApiKey,
   saveApiKey,
@@ -153,24 +153,24 @@ describe('AuthDialog', () => {
     const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
     const items = mockedRadioButtonSelect.mock.calls[0][0].items;
     expect(items).toHaveLength(2);
-    expect(items[0].value).toBe(AuthType.USE_GEMINI);
+    expect(items[0].value).toBe(ProviderType.USE_GEMINI);
     expect(items[0].label).toBe('Use Gemini API');
-    expect(items[1].value).toBe(AuthType.USE_OPENAI);
+    expect(items[1].value).toBe(ProviderType.USE_OPENAI);
     expect(items[1].label).toBe('Use OpenAI-compatible API');
     unmount();
   });
 
   it('filters auth types when enforcedType is set', async () => {
-    props.settings.merged.security.auth.enforcedType = AuthType.USE_GEMINI;
+    props.settings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
     const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
     const items = mockedRadioButtonSelect.mock.calls[0][0].items;
     expect(items).toHaveLength(1);
-    expect(items[0].value).toBe(AuthType.USE_GEMINI);
+    expect(items[0].value).toBe(ProviderType.USE_GEMINI);
     unmount();
   });
 
   it('sets initial index to 0 when enforcedType is set', async () => {
-    props.settings.merged.security.auth.enforcedType = AuthType.USE_GEMINI;
+    props.settings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
     const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
     const { initialIndex } = mockedRadioButtonSelect.mock.calls[0][0];
     expect(initialIndex).toBe(0);
@@ -182,28 +182,28 @@ describe('AuthDialog', () => {
       {
         setup: () => {
           props.settings.merged.security.auth.selectedType =
-            AuthType.USE_GEMINI;
+            ProviderType.USE_GEMINI;
         },
-        expected: AuthType.USE_GEMINI,
+        expected: ProviderType.USE_GEMINI,
         desc: 'from settings',
       },
       {
         setup: () => {
-          vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', AuthType.USE_GEMINI);
+          vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', ProviderType.USE_GEMINI);
         },
-        expected: AuthType.USE_GEMINI,
+        expected: ProviderType.USE_GEMINI,
         desc: 'from GEMINI_DEFAULT_AUTH_TYPE env var',
       },
       {
         setup: () => {
           vi.stubEnv('GEMINI_API_KEY', 'test-key');
         },
-        expected: AuthType.USE_GEMINI,
+        expected: ProviderType.USE_GEMINI,
         desc: 'from GEMINI_API_KEY env var',
       },
       {
         setup: () => {},
-        expected: AuthType.USE_GEMINI,
+        expected: ProviderType.USE_GEMINI,
         desc: 'defaults to Gemini API key',
       },
     ])('selects initial auth type $desc', async ({ setup, expected }) => {
@@ -221,10 +221,10 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(mockedValidateAuthMethod).toHaveBeenCalledWith(
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         props.settings,
       );
       expect(props.onAuthError).toHaveBeenCalledWith('Invalid method');
@@ -237,12 +237,12 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(props.settings.setValue).toHaveBeenCalledWith(
         expect.any(String),
         'security.auth.selectedType',
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
       );
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.AwaitingApiKeyInput,
@@ -258,7 +258,7 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.AwaitingApiKeyInput,
@@ -274,7 +274,7 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.AwaitingApiKeyInput,
@@ -290,7 +290,7 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.AwaitingApiKeyInput,
@@ -302,12 +302,12 @@ describe('AuthDialog', () => {
       mockedValidateAuthMethod.mockResolvedValue(null);
       vi.stubEnv('GEMINI_API_KEY', 'test-key-from-env');
       // Simulate switching from a different auth method (e.g., Gateway → API key)
-      props.settings.merged.security.auth.selectedType = AuthType.GATEWAY;
+      props.settings.merged.security.auth.selectedType = ProviderType.GATEWAY;
 
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_GEMINI);
+      await handleAuthSelect(ProviderType.USE_GEMINI);
 
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.AwaitingApiKeyInput,
@@ -324,7 +324,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(lastFrame()).toContain('Configure OpenAI-compatible API');
@@ -389,10 +389,10 @@ describe('AuthDialog', () => {
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
-        expect(mockedLoadApiKey).toHaveBeenCalledWith(AuthType.USE_OPENAI);
+        expect(mockedLoadApiKey).toHaveBeenCalledWith(ProviderType.USE_OPENAI);
       });
       expect(mockBuffer.setText).toHaveBeenCalledWith('sk-stored-key');
       unmount();
@@ -420,7 +420,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(2);
@@ -464,7 +464,7 @@ describe('AuthDialog', () => {
       });
 
       expect(mockedSaveApiKey).toHaveBeenCalledWith(
-        AuthType.USE_OPENAI,
+        ProviderType.USE_OPENAI,
         'sk-test-key',
       );
       expect(props.settings.setValue).toHaveBeenCalledWith(
@@ -475,7 +475,7 @@ describe('AuthDialog', () => {
       expect(props.settings.setValue).toHaveBeenCalledWith(
         expect.any(String),
         'security.auth.selectedType',
-        AuthType.USE_OPENAI,
+        ProviderType.USE_OPENAI,
       );
       expect(props.setAuthState).toHaveBeenCalledWith(
         AuthState.Unauthenticated,
@@ -505,7 +505,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(2);
@@ -540,7 +540,7 @@ describe('AuthDialog', () => {
       });
 
       expect(mockedSaveApiKey).toHaveBeenCalledWith(
-        AuthType.USE_OPENAI,
+        ProviderType.USE_OPENAI,
         undefined,
       );
       expect(props.settings.setValue).toHaveBeenCalledWith(
@@ -576,7 +576,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(2);
@@ -627,7 +627,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(mockedUseKeypress.mock.calls.length).toBeGreaterThan(2);
@@ -662,7 +662,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
 
       await waitFor(() => {
         expect(lastFrame()).toContain('Configure OpenAI-compatible API');
@@ -723,7 +723,7 @@ describe('AuthDialog', () => {
         desc: 'calls setAuthState(Unauthenticated) on escape if auth method is set',
         setup: () => {
           props.settings.merged.security.auth.selectedType =
-            AuthType.USE_GEMINI;
+            ProviderType.USE_GEMINI;
         },
         expectations: (p: typeof props) => {
           expect(p.setAuthState).toHaveBeenCalledWith(
@@ -761,7 +761,8 @@ describe('AuthDialog', () => {
     });
 
     it('renders correctly with enforced auth type', async () => {
-      props.settings.merged.security.auth.enforcedType = AuthType.USE_GEMINI;
+      props.settings.merged.security.auth.enforcedType =
+        ProviderType.USE_GEMINI;
       const { lastFrame, unmount } = await renderWithProviders(
         <AuthDialog {...props} />,
       );
@@ -776,7 +777,7 @@ describe('AuthDialog', () => {
       );
       const { onSelect: handleAuthSelect } =
         mockedRadioButtonSelect.mock.calls[0][0];
-      await handleAuthSelect(AuthType.USE_OPENAI);
+      await handleAuthSelect(ProviderType.USE_OPENAI);
       await waitFor(() => {
         expect(lastFrame()).toContain('Configure OpenAI-compatible API');
       });

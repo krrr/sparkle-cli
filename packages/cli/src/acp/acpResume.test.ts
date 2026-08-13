@@ -17,7 +17,7 @@ import { GeminiAgent } from './acpRpcDispatcher.js';
 import * as acp from '@agentclientprotocol/sdk';
 import {
   ApprovalMode,
-  AuthType,
+  ProviderType,
   type Config,
   CoreToolCallStatus,
   SPARKLE_MODEL_ALIAS_AUTO,
@@ -135,7 +135,7 @@ describe('GeminiAgent Session Resume', () => {
     } as unknown as Mocked<Config>;
     mockSettings = {
       merged: {
-        security: { auth: { selectedType: AuthType.USE_GEMINI } },
+        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
         mcpServers: {},
       },
       setValue: vi.fn(),

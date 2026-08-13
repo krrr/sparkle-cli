@@ -15,7 +15,7 @@ import {
   SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import fs from 'node:fs';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import type { FallbackIntent } from '../fallback/types.js';
 import { LlmRole } from '../telemetry/types.js';
 import type { GenerateContentResponse } from '@google/genai';
@@ -79,7 +79,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Force interactive mode to enable fallback handler in BaseLlmClient
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
+    client = new BaseLlmClient(fakeGenerator, config, ProviderType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;
@@ -157,7 +157,7 @@ describe('Auto Routing Fallback Integration', () => {
     const clientNonAuto = new BaseLlmClient(
       fakeGenerator,
       configNonAuto,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
 
     let attemptsCustom = 0;
@@ -229,7 +229,7 @@ describe('Auto Routing Fallback Integration', () => {
     // Force interactive mode to enable fallback handler in BaseLlmClient
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
+    client = new BaseLlmClient(fakeGenerator, config, ProviderType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;
@@ -331,7 +331,7 @@ describe('Auto Routing Fallback Integration', () => {
 
     vi.spyOn(config, 'isInteractive').mockReturnValue(true);
 
-    client = new BaseLlmClient(fakeGenerator, config, AuthType.USE_GEMINI);
+    client = new BaseLlmClient(fakeGenerator, config, ProviderType.USE_GEMINI);
 
     let attemptsPro = 0;
     let attemptsFlash = 0;

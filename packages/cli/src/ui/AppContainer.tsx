@@ -56,7 +56,7 @@ import {
   ideContextStore,
   getErrorMessage,
   getAllGeminiMdFilenames,
-  AuthType,
+  ProviderType,
   type ResumedSessionData,
   recordExitFail,
   ShellExecutionService,
@@ -687,7 +687,7 @@ export const AppContainer = (props: AppContainerProps) => {
   // TODO: Consider handling other auth types that should also skip the blocking screen
   const isAuthenticating =
     authState === AuthState.Unauthenticated &&
-    settings.merged.security.auth.selectedType !== AuthType.USE_GEMINI;
+    settings.merged.security.auth.selectedType !== ProviderType.USE_GEMINI;
 
   // Session browser and resume functionality
   const isGeminiClientInitialized = config.getGeminiClient()?.isInitialized();
@@ -718,7 +718,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
   // Create handleAuthSelect wrapper for backward compatibility
   const handleAuthSelect = useCallback(
-    async (authType: AuthType | undefined, scope: LoadableSettingScope) => {
+    async (authType: ProviderType | undefined, scope: LoadableSettingScope) => {
       if (authType) {
         settings.setValue(scope, 'security.auth.selectedType', authType);
 
@@ -749,9 +749,9 @@ export const AppContainer = (props: AppContainerProps) => {
           return;
         }
 
-        await saveApiKey(AuthType.USE_GEMINI, apiKey);
+        await saveApiKey(ProviderType.USE_GEMINI, apiKey);
         await reloadApiKey();
-        await config.refreshAuth(AuthType.USE_GEMINI);
+        await config.refreshAuth(ProviderType.USE_GEMINI);
         setAuthState(AuthState.Authenticated);
       } catch (e) {
         onAuthError(
@@ -785,7 +785,9 @@ export const AppContainer = (props: AppContainerProps) => {
       // We skip validation for Gemini API key here because it might be stored
       // in the keychain, which we can't check synchronously.
       // The useAuth hook handles validation for this case.
-      if (settings.merged.security.auth.selectedType === AuthType.USE_GEMINI) {
+      if (
+        settings.merged.security.auth.selectedType === ProviderType.USE_GEMINI
+      ) {
         return;
       }
 

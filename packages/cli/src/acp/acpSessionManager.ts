@@ -6,7 +6,7 @@
 
 import {
   type Config,
-  AuthType,
+  ProviderType,
   MCPServerConfig,
   debugLogger,
   startupProfiler,
@@ -71,8 +71,8 @@ export class AcpSessionManager {
     const authType =
       loadedSettings.merged.security.auth.selectedType ||
       (authDetails.baseUrl || process.env['GOOGLE_GEMINI_BASE_URL']
-        ? AuthType.GATEWAY
-        : AuthType.USE_GEMINI);
+        ? ProviderType.GATEWAY
+        : ProviderType.USE_GEMINI);
 
     let isAuthenticated = false;
     let authErrorMessage = '';
@@ -88,7 +88,7 @@ export class AcpSessionManager {
       // Extra validation for Gemini API key
       const contentGeneratorConfig = config.getContentGeneratorConfig();
       if (
-        authType === AuthType.USE_GEMINI &&
+        authType === ProviderType.USE_GEMINI &&
         (!contentGeneratorConfig || !contentGeneratorConfig.apiKey)
       ) {
         isAuthenticated = false;
@@ -237,7 +237,7 @@ export class AcpSessionManager {
     const selectedAuthType =
       this.settings.merged.security.auth.selectedType ||
       (authDetails.baseUrl || process.env['GOOGLE_GEMINI_BASE_URL']
-        ? AuthType.GATEWAY
+        ? ProviderType.GATEWAY
         : undefined);
 
     if (!selectedAuthType) {

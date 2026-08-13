@@ -13,7 +13,7 @@ import {
   useTextBuffer,
   type TextBuffer,
 } from '../components/shared/text-buffer.js';
-import { AuthType, clearApiKey } from 'sparkle-cli-core';
+import { ProviderType, clearApiKey } from 'sparkle-cli-core';
 
 // Mocks
 vi.mock('sparkle-cli-core', async (importOriginal) => {
@@ -165,7 +165,7 @@ describe('ApiAuthDialog', () => {
     });
 
     await waitFor(() => {
-      expect(clearApiKey).toHaveBeenCalledWith(AuthType.USE_GEMINI);
+      expect(clearApiKey).toHaveBeenCalledWith(ProviderType.USE_GEMINI);
       expect(mockBuffer.setText).toHaveBeenCalledWith('');
     });
     unmount();

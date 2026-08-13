@@ -6,7 +6,7 @@
 
 import {
   CoreToolCallStatus,
-  AuthType,
+  ProviderType,
   EditTool,
   GeminiClient,
   ToolConfirmationOutcome,
@@ -182,7 +182,7 @@ describe('loggers', () => {
       getContentGeneratorConfig: () => ({
         model: 'test-model',
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       }),
       getTelemetryEnabled: () => true,
       getUsageStatisticsEnabled: () => true,
@@ -291,7 +291,7 @@ describe('loggers', () => {
       const event = new UserPromptEvent(
         11,
         'prompt-id-8',
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         'test-prompt',
       );
 
@@ -327,7 +327,7 @@ describe('loggers', () => {
       const event = new UserPromptEvent(
         11,
         'prompt-id-9',
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         'test-prompt',
       );
 
@@ -427,7 +427,7 @@ describe('loggers', () => {
             },
           ],
         },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         usageData,
         'test-response',
       );
@@ -544,7 +544,7 @@ describe('loggers', () => {
         100,
         { prompt_id: 'prompt-id-1', contents: [] },
         { candidates: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         undefined,
         'test-response',
       );
@@ -582,7 +582,7 @@ describe('loggers', () => {
         100,
         { prompt_id: 'prompt-id-role', contents: [] },
         { candidates: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         {},
         'test-response',
         LlmRole.SUBAGENT,
@@ -616,7 +616,7 @@ describe('loggers', () => {
         100,
         { prompt_id: 'prompt-id-noprompts', contents: [] },
         { candidates: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         {},
         'this response should be hidden',
       );
@@ -633,7 +633,7 @@ describe('loggers', () => {
         100,
         { prompt_id: 'prompt-id-withprompts', contents: [] },
         { candidates: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         {},
         'this response should be visible',
       );
@@ -708,7 +708,7 @@ describe('loggers', () => {
             port: 8080,
           },
         },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         'ApiError',
         503,
       );
@@ -798,7 +798,7 @@ describe('loggers', () => {
         'error',
         100,
         { prompt_id: 'prompt-id-1', contents: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         'ApiError',
         500,
       );
@@ -831,7 +831,7 @@ describe('loggers', () => {
         'error',
         100,
         { prompt_id: 'prompt-id-role', contents: [] },
-        AuthType.USE_GEMINI,
+        ProviderType.USE_GEMINI,
         'ApiError',
         503,
         LlmRole.SUBAGENT,
@@ -860,7 +860,7 @@ describe('loggers', () => {
       getTelemetryTracesEnabled: () => false,
       isInteractive: () => false,
       getContentGeneratorConfig: () => ({
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       }),
     } as Config;
 
@@ -937,7 +937,7 @@ describe('loggers', () => {
         getTelemetryTracesEnabled: () => true, // Enabled
         isInteractive: () => false,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
         }),
       } as Config;
 
@@ -1025,7 +1025,7 @@ describe('loggers', () => {
         getTelemetryTracesEnabled: () => false, // Disabled
         isInteractive: () => false,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
         }),
       } as Config;
 
@@ -1084,7 +1084,7 @@ describe('loggers', () => {
         isInteractive: () => false,
         getUsageStatisticsEnabled: () => true,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
         }),
       } as Config;
 
@@ -1142,7 +1142,7 @@ describe('loggers', () => {
     } as unknown as Config;
 
     it('should log flash fallback event', () => {
-      const event = new FlashFallbackEvent(AuthType.USE_GEMINI);
+      const event = new FlashFallbackEvent(ProviderType.USE_GEMINI);
 
       logFlashFallback(mockConfig, event);
 

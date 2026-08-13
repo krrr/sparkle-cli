@@ -20,7 +20,7 @@ import { vi } from 'vitest';
 import {
   Config,
   type ConfigParameters,
-  AuthType,
+  ProviderType,
   ApprovalMode,
   createPolicyEngineConfig,
   ExtensionLoader,
@@ -97,7 +97,7 @@ export class ComponentRig {
     // Refresh auth using USE_GEMINI to initialize the real BaseLlmClient.
     // This must happen BEFORE stubbing SPARKLE_CLI_HOME because OAuth credential
     // lookup resolves through homedir() → SPARKLE_CLI_HOME.
-    await this.config.refreshAuth(AuthType.USE_GEMINI);
+    await this.config.refreshAuth(ProviderType.USE_GEMINI);
 
     // Isolate storage paths (session files, skills, extraction state) by
     // pointing SPARKLE_CLI_HOME at a per-test temp directory.  Storage resolves

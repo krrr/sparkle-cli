@@ -16,7 +16,7 @@
  */
 
 import type { Config } from '../../config/config.js';
-import { AuthType } from '../../core/contentGenerator.js';
+import { ProviderType } from '../../config/constants.js';
 import type { LocalAgentDefinition } from '../types.js';
 import type { MessageBus } from '../../confirmation-bus/message-bus.js';
 import type { AnyDeclarativeTool } from '../../tools/tools.js';
@@ -234,7 +234,7 @@ export async function createBrowserAgentDefinition(
         };
       }
       const authType = config.getContentGeneratorConfig()?.authType;
-      const blockedAuthTypes = new Set([AuthType.GATEWAY]);
+      const blockedAuthTypes = new Set([ProviderType.GATEWAY]);
       if (authType && blockedAuthTypes.has(authType)) {
         return {
           code: 'blocked_auth_type',

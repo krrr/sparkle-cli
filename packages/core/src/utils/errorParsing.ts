@@ -6,7 +6,7 @@
 
 import { isApiError, isStructuredError } from './quotaErrorDetection.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 
 const RATE_LIMIT_ERROR_MESSAGE_USE_GEMINI =
   '\nPlease wait and try again later. To increase your limits, request a quota increase through AI Studio, or switch to another /auth method';
@@ -16,11 +16,11 @@ const getRateLimitErrorMessageDefault = (
   `\nPossible quota limitations in place or slow response times detected. Switching to the ${fallbackModel} model for the rest of this session.`;
 
 function getRateLimitMessage(
-  authType?: AuthType,
+  authType?: ProviderType,
   fallbackModel?: string,
 ): string {
   switch (authType) {
-    case AuthType.USE_GEMINI:
+    case ProviderType.USE_GEMINI:
       return RATE_LIMIT_ERROR_MESSAGE_USE_GEMINI;
     default:
       return getRateLimitErrorMessageDefault(fallbackModel);
@@ -29,7 +29,7 @@ function getRateLimitMessage(
 
 export function parseAndFormatApiError(
   error: unknown,
-  authType?: AuthType,
+  authType?: ProviderType,
   currentModel?: string,
   fallbackModel?: string,
 ): string {

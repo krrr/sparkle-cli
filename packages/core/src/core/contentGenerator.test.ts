@@ -5,11 +5,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { ProviderType, getProviderTypeFromEnv } from '../config/constants.js';
 import {
   createContentGenerator,
-  AuthType,
   createContentGeneratorConfig,
-  getAuthTypeFromEnv,
   type ContentGenerator,
 } from './contentGenerator.js';
 import { DEFAULT_OPENAI_BASE_URL } from './openAiCompatibleGenerator.js';
@@ -69,7 +68,7 @@ function createMockConfig(overrides: Partial<Config> = {}): Config {
   } as unknown as Config;
 }
 
-describe('getAuthTypeFromEnv', () => {
+describe('getProviderTypeFromEnv', () => {
   beforeEach(() => {
     vi.stubEnv('GEMINI_API_KEY', '');
     vi.stubEnv('OPENAI_API_KEY', '');
@@ -82,16 +81,16 @@ describe('getAuthTypeFromEnv', () => {
 
   it('should detect GATEWAY when GOOGLE_GEMINI_BASE_URL is present', () => {
     vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gateway.example.com');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.GATEWAY);
+    expect(getProviderTypeFromEnv()).toBe(ProviderType.GATEWAY);
   });
 
   it('should detect USE_GEMINI when GEMINI_API_KEY is present', () => {
     vi.stubEnv('GEMINI_API_KEY', 'fake-key');
-    expect(getAuthTypeFromEnv()).toBe(AuthType.USE_GEMINI);
+    expect(getProviderTypeFromEnv()).toBe(ProviderType.USE_GEMINI);
   });
 
   it('should return undefined when no matching env variables are set', () => {
-    expect(getAuthTypeFromEnv()).toBeUndefined();
+    expect(getProviderTypeFromEnv()).toBeUndefined();
   });
 });
 
@@ -118,7 +117,7 @@ describe('createContentGenerator', () => {
     } as unknown as Config;
     const generator = await createContentGenerator(
       {
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfigWithFake,
     );
@@ -140,7 +139,7 @@ describe('createContentGenerator', () => {
     } as unknown as Config;
     const generator = await createContentGenerator(
       {
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfigWithRecordResponses,
     );
@@ -164,7 +163,7 @@ describe('createContentGenerator', () => {
     const generator = await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -200,7 +199,7 @@ describe('createContentGenerator', () => {
     } as unknown as GoogleGenAI;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
     await createContentGenerator(
-      { apiKey: 'test-api-key', authType: AuthType.USE_GEMINI },
+      { apiKey: 'test-api-key', authType: ProviderType.USE_GEMINI },
       mockConfig,
       undefined,
     );
@@ -235,7 +234,7 @@ describe('createContentGenerator', () => {
     } as unknown as GoogleGenAI;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
     await createContentGenerator(
-      { apiKey: 'test-api-key', authType: AuthType.USE_GEMINI },
+      { apiKey: 'test-api-key', authType: ProviderType.USE_GEMINI },
       mockConfig,
       undefined,
     );
@@ -270,7 +269,7 @@ describe('createContentGenerator', () => {
     } as unknown as GoogleGenAI;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
     await createContentGenerator(
-      { apiKey: 'test-api-key', authType: AuthType.USE_GEMINI },
+      { apiKey: 'test-api-key', authType: ProviderType.USE_GEMINI },
       mockConfig,
       undefined,
     );
@@ -298,7 +297,7 @@ describe('createContentGenerator', () => {
     } as unknown as GoogleGenAI;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
     await createContentGenerator(
-      { apiKey: 'test-api-key', authType: AuthType.USE_GEMINI },
+      { apiKey: 'test-api-key', authType: ProviderType.USE_GEMINI },
       mockConfig,
       undefined,
     );
@@ -331,7 +330,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -371,7 +370,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
         proxy: 'https://proxy.example.com:8080',
       },
       mockConfigWithProxy,
@@ -404,7 +403,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
         proxy: 'http://proxy.example.com:8080',
       },
       mockConfigWithProxy,
@@ -437,7 +436,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
         proxy: '  https://proxy.example.com:8080  ',
       },
       mockConfigWithProxy,
@@ -465,7 +464,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -491,7 +490,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -521,7 +520,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -557,7 +556,7 @@ describe('createContentGenerator', () => {
     const generator = await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -588,7 +587,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -617,7 +616,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -652,7 +651,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -687,7 +686,7 @@ describe('createContentGenerator', () => {
 
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
     await createContentGenerator(config, mockConfig);
 
@@ -715,7 +714,7 @@ describe('createContentGenerator', () => {
 
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       undefined,
       'https://explicit.test.local',
     );
@@ -743,7 +742,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
         baseUrl: 'http://127.0.0.1:8080',
       },
       mockConfig,
@@ -763,7 +762,7 @@ describe('createContentGenerator', () => {
       createContentGenerator(
         {
           apiKey: 'test-api-key',
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
           baseUrl: 'not-a-url',
         },
         mockConfig,
@@ -784,7 +783,7 @@ describe('createContentGenerator', () => {
     await createContentGenerator(
       {
         apiKey: '',
-        authType: AuthType.GATEWAY,
+        authType: ProviderType.GATEWAY,
         baseUrl: 'https://gateway.test.local',
       },
       mockConfig,
@@ -814,7 +813,7 @@ describe('createContentGenerator', () => {
     const generator = await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       },
       mockConfig,
     );
@@ -849,7 +848,7 @@ describe('createContentGenerator', () => {
     const generator = await createContentGenerator(
       {
         apiKey: 'test-api-key',
-        authType: AuthType.GATEWAY,
+        authType: ProviderType.GATEWAY,
       },
       mockConfig,
     );
@@ -896,7 +895,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('GEMINI_API_KEY', 'env-gemini-key');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
     expect(config.apiKey).toBe('env-gemini-key');
   });
@@ -905,7 +904,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('GEMINI_API_KEY', '');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
     expect(config.apiKey).toBeUndefined();
   });
@@ -915,7 +914,7 @@ describe('createContentGeneratorConfig', () => {
     vi.mocked(loadApiKey).mockResolvedValue(null);
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
     expect(config.apiKey).toBeUndefined();
   });
@@ -923,7 +922,7 @@ describe('createContentGeneratorConfig', () => {
   it('should configure for GATEWAY using provided apiKey if available', async () => {
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.GATEWAY,
+      ProviderType.GATEWAY,
       'custom-gateway-key',
     );
     expect(config.apiKey).toBe('custom-gateway-key');
@@ -933,7 +932,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('GEMINI_API_KEY', 'env-gateway-key');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.GATEWAY,
+      ProviderType.GATEWAY,
     );
     expect(config.apiKey).toBe('env-gateway-key');
   });
@@ -942,7 +941,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('GEMINI_API_KEY', '');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.GATEWAY,
+      ProviderType.GATEWAY,
     );
     expect(config.apiKey).toBe('');
   });
@@ -952,7 +951,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('OPENAI_BASE_URL', '');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config.apiKey).toBe('env-openai-key');
     expect(config.baseUrl).toBe(DEFAULT_OPENAI_BASE_URL);
@@ -964,10 +963,10 @@ describe('createContentGeneratorConfig', () => {
     vi.mocked(loadApiKey).mockResolvedValue('stored-openai-key');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config.apiKey).toBe('stored-openai-key');
-    expect(loadApiKey).toHaveBeenCalledWith(AuthType.USE_OPENAI);
+    expect(loadApiKey).toHaveBeenCalledWith(ProviderType.USE_OPENAI);
   });
 
   it('should configure for USE_OPENAI with an empty apiKey when no key is available', async () => {
@@ -976,7 +975,7 @@ describe('createContentGeneratorConfig', () => {
     vi.mocked(loadApiKey).mockResolvedValue(null);
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config.apiKey).toBe('');
   });
@@ -986,7 +985,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('OPENAI_BASE_URL', '');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
       'explicit-openai-key',
     );
     expect(config.apiKey).toBe('explicit-openai-key');
@@ -997,7 +996,7 @@ describe('createContentGeneratorConfig', () => {
     vi.stubEnv('OPENAI_BASE_URL', 'https://custom.example.com/v1');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      AuthType.USE_OPENAI,
+      ProviderType.USE_OPENAI,
     );
     expect(config.baseUrl).toBe('https://custom.example.com/v1');
   });

@@ -8,7 +8,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { Footer } from './Footer.js';
 import { createMockSettings } from '../../test-utils/settings.js';
-import { type Config, AuthType } from 'sparkle-cli-core';
+import { type Config, ProviderType } from 'sparkle-cli-core';
 import path from 'node:path';
 
 // Normalize paths to POSIX slashes for stable cross-platform snapshots.
@@ -628,7 +628,7 @@ describe('<Footer />', () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
         }),
       } as unknown as Config;
 
@@ -649,7 +649,7 @@ describe('<Footer />', () => {
       });
 
       expect(lastFrame()).toContain('auth');
-      expect(lastFrame()).toContain(AuthType.USE_GEMINI);
+      expect(lastFrame()).toContain(ProviderType.USE_GEMINI);
       unmount();
     });
 
@@ -657,7 +657,7 @@ describe('<Footer />', () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
-          authType: AuthType.USE_GEMINI,
+          authType: ProviderType.USE_GEMINI,
         }),
       } as unknown as Config;
 

@@ -18,7 +18,7 @@ import { CliSpinner } from './CliSpinner.js';
 
 import { longAsciiLogoCompactText } from './AsciiArt.js';
 import { getAsciiArtWidth } from '../utils/textUtils.js';
-import { AuthType } from 'sparkle-cli-core';
+import { ProviderType } from 'sparkle-cli-core';
 
 interface AppHeaderProps {
   version: string;
@@ -42,12 +42,12 @@ const LOGO_METADATA_PADDING = 20;
  */
 const NARROW_TERMINAL_BREAKPOINT = 60;
 
-function getProviderLabel(authType: AuthType | undefined): string | null {
+function getProviderLabel(authType: ProviderType | undefined): string | null {
   switch (authType) {
-    case AuthType.USE_GEMINI:
-    case AuthType.GATEWAY:
+    case ProviderType.USE_GEMINI:
+    case ProviderType.GATEWAY:
       return 'Gemini';
-    case AuthType.USE_OPENAI:
+    case ProviderType.USE_OPENAI:
       return 'OpenAI Compatible';
     default:
       return null;

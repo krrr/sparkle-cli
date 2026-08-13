@@ -15,7 +15,7 @@ import {
 } from './testUtils.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
 import { retryWithBackoff } from './retry.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 // Import the new types (Assuming this test file is in packages/core/src/utils/)
 import type { FallbackModelHandler } from '../fallback/types.js';
 import type { GoogleApiError } from './googleErrors.js';
@@ -95,12 +95,12 @@ describe('Retry Utility Fallback Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 10,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     });
 
     expect(fallbackCalled).toBe(true);
     expect(mockPersistent429Callback).toHaveBeenCalledWith(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       expect.any(TerminalQuotaError),
     );
     expect(result).toBe('success after fallback');
@@ -127,7 +127,7 @@ describe('Retry Utility Fallback Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 10,
       onPersistent429: mockPersistent429Callback,
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     });
 
     await expect(promise).rejects.toThrow('Simulated 499 error');
@@ -149,7 +149,7 @@ describe('Retry Utility Fallback Integration', () => {
       initialDelayMs: 1,
       maxDelayMs: 10,
       onPersistent429: fallbackCallback,
-      authType: AuthType.USE_GEMINI, // API key auth type
+      authType: ProviderType.USE_GEMINI, // API key auth type
     });
 
     await expect(promise).rejects.toThrow('Daily limit');

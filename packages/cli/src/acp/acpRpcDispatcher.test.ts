@@ -16,7 +16,7 @@ import {
 import { GeminiAgent } from './acpRpcDispatcher.js';
 import * as acp from '@agentclientprotocol/sdk';
 import {
-  AuthType,
+  ProviderType,
   type Config,
   type MessageBus,
   type Storage,
@@ -105,7 +105,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: AuthType.USE_GEMINI },
+          auth: { selectedType: ProviderType.USE_GEMINI },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},
@@ -125,7 +125,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     expect(response.protocolVersion).toBe(acp.PROTOCOL_VERSION);
     expect(response.authMethods).toHaveLength(2);
     const gatewayAuth = response.authMethods?.find(
-      (m) => m.id === AuthType.GATEWAY,
+      (m) => m.id === ProviderType.GATEWAY,
     );
     expect(gatewayAuth?._meta).toEqual({
       gateway: {
@@ -134,7 +134,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
       },
     });
     const geminiAuth = response.authMethods?.find(
-      (m) => m.id === AuthType.USE_GEMINI,
+      (m) => m.id === ProviderType.USE_GEMINI,
     );
     expect(geminiAuth?._meta).toEqual({
       'api-key': {
@@ -146,11 +146,11 @@ describe('GeminiAgent - RPC Dispatcher', () => {
 
   it('should authenticate correctly', async () => {
     await agent.authenticate({
-      methodId: AuthType.USE_GEMINI,
+      methodId: ProviderType.USE_GEMINI,
     });
 
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       undefined,
       undefined,
       undefined,
@@ -158,20 +158,20 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     expect(mockSettings.setValue).toHaveBeenCalledWith(
       SettingScope.User,
       'security.auth.selectedType',
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
   });
 
   it('should authenticate correctly with api-key in _meta', async () => {
     await agent.authenticate({
-      methodId: AuthType.USE_GEMINI,
+      methodId: ProviderType.USE_GEMINI,
       _meta: {
         'api-key': 'test-api-key',
       },
     } as unknown as acp.AuthenticateRequest);
 
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       'test-api-key',
       undefined,
       undefined,
@@ -179,13 +179,13 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     expect(mockSettings.setValue).toHaveBeenCalledWith(
       SettingScope.User,
       'security.auth.selectedType',
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
     );
   });
 
   it('should authenticate correctly with gateway method', async () => {
     await agent.authenticate({
-      methodId: AuthType.GATEWAY,
+      methodId: ProviderType.GATEWAY,
       _meta: {
         gateway: {
           baseUrl: 'https://example.com',
@@ -195,7 +195,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     } as unknown as acp.AuthenticateRequest);
 
     expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      AuthType.GATEWAY,
+      ProviderType.GATEWAY,
       undefined,
       'https://example.com',
       { Authorization: 'Bearer token' },
@@ -203,14 +203,14 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     expect(mockSettings.setValue).toHaveBeenCalledWith(
       SettingScope.User,
       'security.auth.selectedType',
-      AuthType.GATEWAY,
+      ProviderType.GATEWAY,
     );
   });
 
   it('should throw acp.RequestError when gateway payload is malformed', async () => {
     await expect(
       agent.authenticate({
-        methodId: AuthType.GATEWAY,
+        methodId: ProviderType.GATEWAY,
         _meta: {
           gateway: {
             baseUrl: 123,

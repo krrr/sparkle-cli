@@ -8,9 +8,9 @@ import {
   debugLogger,
   OutputFormat,
   ExitCodes,
-  getAuthTypeFromEnv,
+  getProviderTypeFromEnv,
   type Config,
-  type AuthType,
+  type ProviderType,
 } from 'sparkle-cli-core';
 import { USER_SETTINGS_PATH, type LoadedSettings } from './config/settings.js';
 import { validateAuthMethod } from './config/auth.js';
@@ -18,13 +18,13 @@ import { handleError } from './utils/errors.js';
 import { runExitCleanup } from './utils/cleanup.js';
 
 export async function validateNonInteractiveAuth(
-  configuredAuthType: AuthType | undefined,
+  configuredAuthType: ProviderType | undefined,
   useExternalAuth: boolean | undefined,
   nonInteractiveConfig: Config,
   settings: LoadedSettings,
 ) {
   try {
-    const effectiveAuthType = configuredAuthType || getAuthTypeFromEnv();
+    const effectiveAuthType = configuredAuthType || getProviderTypeFromEnv();
 
     const enforcedType = settings.merged.security.auth.enforcedType;
     if (enforcedType && effectiveAuthType !== enforcedType) {
@@ -39,7 +39,7 @@ export async function validateNonInteractiveAuth(
       throw new Error(message);
     }
 
-    const authType: AuthType = effectiveAuthType;
+    const authType: ProviderType = effectiveAuthType;
 
     if (!useExternalAuth) {
       const err = await validateAuthMethod(String(authType));

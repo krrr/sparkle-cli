@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AuthType, loadApiKey } from 'sparkle-cli-core';
+import { ProviderType, loadApiKey } from 'sparkle-cli-core';
 import { loadEnvironment, loadSettings } from './settings.js';
 
 export async function validateAuthMethod(
@@ -12,9 +12,10 @@ export async function validateAuthMethod(
 ): Promise<string | null> {
   loadEnvironment(loadSettings().merged, process.cwd());
 
-  if (authMethod === AuthType.USE_GEMINI) {
+  if (authMethod === ProviderType.USE_GEMINI) {
     const key =
-      process.env['GEMINI_API_KEY'] || (await loadApiKey(AuthType.USE_GEMINI));
+      process.env['GEMINI_API_KEY'] ||
+      (await loadApiKey(ProviderType.USE_GEMINI));
     if (!key) {
       return (
         'When using Gemini API, you must specify the GEMINI_API_KEY environment variable.\n' +
@@ -24,7 +25,7 @@ export async function validateAuthMethod(
     return null;
   }
 
-  if (authMethod === AuthType.USE_OPENAI) {
+  if (authMethod === ProviderType.USE_OPENAI) {
     // The API key is optional for OpenAI-compatible endpoints: local or
     // custom servers (e.g. Ollama) may not require one. When a key is
     // needed, it is read from OPENAI_API_KEY by the core generator.

@@ -16,8 +16,8 @@ import type {
   ToolOutputMaskingConfig,
 } from '../context/types.js';
 export type { ConversationRecord };
+import { ProviderType } from './constants.js';
 import {
-  AuthType,
   createContentGenerator,
   createContentGeneratorConfig,
   type ContentGenerator,
@@ -637,7 +637,7 @@ export interface ConfigParameters {
   policyUpdateConfirmationRequest?: PolicyUpdateConfirmationRequest;
   output?: OutputSettings;
   adk?: ADKSettings;
-  disableModelRouterForAuth?: AuthType[];
+  disableModelRouterForAuth?: ProviderType[];
   retryFetchErrors?: boolean;
   maxAttempts?: number;
   enableShellOutputEfficiency?: boolean;
@@ -1430,7 +1430,7 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   async refreshAuth(
-    authMethod: AuthType,
+    authMethod: ProviderType,
     apiKey?: string,
     baseUrl?: string,
     customHeaders?: Record<string, string>,
@@ -1443,8 +1443,8 @@ export class Config implements McpContext, AgentLoopContext {
     // Vertex and Genai have incompatible encryption and sending history with
     // thoughtSignature from Genai to Vertex will fail, we need to strip them
     if (
-      this.contentGeneratorConfig?.authType === AuthType.USE_GEMINI &&
-      authMethod !== AuthType.USE_GEMINI
+      this.contentGeneratorConfig?.authType === ProviderType.USE_GEMINI &&
+      authMethod !== ProviderType.USE_GEMINI
     ) {
       // Restore the conversation history to the new client
       this._geminiClient.stripThoughtsFromHistory();

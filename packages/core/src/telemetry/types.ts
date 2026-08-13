@@ -16,7 +16,7 @@ import type { ApprovalMode } from '../policy/types.js';
 import type { CompletedToolCall } from '../scheduler/types.js';
 import { CoreToolCallStatus } from '../scheduler/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
-import { AuthType } from '../core/contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
 import type { LogAttributes, LogRecord } from '@opentelemetry/api-logs';
 import {
   getDecisionFromOutcome,
@@ -85,7 +85,7 @@ export class StartSessionEvent implements BaseTelemetryEvent {
 
     let useGemini = false;
     if (generatorConfig && generatorConfig.authType) {
-      useGemini = generatorConfig.authType === AuthType.USE_GEMINI;
+      useGemini = generatorConfig.authType === ProviderType.USE_GEMINI;
     }
 
     this['event.name'] = 'cli_config';

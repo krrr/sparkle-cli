@@ -9,7 +9,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { SlashCommand, CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import type { Content } from '@google/genai';
-import { AuthType, type GeminiClient } from 'sparkle-cli-core';
+import { ProviderType, type GeminiClient } from 'sparkle-cli-core';
 
 import * as fsPromises from 'node:fs/promises';
 import { debugCommand, resumeCommand } from './resumeCommand.js';
@@ -74,7 +74,7 @@ describe('resumeCommand', () => {
           config: {
             getProjectRoot: () => '/project/root',
             getContentGeneratorConfig: () => ({
-              authType: AuthType.USE_GEMINI,
+              authType: ProviderType.USE_GEMINI,
             }),
             storage: {
               getProjectTempDir: () => '/project/root/.sparkle/tmp/mockhash',
@@ -261,7 +261,7 @@ describe('resumeCommand', () => {
 
       expect(mockCheckpointExists).not.toHaveBeenCalled(); // Should skip existence check
       expect(mockSaveCheckpoint).toHaveBeenCalledWith(
-        { history, authType: AuthType.USE_GEMINI },
+        { history, authType: ProviderType.USE_GEMINI },
         tag,
       );
       expect(result).toEqual({
@@ -314,7 +314,7 @@ describe('resumeCommand', () => {
       ];
       mockLoadCheckpoint.mockResolvedValue({
         history: conversation,
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       });
 
       const result = await resumeCheckpointCommand?.action?.(
@@ -346,7 +346,7 @@ describe('resumeCommand', () => {
       ];
       mockLoadCheckpoint.mockResolvedValue({
         history: conversation,
-        authType: AuthType.USE_GEMINI,
+        authType: ProviderType.USE_GEMINI,
       });
 
       const result = await resumeCheckpointCommand?.action?.(
@@ -374,7 +374,7 @@ describe('resumeCommand', () => {
       ];
       mockLoadCheckpoint.mockResolvedValue({
         history: conversation,
-        authType: AuthType.GATEWAY,
+        authType: ProviderType.GATEWAY,
       });
 
       const result = await resumeCheckpointCommand?.action?.(
@@ -385,7 +385,7 @@ describe('resumeCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: `Cannot resume chat. It was saved with a different authentication method (${AuthType.GATEWAY}) than the current one (${AuthType.USE_GEMINI}).`,
+        content: `Cannot resume chat. It was saved with a different authentication method (${ProviderType.GATEWAY}) than the current one (${ProviderType.USE_GEMINI}).`,
       });
     });
 

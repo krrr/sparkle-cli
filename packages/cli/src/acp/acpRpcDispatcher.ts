@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type AgentLoopContext, AuthType, getVersion } from 'sparkle-cli-core';
+import {
+  type AgentLoopContext,
+  ProviderType,
+  getVersion,
+} from 'sparkle-cli-core';
 import * as acp from '@agentclientprotocol/sdk';
 import { z } from 'zod';
 import { SettingScope, type LoadedSettings } from '../config/settings.js';
@@ -41,7 +45,7 @@ export class GeminiAgent {
 
     const authMethods = [
       {
-        id: AuthType.USE_GEMINI,
+        id: ProviderType.USE_GEMINI,
         name: 'Gemini API key',
         description: 'Use an API key with Gemini Developer API',
         _meta: {
@@ -51,7 +55,7 @@ export class GeminiAgent {
         },
       },
       {
-        id: AuthType.GATEWAY,
+        id: ProviderType.GATEWAY,
         name: 'AI API Gateway',
         description: 'Use a custom AI API Gateway',
         _meta: {
@@ -90,7 +94,7 @@ export class GeminiAgent {
 
   async authenticate(req: acp.AuthenticateRequest): Promise<void> {
     const { methodId } = req;
-    const method = z.nativeEnum(AuthType).parse(methodId);
+    const method = z.nativeEnum(ProviderType).parse(methodId);
 
     // Check for api-key in _meta
     const meta = hasMeta(req) ? req._meta : undefined;

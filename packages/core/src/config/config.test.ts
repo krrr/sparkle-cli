@@ -33,8 +33,8 @@ import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { setGeminiMdFilename as mockSetGeminiMdFilename } from '../tools/memoryTool.js';
 import { uiTelemetryService } from '../telemetry/index.js';
+import { ProviderType } from './constants.js';
 import {
-  AuthType,
   createContentGenerator,
   createContentGeneratorConfig,
   type ContentGeneratorConfig,
@@ -522,7 +522,7 @@ describe('Server Config (config.ts)', () => {
   describe('refreshAuth', () => {
     it('should refresh auth and update config', async () => {
       const config = new Config(baseParams);
-      const authType = AuthType.USE_GEMINI;
+      const authType = ProviderType.USE_GEMINI;
       const mockContentConfig = {
         apiKey: 'test-key',
       };
@@ -550,7 +550,7 @@ describe('Server Config (config.ts)', () => {
       config.activateFallbackMode('fallback-model', 'failed-model');
       expect(config.getFallbackOverride('failed-model')).toBe('fallback-model');
 
-      await config.refreshAuth(AuthType.USE_GEMINI);
+      await config.refreshAuth(ProviderType.USE_GEMINI);
 
       expect(config.getFallbackOverride('failed-model')).toBeUndefined();
     });
@@ -561,13 +561,13 @@ describe('Server Config (config.ts)', () => {
       const spy = vi.spyOn(service, 'reset');
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: AuthType | undefined) =>
+        async (_: Config, authType: ProviderType | undefined) =>
           ({
             authType,
           }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
       );
 
-      await config.refreshAuth(AuthType.USE_GEMINI);
+      await config.refreshAuth(ProviderType.USE_GEMINI);
 
       expect(spy).toHaveBeenCalled();
     });
@@ -576,15 +576,15 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: AuthType | undefined) =>
+        async (_: Config, authType: ProviderType | undefined) =>
           ({
             authType,
           }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
       );
 
-      await config.refreshAuth(AuthType.USE_GEMINI);
+      await config.refreshAuth(ProviderType.USE_GEMINI);
 
-      await config.refreshAuth(AuthType.GATEWAY);
+      await config.refreshAuth(ProviderType.GATEWAY);
 
       const loopContext: AgentLoopContext = config;
       expect(
@@ -596,15 +596,15 @@ describe('Server Config (config.ts)', () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: AuthType | undefined) =>
+        async (_: Config, authType: ProviderType | undefined) =>
           ({
             authType,
           }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
       );
 
-      await config.refreshAuth(AuthType.GATEWAY);
+      await config.refreshAuth(ProviderType.GATEWAY);
 
-      await config.refreshAuth(AuthType.USE_GEMINI);
+      await config.refreshAuth(ProviderType.USE_GEMINI);
 
       const loopContext: AgentLoopContext = config;
       expect(
@@ -1879,7 +1879,7 @@ describe('BaseLlmClient Lifecycle', () => {
 
   it('should successfully initialize BaseLlmClient after refreshAuth is called', async () => {
     const config = new Config(baseParams);
-    const authType = AuthType.USE_GEMINI;
+    const authType = ProviderType.USE_GEMINI;
     const mockContentConfig = { model: 'gemini-flash', apiKey: 'test-key' };
 
     vi.mocked(createContentGeneratorConfig).mockResolvedValue(
@@ -3001,7 +3001,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
 
   it('should preserve the saved model across auth refresh', async () => {
     const mockContentConfig = {
-      authType: AuthType.GATEWAY,
+      authType: ProviderType.GATEWAY,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
 
     const mockContentGenerator = {
@@ -3018,7 +3018,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth to simulate restart (GATEWAY auth, no projectId)
-    await config.refreshAuth(AuthType.GATEWAY);
+    await config.refreshAuth(ProviderType.GATEWAY);
 
     // Verify the model was NOT reset
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
@@ -3027,7 +3027,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
 
   it('should preserve the saved model for USE_GEMINI', async () => {
     const mockContentConfig = {
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
 
     const mockContentGenerator = {
@@ -3045,7 +3045,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth
-    await config.refreshAuth(AuthType.USE_GEMINI);
+    await config.refreshAuth(ProviderType.USE_GEMINI);
 
     // The model should NOT be reset
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);

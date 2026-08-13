@@ -10,7 +10,7 @@ import * as dotenv from 'dotenv';
 import { AsyncLocalStorage } from 'node:async_hooks';
 
 import {
-  AuthType,
+  ProviderType,
   Config,
   ApprovalMode,
   SPARKLE_DIR,
@@ -556,7 +556,7 @@ async function refreshAuthentication(
   if (getEnvLocal('GEMINI_API_KEY')) {
     logger.info(`[${logPrefix}] Using Gemini API Key`);
     await config.refreshAuth(
-      AuthType.USE_GEMINI,
+      ProviderType.USE_GEMINI,
       getEnvLocal('GEMINI_API_KEY'),
     );
   } else {

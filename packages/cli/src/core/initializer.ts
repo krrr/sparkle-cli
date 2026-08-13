@@ -5,7 +5,7 @@
  */
 
 import {
-  AuthType,
+  ProviderType,
   IdeClient,
   IdeConnectionEvent,
   IdeConnectionType,
@@ -48,7 +48,7 @@ export async function initializeApp(
       await config.refreshAuth(
         authType,
         undefined,
-        authType === AuthType.USE_OPENAI
+        authType === ProviderType.USE_OPENAI
           ? settings.merged.security.auth.openaiBaseUrl
           : undefined,
       );

@@ -18,7 +18,7 @@ import {
   type Config,
   type FallbackModelHandler,
   type GoogleApiError,
-  AuthType,
+  ProviderType,
   TerminalQuotaError,
   makeFakeConfig,
   RetryableQuotaError,
@@ -40,7 +40,7 @@ describe('useQuotaAndFallback', () => {
   beforeEach(() => {
     mockConfig = makeFakeConfig();
     vi.spyOn(mockConfig, 'getContentGeneratorConfig').mockReturnValue({
-      authType: AuthType.USE_GEMINI,
+      authType: ProviderType.USE_GEMINI,
     });
 
     mockHistoryManager = {

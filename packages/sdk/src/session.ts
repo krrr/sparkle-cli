@@ -8,7 +8,7 @@ import {
   type AgentLoopContext,
   Config,
   type ConfigParameters,
-  AuthType,
+  ProviderType,
   SPARKLE_MODEL_ALIAS_AUTO,
   GeminiEventType,
   type ToolCallRequestInfo,
@@ -16,7 +16,7 @@ import {
   type GeminiClient,
   type Content,
   scheduleAgentTools,
-  getAuthTypeFromEnv,
+  getProviderTypeFromEnv,
   type ToolRegistry,
   loadSkillsFromDir,
   ActivateSkillTool,
@@ -111,9 +111,9 @@ export class GeminiCliSession {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const authType = getAuthTypeFromEnv() || AuthType.USE_GEMINI;
+    const providerType = getProviderTypeFromEnv() || ProviderType.USE_GEMINI;
 
-    await this.config.refreshAuth(authType);
+    await this.config.refreshAuth(providerType);
     await this.config.initialize();
 
     // Load additional skills from options

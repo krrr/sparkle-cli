@@ -45,7 +45,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...actual,
     Config: vi.fn().mockImplementation(() => mockConfig),
-    getAuthTypeFromEnv: vi.fn().mockReturnValue(null),
+    getProviderTypeFromEnv: vi.fn().mockReturnValue(null),
     scheduleAgentTools: (...args: unknown[]) => mockScheduleAgentTools(...args),
     loadSkillsFromDir: vi.fn().mockResolvedValue([]),
     ActivateSkillTool: class {

@@ -13,7 +13,8 @@ import type {
   GenerateContentConfig,
 } from '@google/genai';
 import type { Config } from '../config/config.js';
-import type { ContentGenerator, AuthType } from './contentGenerator.js';
+import type { ProviderType } from '../config/constants.js';
+import type { ContentGenerator } from './contentGenerator.js';
 import { handleFallback } from '../fallback/handler.js';
 import { getResponseText } from '../utils/partUtils.js';
 import { reportError } from '../utils/errorReporting.js';
@@ -124,7 +125,7 @@ export class BaseLlmClient {
   constructor(
     private readonly contentGenerator: ContentGenerator,
     private readonly config: Config,
-    private readonly authType?: AuthType,
+    private readonly authType?: ProviderType,
   ) {}
 
   async generateJson(

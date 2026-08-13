@@ -20,7 +20,8 @@ import {
   type GenerateContentOptions,
   type GenerateJsonOptions,
 } from './baseLlmClient.js';
-import { AuthType, type ContentGenerator } from './contentGenerator.js';
+import { ProviderType } from '../config/constants.js';
+import type { ContentGenerator } from './contentGenerator.js';
 import type { ModelAvailabilityService } from '../availability/modelAvailabilityService.js';
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
 import type { GenerateContentResponse } from '@google/genai';
@@ -111,7 +112,7 @@ describe('BaseLlmClient', () => {
       getSessionId: vi.fn().mockReturnValue('test-session-id'),
       getContentGeneratorConfig: vi
         .fn()
-        .mockReturnValue({ authType: AuthType.USE_GEMINI }),
+        .mockReturnValue({ authType: ProviderType.USE_GEMINI }),
       getEmbeddingModel: vi.fn().mockReturnValue('test-embedding-model'),
       isInteractive: vi.fn().mockReturnValue(false),
       modelConfigService: {

@@ -13,7 +13,7 @@ import type { Settings } from './settings.js';
 import {
   type ExtensionLoader,
   Config,
-  AuthType,
+  ProviderType,
   isHeadlessMode,
   PolicyDecision,
   ApprovalMode,
@@ -346,7 +346,7 @@ describe('loadConfig', () => {
         await loadConfig(mockSettings, mockExtensionLoader, taskId);
 
         expect(refreshAuthMock).toHaveBeenCalledWith(
-          AuthType.USE_GEMINI,
+          ProviderType.USE_GEMINI,
           'test-key',
         );
       });

@@ -17,6 +17,7 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import * as os from 'node:os';
 import type { Config } from '../config/config.js';
+import { ProviderType } from '../config/constants.js';
 import { loadApiKey } from './apiKeyCredentialStorage.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
@@ -52,36 +53,9 @@ export interface ContentGenerator {
   embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse>;
 }
 
-export enum AuthType {
-  USE_GEMINI = 'gemini-api-key',
-  GATEWAY = 'gateway',
-  USE_OPENAI = 'openai',
-}
-
-/**
- * Detects the best authentication type based on environment variables.
- *
- * Checks in order:
- * 1. GOOGLE_GEMINI_BASE_URL -> GATEWAY
- * 2. GEMINI_API_KEY -> USE_GEMINI
- * 3. OPENAI_API_KEY -> USE_OPENAI
- */
-export function getAuthTypeFromEnv(): AuthType | undefined {
-  if (process.env['GOOGLE_GEMINI_BASE_URL']) {
-    return AuthType.GATEWAY;
-  }
-  if (process.env['GEMINI_API_KEY']) {
-    return AuthType.USE_GEMINI;
-  }
-  if (process.env['OPENAI_API_KEY']) {
-    return AuthType.USE_OPENAI;
-  }
-  return undefined;
-}
-
 export type ContentGeneratorConfig = {
   apiKey?: string;
-  authType?: AuthType;
+  authType?: ProviderType;
   proxy?: string;
   baseUrl?: string;
   customHeaders?: Record<string, string>;
@@ -132,7 +106,7 @@ function validateBaseUrl(baseUrl: string): void {
 
 export async function createContentGeneratorConfig(
   config: Config,
-  authType: AuthType | undefined,
+  authType: ProviderType | undefined,
   apiKey?: string,
   baseUrl?: string,
   customHeaders?: Record<string, string>,
@@ -154,20 +128,20 @@ export async function createContentGeneratorConfig(
   const geminiApiKey =
     apiKey ||
     getEnv('GEMINI_API_KEY') ||
-    (await loadApiKey(AuthType.USE_GEMINI)) ||
+    (await loadApiKey(ProviderType.USE_GEMINI)) ||
     undefined;
 
-  if (authType === AuthType.USE_GEMINI && geminiApiKey) {
+  if (authType === ProviderType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
 
     return contentGeneratorConfig;
   }
 
-  if (authType === AuthType.USE_OPENAI) {
+  if (authType === ProviderType.USE_OPENAI) {
     contentGeneratorConfig.apiKey =
       apiKey ||
       getEnv('OPENAI_API_KEY') ||
-      (await loadApiKey(AuthType.USE_OPENAI)) ||
+      (await loadApiKey(ProviderType.USE_OPENAI)) ||
       '';
     contentGeneratorConfig.baseUrl =
       baseUrl || getEnv('OPENAI_BASE_URL') || DEFAULT_OPENAI_BASE_URL;
@@ -175,7 +149,7 @@ export async function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
-  if (authType === AuthType.GATEWAY) {
+  if (authType === ProviderType.GATEWAY) {
     contentGeneratorConfig.apiKey = apiKey || getEnv('GEMINI_API_KEY') || '';
 
     return contentGeneratorConfig;
@@ -247,21 +221,21 @@ export async function createContentGenerator(
 
     if (
       apiKeyAuthMechanism === 'bearer' &&
-      config.authType === AuthType.USE_GEMINI &&
+      config.authType === ProviderType.USE_GEMINI &&
       config.apiKey
     ) {
       baseHeaders['Authorization'] = `Bearer ${config.apiKey}`;
     }
 
     if (
-      config.authType === AuthType.USE_GEMINI ||
-      config.authType === AuthType.GATEWAY
+      config.authType === ProviderType.USE_GEMINI ||
+      config.authType === ProviderType.GATEWAY
     ) {
       let headers: Record<string, string> = { ...baseHeaders };
       if (config.customHeaders) {
         headers = { ...headers, ...config.customHeaders };
       }
-      if (config.authType === AuthType.GATEWAY && config.apiKey === '') {
+      if (config.authType === ProviderType.GATEWAY && config.apiKey === '') {
         headers['x-goog-api-key'] = '';
       }
       let baseUrl = config.baseUrl;
@@ -292,7 +266,7 @@ export async function createContentGenerator(
         : undefined;
       const googleGenAI = new GoogleGenAI({
         apiKey:
-          config.authType === AuthType.GATEWAY
+          config.authType === ProviderType.GATEWAY
             ? config.apiKey
             : config.apiKey === ''
               ? undefined
@@ -309,7 +283,7 @@ export async function createContentGenerator(
         }),
       });
       return new LoggingContentGenerator(googleGenAI.models, gcConfig);
-    } else if (config.authType === AuthType.USE_OPENAI) {
+    } else if (config.authType === ProviderType.USE_OPENAI) {
       const model = resolveModel(gcConfig.getModel(), gcConfig);
       const provider = getOpenAiProvider(gcConfig, config, model);
       return new LoggingContentGenerator(
