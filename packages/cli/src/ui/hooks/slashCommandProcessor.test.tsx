@@ -98,14 +98,6 @@ vi.mock('../contexts/SessionContext.js', () => ({
   useSessionStats: vi.fn(() => ({ stats: {} })),
 }));
 
-const { mockRunExitCleanup } = vi.hoisted(() => ({
-  mockRunExitCleanup: vi.fn(),
-}));
-
-vi.mock('../../utils/cleanup.js', () => ({
-  runExitCleanup: mockRunExitCleanup,
-}));
-
 function createTestCommand(
   overrides: Partial<SlashCommand>,
   kind: CommandKind = CommandKind.BUILT_IN,
