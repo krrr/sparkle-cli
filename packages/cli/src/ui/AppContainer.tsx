@@ -749,7 +749,7 @@ export const AppContainer = (props: AppContainerProps) => {
           return;
         }
 
-        await saveApiKey(apiKey);
+        await saveApiKey(AuthType.USE_GEMINI, apiKey);
         await reloadApiKey();
         await config.refreshAuth(AuthType.USE_GEMINI);
         setAuthState(AuthState.Authenticated);

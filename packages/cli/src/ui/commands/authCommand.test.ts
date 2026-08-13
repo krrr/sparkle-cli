@@ -9,7 +9,7 @@ import { authCommand } from './authCommand.js';
 import { type CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { SettingScope } from '../../config/settings.js';
-import type { GeminiClient } from 'sparkle-cli-core';
+import { AuthType, type GeminiClient } from 'sparkle-cli-core';
 
 vi.mock('sparkle-cli-core', async () => {
   const actual = await vi.importActual('sparkle-cli-core');
@@ -83,6 +83,7 @@ describe('authCommand', () => {
       await logoutCommand!.action!(mockContext, '');
 
       expect(clearApiKey).toHaveBeenCalledOnce();
+      expect(clearApiKey).toHaveBeenCalledWith(AuthType.USE_GEMINI);
     });
 
     it('should clear selectedAuthType setting', async () => {

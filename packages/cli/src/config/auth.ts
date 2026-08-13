@@ -13,7 +13,8 @@ export async function validateAuthMethod(
   loadEnvironment(loadSettings().merged, process.cwd());
 
   if (authMethod === AuthType.USE_GEMINI) {
-    const key = process.env['GEMINI_API_KEY'] || (await loadApiKey());
+    const key =
+      process.env['GEMINI_API_KEY'] || (await loadApiKey(AuthType.USE_GEMINI));
     if (!key) {
       return (
         'When using Gemini API, you must specify the GEMINI_API_KEY environment variable.\n' +

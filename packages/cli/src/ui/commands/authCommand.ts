@@ -10,7 +10,7 @@ import type {
   LogoutActionReturn,
 } from './types.js';
 import { CommandKind } from './types.js';
-import { clearApiKey } from 'sparkle-cli-core';
+import { AuthType, clearApiKey } from 'sparkle-cli-core';
 import { SettingScope } from '../../config/settings.js';
 
 const authLoginCommand: SlashCommand = {
@@ -31,7 +31,7 @@ const authLogoutCommand: SlashCommand = {
   description: 'Sign out and clear all cached credentials',
   kind: CommandKind.BUILT_IN,
   action: async (context, _args): Promise<LogoutActionReturn> => {
-    await clearApiKey();
+    await clearApiKey(AuthType.USE_GEMINI);
     // Clear the selected auth type so user sees the auth selection menu
     context.services.settings.setValue(
       SettingScope.User,

@@ -5,17 +5,13 @@ exports[`AuthDialog > Snapshots > renders correctly with auth error 1`] = `
 │                                                                                                  │
 │ ? Get started                                                                                    │
 │                                                                                                  │
-│   How would you like to authenticate for this project?                                           │
+│   Which kind of LLM provider would you like to use?                                              │
 │                                                                                                  │
-│   (selected) Use Gemini API Key(not selected) Use OpenAI-compatible API Key                      │
+│   (selected) Use Gemini API(not selected) Use OpenAI-compatible API                              │
 │                                                                                                  │
 │   Something went wrong                                                                           │
 │                                                                                                  │
 │   (Use Enter to select)                                                                          │
-│                                                                                                  │
-│   Terms of Services and Privacy Notice for Sparkle CLI                                           │
-│                                                                                                  │
-│   https://geminicli.com/docs/resources/tos-privacy/                                              │
 │                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 "
@@ -26,15 +22,11 @@ exports[`AuthDialog > Snapshots > renders correctly with default props 1`] = `
 │                                                                                                  │
 │ ? Get started                                                                                    │
 │                                                                                                  │
-│   How would you like to authenticate for this project?                                           │
+│   Which kind of LLM provider would you like to use?                                              │
 │                                                                                                  │
-│   (selected) Use Gemini API Key(not selected) Use OpenAI-compatible API Key                      │
+│   (selected) Use Gemini API(not selected) Use OpenAI-compatible API                              │
 │                                                                                                  │
 │   (Use Enter to select)                                                                          │
-│                                                                                                  │
-│   Terms of Services and Privacy Notice for Sparkle CLI                                           │
-│                                                                                                  │
-│   https://geminicli.com/docs/resources/tos-privacy/                                              │
 │                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 "
@@ -45,27 +37,32 @@ exports[`AuthDialog > Snapshots > renders correctly with enforced auth type 1`] 
 │                                                                                                  │
 │ ? Get started                                                                                    │
 │                                                                                                  │
-│   How would you like to authenticate for this project?                                           │
+│   Which kind of LLM provider would you like to use?                                              │
 │                                                                                                  │
-│   (selected) Use Gemini API Key                                                                  │
+│   (selected) Use Gemini API                                                                      │
 │                                                                                                  │
 │   (Use Enter to select)                                                                          │
-│                                                                                                  │
-│   Terms of Services and Privacy Notice for Sparkle CLI                                           │
-│                                                                                                  │
-│   https://geminicli.com/docs/resources/tos-privacy/                                              │
 │                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 "
 `;
 
-exports[`AuthDialog > Snapshots > renders the base URL input when OpenAI is selected 1`] = `
+exports[`AuthDialog > Snapshots > renders the OpenAI config form when OpenAI is selected 1`] = `
 "╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
 │                                                                                                  │
-│ ? Enter OpenAI-compatible Base URL                                                               │
+│ ? Configure OpenAI-compatible API                                                                │
 │                                                                                                  │
-│   Enter the base URL of your OpenAI-compatible API endpoint.                                     │
-│   For example: https://api.openai.com/v1 or a local endpoint such as http://localhost:11434/v1   │
+│   Base URL                                                                                       │
+│   Enter the base URL of your API endpoint. For example: https://api.openai.com/v1 (Official) or  │
+│   http://localhost:11434/v1 (Ollama)                                                             │
+│                                                                                                  │
+│   ╭────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│   │ https://api.openai.com/v1                                                                  │ │
+│   ╰────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                  │
+│   API Key                                                                                        │
+│   Optional for local or custom endpoints that do not require authentication. When provided, it   │
+│   is securely stored in your system keychain.                                                    │
 │                                                                                                  │
 │   ╭────────────────────────────────────────────────────────────────────────────────────────────╮ │
 │   │ https://api.openai.com/v1                                                                  │ │

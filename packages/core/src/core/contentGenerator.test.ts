@@ -12,6 +12,7 @@ import {
   getAuthTypeFromEnv,
   type ContentGenerator,
 } from './contentGenerator.js';
+import { DEFAULT_OPENAI_BASE_URL } from './openAiCompatibleGenerator.js';
 import { GoogleGenAI } from '@google/genai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import type { Config } from '../config/config.js';
@@ -944,5 +945,60 @@ describe('createContentGeneratorConfig', () => {
       AuthType.GATEWAY,
     );
     expect(config.apiKey).toBe('');
+  });
+
+  it('should configure for USE_OPENAI using OPENAI_API_KEY when set', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'env-openai-key');
+    vi.stubEnv('OPENAI_BASE_URL', '');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_OPENAI,
+    );
+    expect(config.apiKey).toBe('env-openai-key');
+    expect(config.baseUrl).toBe(DEFAULT_OPENAI_BASE_URL);
+  });
+
+  it('should configure for USE_OPENAI using the stored key when OPENAI_API_KEY is not set', async () => {
+    vi.stubEnv('OPENAI_API_KEY', '');
+    vi.stubEnv('OPENAI_BASE_URL', '');
+    vi.mocked(loadApiKey).mockResolvedValue('stored-openai-key');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_OPENAI,
+    );
+    expect(config.apiKey).toBe('stored-openai-key');
+    expect(loadApiKey).toHaveBeenCalledWith(AuthType.USE_OPENAI);
+  });
+
+  it('should configure for USE_OPENAI with an empty apiKey when no key is available', async () => {
+    vi.stubEnv('OPENAI_API_KEY', '');
+    vi.stubEnv('OPENAI_BASE_URL', '');
+    vi.mocked(loadApiKey).mockResolvedValue(null);
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_OPENAI,
+    );
+    expect(config.apiKey).toBe('');
+  });
+
+  it('should prefer the explicit apiKey over env and stored key for USE_OPENAI', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'env-openai-key');
+    vi.stubEnv('OPENAI_BASE_URL', '');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_OPENAI,
+      'explicit-openai-key',
+    );
+    expect(config.apiKey).toBe('explicit-openai-key');
+  });
+
+  it('should use the configured base URL for USE_OPENAI', async () => {
+    vi.stubEnv('OPENAI_API_KEY', '');
+    vi.stubEnv('OPENAI_BASE_URL', 'https://custom.example.com/v1');
+    const config = await createContentGeneratorConfig(
+      mockConfig,
+      AuthType.USE_OPENAI,
+    );
+    expect(config.baseUrl).toBe('https://custom.example.com/v1');
   });
 });

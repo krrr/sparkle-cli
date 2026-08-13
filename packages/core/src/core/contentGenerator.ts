@@ -152,7 +152,10 @@ export async function createContentGeneratorConfig(
   };
 
   const geminiApiKey =
-    apiKey || getEnv('GEMINI_API_KEY') || (await loadApiKey()) || undefined;
+    apiKey ||
+    getEnv('GEMINI_API_KEY') ||
+    (await loadApiKey(AuthType.USE_GEMINI)) ||
+    undefined;
 
   if (authType === AuthType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
@@ -161,7 +164,11 @@ export async function createContentGeneratorConfig(
   }
 
   if (authType === AuthType.USE_OPENAI) {
-    contentGeneratorConfig.apiKey = apiKey || getEnv('OPENAI_API_KEY') || '';
+    contentGeneratorConfig.apiKey =
+      apiKey ||
+      getEnv('OPENAI_API_KEY') ||
+      (await loadApiKey(AuthType.USE_OPENAI)) ||
+      '';
     contentGeneratorConfig.baseUrl =
       baseUrl || getEnv('OPENAI_BASE_URL') || DEFAULT_OPENAI_BASE_URL;
 

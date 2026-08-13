@@ -65,7 +65,7 @@ export const useAuthCommand = (
       return envKey;
     }
 
-    const storedKey = (await loadApiKey()) ?? '';
+    const storedKey = (await loadApiKey(AuthType.USE_GEMINI)) ?? '';
     setApiKeyDefaultValue(storedKey);
     return storedKey;
   }, []);

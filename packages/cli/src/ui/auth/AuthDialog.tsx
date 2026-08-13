@@ -17,7 +17,12 @@ import {
   type LoadableSettingScope,
   type LoadedSettings,
 } from '../../config/settings.js';
-import { AuthType, DEFAULT_OPENAI_BASE_URL } from 'sparkle-cli-core';
+import {
+  AuthType,
+  DEFAULT_OPENAI_BASE_URL,
+  loadApiKey,
+  saveApiKey,
+} from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { AuthState } from '../types.js';
 import { validateAuthMethodWithSettings } from './useAuth.js';
@@ -48,12 +53,12 @@ export function AuthDialog({
   // (e.g. Ollama) that may not require an API key.
   const items = [
     {
-      label: 'Use Gemini API Key',
+      label: 'Use Gemini API',
       value: AuthType.USE_GEMINI,
       key: AuthType.USE_GEMINI,
     },
     {
-      label: 'Use OpenAI-compatible API Key',
+      label: 'Use OpenAI-compatible API',
       value: AuthType.USE_OPENAI,
       key: AuthType.USE_OPENAI,
     },
@@ -65,9 +70,12 @@ export function AuthDialog({
       )
     : items;
 
-  // When true, the dialog shows a base URL input for the OpenAI option
-  // instead of the auth method radio list.
-  const [isEnteringBaseUrl, setIsEnteringBaseUrl] = useState(false);
+  // When true, the dialog shows the OpenAI config form (base URL on top,
+  // API key below) instead of the auth method radio list.
+  const [isEnteringOpenAiConfig, setIsEnteringOpenAiConfig] = useState(false);
+  // Tracks which input has focus while entering the OpenAI config. The base
+  // URL input is focused first; submitting it moves focus to the API key.
+  const [isBaseUrlFocused, setIsBaseUrlFocused] = useState(true);
 
   const { terminalWidth } = useUIState();
   const viewportWidth = terminalWidth - 8;
@@ -79,6 +87,21 @@ export function AuthDialog({
       width: viewportWidth,
       height: 4,
     },
+    singleLine: true,
+  });
+
+  const defaultOpenAiKey = process.env['OPENAI_API_KEY'] || '';
+  const apiKeyBuffer = useTextBuffer({
+    initialText: defaultOpenAiKey,
+    initialCursorOffset: defaultOpenAiKey.length,
+    viewport: {
+      width: viewportWidth,
+      height: 4,
+    },
+    // API keys are alphanumeric (plus a few separator characters), matching
+    // the Gemini API key input behavior.
+    inputFilter: (text) =>
+      text.replace(/[^a-zA-Z0-9_.-]/g, '').replace(/[\r\n]/g, ''),
     singleLine: true,
   });
 
@@ -136,14 +159,28 @@ export function AuthDialog({
       return;
     }
     if (authMethod === AuthType.USE_OPENAI) {
-      // Ask for the base URL before finalizing the selection so it can be
-      // stored and used by the OpenAI-compatible content generator.
+      // Ask for the base URL and API key before finalizing the selection so
+      // they can be stored and used by the OpenAI-compatible content
+      // generator. The base URL input is shown on top, the key below.
       onAuthError(null);
-      setIsEnteringBaseUrl(true);
+      setIsEnteringOpenAiConfig(true);
+      setIsBaseUrlFocused(true);
+      if (!process.env['OPENAI_API_KEY']) {
+        const storedKey = await loadApiKey(AuthType.USE_OPENAI);
+        if (storedKey) {
+          apiKeyBuffer.setText(storedKey);
+        }
+      }
       return;
     }
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     onSelect(authMethod, SettingScope.User);
+  };
+
+  const handleOpenAiConfigCancel = () => {
+    setIsEnteringOpenAiConfig(false);
+    setIsBaseUrlFocused(true);
+    onAuthError(null);
   };
 
   const handleBaseUrlSubmit = (baseUrl: string) => {
@@ -156,19 +193,28 @@ export function AuthDialog({
         return;
       }
     }
-    settings.setValue(
-      SettingScope.User,
-      'security.auth.openaiBaseUrl',
-      trimmed || undefined,
-    );
-    setIsEnteringBaseUrl(false);
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    onSelect(AuthType.USE_OPENAI, SettingScope.User);
+    onAuthError(null);
+    // Move focus to the API key input below.
+    setIsBaseUrlFocused(false);
   };
 
-  const handleBaseUrlCancel = () => {
-    setIsEnteringBaseUrl(false);
-    onAuthError(null);
+  const handleOpenAiKeySubmit = async (apiKey: string) => {
+    try {
+      await saveApiKey(AuthType.USE_OPENAI, apiKey.trim() || undefined);
+      onAuthError(null);
+      settings.setValue(
+        SettingScope.User,
+        'security.auth.openaiBaseUrl',
+        baseUrlBuffer.text.trim() || undefined,
+      );
+      setIsEnteringOpenAiConfig(false);
+      setIsBaseUrlFocused(true);
+      await onSelect(AuthType.USE_OPENAI, SettingScope.User);
+    } catch (e) {
+      onAuthError(
+        `Failed to save API key: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
   };
 
   useKeypress(
@@ -192,7 +238,7 @@ export function AuthDialog({
       }
       return false;
     },
-    { isActive: !isEnteringBaseUrl },
+    { isActive: !isEnteringOpenAiConfig },
   );
 
   return (
@@ -206,19 +252,17 @@ export function AuthDialog({
     >
       <Text color={theme.text.accent}>? </Text>
       <Box flexDirection="column" flexGrow={1}>
-        {isEnteringBaseUrl ? (
+        {isEnteringOpenAiConfig ? (
           <>
             <Text bold color={theme.text.primary}>
-              Enter OpenAI-compatible Base URL
+              Configure OpenAI-compatible API
             </Text>
             <Box marginTop={1} flexDirection="column">
-              <Text color={theme.text.primary}>
-                Enter the base URL of your OpenAI-compatible API endpoint.
-              </Text>
+              <Text color={theme.text.primary}>Base URL</Text>
               <Text color={theme.text.secondary}>
-                For example:{' '}
+                Enter the base URL of your API endpoint. For example:{' '}
                 <Text color={theme.text.link}>{DEFAULT_OPENAI_BASE_URL}</Text>{' '}
-                or a local endpoint such as http://localhost:11434/v1
+                (Official) or http://localhost:11434/v1 (Ollama)
               </Text>
             </Box>
             <Box marginTop={1} flexDirection="row">
@@ -231,8 +275,33 @@ export function AuthDialog({
                 <TextInput
                   buffer={baseUrlBuffer}
                   onSubmit={handleBaseUrlSubmit}
-                  onCancel={handleBaseUrlCancel}
+                  onCancel={handleOpenAiConfigCancel}
                   placeholder={DEFAULT_OPENAI_BASE_URL}
+                  focus={isBaseUrlFocused}
+                />
+              </Box>
+            </Box>
+            <Box marginTop={1} flexDirection="column">
+              <Text color={theme.text.primary}>API Key</Text>
+              <Text color={theme.text.secondary}>
+                Optional for local or custom endpoints that do not require
+                authentication. When provided, it is securely stored in your
+                system keychain.
+              </Text>
+            </Box>
+            <Box marginTop={1} flexDirection="row">
+              <Box
+                borderStyle="round"
+                borderColor={theme.border.default}
+                paddingX={1}
+                flexGrow={1}
+              >
+                <TextInput
+                  buffer={apiKeyBuffer}
+                  onSubmit={handleOpenAiKeySubmit}
+                  onCancel={handleOpenAiConfigCancel}
+                  placeholder="Paste your API key here (optional)"
+                  focus={!isBaseUrlFocused}
                 />
               </Box>
             </Box>
@@ -254,7 +323,7 @@ export function AuthDialog({
             </Text>
             <Box marginTop={1}>
               <Text color={theme.text.primary}>
-                Which LLM provider would you like to use?
+                Which kind of LLM provider would you like to use?
               </Text>
             </Box>
             <Box marginTop={1}>

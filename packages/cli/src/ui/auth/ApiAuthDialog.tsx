@@ -11,7 +11,7 @@ import { theme } from '../semantic-colors.js';
 import { TextInput } from '../components/shared/TextInput.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
-import { clearApiKey, debugLogger } from 'sparkle-cli-core';
+import { AuthType, clearApiKey, debugLogger } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
@@ -65,7 +65,7 @@ export function ApiAuthDialog({
 
     let isCancelled = false;
     const wrappedPromise = new Promise<void>((resolve, reject) => {
-      clearApiKey().then(
+      clearApiKey(AuthType.USE_GEMINI).then(
         () => !isCancelled && resolve(),
         (error) => !isCancelled && reject(error),
       );
