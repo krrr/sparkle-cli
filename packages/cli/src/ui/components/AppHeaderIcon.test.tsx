@@ -17,8 +17,6 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   };
 });
 
-import { isAppleTerminal } from 'sparkle-cli-core';
-
 describe('AppHeader Icon Rendering', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,17 +27,6 @@ describe('AppHeader Icon Rendering', () => {
   });
 
   it('renders the default icon in standard terminals', async () => {
-    vi.mocked(isAppleTerminal).mockReturnValue(false);
-
-    const result = await renderWithProviders(<AppHeader version="1.0.0" />);
-    await result.waitUntilReady();
-
-    await expect(result).toMatchSvgSnapshot();
-  });
-
-  it('renders the symmetric icon in Apple Terminal', async () => {
-    vi.mocked(isAppleTerminal).mockReturnValue(true);
-
     const result = await renderWithProviders(<AppHeader version="1.0.0" />);
     await result.waitUntilReady();
 

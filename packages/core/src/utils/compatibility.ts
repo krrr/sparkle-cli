@@ -64,13 +64,6 @@ export function isDumbTerminal(): boolean {
 }
 
 /**
- * Detects if the current terminal is the default Apple Terminal.app.
- */
-export function isAppleTerminal(): boolean {
-  return process.env['TERM_PROGRAM'] === 'Apple_Terminal';
-}
-
-/**
  * Detects if the current terminal supports 256 colors (8-bit).
  */
 export function supports256Colors(): boolean {
@@ -185,7 +178,7 @@ export function getCompatibilityWarnings(options?: {
         'Warning: 256-color support not detected. Using a terminal with at least 256-color support is recommended for a better visual experience.',
       priority: WarningPriority.High,
     });
-  } else if (!supportsTrueColor() && !isAppleTerminal()) {
+  } else if (!supportsTrueColor()) {
     warnings.push({
       id: 'true-color',
       message:
