@@ -12,7 +12,7 @@ import {
   READ_FILE_TOOL_NAME,
 } from '../tools/tool-names.js';
 import {
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   supportsModernFeatures,
 } from '../config/models.js';
@@ -54,7 +54,7 @@ export const CodebaseInvestigatorAgent = (
   // If the main model is not a modern model, use the default pro model.
   const model = supportsModernFeatures(config.getModel())
     ? DEFAULT_GEMINI_FLASH_MODEL
-    : DEFAULT_SPARKLE_MODEL;
+    : DEFAULT_GEMINI_MODEL;
 
   const listCommand =
     process.platform === 'win32'

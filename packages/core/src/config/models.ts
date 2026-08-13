@@ -47,7 +47,7 @@ export interface ModelCapabilityContext {
   readonly modelConfigService: IModelConfigService;
 }
 
-export const DEFAULT_SPARKLE_MODEL = 'gemini-pro-latest';
+export const DEFAULT_GEMINI_MODEL = 'gemini-pro-latest';
 export const DEFAULT_GEMINI_FLASH_MODEL = 'gemini-flash-latest';
 export const DEFAULT_GEMINI_FLASH_LITE_MODEL = 'gemini-flash-lite-latest';
 
@@ -60,7 +60,7 @@ export const SPARKLE_MODEL_ALIAS_FLASH_LITE = 'flash-lite';
 export const DEFAULT_GEMINI_EMBEDDING_MODEL = 'gemini-embedding-001';
 
 export function getAutoModelDescription() {
-  return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_SPARKLE_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
+  return `Let Sparkle CLI decide the best model for the task: ${getDisplayString(DEFAULT_GEMINI_MODEL)}, ${getDisplayString(DEFAULT_GEMINI_FLASH_MODEL)}`;
 }
 
 /**
@@ -92,7 +92,7 @@ export function resolveModel(
   switch (normalizedModel) {
     case SPARKLE_MODEL_ALIAS_AUTO:
     case SPARKLE_MODEL_ALIAS_PRO: {
-      return DEFAULT_SPARKLE_MODEL;
+      return DEFAULT_GEMINI_MODEL;
     }
     case SPARKLE_MODEL_ALIAS_FLASH: {
       return DEFAULT_GEMINI_FLASH_MODEL;
@@ -147,7 +147,7 @@ export function getDisplayString(
     case SPARKLE_MODEL_ALIAS_AUTO:
       return 'Auto';
     case SPARKLE_MODEL_ALIAS_PRO:
-      return DEFAULT_SPARKLE_MODEL;
+      return DEFAULT_GEMINI_MODEL;
     case SPARKLE_MODEL_ALIAS_FLASH:
       return DEFAULT_GEMINI_FLASH_MODEL;
     default:

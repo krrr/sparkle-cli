@@ -7,7 +7,7 @@
 import { ThinkingLevel } from '@google/genai';
 import type { ModelConfigServiceConfig } from '../services/modelConfigService.js';
 import {
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
 } from './models.js';
@@ -39,10 +39,10 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    [DEFAULT_SPARKLE_MODEL]: {
+    [DEFAULT_GEMINI_MODEL]: {
       extends: 'chat-base',
       modelConfig: {
-        model: DEFAULT_SPARKLE_MODEL,
+        model: DEFAULT_GEMINI_MODEL,
       },
     },
     [DEFAULT_GEMINI_FLASH_LITE_MODEL]: {
@@ -263,7 +263,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       isVisible: true,
       features: { thinking: true, multimodalToolUse: true },
     },
-    [DEFAULT_SPARKLE_MODEL]: {
+    [DEFAULT_GEMINI_MODEL]: {
       tier: 'pro',
       family: 'gemini-3',
       isVisible: true,
@@ -311,7 +311,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
   },
   modelIdResolutions: {
     auto: {
-      default: DEFAULT_SPARKLE_MODEL,
+      default: DEFAULT_GEMINI_MODEL,
       contexts: [
         {
           condition: { isCustomModel: true },
@@ -320,7 +320,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       ],
     },
     pro: {
-      default: DEFAULT_SPARKLE_MODEL,
+      default: DEFAULT_GEMINI_MODEL,
       contexts: [
         {
           condition: { isCustomModel: true },
@@ -358,7 +358,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       ],
     },
     pro: {
-      default: DEFAULT_SPARKLE_MODEL,
+      default: DEFAULT_GEMINI_MODEL,
       contexts: [
         {
           condition: { isCustomModel: true },

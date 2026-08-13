@@ -57,7 +57,7 @@ import { ACTIVATE_SKILL_TOOL_NAME } from '../tools/tool-names.js';
 import type { SkillDefinition } from '../skills/skillLoader.js';
 import type { McpClientManager } from '../tools/mcp-client-manager.js';
 import { DEFAULT_MODEL_CONFIGS } from './defaultModelConfigs.js';
-import { DEFAULT_SPARKLE_MODEL, SPARKLE_MODEL_ALIAS_AUTO } from './models.js';
+import { DEFAULT_GEMINI_MODEL, SPARKLE_MODEL_ALIAS_AUTO } from './models.js';
 import { Storage } from './storage.js';
 import type { AgentLoopContext } from './agent-loop-context.js';
 import {
@@ -256,7 +256,7 @@ afterEach(() => {
 });
 
 describe('Server Config (config.ts)', () => {
-  const MODEL = DEFAULT_SPARKLE_MODEL;
+  const MODEL = DEFAULT_GEMINI_MODEL;
   const SANDBOX: SandboxConfig = createMockSandboxConfig({
     command: 'docker',
     image: 'sparkle-cli-sandbox',
@@ -2178,9 +2178,9 @@ describe('Config getHooks', () => {
         onModelChange,
       });
 
-      config.setModel(DEFAULT_SPARKLE_MODEL, false);
+      config.setModel(DEFAULT_GEMINI_MODEL, false);
 
-      expect(onModelChange).toHaveBeenCalledWith(DEFAULT_SPARKLE_MODEL);
+      expect(onModelChange).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
     });
 
     it('should NOT call onModelChange when a new model is temporary', () => {
@@ -2190,7 +2190,7 @@ describe('Config getHooks', () => {
         onModelChange,
       });
 
-      config.setModel(DEFAULT_SPARKLE_MODEL, true);
+      config.setModel(DEFAULT_GEMINI_MODEL, true);
 
       expect(onModelChange).not.toHaveBeenCalled();
     });
@@ -2204,12 +2204,12 @@ describe('Config getHooks', () => {
       });
 
       // Temporary selection
-      config.setModel(DEFAULT_SPARKLE_MODEL, true);
+      config.setModel(DEFAULT_GEMINI_MODEL, true);
       expect(onModelChange).not.toHaveBeenCalled();
 
       // Persist selection of the same model
-      config.setModel(DEFAULT_SPARKLE_MODEL, false);
-      expect(onModelChange).toHaveBeenCalledWith(DEFAULT_SPARKLE_MODEL);
+      config.setModel(DEFAULT_GEMINI_MODEL, false);
+      expect(onModelChange).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
     });
   });
 });
@@ -2996,7 +2996,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     cwd: '/tmp',
     targetDir: '/path/to/target',
     debugMode: false,
-    model: DEFAULT_SPARKLE_MODEL,
+    model: DEFAULT_GEMINI_MODEL,
   };
 
   it('should preserve the saved model across auth refresh', async () => {
@@ -3015,13 +3015,13 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     const config = new Config(baseParams);
 
     // Verify initial model is preserved
-    expect(config.getModel()).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth to simulate restart (GATEWAY auth, no projectId)
     await config.refreshAuth(AuthType.GATEWAY);
 
     // Verify the model was NOT reset
-    expect(config.getModel()).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
     expect(config.getModel()).not.toBe(SPARKLE_MODEL_ALIAS_AUTO);
   });
 
@@ -3042,13 +3042,13 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     const config = new Config(baseParams);
 
     // Verify initial model is preserved
-    expect(config.getModel()).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
     // Call refreshAuth
     await config.refreshAuth(AuthType.USE_GEMINI);
 
     // The model should NOT be reset
-    expect(config.getModel()).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('should persist model when user selects it with persistMode=true', () => {
@@ -3060,11 +3060,11 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     });
 
     // User selects a model with persist mode enabled
-    config.setModel(DEFAULT_SPARKLE_MODEL, false); // isTemporary = false
+    config.setModel(DEFAULT_GEMINI_MODEL, false); // isTemporary = false
 
     // Verify onModelChange was called to persist the model
-    expect(onModelChange).toHaveBeenCalledWith(DEFAULT_SPARKLE_MODEL);
-    expect(config.getModel()).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(onModelChange).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
+    expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
   });
 });
 

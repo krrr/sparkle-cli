@@ -11,7 +11,7 @@ import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import type { Config } from '../../config/config.js';
 import type { ModelAvailabilityService } from '../../availability/modelAvailabilityService.js';
 import {
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
@@ -26,7 +26,7 @@ vi.mock('../../availability/policyHelpers.js', () => ({
 const createMockConfig = (overrides: Partial<Config> = {}): Config =>
   ({
     getModelAvailabilityService: vi.fn(),
-    getModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
+    getModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
     modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     ...overrides,
   }) as unknown as Config;
@@ -56,8 +56,8 @@ describe('FallbackStrategy', () => {
 
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
     expect(decision).toBeNull();
-    // Should check availability of the resolved model (DEFAULT_SPARKLE_MODEL)
-    expect(mockService.snapshot).toHaveBeenCalledWith(DEFAULT_SPARKLE_MODEL);
+    // Should check availability of the resolved model (DEFAULT_GEMINI_MODEL)
+    expect(mockService.snapshot).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
   });
 
   it('should return null if fallback selection is same as requested model', async () => {
@@ -68,7 +68,7 @@ describe('FallbackStrategy', () => {
     });
     // Mock selectModelForAvailability to return the SAME model (no fallback found)
     vi.mocked(selectModelForAvailability).mockReturnValue({
-      selectedModel: DEFAULT_SPARKLE_MODEL,
+      selectedModel: DEFAULT_GEMINI_MODEL,
       skipped: [],
     });
 
@@ -86,7 +86,7 @@ describe('FallbackStrategy', () => {
     // Mock selectModelForAvailability to find a fallback (Flash)
     vi.mocked(selectModelForAvailability).mockReturnValue({
       selectedModel: DEFAULT_GEMINI_FLASH_MODEL,
-      skipped: [{ model: DEFAULT_SPARKLE_MODEL, reason: 'quota' }],
+      skipped: [{ model: DEFAULT_GEMINI_MODEL, reason: 'quota' }],
     });
 
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
@@ -95,7 +95,7 @@ describe('FallbackStrategy', () => {
     expect(decision?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     expect(decision?.metadata.source).toBe('fallback');
     expect(decision?.metadata.reasoning).toContain(
-      `Model ${DEFAULT_SPARKLE_MODEL} is unavailable`,
+      `Model ${DEFAULT_GEMINI_MODEL} is unavailable`,
     );
   });
 
@@ -108,7 +108,7 @@ describe('FallbackStrategy', () => {
 
     expect(decision).toBeNull();
     // Important: check that it queried snapshot with the RESOLVED model, not 'auto'
-    expect(mockService.snapshot).toHaveBeenCalledWith(DEFAULT_SPARKLE_MODEL);
+    expect(mockService.snapshot).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL);
   });
 
   it('should respect requestedModel from context', async () => {

@@ -22,7 +22,7 @@ import { AuthType } from '../core/contentGenerator.js';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import type { FallbackModelHandler } from './types.js';
@@ -53,7 +53,7 @@ vi.mock('../utils/debugLogger.js', () => ({
   },
 }));
 
-const MOCK_PRO_MODEL = DEFAULT_SPARKLE_MODEL;
+const MOCK_PRO_MODEL = DEFAULT_GEMINI_MODEL;
 const FALLBACK_MODEL = DEFAULT_GEMINI_FLASH_MODEL;
 const AUTH_OAUTH = AuthType.USE_GEMINI;
 
@@ -96,7 +96,7 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
                 stateTransitions: {},
               },
               {
-                model: DEFAULT_SPARKLE_MODEL,
+                model: DEFAULT_GEMINI_MODEL,
                 isLastResort: true,
                 actions: {},
                 stateTransitions: {},
@@ -104,7 +104,7 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config =>
             ]
           : [
               {
-                model: DEFAULT_SPARKLE_MODEL,
+                model: DEFAULT_GEMINI_MODEL,
                 isLastResort: false,
                 actions: {},
                 stateTransitions: {},
@@ -177,7 +177,7 @@ describe('handleFallback', () => {
         SPARKLE_MODEL_ALIAS_AUTO,
       );
 
-      await handleFallback(policyConfig, DEFAULT_SPARKLE_MODEL, AUTH_OAUTH);
+      await handleFallback(policyConfig, DEFAULT_GEMINI_MODEL, AUTH_OAUTH);
 
       expect(availability.selectFirstAvailable).toHaveBeenCalledWith([
         DEFAULT_GEMINI_FLASH_MODEL,
@@ -276,7 +276,7 @@ describe('handleFallback', () => {
       });
       policyHandler.mockResolvedValue('retry_once');
       vi.mocked(policyConfig.getActiveModel).mockReturnValue(
-        DEFAULT_SPARKLE_MODEL,
+        DEFAULT_GEMINI_MODEL,
       );
       vi.mocked(policyConfig.getModel).mockReturnValue(
         SPARKLE_MODEL_ALIAS_AUTO,
@@ -284,7 +284,7 @@ describe('handleFallback', () => {
 
       const result = await handleFallback(
         policyConfig,
-        DEFAULT_SPARKLE_MODEL,
+        DEFAULT_GEMINI_MODEL,
         AUTH_OAUTH,
       );
 

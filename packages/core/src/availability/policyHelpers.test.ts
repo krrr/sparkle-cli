@@ -16,7 +16,7 @@ import type { RetryAvailabilityContext } from './modelPolicy.js';
 import type { Config } from '../config/config.js';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
@@ -26,7 +26,7 @@ import { ApprovalMode } from '../policy/types.js';
 
 const createMockConfig = (overrides: Partial<Config> = {}): Config => {
   const config = {
-    getModel: () => DEFAULT_SPARKLE_MODEL,
+    getModel: () => DEFAULT_GEMINI_MODEL,
     getContentGeneratorConfig: () => ({ authType: undefined }),
     getMaxAttemptsPerTurn: () => 3,
     getReleaseChannel: () => 'preview',
@@ -49,10 +49,10 @@ describe('policyHelpers', () => {
 
     it('leaves catalog order untouched when active model already present', () => {
       const config = createMockConfig({
-        getModel: () => DEFAULT_SPARKLE_MODEL,
+        getModel: () => DEFAULT_GEMINI_MODEL,
       });
       const chain = resolvePolicyChain(config);
-      expect(chain[0]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
     it('returns the default chain when active model is "auto"', () => {
@@ -63,17 +63,17 @@ describe('policyHelpers', () => {
 
       // Expect default chain [Pro, Flash]
       expect(chain).toHaveLength(2);
-      expect(chain[0]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
       expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 
     it('uses auto chain when preferred model is auto', () => {
       const config = createMockConfig({
-        getModel: () => DEFAULT_SPARKLE_MODEL,
+        getModel: () => DEFAULT_GEMINI_MODEL,
       });
       const chain = resolvePolicyChain(config, SPARKLE_MODEL_ALIAS_AUTO);
       expect(chain).toHaveLength(2);
-      expect(chain[0]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
       expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 
@@ -81,9 +81,9 @@ describe('policyHelpers', () => {
       const config = createMockConfig({
         getModel: () => SPARKLE_MODEL_ALIAS_AUTO,
       });
-      const chain = resolvePolicyChain(config, DEFAULT_SPARKLE_MODEL);
+      const chain = resolvePolicyChain(config, DEFAULT_GEMINI_MODEL);
       expect(chain).toHaveLength(2);
-      expect(chain[0]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[0]?.model).toBe(DEFAULT_GEMINI_MODEL);
       expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
     });
 
@@ -104,7 +104,7 @@ describe('policyHelpers', () => {
       expect(chain).toHaveLength(3);
       expect(chain[0]?.model).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
       expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-      expect(chain[2]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[2]?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
     it('returns flash-lite chain when configured model is flash-lite', () => {
@@ -115,7 +115,7 @@ describe('policyHelpers', () => {
       expect(chain).toHaveLength(3);
       expect(chain[0]?.model).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
       expect(chain[1]?.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
-      expect(chain[2]?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(chain[2]?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
     it('applies SILENT_ACTIONS when ApprovalMode is PLAN', () => {

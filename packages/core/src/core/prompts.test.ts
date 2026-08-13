@@ -19,7 +19,7 @@ import { SPARKLE_DIR } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import {
   SPARKLE_MODEL_ALIAS_AUTO,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
 } from '../config/models.js';
 import { ApprovalMode } from '../policy/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
@@ -108,7 +108,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       isAgentsEnabled: vi.fn().mockReturnValue(false),
       getPreviewFeatures: vi.fn().mockReturnValue(true),
       getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
-      getActiveModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
+      getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
       getMessageBus: vi.fn(),
       getAgentRegistry: vi.fn().mockReturnValue({
         getDirectoryContext: vi.fn().mockReturnValue('Mock Agent Directory'),

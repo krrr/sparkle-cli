@@ -15,7 +15,7 @@ import {
 } from '../index.js';
 import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
 import { MockTool } from '../test-utils/mock-tool.js';
-import { DEFAULT_SPARKLE_MODEL } from '../config/models.js';
+import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import type { PolicyEngine } from '../policy/policy-engine.js';
 import { HookSystem } from '../hooks/hookSystem.js';
 import { HookType, HookEventName } from '../hooks/types.js';
@@ -65,7 +65,7 @@ function createMockConfig(overrides: Partial<Config> = {}): Config {
     getTruncateToolOutputLines: () => 1000,
     getToolRegistry: () => defaultToolRegistry,
     getWorkingDir: () => '/mock/dir',
-    getActiveModel: () => DEFAULT_SPARKLE_MODEL,
+    getActiveModel: () => DEFAULT_GEMINI_MODEL,
     getGeminiClient: () => null,
     getMessageBus: () => createMockMessageBus(),
     getEnableHooks: () => true,

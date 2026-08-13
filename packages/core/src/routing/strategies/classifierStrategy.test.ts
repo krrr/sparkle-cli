@@ -15,7 +15,7 @@ import {
 } from '../../utils/messageInspectors.js';
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
 } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
@@ -57,7 +57,7 @@ describe('ClassifierStrategy', () => {
         },
       ),
       getModel: vi.fn().mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO),
-      getActiveModel: vi.fn().mockReturnValue(DEFAULT_SPARKLE_MODEL),
+      getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
       getNumericalRoutingEnabled: vi.fn().mockResolvedValue(false),
       getModelAvailabilityService: vi
         .fn()
@@ -165,7 +165,7 @@ describe('ClassifierStrategy', () => {
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledOnce();
     expect(decision).toEqual({
-      model: DEFAULT_SPARKLE_MODEL,
+      model: DEFAULT_GEMINI_MODEL,
       metadata: {
         source: 'Classifier',
         latencyMs: expect.any(Number),
@@ -324,7 +324,7 @@ describe('ClassifierStrategy', () => {
   });
 
   it('should respect requestedModel from context in resolveClassifierModel', async () => {
-    const requestedModel = DEFAULT_SPARKLE_MODEL; // Pro model
+    const requestedModel = DEFAULT_GEMINI_MODEL; // Pro model
     const mockApiResponse = {
       reasoning: 'Choice is flash',
       model_choice: 'flash',
@@ -454,7 +454,7 @@ describe('ClassifierStrategy', () => {
         mockBaseLlmClient,
       );
 
-      expect(decision?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
 
     it('should route to the default flash model when classifier selects flash', async () => {

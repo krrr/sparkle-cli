@@ -12,7 +12,7 @@ import {
   getAllGeminiMdFilenames,
   DEFAULT_CONTEXT_FILENAME,
 } from '../tools/memoryTool.js';
-import { DEFAULT_SPARKLE_MODEL } from '../config/models.js';
+import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import { ApprovalMode } from '../policy/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
 import { MockTool } from '../test-utils/mock-tool.js';
@@ -404,7 +404,7 @@ describe('PromptProvider', () => {
 
     it('should include topic update instructions in legacy model prompt when enabled', () => {
       vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        DEFAULT_SPARKLE_MODEL,
+        DEFAULT_GEMINI_MODEL,
       );
       vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(true);
 

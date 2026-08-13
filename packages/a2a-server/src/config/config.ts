@@ -15,7 +15,7 @@ import {
   ApprovalMode,
   SPARKLE_DIR,
   DEFAULT_GEMINI_EMBEDDING_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   startupProfiler,
   homedir,
   tmpdir,
@@ -302,7 +302,7 @@ export async function loadConfig(
   const configParams: ConfigParameters = {
     sessionId: taskId,
     clientName: 'a2a-server',
-    model: DEFAULT_SPARKLE_MODEL,
+    model: DEFAULT_GEMINI_MODEL,
     embeddingModel: DEFAULT_GEMINI_EMBEDDING_MODEL,
     sandbox: undefined, // Sandbox might not be relevant for a server-side agent
     targetDir: workspaceDir, // Or a specific directory the agent operates on

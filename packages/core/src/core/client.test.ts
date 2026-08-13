@@ -34,7 +34,7 @@ import {
 import { getCoreSystemPrompt } from './prompts.js';
 import {
   SPARKLE_MODEL_ALIAS_AUTO,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
 } from '../config/models.js';
@@ -301,7 +301,7 @@ describe('Gemini Client (client.ts)', () => {
                   stateTransitions: {},
                 },
                 {
-                  model: DEFAULT_SPARKLE_MODEL,
+                  model: DEFAULT_GEMINI_MODEL,
                   isLastResort: true,
                   actions: {},
                   stateTransitions: {},
@@ -309,7 +309,7 @@ describe('Gemini Client (client.ts)', () => {
               ]
             : [
                 {
-                  model: DEFAULT_SPARKLE_MODEL,
+                  model: DEFAULT_GEMINI_MODEL,
                   isLastResort: false,
                   actions: {},
                   stateTransitions: {},

@@ -61,7 +61,7 @@ import {
 } from './types.js';
 import { getErrorMessage } from '../utils/errors.js';
 import { templateString } from './utils.js';
-import { DEFAULT_SPARKLE_MODEL, isAutoModel } from '../config/models.js';
+import { DEFAULT_GEMINI_MODEL, isAutoModel } from '../config/models.js';
 import type { RoutingContext } from '../routing/routingStrategy.js';
 import { LRUCache } from 'mnemonist';
 import { parseThought } from '../utils/thoughtUtils.js';
@@ -907,7 +907,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
     prompt_id: string,
     abortSignal?: AbortSignal,
   ): Promise<void> {
-    const model = this.definition.modelConfig.model ?? DEFAULT_SPARKLE_MODEL;
+    const model = this.definition.modelConfig.model ?? DEFAULT_GEMINI_MODEL;
 
     const { newHistory, info } = await this.compressionService.compress(
       chat,
@@ -990,7 +990,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
           modelToUse = decision.model;
         } catch (error) {
           debugLogger.warn(`Error during model routing: ${error}`);
-          modelToUse = DEFAULT_SPARKLE_MODEL;
+          modelToUse = DEFAULT_GEMINI_MODEL;
         }
         // Cache the result regardless of whether it succeeded or fell back
         this.cache.set('modelToUse', modelToUse);

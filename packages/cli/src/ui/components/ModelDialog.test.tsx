@@ -11,7 +11,7 @@ import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
 import { createMockSettings } from '../../test-utils/settings.js';
 import {
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
@@ -81,9 +81,9 @@ describe('<ModelDialog />', () => {
           description: 'Flash description',
         },
         {
-          modelId: DEFAULT_SPARKLE_MODEL,
+          modelId: DEFAULT_GEMINI_MODEL,
           tier: 'pro',
-          name: mockGetDisplayString(DEFAULT_SPARKLE_MODEL),
+          name: mockGetDisplayString(DEFAULT_GEMINI_MODEL),
           description: 'Pro description',
         },
       ];
@@ -92,7 +92,7 @@ describe('<ModelDialog />', () => {
     getModelDefinition: vi.fn((modelId: string) =>
       modelId === SPARKLE_MODEL_ALIAS_AUTO
         ? { tier: 'auto', isVisible: true }
-        : modelId === DEFAULT_SPARKLE_MODEL
+        : modelId === DEFAULT_GEMINI_MODEL
           ? { tier: 'pro', isVisible: true }
           : modelId === DEFAULT_GEMINI_FLASH_MODEL
             ? { tier: 'flash', isVisible: true }
@@ -168,7 +168,7 @@ describe('<ModelDialog />', () => {
 
   it('switches to "manual" view when "Manual" is selected and uses getDisplayString for models', async () => {
     mockGetDisplayString.mockImplementation((val: string) => {
-      if (val === DEFAULT_SPARKLE_MODEL) return 'Formatted Pro Model';
+      if (val === DEFAULT_GEMINI_MODEL) return 'Formatted Pro Model';
       if (val === DEFAULT_GEMINI_FLASH_MODEL) return 'Formatted Flash Model';
       if (val === DEFAULT_GEMINI_FLASH_LITE_MODEL)
         return 'Formatted Lite Model';
@@ -313,7 +313,7 @@ describe('<ModelDialog />', () => {
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(lastFrame()).toContain(DEFAULT_SPARKLE_MODEL);
+      expect(lastFrame()).toContain(DEFAULT_GEMINI_MODEL);
     });
 
     // Press Escape
@@ -333,9 +333,9 @@ describe('<ModelDialog />', () => {
   });
 
   it('shows the preferred manual model in the main view option using getDisplayString', async () => {
-    mockGetModel.mockReturnValue(DEFAULT_SPARKLE_MODEL);
+    mockGetModel.mockReturnValue(DEFAULT_GEMINI_MODEL);
     mockGetDisplayString.mockImplementation((val: string) => {
-      if (val === DEFAULT_SPARKLE_MODEL) return 'My Custom Model Display';
+      if (val === DEFAULT_GEMINI_MODEL) return 'My Custom Model Display';
       if (val === 'auto') return 'Auto';
       return val;
     });
@@ -360,7 +360,7 @@ describe('<ModelDialog />', () => {
     await waitUntilReady();
 
     const output = lastFrame();
-    expect(output).toContain(DEFAULT_SPARKLE_MODEL);
+    expect(output).toContain(DEFAULT_GEMINI_MODEL);
     expect(output).toContain(DEFAULT_GEMINI_FLASH_MODEL);
     expect(output).toContain(DEFAULT_GEMINI_FLASH_LITE_MODEL);
     unmount();

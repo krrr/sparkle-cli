@@ -14,7 +14,7 @@ import type { Config } from '../../config/config.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
 } from '../../config/models.js';
 import { promptIdContext } from '../../utils/promptIdContext.js';
 import type { Content } from '@google/genai';
@@ -168,7 +168,7 @@ describe('NumericalClassifierStrategy', () => {
       );
 
       expect(decision).toEqual({
-        model: DEFAULT_SPARKLE_MODEL,
+        model: DEFAULT_GEMINI_MODEL,
         metadata: {
           source: 'NumericalClassifier (Default)',
           latencyMs: expect.any(Number),
@@ -595,7 +595,7 @@ describe('NumericalClassifierStrategy', () => {
         mockBaseLlmClient,
       );
 
-      expect(decision?.model).toBe(DEFAULT_SPARKLE_MODEL);
+      expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
     });
   });
 });

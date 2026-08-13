@@ -9,7 +9,7 @@ import { DefaultStrategy } from './defaultStrategy.js';
 import type { RoutingContext } from '../routingStrategy.js';
 import type { BaseLlmClient } from '../../core/baseLlmClient.js';
 import {
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   SPARKLE_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
 } from '../../config/models.js';
@@ -31,11 +31,11 @@ describe('DefaultStrategy', () => {
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).toEqual({
-      model: DEFAULT_SPARKLE_MODEL,
+      model: DEFAULT_GEMINI_MODEL,
       metadata: {
         source: 'default',
         latencyMs: 0,
-        reasoning: `Routing to default model: ${DEFAULT_SPARKLE_MODEL}`,
+        reasoning: `Routing to default model: ${DEFAULT_GEMINI_MODEL}`,
       },
     });
   });
@@ -53,11 +53,11 @@ describe('DefaultStrategy', () => {
     const decision = await strategy.route(mockContext, mockConfig, mockClient);
 
     expect(decision).toEqual({
-      model: DEFAULT_SPARKLE_MODEL,
+      model: DEFAULT_GEMINI_MODEL,
       metadata: {
         source: 'default',
         latencyMs: 0,
-        reasoning: `Routing to default model: ${DEFAULT_SPARKLE_MODEL}`,
+        reasoning: `Routing to default model: ${DEFAULT_GEMINI_MODEL}`,
       },
     });
   });

@@ -12,7 +12,7 @@ import {
   supportsModernFeatures,
   isAutoModel,
   getDisplayString,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   supportsMultimodalFunctionResponse,
@@ -36,10 +36,10 @@ const config = {
 describe('config-driven model resolution', () => {
   it('resolveModel resolves aliases via the model config service', () => {
     expect(resolveModel(SPARKLE_MODEL_ALIAS_AUTO, config)).toBe(
-      DEFAULT_SPARKLE_MODEL,
+      DEFAULT_GEMINI_MODEL,
     );
     expect(resolveModel(SPARKLE_MODEL_ALIAS_PRO, config)).toBe(
-      DEFAULT_SPARKLE_MODEL,
+      DEFAULT_GEMINI_MODEL,
     );
     expect(resolveModel(SPARKLE_MODEL_ALIAS_FLASH, config)).toBe(
       DEFAULT_GEMINI_FLASH_MODEL,
@@ -74,25 +74,25 @@ describe('config-driven model resolution', () => {
         SPARKLE_MODEL_ALIAS_PRO,
         config,
       ),
-    ).toBe(DEFAULT_SPARKLE_MODEL);
+    ).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('isProModel is tier-based when a config is provided', () => {
-    expect(isProModel(DEFAULT_SPARKLE_MODEL, config)).toBe(true);
+    expect(isProModel(DEFAULT_GEMINI_MODEL, config)).toBe(true);
     // Custom models with 'pro' in the name are no longer treated as Pro.
     expect(isProModel('custom-pro-model', config)).toBe(false);
   });
 
   it('isCustomModel and isAutoModel honor definition tiers', () => {
     expect(isCustomModel('custom-model', config)).toBe(true);
-    expect(isCustomModel(DEFAULT_SPARKLE_MODEL, config)).toBe(false);
+    expect(isCustomModel(DEFAULT_GEMINI_MODEL, config)).toBe(false);
     expect(isAutoModel(SPARKLE_MODEL_ALIAS_AUTO, config)).toBe(true);
-    expect(isAutoModel(DEFAULT_SPARKLE_MODEL, config)).toBe(false);
+    expect(isAutoModel(DEFAULT_GEMINI_MODEL, config)).toBe(false);
   });
 
   it('supportsMultimodalFunctionResponse requires a definition with the feature flag', () => {
     expect(
-      supportsMultimodalFunctionResponse(DEFAULT_SPARKLE_MODEL, config),
+      supportsMultimodalFunctionResponse(DEFAULT_GEMINI_MODEL, config),
     ).toBe(true);
     // Unknown gemini-* models have no definition, so the feature is not assumed.
     expect(
@@ -155,7 +155,7 @@ describe('supportsModernFeatures', () => {
 describe('getDisplayString', () => {
   it('should return concrete model name for pro alias', () => {
     expect(getDisplayString(SPARKLE_MODEL_ALIAS_PRO)).toBe(
-      DEFAULT_SPARKLE_MODEL,
+      DEFAULT_GEMINI_MODEL,
     );
   });
 
@@ -187,8 +187,8 @@ describe('supportsMultimodalFunctionResponse', () => {
 
 describe('resolveModel', () => {
   it('should return the Default Pro model when auto is requested', () => {
-    expect(resolveModel(SPARKLE_MODEL_ALIAS_AUTO)).toBe(DEFAULT_SPARKLE_MODEL);
-    expect(resolveModel(SPARKLE_MODEL_ALIAS_PRO)).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(resolveModel(SPARKLE_MODEL_ALIAS_AUTO)).toBe(DEFAULT_GEMINI_MODEL);
+    expect(resolveModel(SPARKLE_MODEL_ALIAS_PRO)).toBe(DEFAULT_GEMINI_MODEL);
   });
 
   it('should return the Default Flash model when flash is requested', () => {
@@ -204,7 +204,7 @@ describe('resolveModel', () => {
   });
 
   it('should return the requested model as-is for explicit specific models', () => {
-    expect(resolveModel(DEFAULT_SPARKLE_MODEL)).toBe(DEFAULT_SPARKLE_MODEL);
+    expect(resolveModel(DEFAULT_GEMINI_MODEL)).toBe(DEFAULT_GEMINI_MODEL);
     expect(resolveModel(DEFAULT_GEMINI_FLASH_LITE_MODEL)).toBe(
       DEFAULT_GEMINI_FLASH_LITE_MODEL,
     );
@@ -237,7 +237,7 @@ describe('isAutoModel', () => {
   });
 
   it('should return false for concrete models', () => {
-    expect(isAutoModel(DEFAULT_SPARKLE_MODEL)).toBe(false);
+    expect(isAutoModel(DEFAULT_GEMINI_MODEL)).toBe(false);
     expect(isAutoModel('some-random-model')).toBe(false);
   });
 });
@@ -255,7 +255,7 @@ describe('resolveClassifierModel', () => {
   it('should return pro model when alias is pro', () => {
     expect(
       resolveClassifierModel(SPARKLE_MODEL_ALIAS_AUTO, SPARKLE_MODEL_ALIAS_PRO),
-    ).toBe(DEFAULT_SPARKLE_MODEL);
+    ).toBe(DEFAULT_GEMINI_MODEL);
   });
 });
 

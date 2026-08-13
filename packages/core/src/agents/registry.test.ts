@@ -24,7 +24,7 @@ import { ThinkingLevel } from '@google/genai';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
 } from '../config/models.js';
 import * as tomlLoader from './agentLoader.js';
 import { SimpleExtensionLoader } from '../utils/extensionLoader.js';
@@ -166,7 +166,7 @@ describe('AgentRegistry', () => {
 
     it('should use the model from the investigator settings', async () => {
       const previewConfig = makeMockedConfig({
-        model: DEFAULT_SPARKLE_MODEL,
+        model: DEFAULT_GEMINI_MODEL,
         agents: {
           overrides: {
             codebase_investigator: {

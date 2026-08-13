@@ -9,12 +9,12 @@ import { tokenLimit, DEFAULT_TOKEN_LIMIT } from './tokenLimits.js';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
 } from '../config/models.js';
 
 describe('tokenLimit', () => {
   it('should return the correct token limit for default models', () => {
-    expect(tokenLimit(DEFAULT_SPARKLE_MODEL)).toBe(1_048_576);
+    expect(tokenLimit(DEFAULT_GEMINI_MODEL)).toBe(1_048_576);
     expect(tokenLimit(DEFAULT_GEMINI_FLASH_MODEL)).toBe(1_048_576);
     expect(tokenLimit(DEFAULT_GEMINI_FLASH_LITE_MODEL)).toBe(1_048_576);
   });

@@ -27,7 +27,7 @@ import fs from 'node:fs';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_SPARKLE_MODEL,
+  DEFAULT_GEMINI_MODEL,
 } from 'src/config/models.js';
 import { ModelConfigService } from '../services/modelConfigService.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
@@ -124,7 +124,7 @@ describe('modelStringToModelConfigAlias', () => {
   });
 
   it('should handle valid names', () => {
-    expect(modelStringToModelConfigAlias(DEFAULT_SPARKLE_MODEL)).toBe(
+    expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_MODEL)).toBe(
       'chat-compression-pro',
     );
     expect(modelStringToModelConfigAlias(DEFAULT_GEMINI_FLASH_MODEL)).toBe(
@@ -165,9 +165,9 @@ describe('modelStringToModelConfigAlias', () => {
     // Gemini active model keeps the default resolution.
     expect(
       service.resolveModelId(resolved.model, {
-        requestedModel: DEFAULT_SPARKLE_MODEL,
+        requestedModel: DEFAULT_GEMINI_MODEL,
       }),
-    ).toBe(DEFAULT_SPARKLE_MODEL);
+    ).toBe(DEFAULT_GEMINI_MODEL);
   });
 });
 
