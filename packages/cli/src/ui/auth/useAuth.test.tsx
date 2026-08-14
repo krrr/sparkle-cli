@@ -60,7 +60,7 @@ describe('useAuth', () => {
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        ProviderType.GATEWAY,
+        ProviderType.USE_OPENAI,
         settings,
       );
       expect(error).toContain('Authentication is enforced to be');
@@ -78,7 +78,7 @@ describe('useAuth', () => {
       } as LoadedSettings;
 
       const error = await validateAuthMethodWithSettings(
-        ProviderType.GATEWAY,
+        ProviderType.USE_OPENAI,
         settings,
       );
       expect(error).toBeNull();
@@ -111,11 +111,13 @@ describe('useAuth', () => {
 
       mockValidateAuthMethod.mockResolvedValue('Validation Error');
       const error = await validateAuthMethodWithSettings(
-        ProviderType.GATEWAY,
+        ProviderType.USE_OPENAI,
         settings,
       );
       expect(error).toBe('Validation Error');
-      expect(mockValidateAuthMethod).toHaveBeenCalledWith(ProviderType.GATEWAY);
+      expect(mockValidateAuthMethod).toHaveBeenCalledWith(
+        ProviderType.USE_OPENAI,
+      );
     });
   });
 
@@ -276,7 +278,7 @@ describe('useAuth', () => {
     it('should set error if validation fails', async () => {
       mockValidateAuthMethod.mockResolvedValue('Validation Failed');
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(ProviderType.GATEWAY), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_OPENAI), mockConfig),
       );
 
       expect(result.current.authError).toBe('Validation Failed');
@@ -297,7 +299,7 @@ describe('useAuth', () => {
 
     it('should authenticate successfully for valid auth type', async () => {
       const { result } = await renderHook(() =>
-        useAuthCommand(createSettings(ProviderType.GATEWAY), mockConfig),
+        useAuthCommand(createSettings(ProviderType.USE_OPENAI), mockConfig),
       );
 
       await act(async () => {
@@ -305,7 +307,7 @@ describe('useAuth', () => {
       });
 
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        ProviderType.GATEWAY,
+        ProviderType.USE_OPENAI,
         undefined,
         undefined,
       );

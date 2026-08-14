@@ -374,7 +374,7 @@ describe('resumeCommand', () => {
       ];
       mockLoadCheckpoint.mockResolvedValue({
         history: conversation,
-        authType: ProviderType.GATEWAY,
+        authType: ProviderType.USE_OPENAI,
       });
 
       const result = await resumeCheckpointCommand?.action?.(
@@ -385,7 +385,7 @@ describe('resumeCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: `Cannot resume chat. It was saved with a different authentication method (${ProviderType.GATEWAY}) than the current one (${ProviderType.USE_GEMINI}).`,
+        content: `Cannot resume chat. It was saved with a different authentication method (${ProviderType.USE_OPENAI}) than the current one (${ProviderType.USE_GEMINI}).`,
       });
     });
 

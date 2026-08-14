@@ -16,7 +16,6 @@
  */
 
 import type { Config } from '../../config/config.js';
-import { ProviderType } from '../../config/constants.js';
 import type { LocalAgentDefinition } from '../types.js';
 import type { MessageBus } from '../../confirmation-bus/message-bus.js';
 import type { AnyDeclarativeTool } from '../../tools/tools.js';
@@ -50,7 +49,6 @@ import {
 type VisionDisabledReason =
   | { code: 'no_visual_model'; message: string }
   | { code: 'missing_visual_tools'; message: string }
-  | { code: 'blocked_auth_type'; message: string }
   | undefined;
 
 /**
@@ -231,14 +229,6 @@ export async function createBrowserAgentDefinition(
           message:
             `Visual tools missing (${missingVisualTools.join(', ')}). ` +
             `The installed chrome-devtools-mcp version may be too old.`,
-        };
-      }
-      const authType = config.getContentGeneratorConfig()?.authType;
-      const blockedAuthTypes = new Set([ProviderType.GATEWAY]);
-      if (authType && blockedAuthTypes.has(authType)) {
-        return {
-          code: 'blocked_auth_type',
-          message: 'Visual agent model not available for current auth type.',
         };
       }
       return undefined;

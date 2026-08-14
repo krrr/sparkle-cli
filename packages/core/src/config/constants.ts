@@ -50,22 +50,14 @@ export const SECRET_KEY_ACCOUNT = 'secret-key';
  */
 export enum ProviderType {
   USE_GEMINI = 'gemini-api-key',
-  GATEWAY = 'gateway',
   USE_OPENAI = 'openai-api-key',
 }
 
 /**
  * Detects the best provider type based on environment variables.
  *
- * Checks in order:
- * 1. GOOGLE_GEMINI_BASE_URL -> GATEWAY
- * 2. GEMINI_API_KEY -> USE_GEMINI
- * 3. OPENAI_API_KEY -> USE_OPENAI
  */
 export function getProviderTypeFromEnv(): ProviderType | undefined {
-  if (process.env['GOOGLE_GEMINI_BASE_URL']) {
-    return ProviderType.GATEWAY;
-  }
   if (process.env['GEMINI_API_KEY']) {
     return ProviderType.USE_GEMINI;
   }

@@ -53,6 +53,8 @@ describe('AcpSessionManager', () => {
   let manager: AcpSessionManager;
 
   beforeEach(() => {
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', '');
+    vi.stubEnv('GEMINI_API_KEY', '');
     mockConfig = {
       refreshAuth: vi.fn(),
       initialize: vi.fn(),
@@ -144,6 +146,7 @@ describe('AcpSessionManager', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -300,6 +303,28 @@ describe('AcpSessionManager', () => {
     ).rejects.toMatchObject({
       message: 'Gemini API key is missing or not configured.',
     });
+  });
+
+  it('should allow session creation without Gemini API key if custom endpoint is used', async () => {
+    (loadSettings as unknown as Mock).mockImplementation(() => ({
+      merged: {
+        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
+        mcpServers: {},
+      },
+      setValue: vi.fn(),
+    }));
+    mockConfig.getContentGeneratorConfig = vi.fn().mockReturnValue({
+      apiKey: undefined,
+    });
+
+    const session = await manager.newSession(
+      {
+        cwd: '/tmp',
+        mcpServers: [],
+      },
+      { baseUrl: 'https://gateway.example.com' },
+    );
+    expect(session.sessionId).toBe('test-session-id');
   });
 
   it('should create a new session with mcp servers', async () => {

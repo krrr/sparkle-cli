@@ -64,11 +64,12 @@ export function AuthDialog({
     },
   ];
 
-  const filteredItems = settings.merged.security.auth.enforcedType
-    ? items.filter(
-        (item) => item.value === settings.merged.security.auth.enforcedType,
-      )
-    : items;
+  // Fall back to showing all options instead of an empty list when saved value is invalid
+  const enforcedType = settings.merged.security.auth.enforcedType;
+  const filteredItems =
+    enforcedType && items.some((item) => item.value === enforcedType)
+      ? items.filter((item) => item.value === enforcedType)
+      : items;
 
   // When true, the dialog shows the OpenAI config form (base URL on top,
   // API key below) instead of the auth method radio list.

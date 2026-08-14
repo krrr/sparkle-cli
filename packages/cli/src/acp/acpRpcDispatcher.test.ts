@@ -123,16 +123,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     });
 
     expect(response.protocolVersion).toBe(acp.PROTOCOL_VERSION);
-    expect(response.authMethods).toHaveLength(2);
-    const gatewayAuth = response.authMethods?.find(
-      (m) => m.id === ProviderType.GATEWAY,
-    );
-    expect(gatewayAuth?._meta).toEqual({
-      gateway: {
-        protocol: 'google',
-        restartRequired: 'false',
-      },
-    });
+    expect(response.authMethods).toHaveLength(1);
     const geminiAuth = response.authMethods?.find(
       (m) => m.id === ProviderType.USE_GEMINI,
     );
@@ -183,34 +174,10 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     );
   });
 
-  it('should authenticate correctly with gateway method', async () => {
-    await agent.authenticate({
-      methodId: ProviderType.GATEWAY,
-      _meta: {
-        gateway: {
-          baseUrl: 'https://example.com',
-          headers: { Authorization: 'Bearer token' },
-        },
-      },
-    } as unknown as acp.AuthenticateRequest);
-
-    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      ProviderType.GATEWAY,
-      undefined,
-      'https://example.com',
-      { Authorization: 'Bearer token' },
-    );
-    expect(mockSettings.setValue).toHaveBeenCalledWith(
-      SettingScope.User,
-      'security.auth.selectedType',
-      ProviderType.GATEWAY,
-    );
-  });
-
   it('should throw acp.RequestError when gateway payload is malformed', async () => {
     await expect(
       agent.authenticate({
-        methodId: ProviderType.GATEWAY,
+        methodId: 'gateway',
         _meta: {
           gateway: {
             baseUrl: 123,

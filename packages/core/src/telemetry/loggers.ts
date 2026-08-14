@@ -870,10 +870,7 @@ export function logBrowserAgentVisionStatus(
   config: Config,
   attributes: {
     enabled: boolean;
-    disabled_reason?:
-      | 'no_visual_model'
-      | 'missing_visual_tools'
-      | 'blocked_auth_type';
+    disabled_reason?: 'no_visual_model' | 'missing_visual_tools';
   },
 ): void {
   recordBrowserAgentVisionStatus(config, attributes);

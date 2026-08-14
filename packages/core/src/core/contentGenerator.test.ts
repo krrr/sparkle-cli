@@ -79,9 +79,9 @@ describe('getProviderTypeFromEnv', () => {
     vi.unstubAllEnvs();
   });
 
-  it('should detect GATEWAY when GOOGLE_GEMINI_BASE_URL is present', () => {
+  it('should not select a provider when only GOOGLE_GEMINI_BASE_URL is set', () => {
     vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gateway.example.com');
-    expect(getProviderTypeFromEnv()).toBe(ProviderType.GATEWAY);
+    expect(getProviderTypeFromEnv()).toBeUndefined();
   });
 
   it('should detect USE_GEMINI when GEMINI_API_KEY is present', () => {
@@ -99,6 +99,9 @@ describe('createContentGenerator', () => {
     resetVersionCache();
     vi.clearAllMocks();
     vi.stubEnv('ANTIGRAVITY_CLI_ALIAS', '');
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', '');
+    vi.stubEnv('GEMINI_API_KEY', '');
+    vi.stubEnv('OPENAI_API_KEY', '');
   });
 
   afterEach(() => {
@@ -770,7 +773,7 @@ describe('createContentGenerator', () => {
     ).rejects.toThrow('Invalid custom base URL: not-a-url');
   });
 
-  it('should set empty x-goog-api-key header for GATEWAY auth when apiKey is empty string', async () => {
+  it('should set empty x-goog-api-key header for custom endpoint without apiKey', async () => {
     const mockConfig = createMockConfig({
       getUsageStatisticsEnabled: () => false,
     });
@@ -782,8 +785,7 @@ describe('createContentGenerator', () => {
 
     await createContentGenerator(
       {
-        apiKey: '',
-        authType: ProviderType.GATEWAY,
+        authType: ProviderType.USE_GEMINI,
         baseUrl: 'https://gateway.test.local',
       },
       mockConfig,
@@ -835,41 +837,6 @@ describe('createContentGenerator', () => {
       'user',
     );
   });
-
-  it('should not apply model mapping for GATEWAY', async () => {
-    const mockModels = {
-      generateContent: vi.fn().mockResolvedValue({}),
-    };
-    const mockGenerator = {
-      models: mockModels,
-    } as unknown as GoogleGenAI;
-    vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-
-    const generator = await createContentGenerator(
-      {
-        apiKey: 'test-api-key',
-        authType: ProviderType.GATEWAY,
-      },
-      mockConfig,
-    );
-
-    await generator.generateContent(
-      {
-        model: 'gemini-3.5-flash',
-        contents: [],
-      },
-      'prompt-id',
-      'user' as LlmRole,
-    );
-
-    expect(mockModels.generateContent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: 'gemini-3.5-flash',
-      }),
-      'prompt-id',
-      'user',
-    );
-  });
 });
 
 describe('createContentGeneratorConfig', () => {
@@ -885,6 +852,9 @@ describe('createContentGeneratorConfig', () => {
     // Reset modules to re-evaluate imports and environment variables
     vi.resetModules();
     vi.clearAllMocks();
+    vi.stubEnv('GOOGLE_GEMINI_BASE_URL', '');
+    vi.stubEnv('GEMINI_API_KEY', '');
+    vi.stubEnv('OPENAI_API_KEY', '');
   });
 
   afterEach(() => {
@@ -919,31 +889,32 @@ describe('createContentGeneratorConfig', () => {
     expect(config.apiKey).toBeUndefined();
   });
 
-  it('should configure for GATEWAY using provided apiKey if available', async () => {
+  it('should configure for Gemini using the provided apiKey if available', async () => {
     const config = await createContentGeneratorConfig(
       mockConfig,
-      ProviderType.GATEWAY,
-      'custom-gateway-key',
+      ProviderType.USE_GEMINI,
+      'custom-gemini-key',
     );
-    expect(config.apiKey).toBe('custom-gateway-key');
+    expect(config.apiKey).toBe('custom-gemini-key');
   });
 
-  it('should configure for GATEWAY using GEMINI_API_KEY from environment if set', async () => {
-    vi.stubEnv('GEMINI_API_KEY', 'env-gateway-key');
+  it('should configure for Gemini using GEMINI_API_KEY from environment if set', async () => {
+    vi.stubEnv('GEMINI_API_KEY', 'env-gemini-key');
     const config = await createContentGeneratorConfig(
       mockConfig,
-      ProviderType.GATEWAY,
+      ProviderType.USE_GEMINI,
     );
-    expect(config.apiKey).toBe('env-gateway-key');
+    expect(config.apiKey).toBe('env-gemini-key');
   });
 
-  it('should configure for GATEWAY using empty string if no apiKey is provided', async () => {
+  it('should not configure a key for Gemini when no apiKey is provided', async () => {
     vi.stubEnv('GEMINI_API_KEY', '');
+    vi.mocked(loadApiKey).mockResolvedValue(null);
     const config = await createContentGeneratorConfig(
       mockConfig,
-      ProviderType.GATEWAY,
+      ProviderType.USE_GEMINI,
     );
-    expect(config.apiKey).toBe('');
+    expect(config.apiKey).toBeUndefined();
   });
 
   it('should configure for USE_OPENAI using OPENAI_API_KEY when set', async () => {

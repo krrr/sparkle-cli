@@ -105,12 +105,10 @@ const geminiApiKeyStore = createApiKeyStore(GEMINI_API_KEY_ENTRY);
 const openAiApiKeyStore = createApiKeyStore(OPENAI_API_KEY_ENTRY);
 
 /**
- * Maps an auth type to its key store. USE_GEMINI and GATEWAY share the Gemini
- * entry (GATEWAY is planned to be merged into USE_GEMINI).
+ * Maps an auth type to its key store.
  */
 const STORE_BY_AUTH_TYPE: Record<ProviderType, ApiKeyStore> = {
   [ProviderType.USE_GEMINI]: geminiApiKeyStore,
-  [ProviderType.GATEWAY]: geminiApiKeyStore,
   [ProviderType.USE_OPENAI]: openAiApiKeyStore,
 };
 

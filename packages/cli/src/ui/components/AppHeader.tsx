@@ -45,7 +45,6 @@ const NARROW_TERMINAL_BREAKPOINT = 60;
 function getProviderLabel(authType: ProviderType | undefined): string | null {
   switch (authType) {
     case ProviderType.USE_GEMINI:
-    case ProviderType.GATEWAY:
       return 'Gemini';
     case ProviderType.USE_OPENAI:
       return 'OpenAI Compatible';

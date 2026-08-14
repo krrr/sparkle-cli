@@ -54,17 +54,6 @@ export class GeminiAgent {
           },
         },
       },
-      {
-        id: ProviderType.GATEWAY,
-        name: 'AI API Gateway',
-        description: 'Use a custom AI API Gateway',
-        _meta: {
-          gateway: {
-            protocol: 'google',
-            restartRequired: 'false',
-          },
-        },
-      },
     ];
 
     await this.context.config.initialize();

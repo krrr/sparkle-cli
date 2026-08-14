@@ -169,6 +169,15 @@ describe('AuthDialog', () => {
     unmount();
   });
 
+  it('shows all auth types when enforcedType is not a valid option', async () => {
+    props.settings.merged.security.auth.enforcedType =
+      'gateway' as ProviderType;
+    const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
+    const items = mockedRadioButtonSelect.mock.calls[0][0].items;
+    expect(items).toHaveLength(2);
+    unmount();
+  });
+
   it('sets initial index to 0 when enforcedType is set', async () => {
     props.settings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
     const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
@@ -301,8 +310,9 @@ describe('AuthDialog', () => {
     it('always shows API key dialog on re-auth even if env var is present', async () => {
       mockedValidateAuthMethod.mockResolvedValue(null);
       vi.stubEnv('GEMINI_API_KEY', 'test-key-from-env');
-      // Simulate switching from a different auth method (e.g., Gateway → API key)
-      props.settings.merged.security.auth.selectedType = ProviderType.GATEWAY;
+      // Simulate switching from a different auth method (e.g., OpenAI → API key)
+      props.settings.merged.security.auth.selectedType =
+        ProviderType.USE_OPENAI;
 
       const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
       const { onSelect: handleAuthSelect } =

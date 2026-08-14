@@ -126,10 +126,9 @@ describe('getProviderTypeFromEnv', () => {
     expect(getProviderTypeFromEnv()).toBe(ProviderType.USE_GEMINI);
   });
 
-  it('prefers GOOGLE_GEMINI_BASE_URL over OPENAI_API_KEY', () => {
+  it('does not select a provider based on GOOGLE_GEMINI_BASE_URL alone', () => {
     vi.stubEnv('GOOGLE_GEMINI_BASE_URL', 'https://gateway.example.com');
-    vi.stubEnv('OPENAI_API_KEY', 'sk-test');
-    expect(getProviderTypeFromEnv()).toBe(ProviderType.GATEWAY);
+    expect(getProviderTypeFromEnv()).toBeUndefined();
   });
 });
 

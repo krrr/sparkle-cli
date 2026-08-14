@@ -572,7 +572,7 @@ describe('Server Config (config.ts)', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('should strip thoughts when switching from GenAI to GATEWAY', async () => {
+    it('should strip thoughts when switching from GenAI to OpenAI', async () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
@@ -584,7 +584,7 @@ describe('Server Config (config.ts)', () => {
 
       await config.refreshAuth(ProviderType.USE_GEMINI);
 
-      await config.refreshAuth(ProviderType.GATEWAY);
+      await config.refreshAuth(ProviderType.USE_OPENAI);
 
       const loopContext: AgentLoopContext = config;
       expect(
@@ -592,7 +592,7 @@ describe('Server Config (config.ts)', () => {
       ).toHaveBeenCalledWith();
     });
 
-    it('should not strip thoughts when switching from GATEWAY to GenAI', async () => {
+    it('should not strip thoughts when switching from OpenAI to GenAI', async () => {
       const config = new Config(baseParams);
 
       vi.mocked(createContentGeneratorConfig).mockImplementation(
@@ -602,7 +602,7 @@ describe('Server Config (config.ts)', () => {
           }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
       );
 
-      await config.refreshAuth(ProviderType.GATEWAY);
+      await config.refreshAuth(ProviderType.USE_OPENAI);
 
       await config.refreshAuth(ProviderType.USE_GEMINI);
 
@@ -3001,7 +3001,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
 
   it('should preserve the saved model across auth refresh', async () => {
     const mockContentConfig = {
-      authType: ProviderType.GATEWAY,
+      authType: ProviderType.USE_OPENAI,
     } as Partial<ContentGeneratorConfig> as ContentGeneratorConfig;
 
     const mockContentGenerator = {
@@ -3017,8 +3017,8 @@ describe('Model Persistence Bug Fix (#19864)', () => {
     // Verify initial model is preserved
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);
 
-    // Call refreshAuth to simulate restart (GATEWAY auth, no projectId)
-    await config.refreshAuth(ProviderType.GATEWAY);
+    // Call refreshAuth to simulate restart (OpenAI auth, no projectId)
+    await config.refreshAuth(ProviderType.USE_OPENAI);
 
     // Verify the model was NOT reset
     expect(config.getModel()).toBe(DEFAULT_GEMINI_MODEL);

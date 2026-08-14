@@ -70,9 +70,7 @@ export class AcpSessionManager {
 
     const authType =
       loadedSettings.merged.security.auth.selectedType ||
-      (authDetails.baseUrl || process.env['GOOGLE_GEMINI_BASE_URL']
-        ? ProviderType.GATEWAY
-        : ProviderType.USE_GEMINI);
+      ProviderType.USE_GEMINI;
 
     let isAuthenticated = false;
     let authErrorMessage = '';
@@ -85,10 +83,15 @@ export class AcpSessionManager {
       );
       isAuthenticated = true;
 
-      // Extra validation for Gemini API key
+      // Extra validation for Gemini API key. A custom endpoint (a baseUrl
+      // provided by the client or GOOGLE_GEMINI_BASE_URL) may handle
+      // authentication itself, so no API key is required in that case.
       const contentGeneratorConfig = config.getContentGeneratorConfig();
+      const usingCustomEndpoint =
+        !!authDetails.baseUrl || !!process.env['GOOGLE_GEMINI_BASE_URL'];
       if (
         authType === ProviderType.USE_GEMINI &&
+        !usingCustomEndpoint &&
         (!contentGeneratorConfig || !contentGeneratorConfig.apiKey)
       ) {
         isAuthenticated = false;
@@ -237,7 +240,7 @@ export class AcpSessionManager {
     const selectedAuthType =
       this.settings.merged.security.auth.selectedType ||
       (authDetails.baseUrl || process.env['GOOGLE_GEMINI_BASE_URL']
-        ? ProviderType.GATEWAY
+        ? ProviderType.USE_GEMINI
         : undefined);
 
     if (!selectedAuthType) {

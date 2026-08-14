@@ -200,7 +200,7 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   it('exits if configuredAuthType does not match enforcedType', async () => {
-    mockSettings.merged.security.auth.enforcedType = ProviderType.GATEWAY;
+    mockSettings.merged.security.auth.enforcedType = ProviderType.USE_OPENAI;
     const nonInteractiveConfig = createLocalMockConfig({
       getOutputFormat: vi.fn().mockReturnValue(OutputFormat.TEXT),
     });
@@ -218,7 +218,7 @@ describe('validateNonInterActiveAuth', () => {
       );
     }
     expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
-      "The enforced authentication type is 'gateway', but the current type is 'gemini-api-key'. Please re-authenticate with the correct type.",
+      "The enforced authentication type is 'openai-api-key', but the current type is 'gemini-api-key'. Please re-authenticate with the correct type.",
     );
     expect(processExitSpy).toHaveBeenCalledWith(
       ExitCodes.FATAL_AUTHENTICATION_ERROR,
@@ -226,7 +226,7 @@ describe('validateNonInterActiveAuth', () => {
   });
 
   it('exits if auth from env var does not match enforcedType', async () => {
-    mockSettings.merged.security.auth.enforcedType = ProviderType.GATEWAY;
+    mockSettings.merged.security.auth.enforcedType = ProviderType.USE_OPENAI;
     process.env['GEMINI_API_KEY'] = 'fake-key';
     const nonInteractiveConfig = createLocalMockConfig({
       getOutputFormat: vi.fn().mockReturnValue(OutputFormat.TEXT),
@@ -245,7 +245,7 @@ describe('validateNonInterActiveAuth', () => {
       );
     }
     expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
-      "The enforced authentication type is 'gateway', but the current type is 'gemini-api-key'. Please re-authenticate with the correct type.",
+      "The enforced authentication type is 'openai-api-key', but the current type is 'gemini-api-key'. Please re-authenticate with the correct type.",
     );
     expect(processExitSpy).toHaveBeenCalledWith(
       ExitCodes.FATAL_AUTHENTICATION_ERROR,
@@ -298,7 +298,7 @@ describe('validateNonInterActiveAuth', () => {
       let thrown: Error | undefined;
       try {
         await validateNonInteractiveAuth(
-          ProviderType.GATEWAY,
+          ProviderType.USE_OPENAI,
           undefined,
           nonInteractiveConfig,
           mockSettings,
@@ -317,7 +317,7 @@ describe('validateNonInterActiveAuth', () => {
         expect(payload.error.type).toBe('Error');
         expect(payload.error.code).toBe(ExitCodes.FATAL_AUTHENTICATION_ERROR);
         expect(payload.error.message).toContain(
-          "The enforced authentication type is 'gemini-api-key', but the current type is 'gateway'. Please re-authenticate with the correct type.",
+          "The enforced authentication type is 'gemini-api-key', but the current type is 'openai-api-key'. Please re-authenticate with the correct type.",
         );
       }
     });

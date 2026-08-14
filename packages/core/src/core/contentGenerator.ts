@@ -149,12 +149,6 @@ export async function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
-  if (authType === ProviderType.GATEWAY) {
-    contentGeneratorConfig.apiKey = apiKey || getEnv('GEMINI_API_KEY') || '';
-
-    return contentGeneratorConfig;
-  }
-
   return contentGeneratorConfig;
 }
 
@@ -227,16 +221,10 @@ export async function createContentGenerator(
       baseHeaders['Authorization'] = `Bearer ${config.apiKey}`;
     }
 
-    if (
-      config.authType === ProviderType.USE_GEMINI ||
-      config.authType === ProviderType.GATEWAY
-    ) {
+    if (config.authType === ProviderType.USE_GEMINI) {
       let headers: Record<string, string> = { ...baseHeaders };
       if (config.customHeaders) {
         headers = { ...headers, ...config.customHeaders };
-      }
-      if (config.authType === ProviderType.GATEWAY && config.apiKey === '') {
-        headers['x-goog-api-key'] = '';
       }
       let baseUrl = config.baseUrl;
       if (!baseUrl) {
@@ -247,6 +235,14 @@ export async function createContentGenerator(
         }
       } else {
         validateBaseUrl(baseUrl);
+      }
+
+      // Preserve legacy GATEWAY behavior: a custom endpoint without an API key
+      // sends an empty x-goog-api-key header instead of attempting default
+      // OAuth/ADC authentication, since the endpoint handles authentication.
+      const useEmptyApiKeyForCustomEndpoint = !config.apiKey && !!baseUrl;
+      if (useEmptyApiKeyForCustomEndpoint) {
+        headers['x-goog-api-key'] = '';
       }
 
       const httpOptions: {
@@ -265,12 +261,7 @@ export async function createContentGenerator(
           : new HttpsProxyAgent(proxyUrl)
         : undefined;
       const googleGenAI = new GoogleGenAI({
-        apiKey:
-          config.authType === ProviderType.GATEWAY
-            ? config.apiKey
-            : config.apiKey === ''
-              ? undefined
-              : config.apiKey,
+        apiKey: useEmptyApiKeyForCustomEndpoint ? '' : config.apiKey,
         httpOptions,
         ...(apiVersionEnv && { apiVersion: apiVersionEnv }),
         // Merge proxy into googleAuthOptions if it exists
