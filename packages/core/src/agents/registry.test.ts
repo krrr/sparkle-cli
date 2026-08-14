@@ -23,8 +23,8 @@ import type { A2AClientManager } from './a2a-client-manager.js';
 import { ThinkingLevel } from '@google/genai';
 import {
   DEFAULT_GEMINI_FLASH_LITE_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
+  SPARKLE_MODEL_ALIAS_FLASH,
 } from '../config/models.js';
 import * as tomlLoader from './agentLoader.js';
 import { SimpleExtensionLoader } from '../utils/extensionLoader.js';
@@ -154,7 +154,7 @@ describe('AgentRegistry', () => {
       ) as LocalAgentDefinition;
       expect(investigatorDef).toBeDefined();
       expect(investigatorDef?.modelConfig.model).toBe(
-        DEFAULT_GEMINI_FLASH_MODEL,
+        SPARKLE_MODEL_ALIAS_FLASH,
       );
       expect(
         investigatorDef?.modelConfig.generateContentConfig?.thinkingConfig,

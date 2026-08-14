@@ -12,8 +12,8 @@ import {
   READ_FILE_TOOL_NAME,
 } from '../tools/tool-names.js';
 import {
-  DEFAULT_GEMINI_MODEL,
-  DEFAULT_GEMINI_FLASH_MODEL,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_PRO,
   supportsModernFeatures,
 } from '../config/models.js';
 import { z } from 'zod';
@@ -50,11 +50,13 @@ const CodebaseInvestigationReportSchema = z.object({
 export const CodebaseInvestigatorAgent = (
   config: Config,
 ): LocalAgentDefinition<typeof CodebaseInvestigationReportSchema> => {
-  // Use the default flash model if the main model supports modern features.
-  // If the main model is not a modern model, use the default pro model.
+  // Use the default flash tier alias if the main model supports modern
+  // features. If the main model is not a modern model, use the pro tier
+  // alias. Tier aliases resolve within the family of the active model
+  // instead of hardcoding Gemini model names.
   const model = supportsModernFeatures(config.getModel())
-    ? DEFAULT_GEMINI_FLASH_MODEL
-    : DEFAULT_GEMINI_MODEL;
+    ? SPARKLE_MODEL_ALIAS_FLASH
+    : SPARKLE_MODEL_ALIAS_PRO;
 
   const listCommand =
     process.platform === 'win32'

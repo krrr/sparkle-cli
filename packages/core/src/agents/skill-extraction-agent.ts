@@ -15,7 +15,7 @@ import {
   READ_FILE_TOOL_NAME,
   WRITE_FILE_TOOL_NAME,
 } from '../tools/tool-names.js';
-import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
+import { SPARKLE_MODEL_ALIAS_FLASH } from '../config/models.js';
 
 const SkillExtractionSchema = z.object({
   response: z
@@ -411,7 +411,10 @@ export const SkillExtractionAgent = (
     schema: SkillExtractionSchema,
   },
   modelConfig: {
-    model: DEFAULT_GEMINI_FLASH_MODEL,
+    // Tier alias so the extraction agent resolves within the family of the
+    // active model (Gemini flash by default; e.g. deepseek-v4-flash when a
+    // DeepSeek model is active) instead of hardcoding a Gemini model name.
+    model: SPARKLE_MODEL_ALIAS_FLASH,
   },
   memoryInboxAccess: true,
   autoMemoryExtractionWriteAccess: true,
