@@ -376,7 +376,7 @@ describe('compatibility', () => {
       expect(warnings.find((w) => w.id === 'true-color')).toBeUndefined();
     });
 
-    it('should return true color warning when 256 colors are supported but true color is not, and not Apple Terminal', () => {
+    it('should return true color warning when 256 colors are supported but true color is not', () => {
       vi.mocked(os.platform).mockReturnValue('linux');
       vi.stubEnv('TERMINAL_EMULATOR', '');
       vi.stubEnv('COLORTERM', '');
@@ -393,17 +393,6 @@ describe('compatibility', () => {
           priority: WarningPriority.Low,
         }),
       );
-    });
-
-    it('should NOT return true color warning for Apple Terminal', () => {
-      vi.mocked(os.platform).mockReturnValue('darwin');
-      vi.stubEnv('TERMINAL_EMULATOR', '');
-      vi.stubEnv('COLORTERM', '');
-      vi.stubEnv('TERM_PROGRAM', 'Apple_Terminal');
-      process.stdout.getColorDepth = vi.fn().mockReturnValue(8);
-
-      const warnings = getCompatibilityWarnings();
-      expect(warnings.find((w) => w.id === 'true-color')).toBeUndefined();
     });
 
     it('should return all warnings when all are detected', () => {

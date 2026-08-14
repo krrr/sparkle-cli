@@ -116,6 +116,12 @@ describe('Background Tools', () => {
       history,
     );
 
+    // The log directory is shared with real CLI usage and may contain stale
+    // files from previous runs. Remove any leftover log for this pid so the
+    // "log file does not exist" path is exercised deterministically.
+    const logPath = ShellExecutionService.getLogFilePath(pid);
+    fs.rmSync(logPath, { force: true });
+
     const invocation = readTool.build({ pid });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (invocation as any).context = { config: { getSessionId: () => 'default' } };

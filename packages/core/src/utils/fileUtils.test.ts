@@ -47,6 +47,35 @@ vi.mock('mime/lite', () => ({
 
 const mockMimeGetType = mime.getType as Mock;
 
+const RM_RETRY_MAX_ATTEMPTS = 5;
+const RM_RETRY_DELAY_MS = 50;
+
+/**
+ * Remove a file or directory tree, retrying on Windows when an entry is
+ * temporarily held open. `isbinaryfile` closes its file descriptor without
+ * awaiting the close, so on Windows the file may still be delete-pending when
+ * cleanup runs; a subsequent lstat during recursive removal then fails with
+ * EPERM. Antivirus scanning can similarly hold files open for a short moment.
+ */
+async function rmWithRetry(target: string): Promise<void> {
+  for (let attempt = 1; attempt <= RM_RETRY_MAX_ATTEMPTS; attempt++) {
+    try {
+      await fsPromises.rm(target, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      const retryable =
+        code === 'EPERM' || code === 'EBUSY' || code === 'ENOTEMPTY';
+      if (!retryable || attempt === RM_RETRY_MAX_ATTEMPTS) {
+        throw error;
+      }
+      await new Promise((resolve) =>
+        setTimeout(resolve, RM_RETRY_DELAY_MS * attempt),
+      );
+    }
+  }
+}
+
 describe('fileUtils', () => {
   let tempRootDir: string;
   const originalProcessCwd = process.cwd;
@@ -80,9 +109,9 @@ describe('fileUtils', () => {
     actualNodeFs.mkdirSync(directoryPath, { recursive: true }); // Ensure subdir exists
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     if (actualNodeFs.existsSync(tempRootDir)) {
-      actualNodeFs.rmSync(tempRootDir, { recursive: true, force: true });
+      await rmWithRetry(tempRootDir);
     }
     process.cwd = originalProcessCwd;
     vi.restoreAllMocks(); // Restore any spies
@@ -321,7 +350,7 @@ describe('fileUtils', () => {
 
     afterEach(async () => {
       if (testDir) {
-        await fsPromises.rm(testDir, { recursive: true, force: true });
+        await rmWithRetry(testDir);
       }
     });
 

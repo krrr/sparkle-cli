@@ -147,7 +147,13 @@ async function main() {
     );
     const packageLockJson = JSON.parse(packageLockJsonContent);
 
-    const workspaceRelativePath = path.relative(projectRoot, packagePath);
+    // package-lock.json keys always use forward slashes, but path.relative()
+    // returns platform-specific separators (e.g. backslashes on Windows).
+    // Normalize so workspace-scoped lockfile lookups succeed on every OS.
+    const workspaceRelativePath = path
+      .relative(projectRoot, packagePath)
+      .split(path.sep)
+      .join('/');
     const allDependencies = new Map();
     const directDependencies = Object.keys(packageJson.dependencies);
 
