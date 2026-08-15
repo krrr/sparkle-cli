@@ -659,6 +659,7 @@ export class ApiResponseEvent implements BaseTelemetryEvent {
   usage: GenAIUsageDetails;
   finish_reasons: OTelFinishReason[];
   role?: LlmRole;
+  time_to_first_token_ms?: number;
 
   constructor(
     model: string,
@@ -669,6 +670,7 @@ export class ApiResponseEvent implements BaseTelemetryEvent {
     usage_data?: GenerateContentResponseUsageMetadata,
     response_text?: string,
     role?: LlmRole,
+    time_to_first_token_ms?: number,
   ) {
     this['event.name'] = 'api_response';
     this['event.timestamp'] = new Date().toISOString();
@@ -690,6 +692,7 @@ export class ApiResponseEvent implements BaseTelemetryEvent {
     };
     this.finish_reasons = toFinishReasons(this.response.candidates);
     this.role = role;
+    this.time_to_first_token_ms = time_to_first_token_ms;
   }
 
   toLogRecord(config: Config): LogRecord {
@@ -712,6 +715,9 @@ export class ApiResponseEvent implements BaseTelemetryEvent {
     };
     if (this.role) {
       attributes['role'] = this.role;
+    }
+    if (this.time_to_first_token_ms !== undefined) {
+      attributes['time_to_first_token_ms'] = this.time_to_first_token_ms;
     }
     if (config.getTelemetryLogPromptsEnabled() && this.response_text) {
       attributes['response_text'] = this.response_text;

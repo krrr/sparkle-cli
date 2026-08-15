@@ -189,6 +189,87 @@ describe('UiTelemetryService', () => {
       expect(service.getLastPromptTokenCount()).toBe(0);
     });
 
+    it('should accumulate time to first token when provided', () => {
+      const event1 = {
+        'event.name': EVENT_API_RESPONSE,
+        model: 'gemini-2.5-pro',
+        duration_ms: 500,
+        time_to_first_token_ms: 120,
+        usage: {
+          input_token_count: 10,
+          output_token_count: 20,
+          total_token_count: 30,
+          cached_content_token_count: 5,
+          thoughts_token_count: 2,
+          tool_token_count: 3,
+        },
+      } as ApiResponseEvent & { 'event.name': typeof EVENT_API_RESPONSE };
+      const event2 = {
+        'event.name': EVENT_API_RESPONSE,
+        model: 'gemini-2.5-pro',
+        duration_ms: 600,
+        time_to_first_token_ms: 180,
+        usage: {
+          input_token_count: 15,
+          output_token_count: 25,
+          total_token_count: 40,
+          cached_content_token_count: 10,
+          thoughts_token_count: 4,
+          tool_token_count: 6,
+        },
+      } as ApiResponseEvent & { 'event.name': typeof EVENT_API_RESPONSE };
+
+      service.addEvent(event1);
+      service.addEvent(event2);
+
+      expect(
+        service.getMetrics().models['gemini-2.5-pro'].api
+          .totalTimeToFirstTokenMs,
+      ).toBe(300);
+      expect(
+        service.getMetrics().models['gemini-2.5-pro'].api
+          .totalTimeToFirstTokenRequests,
+      ).toBe(2);
+    });
+
+    it('should only count requests that carry time to first token', () => {
+      const eventWithTtft = {
+        'event.name': EVENT_API_RESPONSE,
+        model: 'gemini-2.5-pro',
+        duration_ms: 500,
+        time_to_first_token_ms: 120,
+        usage: {
+          input_token_count: 10,
+          output_token_count: 20,
+          total_token_count: 30,
+          cached_content_token_count: 5,
+          thoughts_token_count: 2,
+          tool_token_count: 3,
+        },
+      } as ApiResponseEvent & { 'event.name': typeof EVENT_API_RESPONSE };
+      const eventWithoutTtft = {
+        'event.name': EVENT_API_RESPONSE,
+        model: 'gemini-2.5-pro',
+        duration_ms: 600,
+        usage: {
+          input_token_count: 15,
+          output_token_count: 25,
+          total_token_count: 40,
+          cached_content_token_count: 10,
+          thoughts_token_count: 4,
+          tool_token_count: 6,
+        },
+      } as ApiResponseEvent & { 'event.name': typeof EVENT_API_RESPONSE };
+
+      service.addEvent(eventWithTtft);
+      service.addEvent(eventWithoutTtft);
+
+      const api = service.getMetrics().models['gemini-2.5-pro'].api;
+      expect(api.totalRequests).toBe(2);
+      expect(api.totalTimeToFirstTokenMs).toBe(120);
+      expect(api.totalTimeToFirstTokenRequests).toBe(1);
+    });
+
     it('should aggregate multiple ApiResponseEvents for the same model', () => {
       const event1 = {
         'event.name': EVENT_API_RESPONSE,

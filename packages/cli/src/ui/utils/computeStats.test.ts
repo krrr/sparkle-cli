@@ -7,8 +7,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   calculateAverageLatency,
+  calculateAverageTimeToFirstToken,
   calculateCacheHitRate,
   calculateErrorRate,
+  calculateTokensPerSecond,
   computeSessionStats,
 } from './computeStats.js';
 import type {
@@ -85,6 +87,128 @@ describe('calculateAverageLatency', () => {
       roles: {},
     };
     expect(calculateAverageLatency(metrics)).toBe(150);
+  });
+});
+
+describe('calculateAverageTimeToFirstToken', () => {
+  it('should return 0 if totalRequests is 0', () => {
+    const metrics: ModelMetrics = {
+      api: {
+        totalRequests: 0,
+        totalErrors: 0,
+        totalLatencyMs: 1000,
+        totalTimeToFirstTokenMs: 500,
+      },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 0,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateAverageTimeToFirstToken(metrics)).toBe(0);
+  });
+
+  it('should calculate the average time to first token correctly', () => {
+    const metrics: ModelMetrics = {
+      api: {
+        totalRequests: 10,
+        totalErrors: 0,
+        totalLatencyMs: 1500,
+        totalTimeToFirstTokenMs: 3000,
+      },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 0,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateAverageTimeToFirstToken(metrics)).toBe(300);
+  });
+
+  it('should divide by TTFT request count when not all requests have one', () => {
+    const metrics: ModelMetrics = {
+      api: {
+        totalRequests: 10,
+        totalErrors: 0,
+        totalLatencyMs: 1500,
+        totalTimeToFirstTokenMs: 3000,
+        totalTimeToFirstTokenRequests: 3,
+      },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 0,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateAverageTimeToFirstToken(metrics)).toBe(1000);
+  });
+
+  it('should treat missing totalTimeToFirstTokenMs as 0', () => {
+    const metrics: ModelMetrics = {
+      api: { totalRequests: 4, totalErrors: 0, totalLatencyMs: 1000 },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 0,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateAverageTimeToFirstToken(metrics)).toBe(0);
+  });
+});
+
+describe('calculateTokensPerSecond', () => {
+  it('should return 0 if totalLatencyMs is 0', () => {
+    const metrics: ModelMetrics = {
+      api: { totalRequests: 1, totalErrors: 0, totalLatencyMs: 0 },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 100,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateTokensPerSecond(metrics)).toBe(0);
+  });
+
+  it('should calculate output tokens per second correctly', () => {
+    const metrics: ModelMetrics = {
+      api: { totalRequests: 1, totalErrors: 0, totalLatencyMs: 2000 },
+      tokens: {
+        input: 0,
+        prompt: 0,
+        candidates: 400,
+        total: 0,
+        cached: 0,
+        thoughts: 0,
+        tool: 0,
+      },
+      roles: {},
+    };
+    expect(calculateTokensPerSecond(metrics)).toBe(200);
   });
 });
 

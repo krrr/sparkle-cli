@@ -140,6 +140,8 @@ describe('LoggingContentGenerator', () => {
       );
       const responseEvent = vi.mocked(logApiResponse).mock.calls[0][1];
       expect(responseEvent.duration_ms).toBe(1000);
+      // Non-streaming responses have no distinct first-token measurement.
+      expect(responseEvent.time_to_first_token_ms).toBeUndefined();
 
       expect(runInDevTraceSpan).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -498,6 +500,7 @@ describe('LoggingContentGenerator', () => {
       );
       const responseEvent = vi.mocked(logApiResponse).mock.calls[0][1];
       expect(responseEvent.duration_ms).toBe(1000);
+      expect(responseEvent.time_to_first_token_ms).toBe(1000);
 
       expect(runInDevTraceSpan).toHaveBeenCalledWith(
         expect.objectContaining({

@@ -10,8 +10,10 @@ import { theme } from '../semantic-colors.js';
 import { formatDuration } from '../utils/formatters.js';
 import {
   calculateAverageLatency,
+  calculateAverageTimeToFirstToken,
   calculateCacheHitRate,
   calculateErrorRate,
+  calculateTokensPerSecond,
 } from '../utils/computeStats.js';
 import {
   useSessionStats,
@@ -73,6 +75,9 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
   const hasCached = activeModels.some(
     ([, metrics]) => metrics.tokens.cached > 0,
   );
+  const hasTimeToFirstToken = activeModels.some(
+    ([, metrics]) => metrics.api.totalTimeToFirstTokenMs !== undefined,
+  );
 
   const allRoles = [
     ...new Set(
@@ -130,6 +135,23 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
   );
   rows.push(
     createRow('Avg Latency', (m) => formatDuration(calculateAverageLatency(m))),
+  );
+
+  if (hasTimeToFirstToken) {
+    rows.push(
+      createRow('Time to First Token', (m) =>
+        m.api.totalTimeToFirstTokenMs === undefined
+          ? '—'
+          : formatDuration(calculateAverageTimeToFirstToken(m)),
+      ),
+    );
+  }
+
+  rows.push(
+    createRow(
+      'Tokens Per Second',
+      (m) => `${calculateTokensPerSecond(m).toFixed(1)} tok/s`,
+    ),
   );
 
   // Spacer

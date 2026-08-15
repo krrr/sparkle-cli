@@ -32,7 +32,11 @@ function areModelMetricsEqual(a: ModelMetrics, b: ModelMetrics): boolean {
   if (
     a.api.totalRequests !== b.api.totalRequests ||
     a.api.totalErrors !== b.api.totalErrors ||
-    a.api.totalLatencyMs !== b.api.totalLatencyMs
+    a.api.totalLatencyMs !== b.api.totalLatencyMs ||
+    (a.api.totalTimeToFirstTokenMs ?? 0) !==
+      (b.api.totalTimeToFirstTokenMs ?? 0) ||
+    (a.api.totalTimeToFirstTokenRequests ?? 0) !==
+      (b.api.totalTimeToFirstTokenRequests ?? 0)
   ) {
     return false;
   }

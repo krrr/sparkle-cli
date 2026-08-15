@@ -210,6 +210,116 @@ describe('<ModelStatsDisplay />', () => {
     unmount();
   });
 
+  it('should display Time to First Token and Tokens Per Second', async () => {
+    const { lastFrame, unmount } = await renderWithMockedStats({
+      models: {
+        'gemini-2.5-pro': {
+          api: {
+            totalRequests: 2,
+            totalErrors: 0,
+            totalLatencyMs: 2000,
+            totalTimeToFirstTokenMs: 600,
+          },
+          tokens: {
+            input: 100,
+            prompt: 100,
+            candidates: 400,
+            total: 500,
+            cached: 0,
+            thoughts: 0,
+            tool: 0,
+          },
+          roles: {},
+        },
+      },
+      tools: {
+        totalCalls: 0,
+        totalSuccess: 0,
+        totalFail: 0,
+        totalDurationMs: 0,
+        totalDecisions: {
+          accept: 0,
+          reject: 0,
+          modify: 0,
+          [ToolCallDecision.AUTO_ACCEPT]: 0,
+        },
+        byName: {},
+      },
+      files: {
+        totalLinesAdded: 0,
+        totalLinesRemoved: 0,
+      },
+    });
+
+    const output = lastFrame();
+    expect(output).toContain('Time to First Token');
+    expect(output).toContain('Tokens Per Second');
+    expect(output).toMatchSnapshot();
+    unmount();
+  });
+
+  it('should show a placeholder for models without Time to First Token data', async () => {
+    const { lastFrame, unmount } = await renderWithMockedStats({
+      models: {
+        'gemini-2.5-pro': {
+          api: {
+            totalRequests: 2,
+            totalErrors: 0,
+            totalLatencyMs: 2000,
+            totalTimeToFirstTokenMs: 600,
+            totalTimeToFirstTokenRequests: 2,
+          },
+          tokens: {
+            input: 100,
+            prompt: 100,
+            candidates: 400,
+            total: 500,
+            cached: 0,
+            thoughts: 0,
+            tool: 0,
+          },
+          roles: {},
+        },
+        'gemini-2.5-flash': {
+          api: { totalRequests: 1, totalErrors: 0, totalLatencyMs: 500 },
+          tokens: {
+            input: 10,
+            prompt: 10,
+            candidates: 20,
+            total: 30,
+            cached: 0,
+            thoughts: 0,
+            tool: 0,
+          },
+          roles: {},
+        },
+      },
+      tools: {
+        totalCalls: 0,
+        totalSuccess: 0,
+        totalFail: 0,
+        totalDurationMs: 0,
+        totalDecisions: {
+          accept: 0,
+          reject: 0,
+          modify: 0,
+          [ToolCallDecision.AUTO_ACCEPT]: 0,
+        },
+        byName: {},
+      },
+      files: {
+        totalLinesAdded: 0,
+        totalLinesRemoved: 0,
+      },
+    });
+
+    const output = lastFrame();
+    expect(output).toContain('Time to First Token');
+    expect(output).toContain('—');
+    expect(output).toMatchSnapshot();
+    unmount();
+  });
+
   it('should display stats for multiple models correctly', async () => {
     const { lastFrame, unmount } = await renderWithMockedStats({
       models: {

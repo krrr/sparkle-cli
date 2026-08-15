@@ -360,6 +360,7 @@ Response received from Gemini API.
 - `model` (string)
 - `status_code` (int or string)
 - `duration_ms` (int)
+- `time_to_first_token_ms` (int, optional)
 - `input_token_count` (int)
 - `output_token_count` (int)
 - `cached_content_token_count` (int)

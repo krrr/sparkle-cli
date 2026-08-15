@@ -56,6 +56,8 @@ export interface ModelMetrics {
     totalRequests: number;
     totalErrors: number;
     totalLatencyMs: number;
+    totalTimeToFirstTokenMs?: number;
+    totalTimeToFirstTokenRequests?: number;
     errorsByType?: Record<string, number>;
   };
   tokens: {
@@ -307,6 +309,13 @@ export class UiTelemetryService extends EventEmitter {
 
     modelMetrics.api.totalRequests++;
     modelMetrics.api.totalLatencyMs += event.duration_ms;
+    if (event.time_to_first_token_ms !== undefined) {
+      modelMetrics.api.totalTimeToFirstTokenMs =
+        (modelMetrics.api.totalTimeToFirstTokenMs ?? 0) +
+        event.time_to_first_token_ms;
+      modelMetrics.api.totalTimeToFirstTokenRequests =
+        (modelMetrics.api.totalTimeToFirstTokenRequests ?? 0) + 1;
+    }
 
     modelMetrics.tokens.prompt += event.usage.input_token_count;
     modelMetrics.tokens.candidates += event.usage.output_token_count;

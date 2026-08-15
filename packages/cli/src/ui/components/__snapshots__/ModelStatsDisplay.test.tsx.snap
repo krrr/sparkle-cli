@@ -1,5 +1,27 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`<ModelStatsDisplay /> > should display Time to First Token and Tokens Per Second 1`] = `
+"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                  │
+│  Model Stats For Nerds                                                                           │
+│                                                                                                  │
+│                                                                                                  │
+│  Metric                      gemini-2.5-pro                                                      │
+│  ──────────────────────────────────────────────────────────────────────────────────────────────  │
+│  API                                                                                             │
+│  Requests                    2                                                                   │
+│  Errors                      0 (0.0%)                                                            │
+│  Avg Latency                 1.0s                                                                │
+│  Time to First Token         300ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
+│  Tokens                                                                                          │
+│  Total                       500                                                                 │
+│    ↳ Input                   100                                                                 │
+│    ↳ Output                  400                                                                 │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+"
+`;
+
 exports[`<ModelStatsDisplay /> > should display a single model correctly 1`] = `
 "╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
 │                                                                                                  │
@@ -12,6 +34,7 @@ exports[`<ModelStatsDisplay /> > should display a single model correctly 1`] = `
 │  Requests                    1                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       30                                                                  │
 │    ↳ Input                   5                                                                   │
@@ -35,6 +58,7 @@ exports[`<ModelStatsDisplay /> > should display conditional rows if at least one
 │  Requests                    1                                1                                  │
 │  Errors                      0 (0.0%)                         0 (0.0%)                           │
 │  Avg Latency                 100ms                            50ms                               │
+│  Tokens Per Second           200.0 tok/s                      200.0 tok/s                        │
 │  Tokens                                                                                          │
 │  Total                       30                               15                                 │
 │    ↳ Input                   5                                5                                  │
@@ -58,6 +82,7 @@ exports[`<ModelStatsDisplay /> > should display gemini-3-flash model names as-is
 │  Requests                    1                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       30                                                                  │
 │    ↳ Input                   5                                                                   │
@@ -81,6 +106,7 @@ exports[`<ModelStatsDisplay /> > should display role breakdown correctly 1`] = `
 │  Requests                    2                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       70                                                                  │
 │    ↳ Input                   20                                                                  │
@@ -108,6 +134,7 @@ exports[`<ModelStatsDisplay /> > should display stats for multiple models correc
 │  Requests                    10                               20                                 │
 │  Errors                      1 (10.0%)                        2 (10.0%)                          │
 │  Avg Latency                 100ms                            25ms                               │
+│  Tokens Per Second           200.0 tok/s                      800.0 tok/s                        │
 │  Tokens                                                                                          │
 │  Total                       300                              600                                │
 │    ↳ Input                   50                               100                                │
@@ -131,6 +158,7 @@ exports[`<ModelStatsDisplay /> > should filter out invalid role names 1`] = `
 │  Requests                    1                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       30                                                                  │
 │    ↳ Input                   10                                                                  │
@@ -151,6 +179,7 @@ exports[`<ModelStatsDisplay /> > should handle large values without wrapping or 
 │  Requests                    999,999,999                                                         │
 │  Errors                      123,456,789 (12.3%)                                                 │
 │  Avg Latency                 0ms                                                                 │
+│  Tokens Per Second           12500687.4 tok/s                                                    │
 │  Tokens                                                                                          │
 │  Total                       999,999,999                                                         │
 │    ↳ Input                   864,197,532                                                         │
@@ -174,6 +203,7 @@ exports[`<ModelStatsDisplay /> > should handle long role name layout 1`] = `
 │  Requests                    1                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       30                                                                  │
 │    ↳ Input                   10                                                                  │
@@ -200,6 +230,7 @@ exports[`<ModelStatsDisplay /> > should handle models with long names (gemini-3-
 │  Requests                    10                     20                       │
 │  Errors                      0 (0.0%)               0 (0.0%)                 │
 │  Avg Latency                 200ms                  50ms                     │
+│  Tokens Per Second           2000.0 tok/s           8000.0 tok/s             │
 │  Tokens                                                                      │
 │  Total                       6,000                  12,000                   │
 │    ↳ Input                   1,000                  2,000                    │
@@ -223,6 +254,7 @@ exports[`<ModelStatsDisplay /> > should not display conditional rows if no model
 │  Requests                    1                                                                   │
 │  Errors                      0 (0.0%)                                                            │
 │  Avg Latency                 100ms                                                               │
+│  Tokens Per Second           200.0 tok/s                                                         │
 │  Tokens                                                                                          │
 │  Total                       30                                                                  │
 │    ↳ Input                   10                                                                  │
@@ -235,6 +267,28 @@ exports[`<ModelStatsDisplay /> > should render "no API calls" message when there
 "╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
 │                                                                                                  │
 │  No API calls have been made in this session.                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+"
+`;
+
+exports[`<ModelStatsDisplay /> > should show a placeholder for models without Time to First Token data 1`] = `
+"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                  │
+│  Model Stats For Nerds                                                                           │
+│                                                                                                  │
+│                                                                                                  │
+│  Metric                      gemini-2.5-pro                   gemini-2.5-flash                   │
+│  ──────────────────────────────────────────────────────────────────────────────────────────────  │
+│  API                                                                                             │
+│  Requests                    2                                1                                  │
+│  Errors                      0 (0.0%)                         0 (0.0%)                           │
+│  Avg Latency                 1.0s                             500ms                              │
+│  Time to First Token         300ms                            —                                  │
+│  Tokens Per Second           200.0 tok/s                      40.0 tok/s                         │
+│  Tokens                                                                                          │
+│  Total                       500                              30                                 │
+│    ↳ Input                   100                              10                                 │
+│    ↳ Output                  400                              20                                 │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
 "
 `;

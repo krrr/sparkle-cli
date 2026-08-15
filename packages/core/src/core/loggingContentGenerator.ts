@@ -198,6 +198,7 @@ export class LoggingContentGenerator implements ContentGenerator {
     responseText?: string,
     generationConfig?: GenerateContentConfig,
     serverDetails?: ServerDetails,
+    timeToFirstTokenMs?: number,
   ): void {
     const event = new ApiResponseEvent(
       model,
@@ -216,6 +217,7 @@ export class LoggingContentGenerator implements ContentGenerator {
       usageMetadata,
       responseText,
       role,
+      timeToFirstTokenMs,
     );
 
     // Only compute context breakdown for turn-ending responses (when the user
@@ -493,10 +495,14 @@ export class LoggingContentGenerator implements ContentGenerator {
     const responses: GenerateContentResponse[] = [];
 
     let lastUsageMetadata: GenerateContentResponseUsageMetadata | undefined;
+    let firstTokenTimeMs: number | undefined;
     const serverDetails = this._getEndpointUrl(req, 'generateContentStream');
     const requestContents: Content[] = toContents(req.contents);
     try {
       for await (const response of stream) {
+        if (firstTokenTimeMs === undefined) {
+          firstTokenTimeMs = Date.now() - startTime;
+        }
         responses.push(response);
         if (response.usageMetadata) {
           lastUsageMetadata = response.usageMetadata;
@@ -525,6 +531,7 @@ export class LoggingContentGenerator implements ContentGenerator {
         ),
         req.config,
         serverDetails,
+        firstTokenTimeMs,
       );
       spanMetadata.output = responses.map(
         (response) => response.candidates?.[0]?.content ?? null,

@@ -25,6 +25,24 @@ export function calculateAverageLatency(metrics: ModelMetrics): number {
   return metrics.api.totalLatencyMs / metrics.api.totalRequests;
 }
 
+export function calculateAverageTimeToFirstToken(
+  metrics: ModelMetrics,
+): number {
+  const sampleCount =
+    metrics.api.totalTimeToFirstTokenRequests ?? metrics.api.totalRequests;
+  if (sampleCount === 0) {
+    return 0;
+  }
+  return (metrics.api.totalTimeToFirstTokenMs ?? 0) / sampleCount;
+}
+
+export function calculateTokensPerSecond(metrics: ModelMetrics): number {
+  if (metrics.api.totalLatencyMs === 0) {
+    return 0;
+  }
+  return metrics.tokens.candidates / (metrics.api.totalLatencyMs / 1000);
+}
+
 export function calculateCacheHitRate(
   metrics: ModelMetrics | RoleMetrics,
 ): number {

@@ -599,6 +599,30 @@ describe('loggers', () => {
         }),
       });
     });
+    it('should include time_to_first_token_ms in the log record when provided', () => {
+      const event = new ApiResponseEvent(
+        'test-model',
+        100,
+        { prompt_id: 'prompt-id-ttft', contents: [] },
+        { candidates: [] },
+        ProviderType.USE_GEMINI,
+        {},
+        'test-response',
+        undefined,
+        45,
+      );
+
+      logApiResponse(mockConfig, event);
+
+      expect(mockLogger.emit).toHaveBeenCalledWith({
+        body: 'API response from test-model. Status: 200. Duration: 100ms.',
+        attributes: expect.objectContaining({
+          'event.name': EVENT_API_RESPONSE,
+          prompt_id: 'prompt-id-ttft',
+          time_to_first_token_ms: 45,
+        }),
+      });
+    });
     it('should not include response_text when logPrompts is disabled', () => {
       const mockConfigNoPrompts = {
         getSessionId: () => 'test-session-id',
