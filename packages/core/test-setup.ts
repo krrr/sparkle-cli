@@ -38,15 +38,6 @@ vi.mock('./src/config/projectRegistry.js', async (importOriginal) => {
   return actual;
 });
 
-vi.mock('./src/config/storageMigration.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('./src/config/storageMigration.js')>();
-  actual.StorageMigration.migrateDirectory = vi.fn(() =>
-    Promise.resolve(undefined),
-  );
-  return actual;
-});
-
 vi.mock('./src/config/storage.js', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('./src/config/storage.js')>();

@@ -2044,9 +2044,8 @@ The CLI keeps a history of shell commands you run. To avoid conflicts between
 different projects, this history is stored in a project-specific directory
 within your user's home folder.
 
-- **Location:** `~/.sparkle/tmp/<project_hash>/shell_history`
-  - `<project_hash>` is a unique identifier generated from your project's root
-    path.
+- **Location:** `~/.sparkle/tmp/<project-id>/shell_history`
+  - `<project-id>` is a unique identifier for your project directory.
   - The history is stored in a file named `shell_history`.
 
 ## Environment variables and `.env` files

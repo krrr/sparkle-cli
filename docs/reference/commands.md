@@ -84,8 +84,8 @@ Slash commands provide meta-level control over the CLI itself.
       `<tag>` for identifying the conversation state.
     - **Details on checkpoint location:** The default locations for saved chat
       checkpoints are:
-      - Linux/macOS: `~/.sparkle/tmp/<project_hash>/`
-      - Windows: `C:\Users\<YourUsername>\.sparkle\tmp\<project_hash>\`
+      - Linux/macOS: `~/.sparkle/tmp/<project-id>/`
+      - Windows: `C:\Users\<YourUsername>\.sparkle\tmp\<project-id>\`
       - **Behavior:** Chats are saved into a project-specific directory,
         determined by where you run the CLI. Consequently, saved chats are only
         accessible when working within that same project.

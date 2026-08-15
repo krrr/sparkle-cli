@@ -6,7 +6,6 @@
 
 import * as path from 'node:path';
 import * as os from 'node:os';
-import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import {
   SPARKLE_DIR,
@@ -16,7 +15,6 @@ import {
   normalizePath,
 } from '../utils/paths.js';
 import { ProjectRegistry } from './projectRegistry.js';
-import { StorageMigration } from './storageMigration.js';
 
 export const OAUTH_FILE = 'oauth_creds.json';
 export const TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json';
@@ -206,10 +204,6 @@ export class Storage {
     return this.targetDir;
   }
 
-  private getFilePathHash(filePath: string): string {
-    return crypto.createHash('sha256').update(filePath).digest('hex');
-  }
-
   private getProjectIdentifier(): string {
     if (!this.projectIdentifier) {
       throw new Error('Storage must be initialized before use');
@@ -218,7 +212,7 @@ export class Storage {
   }
 
   /**
-   * Initializes storage by setting up the project registry and performing migrations.
+   * Initializes storage by setting up the project registry.
    */
   async initialize(): Promise<void> {
     if (this.initPromise) {
@@ -241,30 +235,9 @@ export class Storage {
       await registry.initialize();
 
       this.projectIdentifier = await registry.getShortId(this.getProjectRoot());
-      await this.performMigration();
     })();
 
     return this.initPromise;
-  }
-
-  /**
-   * Performs migration of legacy hash-based directories to the new slug-based format.
-   * This is called internally by initialize().
-   */
-  private async performMigration(): Promise<void> {
-    const shortId = this.getProjectIdentifier();
-    const oldHash = this.getFilePathHash(this.getProjectRoot());
-
-    // Migrate Temp Dir
-    const newTempDir = path.join(Storage.getGlobalTempDir(), shortId);
-    const oldTempDir = path.join(Storage.getGlobalTempDir(), oldHash);
-    await StorageMigration.migrateDirectory(oldTempDir, newTempDir);
-
-    // Migrate History Dir
-    const historyDir = path.join(Storage.getGlobalGeminiDir(), 'history');
-    const newHistoryDir = path.join(historyDir, shortId);
-    const oldHistoryDir = path.join(historyDir, oldHash);
-    await StorageMigration.migrateDirectory(oldHistoryDir, newHistoryDir);
   }
 
   getHistoryDir(): string {

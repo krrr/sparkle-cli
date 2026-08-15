@@ -8,7 +8,6 @@ import { beforeEach, describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.unmock('./storage.js');
 vi.unmock('./projectRegistry.js');
-vi.unmock('./storageMigration.js');
 
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -26,12 +25,10 @@ vi.mock('fs', async (importOriginal) => {
 import { Storage } from './storage.js';
 import { SPARKLE_DIR, homedir, resolveToRealPath } from '../utils/paths.js';
 import { ProjectRegistry } from './projectRegistry.js';
-import { StorageMigration } from './storageMigration.js';
 
 const PROJECT_SLUG = 'project-slug';
 
 vi.mock('./projectRegistry.js');
-vi.mock('./storageMigration.js');
 
 describe('Storage – initialize', () => {
   const projectRoot = '/tmp/project';
@@ -44,12 +41,9 @@ describe('Storage – initialize', () => {
       .mockReturnValue(PROJECT_SLUG);
     storage = new Storage(projectRoot);
     vi.clearAllMocks();
-
-    // Mock StorageMigration.migrateDirectory
-    vi.mocked(StorageMigration.migrateDirectory).mockResolvedValue(undefined);
   });
 
-  it('sets up the registry and performs migration if `getProjectTempDir` is called', async () => {
+  it('sets up the registry when `getProjectTempDir` is called', async () => {
     await storage.initialize();
     expect(storage.getProjectTempDir()).toBe(
       path.join(os.homedir(), SPARKLE_DIR, 'tmp', PROJECT_SLUG),
@@ -61,10 +55,6 @@ describe('Storage – initialize', () => {
     expect(
       vi.mocked(ProjectRegistry).prototype.getShortId,
     ).toHaveBeenCalledWith(projectRoot);
-
-    // Verify migration calls
-    // We can't easily get the hash here without repeating logic, but we can verify it's called twice
-    expect(StorageMigration.migrateDirectory).toHaveBeenCalledTimes(2);
 
     // Verify identifier is set by checking a path
     expect(storage.getProjectTempDir()).toContain(PROJECT_SLUG);

@@ -86,7 +86,7 @@ export interface OperationalGuidelinesOptions {
   topicUpdateNarration: boolean;
   /**
    * Absolute path to the user's per-project private memory index
-   * (e.g. ~/.sparkle/tmp/<project-hash>/memory/MEMORY.md).
+   * (e.g. ~/.sparkle/tmp/<project-id>/memory/MEMORY.md).
    */
   userProjectMemoryPath?: string;
   /**
