@@ -1816,20 +1816,8 @@ describe('isYoloModeDisabled', () => {
     expect(config.isYoloModeDisabled()).toBe(false);
   });
 
-  it('should return true when yolo mode is disabled by parameter', () => {
-    const config = new Config({ ...baseParams, disableYoloMode: true });
-    vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    expect(config.isYoloModeDisabled()).toBe(true);
-  });
-
   it('should return true when folder is untrusted', () => {
     const config = new Config(baseParams);
-    vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
-    expect(config.isYoloModeDisabled()).toBe(true);
-  });
-
-  it('should return true when yolo is disabled and folder is untrusted', () => {
-    const config = new Config({ ...baseParams, disableYoloMode: true });
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(false);
     expect(config.isYoloModeDisabled()).toBe(true);
   });

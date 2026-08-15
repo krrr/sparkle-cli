@@ -48,24 +48,6 @@ describe('useAuth', () => {
   });
 
   describe('validateAuthMethodWithSettings', () => {
-    it('should return error if auth type is enforced and does not match', async () => {
-      const settings = {
-        merged: {
-          security: {
-            auth: {
-              enforcedType: ProviderType.USE_GEMINI,
-            },
-          },
-        },
-      } as LoadedSettings;
-
-      const error = await validateAuthMethodWithSettings(
-        ProviderType.USE_OPENAI,
-        settings,
-      );
-      expect(error).toContain('Authentication is enforced to be');
-    });
-
     it('should return null if useExternal is true', async () => {
       const settings = {
         merged: {

@@ -32,21 +32,6 @@ exports[`AuthDialog > Snapshots > renders correctly with default props 1`] = `
 "
 `;
 
-exports[`AuthDialog > Snapshots > renders correctly with enforced auth type 1`] = `
-"╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
-│                                                                                                  │
-│ ? Get started                                                                                    │
-│                                                                                                  │
-│   Which kind of LLM provider would you like to use?                                              │
-│                                                                                                  │
-│   (selected) Use Gemini API                                                                      │
-│                                                                                                  │
-│   (Use Enter to select)                                                                          │
-│                                                                                                  │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
-"
-`;
-
 exports[`AuthDialog > Snapshots > renders the OpenAI config form when OpenAI is selected 1`] = `
 "╭──────────────────────────────────────────────────────────────────────────────────────────────────╮
 │                                                                                                  │

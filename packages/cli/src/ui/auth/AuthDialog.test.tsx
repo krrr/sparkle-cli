@@ -160,32 +160,6 @@ describe('AuthDialog', () => {
     unmount();
   });
 
-  it('filters auth types when enforcedType is set', async () => {
-    props.settings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
-    const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
-    const items = mockedRadioButtonSelect.mock.calls[0][0].items;
-    expect(items).toHaveLength(1);
-    expect(items[0].value).toBe(ProviderType.USE_GEMINI);
-    unmount();
-  });
-
-  it('shows all auth types when enforcedType is not a valid option', async () => {
-    props.settings.merged.security.auth.enforcedType =
-      'gateway' as ProviderType;
-    const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
-    const items = mockedRadioButtonSelect.mock.calls[0][0].items;
-    expect(items).toHaveLength(2);
-    unmount();
-  });
-
-  it('sets initial index to 0 when enforcedType is set', async () => {
-    props.settings.merged.security.auth.enforcedType = ProviderType.USE_GEMINI;
-    const { unmount } = await renderWithProviders(<AuthDialog {...props} />);
-    const { initialIndex } = mockedRadioButtonSelect.mock.calls[0][0];
-    expect(initialIndex).toBe(0);
-    unmount();
-  });
-
   describe('Initial Auth Type Selection', () => {
     it.each([
       {
@@ -763,16 +737,6 @@ describe('AuthDialog', () => {
 
     it('renders correctly with auth error', async () => {
       props.authError = 'Something went wrong';
-      const { lastFrame, unmount } = await renderWithProviders(
-        <AuthDialog {...props} />,
-      );
-      expect(lastFrame()).toMatchSnapshot();
-      unmount();
-    });
-
-    it('renders correctly with enforced auth type', async () => {
-      props.settings.merged.security.auth.enforcedType =
-        ProviderType.USE_GEMINI;
       const { lastFrame, unmount } = await renderWithProviders(
         <AuthDialog {...props} />,
       );

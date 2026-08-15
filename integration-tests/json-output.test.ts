@@ -7,7 +7,6 @@
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
 import { TestRig } from './test-helper.js';
 import { join } from 'node:path';
-import { ExitCodes } from 'sparkle-cli-core/src/index.js';
 
 describe('JSON output', () => {
   let rig: TestRig;
@@ -55,63 +54,6 @@ describe('JSON output', () => {
     expect(parsed).toHaveProperty('session_id');
     expect(typeof parsed.session_id).toBe('string');
     expect(parsed.session_id).not.toBe('');
-  });
-
-  it('should return a JSON error for sd auth mismatch before running', async () => {
-    await rig.setup('json-output-auth-mismatch', {
-      settings: {
-        security: {
-          auth: { enforcedType: 'gemini-api-key', selectedType: '' },
-        },
-      },
-    });
-
-    let thrown: Error | undefined;
-    try {
-      await rig.run({
-        args: ['Hello', '--output-format', 'json'],
-        env: { GOOGLE_GENAI_USE_GCA: 'true' },
-      });
-      expect.fail('Expected process to exit with error');
-    } catch (e) {
-      thrown = e as Error;
-    }
-
-    expect(thrown).toBeDefined();
-    const message = (thrown as Error).message;
-
-    // Use a regex to find the first complete JSON object in the string
-    // We expect the JSON to start with a quote (e.g. {"error": ...}) to avoid
-    // matching random error objects printed to stderr (like ENOENT).
-    const jsonMatch = message.match(/{\s*"[\s\S]*}/);
-
-    // Fail if no JSON-like text was found
-    expect(
-      jsonMatch,
-      'Expected to find a JSON object in the error output',
-    ).toBeTruthy();
-
-    let payload;
-    try {
-      // Parse the matched JSON string
-      payload = JSON.parse(jsonMatch![0]);
-    } catch (parseError) {
-      console.error('Failed to parse the following JSON:', jsonMatch![0]);
-      throw new Error(
-        `Test failed: Could not parse JSON from error message. Details: ${parseError}`,
-      );
-    }
-
-    expect(payload.error).toBeDefined();
-    expect(payload.error.type).toBe('Error');
-    expect(payload.error.code).toBe(ExitCodes.FATAL_AUTHENTICATION_ERROR);
-    expect(payload.error.message).toContain(
-      "enforced authentication type is 'gemini-api-key'",
-    );
-    expect(payload.error.message).toContain("current type is 'oauth-personal'");
-    expect(payload).toHaveProperty('session_id');
-    expect(typeof payload.session_id).toBe('string');
-    expect(payload.session_id).not.toBe('');
   });
 
   it('should not exit on tool errors and allow model to self-correct in JSON mode', async () => {

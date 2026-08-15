@@ -645,44 +645,6 @@ describe('Settings Loading and Merging', () => {
       expect(settings.merged.security?.folderTrust?.enabled).toBe(true); // System setting should be used
     });
 
-    it('should not allow user or workspace to override system disableYoloMode', () => {
-      (mockFsExistsSync as Mock).mockReturnValue(true);
-      const userSettingsContent = {
-        security: {
-          disableYoloMode: false,
-          disableAlwaysAllow: false,
-        },
-      };
-      const workspaceSettingsContent = {
-        security: {
-          disableYoloMode: false, // This should be ignored
-          disableAlwaysAllow: false, // This should be ignored
-        },
-      };
-      const systemSettingsContent = {
-        security: {
-          disableYoloMode: true,
-          disableAlwaysAllow: true,
-        },
-      };
-
-      (fs.readFileSync as Mock).mockImplementation(
-        (p: fs.PathOrFileDescriptor) => {
-          if (normalizePath(p) === normalizePath(getSystemSettingsPath()))
-            return JSON.stringify(systemSettingsContent);
-          if (normalizePath(p) === normalizePath(USER_SETTINGS_PATH))
-            return JSON.stringify(userSettingsContent);
-          if (normalizePath(p) === normalizePath(MOCK_WORKSPACE_SETTINGS_PATH))
-            return JSON.stringify(workspaceSettingsContent);
-          return '{}';
-        },
-      );
-
-      const settings = loadSettings(MOCK_WORKSPACE_DIR);
-      expect(settings.merged.security?.disableYoloMode).toBe(true); // System setting should be used
-      expect(settings.merged.security?.disableAlwaysAllow).toBe(true); // System setting should be used
-    });
-
     it.each([
       {
         description: 'contextFileName in user settings',

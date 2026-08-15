@@ -65,7 +65,6 @@ describe('GeminiAgent - RPC Dispatcher', () => {
       getApprovalMode: vi.fn().mockReturnValue('default'),
       isPlanEnabled: vi.fn().mockReturnValue(true),
       getCheckpointingEnabled: vi.fn().mockReturnValue(false),
-      getDisableAlwaysAllow: vi.fn().mockReturnValue(false),
       validatePathAccess: vi.fn().mockReturnValue(null),
       getWorkspaceContext: vi.fn().mockReturnValue({
         addReadOnlyPath: vi.fn(),

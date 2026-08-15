@@ -129,7 +129,6 @@ describe('Full Terminal Tool Confirmation Snapshot', () => {
     const mockConfig = makeFakeConfig();
     mockConfig.getUseAlternateBuffer = () => true;
     mockConfig.isTrustedFolder = () => true;
-    mockConfig.getDisableAlwaysAllow = () => false;
     mockConfig.getIdeMode = () => false;
     mockConfig.getTargetDir = () => '/directory';
 

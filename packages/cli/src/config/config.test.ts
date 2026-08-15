@@ -1419,20 +1419,6 @@ describe('Approval mode tool exclusion logic', () => {
     expect(excludedTools).toContain(ASK_USER_TOOL_NAME);
   });
 
-  it('should throw an error if YOLO mode is attempted when disableYoloMode is true', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      security: {
-        disableYoloMode: true,
-      },
-    });
-
-    await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
-    );
-  });
-
   it('should throw an error for invalid approval mode values in loadCliConfig', async () => {
     // Create a mock argv with an invalid approval mode that bypasses argument parsing validation
     const invalidArgv: Partial<CliArgs> & { approvalMode: string } = {
@@ -3180,45 +3166,6 @@ describe('Policy Engine Integration in loadCliConfig', () => {
       expect.anything(),
       undefined,
       expect.anything(),
-    );
-  });
-});
-
-describe('loadCliConfig disableYoloMode', () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    vi.mocked(os.homedir).mockReturnValue('/mock/home/user');
-    vi.stubEnv('GEMINI_API_KEY', 'test-api-key');
-    vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
-    vi.mocked(isWorkspaceTrusted).mockReturnValue({
-      isTrusted: true,
-      source: undefined,
-    });
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    vi.restoreAllMocks();
-  });
-
-  it('should allow auto_edit mode even if yolo mode is disabled', async () => {
-    process.argv = ['node', 'script.js', '--approval-mode=auto_edit'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      security: { disableYoloMode: true },
-    });
-    const config = await loadCliConfig(settings, 'test-session', argv);
-    expect(config.getApprovalMode()).toBe(ApprovalMode.AUTO_EDIT);
-  });
-
-  it('should throw if YOLO mode is attempted when disableYoloMode is true', async () => {
-    process.argv = ['node', 'script.js', '--yolo'];
-    const argv = await parseArguments(createTestMergedSettings());
-    const settings = createTestMergedSettings({
-      security: { disableYoloMode: true },
-    });
-    await expect(loadCliConfig(settings, 'test-session', argv)).rejects.toThrow(
-      'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
     );
   });
 });

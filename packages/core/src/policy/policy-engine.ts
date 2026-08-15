@@ -24,7 +24,6 @@ import {
   type HookCheckerRule,
   ApprovalMode,
   type CheckResult,
-  ALWAYS_ALLOW_PRIORITY_FRACTION,
 } from './types.js';
 import { stableStringify } from './stable-stringify.js';
 import { debugLogger } from '../utils/debugLogger.js';
@@ -201,7 +200,6 @@ export class PolicyEngine {
   private hookCheckers: HookCheckerRule[];
   private readonly defaultDecision: PolicyDecision;
   private readonly nonInteractive: boolean;
-  private readonly disableAlwaysAllow: boolean;
   private readonly checkerRunner?: CheckerRunner;
   private approvalMode: ApprovalMode;
   private readonly sandboxManager: SandboxManager;
@@ -254,7 +252,6 @@ export class PolicyEngine {
     this.defaultDecision =
       config.defaultDecision ??
       (this.nonInteractive ? PolicyDecision.DENY : PolicyDecision.ASK_USER);
-    this.disableAlwaysAllow = config.disableAlwaysAllow ?? false;
     this.checkerRunner = checkerRunner;
     this.approvalMode = config.approvalMode ?? ApprovalMode.DEFAULT;
     this.sandboxManager = config.sandboxManager ?? new NoopSandboxManager();
@@ -272,13 +269,6 @@ export class PolicyEngine {
    */
   getApprovalMode(): ApprovalMode {
     return this.approvalMode;
-  }
-
-  private isAlwaysAllowRule(rule: PolicyRule): boolean {
-    return (
-      rule.priority !== undefined &&
-      Math.round((rule.priority % 1) * 1000) === ALWAYS_ALLOW_PRIORITY_FRACTION
-    );
   }
 
   private shouldDowngradeForRedirection(
@@ -575,10 +565,6 @@ export class PolicyEngine {
     }
 
     for (const rule of this.rules) {
-      if (this.disableAlwaysAllow && this.isAlwaysAllowRule(rule)) {
-        continue;
-      }
-
       const match = toolCallsToTry.some((tc) =>
         ruleMatches(
           rule,
@@ -890,10 +876,6 @@ export class PolicyEngine {
 
       // Evaluate rules in priority order (they are already sorted in constructor)
       for (const rule of this.rules) {
-        if (this.disableAlwaysAllow && this.isAlwaysAllowRule(rule)) {
-          continue;
-        }
-
         // Create a copy of the rule without argsPattern to see if it targets the tool
         // regardless of the runtime arguments it might receive.
         const ruleWithoutArgs: PolicyRule = { ...rule, argsPattern: undefined };

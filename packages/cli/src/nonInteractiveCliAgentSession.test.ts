@@ -214,9 +214,7 @@ describe('runNonInteractive', () => {
       setValue: vi.fn(),
       merged: {
         security: {
-          auth: {
-            enforcedType: undefined,
-          },
+          auth: {},
         },
       },
       isTrusted: true,

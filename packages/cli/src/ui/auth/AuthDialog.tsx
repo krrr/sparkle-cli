@@ -64,13 +64,6 @@ export function AuthDialog({
     },
   ];
 
-  // Fall back to showing all options instead of an empty list when saved value is invalid
-  const enforcedType = settings.merged.security.auth.enforcedType;
-  const filteredItems =
-    enforcedType && items.some((item) => item.value === enforcedType)
-      ? items.filter((item) => item.value === enforcedType)
-      : items;
-
   // When true, the dialog shows the OpenAI config form (base URL on top,
   // API key below) instead of the auth method radio list.
   const [isEnteringOpenAiConfig, setIsEnteringOpenAiConfig] = useState(false);
@@ -117,7 +110,7 @@ export function AuthDialog({
     defaultAuthType = defaultAuthTypeEnv as ProviderType;
   }
 
-  let initialAuthIndex = filteredItems.findIndex((item) => {
+  const initialAuthIndex = items.findIndex((item) => {
     if (settings.merged.security.auth.selectedType) {
       return item.value === settings.merged.security.auth.selectedType;
     }
@@ -128,9 +121,6 @@ export function AuthDialog({
 
     return item.value === ProviderType.USE_GEMINI;
   });
-  if (settings.merged.security.auth.enforcedType) {
-    initialAuthIndex = 0;
-  }
 
   const onSelect = useCallback(
     async (authType: ProviderType | undefined, scope: LoadableSettingScope) => {
@@ -329,7 +319,7 @@ export function AuthDialog({
             </Box>
             <Box marginTop={1}>
               <RadioButtonSelect
-                items={filteredItems}
+                items={items}
                 initialIndex={initialAuthIndex}
                 onSelect={handleAuthSelect}
                 onHighlight={() => {

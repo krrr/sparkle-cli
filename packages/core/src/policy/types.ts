@@ -305,11 +305,6 @@ export interface PolicyEngineConfig {
   nonInteractive?: boolean;
 
   /**
-   * Whether to ignore "Always Allow" rules.
-   */
-  disableAlwaysAllow?: boolean;
-
-  /**
    * Whether to allow hooks to execute.
    * When false, all hooks are denied.
    * Defaults to true.
@@ -346,7 +341,6 @@ export interface PolicySettings {
   // Admin provided policies that will supplement the ADMIN level policies
   adminPolicyPaths?: string[];
   workspacePoliciesDir?: string;
-  disableAlwaysAllow?: boolean;
 }
 
 export interface CheckResult {

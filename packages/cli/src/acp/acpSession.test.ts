@@ -150,7 +150,6 @@ describe('Session', () => {
         getDirectories: vi.fn().mockReturnValue(['/tmp']),
       }),
       waitForMcpInit: vi.fn(),
-      getDisableAlwaysAllow: vi.fn().mockReturnValue(false),
       getMaxSessionTurns: vi.fn().mockReturnValue(-1),
       geminiClient: {
         sendMessageStream: mockSendMessageStream,

@@ -640,7 +640,6 @@ export async function createPolicyEngineConfig(
       : PolicyDecision.DENY,
     nonInteractive: !interactive,
     approvalMode,
-    disableAlwaysAllow: settings.disableAlwaysAllow,
   };
 }
 interface TomlRule {

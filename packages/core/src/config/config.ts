@@ -633,8 +633,6 @@ export interface ConfigParameters {
   fakeResponsesNonStrict?: string;
   recordResponses?: string;
   ptyInfo?: string;
-  disableYoloMode?: boolean;
-  disableAlwaysAllow?: boolean;
   voiceMode?: boolean;
   rawOutput?: boolean;
   acceptRawOutputRisk?: boolean;
@@ -829,8 +827,6 @@ export class Config implements McpContext, AgentLoopContext {
   readonly fakeResponses?: string;
   readonly fakeResponsesNonStrict?: string;
   readonly recordResponses?: string;
-  private readonly disableYoloMode: boolean;
-  private readonly disableAlwaysAllow: boolean;
   private readonly rawOutput: boolean;
   private readonly acceptRawOutputRisk: boolean;
   private pendingIncludeDirectories: string[];
@@ -1204,7 +1200,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.policyUpdateConfirmationRequest =
       params.policyUpdateConfirmationRequest;
 
-    this.disableAlwaysAllow = params.disableAlwaysAllow ?? false;
     const engineApprovalMode =
       params.approvalMode ??
       params.policyEngineConfig?.approvalMode ??
@@ -1213,7 +1208,6 @@ export class Config implements McpContext, AgentLoopContext {
       {
         ...params.policyEngineConfig,
         approvalMode: engineApprovalMode,
-        disableAlwaysAllow: this.disableAlwaysAllow,
         sandboxManager: this._sandboxManager,
       },
       checkerRunner,
@@ -1237,7 +1231,6 @@ export class Config implements McpContext, AgentLoopContext {
       params.maxAttempts ?? DEFAULT_MAX_ATTEMPTS,
       DEFAULT_MAX_ATTEMPTS,
     );
-    this.disableYoloMode = params.disableYoloMode ?? false;
     this.rawOutput = params.rawOutput ?? false;
     this.acceptRawOutputRisk = params.acceptRawOutputRisk ?? false;
 
@@ -2293,11 +2286,7 @@ export class Config implements McpContext, AgentLoopContext {
   }
 
   isYoloModeDisabled(): boolean {
-    return this.disableYoloMode || !this.isTrustedFolder();
-  }
-
-  getDisableAlwaysAllow(): boolean {
-    return this.disableAlwaysAllow;
+    return !this.isTrustedFolder();
   }
 
   getRawOutput(): boolean {

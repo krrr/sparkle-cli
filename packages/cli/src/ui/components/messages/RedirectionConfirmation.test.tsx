@@ -18,7 +18,6 @@ describe('ToolConfirmationMessage Redirection', () => {
   const mockConfig = {
     isTrustedFolder: () => true,
     getIdeMode: () => false,
-    getDisableAlwaysAllow: () => false,
     getApprovalMode: () => 'default',
   } as unknown as Config;
 

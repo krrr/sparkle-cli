@@ -22,7 +22,6 @@ import {
   DEFAULT_FILE_FILTERING_OPTIONS,
   FileDiscoveryService,
   resolveTelemetrySettings,
-  FatalConfigError,
   getErrorMessage,
   getPty,
   debugLogger,
@@ -725,15 +724,7 @@ export async function loadCliConfig(
     approvalMode = ApprovalMode.DEFAULT;
   }
 
-  // Override approval mode if disableYoloMode is set.
-  if (settings.security?.disableYoloMode) {
-    if (approvalMode === ApprovalMode.YOLO) {
-      debugLogger.error('YOLO mode is disabled by the "disableYolo" setting.');
-      throw new FatalConfigError(
-        'YOLO mode is disabled. To enable it, update your configuration to allow YOLO mode.',
-      );
-    }
-  } else if (approvalMode === ApprovalMode.YOLO) {
+  if (approvalMode === ApprovalMode.YOLO) {
     debugLogger.warn(
       'YOLO mode is enabled. All tool calls will be automatically approved.',
     );
@@ -949,8 +940,6 @@ export async function loadCliConfig(
     enableEnvironmentVariableRedaction:
       settings.security?.environmentVariableRedaction?.enabled,
     approvalMode,
-    disableYoloMode: settings.security?.disableYoloMode,
-    disableAlwaysAllow: settings.security?.disableAlwaysAllow,
     showMemoryUsage: settings.ui?.showMemoryUsage || false,
     accessibility: {
       ...settings.ui?.accessibility,

@@ -30,7 +30,7 @@ four locations for these files:
 > JSON-aware editors can use autocomplete and validation by pointing to
 > the generated schema at `schemas/settings.schema.json` in this repository.
 > When working outside the repo, reference the hosted schema at
-> `https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json`.
+> `https://raw.githubusercontent.com/krrr/sparkle-cli/main/schemas/settings.schema.json`.
 
 - **System defaults file:**
   - **Location:** `/etc/sparkle-cli/system-defaults.json` (Linux),
@@ -1435,19 +1435,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `false`
   - **Requires restart:** Yes
 
-- **`security.disableYoloMode`** (boolean):
-
-  - **Description:** Disable YOLO mode, even if enabled by a flag.
-  - **Default:** `false`
-  - **Requires restart:** Yes
-
-- **`security.disableAlwaysAllow`** (boolean):
-
-  - **Description:** Disable "Always allow" options in tool confirmation
-    dialogs.
-  - **Default:** `false`
-  - **Requires restart:** Yes
-
 - **`security.enablePermanentToolApproval`** (boolean):
 
   - **Description:** Enable the "Allow for all future sessions" option in tool
@@ -1502,13 +1489,6 @@ their corresponding top-level category object in your `settings.json` file.
 - **`security.auth.selectedType`** (string):
 
   - **Description:** The currently selected authentication type.
-  - **Default:** `undefined`
-  - **Requires restart:** Yes
-
-- **`security.auth.enforcedType`** (string):
-
-  - **Description:** The required auth type. If this does not match the selected
-    auth type, the user will be prompted to re-authenticate.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 

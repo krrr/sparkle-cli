@@ -53,7 +53,6 @@ export const INFORMATIVE_TIPS = [
   'Disable YOLO mode to enforce confirmations (settings.json)…',
   'Block Git extensions for enhanced security (settings.json)…',
   'Change your authentication method (/settings)…',
-  'Enforce auth type for enterprise use (settings.json)…',
   'Let Node.js auto-configure memory (settings.json)…',
   'Retry on fetch failed errors automatically (settings.json)…',
   'Customize the DNS resolution order (settings.json)…',

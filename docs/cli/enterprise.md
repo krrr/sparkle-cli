@@ -289,26 +289,6 @@ environment to a blocklist.
 > and clever users may find ways to bypass simple string-based blocks.
 > **Allowlisting is the recommended approach.**
 
-### Disabling YOLO mode
-
-To ensure that users cannot bypass the confirmation prompt for tool execution,
-you can disable YOLO mode at the policy level. This adds a critical layer of
-safety, as it prevents the model from executing tools without explicit user
-approval.
-
-**Example:** Force all tool executions to require user confirmation.
-
-```json
-{
-  "security": {
-    "disableYoloMode": true
-  }
-}
-```
-
-This setting is highly recommended in an enterprise environment to prevent
-unintended tool execution.
-
 ## Managing custom tools (MCP servers)
 
 If your organization uses custom tools via
@@ -500,30 +480,6 @@ For more information, see the [telemetry documentation](./telemetry.md).
 > [!NOTE]
 > Ensure that `logPrompts` is set to `false` in an enterprise setting to
 > avoid collecting potentially sensitive information from user prompts.
-
-## Authentication
-
-You can enforce a specific authentication method for all users by setting the
-`security.auth.enforcedType` in the system-level `settings.json` file. This
-prevents users from choosing a different authentication method. See the
-[Authentication docs](../get-started/authentication.mdx) for more details.
-
-**Example:** Enforce the use of a Gemini API key for all users.
-
-```json
-{
-  "security": {
-    "auth": {
-      "enforcedType": "gemini-api-key"
-    }
-  }
-}
-```
-
-If a user has a different authentication method configured, they will be
-prompted to switch to the enforced method. In non-interactive mode, the CLI will
-exit with an error if the configured authentication method does not match the
-enforced one.
 
 ## Putting it all together: example system `settings.json`
 

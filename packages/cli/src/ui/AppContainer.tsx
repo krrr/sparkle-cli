@@ -767,18 +767,10 @@ export const AppContainer = (props: AppContainerProps) => {
     setAuthState(AuthState.Updating);
   }, [setAuthState]);
 
-  // Check for enforced auth type mismatch
+  // Validates the selected auth type on startup, skipping the Gemini API key
+  // because it might be stored in the keychain (the useAuth hook handles it).
   useEffect(() => {
     if (
-      settings.merged.security.auth.enforcedType &&
-      settings.merged.security.auth.selectedType &&
-      settings.merged.security.auth.enforcedType !==
-        settings.merged.security.auth.selectedType
-    ) {
-      onAuthError(
-        `Authentication is enforced to be ${settings.merged.security.auth.enforcedType}, but you are currently using ${settings.merged.security.auth.selectedType}.`,
-      );
-    } else if (
       settings.merged.security.auth.selectedType &&
       !settings.merged.security.auth.useExternal
     ) {
@@ -810,7 +802,6 @@ export const AppContainer = (props: AppContainerProps) => {
     }
   }, [
     settings.merged.security.auth.selectedType,
-    settings.merged.security.auth.enforcedType,
     settings.merged.security.auth.useExternal,
     onAuthError,
   ]);

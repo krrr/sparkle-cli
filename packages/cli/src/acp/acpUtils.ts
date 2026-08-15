@@ -89,82 +89,79 @@ export function toPermissionOptions(
   config: Config,
   enablePermanentToolApproval: boolean = false,
 ): acp.PermissionOption[] {
-  const disableAlwaysAllow = config.getDisableAlwaysAllow();
   const options: acp.PermissionOption[] = [];
 
-  if (!disableAlwaysAllow) {
-    switch (confirmation.type) {
-      case 'edit':
+  switch (confirmation.type) {
+    case 'edit':
+      options.push({
+        optionId: ToolConfirmationOutcome.ProceedAlways,
+        name: 'Allow for this session',
+        kind: 'allow_always',
+      });
+      if (enablePermanentToolApproval) {
         options.push({
-          optionId: ToolConfirmationOutcome.ProceedAlways,
-          name: 'Allow for this session',
+          optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
+          name: 'Allow for this file in all future sessions',
           kind: 'allow_always',
         });
-        if (enablePermanentToolApproval) {
-          options.push({
-            optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
-            name: 'Allow for this file in all future sessions',
-            kind: 'allow_always',
-          });
-        }
-        break;
-      case 'exec':
+      }
+      break;
+    case 'exec':
+      options.push({
+        optionId: ToolConfirmationOutcome.ProceedAlways,
+        name: 'Allow for this session',
+        kind: 'allow_always',
+      });
+      if (enablePermanentToolApproval) {
         options.push({
-          optionId: ToolConfirmationOutcome.ProceedAlways,
-          name: 'Allow for this session',
+          optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
+          name: 'Allow this command for all future sessions',
           kind: 'allow_always',
         });
-        if (enablePermanentToolApproval) {
-          options.push({
-            optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
-            name: 'Allow this command for all future sessions',
-            kind: 'allow_always',
-          });
-        }
-        break;
-      case 'mcp':
-        options.push(
-          {
-            optionId: ToolConfirmationOutcome.ProceedAlwaysServer,
-            name: 'Allow all server tools for this session',
-            kind: 'allow_always',
-          },
-          {
-            optionId: ToolConfirmationOutcome.ProceedAlwaysTool,
-            name: 'Allow tool for this session',
-            kind: 'allow_always',
-          },
-        );
-        if (enablePermanentToolApproval) {
-          options.push({
-            optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
-            name: 'Allow tool for all future sessions',
-            kind: 'allow_always',
-          });
-        }
-        break;
-      case 'info':
+      }
+      break;
+    case 'mcp':
+      options.push(
+        {
+          optionId: ToolConfirmationOutcome.ProceedAlwaysServer,
+          name: 'Allow all server tools for this session',
+          kind: 'allow_always',
+        },
+        {
+          optionId: ToolConfirmationOutcome.ProceedAlwaysTool,
+          name: 'Allow tool for this session',
+          kind: 'allow_always',
+        },
+      );
+      if (enablePermanentToolApproval) {
         options.push({
-          optionId: ToolConfirmationOutcome.ProceedAlways,
-          name: 'Allow for this session',
+          optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
+          name: 'Allow tool for all future sessions',
           kind: 'allow_always',
         });
-        if (enablePermanentToolApproval) {
-          options.push({
-            optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
-            name: 'Allow for all future sessions',
-            kind: 'allow_always',
-          });
-        }
-        break;
-      case 'ask_user':
-      case 'exit_plan_mode':
-        // askuser and exit_plan_mode don't need "always allow" options
-        break;
-      default:
-        // No "always allow" options for other types
-        break;
-    }
+      }
+      break;
+    case 'info':
+      options.push({
+        optionId: ToolConfirmationOutcome.ProceedAlways,
+        name: 'Allow for this session',
+        kind: 'allow_always',
+      });
+      if (enablePermanentToolApproval) {
+        options.push({
+          optionId: ToolConfirmationOutcome.ProceedAlwaysAndSave,
+          name: 'Allow for all future sessions',
+          kind: 'allow_always',
+        });
+      }
+      break;
+    case 'ask_user':
+    case 'exit_plan_mode':
+      // askuser and exit_plan_mode don't need "always allow" options
+      break;
+    default:
+      // No "always allow" options for other types
+      break;
   }
 
   options.push(...basicPermissionOptions);

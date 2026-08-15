@@ -20,10 +20,6 @@ export async function validateAuthMethodWithSettings(
   authType: ProviderType,
   settings: LoadedSettings,
 ): Promise<string | null> {
-  const enforcedType = settings.merged.security.auth.enforcedType;
-  if (enforcedType && enforcedType !== authType) {
-    return `Authentication is enforced to be ${enforcedType}, but you are currently using ${authType}.`;
-  }
   if (settings.merged.security.auth.useExternal) {
     return null;
   }

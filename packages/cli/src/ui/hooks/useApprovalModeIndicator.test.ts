@@ -474,7 +474,7 @@ describe('useApprovalModeIndicator', () => {
     });
   });
 
-  describe('when YOLO mode is disabled by settings', () => {
+  describe('when YOLO mode is disabled', () => {
     beforeEach(() => {
       // Ensure isYoloModeDisabled returns true for these tests
       if (mockConfigInstance && mockConfigInstance.isYoloModeDisabled) {
@@ -504,7 +504,7 @@ describe('useApprovalModeIndicator', () => {
       expect(mockAddItem).toHaveBeenCalledWith(
         {
           type: MessageType.WARNING,
-          text: 'You cannot enter YOLO mode since it is disabled in your settings.',
+          text: 'You cannot enter YOLO mode because the current folder is not trusted.',
         },
         expect.any(Number),
       );

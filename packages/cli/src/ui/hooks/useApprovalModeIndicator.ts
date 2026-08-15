@@ -47,7 +47,7 @@ export function useApprovalModeIndicator({
             addItem(
               {
                 type: MessageType.WARNING,
-                text: 'You cannot enter YOLO mode since it is disabled in your settings.',
+                text: 'You cannot enter YOLO mode because the current folder is not trusted.',
               },
               Date.now(),
             );

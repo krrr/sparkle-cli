@@ -118,7 +118,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getBannerTextNoCapacityIssues: vi.fn().mockResolvedValue(''),
     getBannerTextCapacityIssues: vi.fn().mockResolvedValue(''),
     isInteractiveShellEnabled: vi.fn().mockReturnValue(false),
-    getDisableAlwaysAllow: vi.fn().mockReturnValue(false),
     isSkillsSupportEnabled: vi.fn().mockReturnValue(false),
     reloadSkills: vi.fn().mockResolvedValue(undefined),
     reloadAgents: vi.fn().mockResolvedValue(undefined),

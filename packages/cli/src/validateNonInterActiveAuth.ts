@@ -12,7 +12,7 @@ import {
   type Config,
   type ProviderType,
 } from 'sparkle-cli-core';
-import { USER_SETTINGS_PATH, type LoadedSettings } from './config/settings.js';
+import { USER_SETTINGS_PATH } from './config/settings.js';
 import { validateAuthMethod } from './config/auth.js';
 import { handleError } from './utils/errors.js';
 import { runExitCleanup } from './utils/cleanup.js';
@@ -21,18 +21,9 @@ export async function validateNonInteractiveAuth(
   configuredAuthType: ProviderType | undefined,
   useExternalAuth: boolean | undefined,
   nonInteractiveConfig: Config,
-  settings: LoadedSettings,
 ) {
   try {
     const effectiveAuthType = configuredAuthType || getProviderTypeFromEnv();
-
-    const enforcedType = settings.merged.security.auth.enforcedType;
-    if (enforcedType && effectiveAuthType !== enforcedType) {
-      const message = effectiveAuthType
-        ? `The enforced authentication type is '${enforcedType}', but the current type is '${effectiveAuthType}'. Please re-authenticate with the correct type.`
-        : `The auth type '${enforcedType}' is enforced, but no authentication is configured.`;
-      throw new Error(message);
-    }
 
     if (!effectiveAuthType) {
       const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify the GEMINI_API_KEY or OPENAI_API_KEY environment variable before running.`;

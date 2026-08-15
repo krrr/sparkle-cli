@@ -1771,25 +1771,6 @@ const SETTINGS_SCHEMA = {
           'Tool-level sandboxing. Isolates individual tools instead of the entire CLI process.',
         showInDialog: true,
       },
-      disableYoloMode: {
-        type: 'boolean',
-        label: 'Disable YOLO Mode',
-        category: 'Security',
-        requiresRestart: true,
-        default: false,
-        description: 'Disable YOLO mode, even if enabled by a flag.',
-        showInDialog: true,
-      },
-      disableAlwaysAllow: {
-        type: 'boolean',
-        label: 'Disable Always Allow',
-        category: 'Security',
-        requiresRestart: true,
-        default: false,
-        description:
-          'Disable "Always allow" options in tool confirmation dialogs.',
-        showInDialog: true,
-      },
       enablePermanentToolApproval: {
         type: 'boolean',
         label: 'Allow Permanent Tool Approval',
@@ -1910,16 +1891,6 @@ const SETTINGS_SCHEMA = {
             requiresRestart: true,
             default: undefined as ProviderType | undefined,
             description: 'The currently selected authentication type.',
-            showInDialog: false,
-          },
-          enforcedType: {
-            type: 'string',
-            label: 'Enforced Auth Type',
-            category: 'Advanced',
-            requiresRestart: true,
-            default: undefined as ProviderType | undefined,
-            description:
-              'The required auth type. If this does not match the selected auth type, the user will be prompted to re-authenticate.',
             showInDialog: false,
           },
           useExternal: {
