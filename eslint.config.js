@@ -64,6 +64,7 @@ export default tseslint.config(
       'evals/**',
       'packages/test-utils/**',
       '.sparkle/**',
+      '**/.sparkle-linters/**',
       '**/*.d.ts',
     ],
   },

@@ -37,7 +37,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     if: "github.repository == 'krrr/sparkle-cli'"
     env:
-      SPARKLE_LINT_TEMP_DIR: '${{ github.workspace }}/.gemini-linters'
+      SPARKLE_LINT_TEMP_DIR: '${{ github.workspace }}/.sparkle-linters'
     steps:
       - name: 'Checkout'
         uses: 'actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8' # ratchet:actions/checkout@v5

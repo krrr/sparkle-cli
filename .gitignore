@@ -62,6 +62,7 @@ sparkle-debug.log
 .genkit
 .sparkle-clipboard/
 .eslintcache
+.sparkle-linters/
 evals/logs/
 
 temp_agents/
