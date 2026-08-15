@@ -8,6 +8,7 @@ import type {
   SessionMetrics,
   ComputedSessionStats,
   ModelMetrics,
+  RoleMetrics,
 } from '../contexts/SessionContext.js';
 
 export function calculateErrorRate(metrics: ModelMetrics): number {
@@ -24,7 +25,9 @@ export function calculateAverageLatency(metrics: ModelMetrics): number {
   return metrics.api.totalLatencyMs / metrics.api.totalRequests;
 }
 
-export function calculateCacheHitRate(metrics: ModelMetrics): number {
+export function calculateCacheHitRate(
+  metrics: ModelMetrics | RoleMetrics,
+): number {
   if (metrics.tokens.prompt === 0) {
     return 0;
   }
@@ -61,19 +64,8 @@ export const computeSessionStats = (
   const cacheEfficiency =
     totalPromptTokens > 0 ? (totalCachedTokens / totalPromptTokens) * 100 : 0;
 
-  const totalDecisions =
-    tools.totalDecisions.accept +
-    tools.totalDecisions.reject +
-    tools.totalDecisions.modify +
-    tools.totalDecisions.auto_accept;
   const successRate =
     tools.totalCalls > 0 ? (tools.totalSuccess / tools.totalCalls) * 100 : 0;
-  const agreementRate =
-    totalDecisions > 0
-      ? ((tools.totalDecisions.accept + tools.totalDecisions.auto_accept) /
-          totalDecisions) *
-        100
-      : 0;
 
   return {
     totalApiTime,
@@ -82,9 +74,7 @@ export const computeSessionStats = (
     apiTimePercent,
     toolTimePercent,
     cacheEfficiency,
-    totalDecisions,
     successRate,
-    agreementRate,
     totalCachedTokens,
     totalInputTokens,
     totalPromptTokens,

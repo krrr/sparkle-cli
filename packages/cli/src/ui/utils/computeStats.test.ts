@@ -151,9 +151,7 @@ describe('computeSessionStats', () => {
       apiTimePercent: 0,
       toolTimePercent: 0,
       cacheEfficiency: 0,
-      totalDecisions: 0,
       successRate: 0,
-      agreementRate: 0,
       totalPromptTokens: 0,
       totalInputTokens: 0,
       totalCachedTokens: 0,
@@ -238,7 +236,7 @@ describe('computeSessionStats', () => {
     expect(result.cacheEfficiency).toBeCloseTo(33.33); // 50 / 150
   });
 
-  it('should correctly calculate success and agreement rates', () => {
+  it('should correctly calculate success rate', () => {
     const metrics: SessionMetrics = {
       models: {},
       tools: {
@@ -258,7 +256,6 @@ describe('computeSessionStats', () => {
     const result = computeSessionStats(metrics);
 
     expect(result.successRate).toBe(80); // 8 / 10
-    expect(result.agreementRate).toBe(60); // 6 / 10
   });
 
   it('should handle division by zero gracefully', () => {
@@ -284,7 +281,6 @@ describe('computeSessionStats', () => {
     expect(result.toolTimePercent).toBe(0);
     expect(result.cacheEfficiency).toBe(0);
     expect(result.successRate).toBe(0);
-    expect(result.agreementRate).toBe(0);
   });
 
   it('should correctly include line counts', () => {

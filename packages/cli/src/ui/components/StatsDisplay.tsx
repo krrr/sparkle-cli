@@ -18,10 +18,11 @@ import {
   getStatusColor,
   TOOL_SUCCESS_RATE_HIGH,
   TOOL_SUCCESS_RATE_MEDIUM,
-  USER_AGREEMENT_RATE_HIGH,
-  USER_AGREEMENT_RATE_MEDIUM,
 } from '../utils/displayUtils.js';
-import { computeSessionStats } from '../utils/computeStats.js';
+import {
+  computeSessionStats,
+  calculateCacheHitRate,
+} from '../utils/computeStats.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { LlmRole, getDisplayString } from 'sparkle-cli-core';
 
@@ -36,22 +37,6 @@ const StatRow: React.FC<StatRowProps> = ({ title, children }) => (
     {/* Fixed width for the label creates a clean "gutter" for alignment */}
     <Box width={28}>
       <Text color={theme.text.link}>{title}</Text>
-    </Box>
-    {children}
-  </Box>
-);
-
-// A SubStatRow for indented, secondary information
-interface SubStatRowProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-const SubStatRow: React.FC<SubStatRowProps> = ({ title, children }) => (
-  <Box paddingLeft={2}>
-    {/* Adjust width for the "» " prefix */}
-    <Box width={26}>
-      <Text color={theme.text.secondary}>» {title}</Text>
     </Box>
     {children}
   </Box>
@@ -92,8 +77,8 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
   const nameWidth = 28;
   const requestsWidth = 8;
   const inputTokensWidth = 14;
-  const cacheReadsWidth = 14;
-  const outputTokensWidth = 14;
+  const cacheReadsWidth = 11;
+  const outputTokensWidth = 15;
 
   const rows: ModelRow[] = [];
 
@@ -102,7 +87,7 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
       name,
       displayName: getDisplayString(name),
       requests: metrics.api.totalRequests,
-      cachedTokens: metrics.tokens.cached.toLocaleString(),
+      cachedTokens: calculateCacheHitRate(metrics).toFixed(1) + '%',
       inputTokens: metrics.tokens.prompt.toLocaleString(),
       outputTokens: metrics.tokens.candidates.toLocaleString(),
       isSubRow: false,
@@ -126,8 +111,8 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
           name: `${name}-${role}`,
           displayName: `  ↳ ${role}`,
           requests: roleMetrics.totalRequests,
-          cachedTokens: roleMetrics.tokens.cached.toLocaleString(),
           inputTokens: roleMetrics.tokens.prompt.toLocaleString(),
+          cachedTokens: calculateCacheHitRate(roleMetrics).toFixed(1) + '%',
           outputTokens: roleMetrics.tokens.candidates.toLocaleString(),
           isSubRow: true,
         });
@@ -168,7 +153,7 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
         </Box>
         <Box width={cacheReadsWidth} justifyContent="flex-end">
           <Text bold color={theme.text.secondary}>
-            Cache Reads
+            Cache Hit
           </Text>
         </Box>
         <Box width={outputTokensWidth} justifyContent="flex-end">
@@ -249,15 +234,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
     green: TOOL_SUCCESS_RATE_HIGH,
     yellow: TOOL_SUCCESS_RATE_MEDIUM,
   };
-  const agreementThresholds = {
-    green: USER_AGREEMENT_RATE_HIGH,
-    yellow: USER_AGREEMENT_RATE_MEDIUM,
-  };
   const successColor = getStatusColor(computed.successRate, successThresholds);
-  const agreementColor = getStatusColor(
-    computed.agreementRate,
-    agreementThresholds,
-  );
 
   const renderTitle = () => {
     if (title) {
@@ -294,30 +271,21 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
           <Text color={theme.text.primary}>{stats.sessionId}</Text>
         </StatRow>
         {showUserIdentity && selectedAuthType && (
-          <StatRow title="Auth Method:">
+          <StatRow title="Provider Type:">
             <Text color={theme.text.primary}>{selectedAuthType}</Text>
           </StatRow>
         )}
         <StatRow title="Tool Calls:">
           <Text color={theme.text.primary}>
-            {tools.totalCalls} ({' '}
+            {tools.totalCalls} (
             <Text color={theme.status.success}>✓ {tools.totalSuccess}</Text>{' '}
-            <Text color={theme.status.error}>x {tools.totalFail}</Text> )
+            <Text color={theme.status.error}>✗ {tools.totalFail}</Text>){'    '}
+            <Text color={successColor}>
+              {computed.successRate.toFixed(1)}%
+            </Text>{' '}
+            Success
           </Text>
         </StatRow>
-        <StatRow title="Success Rate:">
-          <Text color={successColor}>{computed.successRate.toFixed(1)}%</Text>
-        </StatRow>
-        {computed.totalDecisions > 0 && (
-          <StatRow title="User Agreement:">
-            <Text color={agreementColor}>
-              {computed.agreementRate.toFixed(1)}%{' '}
-              <Text color={theme.text.secondary}>
-                ({computed.totalDecisions} reviewed)
-              </Text>
-            </Text>
-          </StatRow>
-        )}
         {files &&
           (files.totalLinesAdded > 0 || files.totalLinesRemoved > 0) && (
             <StatRow title="Code Changes:">
@@ -339,25 +307,13 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         </StatRow>
         <StatRow title="Agent Active:">
           <Text color={theme.text.primary}>
-            {formatDuration(computed.agentActiveTime)}
+            {formatDuration(computed.agentActiveTime)}{' '}
+            <Text color={theme.text.secondary}>
+              (API {computed.apiTimePercent.toFixed(1)}%, Tool{' '}
+              {computed.toolTimePercent.toFixed(1)}%)
+            </Text>
           </Text>
         </StatRow>
-        <SubStatRow title="API Time:">
-          <Text color={theme.text.primary}>
-            {formatDuration(computed.totalApiTime)}{' '}
-            <Text color={theme.text.secondary}>
-              ({computed.apiTimePercent.toFixed(1)}%)
-            </Text>
-          </Text>
-        </SubStatRow>
-        <SubStatRow title="Tool Time:">
-          <Text color={theme.text.primary}>
-            {formatDuration(computed.totalToolTime)}{' '}
-            <Text color={theme.text.secondary}>
-              ({computed.toolTimePercent.toFixed(1)}%)
-            </Text>
-          </Text>
-        </SubStatRow>
       </Section>
 
       {Object.keys(models).length > 0 && <ModelUsageTable models={models} />}

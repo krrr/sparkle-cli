@@ -168,9 +168,7 @@ export interface ComputedSessionStats {
   apiTimePercent: number;
   toolTimePercent: number;
   cacheEfficiency: number;
-  totalDecisions: number;
   successRate: number;
-  agreementRate: number;
   totalCachedTokens: number;
   totalInputTokens: number;
   totalPromptTokens: number;

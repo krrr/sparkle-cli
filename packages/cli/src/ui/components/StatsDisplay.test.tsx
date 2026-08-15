@@ -75,7 +75,7 @@ describe('<StatsDisplay />', () => {
     vi.unstubAllEnvs();
   });
 
-  it('renders only the Performance section in its zero state', async () => {
+  it('renders Interaction Summary and Performance sections in its zero state', async () => {
     const zeroMetrics = createTestMetrics();
 
     const { lastFrame } = await renderWithMockedStats(zeroMetrics);
@@ -126,7 +126,7 @@ describe('<StatsDisplay />', () => {
     expect(output).toContain('Model Usage');
     expect(output).toContain('Reqs');
     expect(output).toContain('Input Tokens');
-    expect(output).toContain('Cache Reads');
+    expect(output).toContain('Cache Hit');
     expect(output).toContain('Output Tokens');
     expect(output).toMatchSnapshot();
   });
@@ -213,8 +213,12 @@ describe('<StatsDisplay />', () => {
     expect(output).toContain('10'); // Total requests
     expect(output).toContain('↳ main');
     expect(output).toContain('7'); // main requests
+    expect(output).toContain('900'); // main prompt tokens (Input Tokens column)
+    expect(output).toContain('11.1%'); // main cache hit rate (100 cached / 900 prompt)
     expect(output).toContain('↳ utility_tool');
     expect(output).toContain('3'); // tool requests
+    expect(output).toContain('300'); // tool prompt tokens (Input Tokens column)
+    expect(output).toContain('33.3%'); // tool cache hit rate (100 cached / 300 prompt)
     expect(output).toMatchSnapshot();
   });
 
@@ -268,52 +272,12 @@ describe('<StatsDisplay />', () => {
 
     expect(output).toContain('Performance');
     expect(output).toContain('Interaction Summary');
-    expect(output).toContain('User Agreement');
     expect(output).toContain('Model Usage');
     expect(output).toMatchSnapshot();
   });
 
   describe('Conditional Rendering Tests', () => {
-    it('hides User Agreement when no decisions are made', async () => {
-      const metrics = createTestMetrics({
-        tools: {
-          totalCalls: 2,
-          totalSuccess: 1,
-          totalFail: 1,
-          totalDurationMs: 123,
-          totalDecisions: {
-            accept: 0,
-            reject: 0,
-            modify: 0,
-            [ToolCallDecision.AUTO_ACCEPT]: 0,
-          }, // No decisions
-          byName: {
-            'test-tool': {
-              count: 2,
-              success: 1,
-              fail: 1,
-              durationMs: 123,
-              decisions: {
-                accept: 0,
-                reject: 0,
-                modify: 0,
-                [ToolCallDecision.AUTO_ACCEPT]: 0,
-              },
-            },
-          },
-        },
-      });
-
-      const { lastFrame } = await renderWithMockedStats(metrics);
-      const output = lastFrame();
-
-      expect(output).toContain('Interaction Summary');
-      expect(output).toContain('Success Rate');
-      expect(output).not.toContain('User Agreement');
-      expect(output).toMatchSnapshot();
-    });
-
-    it('hides Efficiency section when cache is not used', async () => {
+    it('renders the model usage table with a 0.0% Cache Hit when no cache is used', async () => {
       const metrics = createTestMetrics({
         models: {
           'gemini-2.5-pro': {
@@ -494,7 +458,7 @@ describe('<StatsDisplay />', () => {
   });
 
   describe('User Identity Display', () => {
-    it('renders User row with Auth Method', async () => {
+    it('renders Provider Type row with oauth', async () => {
       const metrics = createTestMetrics();
 
       useSessionStatsMock.mockReturnValue({
@@ -515,12 +479,12 @@ describe('<StatsDisplay />', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Auth Method:');
+      expect(output).toContain('Provider Type:');
       expect(output).toContain('oauth');
       expect(output).not.toContain('Tier:');
     });
 
-    it('renders User row with API Key and no Tier', async () => {
+    it('renders Provider Type row with API Key', async () => {
       const metrics = createTestMetrics();
 
       useSessionStatsMock.mockReturnValue({
@@ -541,7 +505,7 @@ describe('<StatsDisplay />', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Auth Method:');
+      expect(output).toContain('Provider Type:');
       expect(output).toContain('Google API Key');
       expect(output).not.toContain('Tier:');
     });
