@@ -52,7 +52,7 @@
       "topK": 64
     }
   },
-  "gemini-3-flash-base": {
+  "internal-tool-flash": {
     "model": "flash",
     "generateContentConfig": {
       "temperature": 0,

@@ -593,7 +593,7 @@ their corresponding top-level category object in your `settings.json` file.
           "model": "gemini-flash-latest"
         }
       },
-      "gemini-3-flash-base": {
+      "internal-tool-flash": {
         "extends": "base",
         "modelConfig": {
           "model": "flash"
@@ -667,7 +667,7 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "web-search": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {
           "generateContentConfig": {
             "tools": [
@@ -679,7 +679,7 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "web-fetch": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {
           "generateContentConfig": {
             "tools": [
@@ -691,11 +691,11 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "web-fetch-fallback": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {}
       },
       "loop-detection": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {}
       },
       "loop-detection-double-check": {
@@ -705,15 +705,15 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "llm-edit-fixer": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {}
       },
       "next-speaker-checker": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {}
       },
       "context-snapshotter": {
-        "extends": "gemini-3-flash-base",
+        "extends": "internal-tool-flash",
         "modelConfig": {
           "generateContentConfig": {
             "thinkingConfig": {

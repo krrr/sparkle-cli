@@ -13,7 +13,7 @@ export interface JudgeOptions {
    */
   selfConsistencyRuns?: number;
   /**
-   * The model to use for judging. Defaults to gemini-3-flash-base.
+   * The model to use for judging. Defaults to internal-tool-flash.
    */
   model?: string;
 }
@@ -39,7 +39,7 @@ export class LLMJudge {
     options: JudgeOptions = {},
   ): Promise<JudgeResult> {
     const runs = options.selfConsistencyRuns ?? 1;
-    const model = options.model ?? 'gemini-3-flash-base';
+    const model = options.model ?? 'internal-tool-flash';
 
     const systemPrompt = `You are a strict, impartial expert judge. Read the provided evidence and question carefully. You MUST answer the question with ONLY "YES" or "NO". Do not provide any conversational filler or explanation before your answer.`;
 

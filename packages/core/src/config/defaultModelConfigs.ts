@@ -58,12 +58,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       },
     },
 
-    // Bases for the internal model configs.
-    // Uses the 'flash' tier alias so the model resolves within the family of
-    // the active model (Gemini flash by default; e.g. deepseek-v4-flash when a
-    // DeepSeek model is active). The name is kept for backward compatibility
-    // with extensions that reference it.
-    'gemini-3-flash-base': {
+    'internal-tool-flash': {
       extends: 'base',
       modelConfig: {
         model: 'flash',
@@ -137,7 +132,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       },
     },
     'web-search': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {
         generateContentConfig: {
           tools: [{ googleSearch: {} }],
@@ -145,7 +140,7 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       },
     },
     'web-fetch': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {
         generateContentConfig: {
           tools: [{ urlContext: {} }],
@@ -154,11 +149,11 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     },
     // TODO(joshualitt): During cleanup, make modelConfig optional.
     'web-fetch-fallback': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {},
     },
     'loop-detection': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {},
     },
     'loop-detection-double-check': {
@@ -168,15 +163,15 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       },
     },
     'llm-edit-fixer': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {},
     },
     'next-speaker-checker': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {},
     },
     'context-snapshotter': {
-      extends: 'gemini-3-flash-base',
+      extends: 'internal-tool-flash',
       modelConfig: {
         generateContentConfig: {
           thinkingConfig: {
