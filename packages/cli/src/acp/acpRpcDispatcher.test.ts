@@ -177,7 +177,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
   it('should throw acp.RequestError when gateway payload is malformed', async () => {
     await expect(
       agent.authenticate({
-        methodId: 'gateway',
+        methodId: ProviderType.USE_GEMINI,
         _meta: {
           gateway: {
             baseUrl: 123,
