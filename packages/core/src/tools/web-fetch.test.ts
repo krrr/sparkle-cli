@@ -286,11 +286,15 @@ describe('WebFetchTool', () => {
       getRetryFetchErrors: vi.fn().mockReturnValue(false),
       getMaxAttempts: vi.fn().mockReturnValue(3),
       getDirectWebFetch: vi.fn().mockReturnValue(false),
+      getActiveModel: vi.fn().mockReturnValue('gemini-2.0-flash'),
+      getModel: vi.fn().mockReturnValue('gemini-2.0-flash'),
       modelConfigService: {
         getResolvedConfig: vi.fn().mockImplementation(({ model }) => ({
           model,
           generateContentConfig: {},
         })),
+        resolveModelId: vi.fn((model) => model),
+        getModelDefinition: vi.fn(() => undefined),
       },
       isInteractive: () => false,
       isContextManagementEnabled: vi.fn().mockReturnValue(false),
@@ -585,6 +589,78 @@ describe('WebFetchTool', () => {
       expect(WebFetchFallbackAttemptEvent).toHaveBeenCalledWith(
         'primary_failed',
       );
+    });
+
+    it('should skip the primary fetch and use fallback directly for non-Gemini models', async () => {
+      vi.spyOn(fetchUtils, 'isPrivateIp').mockReturnValue(false);
+      vi.spyOn(mockConfig, 'getActiveModel').mockReturnValue('gpt-4o');
+
+      // Fallback HTTP fetch succeeds
+      mockFetch('https://url1.com/', {
+        text: () => Promise.resolve('content 1'),
+      });
+      // Fallback LLM processing call
+      mockGenerateContent.mockResolvedValueOnce({
+        candidates: [
+          { content: { parts: [{ text: 'fallback processed response' }] } },
+        ],
+      });
+
+      const tool = new WebFetchTool(mockConfig, bus);
+      const params = { prompt: 'fetch https://url1.com' };
+      const invocation = tool.build(params);
+      const result = await invocation.execute({
+        abortSignal: new AbortController().signal,
+      });
+
+      expect(result.llmContent).toBe(
+        '<untrusted_context>\nfallback processed response\n</untrusted_context>',
+      );
+      // The primary grounding fetch was never attempted: generateContent was
+      // called exactly once, for the fallback LLM processing.
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1);
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        { model: 'web-fetch-fallback' },
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+      expect(logWebFetchFallbackAttempt).toHaveBeenCalledWith(
+        mockConfig,
+        expect.objectContaining({ reason: 'non_gemini_model' }),
+      );
+      expect(WebFetchFallbackAttemptEvent).toHaveBeenCalledWith(
+        'non_gemini_model',
+      );
+    });
+
+    it('should use the primary fetch path for Gemini models', async () => {
+      vi.spyOn(fetchUtils, 'isPrivateIp').mockReturnValue(false);
+      vi.spyOn(mockConfig, 'getActiveModel').mockReturnValue(
+        'gemini-2.0-flash',
+      );
+
+      mockGenerateContent.mockResolvedValueOnce({
+        candidates: [{ content: { parts: [{ text: 'primary response' }] } }],
+      });
+
+      const tool = new WebFetchTool(mockConfig, bus);
+      const params = { prompt: 'fetch https://url1.com' };
+      const invocation = tool.build(params);
+      const result = await invocation.execute({
+        abortSignal: new AbortController().signal,
+      });
+
+      expect(result.llmContent).toBe(
+        '<untrusted_context>\nprimary response\n</untrusted_context>',
+      );
+      expect(mockGenerateContent).toHaveBeenCalledWith(
+        { model: 'web-fetch' },
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+      expect(logWebFetchFallbackAttempt).not.toHaveBeenCalled();
     });
   });
 

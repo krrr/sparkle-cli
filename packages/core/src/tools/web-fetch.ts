@@ -29,6 +29,7 @@ import {
   NetworkRetryAttemptEvent,
 } from '../telemetry/index.js';
 import { LlmRole } from '../telemetry/llmRole.js';
+import { isCustomModel } from '../config/models.js';
 import { WEB_FETCH_TOOL_NAME, WEB_FETCH_DISPLAY_NAME } from './tool-names.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents } from '../utils/events.js';
@@ -783,6 +784,22 @@ Response: ${rawResponseText}`;
           type: ToolErrorType.WEB_FETCH_PROCESSING_ERROR,
         },
       };
+    }
+
+    // The primary fetch path relies on the Gemini API's URL grounding
+    // (urlContext tool), which is not available to non-Gemini (custom)
+    // models. Skip straight to the direct-fetch fallback in that case.
+    if (
+      isCustomModel(this.context.config.getActiveModel(), this.context.config)
+    ) {
+      debugLogger.warn(
+        `[WebFetchTool] Model ${this.context.config.getActiveModel()} is not a Gemini model; using direct fetch fallback.`,
+      );
+      logWebFetchFallbackAttempt(
+        this.context.config,
+        new WebFetchFallbackAttemptEvent('non_gemini_model'),
+      );
+      return this.executeFallback(toFetch, signal);
     }
 
     try {

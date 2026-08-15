@@ -2074,7 +2074,8 @@ export const EVENT_WEB_FETCH_FALLBACK_ATTEMPT =
 export type WebFetchFallbackReason =
   | 'private_ip'
   | 'primary_failed'
-  | 'private_ip_skipped';
+  | 'private_ip_skipped'
+  | 'non_gemini_model';
 
 export class WebFetchFallbackAttemptEvent implements BaseTelemetryEvent {
   'event.name': 'web_fetch_fallback_attempt';
