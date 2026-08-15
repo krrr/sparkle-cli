@@ -16,8 +16,6 @@ import { theme } from '../semantic-colors.js';
 import { ThemedGradient } from './ThemedGradient.js';
 import { CliSpinner } from './CliSpinner.js';
 
-import { longAsciiLogoCompactText } from './AsciiArt.js';
-import { getAsciiArtWidth } from '../utils/textUtils.js';
 import { ProviderType } from 'sparkle-cli-core';
 
 interface AppHeaderProps {
@@ -25,16 +23,10 @@ interface AppHeaderProps {
   showDetails?: boolean;
 }
 
-const DEFAULT_ICON = `▝▜▄  
-  ▝▜▄
- ▗▟▀ 
-▝▀    `;
-
-/**
- * The horizontal padding (in columns) required for metadata (version, identity, etc.)
- * when rendered alongside the ASCII logo.
- */
-const LOGO_METADATA_PADDING = 20;
+const DEFAULT_ICON = `   ⣰⣆
+⢀⣠⣴⣿⣿⣦⣄⡀
+⠈⠙⠻⣿⣿⠟⠋⠁
+   ⠹⠏`;
 
 /**
  * The terminal width below which we switch to a narrow/column layout to prevent
@@ -56,14 +48,7 @@ function getProviderLabel(authType: ProviderType | undefined): string | null {
 export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
   const settings = useSettings();
   const config = useConfig();
-  const {
-    terminalWidth,
-    bannerData,
-    bannerVisible,
-    updateInfo,
-    isConfigInitialized,
-    isAuthenticating,
-  } = useUIState();
+  const { terminalWidth, bannerData, bannerVisible, updateInfo } = useUIState();
 
   const { bannerText } = useBanner(bannerData);
   const { showTips } = useTips();
@@ -71,21 +56,10 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
   const generatorConfig = config.getContentGeneratorConfig();
   const authType = generatorConfig?.authType;
   const providerLabel = getProviderLabel(authType);
-  const loggedOut = isConfigInitialized && !isAuthenticating && !authType;
 
   const showHeader = !(
     settings.merged.ui.hideBanner || config.getScreenReader()
   );
-
-  let logoTextArt = '';
-  if (loggedOut) {
-    const widthOfLongLogo =
-      getAsciiArtWidth(longAsciiLogoCompactText) + LOGO_METADATA_PADDING;
-
-    if (terminalWidth >= widthOfLongLogo) {
-      logoTextArt = longAsciiLogoCompactText.trim();
-    }
-  }
 
   // If the terminal is too narrow to fit the icon and metadata (especially long nightly versions)
   // side-by-side, we switch to column mode to prevent wrapping.
@@ -96,11 +70,6 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
       <Box flexShrink={0}>
         <ThemedGradient>{DEFAULT_ICON}</ThemedGradient>
       </Box>
-      {logoTextArt && (
-        <Box marginLeft={3}>
-          <Text color={theme.text.primary}>{logoTextArt}</Text>
-        </Box>
-      )}
     </Box>
   );
 
@@ -138,7 +107,7 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
     </Box>
   );
 
-  const useColumnLayout = !!logoTextArt || isNarrow;
+  const useColumnLayout = isNarrow;
 
   return (
     <Box flexDirection="column">

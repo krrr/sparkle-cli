@@ -2,13 +2,10 @@
 
 exports[`AppHeader Icon Rendering > renders the default icon in standard terminals 1`] = `
 "
- ▝▜▄      ▗█▀▀▜▙▝█▛▀▀▌▜██▖▟██▘▜█▘▜██▖▝█▛▝█▛
-   ▝▜▄    █▌     █▙▟  ▐█▝█▛▐█ ▐█ ▐█▝█▖█▌ █▌
-  ▗▟▀     ▜▙ ▝█▛ █▌▝ ▖▐█   ▐█ ▐█ ▐█ ▝██▌ █▌
- ▝▀        ▀▀▀▀▘▝▀▀▀▀▘▀▀▘  ▀▀▘▀▀▘▀▀▘ ▝▀▀▝▀▀
-
- Sparkle CLI v1.0.0
-
+    ⣰⣆     Sparkle CLI v1.0.0
+ ⢀⣠⣴⣿⣿⣦⣄⡀
+ ⠈⠙⠻⣿⣿⠟⠋⠁
+    ⠹⠏
 
 
 Tips for getting started:

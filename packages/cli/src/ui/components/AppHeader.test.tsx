@@ -248,7 +248,7 @@ describe('<AppHeader />', () => {
     session2.unmount();
   });
 
-  it('should render the full logo when logged out', async () => {
+  it('should render the default icon', async () => {
     const mockConfig = makeFakeConfig();
     vi.spyOn(mockConfig, 'getContentGeneratorConfig').mockReturnValue({
       authType: undefined,
@@ -265,8 +265,8 @@ describe('<AppHeader />', () => {
     );
     await waitUntilReady();
 
-    // Check for block characters from the logo
-    expect(lastFrame()).toContain('▗█▀▀▜▙');
+    // Check for braille block characters from the logo
+    expect(lastFrame()).toContain('⣿⣿');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
