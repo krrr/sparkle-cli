@@ -31,7 +31,7 @@ next step" immediately.
 If you want to find a specific conversation from yesterday, use the interactive
 browser.
 
-**Command:** `/resume`
+**Command:** `/chat`
 
 This opens a searchable list of all your past sessions. You'll see:
 
@@ -48,7 +48,7 @@ helps you find what you need.
 
 ### Scenario: Deleting sessions
 
-In the `/resume` browser, navigate to a session you no longer need and press
+In the `/chat` browser, navigate to a session you no longer need and press
 **x**. This permanently deletes the history for that specific conversation.
 
 You can also manage sessions from the command line:
@@ -102,9 +102,9 @@ Sparkle gives you granular control over the undo process. You can choose to:
 Sometimes you want to try two different approaches to the same problem.
 
 1.  Start a session and get to a decision point.
-2.  Save the current state with `/resume save decision-point`.
+2.  Save the current state with `/chat save decision-point`.
 3.  Try your first approach.
-4.  Later, use `/resume resume decision-point` to fork the conversation back to
+4.  Later, use `/chat resume decision-point` to fork the conversation back to
     that moment and try a different approach.
 
 This creates a new branch of history without losing your original work.
@@ -114,5 +114,5 @@ This creates a new branch of history without losing your original work.
 - Learn about [Checkpointing](../../cli/checkpointing.md) to understand the
   underlying safety mechanism.
 - Explore [Task planning](task-planning.md) to keep complex sessions organized.
-- See the [Command reference](../../reference/commands.md) for `/resume`
-  options, grouped checkpoint menus, and `/chat` compatibility aliases.
+- See the [Command reference](../../reference/commands.md) for `/chat` options,
+  grouped checkpoint menus, and `/resume` compatibility aliases.

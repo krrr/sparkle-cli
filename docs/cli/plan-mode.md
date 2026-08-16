@@ -478,7 +478,7 @@ associated plan files and task trackers.
 Manual deletion also removes all associated artifacts:
 
 - **Command Line:** Use `sparkle --delete-session <index|id>`.
-- **Session Browser:** Press `/resume`, navigate to a session, and press `x`.
+- **Session Browser:** Press `/chat`, navigate to a session, and press `x`.
 
 If you use a [custom plans directory](#custom-plan-directory-and-policies),
 those files are not automatically deleted and must be managed manually.

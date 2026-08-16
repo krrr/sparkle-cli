@@ -53,21 +53,21 @@ sessions.
 
 ### From the interactive interface
 
-While the CLI is running, use the `/resume` slash command to open the **Session
+While the CLI is running, use the `/chat` slash command to open the **Session
 Browser**:
 
 ```text
-/resume
+/chat
 ```
 
-When typing `/resume` (or `/chat`) in slash completion, commands are grouped
+When typing `/chat` (or `/resume`) in slash completion, commands are grouped
 under titled separators:
 
 - `-- auto --` (session browser)
   - `list` is selectable and opens the session browser
 - `-- checkpoints --` (manual tagged checkpoint commands)
 
-Unique prefixes such as `/resum` and `/cha` resolve to the same grouped menu.
+Unique prefixes such as `/cha` and `/resu` resolve to the same grouped menu.
 
 The Session Browser provides an interactive interface where you can perform the
 following actions:
@@ -85,14 +85,14 @@ following actions:
 For named branch points inside a session, use chat checkpoints:
 
 ```text
-/resume save decision-point
-/resume list
-/resume resume decision-point
+/chat save decision-point
+/chat list
+/chat resume decision-point
 ```
 
-Compatibility aliases:
+Aliases:
 
-- `/chat ...` works for the same commands.
+- `/resume ...` works for the same commands.
 - `/resume checkpoints ...` also remains supported during migration.
 
 ## Parallel sessions with Git worktrees
@@ -138,7 +138,7 @@ sparkle --delete-session 2
 
 **From the Session Browser:**
 
-1.  Open the browser with `/resume`.
+1.  Open the browser with `/chat`.
 2.  Navigate to the session you want to remove.
 3.  Press **x**.
 

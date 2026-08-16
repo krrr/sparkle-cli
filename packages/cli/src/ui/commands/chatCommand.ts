@@ -92,7 +92,7 @@ const listCommand: SlashCommand = {
 const saveCommand: SlashCommand = {
   name: 'save',
   description:
-    'Save the current conversation as a checkpoint. Usage: /resume save <tag>',
+    'Save the current conversation as a checkpoint. Usage: /chat save <tag>',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context, args): Promise<SlashCommandActionReturn | void> => {
@@ -101,7 +101,7 @@ const saveCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume save <tag>',
+        content: 'Missing tag. Usage: /chat save <tag>',
       };
     }
 
@@ -122,7 +122,7 @@ const saveCommand: SlashCommand = {
             ' already exists. Do you want to overwrite it?',
           ),
           originalInvocation: {
-            raw: context.invocation?.raw || `/resume save ${tag}`,
+            raw: context.invocation?.raw || `/chat save ${tag}`,
           },
         };
       }
@@ -162,7 +162,7 @@ const resumeCheckpointCommand: SlashCommand = {
   name: 'resume',
   altNames: ['load'],
   description:
-    'Resume a conversation from a checkpoint. Usage: /resume resume <tag>',
+    'Resume a conversation from a checkpoint. Usage: /chat resume <tag>',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context, args) => {
@@ -171,7 +171,7 @@ const resumeCheckpointCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume resume <tag>',
+        content: 'Missing tag. Usage: /chat resume <tag>',
       };
     }
 
@@ -244,7 +244,7 @@ const resumeCheckpointCommand: SlashCommand = {
 
 const deleteCommand: SlashCommand = {
   name: 'delete',
-  description: 'Delete a conversation checkpoint. Usage: /resume delete <tag>',
+  description: 'Delete a conversation checkpoint. Usage: /chat delete <tag>',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context, args): Promise<MessageActionReturn> => {
@@ -253,7 +253,7 @@ const deleteCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume delete <tag>',
+        content: 'Missing tag. Usage: /chat delete <tag>',
       };
     }
 
@@ -286,7 +286,7 @@ const deleteCommand: SlashCommand = {
 const shareCommand: SlashCommand = {
   name: 'share',
   description:
-    'Share the current conversation to a markdown or json file. Usage: /resume share <file>',
+    'Share the current conversation to a markdown or json file. Usage: /chat share <file>',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context, args): Promise<MessageActionReturn> => {
@@ -403,7 +403,7 @@ const checkpointCompatibilityCommand: SlashCommand = {
   subCommands: checkpointSubCommands,
 };
 
-const chatResumeSubCommands: SlashCommand[] = [
+const chatSubCommands: SlashCommand[] = [
   ...checkpointSubCommands.map((subCommand) => ({
     ...subCommand,
     suggestionGroup: CHECKPOINT_MENU_GROUP,
@@ -411,9 +411,9 @@ const chatResumeSubCommands: SlashCommand[] = [
   checkpointCompatibilityCommand,
 ];
 
-export const resumeCommand: SlashCommand = {
-  name: 'resume',
-  altNames: ['chat'],
+export const chatCommand: SlashCommand = {
+  name: 'chat',
+  altNames: ['resume'],
   description: 'Browse auto-saved conversations and manage chat checkpoints',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
@@ -424,5 +424,5 @@ export const resumeCommand: SlashCommand = {
     type: 'dialog',
     dialog: 'sessionBrowser',
   }),
-  subCommands: chatResumeSubCommands,
+  subCommands: chatSubCommands,
 };

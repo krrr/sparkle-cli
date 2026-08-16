@@ -39,7 +39,7 @@ import { policiesCommand } from '../ui/commands/policiesCommand.js';
 import { profileCommand } from '../ui/commands/profileCommand.js';
 import { quitCommand } from '../ui/commands/quitCommand.js';
 import { restoreCommand } from '../ui/commands/restoreCommand.js';
-import { debugCommand, resumeCommand } from '../ui/commands/resumeCommand.js';
+import { chatCommand, debugCommand } from '../ui/commands/chatCommand.js';
 import { statsCommand } from '../ui/commands/statsCommand.js';
 import { themeCommand } from '../ui/commands/themeCommand.js';
 import { toolsCommand } from '../ui/commands/toolsCommand.js';
@@ -68,7 +68,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
     const handle = startupProfiler.start('load_builtin_commands');
 
     const isNightlyBuild = await isNightly(process.cwd());
-    const addDebugToResumeSubCommands = (
+    const addDebugToChatSubCommands = (
       subCommands: SlashCommand[] | undefined,
     ): SlashCommand[] | undefined => {
       if (!subCommands) {
@@ -82,7 +82,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
 
         return {
           ...subCommand,
-          subCommands: addDebugToResumeSubCommands(subCommand.subCommands),
+          subCommands: addDebugToChatSubCommands(subCommand.subCommands),
         };
       });
 
@@ -132,8 +132,8 @@ export class BuiltinCommandLoader implements ICommandLoader {
       quitCommand,
       restoreCommand(this.config),
       {
-        ...resumeCommand,
-        subCommands: addDebugToResumeSubCommands(resumeCommand.subCommands),
+        ...chatCommand,
+        subCommands: addDebugToChatSubCommands(chatCommand.subCommands),
       },
       statsCommand,
       themeCommand,

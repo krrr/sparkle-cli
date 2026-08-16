@@ -52,8 +52,24 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/chat`
 
-- **Description:** Alias for `/resume`. Both `/chat` and `/resume` open the
-  session browser and expose the same checkpoint subcommands.
+- **Description:** Browse and resume previous conversation sessions, and manage
+  manual chat checkpoints.
+- **Features:**
+  - **Auto sessions:** Run `/chat` to open the interactive session browser for
+    automatically saved conversations.
+  - **Chat checkpoints:** Use checkpoint subcommands directly (`/chat save`,
+    `/chat resume`, etc.).
+  - **Management:** Delete unwanted sessions directly from the browser.
+  - **Resume:** Select any session to resume and continue the conversation.
+  - **Search:** Use `/` to search through conversation content across all
+    sessions.
+  - **Session Browser:** Interactive interface showing all saved sessions with
+    timestamps, message counts, and first user message for context.
+  - **Sorting:** Sort sessions by date or message count.
+- **Note:** All conversations are automatically saved as you chat - no manual
+  saving required. See [Session Management](../cli/session-management.md) for
+  complete details.
+- **Alias:** `/resume` provides the same behavior and subcommands.
 - **Menu layout when typing `/chat` (or `/resume`)**:
   - `-- auto --`
     - `list` (selecting this opens the auto-saved session browser)
@@ -66,19 +82,19 @@ Slash commands provide meta-level control over the CLI itself.
     - **Description:** Export the most recent API request as a JSON payload.
   - **`delete <tag>`**
     - **Description:** Deletes a saved conversation checkpoint.
-    - **Equivalent:** `/resume delete <tag>`
+    - **Alias form:** `/resume delete <tag>`
   - **`list`**
     - **Description:** Lists available tags for manually saved checkpoints.
     - **Note:** This command only lists chats saved within the current project.
       Because chat history is project-scoped, chats saved in other project
       directories will not be displayed.
-    - **Equivalent:** `/resume list`
+    - **Alias form:** `/resume list`
   - **`resume <tag>`**
     - **Description:** Resumes a conversation from a previous save.
     - **Note:** You can only resume chats that were saved within the current
       project. To resume a chat from a different project, you must run the
       Sparkle CLI from that project's directory.
-    - **Equivalent:** `/resume resume <tag>`
+    - **Alias form:** `/resume resume <tag>`
   - **`save <tag>`**
     - **Description:** Saves the current conversation history. You must add a
       `<tag>` for identifying the conversation state.
@@ -93,12 +109,12 @@ Slash commands provide meta-level control over the CLI itself.
         conversation states. For automatic checkpoints created before file
         modifications, see the
         [Checkpointing documentation](../cli/checkpointing.md).
-      - **Equivalent:** `/resume save <tag>`
+      - **Alias form:** `/resume save <tag>`
   - **`share [filename]`**
     - **Description:** Writes the current conversation to a provided Markdown or
       JSON file. If no filename is provided, then the CLI will generate one.
     - **Usage:** `/chat share file.md` or `/chat share file.json`.
-    - **Equivalent:** `/resume share [filename]`
+    - **Alias form:** `/resume share [filename]`
 
 ### `/clear`
 
@@ -356,40 +372,10 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/resume`
 
-- **Description:** Browse and resume previous conversation sessions, and manage
-  manual chat checkpoints.
-- **Features:**
-  - **Auto sessions:** Run `/resume` to open the interactive session browser for
-    automatically saved conversations.
-  - **Chat checkpoints:** Use checkpoint subcommands directly (`/resume save`,
-    `/resume resume`, etc.).
-  - **Management:** Delete unwanted sessions directly from the browser
-  - **Resume:** Select any session to resume and continue the conversation
-  - **Search:** Use `/` to search through conversation content across all
-    sessions
-  - **Session Browser:** Interactive interface showing all saved sessions with
-    timestamps, message counts, and first user message for context
-  - **Sorting:** Sort sessions by date or message count
-- **Note:** All conversations are automatically saved as you chat - no manual
-  saving required. See [Session Management](../cli/session-management.md) for
-  complete details.
-- **Alias:** `/chat` provides the same behavior and subcommands.
-- **Sub-commands:**
-  - **`list`**
-    - **Description:** Lists available tags for manual chat checkpoints.
-  - **`save <tag>`**
-    - **Description:** Saves the current conversation as a tagged checkpoint.
-  - **`resume <tag>`** (alias: `load`)
-    - **Description:** Loads a previously saved tagged checkpoint.
-  - **`delete <tag>`**
-    - **Description:** Deletes a tagged checkpoint.
-  - **`share [filename]`**
-    - **Description:** Exports the current conversation to Markdown or JSON.
-  - **`debug`**
-    - **Description:** Export the most recent API request as JSON payload
-      (nightly builds).
-  - **Compatibility alias:** `/resume checkpoints ...` is still accepted for the
-    same checkpoint commands.
+- **Description:** Alias for `/chat`. Both `/chat` and `/resume` open the
+  session browser and expose the same checkpoint subcommands.
+- **Compatibility alias:** `/resume checkpoints ...` is still accepted for the
+  same checkpoint commands.
 
 ### `/settings`
 

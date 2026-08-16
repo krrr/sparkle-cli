@@ -12,7 +12,7 @@ import type { Content } from '@google/genai';
 import { ProviderType, type GeminiClient } from 'sparkle-cli-core';
 
 import * as fsPromises from 'node:fs/promises';
-import { debugCommand, resumeCommand } from './resumeCommand.js';
+import { debugCommand, chatCommand } from './chatCommand.js';
 import {
   serializeHistoryToMarkdown,
   exportHistoryToFile,
@@ -36,7 +36,7 @@ vi.mock('../utils/historyExportUtils.js', async (importOriginal) => {
   };
 });
 
-describe('resumeCommand', () => {
+describe('chatCommand', () => {
   const mockFs = vi.mocked(fsPromises);
   const mockExport = vi.mocked(exportHistoryToFile);
 
@@ -50,11 +50,11 @@ describe('resumeCommand', () => {
   const getSubCommand = (
     name: 'list' | 'save' | 'resume' | 'delete' | 'share',
   ): SlashCommand => {
-    const subCommand = resumeCommand.subCommands?.find(
+    const subCommand = chatCommand.subCommands?.find(
       (cmd) => cmd.name === name,
     );
     if (!subCommand) {
-      throw new Error(`/resume ${name} command not found.`);
+      throw new Error(`/chat ${name} command not found.`);
     }
     return subCommand;
   };
@@ -98,8 +98,8 @@ describe('resumeCommand', () => {
     vi.restoreAllMocks();
   });
 
-  it('should open the session browser for bare /resume', async () => {
-    const result = await resumeCommand.action?.({} as CommandContext, '');
+  it('should open the session browser for bare /chat', async () => {
+    const result = await chatCommand.action?.({} as CommandContext, '');
     expect(result).toEqual({
       type: 'dialog',
       dialog: 'sessionBrowser',
@@ -107,17 +107,17 @@ describe('resumeCommand', () => {
   });
 
   it('should have the correct main command definition', () => {
-    expect(resumeCommand.name).toBe('resume');
-    expect(resumeCommand.altNames).toContain('chat');
-    expect(resumeCommand.description).toBe(
+    expect(chatCommand.name).toBe('chat');
+    expect(chatCommand.altNames).toContain('resume');
+    expect(chatCommand.description).toBe(
       'Browse auto-saved conversations and manage chat checkpoints',
     );
-    expect(resumeCommand.autoExecute).toBe(true);
-    expect(resumeCommand.subCommands).toHaveLength(6);
+    expect(chatCommand.autoExecute).toBe(true);
+    expect(chatCommand.subCommands).toHaveLength(6);
   });
 
-  it('should expose unified chat subcommands directly under /resume', () => {
-    const visibleSubCommandNames = (resumeCommand.subCommands ?? [])
+  it('should expose unified chat subcommands directly under /chat', () => {
+    const visibleSubCommandNames = (chatCommand.subCommands ?? [])
       .filter((subCommand) => !subCommand.hidden)
       .map((subCommand) => subCommand.name);
 
@@ -126,8 +126,8 @@ describe('resumeCommand', () => {
     );
   });
 
-  it('should keep a hidden /resume checkpoints compatibility alias', () => {
-    const checkpoints = resumeCommand.subCommands?.find(
+  it('should keep a hidden /chat checkpoints compatibility alias', () => {
+    const checkpoints = chatCommand.subCommands?.find(
       (subCommand) => subCommand.name === 'checkpoints',
     );
     expect(checkpoints?.hidden).toBe(true);
@@ -193,7 +193,7 @@ describe('resumeCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume save <tag>',
+        content: 'Missing tag. Usage: /chat save <tag>',
       });
     });
 
@@ -287,7 +287,7 @@ describe('resumeCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume resume <tag>',
+        content: 'Missing tag. Usage: /chat resume <tag>',
       });
     });
 
@@ -473,7 +473,7 @@ describe('resumeCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: 'Missing tag. Usage: /resume delete <tag>',
+        content: 'Missing tag. Usage: /chat delete <tag>',
       });
     });
 
