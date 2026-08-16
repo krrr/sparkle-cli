@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { Content, Part } from '@google/genai';
+import type { Part } from '@google/genai';
 import path from 'node:path';
 import * as fsPromises from 'node:fs/promises';
 import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { sanitizeFilenamePart } from '../utils/fileUtils.js';
 import type { Config } from '../config/config.js';
+import type { HistoryTurn } from '../core/agentChatHistory.js';
 import { logToolOutputMasking } from '../telemetry/loggers.js';
 import {
   SHELL_TOOL_NAME,
@@ -41,7 +42,7 @@ const EXEMPT_TOOLS = new Set([
 ]);
 
 export interface MaskingResult {
-  newHistory: readonly Content[];
+  newHistory: readonly HistoryTurn[];
   maskedCount: number;
   tokensSaved: number;
 }
@@ -63,10 +64,23 @@ export interface MaskingResult {
  * Effectively, this means masking only starts once the conversation contains approximately 80k
  * tokens of prunable tool outputs (50k protected + 30k prunable buffer). Small tool outputs
  * are preserved until they collectively reach the threshold.
+ *
+ * Masking changes an earlier token prefix, so provider prompt caches miss
+ * on the first request after a mask. Keeping already-masked outputs stable
+ * is what lets later requests reuse the new cached prefix.
  */
 export class ToolOutputMaskingService {
+  /**
+   * Masks bulky tool outputs in the given history.
+   *
+   * The history must be the durable, un-coalesced turns (with stable ids),
+   * e.g. as exposed by {@link GeminiChat.getDurableHistoryTurns}. Operating
+   * on durable turns (instead of the coalesced id-less Content[] view)
+   * guarantees that the masked result can be written back via setHistory()
+   * without regenerating ids, re-merging turns, or losing per-turn metadata.
+   */
   async mask(
-    history: readonly Content[],
+    history: readonly HistoryTurn[],
     config: Config,
   ): Promise<MaskingResult> {
     if (history.length === 0) {
@@ -95,8 +109,8 @@ export class ToolOutputMaskingService {
 
     // Backward scan to identify prunable tool outputs
     for (let i = scanStartIdx; i >= 0; i--) {
-      const content = history[i];
-      const parts = content.parts || [];
+      const turn = history[i];
+      const parts = turn.content.parts || [];
 
       for (let j = parts.length - 1; j >= 0; j--) {
         const part = parts[j];
@@ -173,8 +187,9 @@ export class ToolOutputMaskingService {
 
     for (const item of prunableParts) {
       const { contentIndex, partIndex, content, tokens } = item;
-      const contentRecord = newHistory[contentIndex];
-      const part = contentRecord.parts![partIndex];
+      const turn = newHistory[contentIndex];
+      const parts = turn.content.parts!;
+      const part = parts[partIndex];
 
       if (!part.functionResponse) continue;
 
@@ -234,9 +249,13 @@ export class ToolOutputMaskingService {
       const savings = tokens - newTaskTokens;
 
       if (savings > 0) {
-        const newParts = [...contentRecord.parts!];
+        const newParts = [...parts];
         newParts[partIndex] = maskedPart;
-        newHistory[contentIndex] = { ...contentRecord, parts: newParts };
+        // Preserve the durable turn id: only the content parts are replaced.
+        newHistory[contentIndex] = {
+          ...turn,
+          content: { ...turn.content, parts: newParts },
+        };
         actualTokensSaved += savings;
         maskedCount++;
       }

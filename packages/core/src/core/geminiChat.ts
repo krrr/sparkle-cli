@@ -1048,6 +1048,25 @@ export class GeminiChat {
   }
 
   /**
+   * Returns the raw, un-coalesced durable history turns (with their stable
+   * ids) as stored in the agent history.
+   *
+   * Unlike {@link getHistory} / {@link getHistoryTurns} — which expose the
+   * coalesced, id-less API-facing view — this is the representation used by
+   * history transformations (e.g. tool output masking) that must preserve
+   * per-turn identity when the result is written back via setHistory().
+   */
+  getDurableHistoryTurns(): HistoryTurn[] {
+    return this.agentHistory.map((turn) => ({
+      id: turn.id,
+      content: {
+        ...turn.content,
+        parts: turn.content.parts ? [...turn.content.parts] : undefined,
+      },
+    }));
+  }
+
+  /**
    * Clears the chat history.
    */
   clearHistory(): void {

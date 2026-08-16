@@ -18,7 +18,8 @@ import {
 } from '../tools/tool-names.js';
 import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
 import type { Config } from '../config/config.js';
-import type { Content, Part } from '@google/genai';
+import type { Part } from '@google/genai';
+import type { HistoryTurn } from '../core/agentChatHistory.js';
 
 vi.mock('../utils/tokenCalculation.js', () => ({
   estimateTokenCountSync: vi.fn(),
@@ -69,17 +70,20 @@ describe('ToolOutputMaskingService', () => {
       protectLatestTurn: false,
     });
 
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'test_tool',
-              response: { output: 'A'.repeat(200) },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'test_tool',
+                response: { output: 'A'.repeat(200) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
     ];
 
@@ -100,17 +104,20 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should not mask if total tool tokens are below protection threshold', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'test_tool',
-              response: { output: 'small output' },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'test_tool',
+                response: { output: 'small output' },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
     ];
 
@@ -134,39 +141,48 @@ describe('ToolOutputMaskingService', () => {
     // Turn 1: 60k (Oldest)
     // Turn 2: 20k
     // Turn 3: 10k (Latest) - Protected because PROTECT_LATEST_TURN is true
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 't1',
-              response: { output: 'A'.repeat(60000) },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 't1',
+                response: { output: 'A'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 't2',
-              response: { output: 'B'.repeat(20000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 't2',
+                response: { output: 'B'.repeat(20000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 't3',
-              response: { output: 'C'.repeat(10000) },
+        id: 'turn-3',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 't3',
+                response: { output: 'C'.repeat(10000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
     ];
 
@@ -192,13 +208,13 @@ describe('ToolOutputMaskingService', () => {
     const result = await service.mask(history, mockConfig);
 
     expect(result.maskedCount).toBe(1);
-    expect(getToolResponse(result.newHistory[0].parts?.[0])).toContain(
+    expect(getToolResponse(result.newHistory[0].content.parts?.[0])).toContain(
       `<${MASKING_INDICATOR_TAG}`,
     );
-    expect(getToolResponse(result.newHistory[1].parts?.[0])).toEqual(
+    expect(getToolResponse(result.newHistory[1].content.parts?.[0])).toEqual(
       'B'.repeat(20000),
     );
-    expect(getToolResponse(result.newHistory[2].parts?.[0])).toEqual(
+    expect(getToolResponse(result.newHistory[2].content.parts?.[0])).toEqual(
       'C'.repeat(10000),
     );
   });
@@ -213,16 +229,19 @@ describe('ToolOutputMaskingService', () => {
     // Index 6: 10k (Sum 50k) - Boundary hit here?
     // Actually, Boundary is 50k. So Index 6 crosses it.
     // Index 6, 5, 4, 3, 2, 1, 0 are all prunable. (7 * 10k = 70k).
-    const history: Content[] = Array.from({ length: 12 }, (_, i) => ({
-      role: 'user',
-      parts: [
-        {
-          functionResponse: {
-            name: `tool${i}`,
-            response: { output: 'A'.repeat(10000) },
+    const history: HistoryTurn[] = Array.from({ length: 12 }, (_, i) => ({
+      id: `turn-${i}`,
+      content: {
+        role: 'user',
+        parts: [
+          {
+            functionResponse: {
+              name: `tool${i}`,
+              response: { output: 'A'.repeat(10000) },
+            },
           },
-        },
-      ],
+        ],
+      },
     }));
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -245,37 +264,48 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should verify tool-aware previews (shell vs generic)', async () => {
-    const shellHistory: Content[] = [
+    const shellHistory: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: SHELL_TOOL_NAME,
-              response: {
-                output:
-                  'Output: line1\nline2\nline3\nline4\nline5\nError: failed\nExit Code: 1',
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: SHELL_TOOL_NAME,
+                response: {
+                  output:
+                    'Output: line1\nline2\nline3\nline4\nline5\nError: failed\nExit Code: 1',
+                },
               },
             },
-          },
-        ],
+          ],
+        },
       },
       // Protection buffer
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'p',
-              response: { output: 'p'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'p',
+                response: { output: 'p'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       // Latest turn
       {
-        role: 'user',
-        parts: [{ functionResponse: { name: 'l', response: { output: 'l' } } }],
+        id: 'turn-3',
+        content: {
+          role: 'user',
+          parts: [
+            { functionResponse: { name: 'l', response: { output: 'l' } } },
+          ],
+        },
       },
     ];
 
@@ -294,7 +324,7 @@ describe('ToolOutputMaskingService', () => {
     });
 
     const result = await service.mask(shellHistory, mockConfig);
-    const maskedBash = getToolResponse(result.newHistory[0].parts?.[0]);
+    const maskedBash = getToolResponse(result.newHistory[0].content.parts?.[0]);
 
     expect(maskedBash).toContain('Output: line1\nline2\nline3\nline4\nline5');
     expect(maskedBash).toContain('Exit Code: 1');
@@ -302,30 +332,36 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should skip already masked content and not count it towards totals', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'tool1',
-              response: {
-                output: `<${MASKING_INDICATOR_TAG}>...</${MASKING_INDICATOR_TAG}>`,
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tool1',
+                response: {
+                  output: `<${MASKING_INDICATOR_TAG}>...</${MASKING_INDICATOR_TAG}>`,
+                },
               },
             },
-          },
-        ],
+          ],
+        },
       },
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'tool2',
-              response: { output: 'A'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tool2',
+                response: { output: 'A'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
     ];
     mockedEstimateTokenCountSync.mockReturnValue(60000);
@@ -335,30 +371,36 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should handle different response keys in masked update', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'model',
-        parts: [
-          {
-            functionResponse: {
-              name: 't1',
-              response: { result: 'A'.repeat(60000) },
+        id: 'turn-1',
+        content: {
+          role: 'model',
+          parts: [
+            {
+              functionResponse: {
+                name: 't1',
+                response: { result: 'A'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       {
-        role: 'model',
-        parts: [
-          {
-            functionResponse: {
-              name: 'p',
-              response: { output: 'P'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'model',
+          parts: [
+            {
+              functionResponse: {
+                name: 'p',
+                response: { output: 'P'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-      { role: 'user', parts: [{ text: 'latest' }] },
+      { id: 'turn-3', content: { role: 'user', parts: [{ text: 'latest' }] } },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -376,44 +418,50 @@ describe('ToolOutputMaskingService', () => {
 
     const result = await service.mask(history, mockConfig);
     expect(result.maskedCount).toBe(2); // both t1 and p are prunable (cumulative 60k and 120k)
-    const responseObj = result.newHistory[0].parts?.[0].functionResponse
+    const responseObj = result.newHistory[0].content.parts?.[0].functionResponse
       ?.response as Record<string, unknown>;
     expect(Object.keys(responseObj)).toEqual(['output']);
   });
 
   it('should preserve multimodal parts while masking tool responses', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 't1',
-              response: { output: 'A'.repeat(60000) },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 't1',
+                response: { output: 'A'.repeat(60000) },
+              },
             },
-          },
-          {
-            inlineData: {
-              data: 'base64data',
-              mimeType: 'image/png',
+            {
+              inlineData: {
+                data: 'base64data',
+                mimeType: 'image/png',
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       // Protection buffer
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'p',
-              response: { output: 'p'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'p',
+                response: { output: 'p'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       // Latest turn
-      { role: 'user', parts: [{ text: 'latest' }] },
+      { id: 'turn-3', content: { role: 'user', parts: [{ text: 'latest' }] } },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -432,51 +480,57 @@ describe('ToolOutputMaskingService', () => {
     const result = await service.mask(history, mockConfig);
 
     expect(result.maskedCount).toBe(2); //Both t1 and p are prunable (cumulative 60k each > 50k protection)
-    expect(result.newHistory[0].parts).toHaveLength(2);
-    expect(result.newHistory[0].parts?.[0].functionResponse).toBeDefined();
+    expect(result.newHistory[0].content.parts).toHaveLength(2);
+    expect(
+      result.newHistory[0].content.parts?.[0].functionResponse,
+    ).toBeDefined();
     expect(
       (
-        result.newHistory[0].parts?.[0].functionResponse?.response as Record<
-          string,
-          unknown
-        >
+        result.newHistory[0].content.parts?.[0].functionResponse
+          ?.response as Record<string, unknown>
       )['output'],
     ).toContain(`<${MASKING_INDICATOR_TAG}`);
-    expect(result.newHistory[0].parts?.[1].inlineData).toEqual({
+    expect(result.newHistory[0].content.parts?.[1].inlineData).toEqual({
       data: 'base64data',
       mimeType: 'image/png',
     });
   });
 
   it('should match the expected snapshot for a masked tool output', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: SHELL_TOOL_NAME,
-              response: {
-                output: 'Line\n'.repeat(25),
-                exitCode: 0,
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: SHELL_TOOL_NAME,
+                response: {
+                  output: 'Line\n'.repeat(25),
+                  exitCode: 0,
+                },
               },
             },
-          },
-        ],
+          ],
+        },
       },
       // Buffer to push shell_tool into prunable territory
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'padding',
-              response: { output: 'B'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'padding',
+                response: { output: 'B'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-      { role: 'user', parts: [{ text: 'latest' }] },
+      { id: 'turn-3', content: { role: 'user', parts: [{ text: 'latest' }] } },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -495,7 +549,7 @@ describe('ToolOutputMaskingService', () => {
     const result = await service.mask(history, mockConfig);
 
     // Verify complete masking: only 'output' key should exist
-    const responseObj = result.newHistory[0].parts?.[0].functionResponse
+    const responseObj = result.newHistory[0].content.parts?.[0].functionResponse
       ?.response as Record<string, unknown>;
     expect(Object.keys(responseObj)).toEqual(['output']);
 
@@ -515,31 +569,37 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should not mask if masking increases token count (due to overhead)', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'tiny_tool',
-              response: { output: 'tiny' },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tiny_tool',
+                response: { output: 'tiny' },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       // Protection buffer to push tiny_tool into prunable territory
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'padding',
-              response: { output: 'B'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'padding',
+                response: { output: 'B'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-      { role: 'user', parts: [{ text: 'latest' }] },
+      { id: 'turn-3', content: { role: 'user', parts: [{ text: 'latest' }] } },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -553,42 +613,51 @@ describe('ToolOutputMaskingService', () => {
   });
 
   it('should never mask exempt tools (like activate_skill) even if they are deep in history', async () => {
-    const history: Content[] = [
+    const history: HistoryTurn[] = [
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: ACTIVATE_SKILL_TOOL_NAME,
-              response: { output: 'High value instructions for skill' },
+        id: 'turn-1',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: ACTIVATE_SKILL_TOOL_NAME,
+                response: { output: 'High value instructions for skill' },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'bulky_tool',
-              response: { output: 'A'.repeat(60000) },
+        id: 'turn-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'bulky_tool',
+                response: { output: 'A'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
       // Protection buffer
       {
-        role: 'user',
-        parts: [
-          {
-            functionResponse: {
-              name: 'padding',
-              response: { output: 'B'.repeat(60000) },
+        id: 'turn-3',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'padding',
+                response: { output: 'B'.repeat(60000) },
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-      { role: 'user', parts: [{ text: 'latest' }] },
+      { id: 'turn-4', content: { role: 'user', parts: [{ text: 'latest' }] } },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
@@ -612,28 +681,114 @@ describe('ToolOutputMaskingService', () => {
     // 'padding' crosses the 50k protection boundary immediately.
     // ACTIVATE_SKILL is exempt.
     expect(result.maskedCount).toBe(2);
-    expect(result.newHistory[0].parts?.[0].functionResponse?.name).toBe(
+    expect(result.newHistory[0].content.parts?.[0].functionResponse?.name).toBe(
       ACTIVATE_SKILL_TOOL_NAME,
     );
     expect(
       (
-        result.newHistory[0].parts?.[0].functionResponse?.response as Record<
-          string,
-          unknown
-        >
+        result.newHistory[0].content.parts?.[0].functionResponse
+          ?.response as Record<string, unknown>
       )['output'],
     ).toBe('High value instructions for skill');
 
-    expect(result.newHistory[1].parts?.[0].functionResponse?.name).toBe(
+    expect(result.newHistory[1].content.parts?.[0].functionResponse?.name).toBe(
       'bulky_tool',
     );
     expect(
       (
-        result.newHistory[1].parts?.[0].functionResponse?.response as Record<
-          string,
-          unknown
-        >
+        result.newHistory[1].content.parts?.[0].functionResponse
+          ?.response as Record<string, unknown>
       )['output'],
     ).toContain(MASKING_INDICATOR_TAG);
+  });
+
+  it('should preserve durable turn ids and turn boundaries while masking', async () => {
+    // A realistic conversation where the environment-context turn (user) is
+    // followed by the first user message. Masking must not merge the two
+    // turns nor regenerate ids — otherwise the next resume would drop the
+    // first user message (it would start with `<session_context>`).
+    const history: HistoryTurn[] = [
+      {
+        id: 'env-1',
+        content: {
+          role: 'user',
+          parts: [{ text: '<session_context>We are setting up context.' }],
+        },
+      },
+      {
+        id: 'user-1',
+        content: { role: 'user', parts: [{ text: 'First message' }] },
+      },
+      {
+        id: 'model-1',
+        content: {
+          role: 'model',
+          parts: [
+            { text: 'ok' },
+            {
+              functionCall: {
+                id: 'call-1',
+                name: 'read_file',
+                args: { file_path: 'README.md' },
+              },
+            },
+          ],
+        },
+      },
+      {
+        id: 'user-2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                id: 'call-1',
+                name: 'read_file',
+                response: { output: 'A'.repeat(60000) },
+              },
+            },
+          ],
+        },
+      },
+      { id: 'user-3', content: { role: 'user', parts: [{ text: 'latest' }] } },
+    ];
+
+    mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
+      const resp = parts[0].functionResponse?.response as Record<
+        string,
+        unknown
+      >;
+      const content =
+        (resp?.['output'] as string) ?? JSON.stringify(resp ?? {});
+      if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
+      return 60000;
+    });
+
+    const result = await service.mask(history, mockConfig);
+    expect(result.maskedCount).toBeGreaterThan(0);
+
+    // Identity contract: same turns, same ids, same boundaries.
+    expect(result.newHistory.map((t) => t.id)).toEqual(
+      history.map((t) => t.id),
+    );
+    expect(result.newHistory[0].id).toBe('env-1');
+    expect(result.newHistory[0].content.parts?.[0].text).toContain(
+      '<session_context>',
+    );
+    expect(result.newHistory[1].id).toBe('user-1');
+    expect(result.newHistory[1].content.parts?.[0].text).toBe('First message');
+    expect(result.newHistory[2].id).toBe('model-1');
+    expect(
+      result.newHistory[2].content.parts?.some((p) => p.functionCall),
+    ).toBe(true);
+    expect(result.newHistory[3].id).toBe('user-2');
+    expect(
+      (
+        result.newHistory[3].content.parts?.[0].functionResponse?.response as
+          | { output: string }
+          | undefined
+      )?.output,
+    ).toContain(MASKING_INDICATOR_TAG);
+    expect(result.newHistory[4].id).toBe('user-3');
   });
 });
