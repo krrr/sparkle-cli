@@ -91,7 +91,6 @@
   "devDependencies": {
     "@agentclientprotocol/sdk": "0.16.1",
     "@modelcontextprotocol/sdk": "1.23.0",
-    "read-package-up": "11.0.0",
     "@octokit/rest": "22.0.0",
     "@types/express": "5.0.3",
     "@types/marked": "5.0.2",
@@ -133,6 +132,7 @@
     "prettier": "3.5.3",
     "react-devtools-core": "6.1.2",
     "react-dom": "19.2.4",
+    "read-package-up": "11.0.0",
     "semver": "7.7.2",
     "strip-ansi": "7.1.2",
     "ts-prune": "0.10.3",
@@ -158,6 +158,7 @@
     "@lydell/node-pty-linux-x64": "1.1.0",
     "@lydell/node-pty-win32-arm64": "1.1.0",
     "@lydell/node-pty-win32-x64": "1.1.0",
+    "koffi": "^3.1.5",
     "node-pty": "1.0.0"
   },
   "lint-staged": {

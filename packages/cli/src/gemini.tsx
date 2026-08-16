@@ -92,6 +92,7 @@ import { deleteSession, listSessions } from './utils/sessions.js';
 import { createPolicyUpdater } from './config/policy.js';
 
 import { setupTerminalAndTheme } from './utils/terminalTheme.js';
+import { installWindowsVtInputPatch } from './utils/windowsVtInput.js';
 import { runDeferredCommand } from './deferred.js';
 import { cleanupBackgroundLogs } from './utils/logCleanup.js';
 import { SlashCommandConflictHandler } from './services/SlashCommandConflictHandler.js';
@@ -347,6 +348,13 @@ export async function main() {
   const cliStartupHandle = startupProfiler.start('cli_startup');
 
   const cleanupStdio = patchStdio();
+
+  // Enable ENABLE_VIRTUAL_TERMINAL_INPUT on Windows consoles before any
+  // startup code toggles stdin raw mode (e.g. TerminalCapabilityManager's
+  // capability queries), so that modern keyboard input and terminal
+  // capability responses can reach the CLI.
+  await installWindowsVtInputPatch();
+
   registerSyncCleanup(() => {
     // This is needed to ensure we don't lose any buffered output.
     initializeOutputListenersAndFlush(config);

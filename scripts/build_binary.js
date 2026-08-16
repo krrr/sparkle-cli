@@ -238,6 +238,9 @@ if (existsSync(ripgrepVendorDest)) {
 if (includeNativeModules) {
   addAssetsFromDir('node_modules/@lydell', 'node_modules/@lydell');
   addAssetsFromDir('node_modules/@github', 'node_modules/@github');
+  // koffi (FFI used to enable Windows VT input) and its prebuild packages.
+  addAssetsFromDir('node_modules/koffi', 'node_modules/koffi');
+  addAssetsFromDir('node_modules/@koromix', 'node_modules/@koromix');
 }
 
 writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
