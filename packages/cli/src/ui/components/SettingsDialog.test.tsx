@@ -1610,13 +1610,14 @@ describe('SettingsDialog', () => {
       );
 
       await act(async () => {
-        stdin.write('yolo');
+        stdin.write('vim');
       });
       await waitUntilReady();
 
       await waitFor(() => {
-        expect(lastFrame()).toContain('yolo');
-        expect(lastFrame()).toContain('Disable YOLO Mode');
+        expect(lastFrame()).toContain('vim');
+        expect(lastFrame()).toContain('Vim Mode');
+        expect(lastFrame()).not.toContain('Hook Notifications');
       });
 
       unmount();
