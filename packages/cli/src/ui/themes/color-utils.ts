@@ -11,6 +11,7 @@ import {
   INK_SUPPORTED_NAMES,
   INK_NAME_TO_HEX_MAP,
   getLuminance,
+  getContrastingTextColor,
   CSS_NAME_TO_HEX_MAP,
 } from './theme.js';
 
@@ -21,6 +22,7 @@ export {
   INK_SUPPORTED_NAMES,
   INK_NAME_TO_HEX_MAP,
   getLuminance,
+  getContrastingTextColor,
   CSS_NAME_TO_HEX_MAP,
 };
 

@@ -350,7 +350,7 @@ describe('SessionBrowser component', () => {
     const onDeleteSession = vi.fn().mockResolvedValue(undefined);
     const onExit = vi.fn();
 
-    const { waitUntilReady } = await render(
+    const { lastFrame, waitUntilReady } = await render(
       <TestSessionBrowser
         config={config}
         onResumeSession={onResumeSession}
@@ -365,10 +365,210 @@ describe('SessionBrowser component', () => {
     await waitUntilReady();
     expect(onResumeSession).not.toHaveBeenCalled();
 
-    // Attempt delete.
+    // Attempt delete: the current session cannot be deleted, so no
+    // confirmation is armed.
     triggerKey({ sequence: 'x', name: 'x' });
     await waitUntilReady();
     expect(onDeleteSession).not.toHaveBeenCalled();
+    expect(lastFrame()).not.toContain('again to confirm');
+  });
+
+  it('requires a second x press to confirm deleting a session', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const { lastFrame, waitUntilReady } = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+
+    // First x only arms the confirmation: no delete yet, confirm bar shown.
+    triggerKey({ sequence: 'x', name: 'x' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+    expect(onDeleteSession).not.toHaveBeenCalled();
+
+    // Second x confirms and deletes the armed session.
+    triggerKey({ sequence: 'x', name: 'x' });
+    // Flush the async delete callback inside act so its state updates are
+    // wrapped (the component updates state in the onDeleteSession .then()).
+    await act(async () => {
+      await Promise.resolve();
+    });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(onDeleteSession).toHaveBeenCalledTimes(1);
+    });
+    expect(onDeleteSession).toHaveBeenCalledWith(session1);
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Chat Sessions (1 total');
+    });
+  });
+
+  it('escape cancels a pending delete confirmation', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const { lastFrame, waitUntilReady } = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+
+    triggerKey({ sequence: 'x', name: 'x' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+
+    // Escape cancels the confirmation without deleting or exiting.
+    triggerKey({ name: 'escape', sequence: '\x1b' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Navigate');
+    });
+    expect(onDeleteSession).not.toHaveBeenCalled();
+    expect(onExit).not.toHaveBeenCalled();
+  });
+
+  it('any other key cancels the pending delete confirmation', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const { lastFrame, waitUntilReady } = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+
+    triggerKey({ sequence: 'x', name: 'x' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+
+    // Moving the selection cancels the confirmation and moves normally.
+    triggerKey({ name: 'down', sequence: '[B' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Navigate');
+    });
+    expect(onDeleteSession).not.toHaveBeenCalled();
+
+    // x on the newly selected session only re-arms the confirmation.
+    triggerKey({ sequence: 'x', name: 'x' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+    expect(onDeleteSession).not.toHaveBeenCalled();
+  });
+
+  it('renders the pending delete row with red background and light text', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const renderResult = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+    const { lastFrame, waitUntilReady } = renderResult;
+
+    triggerKey({ sequence: 'x', name: 'x' });
+    await waitUntilReady();
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+
+    await expect(renderResult).toMatchSvgSnapshot();
   });
 
   it('shows an error state when loading sessions fails', async () => {

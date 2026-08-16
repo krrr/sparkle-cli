@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="156" viewBox="0 0 920 156">
+  <style>
+    text { font-family: Consolas, "Courier New", monospace; font-size: 14px; dominant-baseline: text-before-edge; white-space: pre; }
+  </style>
+  <rect width="920" height="156" fill="#000000" />
+  <g transform="translate(10, 10)">
+    <text x="9" y="2" fill="#d7afff" textLength="207" lengthAdjust="spacingAndGlyphs">Chat Sessions (2 total)</text>
+    <text x="720" y="2" fill="#afafaf" textLength="171" lengthAdjust="spacingAndGlyphs">sorted by date desc</text>
+    <text x="9" y="19" fill="#ff87af" textLength="72" lengthAdjust="spacingAndGlyphs">Delete: </text>
+    <text x="81" y="19" fill="#ff87af" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">x</text>
+    <text x="90" y="19" fill="#ff87af" textLength="252" lengthAdjust="spacingAndGlyphs"> again to confirm   Cancel: </text>
+    <text x="342" y="19" fill="#ff87af" textLength="27" lengthAdjust="spacingAndGlyphs" font-weight="bold">Esc</text>
+    <text x="9" y="36" fill="#afafaf" textLength="189" lengthAdjust="spacingAndGlyphs">Any other key cancels</text>
+    <text x="27" y="70" fill="#afafaf" textLength="45" lengthAdjust="spacingAndGlyphs" font-weight="bold">Index</text>
+    <text x="72" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="99" y="70" fill="#afafaf" textLength="36" lengthAdjust="spacingAndGlyphs" font-weight="bold">Msgs</text>
+    <text x="135" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="162" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs" font-weight="bold">Age</text>
+    <text x="198" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="225" y="70" fill="#afafaf" textLength="36" lengthAdjust="spacingAndGlyphs" font-weight="bold">Name</text>
+    <rect x="9" y="85" width="36" height="17" fill="#ff87af" />
+    <text x="9" y="87" fill="#ffffff" textLength="36" lengthAdjust="spacingAndGlyphs">❯ #1</text>
+    <rect x="45" y="85" width="27" height="17" fill="#ff87af" />
+    <rect x="72" y="85" width="36" height="17" fill="#ff87af" />
+    <text x="72" y="87" fill="#ffffff" textLength="36" lengthAdjust="spacingAndGlyphs"> │ 1</text>
+    <rect x="108" y="85" width="27" height="17" fill="#ff87af" />
+    <rect x="135" y="85" width="207" height="17" fill="#ff87af" />
+    <text x="135" y="87" fill="#ffffff" textLength="207" lengthAdjust="spacingAndGlyphs"> │ 10mo │ First session</text>
+    <rect x="342" y="85" width="549" height="17" fill="#ff87af" />
+    <text x="9" y="104" fill="#ffffff" textLength="36" lengthAdjust="spacingAndGlyphs">  #2</text>
+    <text x="72" y="104" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="99" y="104" fill="#ffffff" textLength="9" lengthAdjust="spacingAndGlyphs">1</text>
+    <text x="135" y="104" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="162" y="104" fill="#ffffff" textLength="36" lengthAdjust="spacingAndGlyphs">10mo</text>
+    <text x="198" y="104" fill="#afafaf" textLength="153" lengthAdjust="spacingAndGlyphs"> │ Second session</text>
+    <text x="9" y="121" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs">▼</text>
+  </g>
+</svg>

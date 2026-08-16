@@ -13,6 +13,7 @@ import {
   INK_SUPPORTED_NAMES,
   getThemeTypeFromBackgroundColor,
   getLuminance,
+  getContrastingTextColor,
   parseColor,
   shouldSwitchTheme,
 } from './color-utils.js';
@@ -308,6 +309,26 @@ describe('Color Utils', () => {
       expect(getLuminance('#000')).toBeCloseTo(0);
       // #f00 -> #ff0000 -> 54.213
       expect(getLuminance('#f00')).toBeCloseTo(54.213);
+    });
+  });
+
+  describe('getContrastingTextColor', () => {
+    it('returns black text on light backgrounds', () => {
+      expect(getContrastingTextColor('#ffffff')).toBe('#000000');
+      expect(getContrastingTextColor('#ffb3b3')).toBe('#000000');
+      expect(getContrastingTextColor('#d7ffd7')).toBe('#000000');
+    });
+
+    it('returns white text on dark backgrounds', () => {
+      expect(getContrastingTextColor('#000000')).toBe('#FFFFFF');
+      expect(getContrastingTextColor('#af0000')).toBe('#FFFFFF');
+      expect(getContrastingTextColor('#f07171')).toBe('#FFFFFF');
+      expect(getContrastingTextColor('#ff87af')).toBe('#FFFFFF');
+    });
+
+    it('handles named colors', () => {
+      expect(getContrastingTextColor('red')).toBe('#FFFFFF');
+      expect(getContrastingTextColor('white')).toBe('#000000');
     });
   });
 

@@ -8,6 +8,7 @@ import type React from 'react';
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
+import { getContrastingTextColor } from '../themes/color-utils.js';
 import { Colors } from '../colors.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -64,6 +65,10 @@ export interface SessionBrowserState {
   /** Whether full content has been loaded for search */
   hasLoadedFullContent: boolean;
 
+  // Delete state
+  /** Id of the session awaiting delete confirmation, null when none */
+  pendingDeleteSessionId: string | null;
+
   // Sort state
   /** Current sort criteria */
   sortOrder: 'date' | 'messages' | 'name';
@@ -102,6 +107,10 @@ export interface SessionBrowserState {
   /** Update sort reverse flag */
   setSortReverse: React.Dispatch<React.SetStateAction<boolean>>;
   setHasLoadedFullContent: React.Dispatch<React.SetStateAction<boolean>>;
+  /** Set the session id awaiting delete confirmation */
+  setPendingDeleteSessionId: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
 }
 
 const SESSIONS_PER_PAGE = 20;
@@ -114,6 +123,7 @@ import {
   SearchModeDisplay,
   NavigationHelpDisplay,
   NoResultsDisplay,
+  DeleteConfirmDisplay,
 } from './SessionBrowser/SessionBrowserNav.js';
 import { SessionListHeader } from './SessionBrowser/SessionListHeader.js';
 import { SessionBrowserLoading } from './SessionBrowser/SessionBrowserLoading.js';
@@ -210,7 +220,18 @@ const SessionItem = ({
     state.startIndex + state.visibleSessions.indexOf(session);
   const isActive = originalIndex === state.activeIndex;
   const isDisabled = session.isCurrentSession;
+  const isPendingDelete = state.pendingDeleteSessionId === session.id;
+  // Pick black or white text by the actual AccentRed luminance so contrast
+  // holds on both light and dark themes. Skipped in color-less terminals where
+  // AccentRed is empty.
+  const pendingDeleteTextColor =
+    isPendingDelete && Colors.AccentRed
+      ? getContrastingTextColor(Colors.AccentRed)
+      : undefined;
   const textColor = (c: string = Colors.Foreground) => {
+    if (pendingDeleteTextColor) {
+      return pendingDeleteTextColor;
+    }
     if (isDisabled) {
       return Colors.Gray;
     }
@@ -263,7 +284,13 @@ const SessionItem = ({
   return (
     <Box
       flexDirection="row"
-      backgroundColor={isActive ? theme.background.focus : undefined}
+      backgroundColor={
+        isPendingDelete
+          ? Colors.AccentRed
+          : isActive
+            ? theme.background.focus
+            : undefined
+      }
     >
       <Text color={textColor()} dimColor={isDisabled}>
         {prefix}
@@ -322,7 +349,12 @@ const SessionList = ({
   <Box flexDirection="column">
     {/* Table Header */}
     <Box flexDirection="column">
-      {!state.isSearchMode && <NavigationHelpDisplay />}
+      {!state.isSearchMode &&
+        (state.pendingDeleteSessionId !== null ? (
+          <DeleteConfirmDisplay />
+        ) : (
+          <NavigationHelpDisplay />
+        ))}
       <SessionTableHeader state={state} />
     </Box>
 
@@ -363,6 +395,9 @@ export const useSessionBrowserState = (
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [hasLoadedFullContent, setHasLoadedFullContent] = useState(false);
+  const [pendingDeleteSessionId, setPendingDeleteSessionId] = useState<
+    string | null
+  >(null);
   const loadingFullContentRef = useRef(false);
 
   const filteredAndSortedSessions = useMemo(() => {
@@ -400,6 +435,8 @@ export const useSessionBrowserState = (
     setIsSearchMode,
     hasLoadedFullContent,
     setHasLoadedFullContent,
+    pendingDeleteSessionId,
+    setPendingDeleteSessionId,
     sortOrder,
     setSortOrder,
     sortReverse,
@@ -584,6 +621,17 @@ export const useSessionBrowserInput = (
       } else {
         // Navigation mode input handling.  We're keeping the letter-based controls for non-search
         // mode only, because the letters need to act as input for the search.
+        // While a delete confirmation is pending, any key other than x/X
+        // (confirm) or escape (cancel) first cancels the confirmation and is
+        // then processed normally below.
+        if (
+          state.pendingDeleteSessionId !== null &&
+          key.sequence !== 'x' &&
+          key.sequence !== 'X' &&
+          key.name !== 'escape'
+        ) {
+          state.setPendingDeleteSessionId(null);
+        }
         if (key.sequence === 'g') {
           state.setActiveIndex(0);
           state.setScrollOffset(0);
@@ -612,7 +660,12 @@ export const useSessionBrowserInput = (
           key.sequence === 'Q' ||
           key.name === 'escape'
         ) {
-          onExit();
+          if (key.name === 'escape' && state.pendingDeleteSessionId !== null) {
+            // Escape cancels a pending delete confirmation instead of exiting.
+            state.setPendingDeleteSessionId(null);
+          } else {
+            onExit();
+          }
           return true;
         }
         // Delete session control.
@@ -620,6 +673,13 @@ export const useSessionBrowserInput = (
           const selectedSession =
             state.filteredAndSortedSessions[state.activeIndex];
           if (selectedSession && !selectedSession.isCurrentSession) {
+            if (state.pendingDeleteSessionId === null) {
+              // First press: arm the delete confirmation.
+              state.setPendingDeleteSessionId(selectedSession.id);
+              return true;
+            }
+            // Second press: confirm and delete.
+            state.setPendingDeleteSessionId(null);
             onDeleteSession(selectedSession)
               .then(() => {
                 // Remove the session from the state
@@ -643,14 +703,6 @@ export const useSessionBrowserInput = (
                 );
               });
           }
-          return true;
-        }
-        // less-like u/d controls.
-        else if (key.sequence === 'u') {
-          moveSelection(-Math.round(SESSIONS_PER_PAGE / 2));
-          return true;
-        } else if (key.sequence === 'd') {
-          moveSelection(Math.round(SESSIONS_PER_PAGE / 2));
           return true;
         }
       }

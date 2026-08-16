@@ -10,6 +10,7 @@ import {
   SearchModeDisplay,
   NavigationHelpDisplay,
   NoResultsDisplay,
+  DeleteConfirmDisplay,
 } from './SessionBrowserNav.js';
 import { SessionListHeader } from './SessionListHeader.js';
 import type { SessionBrowserState } from '../SessionBrowser.js';
@@ -23,6 +24,11 @@ describe('SessionBrowser Search and Navigation Components', () => {
 
   it('NavigationHelp renders correctly', async () => {
     const { lastFrame } = await render(<NavigationHelpDisplay />);
+    expect(lastFrame()).toMatchSnapshot();
+  });
+
+  it('DeleteConfirmDisplay renders correctly', async () => {
+    const { lastFrame } = await render(<DeleteConfirmDisplay />);
     expect(lastFrame()).toMatchSnapshot();
   });
 

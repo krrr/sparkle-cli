@@ -42,6 +42,24 @@ export const NavigationHelpDisplay = (): React.JSX.Element => (
 );
 
 /**
+ * Delete confirmation display component. Replaces the navigation help bar
+ * while a delete confirmation is pending. Keeps the same two-line height as
+ * NavigationHelpDisplay so the layout does not jump.
+ */
+export const DeleteConfirmDisplay = (): React.JSX.Element => (
+  <Box flexDirection="column">
+    <Text color={Colors.AccentRed}>
+      <Kbd name="Delete" shortcut="x" />
+      {' again to confirm   '}
+      <Kbd name="Cancel" shortcut="Esc" />
+    </Text>
+    <Text color={Colors.Gray} dimColor>
+      Any other key cancels
+    </Text>
+  </Box>
+);
+
+/**
  * Search input display component.
  */
 export const SearchModeDisplay = ({

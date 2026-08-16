@@ -79,6 +79,17 @@ export function getLuminance(color: string): number {
 }
 
 /**
+ * Returns a text color (black or white) that contrasts with the given
+ * background color, based on its relative luminance.
+ *
+ * @param color Background color string (hex or Ink-supported name)
+ * @returns '#000000' for light backgrounds, '#FFFFFF' for dark ones
+ */
+export function getContrastingTextColor(color: string): string {
+  return getLuminance(color) > 128 ? '#000000' : '#FFFFFF';
+}
+
+/**
  * Resolves a CSS color value (name or hex) into an Ink-compatible color string.
  * @param colorValue The raw color string (e.g., 'blue', '#ff0000', 'darkkhaki').
  * @returns An Ink-compatible color string (hex or name), or undefined if not resolvable.

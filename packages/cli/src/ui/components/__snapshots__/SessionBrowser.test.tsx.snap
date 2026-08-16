@@ -23,6 +23,17 @@ exports[`SessionBrowser component > renders a list of sessions and marks current
 "
 `;
 
+exports[`SessionBrowser component > renders the pending delete row with red background and light text 1`] = `
+" Chat Sessions (2 total)                                                        sorted by date desc
+ Delete: x again to confirm   Cancel: Esc
+ Any other key cancels
+
+   Index │ Msgs │ Age  │ Name
+ ❯ #1    │ 1    │ 10mo │ First session                                                             
+   #2    │ 1    │ 10mo │ Second session
+ ▼"
+`;
+
 exports[`SessionBrowser component > shows an error state when loading sessions fails 1`] = `
 " Error: storage failure
  Press q to exit
