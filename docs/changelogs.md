@@ -15,6 +15,8 @@ Google-specific features, rebrands the project, adds OpenAI API compatibility.
 
 - OpenAI API format support for models, including an OpenAI-compatible base URL
   configuration and API key management in the settings screen.
+- Tokens per second (TPS) and time-to-first-token (TTFT) metrics in the model
+  statistics display.
 
 ### Changed
 
@@ -28,16 +30,18 @@ Google-specific features, rebrands the project, adds OpenAI API compatibility.
   `DynamicModelConfiguration`, removing the preview model mechanism and the
   older configuration path.
 - Hid tool calls and other non-meaningful entries from the rewind menu.
-- Using Model aliases in subagent configuration instead of concrete model names.
+- Use model aliases in subagent configuration instead of concrete model names.
 - Dynamic routing of tool models by active model family, letting models on the
   same tier chain (for example, DeepSeek) be reused.
+- Reworked the `/stats` statistics page: cache reads are now shown as a cache
+  hit rate percentage, and the summary layout was simplified.
 
 ### Removed
 
 - Google Cloud Platform (GCP) related code, including GCP deployment
   configuration and Dockerfiles.
-- Enterprise Admin Controls, billing logic, and local Gemma deployment
-  management, including the `experimental.gemma` setting.
+- Enterprise Admin Controls, billing logic, admin policy, and local Gemma
+  deployment management, including the `experimental.gemma` setting.
 - Clearcut telemetry and remote telemetry upload; telemetry now stays local.
 - The Conseca security engine.
 - The `/bug` and `/privacy` slash commands, the `logout` command, and the
