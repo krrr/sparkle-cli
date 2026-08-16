@@ -176,11 +176,6 @@ const SETTINGS_SCHEMA = {
     'Additional policy files or directories to load.',
   ),
 
-  adminPolicyPaths: pathArraySetting(
-    'Admin Policy Paths',
-    'Additional admin policy files or directories to load.',
-  ),
-
   general: {
     type: 'object',
     label: 'General',

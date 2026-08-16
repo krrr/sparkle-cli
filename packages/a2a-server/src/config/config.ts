@@ -289,7 +289,6 @@ export async function loadConfig(
       allowed: settings.tools?.allowed,
     },
     policyPaths: settings.policyPaths,
-    adminPolicyPaths: settings.adminPolicyPaths,
   };
 
   const policyEngineConfig = await createPolicyEngineConfig(

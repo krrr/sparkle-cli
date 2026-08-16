@@ -7,12 +7,6 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import nodePath from 'node:path';
 import { ApprovalMode } from './types.js';
-import { isDirectorySecure } from '../utils/security.js';
-
-// Mock dependencies
-vi.mock('../utils/security.js', () => ({
-  isDirectorySecure: vi.fn().mockResolvedValue({ secure: true }),
-}));
 
 describe('Workspace-Level Policies', () => {
   beforeEach(async () => {
@@ -21,11 +15,6 @@ describe('Workspace-Level Policies', () => {
     vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(
       nodePath.resolve('/mock/user/policies'),
     );
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
-      nodePath.resolve('/mock/system/policies'),
-    );
-    // Ensure security check always returns secure
-    vi.mocked(isDirectorySecure).mockResolvedValue({ secure: true });
   });
 
   afterEach(() => {
@@ -78,10 +67,6 @@ describe('Workspace-Level Policies', () => {
             isDirectory: () => false,
           },
         ] as unknown as Awaited<ReturnType<typeof actualFs.readdir>>;
-      if (normalizedPath.endsWith(nodePath.normalize('system/policies')))
-        return [
-          { name: 'admin.toml', isFile: () => true, isDirectory: () => false },
-        ] as unknown as Awaited<ReturnType<typeof actualFs.readdir>>;
       return [];
     });
 
@@ -107,13 +92,6 @@ toolName = "test_tool"
 decision = "allow"
 priority = 10
 `; // Tier 3 -> 3.010
-      }
-      if (path.includes('admin.toml')) {
-        return `[[rule]]
-toolName = "test_tool"
-decision = "deny"
-priority = 10
-`; // Tier 5 -> 5.010
       }
       return '';
     });
@@ -143,19 +121,16 @@ priority = 10
     const rules = config.rules?.filter((r) => r.toolName === 'test_tool');
     expect(rules).toBeDefined();
 
-    // Check for all 4 rules
+    // Check for all 3 rules
     const defaultRule = rules?.find((r) => r.priority === 1.01);
     const workspaceRule = rules?.find((r) => r.priority === 3.01);
     const userRule = rules?.find((r) => r.priority === 4.01);
-    const adminRule = rules?.find((r) => r.priority === 5.01);
 
     expect(defaultRule).toBeDefined();
     expect(userRule).toBeDefined();
     expect(workspaceRule).toBeDefined();
-    expect(adminRule).toBeDefined();
 
-    // Verify Hierarchy: Admin > User > Workspace > Default
-    expect(adminRule!.priority).toBeGreaterThan(userRule!.priority!);
+    // Verify Hierarchy: User > Workspace > Default
     expect(userRule!.priority).toBeGreaterThan(workspaceRule!.priority!);
     expect(workspaceRule!.priority).toBeGreaterThan(defaultRule!.priority!);
   });

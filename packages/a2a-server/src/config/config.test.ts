@@ -177,7 +177,6 @@ describe('loadConfig', () => {
           test: { command: 'test', args: [] },
         },
         policyPaths: ['/path/to/policy'],
-        adminPolicyPaths: ['/path/to/admin/policy'],
       };
 
       await loadConfig(settings, mockExtensionLoader, taskId);
@@ -191,7 +190,6 @@ describe('loadConfig', () => {
           },
           mcpServers: settings.mcpServers,
           policyPaths: settings.policyPaths,
-          adminPolicyPaths: settings.adminPolicyPaths,
         }),
         ApprovalMode.DEFAULT,
         undefined,

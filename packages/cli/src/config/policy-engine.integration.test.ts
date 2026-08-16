@@ -15,7 +15,6 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   const Storage = actual.Storage;
   // Monkey-patch static methods
   Storage.getUserPoliciesDir = () => '/non-existent/user/policies';
-  Storage.getSystemPoliciesDir = () => '/non-existent/system/policies';
 
   return {
     ...actual,

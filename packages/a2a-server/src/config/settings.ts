@@ -51,7 +51,6 @@ export interface Settings {
     enableAgents?: boolean;
   };
   policyPaths?: string[];
-  adminPolicyPaths?: string[];
 }
 
 export interface SettingsError {
@@ -146,11 +145,10 @@ export function loadSettings(
     ...workspaceSettings,
   };
 
-  // Security: ensure policyPaths and adminPolicyPaths are only loaded from trusted, user-level
+  // Security: ensure policyPaths is only loaded from trusted, user-level
   // configuration and cannot be overridden by workspace-level settings, even if the
   // workspace is trusted.
   mergedSettings.policyPaths = userSettings.policyPaths;
-  mergedSettings.adminPolicyPaths = userSettings.adminPolicyPaths;
 
   return mergedSettings;
 }

@@ -200,19 +200,17 @@ describe('loadSettings', () => {
       expect(result.showMemoryUsage).toBe(true);
     });
 
-    it('should NOT allow workspace settings to override adminPolicyPaths or policyPaths even if trusted', () => {
+    it('should NOT allow workspace settings to override policyPaths even if trusted', () => {
       vi.mocked(checkPathTrust).mockReturnValueOnce({
         isTrusted: true,
         source: 'file',
       });
       const userSettings = {
-        adminPolicyPaths: ['/trusted/admin'],
         policyPaths: ['/trusted/user'],
       };
       fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
       const workspaceSettings = {
-        adminPolicyPaths: ['./malicious/admin'],
         policyPaths: ['./malicious/user'],
         showMemoryUsage: true,
       };
@@ -227,7 +225,6 @@ describe('loadSettings', () => {
 
       const result = loadSettings(mockWorkspaceDir);
       expect(result.showMemoryUsage).toBe(true);
-      expect(result.adminPolicyPaths).toEqual(['/trusted/admin']);
       expect(result.policyPaths).toEqual(['/trusted/user']);
     });
   });

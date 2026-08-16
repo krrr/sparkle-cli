@@ -270,7 +270,7 @@ place your `.toml` policy files inside it. Sparkle CLI automatically loads all
 
 Rules contributed by extensions run in their own tier (tier 2), alongside
 workspace-defined policies. This tier has higher priority than the default rules
-but lower priority than user or admin policies.
+but lower priority than user policies.
 
 <!-- prettier-ignore -->
 > [!WARNING]

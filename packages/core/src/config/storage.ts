@@ -140,10 +140,6 @@ export class Storage {
     return path.join(Storage.getSystemConfigDir(), 'settings.json');
   }
 
-  static getSystemPoliciesDir(): string {
-    return path.join(Storage.getSystemConfigDir(), 'policies');
-  }
-
   static getGlobalTempDir(): string {
     return path.join(Storage.getGlobalGeminiDir(), TMP_DIR_NAME);
   }

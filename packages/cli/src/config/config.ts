@@ -80,7 +80,6 @@ export interface CliArgs {
   yolo: boolean | undefined;
   approvalMode: string | undefined;
   policy: string[] | undefined;
-  adminPolicy: string[] | undefined;
   allowedMcpServerNames: string[] | undefined;
   allowedTools: string[] | undefined;
   acp?: boolean;
@@ -341,14 +340,6 @@ export async function parseArguments(
           nargs: 1,
           description:
             'Additional policy files or directories to load (comma-separated or multiple --policy)',
-          coerce: coerceCommaSeparated,
-        })
-        .option('admin-policy', {
-          type: 'array',
-          string: true,
-          nargs: 1,
-          description:
-            'Additional admin policy files or directories to load (comma-separated or multiple --admin-policy)',
           coerce: coerceCommaSeparated,
         })
         .option('acp', {
@@ -784,9 +775,6 @@ export async function loadCliConfig(
     },
     policyPaths: (argv.policy ?? settings.policyPaths)?.map((p) =>
       resolvePath(p),
-    ),
-    adminPolicyPaths: (argv.adminPolicy ?? settings.adminPolicyPaths)?.map(
-      (p) => resolvePath(p),
     ),
   };
 

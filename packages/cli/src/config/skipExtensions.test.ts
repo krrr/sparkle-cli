@@ -28,7 +28,6 @@ describe('loadCliConfig skipExtensions', () => {
     yolo: undefined,
     approvalMode: undefined,
     policy: undefined,
-    adminPolicy: undefined,
     allowedMcpServerNames: undefined,
     allowedTools: undefined,
     extensions: undefined,

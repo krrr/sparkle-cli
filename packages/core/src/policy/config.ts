@@ -37,38 +37,15 @@ import {
 import { isNodeError } from '../utils/errors.js';
 import { MCP_TOOL_PREFIX } from '../tools/mcp-tool.js';
 
-import { isDirectorySecure } from '../utils/security.js';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const DEFAULT_CORE_POLICIES_DIR = path.join(__dirname, 'policies');
-
-// Cache to prevent duplicate warnings in the same process
-const emittedWarnings = new Set<string>();
-
-/**
- * Emits a warning feedback event only once per process.
- */
-function emitWarningOnce(message: string): void {
-  if (!emittedWarnings.has(message)) {
-    coreEvents.emitFeedback('warning', message);
-    emittedWarnings.add(message);
-  }
-}
-
-/**
- * Clears the emitted warnings cache. Used primarily for tests.
- */
-export function clearEmittedPolicyWarnings(): void {
-  emittedWarnings.clear();
-}
 
 // Policy tier constants for priority calculation
 export const DEFAULT_POLICY_TIER = 1;
 export const EXTENSION_POLICY_TIER = 2;
 export const WORKSPACE_POLICY_TIER = 3;
 export const USER_POLICY_TIER = 4;
-export const ADMIN_POLICY_TIER = 5;
 
 // Specific priority offsets and derived priorities for dynamic/settings rules.
 
@@ -94,7 +71,7 @@ export function getAlwaysAllowPriorityFraction(): number {
 
 /**
  * Gets the list of directories to search for policy files, in order of increasing priority
- * (Default -> Extension -> Workspace -> User -> Admin).
+ * (Default -> Extension -> Workspace -> User).
  *
  * Note: Extension policies are loaded separately by the extension manager.
  *
@@ -102,26 +79,19 @@ export function getAlwaysAllowPriorityFraction(): number {
  * @param policyPaths Optional user-provided policy paths (from --policy flag).
  *   When provided, these replace the default user policies directory.
  * @param workspacePoliciesDir Optional path to a directory containing workspace policies.
- * @param adminPolicyPaths Optional admin-provided policy paths (from --admin-policy flag).
- *   When provided, these supplement the default system policies directory.
  */
 export function getPolicyDirectories(
   defaultPoliciesDir?: string,
   policyPaths?: string[],
   workspacePoliciesDir?: string,
-  adminPolicyPaths?: string[],
 ): string[] {
   return [
-    // Admin tier (highest priority)
-    Storage.getSystemPoliciesDir(),
-    ...(adminPolicyPaths ?? []),
-
-    // User tier (second highest priority)
+    // User tier (highest priority)
     ...(policyPaths && policyPaths.length > 0
       ? policyPaths
       : [Storage.getUserPoliciesDir()]),
 
-    // Workspace Tier (third highest)
+    // Workspace Tier (second highest)
     workspacePoliciesDir,
 
     // Default tier (lowest priority)
@@ -130,7 +100,7 @@ export function getPolicyDirectories(
 }
 
 /**
- * Determines the policy tier (1=default, 2=extension, 3=workspace, 4=user, 5=admin) for a given directory.
+ * Determines the policy tier (1=default, 2=extension, 3=workspace, 4=user) for a given directory.
  * This is used by the TOML loader to assign priority bands.
  */
 export function getPolicyTier(
@@ -138,19 +108,11 @@ export function getPolicyTier(
   context: {
     defaultPoliciesDir?: string;
     workspacePoliciesDir?: string;
-    adminPolicyPaths?: Set<string>;
-    systemPoliciesDir: string;
     userPoliciesDir: string;
   },
 ): number {
   const normalizedDir = path.resolve(dir);
 
-  if (normalizedDir === context.systemPoliciesDir) {
-    return ADMIN_POLICY_TIER;
-  }
-  if (context.adminPolicyPaths?.has(normalizedDir)) {
-    return ADMIN_POLICY_TIER;
-  }
   if (normalizedDir === context.userPoliciesDir) {
     return USER_POLICY_TIER;
   }
@@ -188,36 +150,6 @@ export function formatPolicyError(error: PolicyFileError): string {
     message += `\n  Suggestion: ${error.suggestion}`;
   }
   return message;
-}
-
-/**
- * Filters out insecure policy directories (specifically the system policy directory).
- * Supplemental admin policy paths are NOT subject to strict security checks as they
- * are explicitly provided by the user/administrator via flags or settings.
- * Emits warnings if insecure directories are found.
- */
-async function filterSecurePolicyDirectories(
-  dirs: string[],
-  systemPoliciesDir: string,
-): Promise<string[]> {
-  const results = await Promise.all(
-    dirs.map(async (dir) => {
-      const normalizedDir = path.resolve(dir);
-      const isSystemPolicy = normalizedDir === systemPoliciesDir;
-
-      if (isSystemPolicy) {
-        const { secure, reason } = await isDirectorySecure(dir);
-        if (!secure) {
-          const msg = `Security Warning: Skipping system policies from ${dir}: ${reason}`;
-          emitWarningOnce(msg);
-          return null;
-        }
-      }
-      return dir;
-    }),
-  );
-
-  return results.filter((dir): dir is string => dir !== null);
 }
 
 /**
@@ -289,51 +221,17 @@ export async function createPolicyEngineConfig(
   defaultPoliciesDir?: string,
   interactive: boolean = true,
 ): Promise<PolicyEngineConfig> {
-  const systemPoliciesDir = path.resolve(Storage.getSystemPoliciesDir());
   const userPoliciesDir = path.resolve(Storage.getUserPoliciesDir());
-  let adminPolicyPaths = settings.adminPolicyPaths;
-
-  // Security: Ignore supplemental admin policies if the system directory already contains policies.
-  // This prevents flag-based overrides when a central system policy is established.
-  if (adminPolicyPaths?.length) {
-    try {
-      const files = await fs.readdir(systemPoliciesDir);
-      if (files.some((f) => f.endsWith('.toml'))) {
-        const msg = `Security Warning: Ignoring --admin-policy because system policies are already defined in ${systemPoliciesDir}`;
-        emitWarningOnce(msg);
-        adminPolicyPaths = undefined;
-      }
-    } catch (e) {
-      if (!isNodeError(e) || e.code !== 'ENOENT') {
-        debugLogger.warn(
-          `Failed to check system policies in ${systemPoliciesDir}`,
-          e,
-        );
-      }
-    }
-  }
 
   const policyDirs = getPolicyDirectories(
     defaultPoliciesDir,
     settings.policyPaths,
     settings.workspacePoliciesDir,
-    adminPolicyPaths,
-  );
-
-  const adminPolicyPathsSet = adminPolicyPaths
-    ? new Set(adminPolicyPaths.map((p) => path.resolve(p)))
-    : undefined;
-
-  const securePolicyDirs = await filterSecurePolicyDirectories(
-    policyDirs,
-    systemPoliciesDir,
   );
 
   const tierContext = {
     defaultPoliciesDir,
     workspacePoliciesDir: settings.workspacePoliciesDir,
-    adminPolicyPaths: adminPolicyPathsSet,
-    systemPoliciesDir,
     userPoliciesDir,
   };
 
@@ -346,12 +244,12 @@ export async function createPolicyEngineConfig(
     rules: tomlRules,
     checkers: tomlCheckers,
     errors,
-  } = await loadPoliciesFromToml(securePolicyDirs, (p) => {
+  } = await loadPoliciesFromToml(policyDirs, (p) => {
     const normalizedPath = path.resolve(p);
     const tier = getPolicyTier(normalizedPath, tierContext);
 
-    // If it's a user-provided path that isn't already categorized as ADMIN, treat it as USER tier.
-    if (userProvidedPaths.has(normalizedPath) && tier !== ADMIN_POLICY_TIER) {
+    // If it's a user-provided path, treat it as USER tier.
+    if (userProvidedPaths.has(normalizedPath)) {
       return USER_POLICY_TIER;
     }
 
@@ -383,9 +281,8 @@ export async function createPolicyEngineConfig(
   // - Extension policies (TOML): 2 + priority/1000 (e.g., priority 100 → 2.100)
   // - Workspace policies (TOML): 3 + priority/1000 (e.g., priority 100 → 3.100)
   // - User policies (TOML): 4 + priority/1000 (e.g., priority 100 → 4.100)
-  // - Admin policies (TOML): 5 + priority/1000 (e.g., priority 100 → 5.100)
   //
-  // This ensures Admin > User > Workspace > Extension > Default hierarchy is always preserved,
+  // This ensures User > Workspace > Extension > Default hierarchy is always preserved,
   // while allowing user-specified priorities to work within each tier.
   //
   // Settings-based and dynamic rules (mixed tiers):

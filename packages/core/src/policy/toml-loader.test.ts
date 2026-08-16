@@ -331,11 +331,6 @@ modes = ["autoEdit"]
       const getPolicyTier2 = (_dir: string) => 2; // Tier 2 (Extension)
       const result2 = await loadPoliciesFromToml([tempDir], getPolicyTier2);
       expect(result2.rules[0].source).toBe('Extension: tier4.toml');
-
-      const getPolicyTier5 = (_dir: string) => 5; // Tier 5 (Admin)
-      const result5 = await loadPoliciesFromToml([tempDir], getPolicyTier5);
-      expect(result5.rules[0].source).toBe('Admin: tier4.toml');
-      expect(result5.errors).toHaveLength(0);
     });
 
     it('should handle TOML parse errors', async () => {

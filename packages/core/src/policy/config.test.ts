@@ -15,22 +15,11 @@ import {
   InProcessCheckerType,
   type PolicySettings,
 } from './types.js';
-import { isDirectorySecure } from '../utils/security.js';
-import {
-  createPolicyEngineConfig,
-  clearEmittedPolicyWarnings,
-  getPolicyDirectories,
-} from './config.js';
+import { createPolicyEngineConfig, getPolicyDirectories } from './config.js';
 import { Storage } from '../config/storage.js';
-import * as tomlLoader from './toml-loader.js';
-import { coreEvents } from '../utils/events.js';
 import { MCPServerConfig } from '../config/config.js';
 
 vi.unmock('../config/storage.js');
-
-vi.mock('../utils/security.js', () => ({
-  isDirectorySecure: vi.fn().mockResolvedValue({ secure: true }),
-}));
 
 vi.mock('node:fs/promises', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:fs/promises')>();
@@ -57,15 +46,10 @@ describe('createPolicyEngineConfig', () => {
   const MOCK_DEFAULT_DIR = nodePath.resolve('/tmp/mock/default/policies');
 
   beforeEach(async () => {
-    clearEmittedPolicyWarnings();
     // Mock Storage to avoid host environment contamination
     vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(
       nodePath.resolve('/non/existent/user/policies'),
     );
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
-      nodePath.resolve('/non/existent/system/policies'),
-    );
-    vi.mocked(isDirectorySecure).mockResolvedValue({ secure: true });
   });
 
   /**
@@ -123,62 +107,6 @@ describe('createPolicyEngineConfig', () => {
       ).readFile(p);
     });
   }
-
-  it('should filter out insecure system policy directories', async () => {
-    const systemPolicyDir = '/insecure/system/policies';
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(systemPolicyDir);
-
-    vi.mocked(isDirectorySecure).mockImplementation(async (path: string) => {
-      if (nodePath.resolve(path) === nodePath.resolve(systemPolicyDir)) {
-        return { secure: false, reason: 'Insecure directory' };
-      }
-      return { secure: true };
-    });
-
-    const loadPoliciesSpy = vi
-      .spyOn(tomlLoader, 'loadPoliciesFromToml')
-      .mockResolvedValue({ rules: [], checkers: [], errors: [] });
-
-    await createPolicyEngineConfig({}, ApprovalMode.DEFAULT, MOCK_DEFAULT_DIR);
-
-    expect(loadPoliciesSpy).toHaveBeenCalled();
-    const calledDirs = loadPoliciesSpy.mock.calls[0][0];
-    expect(calledDirs).not.toContain(nodePath.resolve(systemPolicyDir));
-    expect(calledDirs).toContain(
-      nodePath.resolve('/non/existent/user/policies'),
-    );
-    expect(calledDirs).toContain(MOCK_DEFAULT_DIR);
-  });
-
-  it('should NOT filter out insecure supplemental admin policy directories', async () => {
-    const adminPolicyDir = nodePath.resolve('/insecure/admin/policies');
-    vi.mocked(isDirectorySecure).mockImplementation(async (path: string) => {
-      if (nodePath.resolve(path) === adminPolicyDir) {
-        return { secure: false, reason: 'Insecure directory' };
-      }
-      return { secure: true };
-    });
-
-    const loadPoliciesSpy = vi
-      .spyOn(tomlLoader, 'loadPoliciesFromToml')
-      .mockResolvedValue({ rules: [], checkers: [], errors: [] });
-
-    await createPolicyEngineConfig(
-      { adminPolicyPaths: [adminPolicyDir] },
-      ApprovalMode.DEFAULT,
-      MOCK_DEFAULT_DIR,
-    );
-
-    const calledDirs = loadPoliciesSpy.mock.calls[0][0];
-    expect(calledDirs).toContain(adminPolicyDir);
-    expect(calledDirs).toContain(
-      nodePath.resolve('/non/existent/system/policies'),
-    );
-    expect(calledDirs).toContain(
-      nodePath.resolve('/non/existent/user/policies'),
-    );
-    expect(calledDirs).toContain(MOCK_DEFAULT_DIR);
-  });
 
   it('should return ASK_USER for write tools and ALLOW for read-only tools by default', async () => {
     vi.mocked(
@@ -877,59 +805,13 @@ modes = ["plan"]
     expect(subagentRule).toBeDefined();
     expect(subagentRule?.priority).toBeCloseTo(4.1, 5);
   });
-
-  it('should deduplicate security warnings when called multiple times', async () => {
-    const systemPoliciesDir = nodePath.resolve(
-      '/tmp/sparkle-cli-test/system/policies',
-    );
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
-      systemPoliciesDir,
-    );
-
-    vi.mocked(
-      fs.readdir as (path: PathLike) => Promise<string[]>,
-    ).mockImplementation(async (path) => {
-      if (nodePath.resolve(path.toString()) === systemPoliciesDir) {
-        return ['policy.toml'] as string[];
-      }
-      return [] as string[];
-    });
-
-    const feedbackSpy = vi
-      .spyOn(coreEvents, 'emitFeedback')
-      .mockImplementation(() => {});
-
-    // First call
-    await createPolicyEngineConfig(
-      { adminPolicyPaths: [nodePath.resolve('/tmp/other/admin/policies')] },
-      ApprovalMode.DEFAULT,
-    );
-    expect(feedbackSpy).toHaveBeenCalledWith(
-      'warning',
-      expect.stringContaining('Ignoring --admin-policy'),
-    );
-    const count = feedbackSpy.mock.calls.length;
-
-    // Second call
-    await createPolicyEngineConfig(
-      { adminPolicyPaths: ['/tmp/other/admin/policies'] },
-      ApprovalMode.DEFAULT,
-    );
-    expect(feedbackSpy.mock.calls.length).toBe(count);
-
-    feedbackSpy.mockRestore();
-  });
 });
 
 describe('getPolicyDirectories', () => {
   const USER_POLICIES_DIR = '/mock/user/policies';
-  const SYSTEM_POLICIES_DIR = '/mock/system/policies';
 
   beforeEach(() => {
     vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(USER_POLICIES_DIR);
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
-      SYSTEM_POLICIES_DIR,
-    );
   });
 
   it('should include default user policies directory when policyPaths is undefined', () => {
@@ -953,19 +835,14 @@ describe('getPolicyDirectories', () => {
   it('should include all tiers in correct order', () => {
     const defaultDir = '/default/policies';
     const workspaceDir = '/workspace/policies';
-    const adminPath = '/admin/extra/policies';
     const userPath = '/user/custom/policies';
 
-    const dirs = getPolicyDirectories(defaultDir, [userPath], workspaceDir, [
-      adminPath,
-    ]);
+    const dirs = getPolicyDirectories(defaultDir, [userPath], workspaceDir);
 
-    // Order should be Admin -> User -> Workspace -> Default
+    // Order should be User -> Workspace -> Default
     // getPolicyDirectories returns them in that order (which is then reversed by the loader)
-    expect(dirs[0]).toBe(SYSTEM_POLICIES_DIR);
-    expect(dirs[1]).toBe(adminPath);
-    expect(dirs[2]).toBe(userPath);
-    expect(dirs[3]).toBe(workspaceDir);
-    expect(dirs[4]).toBe(defaultDir);
+    expect(dirs[0]).toBe(userPath);
+    expect(dirs[1]).toBe(workspaceDir);
+    expect(dirs[2]).toBe(defaultDir);
   });
 });

@@ -47,8 +47,9 @@ const PolicyRuleSchema = z.object({
   // Priority must be in range [0, 999] to prevent tier overflow.
   // With tier transformation (tier + priority/1000), this ensures:
   // - Tier 1 (default): range [1.000, 1.999]
-  // - Tier 2 (user): range [2.000, 2.999]
-  // - Tier 3 (admin): range [3.000, 3.999]
+  // - Tier 2 (extension): range [2.000, 2.999]
+  // - Tier 3 (workspace): range [3.000, 3.999]
+  // - Tier 4 (user): range [4.000, 4.999]
   priority: z
     .number({
       required_error: 'priority is required',
@@ -127,7 +128,7 @@ export type PolicyFileErrorType =
 export interface PolicyFileError {
   filePath: string;
   fileName: string;
-  tier: 'default' | 'extension' | 'user' | 'workspace' | 'admin';
+  tier: 'default' | 'extension' | 'user' | 'workspace';
   ruleIndex?: number;
   errorType: PolicyFileErrorType;
   message: string;
@@ -195,12 +196,11 @@ export async function readPolicyFiles(
  */
 function getTierName(
   tier: number,
-): 'default' | 'extension' | 'user' | 'workspace' | 'admin' {
+): 'default' | 'extension' | 'user' | 'workspace' {
   if (tier === 1) return 'default';
   if (tier === 2) return 'extension';
   if (tier === 3) return 'workspace';
   if (tier === 4) return 'user';
-  if (tier === 5) return 'admin';
   return 'default';
 }
 
@@ -300,7 +300,7 @@ function validateToolName(name: string, ruleIndex: number): string | null {
  * Formula: tier + priority/1000
  *
  * @param priority The priority value from the TOML file
- * @param tier The tier (1=default, 2=user, 3=admin)
+ * @param tier The tier (1=default, 2=extension, 3=workspace, 4=user)
  * @returns The transformed priority
  */
 function transformPriority(priority: number, tier: number): number {

@@ -15,9 +15,6 @@ describe('PolicyEngine - Core Tools Mapping', () => {
     vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(
       '/mock/user/policies',
     );
-    vi.spyOn(Storage, 'getSystemPoliciesDir').mockReturnValue(
-      '/mock/system/policies',
-    );
   });
 
   afterEach(() => {
