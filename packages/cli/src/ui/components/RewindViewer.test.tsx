@@ -441,7 +441,7 @@ describe('RewindViewer', () => {
       unmount();
     });
 
-    it('hides slash command messages from the menu', async () => {
+    it('hides slash command text sent verbatim to the model', async () => {
       const conversation = createConversation([
         { type: 'user', content: '/help', id: '0', timestamp: '0' },
         { type: 'user', content: 'Real prompt', id: '1', timestamp: '1' },
@@ -456,6 +456,55 @@ describe('RewindViewer', () => {
       const frame = lastFrame();
       expect(frame).toContain('Real prompt');
       expect(frame.match(/No files have been changed/g)).toHaveLength(1);
+      unmount();
+    });
+
+    it('shows custom slash command messages and rewinds with the command text', async () => {
+      const conversation = createConversation([
+        {
+          type: 'user',
+          // Custom commands record the expanded prompt as content and the raw
+          // command text as displayContent.
+          content: 'This is the actual prompt from the command file.',
+          displayContent: '/my-custom-command',
+          id: '1',
+          timestamp: '1',
+        },
+      ]);
+      const onRewind = vi.fn();
+      const { lastFrame, stdin, waitUntilReady, unmount } =
+        await renderWithProviders(
+          <RewindViewer
+            conversation={conversation}
+            onExit={vi.fn()}
+            onRewind={onRewind}
+          />,
+        );
+
+      // The custom command appears in the menu using its raw command text.
+      expect(lastFrame()).toContain('/my-custom-command');
+
+      // Select it and confirm the rewind.
+      act(() => {
+        stdin.write('\x1b[A'); // Move up from 'Stay at current position'
+        stdin.write('\r'); // Select
+      });
+      await waitUntilReady();
+      await waitFor(() => {
+        expect(lastFrame()).toContain('Confirm Rewind');
+      });
+      act(() => {
+        stdin.write('\r'); // Confirm
+      });
+      await waitUntilReady();
+
+      await waitFor(() => {
+        expect(onRewind).toHaveBeenCalledWith(
+          '1',
+          '/my-custom-command',
+          expect.anything(),
+        );
+      });
       unmount();
     });
   });

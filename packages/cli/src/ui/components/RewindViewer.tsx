@@ -48,15 +48,20 @@ const getCleanedRewindText = (userPrompt: MessageRecord): string => {
 /**
  * Returns true when a user message represents a real user prompt worth
  * surfacing in the rewind menu. Internal context messages (e.g.
- * <session_context>, <hook_context>), slash commands and tool response
- * messages (functionResponse-only content) are filtered out.
+ * <session_context>, <hook_context>), slash command text sent verbatim to the
+ * model and tool response messages (functionResponse-only content) are
+ * filtered out.
+ *
+ * Eligibility is based on `content` (what was actually sent to the model),
+ * not `displayContent`. Custom slash commands record the expanded prompt in
+ * `content` and only use `displayContent` for the raw command text (e.g.
+ * `/my-command`) shown in the menu, so they must still be eligible.
  */
 const isRewindEligibleUserMessage = (msg: MessageRecord): boolean => {
   if (msg.type !== 'user') {
     return false;
   }
-  const contentToUse = msg.displayContent || msg.content;
-  const text = contentToUse ? partToString(contentToUse) : '';
+  const text = msg.content ? partToString(msg.content) : '';
   return !isIgnoredUserContent(text.trim());
 };
 
