@@ -447,10 +447,6 @@ describe('setUpdateHandler', () => {
     updateEventEmitter.emit('update-received', updateInfo);
 
     expect(setUpdateInfo).toHaveBeenCalledWith(updateInfo);
-
-    // Advance timers to trigger timeout
-    vi.advanceTimersByTime(60000);
-
     expect(addItem).toHaveBeenCalledWith(
       {
         type: MessageType.INFO,
@@ -458,6 +454,10 @@ describe('setUpdateHandler', () => {
       },
       expect.any(Number),
     );
+
+    // Advance timers to trigger timeout
+    vi.advanceTimersByTime(60000);
+
     expect(setUpdateInfo).toHaveBeenCalledWith(null);
   });
 
@@ -489,7 +489,7 @@ describe('setUpdateHandler', () => {
     );
   });
 
-  it('should not show update-received message if update-success was called', () => {
+  it('should show both update-received and update-success messages when update succeeds', () => {
     const updateInfo: UpdateObject = {
       update: {
         latest: '2.0.0',
@@ -506,9 +506,17 @@ describe('setUpdateHandler', () => {
     // Advance timers
     vi.advanceTimersByTime(60000);
 
-    // Should only have called addItem for success, not for received (after timeout)
-    expect(addItem).toHaveBeenCalledTimes(1);
-    expect(addItem).toHaveBeenCalledWith(
+    expect(addItem).toHaveBeenCalledTimes(2);
+    expect(addItem).toHaveBeenNthCalledWith(
+      1,
+      {
+        type: MessageType.INFO,
+        text: 'Update available',
+      },
+      expect.any(Number),
+    );
+    expect(addItem).toHaveBeenNthCalledWith(
+      2,
       {
         type: MessageType.INFO,
         text: 'Update successful! The new version will be used on your next run.',

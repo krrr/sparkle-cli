@@ -190,25 +190,29 @@ export function setUpdateHandler(
   addItem: (item: Omit<HistoryItem, 'id'>, timestamp: number) => void,
   setUpdateInfo: (info: UpdateObject | null) => void,
 ) {
-  let successfullyInstalled = false;
+  let timeoutId: NodeJS.Timeout | undefined;
+
   const handleUpdateReceived = (info: UpdateObject) => {
     setUpdateInfo(info);
-    const savedMessage = info.message;
-    setTimeout(() => {
-      if (!successfullyInstalled) {
-        addItem(
-          {
-            type: MessageType.INFO,
-            text: savedMessage,
-          },
-          Date.now(),
-        );
-      }
+    addItem(
+      {
+        type: MessageType.INFO,
+        text: info.message,
+      },
+      Date.now(),
+    );
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
       setUpdateInfo(null);
     }, 60000);
   };
 
   const handleUpdateFailed = (data?: { message: string }) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     setUpdateInfo(null);
     addItem(
       {
@@ -222,7 +226,9 @@ export function setUpdateHandler(
   };
 
   const handleUpdateSuccess = () => {
-    successfullyInstalled = true;
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     setUpdateInfo(null);
     addItem(
       {
@@ -249,6 +255,9 @@ export function setUpdateHandler(
   updateEventEmitter.on('update-info', handleUpdateInfo);
 
   return () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     updateEventEmitter.off('update-received', handleUpdateReceived);
     updateEventEmitter.off('update-failed', handleUpdateFailed);
     updateEventEmitter.off('update-success', handleUpdateSuccess);
