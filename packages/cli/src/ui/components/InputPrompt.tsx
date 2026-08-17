@@ -1839,7 +1839,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
             ) : commandSearchActive ? (
               <Text color={theme.text.accent}>(r:) </Text>
             ) : showYoloStyling ? (
-              '*'
+              '⚹'
             ) : (
               '>'
             )}{' '}

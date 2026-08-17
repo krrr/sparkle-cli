@@ -165,8 +165,8 @@ export const Composer = ({ isFocused = true }: { isFocused?: boolean }) => {
                 ? "  Press 'Esc' for NORMAL mode."
                 : "  Press 'i' for INSERT mode."
               : inputState.shellModeActive
-                ? '  Type your shell command'
-                : '  Type your message or @path/to/file'
+                ? '  Type shell command'
+                : '  Type a prompt (@ files, / commands, Ctrl+Enter: new line)'
           }
           setQueueErrorMessage={uiActions.setQueueErrorMessage}
           streamingState={uiState.streamingState}
