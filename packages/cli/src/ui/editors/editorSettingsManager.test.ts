@@ -77,7 +77,7 @@ describe('EditorSettingsManager', () => {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const nanoEditor = result.find(e => e.type === ('nano' as any));
+    const nanoEditor = result.find((e) => e.type === ('nano' as any));
     expect(nanoEditor?.name).toBe('Nano (Not installed)');
     expect(nanoEditor?.disabled).toBe(true);
   });
@@ -91,7 +91,7 @@ describe('EditorSettingsManager', () => {
     const manager = new EditorSettingsManager();
     const result = manager.getAvailableEditorDisplays();
 
-    const vscodeEditor = result.find(e => e.type === 'vscode');
+    const vscodeEditor = result.find((e) => e.type === 'vscode');
     expect(vscodeEditor?.name).toBe('VS Code (Not available in sandbox)');
     expect(vscodeEditor?.disabled).toBe(true);
   });
