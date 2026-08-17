@@ -457,9 +457,6 @@ export const AppContainer = (props: AppContainerProps) => {
       }
       setConfigInitialized(true);
       startupProfiler.flush(config);
-
-      startAutoMemoryIfEnabled(config);
-
       const sessionStartSource = resumedSessionData
         ? SessionStartSource.Resume
         : SessionStartSource.Startup;
@@ -480,12 +477,21 @@ export const AppContainer = (props: AppContainerProps) => {
         }
       }
 
-      // Fire-and-forget: generate summary for previous session in background
-      generateSummary(config).catch((e) => {
-        debugLogger.warn('Background summary generation failed:', e);
-      });
+      // Fire-and-forget: background tasks deferred to avoid blocking startup
+      const backgroundTasksTimer = setTimeout(() => {
+        startAutoMemoryIfEnabled(config);
+        generateSummary(config).catch((e) => {
+          debugLogger.warn('Background summary generation failed:', e);
+        });
+      }, 3000);
+      backgroundTasksTimer.unref?.();
+      pendingBackgroundTimer = backgroundTasksTimer;
     })();
+    let pendingBackgroundTimer: NodeJS.Timeout | undefined;
     const cleanupFn = async () => {
+      if (pendingBackgroundTimer) {
+        clearTimeout(pendingBackgroundTimer);
+      }
       // Turn off mouse scroll.
       disableMouseEvents();
 

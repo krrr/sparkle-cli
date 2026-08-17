@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { simpleGit } from 'simple-git';
+import type { SimpleGit, SimpleGitFactory } from 'simple-git';
+
+async function getSimpleGit(targetPath: string): Promise<SimpleGit> {
+  const mod = await import('simple-git');
+  const factory: SimpleGitFactory = mod.simpleGit;
+  return factory(targetPath);
+}
 import {
   debugLogger,
   getErrorMessage,
@@ -33,7 +39,7 @@ export async function cloneFromGit(
   destination: string,
 ): Promise<void> {
   try {
-    const git = simpleGit(destination);
+    const git = await getSimpleGit(destination);
     let sourceUrl = installMetadata.source;
     const token = getGitHubToken();
     if (token) {
@@ -223,7 +229,7 @@ export async function checkForExtensionUpdate(
 
   try {
     if (installMetadata.type === 'git') {
-      const git = simpleGit(extension.path);
+      const git = await getSimpleGit(extension.path);
       const remotes = await git.getRemotes(true);
       if (remotes.length === 0) {
         debugLogger.error('No git remotes found.');

@@ -620,9 +620,15 @@ export async function main() {
       registerCleanup(consolePatcher.cleanup);
     }
 
-    // Launch cleanup expired sessions as a background task
-    cleanupExpiredSessions(config, settings.merged).catch((e) => {
-      debugLogger.error('Failed to cleanup expired sessions:', e);
+    // Launch cleanup expired sessions as a deferred background task to avoid blocking startup
+    const cleanupTimer = setTimeout(() => {
+      cleanupExpiredSessions(config, settings.merged).catch((e) => {
+        debugLogger.error('Failed to cleanup expired sessions:', e);
+      });
+    }, 3000);
+    cleanupTimer.unref?.();
+    registerCleanup(async () => {
+      clearTimeout(cleanupTimer);
     });
 
     if (config.getListExtensions()) {

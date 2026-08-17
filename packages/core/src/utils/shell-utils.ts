@@ -49,11 +49,14 @@ export function extractStringFromParseEntry(entry: ParseEntry): string {
   return '';
 }
 import * as readline from 'node:readline';
-import { Language, Parser, Query, type Node, type Tree } from 'web-tree-sitter';
+import type { Language, Parser, Query, Node, Tree } from 'web-tree-sitter';
 import { loadWasmBinary } from './fileUtils.js';
 import { debugLogger } from './debugLogger.js';
 import type { SandboxManager } from '../services/sandboxManager.js';
 import { NoopSandboxManager } from '../services/sandboxManager.js';
+
+let TreeSitterParserClass: typeof Parser | null = null;
+let TreeSitterQueryClass: typeof Query | null = null;
 
 export const SHELL_TOOL_NAMES = ['run_shell_command', 'ShellTool'];
 
@@ -132,7 +135,12 @@ function toError(value: unknown): Error {
 async function loadBashLanguage(): Promise<void> {
   try {
     treeSitterInitializationError = null;
-    const [treeSitterBinary, bashBinary] = await Promise.all([
+    const [
+      { Parser: ParserClass, Language: LanguageClass, Query: QueryClass },
+      treeSitterBinary,
+      bashBinary,
+    ] = await Promise.all([
+      import('web-tree-sitter'),
       loadWasmBinary(
         () =>
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -149,8 +157,11 @@ async function loadBashLanguage(): Promise<void> {
       ),
     ]);
 
-    await Parser.init({ wasmBinary: treeSitterBinary });
-    bashLanguage = await Language.load(bashBinary);
+    TreeSitterParserClass = ParserClass;
+    TreeSitterQueryClass = QueryClass;
+
+    await ParserClass.init({ wasmBinary: treeSitterBinary });
+    bashLanguage = await LanguageClass.load(bashBinary);
   } catch (error) {
     bashLanguage = null;
     const normalized = toError(error);
@@ -253,7 +264,7 @@ export const REDIRECTION_NAMES = new Set([
 ]);
 
 function createParser(): Parser | null {
-  if (!bashLanguage) {
+  if (!bashLanguage || !TreeSitterParserClass) {
     if (treeSitterInitializationError) {
       throw treeSitterInitializationError;
     }
@@ -261,7 +272,7 @@ function createParser(): Parser | null {
   }
 
   try {
-    const parser = new Parser();
+    const parser = new TreeSitterParserClass();
     parser.setLanguage(bashLanguage);
     return parser;
   } catch {
@@ -494,22 +505,27 @@ export function parseBashCommandDetails(
     hasPromptCommandTransform(tree.rootNode);
 
   if (hasError) {
-    let query = null;
+    let query: Query | null = null;
     try {
-      query = new Query(bashLanguage, '(ERROR) @error (MISSING) @missing');
-      const captures = query.captures(tree.rootNode);
-      const syntaxErrors = captures.map((capture) => {
-        const { node, name } = capture;
-        const type = name === 'missing' ? 'Missing' : 'Error';
-        return `${type} node: "${node.text}" at ${node.startPosition.row}:${node.startPosition.column}`;
-      });
+      if (TreeSitterQueryClass) {
+        query = new TreeSitterQueryClass(
+          bashLanguage,
+          '(ERROR) @error (MISSING) @missing',
+        );
+        const captures = query.captures(tree.rootNode);
+        const syntaxErrors = captures.map((capture) => {
+          const { node, name } = capture;
+          const type = name === 'missing' ? 'Missing' : 'Error';
+          return `${type} node: "${node.text}" at ${node.startPosition.row}:${node.startPosition.column}`;
+        });
 
-      debugLogger.log(
-        'Bash command parsing error detected for command:',
-        command,
-        'Syntax Errors:',
-        syntaxErrors,
-      );
+        debugLogger.log(
+          'Bash command parsing error detected for command:',
+          command,
+          'Syntax Errors:',
+          syntaxErrors,
+        );
+      }
     } catch {
       // Ignore query errors
     } finally {

@@ -4,8 +4,44 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { runExitCleanup } from './cleanup.js';
-import { waitForUpdateCompletion } from './handleAutoUpdate.js';
+/**
+ * IMPORTANT ARCHITECTURAL CONSTRAINT:
+ *
+ * This file is directly imported by `packages/cli/index.ts` (the application's root entry point).
+ * `index.ts` relies on a lightweight "Phase 0" bootloader pattern to initialize V8 compile cache
+ * and configure memory/environment BEFORE any heavy application chunks are parsed or compiled.
+ *
+ * DO NOT add top-level static imports of heavy application modules (e.g. `sparkle-cli-core`,
+ * `./cleanup.js`, UI components, or core utilities) to this file.
+ *
+ * Doing so will cause `esbuild` to statically pull the entire multi-megabyte core dependency graph
+ * into the root bundle entry (`bundle/sparkle.js`), which breaks the lightweight parent process
+ * and prevents V8 compile cache from taking effect on startup.
+ *
+ * - Allowed at top level: Node.js built-in modules (`node:*`) and TypeScript type-only imports (`import type { ... }`).
+ * - For heavy runtime operations (e.g. `relaunchApp`): Use dynamic `await import(...)` inside the function.
+ */
+
+import path from 'node:path';
+import os from 'node:os';
+
+/**
+ * Returns the directory used to store compiled bytecode cache.
+ * Defaults to `<SPARKLE_CLI_HOME or ~/.sparkle>/cache/v8`.
+ * Can be overridden or disabled by the NODE_COMPILE_CACHE environment variable.
+ */
+export function getCompileCacheDir(): string | undefined {
+  const envCache = process.env['NODE_COMPILE_CACHE'];
+  if (envCache === '0' || envCache === 'false' || envCache === 'off') {
+    return undefined;
+  }
+  if (envCache && envCache !== '1' && envCache !== 'true') {
+    return envCache;
+  }
+  const baseDir =
+    process.env['SPARKLE_CLI_HOME'] || path.join(os.homedir(), '.sparkle');
+  return path.join(baseDir, 'cache', 'v8');
+}
 
 /**
  * Exit code used to signal that the CLI should be relaunched.
@@ -25,6 +61,10 @@ export function _resetRelaunchStateForTesting(): void {
 export async function relaunchApp(): Promise<void> {
   if (isRelaunching) return;
   isRelaunching = true;
+  const [{ waitForUpdateCompletion }, { runExitCleanup }] = await Promise.all([
+    import('./handleAutoUpdate.js'),
+    import('./cleanup.js'),
+  ]);
   await waitForUpdateCompletion();
   await runExitCleanup();
   process.exit(RELAUNCH_EXIT_CODE);
@@ -80,9 +120,11 @@ export function getSpawnConfig(
   env: NodeJS.ProcessEnv;
 } {
   const isBinary = isSeaEnvironment();
+  const cacheDir = getCompileCacheDir();
   const newEnv: NodeJS.ProcessEnv = {
     ...process.env,
     SPARKLE_CLI_NO_RELAUNCH: 'true',
+    ...(cacheDir ? { NODE_COMPILE_CACHE: cacheDir } : {}),
   };
 
   const finalSpawnArgs: string[] = [];

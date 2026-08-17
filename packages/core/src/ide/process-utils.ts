@@ -37,9 +37,12 @@ async function getProcessTableWindows(): Promise<Map<number, ProcessInfo>> {
     const powershellCommand =
       'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name,CommandLine | ConvertTo-Json -Compress';
     // Increase maxBuffer to handle large process lists (default is 1MB)
-    const { stdout } = await execAsync(`powershell "${powershellCommand}"`, {
-      maxBuffer: 10 * 1024 * 1024,
-    });
+    const { stdout } = await execAsync(
+      `powershell -NoProfile -NonInteractive "${powershellCommand}"`,
+      {
+        maxBuffer: 10 * 1024 * 1024,
+      },
+    );
 
     if (!stdout.trim()) {
       return processMap;
@@ -226,8 +229,10 @@ export async function getIdeProcessInfo(): Promise<{
 }> {
   const platform = os.platform();
 
-  if (process.env['SPARKLE_CLI_IDE_PID']) {
-    const idePid = parseInt(process.env['SPARKLE_CLI_IDE_PID'], 10);
+  const explicitPid =
+    process.env['SPARKLE_CLI_IDE_PID'] || process.env['VSCODE_PID'];
+  if (explicitPid) {
+    const idePid = parseInt(explicitPid, 10);
     if (!isNaN(idePid) && idePid > 0) {
       if (platform === 'win32') {
         const processMap = await getProcessTableWindows();

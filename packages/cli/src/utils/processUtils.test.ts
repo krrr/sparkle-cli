@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import path from 'node:path';
+import os from 'node:os';
 import { vi } from 'vitest';
 import {
   RELAUNCH_EXIT_CODE,
@@ -13,6 +15,7 @@ import {
   getScriptArgs,
   isSeaEnvironment,
   getSpawnConfig,
+  getCompileCacheDir,
   type ProcessWithSea,
 } from './processUtils.js';
 import * as cleanup from './cleanup.js';
@@ -191,6 +194,59 @@ describe('SEA handling utilities', () => {
       expect(() => {
         getSpawnConfig(['--title=A\\B'], []);
       }).toThrow();
+    });
+  });
+
+  describe('getCompileCacheDir', () => {
+    beforeEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+    });
+
+    it('returns default cache directory under ~/.sparkle/cache', () => {
+      vi.stubEnv('SPARKLE_CLI_HOME', '');
+      vi.stubEnv('NODE_COMPILE_CACHE', '');
+      const expected = path.join(os.homedir(), '.sparkle', 'cache', 'v8');
+      expect(getCompileCacheDir()).toBe(expected);
+    });
+
+    it('respects SPARKLE_CLI_HOME for default cache directory', () => {
+      vi.stubEnv('SPARKLE_CLI_HOME', '/custom/sparkle/home');
+      vi.stubEnv('NODE_COMPILE_CACHE', '');
+      const expected = path.join('/custom/sparkle/home', 'cache', 'v8');
+      expect(getCompileCacheDir()).toBe(expected);
+    });
+
+    it('returns custom path when NODE_COMPILE_CACHE is a directory path', () => {
+      vi.stubEnv('NODE_COMPILE_CACHE', '/my/custom/cache/dir');
+      expect(getCompileCacheDir()).toBe('/my/custom/cache/dir');
+    });
+
+    it('returns undefined when NODE_COMPILE_CACHE is 0, false, or off', () => {
+      vi.stubEnv('NODE_COMPILE_CACHE', '0');
+      expect(getCompileCacheDir()).toBeUndefined();
+
+      vi.stubEnv('NODE_COMPILE_CACHE', 'false');
+      expect(getCompileCacheDir()).toBeUndefined();
+
+      vi.stubEnv('NODE_COMPILE_CACHE', 'off');
+      expect(getCompileCacheDir()).toBeUndefined();
+    });
+
+    it('returns default path when NODE_COMPILE_CACHE is 1 or true', () => {
+      vi.stubEnv('SPARKLE_CLI_HOME', '/custom/home');
+      vi.stubEnv('NODE_COMPILE_CACHE', '1');
+      expect(getCompileCacheDir()).toBe(
+        path.join('/custom/home', 'cache', 'v8'),
+      );
+
+      vi.stubEnv('NODE_COMPILE_CACHE', 'true');
+      expect(getCompileCacheDir()).toBe(
+        path.join('/custom/home', 'cache', 'v8'),
+      );
     });
   });
 });

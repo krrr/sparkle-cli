@@ -8,14 +8,32 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { isNodeError } from '../utils/errors.js';
 import { spawnAsync } from '../utils/shell-utils.js';
-import {
-  simpleGit,
-  CheckRepoActions,
-  type SimpleGit,
-  type SimpleGitOptions,
-} from 'simple-git';
+import type { SimpleGit, SimpleGitOptions, SimpleGitFactory } from 'simple-git';
 import type { Storage } from '../config/storage.js';
 import { debugLogger } from '../utils/debugLogger.js';
+
+let simpleGitModule:
+  | {
+      simpleGit: SimpleGitFactory;
+      CheckRepoActions: typeof import('simple-git').CheckRepoActions;
+    }
+  | undefined;
+
+async function getSimpleGitModule(): Promise<{
+  simpleGit: SimpleGitFactory;
+  CheckRepoActions: typeof import('simple-git').CheckRepoActions;
+}> {
+  if (!simpleGitModule) {
+    const mod = await import('simple-git');
+    const simpleGit: SimpleGitFactory = mod.simpleGit;
+    const CheckRepoActions = mod.CheckRepoActions;
+    simpleGitModule = {
+      simpleGit,
+      CheckRepoActions,
+    };
+  }
+  return simpleGitModule;
+}
 import {
   sanitizeEnvironment,
   getSecureSanitizationConfig,
@@ -141,6 +159,7 @@ export class GitService {
 
     const shadowRepoEnv = this.getShadowRepoEnv(repoDir);
     await fs.writeFile(shadowRepoEnv.GIT_CONFIG_SYSTEM, '');
+    const { simpleGit, CheckRepoActions } = await getSimpleGitModule();
     const repo = simpleGit(repoDir, SHADOW_REPO_GIT_OPTIONS).env(shadowRepoEnv);
     let isRepoDefined = false;
     try {
@@ -176,7 +195,8 @@ export class GitService {
     await fs.writeFile(shadowGitIgnorePath, userGitIgnoreContent);
   }
 
-  private get shadowGitRepository(): SimpleGit {
+  private async getShadowGitRepository(): Promise<SimpleGit> {
+    const { simpleGit } = await getSimpleGitModule();
     const repoDir = this.getHistoryDir();
     return simpleGit(this.projectRoot, SHADOW_REPO_GIT_OPTIONS).env({
       ...this.getShadowRepoEnv(repoDir),
@@ -186,13 +206,14 @@ export class GitService {
   }
 
   async getCurrentCommitHash(): Promise<string> {
-    const hash = await this.shadowGitRepository.raw('rev-parse', 'HEAD');
+    const repo = await this.getShadowGitRepository();
+    const hash = await repo.raw('rev-parse', 'HEAD');
     return hash.trim();
   }
 
   async createFileSnapshot(message: string): Promise<string> {
     try {
-      const repo = this.shadowGitRepository;
+      const repo = await this.getShadowGitRepository();
       await repo.add('.');
       const status = await repo.status();
       if (status.isClean()) {
@@ -211,7 +232,7 @@ export class GitService {
   }
 
   async restoreProjectFromSnapshot(commitHash: string): Promise<void> {
-    const repo = this.shadowGitRepository;
+    const repo = await this.getShadowGitRepository();
     await repo.raw(['restore', '--source', commitHash, '.']);
     // Removes any untracked files that were introduced post snapshot.
     await repo.clean('f', ['-d']);

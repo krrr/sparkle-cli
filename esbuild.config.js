@@ -82,7 +82,7 @@ const commonAliases = {
 const cliConfig = {
   ...baseConfig,
   banner: {
-    js: `const require = (await import('node:module')).createRequire(import.meta.url); const __chunk_filename = (await import('node:url')).fileURLToPath(import.meta.url); const __chunk_dirname = (await import('node:path')).dirname(__chunk_filename);`,
+    js: `const require = (await import('node:module')).createRequire(import.meta.url); const __chunk_filename = (await import('node:url')).fileURLToPath(import.meta.url); const __chunk_dirname = (await import('node:path')).dirname(__chunk_filename); try { const _baseDir = process.env.SPARKLE_CLI_HOME || (await import('node:path')).join((await import('node:os')).homedir(), '.sparkle'); const _envCache = process.env.NODE_COMPILE_CACHE; const _cacheDir = (_envCache === '0' || _envCache === 'false' || _envCache === 'off') ? undefined : (_envCache && _envCache !== '1' && _envCache !== 'true') ? _envCache : (await import('node:path')).join(_baseDir, 'cache', 'v8'); if (_cacheDir) (await import('node:module')).enableCompileCache?.(_cacheDir); } catch {}`,
   },
   entryPoints: { sparkle: 'packages/cli/index.ts' },
   outdir: 'bundle',

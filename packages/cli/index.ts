@@ -6,6 +6,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import module from 'node:module';
 import { spawn } from 'node:child_process';
 import os from 'node:os';
 import v8 from 'node:v8';
@@ -13,7 +14,23 @@ import {
   RELAUNCH_EXIT_CODE,
   getSpawnConfig,
   getScriptArgs,
+  getCompileCacheDir,
 } from './src/utils/processUtils.js';
+
+// Enable Node's on-disk code caching for compiled modules (Node.js v20.19.0+ / v22+)
+const mod = module as unknown as {
+  enableCompileCache?: (cacheDir?: string) => unknown;
+};
+if (typeof mod.enableCompileCache === 'function') {
+  const cacheDir = getCompileCacheDir();
+  if (cacheDir) {
+    try {
+      mod.enableCompileCache(cacheDir);
+    } catch {
+      // Ignore if compile cache is unsupported or already initialized
+    }
+  }
+}
 
 // --- Global Entry Point ---
 

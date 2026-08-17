@@ -77,6 +77,19 @@ describe('getIdeProcessInfo', () => {
         expect.anything(),
       );
     });
+
+    it('should use VSCODE_PID if SPARKLE_CLI_IDE_PID is not set on Unix', async () => {
+      (os.platform as Mock).mockReturnValue('linux');
+      vi.stubEnv('VSCODE_PID', '99999');
+      mockedExec.mockResolvedValueOnce({ stdout: '0 /usr/bin/code' });
+
+      const result = await getIdeProcessInfo();
+
+      expect(result).toEqual({ pid: 99999, command: '/usr/bin/code' });
+      expect(mockedExec).toHaveBeenCalledWith(
+        expect.stringContaining('ps -o ppid=,command= -p 99999'),
+      );
+    });
   });
 
   describe('on Unix', () => {

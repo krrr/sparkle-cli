@@ -24,8 +24,14 @@ import {
 import { debugLogger } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../../config/settings.js';
 
-// Configure theming and parsing utilities.
-const lowlight = createLowlight(common);
+// Configure theming and parsing utilities lazily.
+let lowlightInstance: ReturnType<typeof createLowlight> | null = null;
+function getLowlight(): ReturnType<typeof createLowlight> {
+  if (!lowlightInstance) {
+    lowlightInstance = createLowlight(common);
+  }
+  return lowlightInstance;
+}
 
 function renderHastNode(
   node: Root | Element | HastText | RootContent,
@@ -100,6 +106,7 @@ function highlightAndRenderLine(
 ): React.ReactNode {
   try {
     const strippedLine = stripAnsi(line);
+    const lowlight = getLowlight();
     const getHighlightedLine = () =>
       !language || !lowlight.registered(language)
         ? lowlight.highlightAuto(strippedLine)

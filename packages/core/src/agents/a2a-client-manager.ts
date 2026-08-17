@@ -12,7 +12,11 @@ import type {
   TaskStatusUpdateEvent,
   TaskArtifactUpdateEvent,
 } from '@a2a-js/sdk';
-import type { AuthenticationHandler, Client } from '@a2a-js/sdk/client';
+import type {
+  AuthenticationHandler,
+  Client,
+  TransportFactory,
+} from '@a2a-js/sdk/client';
 import {
   ClientFactory,
   ClientFactoryOptions,
@@ -21,8 +25,6 @@ import {
   RestTransportFactory,
   createAuthenticatingFetchWithRetry,
 } from '@a2a-js/sdk/client';
-import { GrpcTransportFactory } from '@a2a-js/sdk/client/grpc';
-import * as grpc from '@grpc/grpc-js';
 import { v4 as uuidv4 } from 'uuid';
 import { Agent as UndiciAgent, ProxyAgent } from 'undici';
 import { normalizeAgentCard } from './a2aUtils.js';
@@ -147,18 +149,32 @@ export class A2AClientManager {
       agentCard.additionalInterfaces?.find((i) => i.transport === 'GRPC')
         ?.url ?? agentCard.url;
 
+    const transports: TransportFactory[] = [
+      new RestTransportFactory({ fetchImpl: authFetch }),
+      new JsonRpcTransportFactory({ fetchImpl: authFetch }),
+    ];
+
+    try {
+      const [grpc, { GrpcTransportFactory }] = await Promise.all([
+        import('@grpc/grpc-js'),
+        import('@a2a-js/sdk/client/grpc'),
+      ]);
+
+      transports.push(
+        new GrpcTransportFactory({
+          grpcChannelCredentials: grpcUrl.startsWith('https://')
+            ? grpc.credentials.createSsl()
+            : grpc.credentials.createInsecure(),
+        }),
+      );
+    } catch (e) {
+      debugLogger.debug('Failed to load gRPC transport for A2A client:', e);
+    }
+
     const clientOptions = ClientFactoryOptions.createFrom(
       ClientFactoryOptions.default,
       {
-        transports: [
-          new RestTransportFactory({ fetchImpl: authFetch }),
-          new JsonRpcTransportFactory({ fetchImpl: authFetch }),
-          new GrpcTransportFactory({
-            grpcChannelCredentials: grpcUrl.startsWith('https://')
-              ? grpc.credentials.createSsl()
-              : grpc.credentials.createInsecure(),
-          }),
-        ],
+        transports,
         cardResolver: resolver,
       },
     );
