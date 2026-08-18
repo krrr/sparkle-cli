@@ -10,7 +10,7 @@ import {
   type GeminiClient,
 } from 'sparkle-cli-core';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { compressCommand } from './compressCommand.js';
+import { compactCommand } from './compactCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { MessageType } from '../types.js';
 
@@ -41,7 +41,7 @@ describe('compressCommand', () => {
         compressionStatus: null,
       },
     };
-    await compressCommand.action!(context, '');
+    await compactCommand.action!(context, '');
     await new Promise((r) => setTimeout(r, 0));
     expect(context.ui.addItem).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -62,7 +62,7 @@ describe('compressCommand', () => {
     };
     mockTryCompressChat.mockResolvedValue(compressedResult);
 
-    await compressCommand.action!(context, '');
+    await compactCommand.action!(context, '');
     await new Promise((r) => setTimeout(r, 0));
 
     expect(context.ui.setPendingItem).toHaveBeenNthCalledWith(1, {
@@ -99,7 +99,7 @@ describe('compressCommand', () => {
   it('should add an error message if tryCompressChat returns falsy', async () => {
     mockTryCompressChat.mockResolvedValue(null);
 
-    await compressCommand.action!(context, '');
+    await compactCommand.action!(context, '');
     await new Promise((r) => setTimeout(r, 0));
 
     expect(context.ui.addItem).toHaveBeenCalledWith(
@@ -116,7 +116,7 @@ describe('compressCommand', () => {
     const error = new Error('Compression failed');
     mockTryCompressChat.mockRejectedValue(error);
 
-    await compressCommand.action!(context, '');
+    await compactCommand.action!(context, '');
     await new Promise((r) => setTimeout(r, 0));
 
     expect(context.ui.addItem).toHaveBeenCalledWith(
@@ -131,16 +131,15 @@ describe('compressCommand', () => {
 
   it('should clear the pending item in a finally block', async () => {
     mockTryCompressChat.mockRejectedValue(new Error('some error'));
-    await compressCommand.action!(context, '');
+    await compactCommand.action!(context, '');
     await new Promise((r) => setTimeout(r, 0));
     expect(context.ui.setPendingItem).toHaveBeenCalledWith(null);
   });
 
   describe('metadata', () => {
     it('should have the correct name and aliases', () => {
-      expect(compressCommand.name).toBe('compress');
-      expect(compressCommand.altNames).toContain('summarize');
-      expect(compressCommand.altNames).toContain('compact');
+      expect(compactCommand.name).toBe('compact');
+      expect(compactCommand.altNames).toContain('compress');
     });
   });
 });

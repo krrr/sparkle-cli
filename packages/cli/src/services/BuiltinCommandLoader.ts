@@ -11,21 +11,19 @@ import type { Config } from 'sparkle-cli-core';
 import { isNightly, startupProfiler } from 'sparkle-cli-core';
 import { aboutCommand } from '../ui/commands/aboutCommand.js';
 import { agentsCommand } from '../ui/commands/agentsCommand.js';
-import { authCommand } from '../ui/commands/authCommand.js';
+import { providerCommand } from '../ui/commands/providerCommand.js';
 import { bugMemoryCommand } from '../ui/commands/bugMemoryCommand.js';
 import { clearCommand } from '../ui/commands/clearCommand.js';
 import { commandsCommand } from '../ui/commands/commandsCommand.js';
-import { compressCommand } from '../ui/commands/compressCommand.js';
+import { compactCommand } from '../ui/commands/compactCommand.js';
 import { copyCommand } from '../ui/commands/copyCommand.js';
 import { corgiCommand } from '../ui/commands/corgiCommand.js';
-import { docsCommand } from '../ui/commands/docsCommand.js';
 import { exportSessionCommand } from '../ui/commands/exportSessionCommand.js';
 import { directoryCommand } from '../ui/commands/directoryCommand.js';
 import { editorCommand } from '../ui/commands/editorCommand.js';
 import { extensionsCommand } from '../ui/commands/extensionsCommand.js';
 import { footerCommand } from '../ui/commands/footerCommand.js';
 import { helpCommand } from '../ui/commands/helpCommand.js';
-import { shortcutsCommand } from '../ui/commands/shortcutsCommand.js';
 import { rewindCommand } from '../ui/commands/rewindCommand.js';
 import { hooksCommand } from '../ui/commands/hooksCommand.js';
 import { ideCommand } from '../ui/commands/ideCommand.js';
@@ -103,21 +101,19 @@ export class BuiltinCommandLoader implements ICommandLoader {
     const allDefinitions: Array<SlashCommand | null> = [
       aboutCommand,
       ...(this.config?.isAgentsEnabled() ? [agentsCommand] : []),
-      authCommand,
+      providerCommand,
       bugMemoryCommand,
       clearCommand,
       commandsCommand,
-      compressCommand,
+      compactCommand,
       copyCommand,
       corgiCommand,
-      docsCommand,
       exportSessionCommand,
       directoryCommand,
       editorCommand,
       extensionsCommand(this.config?.getEnableExtensionReloading()),
       helpCommand,
       footerCommand,
-      shortcutsCommand,
       ...(this.config?.getEnableHooksUI() ? [hooksCommand] : []),
       rewindCommand,
       await ideCommand(),
