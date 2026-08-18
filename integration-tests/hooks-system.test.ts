@@ -2348,7 +2348,7 @@ console.log(JSON.stringify({
           const run = await rig.runInteractive();
 
           // Wait for prompt to appear
-          await run.expectText('Type your message', 30000);
+          await run.expectText('Type a prompt', 30000);
 
           // Send prompt that will trigger write_file
           await run.type(
@@ -2450,7 +2450,7 @@ console.log(JSON.stringify({
           const run = await rig.runInteractive();
 
           // Wait for prompt to appear
-          await run.expectText('Type your message', 30000);
+          await run.expectText('Type a prompt', 30000);
 
           await run.type(
             'Create a file called cancel-test.txt with content "test"',

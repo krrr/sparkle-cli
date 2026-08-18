@@ -717,7 +717,7 @@ export class AppRig {
   }
 
   async waitForIdle(timeout = 20000) {
-    await this.waitForOutput('Type your message', timeout);
+    await this.waitForOutput('Type a prompt', timeout);
   }
 
   async sendMessage(text: string) {

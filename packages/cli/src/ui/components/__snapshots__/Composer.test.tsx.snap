@@ -5,20 +5,20 @@ exports[`Composer > Snapshots > matches snapshot in idle state 1`] = `
                                                                                     ? for shortcuts
 ────────────────────────────────────────────────────────────────────────────────────────────────────
  ApprovalModeIndicator: default                                                        StatusDisplay
-InputPrompt:   Type your message or @path/to/file
+InputPrompt:   Type a prompt (@ files, / commands, Ctrl+Enter: new line)
 Footer
 "
 `;
 
 exports[`Composer > Snapshots > matches snapshot in minimal UI mode 1`] = `
 "                                                                           press tab twice for more
-InputPrompt:   Type your message or @path/to/file
+InputPrompt:   Type a prompt (@ files, / commands, Ctrl+Enter: new line)
 "
 `;
 
 exports[`Composer > Snapshots > matches snapshot in minimal UI mode while loading 1`] = `
 "LoadingIndicator                                                           press tab twice for more
-InputPrompt:   Type your message or @path/to/file
+InputPrompt:   Type a prompt (@ files, / commands, Ctrl+Enter: new line)
 "
 `;
 
@@ -28,8 +28,8 @@ exports[`Composer > Snapshots > matches snapshot in narrow view 1`] = `
 ────────────────────────────────────────
  ApprovalModeIndicator:     StatusDispl
  default                    ay
-InputPrompt:   Type your message or
-@path/to/file
+InputPrompt:   Type a prompt (@ files, /
+commands, Ctrl+Enter: new line)
 Footer
 "
 `;
@@ -39,7 +39,7 @@ exports[`Composer > Snapshots > matches snapshot while streaming 1`] = `
  LoadingIndicator: Thinking                                                         ? for shortcuts
 ────────────────────────────────────────────────────────────────────────────────────────────────────
  ApprovalModeIndicator: default                                                        StatusDisplay
-InputPrompt:   Type your message or @path/to/file
+InputPrompt:   Type a prompt (@ files, / commands, Ctrl+Enter: new line)
 Footer
 "
 `;

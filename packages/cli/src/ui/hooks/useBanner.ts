@@ -7,8 +7,6 @@
 import { useState, useEffect } from 'react';
 import { persistentState } from '../../utils/persistentState.js';
 import crypto from 'node:crypto';
-import chalk from 'chalk';
-import { getAntigravityInstallInfo } from '../utils/antigravityUtils.js';
 
 const DEFAULT_MAX_BANNER_SHOWN_COUNT = 5;
 
@@ -43,19 +41,10 @@ export function useBanner(bannerData: BannerData) {
   const currentBannerCount = bannerCounts[hashedText] || 0;
 
   const showBanner =
-    activeText !== '' &&
-    (currentBannerCount < DEFAULT_MAX_BANNER_SHOWN_COUNT ||
-      activeText.includes('Antigravity'));
+    activeText !== '' && currentBannerCount < DEFAULT_MAX_BANNER_SHOWN_COUNT;
 
   const rawBannerText = showBanner ? activeText : '';
-  let bannerText = rawBannerText.replace(/\\n/g, '\n');
-
-  if (showBanner && activeText.includes('Antigravity')) {
-    const info = getAntigravityInstallInfo();
-    if (info) {
-      bannerText += `\n \nTo install run "${chalk.bold(info.installCmd)}"`;
-    }
-  }
+  const bannerText = rawBannerText.replace(/\\n/g, '\n');
 
   useEffect(() => {
     if (showBanner && activeText) {

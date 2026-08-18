@@ -4067,7 +4067,7 @@ describe('InputPrompt', () => {
       const { stdout, unmount } = await renderWithProviders(
         <TestInputPrompt {...props} />,
       );
-      await waitFor(() => expect(stdout.lastFrame()).toContain('*'));
+      await waitFor(() => expect(stdout.lastFrame()).toContain('⚹'));
       expect(stdout.lastFrame()).toMatchSnapshot();
       unmount();
     });
