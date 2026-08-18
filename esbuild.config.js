@@ -68,11 +68,17 @@ const external = [
 
 const baseConfig = {
   bundle: true,
+  minify: true,
+  keepNames: true,
+  sourcemap: true,
   platform: 'node',
+  target: 'node20',
   format: 'esm',
   external,
   loader: { '.node': 'file' },
   write: true,
+  legalComments: 'none',
+  treeShaking: true,
 };
 
 const commonAliases = {

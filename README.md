@@ -6,7 +6,9 @@ from the shape of Gemini's icon.
 ## Main Changes
 
 - Add OpenAI API support (works well with DeepSeek v4)
+- Add multi LLM provider switching
 - Remove Google Cloud and Enterprise features (keep Gemini API)
+- Boost startup speed
 
 ## Installation
 

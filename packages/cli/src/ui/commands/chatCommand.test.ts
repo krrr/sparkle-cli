@@ -9,7 +9,12 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import type { SlashCommand, CommandContext } from './types.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import type { Content } from '@google/genai';
-import { ProviderType, type GeminiClient } from 'sparkle-cli-core';
+import {
+  ProviderType,
+  type GeminiClient,
+  uiTelemetryService,
+  type HistoryTurn,
+} from 'sparkle-cli-core';
 
 import * as fsPromises from 'node:fs/promises';
 import { debugCommand, chatCommand } from './chatCommand.js';
@@ -48,7 +53,7 @@ describe('chatCommand', () => {
   let mockGetHistory: ReturnType<typeof vi.fn>;
 
   const getSubCommand = (
-    name: 'list' | 'save' | 'resume' | 'delete' | 'share',
+    name: 'list' | 'save' | 'resume' | 'delete' | 'share' | 'fork',
   ): SlashCommand => {
     const subCommand = chatCommand.subCommands?.find(
       (cmd) => cmd.name === name,
@@ -63,6 +68,7 @@ describe('chatCommand', () => {
     mockGetHistory = vi.fn().mockReturnValue([]);
     mockGetChat = vi.fn().mockReturnValue({
       getHistory: mockGetHistory,
+      getDurableHistoryTurns: mockGetHistory,
     });
     mockSaveCheckpoint = vi.fn().mockResolvedValue(undefined);
     mockLoadCheckpoint = vi.fn().mockResolvedValue({ history: [] });
@@ -113,7 +119,7 @@ describe('chatCommand', () => {
       'Browse auto-saved conversations and manage chat checkpoints',
     );
     expect(chatCommand.autoExecute).toBe(true);
-    expect(chatCommand.subCommands).toHaveLength(6);
+    expect(chatCommand.subCommands).toHaveLength(7);
   });
 
   it('should expose unified chat subcommands directly under /chat', () => {
@@ -122,7 +128,14 @@ describe('chatCommand', () => {
       .map((subCommand) => subCommand.name);
 
     expect(visibleSubCommandNames).toEqual(
-      expect.arrayContaining(['list', 'save', 'resume', 'delete', 'share']),
+      expect.arrayContaining([
+        'list',
+        'save',
+        'resume',
+        'delete',
+        'share',
+        'fork',
+      ]),
     );
   });
 
@@ -207,7 +220,10 @@ describe('chatCommand', () => {
       });
 
       mockGetHistory.mockReturnValue([
-        { role: 'user', parts: [{ text: 'context for our chat' }] },
+        {
+          id: 'env',
+          content: { role: 'user', parts: [{ text: 'context for our chat' }] },
+        },
       ]);
       result = await saveCommand?.action?.(mockContext, tag);
       expect(result).toEqual({
@@ -217,9 +233,24 @@ describe('chatCommand', () => {
       });
 
       mockGetHistory.mockReturnValue([
-        { role: 'user', parts: [{ text: 'context for our chat' }] },
-        { role: 'model', parts: [{ text: 'Got it. Thanks for the context!' }] },
-        { role: 'user', parts: [{ text: 'Hello, how are you?' }] },
+        {
+          id: 'env',
+          content: { role: 'user', parts: [{ text: 'context for our chat' }] },
+        },
+        {
+          id: 'model-1',
+          content: {
+            role: 'model',
+            parts: [{ text: 'Got it. Thanks for the context!' }],
+          },
+        },
+        {
+          id: 'user-1',
+          content: {
+            role: 'user',
+            parts: [{ text: 'Hello, how are you?' }],
+          },
+        },
       ]);
       result = await saveCommand?.action?.(mockContext, tag);
       expect(result).toEqual({
@@ -250,18 +281,61 @@ describe('chatCommand', () => {
     });
 
     it('should save the conversation if overwrite is confirmed', async () => {
-      const history: Content[] = [
-        { role: 'user', parts: [{ text: 'context for our chat' }] },
-        { role: 'user', parts: [{ text: 'hello' }] },
+      const historyTurns = [
+        {
+          id: 'env',
+          content: { role: 'user', parts: [{ text: 'context for our chat' }] },
+        },
+        {
+          id: 'user-1',
+          content: { role: 'user', parts: [{ text: 'hello' }] },
+        },
       ];
-      mockGetHistory.mockReturnValue(history);
+      mockGetHistory.mockReturnValue(historyTurns);
       mockContext.overwriteConfirmed = true;
 
       const result = await saveCommand?.action?.(mockContext, tag);
 
       expect(mockCheckpointExists).not.toHaveBeenCalled(); // Should skip existence check
       expect(mockSaveCheckpoint).toHaveBeenCalledWith(
-        { history, authType: ProviderType.USE_GEMINI },
+        {
+          history: historyTurns.map((t) => t.content),
+          authType: ProviderType.USE_GEMINI,
+        },
+        tag,
+      );
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'info',
+        content: `Conversation checkpoint saved with tag: ${tag}.`,
+      });
+    });
+
+    it('should extract Content from HistoryTurn objects when saving', async () => {
+      const historyTurns = [
+        {
+          id: 'env-1',
+          content: { role: 'user', parts: [{ text: 'context' }] },
+        },
+        {
+          id: 'turn-1',
+          content: { role: 'user', parts: [{ text: 'First user prompt' }] },
+        },
+        {
+          id: 'turn-2',
+          content: { role: 'model', parts: [{ text: 'Model reply' }] },
+        },
+      ];
+      mockGetHistory.mockReturnValue(historyTurns);
+      mockContext.overwriteConfirmed = true;
+
+      const result = await saveCommand?.action?.(mockContext, tag);
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        {
+          history: historyTurns.map((t) => t.content),
+          authType: ProviderType.USE_GEMINI,
+        },
         tag,
       );
       expect(result).toEqual({
@@ -639,6 +713,164 @@ describe('chatCommand', () => {
         history: mockHistory,
         filePath: expectedPath,
       });
+    });
+  });
+
+  describe('fork subcommand', () => {
+    let forkCommand: SlashCommand;
+    const mockHistory: HistoryTurn[] = [
+      { id: 'env', content: { role: 'user', parts: [{ text: 'context' }] } },
+      {
+        id: 'model-1',
+        content: { role: 'model', parts: [{ text: 'context response' }] },
+      },
+      { id: 'user-1', content: { role: 'user', parts: [{ text: 'Hello' }] } },
+      {
+        id: 'model-2',
+        content: { role: 'model', parts: [{ text: 'Hi there!' }] },
+      },
+    ];
+
+    let mockStartChat: ReturnType<typeof vi.fn>;
+    let mockResetNewSessionState: ReturnType<typeof vi.fn>;
+    let mockRefreshMemory: ReturnType<typeof vi.fn>;
+    let mockSaveSummary: ReturnType<typeof vi.fn>;
+    let mockGetConversation: ReturnType<typeof vi.fn>;
+    let mockClearInjections: ReturnType<typeof vi.fn>;
+    let mockClearTelemetry: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      forkCommand = getSubCommand('fork');
+      mockStartChat = vi.fn().mockResolvedValue(undefined);
+      mockResetNewSessionState = vi.fn();
+      mockRefreshMemory = vi.fn().mockResolvedValue(undefined);
+      mockSaveSummary = vi.fn();
+      mockGetConversation = vi.fn().mockReturnValue(null);
+      mockClearInjections = vi.fn();
+      mockClearTelemetry = vi.spyOn(uiTelemetryService, 'clear');
+      mockGetHistory.mockReturnValue(mockHistory);
+
+      mockContext.services.agentContext = {
+        config: {
+          resetNewSessionState: mockResetNewSessionState,
+          injectionService: {
+            clear: mockClearInjections,
+          },
+          getMemoryContextManager: () => ({ refresh: mockRefreshMemory }),
+        },
+        geminiClient: {
+          getChat: mockGetChat,
+          startChat: mockStartChat,
+          getChatRecordingService: () => ({
+            getConversation: mockGetConversation,
+            saveSummary: mockSaveSummary,
+          }),
+        } as unknown as GeminiClient,
+      } as unknown as CommandContext['services']['agentContext'];
+      mockContext.ui.clear = vi.fn();
+      mockContext.ui.loadHistory = vi.fn();
+    });
+
+    it('should error if there is no chat client', async () => {
+      mockContext.services.agentContext = null;
+      const result = await forkCommand?.action?.(mockContext, '');
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: 'No chat client available to fork conversation.',
+      });
+    });
+
+    it('should inform if there is no conversation to fork', async () => {
+      mockGetHistory.mockReturnValue([
+        { id: 'env', content: { role: 'user', parts: [{ text: 'context' }] } },
+      ]);
+      const result = await forkCommand?.action?.(mockContext, '');
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'info',
+        content: 'No conversation found to fork.',
+      });
+      expect(mockStartChat).not.toHaveBeenCalled();
+    });
+
+    it('should fork the conversation into a new session', async () => {
+      const result = await forkCommand?.action?.(mockContext, '');
+
+      expect(mockClearInjections).toHaveBeenCalled();
+      expect(mockResetNewSessionState).toHaveBeenCalledWith(expect.any(String));
+      expect(mockClearTelemetry).toHaveBeenCalledWith(expect.any(String));
+      expect(mockStartChat).toHaveBeenCalledWith(mockHistory);
+      expect(mockSaveSummary).toHaveBeenCalledWith('Fork: Hello');
+      expect(mockRefreshMemory).toHaveBeenCalled();
+      expect(mockContext.ui.loadHistory).toHaveBeenCalledWith([
+        { id: 1, type: 'gemini', text: 'context response' },
+        { id: 2, type: 'user', text: 'Hello' },
+        { id: 3, type: 'gemini', text: 'Hi there!' },
+      ]);
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'info',
+        content: 'Conversation forked into a new session.',
+      });
+    });
+
+    it('should report an error if starting the new chat fails', async () => {
+      mockStartChat.mockRejectedValue(new Error('boom'));
+      const result = await forkCommand?.action?.(mockContext, '');
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: 'Error forking conversation: boom',
+      });
+    });
+
+    it('should use a fallback summary label when there is no user text', async () => {
+      mockGetHistory.mockReturnValue([
+        { id: 'env', content: { role: 'user', parts: [{ text: 'context' }] } },
+        {
+          id: 'model-1',
+          content: { role: 'model', parts: [{ text: 'response' }] },
+        },
+      ]);
+      await forkCommand?.action?.(mockContext, '');
+      expect(mockSaveSummary).toHaveBeenCalledWith('Fork: Untitled');
+    });
+
+    it('should prefer the original session summary over the first user message', async () => {
+      mockGetConversation.mockReturnValue({ summary: 'Add dark mode' });
+      await forkCommand?.action?.(mockContext, '');
+      expect(mockSaveSummary).toHaveBeenCalledWith('Fork: Add dark mode');
+    });
+
+    it('should correctly process HistoryTurn objects from getDurableHistoryTurns', async () => {
+      const historyTurns = [
+        {
+          id: 'env-1',
+          content: {
+            role: 'user',
+            parts: [{ text: '<session_context>initial</session_context>' }],
+          },
+        },
+        {
+          id: 'turn-1',
+          content: { role: 'user', parts: [{ text: 'User prompt' }] },
+        },
+        {
+          id: 'turn-2',
+          content: { role: 'model', parts: [{ text: 'Model reply' }] },
+        },
+      ];
+      mockGetHistory.mockReturnValue(historyTurns);
+
+      await forkCommand?.action?.(mockContext, '');
+
+      expect(mockStartChat).toHaveBeenCalledWith(historyTurns);
+      expect(mockSaveSummary).toHaveBeenCalledWith('Fork: User prompt');
+      expect(mockContext.ui.loadHistory).toHaveBeenCalledWith([
+        { id: 1, type: 'user', text: 'User prompt' },
+        { id: 2, type: 'gemini', text: 'Model reply' },
+      ]);
     });
   });
 
