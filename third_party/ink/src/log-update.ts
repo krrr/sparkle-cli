@@ -197,6 +197,7 @@ const createStandard = (
 	let previousColumns = 0;
 	let hasHiddenCursor = false;
 	let isFirstRender = true;
+	let needsFinalNewline = false;
 	let previousCursorPosition: CursorPosition | undefined;
 
 	if (alternateBuffer) {
@@ -328,6 +329,7 @@ const createStandard = (
 
 		previousOutput = output;
 		previousLineCount = contentLineCount;
+		needsFinalNewline = true;
 		let outputToWrite = buffer;
 
 		if (debugRainbowColor) {
@@ -368,12 +370,27 @@ const createStandard = (
 		stream.write(buffer + ansiEscapes.eraseLines(previousLineCount));
 		previousOutput = '';
 		previousLineCount = 0;
+		needsFinalNewline = false;
 	};
 
 	render.done = () => {
 		const lastFrame = previousOutput;
+
+		if (!alternateBuffer && needsFinalNewline) {
+			let buffer = '';
+			if (previousCursorPosition) {
+				const moveDown = previousLineCount - 1 - previousCursorPosition.row;
+				if (moveDown > 0) {
+					buffer += ansiEscapes.cursorDown(moveDown);
+				}
+			}
+
+			stream.write(buffer + ansiEscapes.cursorNextLine);
+		}
+
 		previousOutput = '';
 		previousLineCount = 0;
+		needsFinalNewline = false;
 
 		if (!showCursor) {
 			ensureCursorShown(showCursor, stream);
@@ -396,6 +413,7 @@ const createStandard = (
 		// [sparkle patch] Track content lines (not the trailing newline) so
 		// erase accounting matches the lines actually written.
 		previousLineCount = str.split('\n').length;
+		needsFinalNewline = false;
 	};
 
 	return render;

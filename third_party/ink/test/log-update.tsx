@@ -16,13 +16,48 @@ test('standard rendering - renders and updates output', t => {
 
 	render('Hello');
 	t.is((stdout.write as any).callCount, 1);
-	t.is((stdout.write as any).firstCall.args[0], 'Hello\n');
+	t.false(((stdout.write as any).firstCall.args[0] as string).endsWith('\n'));
 
 	render('World');
 	t.is((stdout.write as any).callCount, 2);
 	t.true(
 		((stdout.write as any).secondCall.args[0] as string).includes('World'),
 	);
+});
+
+test('standard rendering - done() moves prompt to the next line after newline-free frame', t => {
+	const stdout = createStdout();
+	const render = logUpdate.create(stdout);
+
+	render('Hello');
+	const renderOutput = (stdout.write as any).firstCall.args[0] as string;
+	t.false(renderOutput.endsWith('\n'));
+
+	const writesBeforeDone = (stdout.write as any).callCount;
+	render.done();
+	const doneWrites = (stdout.write as any).getCalls().slice(writesBeforeDone);
+	const doneOutput = doneWrites.map((call: any) => call.args[0]).join('');
+	t.true(doneOutput.includes(ansiEscapes.cursorNextLine));
+
+	render.done();
+	t.is((stdout.write as any).callCount, writesBeforeDone + doneWrites.length);
+});
+
+test('standard rendering - done() returns to the final content row before newline', t => {
+	const stdout = createStdout();
+	const render = logUpdate.create(stdout);
+
+	render('Line 1\nLine 2\nLine 3', [], undefined, {row: 0, col: 0});
+	const writesBeforeDone = (stdout.write as any).callCount;
+	render.done();
+
+	const doneOutput = (stdout.write as any)
+		.getCalls()
+		.slice(writesBeforeDone)
+		.map((call: any) => call.args[0])
+		.join('');
+	t.true(doneOutput.includes(ansiEscapes.cursorDown(2)));
+	t.true(doneOutput.includes(ansiEscapes.cursorNextLine));
 });
 
 test('standard rendering - skips identical output', t => {

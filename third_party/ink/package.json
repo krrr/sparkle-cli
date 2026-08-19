@@ -20,7 +20,7 @@
 	"scripts": {
 		"dev": "tsc --watch",
 		"build": "tsc",
-		"test": "tsc --noEmit",
+		"test1": "tsc --noEmit && ava",
 		"example": "NODE_NO_WARNINGS=1 node --loader ts-node/esm",
 		"benchmark": "NODE_NO_WARNINGS=1 node --loader ts-node/esm"
 	},

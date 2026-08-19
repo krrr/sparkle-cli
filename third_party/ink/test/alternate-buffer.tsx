@@ -9,7 +9,7 @@ import ansiEscapes from 'ansi-escapes';
 import stripAnsi from 'strip-ansi';
 import {run} from './helpers/run.js';
 
-const enterSynchronizedOutput = '\u001B[[?2026h';
+const enterSynchronizedOutput = '\u001B[?2026h';
 const exitSynchronizedOutput = '\u001B[?2026l';
 
 const scenarios: Array<{
