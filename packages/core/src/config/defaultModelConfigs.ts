@@ -214,13 +214,11 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
 
     // OpenAI-compatible providers (used with the 'openai' auth type).
     'deepseek-base': {
-      extends: 'base',
+      extends: 'chat-base',
       modelConfig: {
         model: 'deepseek-v4-flash',
-        generateContentConfig: {
-          temperature: 1, // temperature will be ignored when thinking mode enabled
-          // default setting: thinking enabled, effort=high
-        },
+        // temperature will be ignored when thinking mode enabled
+        // official default setting: thinking enabled, effort=high
       },
     },
     'deepseek-v4-flash': {
