@@ -329,51 +329,6 @@ describe('handleAutoUpdate', () => {
     });
   });
 
-  it('should use the "@nightly" tag for nightly updates', async () => {
-    mockUpdateInfo = {
-      ...mockUpdateInfo,
-      update: {
-        ...mockUpdateInfo.update,
-        current: '1.0.0-nightly.0',
-        latest: '2.0.0-nightly.1',
-      },
-    };
-    mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm i -g sparkle-cli@latest',
-      updateMessage: 'This is an additional message.',
-      isGlobal: false,
-      packageManager: PackageManager.NPM,
-    });
-
-    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', false, mockSpawn);
-
-    expect(mockSpawn).toHaveBeenCalledWith('npm i -g sparkle-cli@nightly', {
-      shell: true,
-      stdio: 'ignore',
-      detached: true,
-    });
-  });
-
-  it('should NOT update if target is less stable than current (defense-in-depth)', async () => {
-    mockUpdateInfo = {
-      ...mockUpdateInfo,
-      update: {
-        ...mockUpdateInfo.update,
-        current: '1.0.0',
-        latest: '1.1.0-nightly.1',
-      },
-    };
-    mockGetInstallationInfo.mockReturnValue({
-      updateCommand: 'npm i -g sparkle-cli@latest',
-      isGlobal: false,
-      packageManager: PackageManager.NPM,
-    });
-
-    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', false, mockSpawn);
-
-    expect(mockSpawn).not.toHaveBeenCalled();
-  });
-
   it('should emit "update-success" when the update process succeeds', async () => {
     await new Promise<void>((resolve) => {
       mockGetInstallationInfo.mockReturnValue({

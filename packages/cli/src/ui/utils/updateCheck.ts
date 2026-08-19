@@ -6,12 +6,7 @@
 
 import latestVersion from 'latest-version';
 import semver from 'semver';
-import {
-  getPackageJson,
-  debugLogger,
-  getChannelFromVersion,
-  RELEASE_CHANNEL_STABILITY,
-} from 'sparkle-cli-core';
+import { getPackageJson, debugLogger } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -35,24 +30,6 @@ export interface UpdateObject {
   isUpdating?: boolean;
 }
 
-/**
- * From a nightly and stable version, determines which is the "best" one to offer.
- * The rule is to always prefer nightly if the base versions are the same.
- */
-function getBestAvailableUpdate(
-  nightly?: string,
-  stable?: string,
-): string | null {
-  if (!nightly) return stable || null;
-  if (!stable) return nightly || null;
-
-  if (semver.coerce(stable)?.version === semver.coerce(nightly)?.version) {
-    return nightly;
-  }
-
-  return semver.gt(stable, nightly) ? stable : nightly;
-}
-
 export async function checkForUpdates(
   settings: LoadedSettings,
 ): Promise<UpdateObject | null> {
@@ -70,59 +47,23 @@ export async function checkForUpdates(
     }
 
     const { name, version: currentVersion } = packageJson;
-    const currentChannel = getChannelFromVersion(currentVersion);
-    const isNightly = currentVersion.includes('nightly');
+    const latestUpdate = await latestVersion(name);
+    if (!latestUpdate) {
+      return null;
+    }
 
-    if (isNightly) {
-      const [nightlyUpdate, latestUpdate] = await Promise.all([
-        latestVersion(name, { version: 'nightly' }),
-        latestVersion(name),
-      ]);
-
-      const bestUpdate = getBestAvailableUpdate(nightlyUpdate, latestUpdate);
-
-      if (bestUpdate && semver.gt(bestUpdate, currentVersion)) {
-        const message = `A new version of Sparkle CLI is available! ${currentVersion} → ${bestUpdate}`;
-        const type = semver.diff(bestUpdate, currentVersion) || undefined;
-        return {
-          message,
-          update: {
-            latest: bestUpdate,
-            current: currentVersion,
-            name,
-            type,
-          },
-        };
-      }
-    } else {
-      const latestUpdate = await latestVersion(name);
-      if (!latestUpdate) {
-        return null;
-      }
-
-      const targetChannel = getChannelFromVersion(latestUpdate);
-
-      // Only offer updates that are as stable or more stable than the current version
-      if (
-        RELEASE_CHANNEL_STABILITY[targetChannel] <
-        RELEASE_CHANNEL_STABILITY[currentChannel]
-      ) {
-        return null;
-      }
-
-      if (semver.gt(latestUpdate, currentVersion)) {
-        const message = `Sparkle CLI update available! ${currentVersion} → ${latestUpdate}`;
-        const type = semver.diff(latestUpdate, currentVersion) || undefined;
-        return {
-          message,
-          update: {
-            latest: latestUpdate,
-            current: currentVersion,
-            name,
-            type,
-          },
-        };
-      }
+    if (semver.gt(latestUpdate, currentVersion)) {
+      const message = `Sparkle CLI update available! ${currentVersion} → ${latestUpdate}`;
+      const type = semver.diff(latestUpdate, currentVersion) || undefined;
+      return {
+        message,
+        update: {
+          latest: latestUpdate,
+          current: currentVersion,
+          name,
+          type,
+        },
+      };
     }
 
     return null;

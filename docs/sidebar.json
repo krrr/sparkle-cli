@@ -283,11 +283,7 @@
     "items": [
       {
         "label": "Releases",
-        "items": [
-          { "label": "Release notes", "slug": "docs/changelogs/" },
-          { "label": "Stable release", "slug": "docs/changelogs/latest" },
-          { "label": "Preview release", "slug": "docs/changelogs/preview" }
-        ]
+        "items": [{ "label": "Release notes", "slug": "docs/changelogs" }]
       }
     ]
   }

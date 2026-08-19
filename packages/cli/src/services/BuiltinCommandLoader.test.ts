@@ -52,18 +52,10 @@ vi.mock('../ui/commands/permissionsCommand.js', async () => {
 
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { BuiltinCommandLoader } from './BuiltinCommandLoader.js';
-import { isNightly, type Config } from 'sparkle-cli-core';
+import { type Config } from 'sparkle-cli-core';
 import { CommandKind } from '../ui/commands/types.js';
 
 import { restoreCommand } from '../ui/commands/restoreCommand.js';
-
-vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
-  return {
-    ...actual,
-    isNightly: vi.fn().mockResolvedValue(false),
-  };
-});
 
 vi.mock('../ui/commands/authCommand.js', () => ({ authCommand: {} }));
 vi.mock('../ui/commands/agentsCommand.js', () => ({
@@ -155,6 +147,7 @@ describe('BuiltinCommandLoader', () => {
       getContentGeneratorConfig: vi.fn().mockReturnValue({
         authType: 'other',
       }),
+      getDebugMode: vi.fn().mockReturnValue(false),
     } as unknown as Config;
 
     restoreCommandMock.mockReturnValue({
@@ -271,8 +264,8 @@ describe('BuiltinCommandLoader', () => {
   });
 
   describe('chat command (with resume alias) debug subcommand', () => {
-    it('should NOT add debug subcommand to the chat command if not a nightly build', async () => {
-      vi.mocked(isNightly).mockResolvedValue(false);
+    it('should NOT add debug subcommand to the chat command when debug mode is disabled', async () => {
+      (mockConfig.getDebugMode as Mock).mockReturnValue(false);
       const loader = new BuiltinCommandLoader(mockConfig);
       const commands = await loader.loadCommands(new AbortController().signal);
 
@@ -291,8 +284,8 @@ describe('BuiltinCommandLoader', () => {
       expect(chatCheckpointHasDebug).toBe(false);
     });
 
-    it('should add debug subcommand to the chat command if it is a nightly build', async () => {
-      vi.mocked(isNightly).mockResolvedValue(true);
+    it('should add debug subcommand to the chat command when debug mode is enabled', async () => {
+      (mockConfig.getDebugMode as Mock).mockReturnValue(true);
       const loader = new BuiltinCommandLoader(mockConfig);
       const commands = await loader.loadCommands(new AbortController().signal);
 
@@ -336,6 +329,7 @@ describe('BuiltinCommandLoader profile', () => {
       getContentGeneratorConfig: vi.fn().mockReturnValue({
         authType: 'other',
       }),
+      getDebugMode: vi.fn().mockReturnValue(false),
     } as unknown as Config;
   });
 

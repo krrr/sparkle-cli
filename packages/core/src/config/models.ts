@@ -7,7 +7,6 @@
 export interface ModelResolutionContext {
   useCustomTools?: boolean;
   requestedModel?: string;
-  releaseChannel?: string;
 }
 
 /**
@@ -18,7 +17,6 @@ export interface IModelConfigService {
     | {
         tier?: string;
         family?: string;
-        isPreview?: boolean;
         displayName?: string;
         features?: {
           thinking?: boolean;

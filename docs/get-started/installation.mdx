@@ -153,45 +153,12 @@ You can also run Sparkle CLI using one of the following advanced methods:
 
 ## Releases
 
-Sparkle CLI has three release channels: stable, preview, and nightly. For most
-users, we recommend the stable release, which is the default installation.
+Every release of Sparkle CLI is a stable release. The `latest` tag on npm is
+always the current version, and omitting the tag installs the latest release by
+default.
 
-<Tabs>
-  <TabItem label="Stable">
-
-  Stable releases are published each week. A stable release is created from the
-  previous week's preview release along with any bug fixes. The stable release
-  uses the `latest` tag. Omitting the tag also installs the latest stable
-  release by default.
-
-  ```bash
-  # Both commands install the latest stable release.
-  npm install -g sparkle-cli
-  npm install -g sparkle-cli@latest
-  ```
-
-  </TabItem>
-  <TabItem label="Preview">
-
-  New preview releases will be published each week. These releases are not fully
-  vetted and may contain regressions or other outstanding issues. Try out the
-  preview release by using the `preview` tag:
-
-  ```bash
-  npm install -g sparkle-cli@preview
-  ```
-
-  </TabItem>
-  <TabItem label="Nightly">
-
-  Nightly releases are published every day. The nightly release includes all
-  changes from the main branch at time of release. It should be assumed there are
-  pending validations and issues. You can help test the latest changes by
-  installing with the `nightly` tag:
-
-  ```bash
-  npm install -g sparkle-cli@nightly
-  ```
-
-  </TabItem>
-</Tabs>
+```bash
+# Both commands install the latest release.
+npm install -g sparkle-cli
+npm install -g sparkle-cli@latest
+```

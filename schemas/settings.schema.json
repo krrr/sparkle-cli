@@ -3331,9 +3331,6 @@
         "family": {
           "type": "string"
         },
-        "isPreview": {
-          "type": "boolean"
-        },
         "isVisible": {
           "type": "boolean"
         },

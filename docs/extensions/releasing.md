@@ -46,16 +46,14 @@ Whenever you push commits to the referenced branch, the CLI prompts users to
 update their installation. The `HEAD` commit is always treated as the latest
 version.
 
-### Manage release channels
+### Manage versions with branches
 
-You can use branches or tags to manage different release channels, such as
-`stable`, `preview`, or `dev`.
+You can use branches to manage different versions, such as `stable` and `dev`.
 
-We recommend using your default branch as the stable release channel. This
-ensures that the default installation command always provides the most reliable
-version of your extension. You can then use a `dev` branch for active
-development and merge it into the default branch when you are ready for a
-release.
+We recommend using your default branch as the stable version. This ensures that
+the default installation command always provides the most reliable version of
+your extension. You can then use a `dev` branch for active development and merge
+it into the default branch when you are ready for a release.
 
 ## Release through GitHub Releases
 

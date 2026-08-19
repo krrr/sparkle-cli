@@ -11,11 +11,7 @@ import { updateEventEmitter } from './updateEventEmitter.js';
 import { MessageType, type HistoryItem } from '../ui/types.js';
 import { spawnWrapper } from './spawnWrapper.js';
 import type { spawn } from 'node:child_process';
-import {
-  debugLogger,
-  getChannelFromVersion,
-  RELEASE_CHANNEL_STABILITY,
-} from 'sparkle-cli-core';
+import { debugLogger } from 'sparkle-cli-core';
 
 let _updateInProgress = false;
 
@@ -135,22 +131,9 @@ export function handleAutoUpdate(
     return;
   }
 
-  const currentChannel = getChannelFromVersion(currentVersion);
-  const targetChannel = getChannelFromVersion(info.update.latest);
-
-  // Defense-in-depth: prevent updates to a less stable channel
-  if (
-    RELEASE_CHANNEL_STABILITY[targetChannel] <
-    RELEASE_CHANNEL_STABILITY[currentChannel]
-  ) {
-    return;
-  }
-
-  const isNightly = info.update.latest.includes('nightly');
-
   const updateCommand = installationInfo.updateCommand.replace(
     '@latest',
-    isNightly ? '@nightly' : `@${info.update.latest}`,
+    `@${info.update.latest}`,
   );
   const updateProcess = spawnFn(updateCommand, {
     stdio: 'ignore',

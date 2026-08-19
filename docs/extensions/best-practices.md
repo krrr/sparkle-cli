@@ -122,10 +122,10 @@ changes clearly.
 - **Minor:** New features (for example, adding new tools or commands).
 - **Patch:** Bug fixes and performance improvements.
 
-### Release channels
+### Branch-based releases
 
-Use Git branches to manage release channels. This lets users choose between
-stability and the latest features.
+Use Git branches to manage versions. The default branch is the stable version,
+and development branches let users opt in to the latest changes.
 
 ```bash
 # Install the stable version (default branch)

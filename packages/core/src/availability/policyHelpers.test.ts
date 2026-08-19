@@ -29,7 +29,6 @@ const createMockConfig = (overrides: Partial<Config> = {}): Config => {
     getModel: () => DEFAULT_GEMINI_MODEL,
     getContentGeneratorConfig: () => ({ authType: undefined }),
     getMaxAttemptsPerTurn: () => 3,
-    getReleaseChannel: () => 'preview',
     modelConfigService: new ModelConfigService(DEFAULT_MODEL_CONFIGS),
     ...overrides,
   } as unknown as Config;

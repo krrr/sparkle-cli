@@ -3092,7 +3092,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
       displayName: { type: 'string' },
       tier: { enum: ['pro', 'flash', 'flash-lite', 'custom', 'auto'] },
       family: { type: 'string' },
-      isPreview: { type: 'boolean' },
       isVisible: { type: 'boolean' },
       dialogDescription: {
         type: 'string',
