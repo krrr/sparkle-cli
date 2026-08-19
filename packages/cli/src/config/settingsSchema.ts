@@ -692,7 +692,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description: 'Hide the current working directory in the footer.',
-            showInDialog: true,
+            showInDialog: false,
           },
           hideSandboxStatus: {
             type: 'boolean',
@@ -701,7 +701,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description: 'Hide the sandbox status indicator in the footer.',
-            showInDialog: true,
+            showInDialog: false,
           },
           hideModelInfo: {
             type: 'boolean',
@@ -710,7 +710,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: false,
             description: 'Hide the model name and context usage in the footer.',
-            showInDialog: true,
+            showInDialog: false,
           },
           hideContextPercentage: {
             type: 'boolean',
@@ -719,7 +719,7 @@ const SETTINGS_SCHEMA = {
             requiresRestart: false,
             default: true,
             description: 'Hides the context window usage percentage.',
-            showInDialog: true,
+            showInDialog: false,
           },
         },
       },
