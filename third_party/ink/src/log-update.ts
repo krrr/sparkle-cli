@@ -229,6 +229,12 @@ const createStandard = (
 				// the cursor position.
 				if (lineCount > rows) {
 					alternateBufferOutput = lines.slice(0, rows).join('\n');
+				} else {
+					// [sparkle patch] Avoid appending the trailing newline that
+					// 'output' ('str + '\n'') adds, which would leave a blank
+					// row (or cause a scroll) right below the final content line
+					// at the bottom of the alternate buffer.
+					alternateBufferOutput = str;
 				}
 			}
 
@@ -294,7 +300,7 @@ const createStandard = (
 			return;
 		}
 
-		const lineCount = output.split('\n').length;
+		const contentLineCount = str.split('\n').length;
 		let buffer = '';
 
 		// Move cursor to end of previous output before erasing (only if we have previous cursor position)
@@ -308,23 +314,34 @@ const createStandard = (
 		// Always erase previous lines
 		buffer += ansiEscapes.eraseLines(previousLineCount);
 
-		buffer += output;
+		// [sparkle patch] Write the content WITHOUT the trailing newline that
+		// 'output' adds, so the cursor stays on the last content line (the
+		// footer) instead of leaving a blank row below it.
+		buffer += str;
 		isFirstRender = false;
 
 		if (cursorPosition) {
-			buffer += positionImeCursor(lineCount, cursorPosition);
+			buffer += positionImeCursor(contentLineCount, cursorPosition);
 		}
 
 		previousCursorPosition = cursorPosition;
 
 		previousOutput = output;
-		previousLineCount = lineCount;
+		previousLineCount = contentLineCount;
 		let outputToWrite = buffer;
 
 		if (debugRainbowColor) {
 			outputToWrite =
 				ansiEscapes.eraseLines(previousLineCount) +
-				colorize(output, debugRainbowColor, 'background');
+				colorize(str, debugRainbowColor, 'background');
+		}
+
+		// [sparkle patch] Wrap the erase+redraw in ANSI synchronized output
+		// so the terminal buffers the whole frame and renders it atomically,
+		// preventing flicker now that the trailing anchor line is gone.
+		if (enableSynchronizedOutput) {
+			outputToWrite =
+				enterSynchronizedOutput + outputToWrite + exitSynchronizedOutput;
 		}
 
 		stream.write(outputToWrite);
@@ -376,7 +393,9 @@ const createStandard = (
 
 		const output = str + '\n';
 		previousOutput = output;
-		previousLineCount = output.split('\n').length;
+		// [sparkle patch] Track content lines (not the trailing newline) so
+		// erase accounting matches the lines actually written.
+		previousLineCount = str.split('\n').length;
 	};
 
 	return render;

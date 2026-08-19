@@ -1430,7 +1430,7 @@ export const AppContainer = (props: AppContainerProps) => {
   // Compute available terminal height based on stable controls measurement
   const availableTerminalHeight = Math.max(
     0,
-    terminalHeight - stableControlsHeight - backgroundTaskHeight - 1,
+    terminalHeight - stableControlsHeight - backgroundTaskHeight,
   );
 
   config.setShellExecutionConfig({

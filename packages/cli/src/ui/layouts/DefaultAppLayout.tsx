@@ -26,14 +26,11 @@ export const DefaultAppLayout: React.FC = () => {
 
   const { rootUiRef, terminalHeight } = uiState;
   useFlickerDetector(rootUiRef, terminalHeight);
-  // If in alternate buffer mode, need to leave room to draw the scrollbar on
-  // the right side of the terminal.
   return (
     <Box
       flexDirection="column"
       width={uiState.terminalWidth}
       height={isAlternateBuffer ? terminalHeight : undefined}
-      paddingBottom={isAlternateBuffer ? 1 : undefined}
       flexShrink={0}
       flexGrow={0}
       ref={uiState.rootUiRef}
