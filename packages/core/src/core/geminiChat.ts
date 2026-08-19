@@ -31,6 +31,7 @@ import {
 } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
 import { resolveModel, supportsModernFeatures } from '../config/models.js';
+import { ProviderType } from '../config/constants.js';
 import { hasCycleInSchema } from '../tools/tools.js';
 import type { StructuredError } from './turn.js';
 import type { CompletedToolCall } from '../scheduler/types.js';
@@ -539,7 +540,14 @@ export class GeminiChat {
       }
     }
 
-    const requestHistory = this.getHistoryTurns(true);
+    // OpenAI-compatible endpoints (DeepSeek thinking mode) require the
+    // reasoning_content of tool-call turns to be passed back; keep thought
+    // parts for those paths so the message converter can derive it. Gemini
+    // paths strip thoughts at request time instead.
+    const preserveThoughts =
+      this.context.config.getContentGeneratorConfig()?.authType ===
+      ProviderType.USE_OPENAI;
+    const requestHistory = this.getHistoryTurns(true, preserveThoughts);
 
     const streamWithRetries = async function* (
       this: GeminiChat,
@@ -569,6 +577,7 @@ export class GeminiChat {
               signal,
               role,
               apiHistoryOverride,
+              preserveThoughts,
             );
             isConnectionPhase = false;
             for await (const chunk of stream) {
@@ -746,20 +755,20 @@ export class GeminiChat {
     abortSignal: AbortSignal,
     role: LlmRole,
     apiHistoryOverride?: Content[],
+    preserveThoughts: boolean = false,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
-    // Last mile scrubbing to remove internal tracking properties (e.g. callIndex)
-    // before sending to the Gemini API. This whitelists only standard Gemini fields.
-    let scrubbedHistory = this.context.config.isContextManagementEnabled()
-      ? scrubHistory([...requestHistory])
-      : [...requestHistory];
-
-    // Always coalesce consecutive roles to prevent 400 Bad Request errors
-    scrubbedHistory = coalesceConsecutiveRoles(scrubbedHistory);
+    // getHistoryTurns has already scrubbed the request history (thought
+    // stripping / field whitelisting based on preserveThoughts happens there).
+    // Only coalesce consecutive same-role turns here to prevent 400 Bad
+    // Request errors.
+    const scrubbedHistory = coalesceConsecutiveRoles([...requestHistory]);
 
     const scrubbedContents = scrubbedHistory.map((h) => h.content);
 
     const requestContents = apiHistoryOverride
-      ? scrubContents(apiHistoryOverride)
+      ? preserveThoughts
+        ? apiHistoryOverride
+        : scrubContents(apiHistoryOverride)
       : scrubbedContents;
 
     const contentsForPreviewModel =
@@ -1026,14 +1035,25 @@ export class GeminiChat {
 
   /**
    * Returns the chat history as HistoryTurns.
+   *
+   * @param curated - whether to return the curated history or the comprehensive
+   * history.
+   * @param preserveThoughts - when true, thought parts are kept (used by
+   * OpenAI-compatible request paths, which derive `reasoning_content` from
+   * them). Defaults to false: Gemini/Vertex replay strips thought parts.
    */
-  getHistoryTurns(curated: boolean = false): HistoryTurn[] {
+  getHistoryTurns(
+    curated: boolean = false,
+    preserveThoughts: boolean = false,
+  ): HistoryTurn[] {
     const history = curated
       ? extractCuratedHistory(this.agentHistory.get())
       : [...this.agentHistory.get()];
 
     if (this.context.config.isContextManagementEnabled()) {
-      return scrubHistory(history);
+      return preserveThoughts
+        ? coalesceConsecutiveRoles(history)
+        : scrubHistory(history);
     }
 
     const model = this.context.config.getModel();
@@ -1041,7 +1061,9 @@ export class GeminiChat {
     // features too), so history is always cleaned up for replay: strip
     // thought parts and merge consecutive same-role turns to avoid 400s.
     if (supportsModernFeatures(model)) {
-      return coalesceConsecutiveRoles(stripThoughts(history));
+      return preserveThoughts
+        ? coalesceConsecutiveRoles(history)
+        : coalesceConsecutiveRoles(stripThoughts(history));
     }
 
     return history;
@@ -1308,22 +1330,20 @@ export class GeminiChat {
 
           let localFunctionCallCounter = 0;
           modelResponseParts.push(
-            ...content.parts
-              .filter((part) => !part.thought)
-              .map((part) => {
-                if (!this.context.config.isContextManagementEnabled()) {
-                  return part;
-                }
-                let callIndex: number | undefined;
-                if (part.functionCall) {
-                  callIndex =
-                    currentChunkStartCounter + localFunctionCallCounter++;
-                }
-                return {
-                  ...part,
-                  callIndex,
-                };
-              }),
+            ...content.parts.map((part) => {
+              if (!this.context.config.isContextManagementEnabled()) {
+                return part;
+              }
+              let callIndex: number | undefined;
+              if (part.functionCall) {
+                callIndex =
+                  currentChunkStartCounter + localFunctionCallCounter++;
+              }
+              return {
+                ...part,
+                callIndex,
+              };
+            }),
           );
         }
       }
@@ -1418,7 +1438,7 @@ export class GeminiChat {
     }
 
     const rawResponseText = consolidatedParts
-      .filter((part) => part.text)
+      .filter((part) => part.text && !part.thought)
       .map((part) => part.text)
       .join('');
 

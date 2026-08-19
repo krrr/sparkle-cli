@@ -9,7 +9,6 @@ import {
   type Candidate,
   type Content,
   type ContentUnion,
-  type FunctionCall,
   FunctionCallingConfigMode,
   type GenerateContentConfig,
   GenerateContentResponse,
@@ -18,7 +17,6 @@ import {
   ThinkingLevel,
   type Tool,
 } from '@google/genai';
-import { createHash } from 'node:crypto';
 import { isRecord } from '../utils/markdownUtils.js';
 import type {
   OpenAiChatCompletion,
@@ -31,9 +29,7 @@ import type {
   OpenAiToolCallDelta,
   OpenAiUsage,
 } from './openAiTypes.js';
-
-/** A read-only view of the reasoning cache used for DeepSeek reasoning reuse. */
-export type ReasoningCache = ReadonlyMap<string, string>;
+import stableStringify from 'json-stable-stringify';
 
 /** OpenAI rejects requests with more than 128 function tools. */
 export const MAX_OPENAI_TOOLS = 128;
@@ -343,7 +339,6 @@ export function geminiContentsToOpenAiMessages(
   contents: Content[],
   options: {
     systemInstruction?: ContentUnion;
-    reasoningCache?: ReasoningCache;
     nameMapper?: FunctionNameMapper;
   } = {},
 ): OpenAiMessage[] {
@@ -396,7 +391,6 @@ export function geminiContentsToOpenAiMessages(
 function modelContentToOpenAiMessage(
   content: Content,
   options: {
-    reasoningCache?: ReasoningCache;
     nameMapper?: FunctionNameMapper;
   },
 ): OpenAiMessage | undefined {
@@ -425,21 +419,23 @@ function modelContentToOpenAiMessage(
           name: options.nameMapper
             ? options.nameMapper.toApiName(call.name ?? '')
             : (call.name ?? ''),
-          arguments: stableStringify(call.args ?? {}),
+          arguments: stableStringify(call.args ?? {})!,
         },
       };
     });
     message.tool_calls = toolCalls;
 
-    // Re-inject cached reasoning content for this exact set of function calls.
-    if (options.reasoningCache) {
-      const fingerprint = fingerprintFunctionCalls(
-        functionCalls.map((part) => part.functionCall!),
-      );
-      const reasoning = options.reasoningCache.get(fingerprint);
-      if (reasoning) {
-        message.reasoning_content = reasoning;
-      }
+    // DeepSeek's thinking mode requires the reasoning_content that accompanied
+    // a turn's tool calls to be passed back on follow-up requests. Derive it
+    // directly from the turn's own thought parts (which are kept in agent
+    // history), so no cross-turn cache state is needed. Turns without tool
+    // calls is not required to carry reasoning_content.
+    const thoughtText = parts
+      .filter((part) => part.thought && typeof part.text === 'string')
+      .map((part) => part.text)
+      .join('');
+    if (thoughtText) {
+      message.reasoning_content = thoughtText;
     }
   }
 
@@ -458,7 +454,7 @@ function functionResponseToContent(
   if (typeof response === 'string') {
     return response;
   }
-  return stableStringify(response);
+  return stableStringify(response)!;
 }
 
 function partsToUserMessage(parts: Part[]): OpenAiMessage {
@@ -555,40 +551,6 @@ export function openAiUsageToGeminiMetadata(
   return metadata;
 }
 
-/**
- * Serializes a value with deterministically ordered object keys, so that the
- * same object always produces the same string (used for reasoning-cache
- * fingerprints and tool call arguments).
- */
-export function stableStringify(value: unknown): string {
-  if (Array.isArray(value)) {
-    return `[${value.map((item) => stableStringify(item)).join(',')}]`;
-  }
-  if (isRecord(value)) {
-    const entries = Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`);
-    return `{${entries.join(',')}}`;
-  }
-  return JSON.stringify(value);
-}
-
-/**
- * Computes a stable fingerprint for a set of function calls. The fingerprint
- * is the key used to look up and store reasoning content in the reasoning
- * cache.
- */
-export function fingerprintFunctionCalls(calls: FunctionCall[]): string {
-  if (calls.length === 0) {
-    return '';
-  }
-  const normalized = calls.map((call) => ({
-    name: call.name ?? '',
-    args: stableStringify(call.args ?? {}),
-  }));
-  return createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
-}
-
 function parseArgs(argsJson: string): Record<string, unknown> | undefined {
   if (!argsJson) {
     return undefined;
@@ -628,32 +590,10 @@ export class OpenAiChunkConverter {
     { id?: string; name?: string; args: string }
   >();
   private readonly emittedCalls = new Set<number>();
-  private readonly reasoningParts: string[] = [];
   /** Reasoning fragments received but not yet emitted as a thought part. */
   private pendingReasoning: string[] = [];
 
   constructor(private readonly nameMapper?: FunctionNameMapper) {}
-
-  /** The full reasoning content accumulated so far (for caching). */
-  getReasoningContent(): string {
-    return this.reasoningParts.join('');
-  }
-
-  /** The completed function calls accumulated so far (for caching). */
-  getCompletedFunctionCalls(): FunctionCall[] {
-    const calls: FunctionCall[] = [];
-    for (const call of this.toolCalls.values()) {
-      if (!call.name) {
-        continue;
-      }
-      calls.push({
-        name: this.nameMapper?.toOriginalName(call.name) ?? call.name,
-        args: parseArgs(call.args),
-        id: call.id,
-      });
-    }
-    return calls;
-  }
 
   toGeminiChunk(chunk: OpenAiStreamChunk): GenerateContentResponse {
     const response = new GenerateContentResponse();
@@ -669,7 +609,6 @@ export class OpenAiChunkConverter {
     const parts: Part[] = [];
 
     if (delta?.reasoning_content) {
-      this.reasoningParts.push(delta.reasoning_content);
       this.pendingReasoning.push(delta.reasoning_content);
     }
 

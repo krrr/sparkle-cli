@@ -16,7 +16,6 @@ import {
   FunctionNameMapper,
   OpenAiChunkConverter,
   extractSystemInstructionText,
-  fingerprintFunctionCalls,
   geminiConfigToOpenAiConfig,
   geminiContentsToOpenAiMessages,
   geminiToolsToOpenAiTools,
@@ -25,7 +24,6 @@ import {
   openAiFinishReasonToGemini,
   openAiUsageToGeminiMetadata,
   sanitizeFunctionName,
-  stableStringify,
 } from './openAiFormatConverter.js';
 import type {
   OpenAiChatCompletion,
@@ -444,29 +442,46 @@ describe('geminiContentsToOpenAiMessages', () => {
     expect(messages[1].tool_call_id).toBe('call_9');
   });
 
-  it('injects cached reasoning content for matching function calls', () => {
-    const calls = [{ name: 'get_weather', args: { city: 'SF' }, id: 'c1' }];
-    const fingerprint = fingerprintFunctionCalls(calls);
-    const reasoningCache = new Map([[fingerprint, 'cached reasoning']]);
-    const messages = geminiContentsToOpenAiMessages(
-      [{ role: 'model', parts: [{ functionCall: calls[0] }] }],
-      { reasoningCache },
-    );
-    expect(messages[0].reasoning_content).toBe('cached reasoning');
+  it('emits reasoning_content from thought parts when the assistant turn has function calls', () => {
+    const messages = geminiContentsToOpenAiMessages([
+      {
+        role: 'model',
+        parts: [
+          { text: 'I should check the weather', thought: true },
+          {
+            functionCall: {
+              name: 'get_weather',
+              args: { city: 'SF' },
+              id: 'c1',
+            },
+          },
+        ],
+      },
+    ]);
+    expect(messages[0].reasoning_content).toBe('I should check the weather');
+    expect(messages[0].tool_calls).toHaveLength(1);
   });
 
-  it('does not inject reasoning when the cache misses', () => {
-    const messages = geminiContentsToOpenAiMessages(
-      [
-        {
-          role: 'model',
-          parts: [
-            { functionCall: { name: 'get_weather', args: {}, id: 'c1' } },
-          ],
-        },
-      ],
-      { reasoningCache: new Map() },
-    );
+  it('does not emit reasoning_content for assistant turns without function calls', () => {
+    const messages = geminiContentsToOpenAiMessages([
+      {
+        role: 'model',
+        parts: [
+          { text: 'thinking...', thought: true },
+          { text: 'final answer' },
+        ],
+      },
+    ]);
+    expect(messages[0].reasoning_content).toBeUndefined();
+  });
+
+  it('does not emit reasoning_content when a tool-call turn has no thought parts', () => {
+    const messages = geminiContentsToOpenAiMessages([
+      {
+        role: 'model',
+        parts: [{ functionCall: { name: 'get_weather', args: {}, id: 'c1' } }],
+      },
+    ]);
     expect(messages[0].reasoning_content).toBeUndefined();
   });
 
@@ -588,39 +603,6 @@ describe('openAiUsageToGeminiMetadata', () => {
   });
 });
 
-describe('stableStringify', () => {
-  it('orders object keys deterministically', () => {
-    const a = stableStringify({ b: 1, a: 2 });
-    const b = stableStringify({ a: 2, b: 1 });
-    expect(a).toBe(b);
-    expect(a).toBe('{"a":2,"b":1}');
-  });
-
-  it('handles nested structures', () => {
-    expect(stableStringify({ z: [3, { y: 1, x: 2 }], a: 's' })).toBe(
-      '{"a":"s","z":[3,{"x":2,"y":1}]}',
-    );
-  });
-});
-
-describe('fingerprintFunctionCalls', () => {
-  it('is stable for equal call sets', () => {
-    const a = fingerprintFunctionCalls([{ name: 'f', args: { b: 1, a: 2 } }]);
-    const b = fingerprintFunctionCalls([{ name: 'f', args: { a: 2, b: 1 } }]);
-    expect(a).toBe(b);
-  });
-
-  it('differs for different calls', () => {
-    expect(fingerprintFunctionCalls([{ name: 'f', args: { a: 1 } }])).not.toBe(
-      fingerprintFunctionCalls([{ name: 'f', args: { a: 2 } }]),
-    );
-  });
-
-  it('returns empty string for no calls', () => {
-    expect(fingerprintFunctionCalls([])).toBe('');
-  });
-});
-
 describe('OpenAiChunkConverter', () => {
   it('accumulates text deltas into parts', () => {
     const converter = new OpenAiChunkConverter();
@@ -655,7 +637,6 @@ describe('OpenAiChunkConverter', () => {
       { text: 'thinking...', thought: true },
       { text: 'Answer' },
     ]);
-    expect(converter.getReasoningContent()).toBe('thinking...');
   });
 
   it('flushes buffered reasoning when the stream finishes', () => {
@@ -690,11 +671,14 @@ describe('OpenAiChunkConverter', () => {
     converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'once' } }],
     });
-    converter.toGeminiChunk({
+    const r2 = converter.toGeminiChunk({
       choices: [{ delta: { content: 'text' }, finish_reason: 'stop' }],
     });
+    expect(r2.candidates![0].content!.parts).toEqual([
+      { text: 'once', thought: true },
+      { text: 'text' },
+    ]);
     expect(converter.toFinalGeminiChunk()).toBeUndefined();
-    expect(converter.getReasoningContent()).toBe('once');
   });
 
   it('assembles fragmented tool call deltas and emits them once on finish', () => {
@@ -743,9 +727,6 @@ describe('OpenAiChunkConverter', () => {
       }
     }
     expect(emitted).toBe(1);
-    expect(converter.getCompletedFunctionCalls()).toEqual([
-      { id: 'call_1', name: 'get_weather', args: { city: 'SF' } },
-    ]);
   });
 
   it('emits unflushed tool calls via toFinalGeminiChunk', () => {

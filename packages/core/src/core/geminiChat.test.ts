@@ -3291,6 +3291,63 @@ describe('GeminiChat', () => {
       });
     });
 
+    it('should keep thought parts when preserveThoughts is true (context management enabled)', () => {
+      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
+
+      chat.setHistory([
+        {
+          role: 'user',
+          parts: [{ text: 'hello' }],
+        },
+        {
+          role: 'model',
+          parts: [
+            { text: 'internal monologue', thought: true } as unknown as Part,
+            { text: 'actual conversational response' },
+          ],
+        },
+      ]);
+
+      const turns = chat.getHistoryTurns(true, true);
+
+      expect(turns).toHaveLength(2);
+      const modelTurn = turns[1];
+      expect(modelTurn.content.parts).toHaveLength(2);
+      expect(modelTurn.content.parts![0]).toEqual({
+        text: 'internal monologue',
+        thought: true,
+      });
+    });
+
+    it('should keep thought parts when preserveThoughts is true (modern model, no context management)', () => {
+      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
+      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-3.1-pro-preview');
+
+      chat.setHistory([
+        {
+          role: 'user',
+          parts: [{ text: 'hello' }],
+        },
+        {
+          role: 'model',
+          parts: [
+            { text: 'internal monologue', thought: true } as unknown as Part,
+            { text: 'actual conversational response' },
+          ],
+        },
+      ]);
+
+      const turns = chat.getHistoryTurns(true, true);
+
+      expect(turns).toHaveLength(2);
+      const modelTurn = turns[1];
+      expect(modelTurn.content.parts).toHaveLength(2);
+      expect(modelTurn.content.parts![0]).toEqual({
+        text: 'internal monologue',
+        thought: true,
+      });
+    });
+
     it('should completely filter out thought parts from getHistoryTurns when context management is disabled but model is gemini-2/modern', () => {
       vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
       vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
@@ -3462,6 +3519,132 @@ describe('GeminiChat', () => {
       expect(modelTurn.content.parts![0].thoughtSignature).toBe(
         'existing-sig-on-call',
       );
+    });
+  });
+
+  describe('preserveThoughts in request history scrubbing', () => {
+    function pushToolLoopHistory(chat: GeminiChat) {
+      chat.agentHistory.push({
+        id: 'u1',
+        content: { role: 'user', parts: [{ text: 'weather?' }] },
+      });
+      chat.agentHistory.push({
+        id: 'm1',
+        content: {
+          role: 'model',
+          parts: [
+            { text: 'thinking', thought: true } as unknown as Part,
+            {
+              functionCall: {
+                name: 'get_weather',
+                args: { city: 'SF' },
+                id: 'c1',
+              },
+            },
+          ],
+        },
+      });
+      chat.agentHistory.push({
+        id: 'u2',
+        content: {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'get_weather',
+                id: 'c1',
+                response: { output: 'sunny' },
+              },
+            },
+          ],
+        },
+      });
+    }
+
+    it('keeps thought parts when context management is enabled and the generator is OpenAI-compatible', async () => {
+      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
+      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
+        authType: ProviderType.USE_OPENAI,
+      });
+      pushToolLoopHistory(chat);
+
+      let capturedContents: Content[] = [];
+      vi.mocked(mockContentGenerator.generateContentStream).mockImplementation(
+        async (req) => {
+          capturedContents = req.contents as Content[];
+          return (async function* () {
+            yield {
+              candidates: [
+                {
+                  content: {
+                    role: 'model',
+                    parts: [{ text: 'ok' }],
+                  },
+                  finishReason: 'STOP',
+                },
+              ],
+            } as unknown as GenerateContentResponse;
+          })();
+        },
+      );
+
+      const stream = await chat.sendMessageStream(
+        { model: 'test-model' },
+        'and then?',
+        'prompt-preserve-thoughts-openai',
+        new AbortController().signal,
+        LlmRole.MAIN,
+      );
+      for await (const _ of stream) {
+        // consume
+      }
+
+      const modelTurn = capturedContents.find((c) => c.role === 'model');
+      expect(modelTurn).toBeDefined();
+      expect(modelTurn!.parts!.some((p) => p.thought)).toBe(true);
+    });
+
+    it('strips thought parts when context management is enabled and the generator is Gemini-native', async () => {
+      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
+      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
+        authType: ProviderType.USE_GEMINI,
+      });
+      pushToolLoopHistory(chat);
+
+      let capturedContents: Content[] = [];
+      vi.mocked(mockContentGenerator.generateContentStream).mockImplementation(
+        async (req) => {
+          capturedContents = req.contents as Content[];
+          return (async function* () {
+            yield {
+              candidates: [
+                {
+                  content: {
+                    role: 'model',
+                    parts: [{ text: 'ok' }],
+                  },
+                  finishReason: 'STOP',
+                },
+              ],
+            } as unknown as GenerateContentResponse;
+          })();
+        },
+      );
+
+      const stream = await chat.sendMessageStream(
+        { model: 'test-model' },
+        'and then?',
+        'prompt-preserve-thoughts-gemini',
+        new AbortController().signal,
+        LlmRole.MAIN,
+      );
+      for await (const _ of stream) {
+        // consume
+      }
+
+      const modelTurn = capturedContents.find((c) => c.role === 'model');
+      expect(modelTurn).toBeDefined();
+      expect(modelTurn!.parts!.some((p) => p.thought)).toBe(false);
     });
   });
 

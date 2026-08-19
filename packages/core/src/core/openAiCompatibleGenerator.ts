@@ -9,7 +9,6 @@ import type {
   CountTokensResponse,
   EmbedContentParameters,
   EmbedContentResponse,
-  FunctionCall,
   GenerateContentParameters,
   GenerateContentResponse,
   Tool,
@@ -22,7 +21,6 @@ import {
   FunctionNameMapper,
   MAX_OPENAI_TOOLS,
   OpenAiChunkConverter,
-  fingerprintFunctionCalls,
   geminiConfigToOpenAiConfig,
   geminiContentsToOpenAiMessages,
   geminiToolsToOpenAiTools,
@@ -39,9 +37,6 @@ import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
 
 /** The default OpenAI-compatible API base URL. */
 export const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1';
-
-/** Maximum number of reasoning cache entries (LRU eviction). */
-const MAX_REASONING_CACHE_ENTRIES = 200;
 
 /** Known provider prefixes that may be prefixed to a model name. */
 const MODEL_PROVIDER_PREFIXES = ['deepseek/', 'openai/'];
@@ -83,12 +78,11 @@ export interface OpenAiCompatibleGeneratorConfig {
  * - SSE stream chunks -> GenerateContentResponse chunks
  *
  * DeepSeek-style reasoning content (`reasoning_content`) is surfaced as
- * Gemini "thought" parts and cached keyed by the fingerprint of the
- * function calls in the turn, so a multi-round tool loop can re-inject the
- * model's previous reasoning on follow-up requests.
+ * Gemini "thought" parts. Those parts stay in the agent history, so the
+ * message converter can re-emit `reasoning_content` on follow-up tool-loop
+ * requests directly from the turn's own parts.
  */
 export class OpenAiCompatibleGenerator {
-  private readonly reasoningCache = new Map<string, string>();
   private readonly functionNameMapper = new FunctionNameMapper();
   private readonly config: OpenAiCompatibleGeneratorConfig;
 
@@ -119,13 +113,6 @@ export class OpenAiCompatibleGenerator {
       completion,
       this.functionNameMapper,
     );
-
-    // Cache reasoning content for reuse in follow-up tool-loop turns.
-    const reasoning = completion.choices?.[0]?.message?.reasoning_content;
-    const calls = geminiResponse.functionCalls ?? [];
-    if (reasoning && calls.length > 0) {
-      this.cacheReasoning(calls, reasoning);
-    }
     return geminiResponse;
   }
 
@@ -207,7 +194,7 @@ export class OpenAiCompatibleGenerator {
     request: GenerateContentParameters,
     streaming: boolean,
   ): OpenAiRequest {
-    const contents = toContents(request.contents);
+    const contents = toContents(request.contents, true);
     const config = request.config ?? {};
 
     const tools = geminiToolsToOpenAiTools(
@@ -222,7 +209,6 @@ export class OpenAiCompatibleGenerator {
 
     const messages = geminiContentsToOpenAiMessages(contents, {
       systemInstruction: config.systemInstruction,
-      reasoningCache: this.reasoningCache,
       nameMapper: this.functionNameMapper,
     });
 
@@ -355,27 +341,5 @@ export class OpenAiCompatibleGenerator {
     if (finalChunk) {
       yield finalChunk;
     }
-    // Cache reasoning content keyed by the completed function calls so
-    // follow-up tool-loop requests can re-inject it.
-    const calls = converter.getCompletedFunctionCalls();
-    const reasoning = converter.getReasoningContent();
-    if (calls.length > 0 && reasoning) {
-      this.cacheReasoning(calls, reasoning);
-    }
-  }
-
-  private cacheReasoning(calls: FunctionCall[], reasoning: string): void {
-    const key = fingerprintFunctionCalls(calls);
-    if (!key) {
-      return;
-    }
-    if (this.reasoningCache.size >= MAX_REASONING_CACHE_ENTRIES) {
-      // Evict the oldest entry (Map preserves insertion order).
-      const oldest = this.reasoningCache.keys().next().value;
-      if (oldest !== undefined) {
-        this.reasoningCache.delete(oldest);
-      }
-    }
-    this.reasoningCache.set(key, reasoning);
   }
 }

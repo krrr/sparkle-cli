@@ -351,50 +351,17 @@ describe('OpenAiCompatibleGenerator', () => {
       expect(usageChunks[0].usageMetadata!.totalTokenCount).toBe(14);
     });
 
-    it('re-injects cached reasoning content on follow-up requests', async () => {
+    it('derives reasoning_content from the turn thought parts on follow-up requests', async () => {
       const requests: OpenAiRequest[] = [];
       fakeServer.on('/v1/chat/completions', (body) => {
         requests.push(body);
-        if (body.messages.some((m) => m.tool_calls)) {
-          return {
-            status: 200,
-            contentType: 'text/event-stream',
-            body: sseEvents([
-              JSON.stringify({ choices: [{ delta: { content: 'sunny' } }] }),
-              JSON.stringify({
-                choices: [{ delta: {}, finish_reason: 'stop' }],
-              }),
-              '[DONE]',
-            ]),
-          };
-        }
         return {
           status: 200,
           contentType: 'text/event-stream',
           body: sseEvents([
+            JSON.stringify({ choices: [{ delta: { content: 'sunny' } }] }),
             JSON.stringify({
-              choices: [{ delta: { reasoning_content: 'cached reasoning' } }],
-            }),
-            JSON.stringify({
-              choices: [
-                {
-                  delta: {
-                    tool_calls: [
-                      {
-                        index: 0,
-                        id: 'call_1',
-                        function: {
-                          name: 'get_weather',
-                          arguments: '{"city":"SF"}',
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            }),
-            JSON.stringify({
-              choices: [{ delta: {}, finish_reason: 'tool_calls' }],
+              choices: [{ delta: {}, finish_reason: 'stop' }],
             }),
             '[DONE]',
           ]),
@@ -409,19 +376,9 @@ describe('OpenAiCompatibleGenerator', () => {
         },
       };
 
-      // First round: model reasons and calls the tool.
-      const stream1 = await generator.generateContentStream(
-        request,
-        'p',
-        LlmRole.MAIN,
-      );
-      for await (const _ of stream1) {
-        // consume
-      }
-
-      // Second round: history contains the tool call turn; the cached
-      // reasoning must be re-injected on the assistant message.
-      const stream2 = await generator.generateContentStream(
+      // Follow-up round: history contains the tool-call turn with its thought
+      // part; reasoning_content must be derived from the turn itself.
+      const stream = await generator.generateContentStream(
         {
           ...request,
           contents: [
@@ -429,6 +386,7 @@ describe('OpenAiCompatibleGenerator', () => {
             {
               role: 'model',
               parts: [
+                { text: 'thinking about the weather', thought: true },
                 {
                   functionCall: {
                     name: 'get_weather',
@@ -455,16 +413,17 @@ describe('OpenAiCompatibleGenerator', () => {
         'p',
         LlmRole.MAIN,
       );
-      for await (const _ of stream2) {
+      for await (const _ of stream) {
         // consume
       }
 
-      const second = requests[1];
-      const assistantMessage = second.messages.find(
+      const assistantMessage = requests[0].messages.find(
         (m) => m.role === 'assistant' && m.tool_calls,
       );
       expect(assistantMessage).toBeDefined();
-      expect(assistantMessage!.reasoning_content).toBe('cached reasoning');
+      expect(assistantMessage!.reasoning_content).toBe(
+        'thinking about the weather',
+      );
       expect(assistantMessage!.tool_calls![0].function.name).toBe(
         'get_weather',
       );

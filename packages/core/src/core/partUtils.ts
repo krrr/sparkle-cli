@@ -14,14 +14,22 @@ import {
 
 /**
  * Converts a ContentListUnion into an array of Content.
+ *
+ * @param contents - the content(s) to normalize.
+ * @param preserveThoughts - when true, thought parts are returned unchanged
+ * instead of being rewritten for API compatibility. Used by OpenAI-compatible
+ * request paths, which derive `reasoning_content` from thought parts.
  */
-export function toContents(contents: ContentListUnion): Content[] {
+export function toContents(
+  contents: ContentListUnion,
+  preserveThoughts: boolean = false,
+): Content[] {
   if (Array.isArray(contents)) {
     // it's a Content[] or a PartsUnion[]
-    return contents.map(toContent);
+    return contents.map((c) => toContent(c, preserveThoughts));
   }
   // it's a Content or a PartsUnion
-  return [toContent(contents)];
+  return [toContent(contents, preserveThoughts)];
 }
 
 function isPart(c: ContentUnion): c is PartUnion {
@@ -34,12 +42,12 @@ function isPart(c: ContentUnion): c is PartUnion {
   );
 }
 
-function toContent(content: ContentUnion): Content {
+function toContent(content: ContentUnion, preserveThoughts: boolean): Content {
   if (Array.isArray(content)) {
     // it's a PartsUnion[]
     return {
       role: 'user',
-      parts: toParts(content),
+      parts: toParts(content, preserveThoughts),
     };
   }
   if (typeof content === 'string') {
@@ -54,25 +62,31 @@ function toContent(content: ContentUnion): Content {
     return {
       ...content,
       parts: content.parts
-        ? toParts(content.parts.filter((p) => p != null))
+        ? toParts(
+            content.parts.filter((p) => p != null),
+            preserveThoughts,
+          )
         : [],
     };
   }
   // it's a Part
   return {
     role: 'user',
-    parts: [toPart(content)],
+    parts: [toPart(content, preserveThoughts)],
   };
 }
 
 /**
  * Converts an array of PartUnion into an array of Part.
  */
-export function toParts(parts: PartUnion[]): Part[] {
-  return parts.map(toPart);
+export function toParts(
+  parts: PartUnion[],
+  preserveThoughts: boolean = false,
+): Part[] {
+  return parts.map((p) => toPart(p, preserveThoughts));
 }
 
-function toPart(part: PartUnion): Part {
+function toPart(part: PartUnion, preserveThoughts: boolean): Part {
   if (typeof part === 'string') {
     // it's a string
     return { text: part };
@@ -82,6 +96,9 @@ function toPart(part: PartUnion): Part {
   // Some APIs expect parts to have certain required "oneof" fields initialized,
   // but thought parts don't conform to this schema and cause API failures
   if ('thought' in part && part.thought) {
+    if (preserveThoughts) {
+      return part;
+    }
     const thoughtText = `[Thought: ${part.thought}]`;
 
     const newPart = { ...part };
