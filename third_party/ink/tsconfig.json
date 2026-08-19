@@ -1,11 +1,17 @@
 {
-	"extends": "@sindresorhus/tsconfig",
 	"compilerOptions": {
 		"outDir": "build",
+		"target": "ES2022",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"lib": ["DOM", "DOM.Iterable", "ES2023"],
+		"declaration": true,
+		"declarationMap": true,
 		"sourceMap": true,
 		"jsx": "react",
-		"isolatedModules": true
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true
 	},
 	"include": ["src"],
 	"ts-node": {

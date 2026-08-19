@@ -744,12 +744,9 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "deepseek-base": {
-        "extends": "base",
+        "extends": "chat-base",
         "modelConfig": {
-          "model": "deepseek-v4-flash",
-          "generateContentConfig": {
-            "temperature": 1
-          }
+          "model": "deepseek-v4-flash"
         }
       },
       "deepseek-v4-flash": {

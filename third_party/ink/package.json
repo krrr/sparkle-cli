@@ -1,5 +1,5 @@
 {
-	"name": "@jrichman/ink",
+	"name": "ink",
 	"version": "7.0.1-beta.10",
 	"description": "React for CLI",
 	"license": "MIT",
@@ -20,8 +20,7 @@
 	"scripts": {
 		"dev": "tsc --watch",
 		"build": "tsc",
-		"prepare": "npm run build",
-		"test": "tsc --noEmit && NODE_OPTIONS=\"--max-old-space-size=8192\" xo && FORCE_COLOR=true ava",
+		"test": "tsc --noEmit",
 		"example": "NODE_NO_WARNINGS=1 node --loader ts-node/esm",
 		"benchmark": "NODE_NO_WARNINGS=1 node --loader ts-node/esm"
 	},

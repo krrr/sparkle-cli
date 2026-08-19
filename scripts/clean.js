@@ -47,6 +47,7 @@ for (const workspace of rootPackageJson.workspaces) {
     try {
       if (statSync(pkgDir).isDirectory()) {
         rmSync(join(pkgDir, 'dist'), RMRF_OPTIONS);
+        rmSync(join(pkgDir, 'build'), RMRF_OPTIONS);
       }
     } catch (e) {
       if (e.code !== 'ENOENT') {

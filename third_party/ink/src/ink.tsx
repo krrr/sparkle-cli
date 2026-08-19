@@ -5,7 +5,16 @@ import {throttle} from 'es-toolkit/compat';
 import ansiEscapes from 'ansi-escapes';
 import isInCi from 'is-in-ci';
 import autoBind from 'auto-bind';
-import signalExit from 'signal-exit';
+import * as signalExitPkg from 'signal-exit';
+
+const signalExit = (
+	typeof signalExitPkg === 'function'
+		? signalExitPkg
+		: (signalExitPkg as any).onExit || (signalExitPkg as any).default
+) as (
+	callback: (code: number | null, signal: string | null) => void,
+	options?: {alwaysLast?: boolean},
+) => () => void;
 import patchConsole from 'patch-console';
 import {LegacyRoot} from 'react-reconciler/constants.js';
 import {type FiberRoot} from 'react-reconciler';

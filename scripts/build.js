@@ -37,7 +37,13 @@ if (process.env.CI) {
   console.log('CI environment detected. Building workspaces sequentially...');
   execSync('npm run build --workspaces', { stdio: 'inherit', cwd: root });
 } else {
-  // Build core first because everyone depends on it
+  // Build ink and core first because other packages depend on them
+  console.log('Building third_party/ink...');
+  execSync('npm run build -w ink', {
+    stdio: 'inherit',
+    cwd: root,
+  });
+
   console.log('Building sparkle-cli-core...');
   execSync('npm run build -w sparkle-cli-core', {
     stdio: 'inherit',
@@ -51,7 +57,7 @@ if (process.env.CI) {
   );
   const parallelWorkspaces = workspaceInfo
     .map((w) => w.name)
-    .filter((name) => name !== 'sparkle-cli-core');
+    .filter((name) => name !== 'sparkle-cli-core' && name !== 'ink');
 
   execSync(
     `npx --no-install npm-run-all --parallel ${parallelWorkspaces.map((w) => `"build -w ${w}"`).join(' ')}`,

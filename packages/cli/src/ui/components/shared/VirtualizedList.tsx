@@ -114,7 +114,7 @@ const VirtualizedListItem = memo(
               (typeof width === 'number' ? width : containerWidth)
             }
           >
-            {content}
+            {() => content}
           </StaticRender>
         ) : (
           content
