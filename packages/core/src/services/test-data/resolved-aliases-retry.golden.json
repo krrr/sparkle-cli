@@ -212,21 +212,36 @@
     "model": "deepseek-v4-flash",
     "generateContentConfig": {
       "temperature": 1,
-      "topP": 1
+      "topP": 0.95,
+      "thinkingConfig": {
+        "includeThoughts": true,
+        "thinkingLevel": "HIGH"
+      },
+      "topK": 64
     }
   },
   "deepseek-v4-flash": {
     "model": "deepseek-v4-flash",
     "generateContentConfig": {
       "temperature": 1,
-      "topP": 1
+      "topP": 0.95,
+      "thinkingConfig": {
+        "includeThoughts": true,
+        "thinkingLevel": "HIGH"
+      },
+      "topK": 64
     }
   },
   "deepseek-v4-pro": {
     "model": "deepseek-v4-pro",
     "generateContentConfig": {
       "temperature": 1,
-      "topP": 1
+      "topP": 0.95,
+      "thinkingConfig": {
+        "includeThoughts": true,
+        "thinkingLevel": "HIGH"
+      },
+      "topK": 64
     }
   }
 }

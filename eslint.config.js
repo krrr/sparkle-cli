@@ -66,6 +66,7 @@ export default tseslint.config(
       '.sparkle/**',
       '**/.sparkle-linters/**',
       '**/*.d.ts',
+      'third_party/**',
     ],
   },
   eslint.configs.recommended,

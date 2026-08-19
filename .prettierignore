@@ -24,3 +24,4 @@ Thumbs.db
 packages/sdk/test-data/*.json
 *.mdx
 packages/vscode-ide-companion/NOTICES.txt
+third_party/

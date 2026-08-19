@@ -140,7 +140,7 @@ const LINTERS = {
     check: shellcheckCheck,
     installer: shellcheckInstaller,
     run: `
-      git ls-files | grep -E '^([^.]+|.*\\.(sh|zsh|bash))' | xargs file --mime-type \
+      git ls-files | grep -v '^third_party/' | grep -E '^([^.]+|.*\\.(sh|zsh|bash))' | xargs file --mime-type \
         | grep "text/x-shellscript" | awk '{ print substr($1, 1, length($1)-1) }' \
         | xargs shellcheck \
           --check-sourced \
@@ -287,7 +287,11 @@ export function runSensitiveKeywordLinter() {
   let violationsFound = false;
 
   for (const file of changedFiles) {
-    if (!existsSync(file) || lstatSync(file).isDirectory()) {
+    if (
+      !existsSync(file) ||
+      lstatSync(file).isDirectory() ||
+      file.startsWith('third_party/')
+    ) {
       continue;
     }
     const content = readFileSync(file, 'utf-8');
