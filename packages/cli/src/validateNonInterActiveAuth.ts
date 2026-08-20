@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,36 +10,33 @@ import {
   ExitCodes,
   getProviderTypeFromEnv,
   type Config,
-  type ProviderType,
 } from 'sparkle-cli-core';
 import { USER_SETTINGS_PATH } from './config/settings.js';
-import { validateAuthMethod } from './config/auth.js';
 import { handleError } from './utils/errors.js';
 import { runExitCleanup } from './utils/cleanup.js';
 
-export async function validateNonInteractiveAuth(
-  configuredAuthType: ProviderType | undefined,
-  useExternalAuth: boolean | undefined,
-  nonInteractiveConfig: Config,
-) {
+export async function validateNonInteractiveAuth(nonInteractiveConfig: Config) {
   try {
-    const effectiveAuthType = configuredAuthType || getProviderTypeFromEnv();
+    const profileService = nonInteractiveConfig.getProviderProfileService();
+    const activeProfile = profileService.getActiveProfile();
 
-    if (!effectiveAuthType) {
-      const message = `Please set an Auth method in your ${USER_SETTINGS_PATH} or specify the GEMINI_API_KEY or OPENAI_API_KEY environment variable before running.`;
-      throw new Error(message);
+    if (activeProfile) {
+      await profileService.activateProfile(activeProfile.id);
+      return activeProfile.providerType;
     }
 
-    const authType: ProviderType = effectiveAuthType;
-
-    if (!useExternalAuth) {
-      const err = await validateAuthMethod(String(authType));
-      if (err != null) {
-        throw new Error(err);
-      }
+    const envProviderType = getProviderTypeFromEnv();
+    if (envProviderType) {
+      const transientProfile = await profileService.createProfile({
+        id: 'env-provider',
+        providerType: envProviderType,
+      });
+      await profileService.activateProfile(transientProfile.id);
+      return envProviderType;
     }
 
-    return authType;
+    const message = `Please configure a provider in your ${USER_SETTINGS_PATH} or specify the GEMINI_API_KEY or OPENAI_API_KEY environment variable before running.`;
+    throw new Error(message);
   } catch (error) {
     if (nonInteractiveConfig.getOutputFormat() === OutputFormat.JSON) {
       handleError(

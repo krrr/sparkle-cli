@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -24,34 +24,21 @@ interface ModelDialogProps {
 
 export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const config = useContext(ConfigContext);
-  const [view, setView] = useState<'main' | 'manual'>('main');
   const [persistMode, setPersistMode] = useState(false);
 
-  // Determine the Preferred Model (read once when the dialog opens).
-  const preferredModel = config?.getModel() || SPARKLE_MODEL_ALIAS_AUTO;
+  const profileService = config?.getProviderProfileService();
+  const activeProfile = profileService?.getActiveProfile();
 
-  const manualModelSelected = useMemo(() => {
-    if (config?.getModelConfigService) {
-      const def = config
-        .getModelConfigService()
-        .getModelDefinition(preferredModel);
-      // Only treat as manual selection if it's a visible, non-auto model.
-      return def && def.tier !== 'auto' && def.isVisible === true
-        ? preferredModel
-        : '';
-    }
-
-    return '';
-  }, [preferredModel, config]);
+  // Determine current preferred model
+  const preferredModel =
+    config?.getModel() ||
+    activeProfile?.defaultModel ||
+    SPARKLE_MODEL_ALIAS_AUTO;
 
   useKeypress(
     (key) => {
       if (key.name === 'escape') {
-        if (view === 'manual') {
-          setView('main');
-        } else {
-          onClose();
-        }
+        onClose();
         return true;
       }
       if (key.name === 'tab') {
@@ -62,36 +49,41 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     },
     { isActive: true },
   );
-  const mainOptions = useMemo(() => {
-    if (!config?.getModelConfigService) {
-      return [];
+
+  const options = useMemo(() => {
+    if (activeProfile?.models && activeProfile.models.length > 0) {
+      const isAutoDefault =
+        activeProfile.defaultModel === SPARKLE_MODEL_ALIAS_AUTO;
+      const autoOption = {
+        value: SPARKLE_MODEL_ALIAS_AUTO,
+        title: 'Auto',
+        description:
+          (isAutoDefault ? 'remembered, ' : '') +
+          'auto routing based on model alias',
+        key: SPARKLE_MODEL_ALIAS_AUTO,
+      };
+
+      const profileModelOptions = activeProfile.models.map((m) => {
+        const isDefault = activeProfile.defaultModel === m.id;
+        const aliasStr =
+          m.aliases && m.aliases.length > 0
+            ? `aliases: ${m.aliases.join(', ')}`
+            : '';
+        const desc = [isDefault ? 'remembered' : '', aliasStr]
+          .filter(Boolean)
+          .join(', ');
+
+        return {
+          value: m.id,
+          title: m.id,
+          description: desc,
+          key: m.id,
+        };
+      });
+
+      return [autoOption, ...profileModelOptions];
     }
 
-    const allOptions = config
-      .getModelConfigService()
-      .getAvailableModelOptions({});
-
-    const list = allOptions
-      .filter((o) => o.tier === 'auto')
-      .map((o) => ({
-        value: o.modelId,
-        title: o.name,
-        description: o.description,
-        key: o.modelId,
-      }));
-
-    list.push({
-      value: 'Manual',
-      title: manualModelSelected
-        ? `Manual (${getDisplayString(manualModelSelected, config ?? undefined)})`
-        : 'Manual',
-      description: 'Manually select a model',
-      key: 'Manual',
-    });
-    return list;
-  }, [config, manualModelSelected]);
-
-  const manualOptions = useMemo(() => {
     if (!config?.getModelConfigService) {
       return [];
     }
@@ -104,53 +96,76 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       .filter((o) => o.tier !== 'auto')
       .map((o) => ({
         value: o.modelId,
-        title: o.name,
+        title: o.name || getDisplayString(o.modelId, config ?? undefined),
+        description: o.description,
         key: o.modelId,
       }));
-  }, [config]);
+  }, [config, activeProfile]);
 
-  const options = useMemo(() => {
-    const rawOptions = view === 'main' ? mainOptions : manualOptions;
-    const seen = new Set<string>();
-    return rawOptions.filter((option) => {
-      if (seen.has(option.value)) {
-        return false;
-      }
-      seen.add(option.value);
-      return true;
-    });
-  }, [view, mainOptions, manualOptions]);
-
-  // Calculate the initial index based on the preferred model.
   const initialIndex = useMemo(() => {
     const idx = options.findIndex((option) => option.value === preferredModel);
-    if (idx !== -1) {
-      return idx;
-    }
-    if (view === 'main') {
-      const manualIdx = options.findIndex((o) => o.value === 'Manual');
-      return manualIdx !== -1 ? manualIdx : 0;
-    }
-    return 0;
-  }, [preferredModel, options, view]);
+    return idx !== -1 ? idx : 0;
+  }, [preferredModel, options]);
 
-  // Handle selection internally (Autonomous Dialog).
   const handleSelect = useCallback(
-    (model: string) => {
-      if (model === 'Manual') {
-        setView('manual');
-        return;
-      }
-
+    async (model: string) => {
       if (config) {
-        config.setModel(model, persistMode ? false : true);
+        if (persistMode && activeProfile && profileService) {
+          await profileService.setDefaultModel(activeProfile.id, model);
+        }
+        config.setModel(model, !persistMode);
         const event = new ModelSlashCommandEvent(model);
         logModelSlashCommand(config, event);
       }
       onClose();
     },
-    [config, onClose, persistMode],
+    [config, activeProfile, profileService, onClose, persistMode],
   );
+
+  if (!activeProfile && options.length === 0) {
+    return (
+      <Box
+        borderStyle="round"
+        borderColor={theme.border.default}
+        flexDirection="column"
+        padding={1}
+        width="100%"
+      >
+        <Text bold>Select Model</Text>
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>
+            No active provider configured. Use /provider to configure a
+            provider.
+          </Text>
+        </Box>
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>(Press Esc to close)</Text>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (activeProfile && options.length === 0) {
+    return (
+      <Box
+        borderStyle="round"
+        borderColor={theme.border.default}
+        flexDirection="column"
+        padding={1}
+        width="100%"
+      >
+        <Text bold>Select Model</Text>
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>
+            {`No models configured for provider "${activeProfile.id}". Use /provider to add models.`}
+          </Text>
+        </Box>
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>(Press Esc to close)</Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -160,12 +175,14 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       padding={1}
       width="100%"
     >
-      <Text bold>Select Model</Text>
+      <Text bold>
+        Select Model {activeProfile ? `(${activeProfile.id})` : ''}
+      </Text>
 
       <Box marginTop={1}>
         <DescriptiveRadioButtonSelect
           items={options}
-          onSelect={handleSelect}
+          onSelect={(val) => void handleSelect(val)}
           initialIndex={initialIndex}
           showNumbers={true}
         />
@@ -180,11 +197,6 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
           </Text>
           <Text color={theme.text.secondary}> (Press Tab to toggle)</Text>
         </Box>
-      </Box>
-      <Box flexDirection="column">
-        <Text color={theme.text.secondary}>
-          {'> To use a specific Gemini model on startup, use the --model flag.'}
-        </Text>
       </Box>
       <Box marginTop={1} flexDirection="column">
         <Text color={theme.text.secondary}>(Press Esc to close)</Text>

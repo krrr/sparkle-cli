@@ -17,10 +17,9 @@ import { type Settings } from './settingsSchema.js';
 
 describe('settings-validation', () => {
   describe('validateSettings', () => {
-    it('should accept valid settings with correct model.name as string', () => {
+    it('should accept valid settings with correct model.maxSessionTurns', () => {
       const validSettings = {
         model: {
-          name: 'gemini-2.0-flash-exp',
           maxSessionTurns: 10,
         },
         ui: {
@@ -32,11 +31,13 @@ describe('settings-validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should reject model.name as object instead of string', () => {
+    it('should reject security.auth.selectedProviderId as object instead of string', () => {
       const invalidSettings = {
-        model: {
-          name: {
-            skipNextSpeakerCheck: true,
+        security: {
+          auth: {
+            selectedProviderId: {
+              invalid: true,
+            },
           },
         },
       };
@@ -48,7 +49,11 @@ describe('settings-validation', () => {
       if (result.error) {
         const issues = result.error.issues;
         expect(issues.length).toBeGreaterThan(0);
-        expect(issues[0]?.path).toEqual(['model', 'name']);
+        expect(issues[0]?.path).toEqual([
+          'security',
+          'auth',
+          'selectedProviderId',
+        ]);
         expect(issues[0]?.code).toBe('invalid_type');
       }
     });
@@ -413,11 +418,13 @@ describe('settings-validation', () => {
   });
 
   describe('formatValidationError', () => {
-    it('should format error with file path and helpful message for model.name', () => {
+    it('should format error with file path and helpful message for security.auth.selectedProviderId', () => {
       const invalidSettings = {
-        model: {
-          name: {
-            skipNextSpeakerCheck: true,
+        security: {
+          auth: {
+            selectedProviderId: {
+              skipNextSpeakerCheck: true,
+            },
           },
         },
       };
@@ -432,7 +439,7 @@ describe('settings-validation', () => {
         );
 
         expect(formatted).toContain('/path/to/settings.json');
-        expect(formatted).toContain('model.name');
+        expect(formatted).toContain('security.auth.selectedProviderId');
         expect(formatted).toContain('Expected: string, but received: object');
         expect(formatted).toContain('Please fix the configuration.');
         expect(formatted).toContain(
@@ -464,8 +471,10 @@ describe('settings-validation', () => {
 
     it('should include link to documentation', () => {
       const invalidSettings = {
-        model: {
-          name: { invalid: 'object' }, // model.name should be a string
+        security: {
+          auth: {
+            selectedProviderId: { invalid: 'object' },
+          },
         },
       };
 
@@ -483,8 +492,12 @@ describe('settings-validation', () => {
 
     it('should list all validation errors', () => {
       const invalidSettings = {
+        security: {
+          auth: {
+            selectedProviderId: { invalid: 'object' },
+          },
+        },
         model: {
-          name: { invalid: 'object' },
           maxSessionTurns: 'not a number',
         },
       };

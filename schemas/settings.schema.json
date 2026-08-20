@@ -2280,26 +2280,7 @@
           "markdownDescription": "Authentication settings.\n\n- Category: `Security`\n- Requires restart: `yes`\n- Default: `{}`",
           "default": {},
           "type": "object",
-          "properties": {
-            "selectedType": {
-              "title": "Selected Auth Type",
-              "description": "The currently selected authentication type.",
-              "markdownDescription": "The currently selected authentication type.\n\n- Category: `Security`\n- Requires restart: `yes`",
-              "type": "string"
-            },
-            "useExternal": {
-              "title": "Use External Auth",
-              "description": "Whether to use an external authentication flow.",
-              "markdownDescription": "Whether to use an external authentication flow.\n\n- Category: `Security`\n- Requires restart: `yes`",
-              "type": "boolean"
-            },
-            "openaiBaseUrl": {
-              "title": "OpenAI Base URL",
-              "description": "The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.",
-              "markdownDescription": "The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.\n\n- Category: `Security`\n- Requires restart: `yes`",
-              "type": "string"
-            }
-          },
+          "properties": {},
           "additionalProperties": false
         }
       },

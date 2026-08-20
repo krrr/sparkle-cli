@@ -1,24 +1,26 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { HybridTokenStorage } from '../mcp/token-storage/hybrid-token-storage.js';
 import type { OAuthCredentials } from '../mcp/token-storage/types.js';
-import { ProviderType } from '../config/constants.js';
+import type { ProviderProfileId } from '../config/providerProfile.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { createCache, type CacheService } from '../utils/cache.js';
 
 const KEYCHAIN_SERVICE_NAME = 'sparkle-cli-api-key';
-const GEMINI_API_KEY_ENTRY = 'gemini-api-key';
-const OPENAI_API_KEY_ENTRY = 'openai-api-key';
 
 const storage = new HybridTokenStorage(KEYCHAIN_SERVICE_NAME);
 
 // Caches to store the results of API key loads to avoid redundant keychain
 // access. One cache per key entry.
-const apiKeyCaches: Array<CacheService<string, Promise<string | null>>> = [];
+const apiKeyCaches: Map<
+  string,
+  CacheService<string, Promise<string | null>>
+> = new Map();
+const storesByEntry: Map<string, ApiKeyStore> = new Map();
 
 /**
  * A per-entry API key store backed by the system keychain.
@@ -33,6 +35,13 @@ interface ApiKeyStore {
 }
 
 /**
+ * Returns the keychain entry key for a provider profile.
+ */
+export function getProfileApiKeyEntry(profileId: ProviderProfileId): string {
+  return `provider-profile:${profileId}:api-key`;
+}
+
+/**
  * Creates a per-entry API key store backed by the system keychain.
  * @internal
  */
@@ -41,7 +50,7 @@ function createApiKeyStore(entry: string): ApiKeyStore {
     storage: 'map',
     defaultTtl: 30000, // 30 seconds
   });
-  apiKeyCaches.push(cache);
+  apiKeyCaches.set(entry, cache);
 
   return {
     /** Load the cached API key for this entry. */
@@ -96,52 +105,60 @@ function createApiKeyStore(entry: string): ApiKeyStore {
         await storage.deleteCredentials(entry);
       } catch (error: unknown) {
         debugLogger.error('Failed to clear API key from storage:', error);
+        throw error;
       }
     },
   };
 }
 
-const geminiApiKeyStore = createApiKeyStore(GEMINI_API_KEY_ENTRY);
-const openAiApiKeyStore = createApiKeyStore(OPENAI_API_KEY_ENTRY);
-
-/**
- * Maps an auth type to its key store.
- */
-const STORE_BY_AUTH_TYPE: Record<ProviderType, ApiKeyStore> = {
-  [ProviderType.USE_GEMINI]: geminiApiKeyStore,
-  [ProviderType.USE_OPENAI]: openAiApiKeyStore,
-};
+function getOrCreateStore(entry: string): ApiKeyStore {
+  let store = storesByEntry.get(entry);
+  if (!store) {
+    store = createApiKeyStore(entry);
+    storesByEntry.set(entry, store);
+  }
+  return store;
+}
 
 /**
  * Resets the API key caches. Used exclusively for test isolation.
  * @internal
  */
 export function resetApiKeyCacheForTesting() {
-  for (const cache of apiKeyCaches) {
+  for (const cache of apiKeyCaches.values()) {
     cache.clear();
   }
+  apiKeyCaches.clear();
+  storesByEntry.clear();
 }
 
 /**
- * Load the cached API key for the given auth type.
+ * Load the cached API key for the given provider profile ID.
  */
-export async function loadApiKey(type: ProviderType): Promise<string | null> {
-  return STORE_BY_AUTH_TYPE[type].load();
+export async function loadApiKeyForProfile(
+  profileId: ProviderProfileId,
+): Promise<string | null> {
+  const entry = getProfileApiKeyEntry(profileId);
+  return getOrCreateStore(entry).load();
 }
 
 /**
- * Save an API key for the given auth type. Passing null/empty clears it.
+ * Save an API key for the given provider profile ID. Passing null/empty clears it.
  */
-export async function saveApiKey(
-  type: ProviderType,
+export async function saveApiKeyForProfile(
+  profileId: ProviderProfileId,
   apiKey: string | null | undefined,
 ): Promise<void> {
-  return STORE_BY_AUTH_TYPE[type].save(apiKey);
+  const entry = getProfileApiKeyEntry(profileId);
+  return getOrCreateStore(entry).save(apiKey);
 }
 
 /**
- * Clear the cached API key for the given auth type.
+ * Clear the cached API key for the given provider profile ID.
  */
-export async function clearApiKey(type: ProviderType): Promise<void> {
-  return STORE_BY_AUTH_TYPE[type].clear();
+export async function clearApiKeyForProfile(
+  profileId: ProviderProfileId,
+): Promise<void> {
+  const entry = getProfileApiKeyEntry(profileId);
+  return getOrCreateStore(entry).clear();
 }

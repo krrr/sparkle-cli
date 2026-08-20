@@ -1106,7 +1106,26 @@ export function saveModelChange(
   model: string,
 ): void {
   try {
-    loadedSettings.setValue(SettingScope.User, 'model.name', model);
+    const selectedProviderId =
+      loadedSettings.merged.security.auth.selectedProviderId;
+    const providers = loadedSettings.merged.security.auth.providers || [];
+    if (selectedProviderId && providers.length > 0) {
+      const updated = providers.map((p) => {
+        if (p.id === selectedProviderId) {
+          return {
+            ...p,
+            defaultModel: model,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return p;
+      });
+      loadedSettings.setValue(
+        SettingScope.User,
+        'security.auth.providers',
+        updated,
+      );
+    }
   } catch (error) {
     const detailedErrorMessage = getFsErrorMessage(error);
     coreEvents.emitFeedback(

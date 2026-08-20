@@ -111,6 +111,10 @@ import {
   type ModelConfig,
   type ModelConfigServiceConfig,
 } from '../services/modelConfigService.js';
+import {
+  ProviderProfileService,
+  type ProfileStorageDelegate,
+} from '../services/providerProfileService.js';
 import { DEFAULT_MODEL_CONFIGS } from './defaultModelConfigs.js';
 import { MemoryContextManager } from '../context/memoryContextManager.js';
 import { TrackerService } from '../services/trackerService.js';
@@ -671,6 +675,8 @@ export interface ConfigParameters {
     agents?: AgentSettings;
   }>;
   logRagSnippets?: boolean;
+  profileStorageDelegate?: ProfileStorageDelegate;
+  providerProfileService?: ProviderProfileService;
 }
 
 export class Config implements McpContext, AgentLoopContext {
@@ -867,6 +873,7 @@ export class Config implements McpContext, AgentLoopContext {
   private latestApiRequest: GenerateContentParameters | undefined;
   private lastModeSwitchTime: number = performance.now();
   readonly injectionService: InjectionService;
+  private readonly providerProfileService: ProviderProfileService;
   private approvedPlanPath: string | undefined;
 
   constructor(params: ConfigParameters) {
@@ -1267,6 +1274,18 @@ export class Config implements McpContext, AgentLoopContext {
     this._geminiClient = new GeminiClient(this);
     this.a2aClientManager = new A2AClientManager(this);
     this.modelRouterService = new ModelRouterService(this);
+    // read from params first, for unit test
+    this.providerProfileService =
+      params.providerProfileService ||
+      new ProviderProfileService({
+        config: this,
+        storageDelegate: params.profileStorageDelegate,
+        env: this.env,
+      });
+  }
+
+  getProviderProfileService(): ProviderProfileService {
+    return this.providerProfileService;
   }
 
   get config(): Config {
@@ -1454,6 +1473,10 @@ export class Config implements McpContext, AgentLoopContext {
 
     // Initialize BaseLlmClient now that the ContentGenerator available
     this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
+  }
+
+  getApiKey(): string | undefined {
+    return this.contentGeneratorConfig?.apiKey;
   }
 
   /**

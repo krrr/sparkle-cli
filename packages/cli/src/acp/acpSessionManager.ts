@@ -68,9 +68,12 @@ export class AcpSessionManager {
       loadedSettings,
     );
 
-    const authType =
-      loadedSettings.merged.security.auth.selectedType ||
-      ProviderType.USE_GEMINI;
+    const profileService = config.getProviderProfileService();
+    const activeProfile = profileService.getActiveProfile();
+    const authType = activeProfile?.providerType || ProviderType.USE_GEMINI;
+    const baseUrl = authDetails.baseUrl || activeProfile?.baseUrl;
+    const customHeaders =
+      authDetails.customHeaders || activeProfile?.customHeaders;
 
     let isAuthenticated = false;
     let authErrorMessage = '';
@@ -78,8 +81,8 @@ export class AcpSessionManager {
       await config.refreshAuth(
         authType,
         authDetails.apiKey,
-        authDetails.baseUrl,
-        authDetails.customHeaders,
+        baseUrl,
+        customHeaders,
       );
       isAuthenticated = true;
 
@@ -237,8 +240,13 @@ export class AcpSessionManager {
     mcpServers: acp.McpServer[],
     authDetails: AuthDetails,
   ): Promise<Config> {
+    // 1. Create config WITHOUT initializing it (no MCP servers started yet)
+    const config = await this.newSessionConfig(sessionId, cwd, mcpServers);
+
+    const profileService = config.getProviderProfileService();
+    const activeProfile = profileService.getActiveProfile();
     const selectedAuthType =
-      this.settings.merged.security.auth.selectedType ||
+      activeProfile?.providerType ||
       (authDetails.baseUrl || process.env['GOOGLE_GEMINI_BASE_URL']
         ? ProviderType.USE_GEMINI
         : undefined);
@@ -247,9 +255,6 @@ export class AcpSessionManager {
       throw acp.RequestError.authRequired();
     }
 
-    // 1. Create config WITHOUT initializing it (no MCP servers started yet)
-    const config = await this.newSessionConfig(sessionId, cwd, mcpServers);
-
     // 2. Authenticate BEFORE initializing configuration or starting MCP servers.
     // This satisfies the security requirement to verify the user before executing
     // potentially unsafe server definitions.
@@ -257,8 +262,8 @@ export class AcpSessionManager {
       await config.refreshAuth(
         selectedAuthType,
         authDetails.apiKey,
-        authDetails.baseUrl,
-        authDetails.customHeaders,
+        authDetails.baseUrl || activeProfile?.baseUrl,
+        authDetails.customHeaders || activeProfile?.customHeaders,
       );
     } catch (e) {
       debugLogger.error(`Authentication failed: ${e}`);

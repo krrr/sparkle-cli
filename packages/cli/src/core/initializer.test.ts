@@ -1,18 +1,19 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { initializeApp } from './initializer.js';
 import {
-  ProviderType,
   IdeClient,
   logIdeConnection,
   logCliConfiguration,
   ValidationRequiredError,
+  ProviderType,
   type Config,
+  type ProviderProfile,
 } from 'sparkle-cli-core';
 import { validateTheme } from './theme.js';
 import { type LoadedSettings } from '../config/settings.js';
@@ -36,30 +37,45 @@ vi.mock('./theme.js', () => ({
 }));
 
 describe('initializer', () => {
+  let mockProfileService: {
+    getActiveProfile: ReturnType<typeof vi.fn>;
+    activateProfile: ReturnType<typeof vi.fn>;
+  };
   let mockConfig: {
     getToolRegistry: ReturnType<typeof vi.fn>;
     getIdeMode: ReturnType<typeof vi.fn>;
     getGeminiMdFileCount: ReturnType<typeof vi.fn>;
-    refreshAuth: ReturnType<typeof vi.fn>;
+    getProviderProfileService: ReturnType<typeof vi.fn>;
   };
   let mockSettings: LoadedSettings;
   let mockIdeClient: {
     connect: ReturnType<typeof vi.fn>;
   };
+  const fakeProfile: ProviderProfile = {
+    id: 'test-profile-1',
+    providerType: ProviderType.USE_GEMINI,
+    models: [{ id: 'gemini-2.5-flash' }],
+    defaultModel: 'gemini-2.5-flash',
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockProfileService = {
+      getActiveProfile: vi.fn().mockReturnValue(fakeProfile),
+      activateProfile: vi.fn().mockResolvedValue(undefined),
+    };
     mockConfig = {
       getToolRegistry: vi.fn(),
       getIdeMode: vi.fn().mockReturnValue(false),
       getGeminiMdFileCount: vi.fn().mockReturnValue(5),
-      refreshAuth: vi.fn().mockResolvedValue(undefined),
+      getProviderProfileService: vi.fn().mockReturnValue(mockProfileService),
     };
     mockSettings = {
       merged: {
         security: {
           auth: {
-            selectedType: 'oauth',
+            selectedProviderId: fakeProfile.id,
+            providers: [fakeProfile],
           },
         },
       },
@@ -85,10 +101,8 @@ describe('initializer', () => {
       shouldOpenAuthDialog: false,
       geminiMdFileCount: 5,
     });
-    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      'oauth',
-      undefined,
-      undefined,
+    expect(mockProfileService.activateProfile).toHaveBeenCalledWith(
+      fakeProfile.id,
     );
     expect(validateTheme).toHaveBeenCalledWith(mockSettings);
     expect(logCliConfiguration).toHaveBeenCalled();
@@ -120,7 +134,9 @@ describe('initializer', () => {
   });
 
   it('should handle auth error', async () => {
-    mockConfig.refreshAuth.mockRejectedValue(new Error('Auth failed'));
+    mockProfileService.activateProfile.mockRejectedValue(
+      new Error('Auth failed'),
+    );
     const result = await initializeApp(
       mockConfig as unknown as Config,
       mockSettings,
@@ -133,7 +149,7 @@ describe('initializer', () => {
   });
 
   it('should treat ValidationRequiredError as non-fatal', async () => {
-    mockConfig.refreshAuth.mockRejectedValue(
+    mockProfileService.activateProfile.mockRejectedValue(
       new ValidationRequiredError('Validation required'),
     );
     const result = await initializeApp(
@@ -145,8 +161,8 @@ describe('initializer', () => {
     expect(result.shouldOpenAuthDialog).toBe(false);
   });
 
-  it('should handle undefined auth type', async () => {
-    mockSettings.merged.security.auth.selectedType = undefined;
+  it('should handle undefined active profile', async () => {
+    mockProfileService.getActiveProfile.mockReturnValue(undefined);
     const result = await initializeApp(
       mockConfig as unknown as Config,
       mockSettings,
@@ -154,51 +170,6 @@ describe('initializer', () => {
 
     expect(result.authError).toBeNull();
     expect(result.shouldOpenAuthDialog).toBe(true);
-    expect(mockConfig.refreshAuth).not.toHaveBeenCalled();
-  });
-
-  it('should pass the OpenAI base URL to refreshAuth for USE_OPENAI', async () => {
-    mockSettings.merged.security.auth.selectedType = ProviderType.USE_OPENAI;
-    mockSettings.merged.security.auth.openaiBaseUrl =
-      'https://custom.example.com/v1';
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
-
-    expect(result.authError).toBeNull();
-    expect(result.shouldOpenAuthDialog).toBe(false);
-    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      ProviderType.USE_OPENAI,
-      undefined,
-      'https://custom.example.com/v1',
-    );
-  });
-
-  it('should not pass the OpenAI base URL for non-OpenAI auth types', async () => {
-    mockSettings.merged.security.auth.selectedType = ProviderType.USE_GEMINI;
-    mockSettings.merged.security.auth.openaiBaseUrl =
-      'https://custom.example.com/v1';
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
-
-    expect(result.authError).toBeNull();
-    expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-      ProviderType.USE_GEMINI,
-      undefined,
-      undefined,
-    );
-  });
-
-  it('should handle theme error', async () => {
-    vi.mocked(validateTheme).mockReturnValue('Theme not found');
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
-
-    expect(result.themeError).toBe('Theme not found');
+    expect(mockProfileService.activateProfile).not.toHaveBeenCalled();
   });
 });

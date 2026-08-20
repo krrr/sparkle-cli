@@ -69,13 +69,14 @@ vi.mock('./extension.js');
 
 const mockCoreEvents = vi.hoisted(() => ({
   emitFeedback: vi.fn(),
+  emitSettingsChanged: vi.fn(),
 }));
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   return {
     ...actual,
-    coreEvents: mockCoreEvents,
+    coreEvents: Object.assign(actual.coreEvents, mockCoreEvents),
   };
 });
 
@@ -117,8 +118,11 @@ describe('Settings Repro', () => {
   });
 
   it('should handle the problematic settings.json without crashing', () => {
+    const normalizePath = (p: string | fs.PathLike) =>
+      p.toString().replace(/\\/g, '/').toLowerCase();
     (mockFsExistsSync as Mock).mockImplementation(
-      (p: fs.PathLike) => p === USER_SETTINGS_PATH,
+      (p: fs.PathLike) =>
+        normalizePath(p) === normalizePath(USER_SETTINGS_PATH),
     );
     const problemSettingsContent = {
       accessibility: {
@@ -135,7 +139,14 @@ describe('Settings Repro', () => {
       },
       security: {
         auth: {
-          selectedType: 'gemini-api-key',
+          selectedProviderId: 'p1',
+          providers: [
+            {
+              id: 'p1',
+              name: 'Gemini',
+              providerType: 'gemini-api-key',
+            },
+          ],
         },
         folderTrust: {
           enabled: true,
@@ -183,7 +194,7 @@ describe('Settings Repro', () => {
 
     (fs.readFileSync as Mock).mockImplementation(
       (p: fs.PathOrFileDescriptor) => {
-        if (p === USER_SETTINGS_PATH)
+        if (normalizePath(p as string) === normalizePath(USER_SETTINGS_PATH))
           return JSON.stringify(problemSettingsContent);
         return '{}';
       },
@@ -195,6 +206,10 @@ describe('Settings Repro', () => {
     // The model.compressionThreshold should be present.
     // And model.name should probably be undefined or default, but certainly NOT { compressionThreshold: 0.8 }
     expect(settings.merged.model?.compressionThreshold).toBe(0.8);
-    expect(typeof settings.merged.model?.name).not.toBe('object');
+    expect(
+      typeof (settings.merged.model as Record<string, unknown> | undefined)?.[
+        'name'
+      ],
+    ).not.toBe('object');
   });
 });

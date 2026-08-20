@@ -466,7 +466,14 @@ export class TestRig {
         },
         security: {
           auth: {
-            selectedType: 'gemini-api-key',
+            selectedProviderId: 'default-gemini',
+            providers: [
+              {
+                id: 'default-gemini',
+                name: 'Default Gemini',
+                providerType: 'gemini-api-key',
+              },
+            ],
           },
           folderTrust: {
             enabled: false,

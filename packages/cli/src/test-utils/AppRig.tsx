@@ -109,10 +109,7 @@ vi.mock('../ui/auth/useAuth.js', () => ({
     setAuthState: vi.fn(),
     authError: null,
     onAuthError: vi.fn(),
-    apiKeyDefaultValue: 'test-api-key',
-    reloadApiKey: vi.fn().mockResolvedValue('test-api-key'),
   }),
-  validateAuthMethodWithSettings: () => null,
 }));
 
 // A minimal mock ExtensionManager to satisfy AppContainer's forceful cast
@@ -256,7 +253,6 @@ export class AppRig {
       // For live tests, we allow falling through to the real shell service if no mock matches
       MockShellExecutionService.setPassthrough(true);
     }
-    vi.stubEnv('GEMINI_DEFAULT_AUTH_TYPE', ProviderType.USE_GEMINI);
   }
 
   private createRigSettings(): LoadedSettings {
@@ -266,8 +262,14 @@ export class AppRig {
         settings: {
           security: {
             auth: {
-              selectedType: ProviderType.USE_GEMINI,
-              useExternal: true,
+              selectedProviderId: 'mock-profile-1',
+              providers: [
+                {
+                  id: 'mock-profile-1',
+                  name: 'Mock Gemini',
+                  providerType: ProviderType.USE_GEMINI,
+                },
+              ],
             },
             folderTrust: {
               enabled: true,
@@ -283,8 +285,14 @@ export class AppRig {
       merged: {
         security: {
           auth: {
-            selectedType: ProviderType.USE_GEMINI,
-            useExternal: true,
+            selectedProviderId: 'mock-profile-1',
+            providers: [
+              {
+                id: 'mock-profile-1',
+                name: 'Mock Gemini',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
           },
           folderTrust: {
             enabled: true,

@@ -16,7 +16,6 @@ import { GoogleGenAI } from '@google/genai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import type { Config } from '../config/config.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
-import { loadApiKey } from './apiKeyCredentialStorage.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { resetVersionCache } from '../utils/version.js';
@@ -24,9 +23,6 @@ import type { LlmRole } from '../telemetry/llmRole.js';
 import type { ModelConfigService } from '../services/modelConfigService.js';
 
 vi.mock('@google/genai');
-vi.mock('./apiKeyCredentialStorage.js', () => ({
-  loadApiKey: vi.fn(),
-}));
 
 vi.mock('./fakeContentGenerator.js');
 
@@ -879,16 +875,6 @@ describe('createContentGeneratorConfig', () => {
     expect(config.apiKey).toBeUndefined();
   });
 
-  it('should not configure for Gemini if GEMINI_API_KEY is not set and storage is empty', async () => {
-    vi.stubEnv('GEMINI_API_KEY', '');
-    vi.mocked(loadApiKey).mockResolvedValue(null);
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      ProviderType.USE_GEMINI,
-    );
-    expect(config.apiKey).toBeUndefined();
-  });
-
   it('should configure for Gemini using the provided apiKey if available', async () => {
     const config = await createContentGeneratorConfig(
       mockConfig,
@@ -898,18 +884,8 @@ describe('createContentGeneratorConfig', () => {
     expect(config.apiKey).toBe('custom-gemini-key');
   });
 
-  it('should configure for Gemini using GEMINI_API_KEY from environment if set', async () => {
-    vi.stubEnv('GEMINI_API_KEY', 'env-gemini-key');
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      ProviderType.USE_GEMINI,
-    );
-    expect(config.apiKey).toBe('env-gemini-key');
-  });
-
-  it('should not configure a key for Gemini when no apiKey is provided', async () => {
+  it('should not configure a key for Gemini when no apiKey is provided and env is not set', async () => {
     vi.stubEnv('GEMINI_API_KEY', '');
-    vi.mocked(loadApiKey).mockResolvedValue(null);
     const config = await createContentGeneratorConfig(
       mockConfig,
       ProviderType.USE_GEMINI,
@@ -928,22 +904,9 @@ describe('createContentGeneratorConfig', () => {
     expect(config.baseUrl).toBe(DEFAULT_OPENAI_BASE_URL);
   });
 
-  it('should configure for USE_OPENAI using the stored key when OPENAI_API_KEY is not set', async () => {
-    vi.stubEnv('OPENAI_API_KEY', '');
-    vi.stubEnv('OPENAI_BASE_URL', '');
-    vi.mocked(loadApiKey).mockResolvedValue('stored-openai-key');
-    const config = await createContentGeneratorConfig(
-      mockConfig,
-      ProviderType.USE_OPENAI,
-    );
-    expect(config.apiKey).toBe('stored-openai-key');
-    expect(loadApiKey).toHaveBeenCalledWith(ProviderType.USE_OPENAI);
-  });
-
   it('should configure for USE_OPENAI with an empty apiKey when no key is available', async () => {
     vi.stubEnv('OPENAI_API_KEY', '');
     vi.stubEnv('OPENAI_BASE_URL', '');
-    vi.mocked(loadApiKey).mockResolvedValue(null);
     const config = await createContentGeneratorConfig(
       mockConfig,
       ProviderType.USE_OPENAI,
@@ -951,7 +914,7 @@ describe('createContentGeneratorConfig', () => {
     expect(config.apiKey).toBe('');
   });
 
-  it('should prefer the explicit apiKey over env and stored key for USE_OPENAI', async () => {
+  it('should prefer the explicit apiKey over env for USE_OPENAI', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'env-openai-key');
     vi.stubEnv('OPENAI_BASE_URL', '');
     const config = await createContentGeneratorConfig(

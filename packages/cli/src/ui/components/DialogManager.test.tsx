@@ -31,11 +31,8 @@ vi.mock('./ThemeDialog.js', () => ({
 vi.mock('./SettingsDialog.js', () => ({
   SettingsDialog: () => <Text>SettingsDialog</Text>,
 }));
-vi.mock('../auth/AuthDialog.js', () => ({
-  AuthDialog: () => <Text>AuthDialog</Text>,
-}));
-vi.mock('../auth/ApiAuthDialog.js', () => ({
-  ApiAuthDialog: () => <Text>ApiAuthDialog</Text>,
+vi.mock('../auth/ProviderManagerDialog.js', () => ({
+  ProviderManagerDialog: () => <Text>ProviderManagerDialog</Text>,
 }));
 vi.mock('./EditorSettingsDialog.js', () => ({
   EditorSettingsDialog: () => <Text>EditorSettingsDialog</Text>,
@@ -75,7 +72,6 @@ describe('DialogManager', () => {
     isSettingsDialogOpen: false,
     isModelDialogOpen: false,
     isAuthenticating: false,
-    isAwaitingApiKeyInput: false,
     isAuthDialogOpen: false,
     isEditorDialogOpen: false,
     isPermissionsDialogOpen: false,
@@ -131,8 +127,7 @@ describe('DialogManager', () => {
     [{ isThemeDialogOpen: true }, 'ThemeDialog'],
     [{ isSettingsDialogOpen: true }, 'SettingsDialog'],
     [{ isModelDialogOpen: true }, 'ModelDialog'],
-    [{ isAwaitingApiKeyInput: true }, 'ApiAuthDialog'],
-    [{ isAuthDialogOpen: true }, 'AuthDialog'],
+    [{ isAuthDialogOpen: true }, 'ProviderManagerDialog'],
     [{ isEditorDialogOpen: true }, 'EditorSettingsDialog'],
     [{ isPermissionsDialogOpen: true }, 'PermissionsModifyTrustDialog'],
     [

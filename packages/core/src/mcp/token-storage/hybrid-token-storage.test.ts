@@ -22,12 +22,6 @@ vi.mock('./keychain-token-storage.js', () => ({
   })),
 }));
 
-vi.mock('../../core/apiKeyCredentialStorage.js', () => ({
-  loadApiKey: vi.fn(),
-  saveApiKey: vi.fn(),
-  clearApiKey: vi.fn(),
-}));
-
 interface MockStorage {
   isAvailable?: ReturnType<typeof vi.fn>;
   isUsingFileFallback: ReturnType<typeof vi.fn>;

@@ -33,6 +33,9 @@ describe('statsCommand', () => {
 
     mockContext.services.agentContext = {
       getModel: vi.fn(),
+      getProviderProfileService: vi.fn().mockReturnValue({
+        getActiveProfile: vi.fn().mockReturnValue(undefined),
+      }),
       get config() {
         return this;
       },

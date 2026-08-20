@@ -1,0 +1,157 @@
+/**
+ * @license
+ * Copyright 2026 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderWithProviders } from '../../test-utils/render.js';
+import { waitFor } from '../../test-utils/async.js';
+import { act } from 'react';
+import { ProviderModelEditorView } from './ProviderModelEditorView.js';
+
+describe('ProviderModelEditorView', () => {
+  const onSave = vi.fn();
+  const onCancel = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders form in add mode', async () => {
+    const { lastFrame, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    expect(lastFrame()).toContain('Add Model');
+    expect(lastFrame()).toContain('Model ID:');
+    expect(lastFrame()).toContain('Aliases:');
+    expect(lastFrame()).toContain('Esc to save & return');
+    unmount();
+  });
+
+  it('renders form in edit mode with initial model values', async () => {
+    const { lastFrame, unmount } = await renderWithProviders(
+      <ProviderModelEditorView
+        model={{ id: 'gemini-2.5-flash', aliases: ['flash', 'fast'] }}
+        onSave={onSave}
+        onCancel={onCancel}
+      />,
+    );
+
+    expect(lastFrame()).toContain('Edit Model: gemini-2.5-flash');
+    expect(lastFrame()).toContain('gemini-2.5-flash');
+    expect(lastFrame()).toContain('flash, fast');
+    unmount();
+  });
+
+  it('saves model when submitting on the aliases field with Enter', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Type model id
+    await act(async () => {
+      stdin.write('gpt-4.5');
+    });
+    await waitUntilReady();
+
+    // Press Enter to move to aliases field
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    // Type aliases
+    await act(async () => {
+      stdin.write('fast, preview');
+    });
+    await waitUntilReady();
+
+    // Press Enter on aliases to submit form
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith({
+        id: 'gpt-4.5',
+        aliases: ['fast', 'preview'],
+      });
+    });
+
+    unmount();
+  });
+
+  it('saves and exits when pressing Esc with valid ID', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Type model id
+    await act(async () => {
+      stdin.write('claude-3-5-sonnet');
+    });
+    await waitUntilReady();
+
+    // Press Escape to save & return
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith({
+        id: 'claude-3-5-sonnet',
+      });
+    });
+
+    unmount();
+  });
+
+  it('cancels when pressing Esc with empty ID', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Press Escape with empty ID
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onCancel).toHaveBeenCalled();
+      expect(onSave).not.toHaveBeenCalled();
+    });
+
+    unmount();
+  });
+
+  it('navigates fields with Tab and arrow keys', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Down arrow to aliases
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+
+    // Up arrow to ID
+    await act(async () => {
+      stdin.write('\u001b[A');
+    });
+    await waitUntilReady();
+
+    // Tab to aliases
+    await act(async () => {
+      stdin.write('\t');
+    });
+    await waitUntilReady();
+
+    unmount();
+  });
+});

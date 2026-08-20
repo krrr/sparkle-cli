@@ -76,7 +76,6 @@ import {
   initializeApp,
   type InitializationResult,
 } from './core/initializer.js';
-import { validateAuthMethod } from './config/auth.js';
 import { runAcpClient } from './acp/acpStdioTransport.js';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
 import { appEvents, AppEvent } from './utils/events.js';
@@ -484,29 +483,14 @@ export async function main() {
   // Refresh auth before entering the sandbox because the sandbox will interfere
   // with the Oauth2 web redirect.
   let initialAuthFailed = false;
-  if (!settings.merged.security.auth.useExternal && !argv.isCommand) {
+  if (!argv.isCommand) {
     try {
-      if (
-        partialConfig.isInteractive() &&
-        settings.merged.security.auth.selectedType
-      ) {
-        const err = await validateAuthMethod(
-          settings.merged.security.auth.selectedType,
-        );
-        if (err) {
-          throw new Error(err);
-        }
-
-        await partialConfig.refreshAuth(
-          settings.merged.security.auth.selectedType,
-        );
+      const profileService = partialConfig.getProviderProfileService();
+      const activeProfile = profileService.getActiveProfile();
+      if (partialConfig.isInteractive() && activeProfile) {
+        await profileService.activateProfile(activeProfile.id);
       } else if (!partialConfig.isInteractive()) {
-        const authType = await validateNonInteractiveAuth(
-          settings.merged.security.auth.selectedType,
-          settings.merged.security.auth.useExternal,
-          partialConfig,
-        );
-        await partialConfig.refreshAuth(authType);
+        await validateNonInteractiveAuth(partialConfig);
       }
     } catch (err) {
       // If validation is required, we don't treat it as a fatal failure.
@@ -643,10 +627,11 @@ export async function main() {
     // Handle --list-sessions flag
     if (config.getListSessions()) {
       // Attempt auth for summary generation (gracefully skips if not configured)
-      const authType = settings.merged.security.auth.selectedType;
-      if (authType) {
+      const profileService = config.getProviderProfileService();
+      const activeProfile = profileService.getActiveProfile();
+      if (activeProfile) {
         try {
-          await config.refreshAuth(authType);
+          await profileService.activateProfile(activeProfile.id);
         } catch (e) {
           // Auth failed - continue without summary generation capability
           debugLogger.debug(
@@ -794,12 +779,7 @@ export async function main() {
       ),
     );
 
-    const authType = await validateNonInteractiveAuth(
-      settings.merged.security.auth.selectedType,
-      settings.merged.security.auth.useExternal,
-      config,
-    );
-    await config.refreshAuth(authType);
+    await validateNonInteractiveAuth(config);
 
     if (config.getDebugMode()) {
       debugLogger.log('Session ID: %s', sessionId);

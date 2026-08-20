@@ -82,6 +82,17 @@ describe('GeminiAgent Session Resume', () => {
     mockConfig = {
       refreshAuth: vi.fn().mockResolvedValue(undefined),
       initialize: vi.fn().mockResolvedValue(undefined),
+      getContentGeneratorConfig: vi
+        .fn()
+        .mockReturnValue({ apiKey: 'test-key' }),
+      getProviderProfileService: vi.fn().mockReturnValue({
+        getActiveProfile: vi.fn().mockReturnValue({
+          id: 'test-profile-1',
+          providerType: ProviderType.USE_GEMINI,
+          models: [{ id: 'gemini-pro' }],
+          defaultModel: 'gemini-pro',
+        }),
+      }),
       getFileSystemService: vi.fn(),
       setFileSystemService: vi.fn(),
       getGeminiClient: vi.fn().mockReturnValue({
@@ -135,7 +146,18 @@ describe('GeminiAgent Session Resume', () => {
     } as unknown as Mocked<Config>;
     mockSettings = {
       merged: {
-        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
+        security: {
+          auth: {
+            selectedProviderId: 'test-profile-1',
+            providers: [
+              {
+                id: 'test-profile-1',
+                name: 'Gemini Profile',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
+          },
+        },
         mcpServers: {},
       },
       setValue: vi.fn(),

@@ -27,8 +27,12 @@ export class AboutCommand implements Command {
     }
     const modelVersion = context.agentContext.config.getModel() || 'Unknown';
     const cliVersion = await getVersion();
-    const selectedAuthType =
-      context.settings.merged?.security?.auth?.selectedType ?? '';
+    const profileService =
+      context.agentContext.config.getProviderProfileService();
+    const activeProfile = profileService.getActiveProfile();
+    const selectedAuthType = activeProfile
+      ? `${activeProfile.id} (${activeProfile.providerType})`
+      : '';
     const ideClient = await getIdeClientName(context);
 
     const info = [
@@ -36,7 +40,7 @@ export class AboutCommand implements Command {
       `- OS: ${osVersion}`,
       `- Sandbox: ${sandboxEnv}`,
       `- Model: ${modelVersion}`,
-      `- Auth Type: ${selectedAuthType}`,
+      `- Provider: ${selectedAuthType}`,
       `- IDE Client: ${ideClient}`,
     ].join('\n');
 

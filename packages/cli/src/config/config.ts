@@ -39,6 +39,7 @@ import {
   type HookDefinition,
   type HookEventName,
   type OutputFormat,
+  type ProviderProfile,
   detectIdeFromEnv,
 } from 'sparkle-cli-core';
 import {
@@ -48,6 +49,7 @@ import {
   loadSettings,
   isWorktreeEnabled,
   type LoadedSettings,
+  SettingScope,
 } from './settings.js';
 
 import { loadSandboxConfig } from './sandboxConfig.js';
@@ -793,8 +795,11 @@ export async function loadCliConfig(
   );
 
   const defaultModel = SPARKLE_MODEL_ALIAS_AUTO;
+  const activeProfile = settings.security?.auth?.providers?.find(
+    (p) => p.id === settings.security?.auth?.selectedProviderId,
+  );
   const rawModel =
-    argv.model || process.env['SPARKLE_MODEL'] || settings.model?.name;
+    argv.model || process.env['SPARKLE_MODEL'] || activeProfile?.defaultModel;
 
   // Ensure specifiedModel is a string (e.g. if yargs parsed multiple --model as an array)
   const specifiedModel = Array.isArray(rawModel)
@@ -1021,6 +1026,36 @@ export async function loadCliConfig(
     disabledHooks: settings.hooksConfig?.disabled || [],
     projectHooks: projectHooks || {},
     onModelChange: (model: string) => saveModelChange(loadSettings(cwd), model),
+    profileStorageDelegate: {
+      getProfiles: () => {
+        const current = loadedSettings
+          ? loadedSettings.merged
+          : loadSettings(cwd).merged;
+        return current.security?.auth?.providers || [];
+      },
+      getSelectedProfileId: () => {
+        const current = loadedSettings
+          ? loadedSettings.merged
+          : loadSettings(cwd).merged;
+        return current.security?.auth?.selectedProviderId;
+      },
+      saveProfiles: (
+        profiles: ProviderProfile[],
+        selectedProfileId: string | undefined,
+      ) => {
+        const current = loadedSettings || loadSettings(cwd);
+        current.setValue(
+          SettingScope.User,
+          'security.auth.providers',
+          profiles,
+        );
+        current.setValue(
+          SettingScope.User,
+          'security.auth.selectedProviderId',
+          selectedProfileId,
+        );
+      },
+    },
     onReload: async () => {
       const refreshedSettings = loadSettings(cwd);
       return {

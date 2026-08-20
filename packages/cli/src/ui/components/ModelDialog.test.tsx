@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,122 +12,53 @@ import { waitFor } from '../../test-utils/async.js';
 import { createMockSettings } from '../../test-utils/settings.js';
 import {
   DEFAULT_GEMINI_MODEL,
-  SPARKLE_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_FLASH_MODEL,
-  DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
+  ProviderType,
+  type Config,
+  type ProviderProfile,
 } from 'sparkle-cli-core';
-import type { Config, ModelSlashCommandEvent } from 'sparkle-cli-core';
-
-// Mock dependencies
-const mockGetDisplayString = vi.fn();
-const mockLogModelSlashCommand = vi.fn();
-const mockModelSlashCommandEvent = vi.fn();
-
-vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
-  return {
-    ...actual,
-    getDisplayString: (val: string) => mockGetDisplayString(val),
-    logModelSlashCommand: (config: Config, event: ModelSlashCommandEvent) =>
-      mockLogModelSlashCommand(config, event),
-    ModelSlashCommandEvent: class {
-      constructor(model: string) {
-        mockModelSlashCommandEvent(model);
-      }
-    },
-  };
-});
 
 describe('<ModelDialog />', () => {
   const mockSetModel = vi.fn();
   const mockGetModel = vi.fn();
   const mockOnClose = vi.fn();
+  const mockUpdateProfile = vi.fn();
+  const mockSetDefaultModel = vi.fn();
 
-  interface MockConfig extends Partial<Config> {
-    setModel: (model: string, isTemporary?: boolean) => void;
-    getModel: () => string;
-    getIdeMode: () => boolean;
-    getLastRetrievedQuota: () =>
-      | {
-          buckets: Array<{
-            modelId?: string;
-            remainingFraction?: number;
-            resetTime?: string;
-          }>;
-        }
-      | undefined;
-    getModelConfigService: () => ReturnType<Config['getModelConfigService']>;
-  }
-
-  const mockModelConfigService = {
-    getAvailableModelOptions: vi.fn(() => {
-      const options = [
-        {
-          modelId: SPARKLE_MODEL_ALIAS_AUTO,
-          tier: 'auto',
-          name: mockGetDisplayString(SPARKLE_MODEL_ALIAS_AUTO),
-          description: 'Auto description',
-        },
-        {
-          modelId: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-          tier: 'flash-lite',
-          name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_LITE_MODEL),
-          description: 'Flash Lite description',
-        },
-        {
-          modelId: DEFAULT_GEMINI_FLASH_MODEL,
-          tier: 'flash',
-          name: mockGetDisplayString(DEFAULT_GEMINI_FLASH_MODEL),
-          description: 'Flash description',
-        },
-        {
-          modelId: DEFAULT_GEMINI_MODEL,
-          tier: 'pro',
-          name: mockGetDisplayString(DEFAULT_GEMINI_MODEL),
-          description: 'Pro description',
-        },
-      ];
-      return options;
-    }),
-    getModelDefinition: vi.fn((modelId: string) =>
-      modelId === SPARKLE_MODEL_ALIAS_AUTO
-        ? { tier: 'auto', isVisible: true }
-        : modelId === DEFAULT_GEMINI_MODEL
-          ? { tier: 'pro', isVisible: true }
-          : modelId === DEFAULT_GEMINI_FLASH_MODEL
-            ? { tier: 'flash', isVisible: true }
-            : modelId === DEFAULT_GEMINI_FLASH_LITE_MODEL
-              ? { tier: 'flash-lite', isVisible: true }
-              : undefined,
-    ),
+  const fakeProfile: ProviderProfile = {
+    id: 'p1',
+    providerType: ProviderType.USE_GEMINI,
+    models: [{ id: DEFAULT_GEMINI_FLASH_MODEL }, { id: DEFAULT_GEMINI_MODEL }],
+    defaultModel: DEFAULT_GEMINI_FLASH_MODEL,
   };
 
-  const mockConfig: MockConfig = {
+  const mockProfileService = {
+    getActiveProfile: vi.fn().mockReturnValue(fakeProfile),
+    updateProfile: mockUpdateProfile,
+    setDefaultModel: mockSetDefaultModel,
+  };
+
+  const mockConfig = {
     setModel: mockSetModel,
     getModel: mockGetModel,
     getIdeMode: () => false,
-    getLastRetrievedQuota: () => ({ buckets: [] }),
     getSessionId: () => 'test-session-id',
-    getModelConfigService: () =>
-      mockModelConfigService as unknown as ReturnType<
-        Config['getModelConfigService']
-      >,
-  };
+    getProviderProfileService: vi.fn().mockReturnValue(mockProfileService),
+  } as unknown as Config;
 
   beforeEach(() => {
     vi.resetAllMocks();
-    mockGetModel.mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
-
-    // Default implementation for getDisplayString
-    mockGetDisplayString.mockImplementation((val: string) => {
-      if (val === 'auto') return 'Auto';
-      return val;
-    });
+    mockGetModel.mockReturnValue(DEFAULT_GEMINI_FLASH_MODEL);
+    mockProfileService.getActiveProfile.mockReturnValue(fakeProfile);
+    vi.mocked(mockConfig.getProviderProfileService).mockReturnValue(
+      mockProfileService as unknown as ReturnType<
+        Config['getProviderProfileService']
+      >,
+    );
   });
 
-  const renderComponent = async (
-    configValue = mockConfig as unknown as Config,
-  ) => {
+  const renderComponent = async (configValue = mockConfig) => {
     const settings = createMockSettings({});
 
     const result = await renderWithProviders(
@@ -140,122 +71,40 @@ describe('<ModelDialog />', () => {
     return result;
   };
 
-  it('renders the initial "main" view correctly', async () => {
+  it('renders the model list for the active profile with Auto virtual option', async () => {
     const { lastFrame, unmount } = await renderComponent();
-    expect(lastFrame()).toContain('Select Model');
-    expect(lastFrame()).toContain('Remember model for future sessions: false');
+    expect(lastFrame()).toContain('Select Model (p1)');
     expect(lastFrame()).toContain('Auto');
-    expect(lastFrame()).toContain('Manual');
-    unmount();
-  });
-
-  it('closes dialog on escape in "manual" view for users with no pro access', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderComponent();
-
-    // Already in manual view
-    await act(async () => {
-      stdin.write('\u001B'); // Escape
-    });
-    await act(async () => {
-      await waitUntilReady();
-    });
-
-    await waitFor(() => {
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-    unmount();
-  });
-
-  it('switches to "manual" view when "Manual" is selected and uses getDisplayString for models', async () => {
-    mockGetDisplayString.mockImplementation((val: string) => {
-      if (val === DEFAULT_GEMINI_MODEL) return 'Formatted Pro Model';
-      if (val === DEFAULT_GEMINI_FLASH_MODEL) return 'Formatted Flash Model';
-      if (val === DEFAULT_GEMINI_FLASH_LITE_MODEL)
-        return 'Formatted Lite Model';
-      return val;
-    });
-
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
-
-    // Select "Manual" (index 1)
-    // Press down arrow to move to "Manual"
-    await act(async () => {
-      stdin.write('\u001B[B'); // Arrow Down
-    });
-    await waitUntilReady();
-
-    // Press enter to select
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    // Should now show manual options
-    await waitFor(() => {
-      const output = lastFrame();
-      expect(output).toContain('Formatted Pro Model');
-      expect(output).toContain('Formatted Flash Model');
-      expect(output).toContain('Formatted Lite Model');
-    });
-    unmount();
-  });
-
-  it('sets model and closes when a model is selected in "main" view', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderComponent();
-
-    // Select "Auto" (index 0)
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(
-        SPARKLE_MODEL_ALIAS_AUTO,
-        true, // Session only by default
-      );
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-    unmount();
-  });
-
-  it('sets model and closes when a model is selected in "manual" view', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderComponent();
-
-    // Navigate to Manual (index 1) and select
-    await act(async () => {
-      stdin.write('\u001B[B');
-    });
-    await waitUntilReady();
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    // Now in manual view. Default selection is the first item (flash-lite)
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(
-        DEFAULT_GEMINI_FLASH_LITE_MODEL,
-        true,
-      );
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-    unmount();
-  });
-
-  it('toggles persist mode with Tab key', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
-
+    expect(lastFrame()).toContain('gemini-flash-latest');
+    expect(lastFrame()).toContain('gemini-pro-latest');
     expect(lastFrame()).toContain('Remember model for future sessions: false');
+    unmount();
+  });
 
-    // Press Tab to toggle persist mode
+  it('sets model and closes when a model is selected', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderComponent();
+
+    // Select the currently highlighted model (gemini-flash-latest) directly with Enter
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(mockSetModel).toHaveBeenCalledWith(
+        DEFAULT_GEMINI_FLASH_MODEL,
+        true, // isTemporary = true because persistMode is false
+      );
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+    unmount();
+  });
+
+  it('persists default model to profile when Tab toggle is active', async () => {
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderComponent();
+
+    // Toggle persist mode with Tab
     await act(async () => {
       stdin.write('\t');
     });
@@ -265,44 +114,7 @@ describe('<ModelDialog />', () => {
       expect(lastFrame()).toContain('Remember model for future sessions: true');
     });
 
-    // Select "Auto" (index 0)
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(
-        SPARKLE_MODEL_ALIAS_AUTO,
-        false, // Persist enabled
-      );
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-    unmount();
-  });
-
-  it('closes dialog on escape in "main" view', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderComponent();
-
-    await act(async () => {
-      stdin.write('\u001B'); // Escape
-    });
-    // Escape key has a 50ms timeout in KeypressContext, so we need to wrap waitUntilReady in act
-    await act(async () => {
-      await waitUntilReady();
-    });
-
-    await waitFor(() => {
-      expect(mockOnClose).toHaveBeenCalled();
-    });
-    unmount();
-  });
-
-  it('goes back to "main" view on escape in "manual" view', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
-
-    // Go to manual view
+    // Move down from Flash (index 1) to Pro model (index 2) and select
     await act(async () => {
       stdin.write('\u001B[B');
     });
@@ -313,73 +125,30 @@ describe('<ModelDialog />', () => {
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(lastFrame()).toContain(DEFAULT_GEMINI_MODEL);
-    });
-
-    // Press Escape
-    await act(async () => {
-      stdin.write('\u001B');
-    });
-    await act(async () => {
-      await waitUntilReady();
-    });
-
-    await waitFor(() => {
-      expect(mockOnClose).not.toHaveBeenCalled();
-      // Should be back to main view (Manual option visible)
-      expect(lastFrame()).toContain('Manual');
+      expect(mockSetModel).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL, false);
+      expect(mockSetDefaultModel).toHaveBeenCalledWith(
+        fakeProfile.id,
+        DEFAULT_GEMINI_MODEL,
+      );
+      expect(mockOnClose).toHaveBeenCalled();
     });
     unmount();
   });
 
-  it('shows the preferred manual model in the main view option using getDisplayString', async () => {
-    mockGetModel.mockReturnValue(DEFAULT_GEMINI_MODEL);
-    mockGetDisplayString.mockImplementation((val: string) => {
-      if (val === DEFAULT_GEMINI_MODEL) return 'My Custom Model Display';
-      if (val === 'auto') return 'Auto';
-      return val;
-    });
-    const { lastFrame, unmount } = await renderComponent();
-
-    expect(lastFrame()).toContain('Manual (My Custom Model Display)');
-    unmount();
-  });
-
-  it('shows the default models in the manual view', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
-
-    // Go to manual view
-    await act(async () => {
-      stdin.write('\u001B[B'); // Manual
-    });
-    await waitUntilReady();
-    await act(async () => {
-      stdin.write('\r');
-    });
-    await waitUntilReady();
-
-    const output = lastFrame();
-    expect(output).toContain(DEFAULT_GEMINI_MODEL);
-    expect(output).toContain(DEFAULT_GEMINI_FLASH_MODEL);
-    expect(output).toContain(DEFAULT_GEMINI_FLASH_LITE_MODEL);
-    unmount();
-  });
-
-  it('sets the default model when selected in the manual view', async () => {
+  it('can select and persist Auto model to profile', async () => {
     const { stdin, waitUntilReady, unmount } = await renderComponent();
 
-    // Go to manual view
+    // Toggle persist mode with Tab
     await act(async () => {
-      stdin.write('\u001B[B'); // Manual
-    });
-    await waitUntilReady();
-    await act(async () => {
-      stdin.write('\r');
+      stdin.write('\t');
     });
     await waitUntilReady();
 
-    // Select the first model (DEFAULT_GEMINI_FLASH_LITE_MODEL)
+    // Move up from Flash (index 1) to Auto (index 0) and select
+    await act(async () => {
+      stdin.write('\u001B[A');
+    });
+    await waitUntilReady();
     await act(async () => {
       stdin.write('\r');
     });
@@ -387,10 +156,38 @@ describe('<ModelDialog />', () => {
 
     await waitFor(() => {
       expect(mockSetModel).toHaveBeenCalledWith(
-        DEFAULT_GEMINI_FLASH_LITE_MODEL,
-        true,
+        SPARKLE_MODEL_ALIAS_AUTO,
+        false,
       );
+      expect(mockSetDefaultModel).toHaveBeenCalledWith(
+        fakeProfile.id,
+        SPARKLE_MODEL_ALIAS_AUTO,
+      );
+      expect(mockOnClose).toHaveBeenCalled();
     });
+    unmount();
+  });
+
+  it('closes dialog on escape', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderComponent();
+
+    await act(async () => {
+      stdin.write('\u001B'); // Escape
+    });
+    await act(async () => {
+      await waitUntilReady();
+    });
+
+    await waitFor(() => {
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+    unmount();
+  });
+
+  it('renders guidance when no provider is active', async () => {
+    mockProfileService.getActiveProfile.mockReturnValue(undefined);
+    const { lastFrame, unmount } = await renderComponent();
+    expect(lastFrame()).toContain('No active provider configured');
     unmount();
   });
 });

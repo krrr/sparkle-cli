@@ -323,7 +323,7 @@ describe('gemini.tsx main function cleanup', () => {
       merged: {
         tools: { allowed: [], exclude: [] },
         advanced: { dnsResolutionOrder: 'ipv4first' },
-        security: { auth: { selectedType: 'google' } },
+        security: { auth: { selectedProviderId: 'p1', providers: [] } },
         ui: { theme: 'default' },
       },
       workspace: { settings: {} },
@@ -378,7 +378,7 @@ describe('gemini.tsx main function cleanup', () => {
       merged: {
         tools: { allowed: [], exclude: [] },
         advanced: { dnsResolutionOrder: 'ipv4first' },
-        security: { auth: { selectedType: 'google' } },
+        security: { auth: { selectedProviderId: 'p1', providers: [] } },
         ui: { theme: 'default' },
       },
       workspace: { settings: {} },

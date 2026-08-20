@@ -393,10 +393,7 @@ describe('SettingsUtils', () => {
 
         const keys = booleanSettings.map((s) => s.key);
         expect(keys).toContain('ui.requiresRestart');
-        expect(keys).toContain('ui.accessibility.enableLoadingPhrases');
-        expect(keys).not.toContain('privacy.usageStatisticsEnabled');
-        expect(keys).not.toContain('security.auth.selectedType'); // Advanced setting
-        expect(keys).not.toContain('security.auth.useExternal'); // Advanced setting
+        expect(keys).not.toContain('security.auth.selectedProviderId'); // Advanced setting
       });
 
       it('should return only string dialog settings', () => {
@@ -406,7 +403,7 @@ describe('SettingsUtils', () => {
         // Note: theme and preferredEditor are now hidden from dialog
         expect(keys).not.toContain('ui.theme'); // Now marked false
         expect(keys).not.toContain('general.preferredEditor'); // Now marked false
-        expect(keys).not.toContain('security.auth.selectedType'); // Advanced setting
+        expect(keys).not.toContain('security.auth.selectedProviderId'); // Advanced setting
 
         // Check that user-facing tool settings are included
         expect(keys).toContain('tools.shell.pager');

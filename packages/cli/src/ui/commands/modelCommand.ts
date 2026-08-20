@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -32,9 +32,17 @@ const setModelCommand: SlashCommand = {
     const persist = parts.includes('--persist');
 
     if (context.services.agentContext?.config) {
-      context.services.agentContext.config.setModel(modelName, !persist);
+      const config = context.services.agentContext.config;
+      const profileService = config.getProviderProfileService?.();
+      const activeProfile = profileService?.getActiveProfile();
+
+      if (persist && activeProfile && profileService) {
+        await profileService.setDefaultModel(activeProfile.id, modelName);
+      }
+
+      config.setModel(modelName, !persist);
       const event = new ModelSlashCommandEvent(modelName);
-      logModelSlashCommand(context.services.agentContext.config, event);
+      logModelSlashCommand(config, event);
 
       context.ui.addItem({
         type: MessageType.INFO,

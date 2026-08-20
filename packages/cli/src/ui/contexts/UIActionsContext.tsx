@@ -8,11 +8,7 @@ import { createContext, useContext } from 'react';
 import { type Key } from '../hooks/useKeypress.js';
 import { type IdeIntegrationNudgeResult } from '../IdeIntegrationNudge.js';
 import { type FolderTrustChoice } from '../components/FolderTrustDialog.js';
-import {
-  type ProviderType,
-  type EditorType,
-  type AgentDefinition,
-} from 'sparkle-cli-core';
+import { type EditorType, type AgentDefinition } from 'sparkle-cli-core';
 import { type LoadableSettingScope } from '../../config/settings.js';
 import type { AuthState } from '../types.js';
 import { type PermissionsDialogProps } from '../components/PermissionsModifyTrustDialog.js';
@@ -26,10 +22,6 @@ export interface UIActions {
   ) => Promise<void>;
   closeThemeDialog: () => void;
   handleThemeHighlight: (themeName: string | undefined) => void;
-  handleAuthSelect: (
-    authType: ProviderType | undefined,
-    scope: LoadableSettingScope,
-  ) => void;
   setAuthState: (state: AuthState) => void;
   onAuthError: (error: string | null) => void;
   handleEditorSelect: (
@@ -66,8 +58,6 @@ export interface UIActions {
   setQueueErrorMessage: (message: string | null) => void;
   addMessage: (message: string) => void;
   popAllMessages: () => string | undefined;
-  handleApiKeySubmit: (apiKey: string) => Promise<void>;
-  handleApiKeyCancel: () => void;
   setBannerVisible: (visible: boolean) => void;
   setShortcutsHelpVisible: (visible: boolean) => void;
   setCleanUiDetailsVisible: (visible: boolean) => void;

@@ -1,48 +1,30 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import type { LoadedSettings } from '../../config/settings.js';
-import {
-  ProviderType,
-  type Config,
-  loadApiKey,
-  debugLogger,
-} from 'sparkle-cli-core';
-import { getErrorMessage } from 'sparkle-cli-core';
+import { type Config, debugLogger, getErrorMessage } from 'sparkle-cli-core';
 import { AuthState } from '../types.js';
-import { validateAuthMethod } from '../../config/auth.js';
-
-export async function validateAuthMethodWithSettings(
-  authType: ProviderType,
-  settings: LoadedSettings,
-): Promise<string | null> {
-  if (settings.merged.security.auth.useExternal) {
-    return null;
-  }
-  // If using Gemini API key, we don't validate it here as we might need to prompt for it.
-  if (authType === ProviderType.USE_GEMINI) {
-    return null;
-  }
-  return validateAuthMethod(authType);
-}
+import { validateProfileAuth } from '../../config/auth.js';
 
 export const useAuthCommand = (
-  settings: LoadedSettings,
+  _settings: LoadedSettings,
   config: Config,
   initialAuthError: string | null = null,
 ) => {
+  const profileService = config.getProviderProfileService();
+  const activeProfile = profileService.getActiveProfile();
+
   const [authState, setAuthState] = useState<AuthState>(
-    initialAuthError ? AuthState.Updating : AuthState.Unauthenticated,
+    initialAuthError || !activeProfile
+      ? AuthState.Updating
+      : AuthState.Unauthenticated,
   );
 
   const [authError, setAuthError] = useState<string | null>(initialAuthError);
-  const [apiKeyDefaultValue, setApiKeyDefaultValue] = useState<
-    string | undefined
-  >(undefined);
 
   const onAuthError = useCallback(
     (error: string | null) => {
@@ -54,103 +36,43 @@ export const useAuthCommand = (
     [setAuthError, setAuthState],
   );
 
-  const reloadApiKey = useCallback(async () => {
-    const envKey = process.env['GEMINI_API_KEY'];
-    if (envKey !== undefined) {
-      setApiKeyDefaultValue(envKey);
-      return envKey;
-    }
-
-    const storedKey = (await loadApiKey(ProviderType.USE_GEMINI)) ?? '';
-    setApiKeyDefaultValue(storedKey);
-    return storedKey;
-  }, []);
-
   useEffect(() => {
-    if (authState === AuthState.AwaitingApiKeyInput) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      reloadApiKey();
-    }
-  }, [authState, reloadApiKey]);
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    (async () => {
+    void (async () => {
       if (authState !== AuthState.Unauthenticated) {
         return;
       }
 
-      const authType = settings.merged.security.auth.selectedType;
-      if (!authType) {
-        // No auth method configured yet: open the provider selection dialog
-        // (AuthDialog) so the user can choose how to authenticate.
+      const currentProfile = profileService.getActiveProfile();
+      if (!currentProfile) {
+        // No provider profile configured or active yet: open ProviderManagerDialog
         setAuthState(AuthState.Updating);
         return;
       }
 
-      if (authType === ProviderType.USE_GEMINI) {
-        const key = await reloadApiKey(); // Use the unified function
-        if (!key) {
-          setAuthState(AuthState.AwaitingApiKeyInput);
-          return;
-        }
-      }
-
-      const error = await validateAuthMethodWithSettings(
-        authType,
-        settings,
-      ).catch((e: unknown) => getErrorMessage(e));
+      const error = await validateProfileAuth(currentProfile).catch(
+        (e: unknown) => getErrorMessage(e),
+      );
 
       if (error) {
         onAuthError(error);
         return;
       }
 
-      const defaultAuthType = process.env['GEMINI_DEFAULT_AUTH_TYPE'];
-      if (
-        defaultAuthType &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        !Object.values(ProviderType).includes(defaultAuthType as ProviderType)
-      ) {
-        onAuthError(
-          `Invalid value for GEMINI_DEFAULT_AUTH_TYPE: "${defaultAuthType}". ` +
-            `Valid values are: ${Object.values(ProviderType).join(', ')}.`,
-        );
-        return;
-      }
-
       try {
-        await config.refreshAuth(
-          authType,
-          undefined,
-          authType === ProviderType.USE_OPENAI
-            ? settings.merged.security.auth.openaiBaseUrl
-            : undefined,
-        );
-
-        debugLogger.log(`Authenticated via "${authType}".`);
+        await profileService.activateProfile(currentProfile.id);
+        debugLogger.log(`Authenticated via profile "${currentProfile.id}".`);
         setAuthError(null);
         setAuthState(AuthState.Authenticated);
       } catch (e) {
         onAuthError(`Failed to sign in. Message: ${getErrorMessage(e)}`);
       }
     })();
-  }, [
-    settings,
-    config,
-    authState,
-    setAuthState,
-    setAuthError,
-    onAuthError,
-    reloadApiKey,
-  ]);
+  }, [profileService, authState, setAuthState, setAuthError, onAuthError]);
 
   return {
     authState,
     setAuthState,
     authError,
     onAuthError,
-    apiKeyDefaultValue,
-    reloadApiKey,
   };
 };

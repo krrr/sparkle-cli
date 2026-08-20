@@ -23,7 +23,7 @@ import {
 } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../config/settings.js';
 import { loadCliConfig, type CliArgs } from '../config/config.js';
-import { loadSettings, SettingScope } from '../config/settings.js';
+import { loadSettings } from '../config/settings.js';
 
 vi.mock('../config/config.js', () => ({
   loadCliConfig: vi.fn(),
@@ -78,6 +78,11 @@ describe('GeminiAgent - RPC Dispatcher', () => {
         subscribe: vi.fn(),
         unsubscribe: vi.fn(),
       } as unknown as MessageBus,
+      getProviderProfileService: vi.fn().mockReturnValue({
+        getActiveProfile: vi.fn().mockReturnValue(undefined),
+        createProfile: vi.fn().mockResolvedValue({ id: 'prof-1' }),
+        updateProfile: vi.fn().mockResolvedValue(undefined),
+      }),
       storage: {
         getWorkspaceAutoSavedPolicyPath: vi.fn(),
         getAutoSavedPolicyPath: vi.fn(),
@@ -89,7 +94,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     } as unknown as Mocked<Config>;
     mockSettings = {
       merged: {
-        security: { auth: { selectedType: 'login_with_google' } },
+        security: { auth: { selectedProviderId: 'prof-1', providers: [] } },
         mcpServers: {},
       },
       setValue: vi.fn(),
@@ -104,7 +109,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: ProviderType.USE_GEMINI },
+          auth: { selectedProviderId: 'prof-1', providers: [] },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},
@@ -123,10 +128,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
 
     expect(response.protocolVersion).toBe(acp.PROTOCOL_VERSION);
     expect(response.authMethods).toHaveLength(1);
-    const geminiAuth = response.authMethods?.find(
-      (m) => m.id === ProviderType.USE_GEMINI,
-    );
-    expect(geminiAuth?._meta).toEqual({
+    expect(response.authMethods?.[0]._meta).toEqual({
       'api-key': {
         provider: 'google',
       },
@@ -145,11 +147,6 @@ describe('GeminiAgent - RPC Dispatcher', () => {
       undefined,
       undefined,
     );
-    expect(mockSettings.setValue).toHaveBeenCalledWith(
-      SettingScope.User,
-      'security.auth.selectedType',
-      ProviderType.USE_GEMINI,
-    );
   });
 
   it('should authenticate correctly with api-key in _meta', async () => {
@@ -165,11 +162,6 @@ describe('GeminiAgent - RPC Dispatcher', () => {
       'test-api-key',
       undefined,
       undefined,
-    );
-    expect(mockSettings.setValue).toHaveBeenCalledWith(
-      SettingScope.User,
-      'security.auth.selectedType',
-      ProviderType.USE_GEMINI,
     );
   });
 

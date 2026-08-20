@@ -61,7 +61,17 @@ describe('AcpSessionManager', () => {
       waitForMcpInit: vi.fn(),
       getFileSystemService: vi.fn(),
       setFileSystemService: vi.fn(),
-      getContentGeneratorConfig: vi.fn(),
+      getContentGeneratorConfig: vi
+        .fn()
+        .mockReturnValue({ apiKey: 'test-key' }),
+      getProviderProfileService: vi.fn().mockReturnValue({
+        getActiveProfile: vi.fn().mockReturnValue({
+          id: 'test-profile-1',
+          providerType: ProviderType.USE_GEMINI,
+          models: [{ id: 'gemini-pro' }],
+          defaultModel: 'gemini-pro',
+        }),
+      }),
       getActiveModel: vi.fn().mockReturnValue('gemini-pro'),
       getModel: vi.fn().mockReturnValue('gemini-pro'),
       getModelConfigService: vi.fn().mockReturnValue({
@@ -115,7 +125,18 @@ describe('AcpSessionManager', () => {
     } as unknown as Mocked<Config>;
     mockSettings = {
       merged: {
-        security: { auth: { selectedType: 'login_with_google' } },
+        security: {
+          auth: {
+            selectedProviderId: 'test-profile-1',
+            providers: [
+              {
+                id: 'test-profile-1',
+                name: 'Gemini Profile',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
+          },
+        },
         mcpServers: {},
       },
       setValue: vi.fn(),
@@ -130,7 +151,16 @@ describe('AcpSessionManager', () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
         security: {
-          auth: { selectedType: ProviderType.USE_GEMINI },
+          auth: {
+            selectedProviderId: 'test-profile-1',
+            providers: [
+              {
+                id: 'test-profile-1',
+                name: 'Gemini Profile',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
+          },
           enablePermanentToolApproval: true,
         },
         mcpServers: {},
@@ -282,7 +312,18 @@ describe('AcpSessionManager', () => {
   it('should fail session creation if Gemini API key is missing', async () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
-        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
+        security: {
+          auth: {
+            selectedProviderId: 'test-profile-1',
+            providers: [
+              {
+                id: 'test-profile-1',
+                name: 'Gemini Profile',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
+          },
+        },
         mcpServers: {},
       },
       setValue: vi.fn(),
@@ -307,7 +348,18 @@ describe('AcpSessionManager', () => {
   it('should allow session creation without Gemini API key if custom endpoint is used', async () => {
     (loadSettings as unknown as Mock).mockImplementation(() => ({
       merged: {
-        security: { auth: { selectedType: ProviderType.USE_GEMINI } },
+        security: {
+          auth: {
+            selectedProviderId: 'test-profile-1',
+            providers: [
+              {
+                id: 'test-profile-1',
+                name: 'Gemini Profile',
+                providerType: ProviderType.USE_GEMINI,
+              },
+            ],
+          },
+        },
         mcpServers: {},
       },
       setValue: vi.fn(),

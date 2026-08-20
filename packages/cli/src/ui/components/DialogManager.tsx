@@ -11,8 +11,7 @@ import { FolderTrustDialog } from './FolderTrustDialog.js';
 import { ConsentPrompt } from './ConsentPrompt.js';
 import { ThemeDialog } from './ThemeDialog.js';
 import { SettingsDialog } from './SettingsDialog.js';
-import { AuthDialog } from '../auth/AuthDialog.js';
-import { ApiAuthDialog } from '../auth/ApiAuthDialog.js';
+import { ProviderManagerDialog } from '../auth/ProviderManagerDialog.js';
 import { EditorSettingsDialog } from './EditorSettingsDialog.js';
 import { relaunchApp } from '../../utils/processUtils.js';
 import { SessionBrowser } from './SessionBrowser.js';
@@ -206,25 +205,11 @@ export const DialogManager = ({
       </Box>
     );
   }
-  if (uiState.isAwaitingApiKeyInput) {
-    return (
-      <Box flexDirection="column">
-        <ApiAuthDialog
-          key={uiState.apiKeyDefaultValue}
-          onSubmit={uiActions.handleApiKeySubmit}
-          onCancel={uiActions.handleApiKeyCancel}
-          error={uiState.authError}
-          defaultValue={uiState.apiKeyDefaultValue}
-        />
-      </Box>
-    );
-  }
 
   if (uiState.isAuthDialogOpen) {
     return (
       <Box flexDirection="column">
-        <AuthDialog
-          settings={settings}
+        <ProviderManagerDialog
           setAuthState={uiActions.setAuthState}
           authError={uiState.authError}
           onAuthError={uiActions.onAuthError}

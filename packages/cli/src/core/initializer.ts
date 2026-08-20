@@ -5,7 +5,6 @@
  */
 
 import {
-  ProviderType,
   IdeClient,
   IdeConnectionEvent,
   IdeConnectionType,
@@ -40,18 +39,13 @@ export async function initializeApp(
   settings: LoadedSettings,
 ): Promise<InitializationResult> {
   const authHandle = startupProfiler.start('authenticate');
-  const authType = settings.merged.security.auth.selectedType;
+  const profileService = config.getProviderProfileService();
+  const activeProfile = profileService.getActiveProfile();
 
   let authError: string | null = null;
-  if (authType) {
+  if (activeProfile) {
     try {
-      await config.refreshAuth(
-        authType,
-        undefined,
-        authType === ProviderType.USE_OPENAI
-          ? settings.merged.security.auth.openaiBaseUrl
-          : undefined,
-      );
+      await profileService.activateProfile(activeProfile.id);
     } catch (e) {
       if (!(e instanceof ValidationRequiredError)) {
         // Don't treat validation required as a fatal auth error during
@@ -64,8 +58,7 @@ export async function initializeApp(
   authHandle?.end();
   const themeError = validateTheme(settings);
 
-  const shouldOpenAuthDialog =
-    settings.merged.security.auth.selectedType === undefined || !!authError;
+  const shouldOpenAuthDialog = !activeProfile || !!authError;
 
   logCliConfiguration(
     config,

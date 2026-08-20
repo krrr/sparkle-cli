@@ -8,10 +8,11 @@ import {
   type AgentLoopContext,
   ProviderType,
   getVersion,
+  saveApiKeyForProfile,
 } from 'sparkle-cli-core';
 import * as acp from '@agentclientprotocol/sdk';
 import { z } from 'zod';
-import { SettingScope, type LoadedSettings } from '../config/settings.js';
+import { type LoadedSettings } from '../config/settings.js';
 import type { CliArgs } from '../config/config.js';
 import { getAcpErrorMessage } from './acpErrors.js';
 import { AcpSessionManager, type AuthDetails } from './acpSessionManager.js';
@@ -25,7 +26,7 @@ export class GeminiAgent {
 
   constructor(
     private context: AgentLoopContext,
-    private settings: LoadedSettings,
+    settings: LoadedSettings,
     argv: CliArgs,
     connection: acp.AgentSideConnection,
   ) {
@@ -129,14 +130,30 @@ export class GeminiAgent {
         baseUrl,
         headers,
       );
+
+      const profileService = this.context.config.getProviderProfileService();
+      let activeProfile = profileService.getActiveProfile();
+      if (!activeProfile) {
+        activeProfile = await profileService.createProfile({
+          id: method === ProviderType.USE_OPENAI ? 'openai' : 'gemini',
+          providerType: method,
+          baseUrl,
+          customHeaders: headers,
+        });
+      } else {
+        await profileService.updateProfile(activeProfile.id, {
+          providerType: method,
+          baseUrl,
+          customHeaders: headers,
+        });
+      }
+      const keyToSave = apiKey ?? this.apiKey;
+      if (keyToSave) {
+        await saveApiKeyForProfile(activeProfile.id, keyToSave);
+      }
     } catch (e) {
       throw new acp.RequestError(-32000, getAcpErrorMessage(e));
     }
-    this.settings.setValue(
-      SettingScope.User,
-      'security.auth.selectedType',
-      method,
-    );
   }
 
   private getAuthDetails(): AuthDetails {

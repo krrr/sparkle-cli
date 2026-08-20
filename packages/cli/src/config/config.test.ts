@@ -19,6 +19,7 @@ import {
   ApprovalMode,
   type GeminiCLIExtension,
   Storage,
+  ProviderType,
 } from 'sparkle-cli-core';
 import { loadCliConfig, parseArguments, type CliArgs } from './config.js';
 import {
@@ -1629,8 +1630,18 @@ describe('loadCliConfig model selection', () => {
     const argv = await parseArguments(createTestMergedSettings());
     const config = await loadCliConfig(
       createTestMergedSettings({
-        model: {
-          name: 'gemini-2.5-pro',
+        security: {
+          auth: {
+            selectedProviderId: 'p1',
+            providers: [
+              {
+                id: 'p1',
+                providerType: ProviderType.USE_GEMINI,
+                models: [{ id: 'gemini-2.5-pro' }],
+                defaultModel: 'gemini-2.5-pro',
+              },
+            ],
+          },
         },
       }),
       'test-session',
@@ -1659,8 +1670,18 @@ describe('loadCliConfig model selection', () => {
     const argv = await parseArguments(createTestMergedSettings());
     const config = await loadCliConfig(
       createTestMergedSettings({
-        model: {
-          name: 'gemini-2.5-pro',
+        security: {
+          auth: {
+            selectedProviderId: 'p1',
+            providers: [
+              {
+                id: 'p1',
+                providerType: ProviderType.USE_GEMINI,
+                models: [{ id: 'gemini-2.5-pro' }],
+                defaultModel: 'gemini-2.5-pro',
+              },
+            ],
+          },
         },
       }),
       'test-session',

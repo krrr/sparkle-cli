@@ -17,7 +17,7 @@ import {
   type MCPServerConfig,
   type BugCommandSettings,
   type TelemetrySettings,
-  type ProviderType,
+  type ProviderProfile,
   type AgentOverride,
   type CustomTheme,
   type SandboxConfig,
@@ -992,15 +992,6 @@ const SETTINGS_SCHEMA = {
     description: 'Settings related to the generative model.',
     showInDialog: false,
     properties: {
-      name: {
-        type: 'string',
-        label: 'Model',
-        category: 'Model',
-        requiresRestart: false,
-        default: undefined as string | undefined,
-        description: 'The Gemini model to use for conversations.',
-        showInDialog: true,
-      },
       maxSessionTurns: {
         type: 'number',
         label: 'Max Session Turns',
@@ -1879,33 +1870,27 @@ const SETTINGS_SCHEMA = {
         description: 'Authentication settings.',
         showInDialog: false,
         properties: {
-          selectedType: {
+          selectedProviderId: {
             type: 'string',
-            label: 'Selected Auth Type',
-            category: 'Security',
-            requiresRestart: true,
-            default: undefined as ProviderType | undefined,
-            description: 'The currently selected authentication type.',
-            showInDialog: false,
-          },
-          useExternal: {
-            type: 'boolean',
-            label: 'Use External Auth',
-            category: 'Security',
-            requiresRestart: true,
-            default: undefined as boolean | undefined,
-            description: 'Whether to use an external authentication flow.',
-            showInDialog: false,
-          },
-          openaiBaseUrl: {
-            type: 'string',
-            label: 'OpenAI Base URL',
+            label: 'Selected Provider ID',
             category: 'Security',
             requiresRestart: true,
             default: undefined as string | undefined,
-            description:
-              'The base URL of the OpenAI-compatible API (e.g. https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment variable, then to the default OpenAI endpoint.',
-            showInDialog: true,
+            description: 'The currently selected provider profile ID.',
+            showInDialog: false,
+          },
+          providers: {
+            type: 'array',
+            label: 'Provider Profiles',
+            category: 'Security',
+            requiresRestart: true,
+            default: [] as ProviderProfile[],
+            description: 'Configured LLM provider profiles.',
+            showInDialog: false,
+            items: {
+              type: 'object',
+              ref: 'ProviderProfile',
+            },
           },
         },
       },
@@ -3168,6 +3153,43 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
       },
     },
     required: ['model'],
+  },
+  ProviderModel: {
+    type: 'object',
+    description: 'A model configuration for a provider.',
+    properties: {
+      id: { type: 'string' },
+      displayName: { type: 'string' },
+      aliases: {
+        type: 'array',
+        items: { type: 'string' },
+      },
+      contextWindow: { type: 'number' },
+      inputTokenLimit: { type: 'number' },
+      outputTokenLimit: { type: 'number' },
+    },
+    required: ['id'],
+  },
+  ProviderProfile: {
+    type: 'object',
+    description: 'A profile representing an LLM provider configuration.',
+    properties: {
+      id: { type: 'string' },
+      providerType: { type: 'string' },
+      baseUrl: { type: 'string' },
+      customHeaders: {
+        type: 'object',
+      },
+      models: {
+        type: 'array',
+        items: {
+          type: 'object',
+          ref: 'ProviderModel',
+        },
+      },
+      defaultModel: { type: 'string' },
+    },
+    required: ['id', 'providerType'],
   },
 };
 

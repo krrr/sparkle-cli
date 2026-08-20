@@ -36,14 +36,18 @@ describe('aboutCommand', () => {
           config: {
             getModel: vi.fn(),
             getIdeMode: vi.fn().mockReturnValue(true),
+            getProviderProfileService: vi.fn().mockReturnValue({
+              getActiveProfile: vi.fn().mockReturnValue({
+                id: 'test-auth',
+                providerType: 'gemini-api-key',
+              }),
+            }),
           },
         },
         settings: {
           merged: {
             security: {
-              auth: {
-                selectedType: 'test-auth',
-              },
+              auth: {},
             },
           },
         },
@@ -91,7 +95,7 @@ describe('aboutCommand', () => {
       osVersion: 'test-os',
       sandboxEnv: 'no sandbox',
       modelVersion: 'test-model',
-      selectedAuthType: 'test-auth',
+      selectedAuthType: 'test-auth (gemini-api-key)',
       ideClient: 'test-ide',
     });
   });
@@ -130,7 +134,7 @@ describe('aboutCommand', () => {
         osVersion: 'test-os',
         sandboxEnv: 'no sandbox',
         modelVersion: 'test-model',
-        selectedAuthType: 'test-auth',
+        selectedAuthType: 'test-auth (gemini-api-key)',
         ideClient: '',
       }),
     );

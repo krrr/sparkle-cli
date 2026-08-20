@@ -18,7 +18,12 @@ import {
 } from './types.js';
 
 function getSelectedAuthType(context: CommandContext) {
-  return context.services.settings.merged.security.auth.selectedType || '';
+  const profileService =
+    context.services.agentContext?.config.getProviderProfileService();
+  const activeProfile = profileService?.getActiveProfile();
+  return activeProfile
+    ? `${activeProfile.id} (${activeProfile.providerType})`
+    : '';
 }
 
 async function defaultSessionView(context: CommandContext) {

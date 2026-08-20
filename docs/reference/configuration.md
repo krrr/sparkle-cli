@@ -1476,25 +1476,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `false`
   - **Requires restart:** Yes
 
-- **`security.auth.selectedType`** (string):
-
-  - **Description:** The currently selected authentication type.
-  - **Default:** `undefined`
-  - **Requires restart:** Yes
-
-- **`security.auth.useExternal`** (boolean):
-
-  - **Description:** Whether to use an external authentication flow.
-  - **Default:** `undefined`
-  - **Requires restart:** Yes
-
-- **`security.auth.openaiBaseUrl`** (string):
-  - **Description:** The base URL of the OpenAI-compatible API (e.g.
-    https://api.openai.com/v1). Falls back to the OPENAI_BASE_URL environment
-    variable, then to the default OpenAI endpoint.
-  - **Default:** `undefined`
-  - **Requires restart:** Yes
-
 #### `advanced`
 
 - **`advanced.autoConfigureMemory`** (boolean):

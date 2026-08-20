@@ -18,7 +18,6 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import * as os from 'node:os';
 import type { Config } from '../config/config.js';
 import { ProviderType } from '../config/constants.js';
-import { loadApiKey } from './apiKeyCredentialStorage.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { parseCustomHeaders } from '../utils/customHeaderUtils.js';
@@ -125,11 +124,7 @@ export async function createContentGeneratorConfig(
     return process.env[key];
   };
 
-  const geminiApiKey =
-    apiKey ||
-    getEnv('GEMINI_API_KEY') ||
-    (await loadApiKey(ProviderType.USE_GEMINI)) ||
-    undefined;
+  const geminiApiKey = apiKey || getEnv('GEMINI_API_KEY') || undefined;
 
   if (authType === ProviderType.USE_GEMINI && geminiApiKey) {
     contentGeneratorConfig.apiKey = geminiApiKey;
@@ -138,11 +133,7 @@ export async function createContentGeneratorConfig(
   }
 
   if (authType === ProviderType.USE_OPENAI) {
-    contentGeneratorConfig.apiKey =
-      apiKey ||
-      getEnv('OPENAI_API_KEY') ||
-      (await loadApiKey(ProviderType.USE_OPENAI)) ||
-      '';
+    contentGeneratorConfig.apiKey = apiKey || getEnv('OPENAI_API_KEY') || '';
     contentGeneratorConfig.baseUrl =
       baseUrl || getEnv('OPENAI_BASE_URL') || DEFAULT_OPENAI_BASE_URL;
 

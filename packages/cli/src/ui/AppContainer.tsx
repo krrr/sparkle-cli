@@ -56,11 +56,9 @@ import {
   ideContextStore,
   getErrorMessage,
   getAllGeminiMdFilenames,
-  ProviderType,
   type ResumedSessionData,
   recordExitFail,
   ShellExecutionService,
-  saveApiKey,
   debugLogger,
   isValidEditorType,
   coreEvents,
@@ -78,12 +76,10 @@ import {
   generateSummary,
   type ConsentRequestPayload,
   type AgentsDiscoveredPayload,
-  ChangeAuthRequestedError,
   buildUserSteeringHintPrompt,
   LegacyAgentProtocol,
   type InjectionSource,
 } from 'sparkle-cli-core';
-import { validateAuthMethod } from '../config/auth.js';
 import process from 'node:process';
 import { useHistory } from './hooks/useHistoryManager.js';
 import { useMemoryMonitor } from './hooks/useMemoryMonitor.js';
@@ -113,7 +109,7 @@ import { useGeminiStream } from './hooks/useGeminiStream.js';
 import { useAgentStream } from './hooks/useAgentStream.js';
 import { type BackgroundTask } from './hooks/useExecutionLifecycle.js';
 import { useVim } from './hooks/vim.js';
-import { type LoadableSettingScope, SettingScope } from '../config/settings.js';
+import { SettingScope } from '../config/settings.js';
 import { type InitializationResult } from '../core/initializer.js';
 import { startAutoMemoryIfEnabled } from '../utils/autoMemory.js';
 import { useFocus } from './hooks/useFocus.js';
@@ -671,14 +667,11 @@ export const AppContainer = (props: AppContainerProps) => {
   );
   // Poll for terminal background color changes to auto-switch theme
   useTerminalTheme(handleThemeSelect, config, refreshStatic);
-  const {
-    authState,
-    setAuthState,
-    authError,
-    onAuthError,
-    apiKeyDefaultValue,
-    reloadApiKey,
-  } = useAuthCommand(settings, config, initializationResult.authError);
+  const { authState, setAuthState, authError, onAuthError } = useAuthCommand(
+    settings,
+    config,
+    initializationResult.authError,
+  );
 
   useQuotaAndFallback({
     config,
@@ -690,10 +683,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
   // Derive auth state variables for backward compatibility with UIStateContext
   const isAuthDialogOpen = authState === AuthState.Updating;
-  // TODO: Consider handling other auth types that should also skip the blocking screen
-  const isAuthenticating =
-    authState === AuthState.Unauthenticated &&
-    settings.merged.security.auth.selectedType !== ProviderType.USE_GEMINI;
+  const isAuthenticating = authState === AuthState.Unauthenticated;
 
   // Session browser and resume functionality
   const isGeminiClientInitialized = config.getGeminiClient()?.isInitialized();
@@ -721,96 +711,6 @@ export const AppContainer = (props: AppContainerProps) => {
     },
     [handleDeleteSessionSync],
   );
-
-  // Create handleAuthSelect wrapper for backward compatibility
-  const handleAuthSelect = useCallback(
-    async (authType: ProviderType | undefined, scope: LoadableSettingScope) => {
-      if (authType) {
-        settings.setValue(scope, 'security.auth.selectedType', authType);
-
-        try {
-          await config.refreshAuth(authType);
-          setAuthState(AuthState.Authenticated);
-        } catch (e) {
-          if (e instanceof ChangeAuthRequestedError) {
-            return;
-          }
-          onAuthError(
-            `Failed to authenticate: ${e instanceof Error ? e.message : String(e)}`,
-          );
-          return;
-        }
-      }
-      setAuthState(AuthState.Authenticated);
-    },
-    [settings, config, setAuthState, onAuthError],
-  );
-
-  const handleApiKeySubmit = useCallback(
-    async (apiKey: string) => {
-      try {
-        onAuthError(null);
-        if (!apiKey.trim()) {
-          onAuthError('API key cannot be empty or whitespace only.');
-          return;
-        }
-
-        await saveApiKey(ProviderType.USE_GEMINI, apiKey);
-        await reloadApiKey();
-        await config.refreshAuth(ProviderType.USE_GEMINI);
-        setAuthState(AuthState.Authenticated);
-      } catch (e) {
-        onAuthError(
-          `Failed to save API key: ${e instanceof Error ? e.message : String(e)}`,
-        );
-      }
-    },
-    [setAuthState, onAuthError, reloadApiKey, config],
-  );
-
-  const handleApiKeyCancel = useCallback(() => {
-    // Go back to auth method selection
-    setAuthState(AuthState.Updating);
-  }, [setAuthState]);
-
-  // Validates the selected auth type on startup, skipping the Gemini API key
-  // because it might be stored in the keychain (the useAuth hook handles it).
-  useEffect(() => {
-    if (
-      settings.merged.security.auth.selectedType &&
-      !settings.merged.security.auth.useExternal
-    ) {
-      // We skip validation for Gemini API key here because it might be stored
-      // in the keychain, which we can't check synchronously.
-      // The useAuth hook handles validation for this case.
-      if (
-        settings.merged.security.auth.selectedType === ProviderType.USE_GEMINI
-      ) {
-        return;
-      }
-
-      const authMethod = settings.merged.security.auth.selectedType;
-      void (async () => {
-        try {
-          const error = await validateAuthMethod(authMethod);
-          if (
-            error &&
-            authMethod === settings.merged.security.auth.selectedType
-          ) {
-            onAuthError(error);
-          }
-        } catch (e) {
-          if (authMethod === settings.merged.security.auth.selectedType) {
-            onAuthError(getErrorMessage(e));
-          }
-        }
-      })();
-    }
-  }, [
-    settings.merged.security.auth.selectedType,
-    settings.merged.security.auth.useExternal,
-    onAuthError,
-  ]);
 
   const { isModelDialogOpen, openModelDialog, closeModelDialog } =
     useModelCommand();
@@ -2064,7 +1964,6 @@ export const AppContainer = (props: AppContainerProps) => {
     isEditorDialogOpen ||
     showIdeRestartPrompt ||
     isSessionBrowserOpen ||
-    authState === AuthState.AwaitingApiKeyInput ||
     !!newAgents;
 
   const hasPendingToolConfirmation = useMemo(
@@ -2267,8 +2166,6 @@ export const AppContainer = (props: AppContainerProps) => {
       isConfigInitialized,
       authError,
       isAuthDialogOpen,
-      isAwaitingApiKeyInput: authState === AuthState.AwaitingApiKeyInput,
-      apiKeyDefaultValue,
       editorError,
       isEditorDialogOpen,
       mouseMode,
@@ -2467,8 +2364,6 @@ export const AppContainer = (props: AppContainerProps) => {
       embeddedShellFocused,
       showDebugProfiler,
       customDialog,
-      apiKeyDefaultValue,
-      authState,
       transientMessage,
       bannerData,
       bannerVisible,
@@ -2488,7 +2383,6 @@ export const AppContainer = (props: AppContainerProps) => {
       handleThemeSelect,
       closeThemeDialog,
       handleThemeHighlight,
-      handleAuthSelect,
       setAuthState,
       onAuthError,
       handleEditorSelect,
@@ -2518,8 +2412,6 @@ export const AppContainer = (props: AppContainerProps) => {
       setQueueErrorMessage,
       addMessage,
       popAllMessages,
-      handleApiKeySubmit,
-      handleApiKeyCancel,
       setBannerVisible,
       setShortcutsHelpVisible,
       setCleanUiDetailsVisible,
@@ -2566,7 +2458,6 @@ export const AppContainer = (props: AppContainerProps) => {
       handleThemeSelect,
       closeThemeDialog,
       handleThemeHighlight,
-      handleAuthSelect,
       setAuthState,
       onAuthError,
       handleEditorSelect,
@@ -2596,8 +2487,6 @@ export const AppContainer = (props: AppContainerProps) => {
       setQueueErrorMessage,
       addMessage,
       popAllMessages,
-      handleApiKeySubmit,
-      handleApiKeyCancel,
       setBannerVisible,
       setShortcutsHelpVisible,
       setCleanUiDetailsVisible,

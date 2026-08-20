@@ -28,8 +28,12 @@ export const aboutCommand: SlashCommand = {
     const modelVersion =
       context.services.agentContext?.config.getModel() || 'Unknown';
     const cliVersion = await getVersion();
-    const selectedAuthType =
-      context.services.settings.merged.security.auth.selectedType || '';
+    const profileService =
+      context.services.agentContext?.config.getProviderProfileService();
+    const activeProfile = profileService?.getActiveProfile();
+    const selectedAuthType = activeProfile
+      ? `${activeProfile.id} (${activeProfile.providerType})`
+      : '';
     const ideClient = await getIdeClientName(context);
 
     const aboutItem: Omit<HistoryItemAbout, 'id'> = {

@@ -265,10 +265,6 @@ vi.mock('./validateNonInterActiveAuth.js', () => ({
   validateNonInteractiveAuth: vi.fn().mockResolvedValue('google'),
 }));
 
-vi.mock('./config/auth.js', () => ({
-  validateAuthMethod: vi.fn().mockResolvedValue(null),
-}));
-
 describe('gemini.tsx main function', () => {
   let originalIsTTY: boolean | undefined;
   let initialUnhandledRejectionListeners: NodeJS.UnhandledRejectionListener[] =
@@ -729,7 +725,7 @@ describe('gemini.tsx main function kitty protocol', () => {
       createMockSettings({
         merged: {
           advanced: {},
-          security: { auth: { selectedType: 'google' } },
+          security: { auth: { selectedProviderId: 'p1', providers: [] } },
           ui: {},
         },
         workspace: { settings: {} },
@@ -1270,7 +1266,7 @@ describe('gemini.tsx main function exit codes', () => {
     }
   });
 
-  it('should exit with 41 for validateAuthMethod failure during sandbox setup', async () => {
+  it('should exit with 41 for activateProfile failure during sandbox setup', async () => {
     vi.stubEnv('SANDBOX', '');
     vi.mocked(loadSandboxConfig).mockResolvedValue(
       createMockSandboxConfig({
@@ -1278,25 +1274,33 @@ describe('gemini.tsx main function exit codes', () => {
         image: 'test-image',
       }),
     );
+    const mockProfileService = {
+      getActiveProfile: vi.fn().mockReturnValue({ id: 'p1' }),
+      activateProfile: vi
+        .fn()
+        .mockRejectedValue(new Error('Auth method invalid')),
+      listProfiles: vi.fn().mockReturnValue([]),
+      createProfile: vi.fn(),
+      updateProfile: vi.fn(),
+      deleteProfile: vi.fn(),
+      addModel: vi.fn(),
+      deleteModel: vi.fn(),
+      setDefaultModel: vi.fn(),
+    };
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
-        refreshAuth: vi.fn().mockResolvedValue(undefined),
         isInteractive: vi.fn().mockReturnValue(true),
+        getProviderProfileService: vi.fn().mockReturnValue(mockProfileService),
       }),
     );
     vi.mocked(loadSettings).mockReturnValue(
       createMockSettings({
         merged: {
-          security: { auth: { selectedType: 'google', useExternal: false } },
+          security: { auth: { selectedProviderId: 'p1' } },
         },
       }),
     );
     vi.mocked(parseArguments).mockResolvedValue({} as CliArgs);
-
-    const authModule = await import('./config/auth.js');
-    vi.mocked(authModule.validateAuthMethod).mockResolvedValueOnce(
-      'Auth method invalid',
-    );
 
     try {
       await main();
@@ -1315,16 +1319,27 @@ describe('gemini.tsx main function exit codes', () => {
         image: 'test-image',
       }),
     );
+    const mockProfileService = {
+      getActiveProfile: vi.fn().mockReturnValue({ id: 'p1' }),
+      activateProfile: vi.fn().mockRejectedValue(new Error('Auth failed')),
+      listProfiles: vi.fn().mockReturnValue([]),
+      createProfile: vi.fn(),
+      updateProfile: vi.fn(),
+      deleteProfile: vi.fn(),
+      addModel: vi.fn(),
+      deleteModel: vi.fn(),
+      setDefaultModel: vi.fn(),
+    };
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
-        refreshAuth: vi.fn().mockRejectedValue(new Error('Auth failed')),
         isInteractive: vi.fn().mockReturnValue(true),
+        getProviderProfileService: vi.fn().mockReturnValue(mockProfileService),
       }),
     );
     vi.mocked(loadSettings).mockReturnValue(
       createMockSettings({
         merged: {
-          security: { auth: { selectedType: 'google', useExternal: false } },
+          security: { auth: { selectedProviderId: 'p1' } },
         },
       }),
     );
@@ -1388,7 +1403,7 @@ describe('gemini.tsx main function exit codes', () => {
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
         isInteractive: () => false,
-        getQuestion: () => '',
+        getQuestion: () => undefined,
         getSandbox: () => undefined,
       }),
     );
@@ -1397,15 +1412,14 @@ describe('gemini.tsx main function exit codes', () => {
         merged: { security: { auth: {} }, ui: {} },
       }),
     );
-    vi.mocked(parseArguments).mockResolvedValue({
-      enabled: true,
-      allowedPaths: [],
-      networkAccess: false,
-    } as unknown as CliArgs);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (process.stdin as any).isTTY = true;
+    vi.mocked(parseArguments).mockResolvedValue({} as CliArgs);
 
-    process.env['GEMINI_API_KEY'] = 'test-key';
+    const processExitSpy = vi
+      .spyOn(process, 'exit')
+      .mockImplementation((code) => {
+        throw new MockProcessExitError(code);
+      });
+
     try {
       await main();
       expect.fail('Should have thrown MockProcessExitError');
@@ -1413,18 +1427,16 @@ describe('gemini.tsx main function exit codes', () => {
       expect(e).toBeInstanceOf(MockProcessExitError);
       expect((e as MockProcessExitError).code).toBe(42);
     } finally {
-      delete process.env['GEMINI_API_KEY'];
+      processExitSpy.mockRestore();
     }
   });
 
   it('should validate and refresh auth in non-interactive mode when no auth type is selected but env var is present', async () => {
-    const refreshAuthSpy = vi.fn();
     vi.mocked(loadCliConfig).mockResolvedValue(
       createMockConfig({
         isInteractive: () => false,
         getQuestion: () => 'test prompt',
         getSandbox: () => undefined,
-        refreshAuth: refreshAuthSpy,
       }),
     );
     vi.mocked(validateNonInteractiveAuth).mockResolvedValue(
@@ -1433,7 +1445,7 @@ describe('gemini.tsx main function exit codes', () => {
 
     vi.mocked(loadSettings).mockReturnValue(
       createMockSettings({
-        merged: { security: { auth: { selectedType: undefined } }, ui: {} },
+        merged: { security: { auth: {} }, ui: {} },
       }),
     );
     vi.mocked(parseArguments).mockResolvedValue({
@@ -1460,7 +1472,7 @@ describe('gemini.tsx main function exit codes', () => {
       processExitSpy.mockRestore();
     }
 
-    expect(refreshAuthSpy).toHaveBeenCalledWith(ProviderType.USE_GEMINI);
+    expect(validateNonInteractiveAuth).toHaveBeenCalled();
   });
 });
 
@@ -1551,7 +1563,7 @@ describe('project hooks loading based on trust', () => {
           settings: { hooks },
         },
         merged: {
-          security: { auth: { selectedType: 'google' } },
+          security: { auth: { selectedProviderId: 'p1', providers: [] } },
         },
       }),
     );
@@ -1576,7 +1588,7 @@ describe('project hooks loading based on trust', () => {
           settings: {},
         },
         merged: {
-          security: { auth: { selectedType: 'google' } },
+          security: { auth: { selectedProviderId: 'p1', providers: [] } },
         },
       }),
     );
