@@ -500,11 +500,6 @@ their corresponding top-level category object in your `settings.json` file.
 
 #### `model`
 
-- **`model.name`** (string):
-
-  - **Description:** The Gemini model to use for conversations.
-  - **Default:** `undefined`
-
 - **`model.maxSessionTurns`** (number):
 
   - **Description:** Maximum number of user/model/tool turns to keep in a
@@ -1474,6 +1469,17 @@ their corresponding top-level category object in your `settings.json` file.
   - **Description:** Enable redaction of environment variables that may contain
     secrets.
   - **Default:** `false`
+  - **Requires restart:** Yes
+
+- **`security.auth.selectedProviderId`** (string):
+
+  - **Description:** The currently selected provider profile ID.
+  - **Default:** `undefined`
+  - **Requires restart:** Yes
+
+- **`security.auth.providers`** (array):
+  - **Description:** Configured LLM provider profiles.
+  - **Default:** `[]`
   - **Requires restart:** Yes
 
 #### `advanced`

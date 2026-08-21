@@ -51,7 +51,11 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   );
 
   const options = useMemo(() => {
-    if (activeProfile?.models && activeProfile.models.length > 0) {
+    if (activeProfile) {
+      if (!activeProfile.models || activeProfile.models.length === 0) {
+        return [];
+      }
+
       const isAutoDefault =
         activeProfile.defaultModel === SPARKLE_MODEL_ALIAS_AUTO;
       const autoOption = {
@@ -59,17 +63,14 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         title: 'Auto',
         description:
           (isAutoDefault ? 'remembered, ' : '') +
-          'auto routing based on model alias',
+          'auto routing based on model tier',
         key: SPARKLE_MODEL_ALIAS_AUTO,
       };
 
       const profileModelOptions = activeProfile.models.map((m) => {
         const isDefault = activeProfile.defaultModel === m.id;
-        const aliasStr =
-          m.aliases && m.aliases.length > 0
-            ? `aliases: ${m.aliases.join(', ')}`
-            : '';
-        const desc = [isDefault ? 'remembered' : '', aliasStr]
+        const tierStr = m.tier ? `tier: ${m.tier}` : '';
+        const desc = [isDefault ? 'remembered' : '', tierStr]
           .filter(Boolean)
           .join(', ');
 
@@ -103,9 +104,20 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   }, [config, activeProfile]);
 
   const initialIndex = useMemo(() => {
-    const idx = options.findIndex((option) => option.value === preferredModel);
+    if (preferredModel === SPARKLE_MODEL_ALIAS_AUTO) {
+      return 0;
+    }
+    let idx = options.findIndex((option) => option.value === preferredModel);
+    if (idx === -1 && activeProfile?.models) {
+      const matchingModel = activeProfile.models.find(
+        (m) => m.tier === preferredModel,
+      );
+      if (matchingModel) {
+        idx = options.findIndex((option) => option.value === matchingModel.id);
+      }
+    }
     return idx !== -1 ? idx : 0;
-  }, [preferredModel, options]);
+  }, [preferredModel, options, activeProfile]);
 
   const handleSelect = useCallback(
     async (model: string) => {

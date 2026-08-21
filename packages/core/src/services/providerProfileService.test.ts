@@ -77,13 +77,13 @@ describe('ProviderProfileService', () => {
         id: 'work-openai',
         providerType: ProviderType.USE_OPENAI,
         baseUrl: 'https://api.openai.com/v1',
-        models: [{ id: 'gpt-4o', aliases: ['main'] }],
+        models: [{ id: 'gpt-4o', tier: 'pro' }],
         defaultModel: 'gpt-4o',
       });
 
       expect(profile.id).toBe('work-openai');
       expect(profile.baseUrl).toBe('https://api.openai.com/v1');
-      expect(profile.models).toEqual([{ id: 'gpt-4o', aliases: ['main'] }]);
+      expect(profile.models).toEqual([{ id: 'gpt-4o', tier: 'pro' }]);
       expect(profile.defaultModel).toBe('gpt-4o');
     });
 
@@ -224,12 +224,12 @@ describe('ProviderProfileService', () => {
       expect(updated?.defaultModel).toBe('o1-preview');
 
       await service.updateModel(profile.id, 'o1-preview', {
-        aliases: ['fast-reasoning'],
+        tier: 'pro',
       });
       updated = service.getProfile(profile.id);
-      expect(
-        updated?.models.find((m) => m.id === 'o1-preview')?.aliases,
-      ).toEqual(['fast-reasoning']);
+      expect(updated?.models.find((m) => m.id === 'o1-preview')?.tier).toBe(
+        'pro',
+      );
 
       await service.removeModel(profile.id, 'o1-preview');
       updated = service.getProfile(profile.id);
@@ -303,7 +303,7 @@ describe('ProviderProfileService', () => {
       );
     });
 
-    it('should resolve API key with priority: explicit CLI > env var > keychain', async () => {
+    it('should resolve API key with priority: env var > keychain', async () => {
       const p = await service.createProfile({
         id: 'gemini-test',
         providerType: ProviderType.USE_GEMINI,
@@ -311,22 +311,7 @@ describe('ProviderProfileService', () => {
 
       loadApiKeyForProfileMock.mockResolvedValue('keychain-key');
       env['GEMINI_API_KEY'] = 'env-key';
-      (mockConfig.getApiKey as ReturnType<typeof vi.fn>).mockReturnValue(
-        'cli-key',
-      );
 
-      await service.activateProfile(p.id);
-      expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
-        ProviderType.USE_GEMINI,
-        'cli-key',
-        undefined,
-        undefined,
-      );
-
-      // Now without CLI key
-      (mockConfig.getApiKey as ReturnType<typeof vi.fn>).mockReturnValue(
-        undefined,
-      );
       await service.activateProfile(p.id);
       expect(mockConfig.refreshAuth).toHaveBeenCalledWith(
         ProviderType.USE_GEMINI,
@@ -384,9 +369,10 @@ describe('ProviderProfileService', () => {
         id: 'openai-models',
         providerType: ProviderType.USE_OPENAI,
         models: [
-          { id: 'gpt-4o', aliases: ['main'] },
-          { id: 'gpt-4o-mini', aliases: ['fast'] },
+          { id: 'gpt-4o', tier: 'pro' },
+          { id: 'gpt-4o-mini', tier: 'flash' },
         ],
+
         defaultModel: 'gpt-4o',
       });
 

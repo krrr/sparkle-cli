@@ -18,7 +18,7 @@ describe('ProviderModelsView', () => {
     models: [
       {
         id: 'gpt-4o',
-        aliases: ['main'],
+        tier: 'pro',
       },
     ],
     defaultModel: 'gpt-4o',
@@ -48,7 +48,7 @@ describe('ProviderModelsView', () => {
 
     expect(lastFrame()).toContain('Models for: test-profile');
     expect(lastFrame()).toContain('gpt-4o');
-    expect(lastFrame()).toContain('aliases: main');
+    expect(lastFrame()).toContain('tier: pro');
     expect(lastFrame()).toContain('[a] Add model');
     expect(lastFrame()).toContain('[Esc] Back');
     unmount();
@@ -112,7 +112,7 @@ describe('ProviderModelsView', () => {
     await waitFor(() => {
       expect(lastFrame()).toContain('Add Model');
       expect(lastFrame()).toContain('Model ID:');
-      expect(lastFrame()).toContain('Aliases:');
+      expect(lastFrame()).toContain('Model Tier:');
       expect(lastFrame()).toContain('Esc to save & return');
     });
 
@@ -141,7 +141,7 @@ describe('ProviderModelsView', () => {
     await waitFor(() => {
       expect(lastFrame()).toContain('Edit Model: gpt-4o');
       expect(lastFrame()).toContain('Model ID:');
-      expect(lastFrame()).toContain('Aliases:');
+      expect(lastFrame()).toContain('Model Tier:');
     });
 
     unmount();
@@ -223,9 +223,9 @@ describe('ProviderModelsView', () => {
     unmount();
   });
 
-  it('renders default indicator and no aliases when model has no aliases', async () => {
-    const profileWithoutAliases: ProviderProfile = {
-      id: 'test-profile-no-alias',
+  it('renders default indicator and no tier when model has no tier', async () => {
+    const profileWithoutTier: ProviderProfile = {
+      id: 'test-profile-no-tier',
       providerType: ProviderType.USE_GEMINI,
       models: [
         {
@@ -237,7 +237,7 @@ describe('ProviderModelsView', () => {
 
     const { lastFrame, unmount } = await renderWithProviders(
       <ProviderModelsView
-        profile={profileWithoutAliases}
+        profile={profileWithoutTier}
         onAddModel={onAddModel}
         onUpdateModel={onUpdateModel}
         onDeleteModel={onDeleteModel}
@@ -248,7 +248,7 @@ describe('ProviderModelsView', () => {
 
     expect(lastFrame()).toContain('gemini-2.5-flash');
     expect(lastFrame()).toContain('✓ Default');
-    expect(lastFrame()).toContain('no aliases');
+    expect(lastFrame()).toContain('no tier');
     unmount();
   });
 });

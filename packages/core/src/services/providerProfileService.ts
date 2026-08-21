@@ -111,11 +111,11 @@ export class ProviderProfileService {
         defaultModels = [
           {
             id: DEFAULT_GEMINI_FLASH_MODEL,
-            aliases: ['flash'],
+            tier: 'flash',
           },
           {
             id: DEFAULT_GEMINI_MODEL,
-            aliases: ['pro'],
+            tier: 'pro',
           },
         ];
         defaultModel = defaultModel || DEFAULT_GEMINI_FLASH_MODEL;
@@ -123,11 +123,11 @@ export class ProviderProfileService {
         defaultModels = [
           {
             id: 'gpt-4o',
-            aliases: ['pro'],
+            tier: 'pro',
           },
           {
             id: 'gpt-4o-mini',
-            aliases: ['flash'],
+            tier: 'flash',
           },
         ];
         defaultModel = defaultModel || 'gpt-4o';
@@ -254,36 +254,40 @@ export class ProviderProfileService {
     const geminiEnvKey = this.env['GEMINI_API_KEY'];
     const openAiEnvKey = this.env['OPENAI_API_KEY'];
 
+    // Resolve API key
+    // Priority: Environment Variable > Keychain > none
+    let resolvedApiKey: string | undefined = undefined;
+
     if (targetProfile.providerType === ProviderType.USE_GEMINI) {
-      if (!geminiEnvKey && openAiEnvKey) {
+      resolvedApiKey =
+        geminiEnvKey ||
+        (await loadApiKeyForProfile(targetProfile.id)) ||
+        undefined;
+    } else if (targetProfile.providerType === ProviderType.USE_OPENAI) {
+      resolvedApiKey =
+        openAiEnvKey ||
+        (await loadApiKeyForProfile(targetProfile.id)) ||
+        undefined;
+    }
+
+    if (!resolvedApiKey && !targetProfile.baseUrl) {
+      if (
+        targetProfile.providerType === ProviderType.USE_GEMINI &&
+        openAiEnvKey &&
+        !geminiEnvKey
+      ) {
         throw new Error(
           'The active provider type is Gemini, but OPENAI_API_KEY was detected in environment variables. Please switch to an OpenAI provider or unset OPENAI_API_KEY.',
         );
       }
-    } else if (targetProfile.providerType === ProviderType.USE_OPENAI) {
-      if (!openAiEnvKey && geminiEnvKey) {
+      if (
+        targetProfile.providerType === ProviderType.USE_OPENAI &&
+        geminiEnvKey &&
+        !openAiEnvKey
+      ) {
         throw new Error(
           'The active provider type is OpenAI, but GEMINI_API_KEY was detected in environment variables. Please switch to a Gemini provider or unset GEMINI_API_KEY.',
         );
-      }
-    }
-
-    // Resolve API key
-    // Priority: CLI args > Environment Variable > Keychain > none
-    let resolvedApiKey: string | undefined =
-      this.config.getApiKey() || undefined;
-
-    if (!resolvedApiKey) {
-      if (targetProfile.providerType === ProviderType.USE_GEMINI) {
-        resolvedApiKey =
-          geminiEnvKey ||
-          (await loadApiKeyForProfile(targetProfile.id)) ||
-          undefined;
-      } else if (targetProfile.providerType === ProviderType.USE_OPENAI) {
-        resolvedApiKey =
-          openAiEnvKey ||
-          (await loadApiKeyForProfile(targetProfile.id)) ||
-          undefined;
       }
     }
 
@@ -307,7 +311,7 @@ export class ProviderProfileService {
     // Resolve model for target profile
     const currentModel = this.config.getModel();
     const modelExistsInProfile = targetProfile.models.some(
-      (m) => m.id === currentModel || m.aliases?.includes(currentModel),
+      (m) => m.id === currentModel || m.tier === currentModel,
     );
 
     let chosenModel: string;
@@ -345,13 +349,23 @@ export class ProviderProfileService {
       throw new Error(`Profile with ID "${profileId}" not found.`);
     }
 
-    const existingIndex = profile.models.findIndex((m) => m.id === model.id);
+    let models = profile.models;
+    // If the added model specifies a tier, remove that tier from any existing model in this profile
+    if (model.tier) {
+      models = models.map((m) =>
+        m.tier === model.tier && m.id !== model.id
+          ? { ...m, tier: undefined }
+          : m,
+      );
+    }
+
+    const existingIndex = models.findIndex((m) => m.id === model.id);
     let updatedModels: ProviderModel[];
     if (existingIndex >= 0) {
-      updatedModels = [...profile.models];
+      updatedModels = [...models];
       updatedModels[existingIndex] = model;
     } else {
-      updatedModels = [...profile.models, model];
+      updatedModels = [...models, model];
     }
 
     const defaultModel = profile.defaultModel || model.id;
@@ -411,7 +425,24 @@ export class ProviderProfileService {
       throw new Error(`Profile with ID "${profileId}" not found.`);
     }
 
-    const updatedModels = profile.models.map((m) => {
+    if (patch.id && patch.id !== modelId) {
+      const duplicate = profile.models.some((m) => m.id === patch.id);
+      if (duplicate) {
+        throw new Error(`Model with ID "${patch.id}" already exists.`);
+      }
+    }
+
+    let models = profile.models;
+    // If the patch specifies a tier, remove that tier from any other model in this profile
+    if (patch.tier) {
+      models = models.map((m) =>
+        m.tier === patch.tier && m.id !== modelId
+          ? { ...m, tier: undefined }
+          : m,
+      );
+    }
+
+    const updatedModels = models.map((m) => {
       if (m.id === modelId) {
         return {
           ...m,

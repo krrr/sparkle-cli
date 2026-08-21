@@ -28,7 +28,7 @@ describe('Multi-Provider CLI components logic', () => {
       models: [
         {
           id: 'gemini-2.5-flash',
-          aliases: ['flash', 'fast'],
+          tier: 'flash',
         },
       ],
       defaultModel: 'gemini-2.5-flash',
@@ -37,7 +37,7 @@ describe('Multi-Provider CLI components logic', () => {
     expect(profile.id).toBe('test-profile-1');
     expect(profile.providerType).toBe(ProviderType.USE_GEMINI);
     expect(profile.models).toHaveLength(1);
-    expect(profile.models[0].aliases).toContain('flash');
+    expect(profile.models[0].tier).toBe('flash');
   });
 
   it('handles model addition with only ID provided', () => {

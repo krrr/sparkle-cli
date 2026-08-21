@@ -1069,6 +1069,7 @@ export class Config implements McpContext, AgentLoopContext {
 
     this.modelConfigService = new ModelConfigService(
       modelConfigServiceConfig ?? DEFAULT_MODEL_CONFIGS,
+      () => this.providerProfileService?.getActiveProfile(),
     );
 
     this.experimentalAutoMemory = params.experimentalAutoMemory ?? false;

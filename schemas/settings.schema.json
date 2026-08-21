@@ -641,12 +641,6 @@
       "default": {},
       "type": "object",
       "properties": {
-        "name": {
-          "title": "Model",
-          "description": "The Gemini model to use for conversations.",
-          "markdownDescription": "The Gemini model to use for conversations.\n\n- Category: `Model`\n- Requires restart: `no`",
-          "type": "string"
-        },
         "maxSessionTurns": {
           "title": "Max Session Turns",
           "description": "Maximum number of user/model/tool turns to keep in a session. -1 means unlimited.",
@@ -2280,7 +2274,24 @@
           "markdownDescription": "Authentication settings.\n\n- Category: `Security`\n- Requires restart: `yes`\n- Default: `{}`",
           "default": {},
           "type": "object",
-          "properties": {},
+          "properties": {
+            "selectedProviderId": {
+              "title": "Selected Provider ID",
+              "description": "The currently selected provider profile ID.",
+              "markdownDescription": "The currently selected provider profile ID.\n\n- Category: `Security`\n- Requires restart: `yes`",
+              "type": "string"
+            },
+            "providers": {
+              "title": "Provider Profiles",
+              "description": "Configured LLM provider profiles.",
+              "markdownDescription": "Configured LLM provider profiles.\n\n- Category: `Security`\n- Requires restart: `yes`\n- Default: `[]`",
+              "default": [],
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ProviderProfile"
+              }
+            }
+          },
           "additionalProperties": false
         }
       },
@@ -3422,6 +3433,64 @@
         }
       },
       "required": ["model"]
+    },
+    "ProviderModel": {
+      "type": "object",
+      "description": "A model configuration for a provider.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["pro", "flash", "flash-lite"]
+        },
+        "contextWindow": {
+          "type": "number"
+        },
+        "inputTokenLimit": {
+          "type": "number"
+        },
+        "outputTokenLimit": {
+          "type": "number"
+        }
+      },
+      "required": ["id"]
+    },
+    "ProviderProfile": {
+      "type": "object",
+      "description": "A profile representing an LLM provider configuration.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "providerType": {
+          "type": "string"
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "customHeaders": {
+          "type": "object"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "ref": "ProviderModel"
+          }
+        },
+        "defaultModel": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "name", "providerType"]
     }
   }
 }

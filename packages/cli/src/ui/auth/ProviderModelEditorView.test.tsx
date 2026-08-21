@@ -25,7 +25,7 @@ describe('ProviderModelEditorView', () => {
 
     expect(lastFrame()).toContain('Add Model');
     expect(lastFrame()).toContain('Model ID:');
-    expect(lastFrame()).toContain('Aliases:');
+    expect(lastFrame()).toContain('Model Tier:');
     expect(lastFrame()).toContain('Esc to save & return');
     unmount();
   });
@@ -33,7 +33,7 @@ describe('ProviderModelEditorView', () => {
   it('renders form in edit mode with initial model values', async () => {
     const { lastFrame, unmount } = await renderWithProviders(
       <ProviderModelEditorView
-        model={{ id: 'gemini-2.5-flash', aliases: ['flash', 'fast'] }}
+        model={{ id: 'gemini-2.5-flash', tier: 'flash' }}
         onSave={onSave}
         onCancel={onCancel}
       />,
@@ -41,11 +41,11 @@ describe('ProviderModelEditorView', () => {
 
     expect(lastFrame()).toContain('Edit Model: gemini-2.5-flash');
     expect(lastFrame()).toContain('gemini-2.5-flash');
-    expect(lastFrame()).toContain('flash, fast');
+    expect(lastFrame()).toContain('[●] flash');
     unmount();
   });
 
-  it('saves model when submitting on the aliases field with Enter', async () => {
+  it('saves model when submitting on the tier field with Enter', async () => {
     const { stdin, waitUntilReady, unmount } = await renderWithProviders(
       <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
     );
@@ -56,19 +56,23 @@ describe('ProviderModelEditorView', () => {
     });
     await waitUntilReady();
 
-    // Press Enter to move to aliases field
+    // Press Enter to move to tier field
     await act(async () => {
       stdin.write('\r');
     });
     await waitUntilReady();
 
-    // Type aliases
+    // Toggle tier using right arrow (none -> flash-lite -> flash -> pro)
     await act(async () => {
-      stdin.write('fast, preview');
+      stdin.write('\u001b[C'); // right arrow -> flash-lite
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\u001b[C'); // right arrow -> flash
     });
     await waitUntilReady();
 
-    // Press Enter on aliases to submit form
+    // Press Enter on tier to submit form
     await act(async () => {
       stdin.write('\r');
     });
@@ -77,7 +81,7 @@ describe('ProviderModelEditorView', () => {
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith({
         id: 'gpt-4.5',
-        aliases: ['fast', 'preview'],
+        tier: 'flash',
       });
     });
 
@@ -104,6 +108,7 @@ describe('ProviderModelEditorView', () => {
     await waitFor(() => {
       expect(onSave).toHaveBeenCalledWith({
         id: 'claude-3-5-sonnet',
+        tier: undefined,
       });
     });
 
@@ -134,7 +139,7 @@ describe('ProviderModelEditorView', () => {
       <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
     );
 
-    // Down arrow to aliases
+    // Down arrow to tier
     await act(async () => {
       stdin.write('\u001b[B');
     });
@@ -146,7 +151,7 @@ describe('ProviderModelEditorView', () => {
     });
     await waitUntilReady();
 
-    // Tab to aliases
+    // Tab to tier
     await act(async () => {
       stdin.write('\t');
     });

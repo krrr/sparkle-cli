@@ -174,10 +174,7 @@ export function ProviderModelsView({
         {models.map((model, idx) => {
           const isSelected = idx === clampedIndex;
           const isDefault = profile.defaultModel === model.id;
-          const aliasText =
-            model.aliases && model.aliases.length > 0
-              ? `aliases: ${model.aliases.join(', ')}`
-              : 'no aliases';
+          const tierText = model.tier ? `tier: ${model.tier}` : 'no tier';
 
           return (
             <Box
@@ -201,7 +198,7 @@ export function ProviderModelsView({
                 )}
               </Box>
               <Box marginLeft={2}>
-                <Text color={theme.text.secondary}>{aliasText}</Text>
+                <Text color={theme.text.secondary}>{tierText}</Text>
               </Box>
             </Box>
           );

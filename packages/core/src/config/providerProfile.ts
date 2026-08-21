@@ -8,9 +8,11 @@ import type { ProviderType } from './constants.js';
 
 export type ProviderProfileId = string;
 
+export type ModelTier = 'pro' | 'flash' | 'flash-lite';
+
 export interface ProviderModel {
   id: string;
-  aliases?: string[];
+  tier?: ModelTier;
 
   // Optional capabilities for routing and UI
   contextWindow?: number;

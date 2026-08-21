@@ -3160,9 +3160,9 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
     properties: {
       id: { type: 'string' },
       displayName: { type: 'string' },
-      aliases: {
-        type: 'array',
-        items: { type: 'string' },
+      tier: {
+        type: 'string',
+        enum: ['pro', 'flash', 'flash-lite'],
       },
       contextWindow: { type: 'number' },
       inputTokenLimit: { type: 'number' },
@@ -3175,6 +3175,7 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
     description: 'A profile representing an LLM provider configuration.',
     properties: {
       id: { type: 'string' },
+      name: { type: 'string' },
       providerType: { type: 'string' },
       baseUrl: { type: 'string' },
       customHeaders: {
@@ -3189,7 +3190,7 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
       },
       defaultModel: { type: 'string' },
     },
-    required: ['id', 'providerType'],
+    required: ['id', 'name', 'providerType'],
   },
 };
 
