@@ -48,6 +48,9 @@ jobs:
           architecture: '${{ matrix.arch }}'
           cache: 'npm'
 
+      - name: 'Build vendored ink fork'
+        uses: './.github/actions/build-vendored-ink'
+
       - name: 'Install dependencies'
         run: 'npm ci'
 

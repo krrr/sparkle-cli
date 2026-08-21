@@ -3,6 +3,27 @@
 This guide provides instructions for setting up and using local development
 features for Sparkle CLI.
 
+## Build the vendored ink fork
+
+Sparkle CLI bundles a patched version of ink from `third_party/ink`. The root
+install links `node_modules/ink` to this folder, so builds always use the
+vendored copy instead of the published package. The compiled output in
+`third_party/ink/build/` isn't committed to the repository, but the bundle step
+requires it. The bundle step runs automatically through the npm `prepare` script
+whenever you install dependencies.
+
+On a fresh clone, build the vendored ink fork before you run the root install:
+
+```bash
+cd third_party/ink
+npm install --no-audit --no-fund
+npm run build
+cd ../..
+```
+
+CI runs the same sequence through the `.github/actions/build-vendored-ink`
+composite action before every root install.
+
 ## Tracing
 
 Sparkle CLI uses OpenTelemetry (OTel) to record traces that help you debug agent

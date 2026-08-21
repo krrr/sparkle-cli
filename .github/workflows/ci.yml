@@ -58,6 +58,9 @@ jobs:
           path: '${{ env.SPARKLE_LINT_TEMP_DIR }}'
           key: "${{ runner.os }}-${{ runner.arch }}-linters-${{ hashFiles('scripts/lint.js') }}"
 
+      - name: 'Build vendored ink fork'
+        uses: './.github/actions/build-vendored-ink'
+
       - name: 'Install dependencies'
         run: 'npm ci'
 
@@ -145,6 +148,9 @@ jobs:
           sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bubblewrap
           # Ubuntu 24.04+ requires this to allow bwrap to function in CI
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+
+      - name: 'Build vendored ink fork'
+        uses: './.github/actions/build-vendored-ink'
 
       - name: 'Install dependencies for testing'
         run: 'npm ci'
@@ -291,6 +297,9 @@ jobs:
           npm config set maxsockets 32
           npm config set registry https://registry.npmjs.org/
         shell: 'pwsh'
+
+      - name: 'Build vendored ink fork'
+        uses: './.github/actions/build-vendored-ink'
 
       - name: 'Install dependencies'
         run: 'npm ci'

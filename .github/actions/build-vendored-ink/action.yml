@@ -1,0 +1,13 @@
+name: 'Build vendored ink fork'
+description: 'Installs dependencies and compiles the vendored ink fork under
+  third_party/ink so the root `npm ci` prepare/bundle step can resolve it.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install and compile vendored ink fork'
+      shell: 'bash'
+      working-directory: 'third_party/ink'
+      run: |
+        npm install --no-audit --no-fund
+        npm run build
