@@ -213,6 +213,9 @@ export class ProviderProfileService {
       selectedId = targetId;
     }
     await this.storageDelegate.saveProfiles(profiles, selectedId);
+    if (selectedId === targetId) {
+      this.config.modelConfigService?.applyProfile(updated);
+    }
   }
 
   async deleteProfile(id: ProviderProfileId): Promise<void> {
@@ -238,6 +241,7 @@ export class ProviderProfileService {
         await this.activateProfile(remaining[0].id);
       } else {
         await this.storageDelegate.saveProfiles(remaining, undefined);
+        this.config.modelConfigService?.applyProfile(undefined);
       }
     } else {
       await this.storageDelegate.saveProfiles(remaining, selectedId);
@@ -328,6 +332,7 @@ export class ProviderProfileService {
           : 'gpt-4o';
     }
 
+    this.config.modelConfigService?.applyProfile(targetProfile);
     this.config.setModel(chosenModel, true);
 
     // Update selectedProviderId in storage

@@ -15,6 +15,8 @@ import {
   DEFAULT_GEMINI_MODEL,
 } from '../config/models.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
+import { ProviderType } from '../config/constants.js';
+import type { ProviderProfile } from '../config/providerProfile.js';
 
 describe('ModelConfigService', () => {
   it('should resolve a basic alias to its model and settings', () => {
@@ -1227,6 +1229,116 @@ describe('ModelConfigService', () => {
       expect(
         service.resolveClassifierModelId('flash', 'gemini-pro-latest'),
       ).toBe('gemini-flash-latest');
+    });
+
+    it('should recompile resolutions and definitions when applyProfile is called', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const openAiProfile: ProviderProfile = {
+        id: 'openai-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          { id: 'gpt-4o', tier: 'pro' },
+          { id: 'gpt-4o-mini', tier: 'flash' },
+        ],
+        defaultModel: 'gpt-4o',
+      };
+
+      service.applyProfile(openAiProfile);
+
+      // Model resolutions under OpenAI profile
+      expect(service.resolveModelId('pro')).toBe('gpt-4o');
+      expect(service.resolveModelId('flash')).toBe('gpt-4o-mini');
+      expect(service.resolveModelId('flash-lite')).toBe('gpt-4o-mini');
+      expect(service.resolveModelId('auto')).toBe('gpt-4o');
+      expect(service.resolveClassifierModelId('flash', 'gpt-4o')).toBe(
+        'gpt-4o-mini',
+      );
+
+      // Chains resolve through the recompiled config
+      const chain = service.resolveChain('auto-default');
+      expect(chain?.[0]?.model).toBe('gpt-4o');
+      expect(chain?.[1]?.model).toBe('gpt-4o-mini');
+
+      // Reset back to Gemini
+      service.applyProfile(undefined);
+      expect(service.resolveModelId('pro')).toBe(DEFAULT_GEMINI_MODEL);
+      expect(service.resolveModelId('flash')).toBe(DEFAULT_GEMINI_FLASH_MODEL);
+    });
+
+    it('should not resolve aliases to themselves when defaultModel is an alias name', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const profile: ProviderProfile = {
+        id: 'alias-default-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'gpt-4o-mini', tier: 'flash' }],
+        defaultModel: 'auto',
+      };
+
+      service.applyProfile(profile);
+
+      // 'auto' must fall through to the tier/listed model, never resolve to
+      // the literal string 'auto'.
+      expect(service.resolveModelId('auto')).toBe('gpt-4o-mini');
+      // Without a pro-tier model, 'pro' falls back to the first listed model.
+      expect(service.resolveModelId('pro')).toBe('gpt-4o-mini');
+      expect(service.resolveModelId('flash')).toBe('gpt-4o-mini');
+      expect(service.resolveClassifierModelId('flash', 'gpt-4o-mini')).toBe(
+        'gpt-4o-mini',
+      );
+    });
+
+    it('should treat models without tiers as custom definitions', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const profile: ProviderProfile = {
+        id: 'no-tier-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'my-model' }, { id: 'other-model' }],
+      };
+
+      service.applyProfile(profile);
+
+      // With no tier assignments and no defaultModel, every tier alias
+      // falls back to the first listed model.
+      expect(service.resolveModelId('pro')).toBe('my-model');
+      expect(service.resolveModelId('flash')).toBe('my-model');
+      expect(service.resolveModelId('flash-lite')).toBe('my-model');
+      expect(service.resolveModelId('auto')).toBe('my-model');
+
+      expect(service.getModelDefinition('my-model')?.tier).toBe('custom');
+      expect(service.getModelDefinition('other-model')?.tier).toBe('custom');
+    });
+
+    it('should propagate contextWindow and features into model definitions', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const profile: ProviderProfile = {
+        id: 'features-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          {
+            id: 'reasoner-v1',
+            features: { thinking: false },
+            contextWindow: 64000,
+          },
+          { id: 'fallback-model' },
+        ],
+        defaultModel: 'reasoner-v1',
+      };
+
+      service.applyProfile(profile);
+
+      const definition = service.getModelDefinition('reasoner-v1');
+      expect(definition?.contextWindow).toBe(64000);
+      // Explicit feature flags are taken as-is.
+      expect(definition?.features).toEqual({ thinking: false });
+      // Models without explicit features get the documented defaults.
+      expect(service.getModelDefinition('fallback-model')?.features).toEqual({
+        thinking: true,
+        multimodalToolUse: false,
+      });
     });
   });
 

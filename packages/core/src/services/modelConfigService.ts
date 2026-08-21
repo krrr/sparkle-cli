@@ -6,7 +6,16 @@
 
 import type { GenerateContentConfig } from '@google/genai';
 import type { ModelPolicy } from '../availability/modelPolicy.js';
-import { getDisplayString, getAutoModelDescription } from '../config/models.js';
+import {
+  getDisplayString,
+  getAutoModelDescription,
+  SPARKLE_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_PRO,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_FLASH_LITE,
+} from '../config/models.js';
+import { ProviderType } from '../config/constants.js';
+import type { ProviderProfile } from '../config/providerProfile.js';
 
 // The primary key for the ModelConfig is the model string. However, we also
 // support a secondary key to limit the override scope, typically an agent name.
@@ -67,12 +76,14 @@ export interface ModelDefinition {
   isVisible?: boolean;
   /** A short description of the model for the dialog. */
   dialogDescription?: string;
+  contextWindow?: number;
   features?: {
     // Whether the model supports thinking.
     thinking?: boolean;
     // Whether the model supports mutlimodal function responses. This is
     // supported in Gemini 3.
     multimodalToolUse?: boolean;
+    toolUse?: boolean;
   };
 }
 
@@ -135,6 +146,19 @@ export interface ModelConfigServiceConfig {
 
 const MAX_ALIAS_CHAIN_DEPTH = 100;
 
+/**
+ * Tier/alias names can be stored in `profile.defaultModel` (e.g. when the
+ * user remembers "Auto" as the default). They are resolution keys, never
+ * concrete model IDs, so they must not become resolution targets themselves;
+ * doing so would make resolutions self-referential.
+ */
+const RESERVED_MODEL_ALIASES: ReadonlySet<string> = new Set([
+  SPARKLE_MODEL_ALIAS_AUTO,
+  SPARKLE_MODEL_ALIAS_PRO,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_FLASH_LITE,
+]);
+
 export type ResolvedModelConfig = _ResolvedModelConfig & {
   readonly _brand: unique symbol;
 };
@@ -145,11 +169,80 @@ export interface _ResolvedModelConfig {
 }
 
 export class ModelConfigService {
+  private readonly baseConfig: ModelConfigServiceConfig;
+  private currentConfig: ModelConfigServiceConfig;
+  private isCustomProvider: boolean = false;
   private readonly runtimeAliases: Record<string, ModelConfigAlias> = {};
   private readonly runtimeOverrides: ModelConfigOverride[] = [];
 
-  // TODO(12597): Process config to build a typed alias hierarchy.
-  constructor(private readonly config: ModelConfigServiceConfig) {}
+  constructor(config: ModelConfigServiceConfig) {
+    this.baseConfig = config;
+    this.currentConfig = config;
+  }
+
+  /**
+   * Recompiles currentConfig when active profile switches or its models change.
+   */
+  applyProfile(profile?: ProviderProfile): void {
+    if (!profile || profile.providerType === ProviderType.USE_GEMINI) {
+      this.currentConfig = this.baseConfig;
+      this.isCustomProvider = false;
+      return;
+    }
+
+    this.isCustomProvider = true;
+    const models = profile.models ?? [];
+
+    // 1. Calculate Tier targets
+    const proModel = models.find((m) => m.tier === 'pro');
+    const flashModel = models.find((m) => m.tier === 'flash');
+    const liteModel = models.find((m) => m.tier === 'flash-lite');
+
+    // An alias name stored as defaultModel resolves through these very
+    // entries, so it can never serve as a concrete target.
+    const defaultTarget =
+      profile.defaultModel && !RESERVED_MODEL_ALIASES.has(profile.defaultModel)
+        ? profile.defaultModel
+        : undefined;
+    const proTarget =
+      proModel?.id || defaultTarget || models[0]?.id || 'gpt-4o';
+    const flashTarget = flashModel?.id || proTarget;
+    const liteTarget = liteModel?.id || flashTarget;
+    const autoTarget = defaultTarget || flashTarget;
+
+    // 2. Convert profile models to ModelDefinition
+    const dynamicDefinitions: Record<string, ModelDefinition> = {};
+    for (const m of models) {
+      dynamicDefinitions[m.id] = {
+        tier: m.tier ?? 'custom',
+        isVisible: true,
+        displayName: m.id,
+        contextWindow: m.contextWindow,
+        features: m.features ?? { thinking: true, multimodalToolUse: false },
+      };
+    }
+
+    // 3. Build merged currentConfig
+    this.currentConfig = {
+      ...this.baseConfig,
+      modelDefinitions: {
+        ...this.baseConfig.modelDefinitions,
+        ...dynamicDefinitions,
+      },
+      modelIdResolutions: {
+        ...this.baseConfig.modelIdResolutions,
+        pro: { default: proTarget },
+        flash: { default: flashTarget },
+        'flash-lite': { default: liteTarget },
+        auto: { default: autoTarget },
+      },
+      classifierIdResolutions: {
+        ...this.baseConfig.classifierIdResolutions,
+        flash: { default: flashTarget },
+        pro: { default: proTarget },
+      },
+    };
+  }
 
   /**
    * Returns a standardized list of available model options based on the resolution context.
@@ -161,7 +254,7 @@ export class ModelConfigService {
     description: string;
     tier: string;
   }> {
-    const definitions = this.config.modelDefinitions ?? {};
+    const definitions = this.currentConfig.modelDefinitions ?? {};
 
     const mainOptions = Object.entries(definitions)
       .filter(([_, m]) => {
@@ -212,13 +305,13 @@ export class ModelConfigService {
   }
 
   getModelDefinition(modelId: string): ModelDefinition | undefined {
-    const definition = this.config.modelDefinitions?.[modelId];
+    const definition = this.currentConfig.modelDefinitions?.[modelId];
     if (definition) {
       return definition;
     }
 
     // For unknown models, return an implicit custom definition to match legacy behavior.
-    if (!modelId.startsWith('gemini-')) {
+    if (!modelId.startsWith('gemini-') || this.isCustomProvider) {
       return {
         tier: 'custom',
         family: 'custom',
@@ -230,7 +323,7 @@ export class ModelConfigService {
   }
 
   getModelDefinitions(): Record<string, ModelDefinition> {
-    return this.config.modelDefinitions ?? {};
+    return this.currentConfig.modelDefinitions ?? {};
   }
 
   /**
@@ -242,8 +335,13 @@ export class ModelConfigService {
    */
   private isCustomModelForResolution(model: string): boolean {
     const resolved = this.resolveModelId(model);
-    const definition = this.config.modelDefinitions?.[resolved];
-    return definition?.tier === 'custom' || !resolved.startsWith('gemini-');
+    const definition = this.currentConfig.modelDefinitions?.[resolved];
+    return (
+      this.isCustomProvider ||
+      definition?.tier === 'custom' ||
+      (definition?.family !== undefined && definition.family !== 'gemini-3') ||
+      !resolved.startsWith('gemini-')
+    );
   }
 
   /**
@@ -269,12 +367,17 @@ export class ModelConfigService {
       // requestedModel, so this is defensive only).
       return target.familyTier;
     }
+
+    // 之前刚加openai支持的时候留下来的遗迹，加入多provider之后就不需要锚点机制了。暂时未去除，待调查需不需要考虑无profile的情况。
     const resolvedRequested = this.resolveModelId(requested);
-    const family = this.config.modelDefinitions?.[resolvedRequested]?.family;
+    const family =
+      this.currentConfig.modelDefinitions?.[resolvedRequested]?.family;
     if (!family) {
       return requested;
     }
-    const match = Object.entries(this.config.modelDefinitions ?? {}).find(
+    const match = Object.entries(
+      this.currentConfig.modelDefinitions ?? {},
+    ).find(
       ([_id, def]) => def.family === family && def.tier === target.familyTier,
     );
     return match?.[0] ?? requested;
@@ -311,7 +414,7 @@ export class ModelConfigService {
     requestedName: string,
     context: ResolutionContext = {},
   ): string {
-    const resolution = this.config.modelIdResolutions?.[requestedName];
+    const resolution = this.currentConfig.modelIdResolutions?.[requestedName];
     if (!resolution) {
       return requestedName;
     }
@@ -331,7 +434,7 @@ export class ModelConfigService {
     requestedModel: string,
     context: ResolutionContext = {},
   ): string {
-    const resolution = this.config.classifierIdResolutions?.[tier];
+    const resolution = this.currentConfig.classifierIdResolutions?.[tier];
     const fullContext: ResolutionContext = { ...context, requestedModel };
 
     if (!resolution) {
@@ -349,7 +452,7 @@ export class ModelConfigService {
   }
 
   getModelChain(chainName: string): ModelPolicy[] | undefined {
-    return this.config.modelChains?.[chainName];
+    return this.currentConfig.modelChains?.[chainName];
   }
 
   /**
@@ -360,7 +463,7 @@ export class ModelConfigService {
     chainName: string,
     context: ResolutionContext = {},
   ): ModelPolicy[] | undefined {
-    const template = this.config.modelChains?.[chainName];
+    const template = this.currentConfig.modelChains?.[chainName];
     if (!template) {
       return undefined;
     }
@@ -419,7 +522,8 @@ export class ModelConfigService {
       customAliases = {},
       overrides = [],
       customOverrides = [],
-    } = this.config || {};
+    } = this.currentConfig || {};
+
     const allAliases = {
       ...aliases,
       ...customAliases,

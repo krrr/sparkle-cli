@@ -848,8 +848,9 @@ their corresponding top-level category object in your `settings.json` file.
         "tier": "flash",
         "family": "deepseek",
         "isVisible": true,
+        "contextWindow": 1000000,
         "features": {
-          "thinking": false,
+          "thinking": true,
           "multimodalToolUse": false
         }
       },
@@ -857,6 +858,7 @@ their corresponding top-level category object in your `settings.json` file.
         "tier": "pro",
         "family": "deepseek",
         "isVisible": true,
+        "contextWindow": 1000000,
         "features": {
           "thinking": true,
           "multimodalToolUse": false

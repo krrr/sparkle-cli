@@ -5,19 +5,35 @@
  */
 
 import type { ProviderType } from './constants.js';
+import type {
+  SPARKLE_MODEL_ALIAS_PRO,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_FLASH_LITE,
+} from './models.js';
 
 export type ProviderProfileId = string;
-
-export type ModelTier = 'pro' | 'flash' | 'flash-lite';
+export type ModelTier =
+  | typeof SPARKLE_MODEL_ALIAS_PRO
+  | typeof SPARKLE_MODEL_ALIAS_FLASH
+  | typeof SPARKLE_MODEL_ALIAS_FLASH_LITE;
 
 export interface ProviderModel {
   id: string;
   tier?: ModelTier;
 
   // Optional capabilities for routing and UI
+  // Passing to ModelDefinition.features
   contextWindow?: number;
-  inputTokenLimit?: number;
-  outputTokenLimit?: number;
+  features?: {
+    thinking?: boolean;
+    toolUse?: boolean;
+    multimodalToolUse?: boolean;
+  };
+  // for future use
+  generateConfig?: {
+    temperature?: number;
+    topP?: number;
+  };
 }
 
 export interface ProviderProfile {
