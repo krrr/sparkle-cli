@@ -37,7 +37,9 @@ vi.mock('../agents/acknowledgedAgents.js', () => ({
   AcknowledgedAgentsService: vi.fn(),
 }));
 vi.mock('../services/modelConfigService.js', () => ({
-  ModelConfigService: vi.fn(),
+  ModelConfigService: vi.fn().mockImplementation(() => ({
+    applyProfile: vi.fn(),
+  })),
 }));
 vi.mock('./models.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./models.js')>();

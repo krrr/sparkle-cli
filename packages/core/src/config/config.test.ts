@@ -1931,9 +1931,9 @@ describe('Generation Config Merging (HACK)', () => {
     const config = new Config(params);
     const serviceConfig = (
       config.modelConfigService as Partial<ModelConfigService> as {
-        config: ModelConfigServiceConfig;
+        currentConfig: ModelConfigServiceConfig;
       }
-    ).config;
+    ).currentConfig;
 
     // Assert that the default aliases are present
     expect(serviceConfig.aliases).toEqual(DEFAULT_MODEL_CONFIGS.aliases);
@@ -1958,9 +1958,9 @@ describe('Generation Config Merging (HACK)', () => {
     const config = new Config(params);
     const serviceConfig = (
       config.modelConfigService as Partial<ModelConfigService> as {
-        config: ModelConfigServiceConfig;
+        currentConfig: ModelConfigServiceConfig;
       }
-    ).config;
+    ).currentConfig;
 
     // Assert that the user's aliases are present
     expect(serviceConfig.aliases).toEqual(userAliases);
@@ -1985,9 +1985,9 @@ describe('Generation Config Merging (HACK)', () => {
     const config = new Config(params);
     const serviceConfig = (
       config.modelConfigService as Partial<ModelConfigService> as {
-        config: ModelConfigServiceConfig;
+        currentConfig: ModelConfigServiceConfig;
       }
-    ).config;
+    ).currentConfig;
 
     // Assert that the user's aliases are used, not the defaults
     expect(serviceConfig.aliases).toEqual(userAliases);
@@ -1999,9 +1999,9 @@ describe('Generation Config Merging (HACK)', () => {
     const config = new Config(params);
     const serviceConfig = (
       config.modelConfigService as Partial<ModelConfigService> as {
-        config: ModelConfigServiceConfig;
+        currentConfig: ModelConfigServiceConfig;
       }
-    ).config;
+    ).currentConfig;
 
     // Assert that the full default config is used
     expect(serviceConfig).toEqual(DEFAULT_MODEL_CONFIGS);
