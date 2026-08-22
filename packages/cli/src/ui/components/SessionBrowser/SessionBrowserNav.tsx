@@ -27,7 +27,7 @@ export const NavigationHelpDisplay = (): React.JSX.Element => (
       {'   '}
       <Kbd name="Search" shortcut="/" />
       {'   '}
-      <Kbd name="Delete" shortcut="x" />
+      <Kbd name="Delete" shortcut="d" />
       {'   '}
       <Kbd name="Quit" shortcut="q" />
     </Text>
@@ -49,7 +49,7 @@ export const NavigationHelpDisplay = (): React.JSX.Element => (
 export const DeleteConfirmDisplay = (): React.JSX.Element => (
   <Box flexDirection="column">
     <Text color={Colors.AccentRed}>
-      <Kbd name="Delete" shortcut="x" />
+      <Kbd name="Delete" shortcut="d" />
       {' again to confirm   '}
       <Kbd name="Cancel" shortcut="Esc" />
     </Text>

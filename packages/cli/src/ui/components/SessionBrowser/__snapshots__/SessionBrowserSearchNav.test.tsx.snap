@@ -1,13 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`SessionBrowser Search and Navigation Components > DeleteConfirmDisplay renders correctly 1`] = `
-"Delete: x again to confirm   Cancel: Esc
+"Delete: d again to confirm   Cancel: Esc
 Any other key cancels
 "
 `;
 
 exports[`SessionBrowser Search and Navigation Components > NavigationHelp renders correctly 1`] = `
-"Navigate: ↑/↓   Resume: Enter   Search: /   Delete: x   Quit: q
+"Navigate: ↑/↓   Resume: Enter   Search: /   Delete: d   Quit: q
 Sort: s         Reverse: r      First/Last: g/G
 "
 `;

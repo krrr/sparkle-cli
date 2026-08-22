@@ -13,7 +13,7 @@ exports[`SessionBrowser component > enters search mode, filters sessions, and re
 
 exports[`SessionBrowser component > renders a list of sessions and marks current session as disabled 1`] = `
 " Chat Sessions (2 total)                                                        sorted by date desc
- Navigate: ↑/↓   Resume: Enter   Search: /   Delete: x   Quit: q
+ Navigate: ↑/↓   Resume: Enter   Search: /   Delete: d   Quit: q
  Sort: s         Reverse: r      First/Last: g/G
 
    Index │ Msgs │ Age  │ Name
@@ -23,9 +23,20 @@ exports[`SessionBrowser component > renders a list of sessions and marks current
 "
 `;
 
+exports[`SessionBrowser component > renders rows with dim index/msgs columns and bright age/name columns 1`] = `
+" Chat Sessions (2 total)                                                        sorted by date desc
+ Navigate: ↑/↓   Resume: Enter   Search: /   Delete: d   Quit: q
+ Sort: s         Reverse: r      First/Last: g/G
+
+   Index │ Msgs │ Age  │ Name
+ ❯ #1    │ 3    │ 10mo │ First session                                                             
+   #2    │ 7    │ 10mo │ Second session
+ ▼"
+`;
+
 exports[`SessionBrowser component > renders the pending delete row with red background and light text 1`] = `
 " Chat Sessions (2 total)                                                        sorted by date desc
- Delete: x again to confirm   Cancel: Esc
+ Delete: d again to confirm   Cancel: Esc
  Any other key cancels
 
    Index │ Msgs │ Age  │ Name

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="156" viewBox="0 0 920 156">
+  <style>
+    text { font-family: Consolas, "Courier New", monospace; font-size: 14px; dominant-baseline: text-before-edge; white-space: pre; }
+  </style>
+  <rect width="920" height="156" fill="#000000" />
+  <g transform="translate(10, 10)">
+    <text x="9" y="2" fill="#d7afff" textLength="207" lengthAdjust="spacingAndGlyphs">Chat Sessions (2 total)</text>
+    <text x="720" y="2" fill="#afafaf" textLength="171" lengthAdjust="spacingAndGlyphs">sorted by date desc</text>
+    <text x="9" y="19" fill="#afafaf" textLength="90" lengthAdjust="spacingAndGlyphs">Navigate: </text>
+    <text x="99" y="19" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs" font-weight="bold">↑/↓</text>
+    <text x="126" y="19" fill="#afafaf" textLength="99" lengthAdjust="spacingAndGlyphs">   Resume: </text>
+    <text x="225" y="19" fill="#afafaf" textLength="45" lengthAdjust="spacingAndGlyphs" font-weight="bold">Enter</text>
+    <text x="270" y="19" fill="#afafaf" textLength="99" lengthAdjust="spacingAndGlyphs">   Search: </text>
+    <text x="369" y="19" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">/</text>
+    <text x="378" y="19" fill="#afafaf" textLength="99" lengthAdjust="spacingAndGlyphs">   Delete: </text>
+    <text x="477" y="19" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">d</text>
+    <text x="486" y="19" fill="#afafaf" textLength="81" lengthAdjust="spacingAndGlyphs">   Quit: </text>
+    <text x="567" y="19" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">q</text>
+    <text x="9" y="36" fill="#afafaf" textLength="54" lengthAdjust="spacingAndGlyphs">Sort: </text>
+    <text x="63" y="36" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">s</text>
+    <text x="72" y="36" fill="#afafaf" textLength="162" lengthAdjust="spacingAndGlyphs">         Reverse: </text>
+    <text x="234" y="36" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs" font-weight="bold">r</text>
+    <text x="243" y="36" fill="#afafaf" textLength="162" lengthAdjust="spacingAndGlyphs">      First/Last: </text>
+    <text x="405" y="36" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs" font-weight="bold">g/G</text>
+    <text x="27" y="70" fill="#afafaf" textLength="45" lengthAdjust="spacingAndGlyphs" font-weight="bold">Index</text>
+    <text x="72" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="99" y="70" fill="#afafaf" textLength="36" lengthAdjust="spacingAndGlyphs" font-weight="bold">Msgs</text>
+    <text x="135" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="162" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs" font-weight="bold">Age</text>
+    <text x="198" y="70" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="225" y="70" fill="#afafaf" textLength="36" lengthAdjust="spacingAndGlyphs" font-weight="bold">Name</text>
+    <rect x="9" y="85" width="36" height="17" fill="#005f00" />
+    <text x="9" y="87" fill="#d7ffd7" textLength="36" lengthAdjust="spacingAndGlyphs">❯ #1</text>
+    <rect x="45" y="85" width="27" height="17" fill="#005f00" />
+    <rect x="72" y="85" width="36" height="17" fill="#005f00" />
+    <text x="72" y="87" fill="#d7ffd7" textLength="36" lengthAdjust="spacingAndGlyphs"> │ 3</text>
+    <rect x="108" y="85" width="27" height="17" fill="#005f00" />
+    <rect x="135" y="85" width="207" height="17" fill="#005f00" />
+    <text x="135" y="87" fill="#d7ffd7" textLength="207" lengthAdjust="spacingAndGlyphs"> │ 10mo │ First session</text>
+    <rect x="342" y="85" width="549" height="17" fill="#005f00" />
+    <text x="27" y="104" fill="#afafaf" textLength="18" lengthAdjust="spacingAndGlyphs">#2</text>
+    <text x="72" y="104" fill="#afafaf" textLength="36" lengthAdjust="spacingAndGlyphs"> │ 7</text>
+    <text x="135" y="104" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="162" y="104" fill="#ffffff" textLength="36" lengthAdjust="spacingAndGlyphs">10mo</text>
+    <text x="198" y="104" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs"> │ </text>
+    <text x="225" y="104" fill="#ffffff" textLength="126" lengthAdjust="spacingAndGlyphs">Second session</text>
+    <text x="9" y="121" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs">▼</text>
+  </g>
+</svg>

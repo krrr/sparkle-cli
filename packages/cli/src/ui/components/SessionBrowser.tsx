@@ -295,8 +295,10 @@ const SessionItem = ({
       <Text color={textColor()} dimColor={isDisabled}>
         {prefix}
       </Text>
+      {/* Visual hierarchy: index/msgs are secondary anchors (Comment);
+          age and the session name carry the primary information. */}
       <Box width={5}>
-        <Text color={textColor()} dimColor={isDisabled}>
+        <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
           #{originalIndex + 1}
         </Text>
       </Box>
@@ -305,7 +307,7 @@ const SessionItem = ({
         │{' '}
       </Text>
       <Box width={4}>
-        <Text color={textColor()} dimColor={isDisabled}>
+        <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
           {session.messageCount}
         </Text>
       </Box>
@@ -323,7 +325,7 @@ const SessionItem = ({
         │{' '}
       </Text>
       <Box flexGrow={1}>
-        <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
+        <Text color={textColor()} dimColor={isDisabled}>
           {truncatedMessage}
           {additionalInfo && (
             <Text color={textColor(Colors.Gray)} dimColor bold={false}>
@@ -621,13 +623,13 @@ export const useSessionBrowserInput = (
       } else {
         // Navigation mode input handling.  We're keeping the letter-based controls for non-search
         // mode only, because the letters need to act as input for the search.
-        // While a delete confirmation is pending, any key other than x/X
+        // While a delete confirmation is pending, any key other than d/D
         // (confirm) or escape (cancel) first cancels the confirmation and is
         // then processed normally below.
         if (
           state.pendingDeleteSessionId !== null &&
-          key.sequence !== 'x' &&
-          key.sequence !== 'X' &&
+          key.sequence !== 'd' &&
+          key.sequence !== 'D' &&
           key.name !== 'escape'
         ) {
           state.setPendingDeleteSessionId(null);
@@ -669,7 +671,7 @@ export const useSessionBrowserInput = (
           return true;
         }
         // Delete session control.
-        else if (key.sequence === 'x' || key.sequence === 'X') {
+        else if (key.sequence === 'd' || key.sequence === 'D') {
           const selectedSession =
             state.filteredAndSortedSessions[state.activeIndex];
           if (selectedSession && !selectedSession.isCurrentSession) {

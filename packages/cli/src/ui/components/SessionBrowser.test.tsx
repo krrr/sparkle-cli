@@ -367,7 +367,7 @@ describe('SessionBrowser component', () => {
 
     // Attempt delete: the current session cannot be deleted, so no
     // confirmation is armed.
-    triggerKey({ sequence: 'x', name: 'x' });
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     expect(onDeleteSession).not.toHaveBeenCalled();
     expect(lastFrame()).not.toContain('again to confirm');
@@ -404,16 +404,16 @@ describe('SessionBrowser component', () => {
       />,
     );
 
-    // First x only arms the confirmation: no delete yet, confirm bar shown.
-    triggerKey({ sequence: 'x', name: 'x' });
+    // First d only arms the confirmation: no delete yet, confirm bar shown.
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     await waitFor(() => {
       expect(lastFrame()).toContain('again to confirm');
     });
     expect(onDeleteSession).not.toHaveBeenCalled();
 
-    // Second x confirms and deletes the armed session.
-    triggerKey({ sequence: 'x', name: 'x' });
+    // Second d confirms and deletes the armed session.
+    triggerKey({ sequence: 'd', name: 'd' });
     // Flush the async delete callback inside act so its state updates are
     // wrapped (the component updates state in the onDeleteSession .then()).
     await act(async () => {
@@ -460,7 +460,7 @@ describe('SessionBrowser component', () => {
       />,
     );
 
-    triggerKey({ sequence: 'x', name: 'x' });
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     await waitFor(() => {
       expect(lastFrame()).toContain('again to confirm');
@@ -507,7 +507,7 @@ describe('SessionBrowser component', () => {
       />,
     );
 
-    triggerKey({ sequence: 'x', name: 'x' });
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     await waitFor(() => {
       expect(lastFrame()).toContain('again to confirm');
@@ -521,8 +521,8 @@ describe('SessionBrowser component', () => {
     });
     expect(onDeleteSession).not.toHaveBeenCalled();
 
-    // x on the newly selected session only re-arms the confirmation.
-    triggerKey({ sequence: 'x', name: 'x' });
+    // d on the newly selected session only re-arms the confirmation.
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     await waitFor(() => {
       expect(lastFrame()).toContain('again to confirm');
@@ -562,11 +562,48 @@ describe('SessionBrowser component', () => {
     );
     const { lastFrame, waitUntilReady } = renderResult;
 
-    triggerKey({ sequence: 'x', name: 'x' });
+    triggerKey({ sequence: 'd', name: 'd' });
     await waitUntilReady();
     await waitFor(() => {
       expect(lastFrame()).toContain('again to confirm');
     });
+
+    await expect(renderResult).toMatchSvgSnapshot();
+  });
+
+  it('renders rows with dim index/msgs columns and bright age/name columns', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      messageCount: 3,
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      messageCount: 7,
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const renderResult = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+    await renderResult.waitUntilReady();
 
     await expect(renderResult).toMatchSvgSnapshot();
   });
