@@ -17,8 +17,10 @@ import { ToolErrorType } from './tool-error.js';
 import * as glob from 'glob';
 import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
 import { execStreaming } from '../utils/shell-utils.js';
+import { isGitRepository } from '../utils/gitUtils.js';
 
 vi.mock('glob', { spy: true });
+vi.mock('../utils/gitUtils.js', { spy: true });
 vi.mock('../utils/shell-utils.js', () => ({
   execStreaming: vi.fn(),
 }));
@@ -201,7 +203,7 @@ describe('GrepTool', () => {
       expect(result.llmContent).toContain('L1: world in ..env');
     });
 
-    it('should ignore system grep output that escapes base path', async () => {
+    it('should ignore git grep output that escapes base path', async () => {
       vi.mocked(execStreaming).mockImplementationOnce(() =>
         createLineGenerator(['..env:1:hello', '../secret.txt:2:leak']),
       );
@@ -212,8 +214,9 @@ describe('GrepTool', () => {
         execute: (options: ExecuteOptions) => Promise<ToolResult>;
       };
       invocation.isCommandAvailable = vi.fn(
-        async (command: string) => command === 'grep',
+        async (command: string) => command === 'git',
       );
+      vi.mocked(isGitRepository).mockReturnValueOnce(true);
 
       const result = await invocation.execute({ abortSignal });
       expect(result.llmContent).toContain('File: ..env');
@@ -276,6 +279,30 @@ describe('GrepTool', () => {
       );
     }, 30000);
 
+    it('should match nested files with a basename glob (rg parity)', async () => {
+      await fs.writeFile(
+        path.join(tempRootDir, 'sub', 'nested.js'),
+        'const greeting = "hello";',
+      );
+      const params: GrepToolParams = {
+        pattern: 'greeting',
+        include_pattern: '*.js',
+      };
+      const invocation = grepTool.build(params);
+      const result = await invocation.execute({ abortSignal });
+      expect(result.llmContent).toContain(
+        'Found 1 match for pattern "greeting"',
+      );
+      expect(result.llmContent).toContain(
+        `File: ${path.join('sub', 'nested.js')}`,
+      );
+      // Basename globs must be normalized to recursive form, like rg --glob.
+      expect(vi.mocked(glob.globStream)).toHaveBeenCalledWith(
+        '**/*.js',
+        expect.anything(),
+      );
+    }, 30000);
+
     it('should return "No matches found" when pattern does not exist', async () => {
       const params: GrepToolParams = { pattern: 'nonexistentpattern' };
       const invocation = grepTool.build(params);
@@ -313,34 +340,6 @@ describe('GrepTool', () => {
         'L2: function baz() { return "hello"; }',
       );
     }, 30000);
-
-    it('should pass -i flag to system grep for case-insensitivity', async () => {
-      vi.mocked(execStreaming).mockImplementationOnce(() =>
-        createLineGenerator(['fileA.txt:1:hello world']),
-      );
-
-      const params: GrepToolParams = { pattern: 'HELLO' };
-      const invocation = grepTool.build(params) as unknown as {
-        isCommandAvailable: (command: string) => Promise<boolean>;
-        execute: (options: ExecuteOptions) => Promise<ToolResult>;
-      };
-      // Force system grep strategy by mocking isCommandAvailable and ensuring git grep is not used
-      invocation.isCommandAvailable = vi.fn(async (command: string) => {
-        if (command === 'git') return false;
-        if (command === 'grep') return true;
-        return false;
-      });
-
-      await invocation.execute({ abortSignal });
-
-      expect(execStreaming).toHaveBeenCalledWith(
-        'grep',
-        expect.arrayContaining(['-i']),
-        expect.objectContaining({
-          cwd: expect.any(String),
-        }),
-      );
-    });
 
     it('should throw an error if params are invalid', async () => {
       const params = { dir_path: '.' } as unknown as GrepToolParams; // Invalid: pattern missing

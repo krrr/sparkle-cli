@@ -487,89 +487,19 @@ class GrepToolInvocation extends BaseToolInvocation<
         }
       }
 
-      // --- Strategy 2: System grep ---
-      debugLogger.debug(
-        'GrepLogic: System grep is being considered as fallback strategy.',
-      );
-
-      const grepAvailable = await this.isCommandAvailable('grep');
-      if (grepAvailable) {
-        strategyUsed = 'system grep';
-        const grepArgs = ['-r', '-n', '-H', '-E', '-I', '-i'];
-        // Extract directory names from exclusion patterns for grep --exclude-dir
-        const globExcludes = this.fileExclusions.getGlobExcludes();
-        const commonExcludes = globExcludes
-          .map((pattern) => {
-            let dir = pattern;
-            if (dir.startsWith('**/')) {
-              dir = dir.substring(3);
-            }
-            if (dir.endsWith('/**')) {
-              dir = dir.slice(0, -3);
-            } else if (dir.endsWith('/')) {
-              dir = dir.slice(0, -1);
-            }
-
-            // Only consider patterns that are likely directories. This filters out file patterns.
-            if (dir && !dir.includes('/') && !dir.includes('*')) {
-              return dir;
-            }
-            return null;
-          })
-          .filter((dir): dir is string => !!dir);
-        commonExcludes.forEach((dir) => grepArgs.push(`--exclude-dir=${dir}`));
-        if (max_matches_per_file) {
-          grepArgs.push('--max-count', max_matches_per_file.toString());
-        }
-        if (include_pattern) {
-          grepArgs.push(`--include=${include_pattern}`);
-        }
-        grepArgs.push(pattern);
-        grepArgs.push('.');
-
-        const results: GrepMatch[] = [];
-        try {
-          const generator = execStreaming('grep', grepArgs, {
-            cwd: absolutePath,
-            signal: options.signal,
-            allowedExitCodes: [0, 1],
-            sandboxManager: this.config.sandboxManager,
-          });
-
-          for await (const line of generator) {
-            const match = this.parseGrepLine(line, absolutePath);
-            if (match) {
-              if (excludeRegex && excludeRegex.test(match.line)) {
-                continue;
-              }
-              results.push(match);
-              if (results.length >= maxMatches) {
-                break;
-              }
-            }
-          }
-          return results;
-        } catch (grepError: unknown) {
-          if (
-            grepError instanceof Error &&
-            /Permission denied|Is a directory/i.test(grepError.message)
-          ) {
-            return results;
-          }
-          debugLogger.debug(
-            `GrepLogic: System grep failed: ${getErrorMessage(
-              grepError,
-            )}. Falling back...`,
-          );
-        }
-      }
-
-      // --- Strategy 3: Pure JavaScript Fallback ---
+      // --- Strategy 2: Pure JavaScript Fallback ---
       debugLogger.debug(
         'GrepLogic: Falling back to JavaScript grep implementation.',
       );
       strategyUsed = 'javascript fallback';
-      const globPattern = include_pattern ? include_pattern : '**/*';
+      // Align with ripgrep's basename-glob semantics: a glob without a '/'
+      // separator (e.g. "*.ts") must match file names at any depth, not just
+      // entries directly under the search root.
+      const globPattern = include_pattern
+        ? include_pattern.includes('/')
+          ? include_pattern
+          : `**/${include_pattern}`
+        : '**/*';
       const ignorePatterns = this.fileExclusions.getGlobExcludes();
 
       const filesStream = globStream(globPattern, {
