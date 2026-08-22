@@ -9,5 +9,5 @@ runs:
       shell: 'bash'
       working-directory: 'third_party/ink'
       run: |
-        npm install --no-audit --no-fund
+        npm install --no-save --no-audit --no-fund --prefix "$PWD"
         npm run build

@@ -16,13 +16,16 @@ On a fresh clone, build the vendored ink fork before you run the root install:
 
 ```bash
 cd third_party/ink
-npm install --no-audit --no-fund
+npm install --no-save --prefix .
 npm run build
 cd ../..
 ```
 
-CI runs the same sequence through the `.github/actions/build-vendored-ink`
-composite action before every root install.
+The fork is a workspace member of the root project, so npm otherwise treats the
+repository root as the project and runs its install scripts. The `--prefix` flag
+keeps npm inside `third_party/ink`, and `--no-save` prevents npm from editing
+the fork's `package.json`. CI runs the same sequence through the
+`.github/actions/build-vendored-ink` composite action before every root install.
 
 ## Tracing
 
