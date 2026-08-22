@@ -163,25 +163,27 @@ export function ProviderManagerDialog({
           await saveApiKeyForProfile(savedProfile.id, apiKey);
         }
 
-        // If newly created and no active profile, or if this is the only profile, activate it
+        // If newly created and no active profile, or if this is the only profile,
+        // activate it directly (without handleActivate calling setAuthState closing dialog)
         if (!activeProfile || profiles.length === 0) {
-          await handleActivate(savedProfile);
+          await profileService.activateProfile(savedProfile.id);
         }
 
         refreshProfiles();
-        setView('list');
+
+        // Newly created providers jump straight into model management; edits
+        // return to the provider list.
+        if (editingProfile) {
+          setView('list');
+        } else {
+          setModelsProfileId(savedProfile.id);
+          setView('models');
+        }
       } catch (e) {
         setLocalError(getErrorMessage(e));
       }
     },
-    [
-      profileService,
-      editingProfile,
-      activeProfile,
-      profiles,
-      handleActivate,
-      refreshProfiles,
-    ],
+    [profileService, editingProfile, activeProfile, profiles, refreshProfiles],
   );
 
   const handleAddModel = useCallback(

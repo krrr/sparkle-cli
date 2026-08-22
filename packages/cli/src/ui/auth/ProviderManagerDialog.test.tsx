@@ -168,22 +168,128 @@ describe('ProviderManagerDialog', () => {
 
     // Type provider ID
     await act(async () => {
-      stdin.write('-custom');
+      stdin.write('gemini-custom');
     });
     await waitUntilReady();
 
-    // Press Escape to save and exit to list
+    // Press Escape to save; should jump straight into the model management
+    // view for the newly created provider
     await act(async () => {
       stdin.write('\u001b');
     });
     await waitUntilReady();
 
-    // Verify returning to list view and that the newly added provider is rendered in list
     await waitFor(() => {
-      expect(lastFrame()).toContain('Provider Manager');
+      expect(lastFrame()).toContain('Models for: gemini-custom');
+      expect(lastFrame()).toContain('gpt-4o');
+    });
+    // An active profile already exists, so no activation should occur
+    expect(mockProfileService.activateProfile).not.toHaveBeenCalled();
+    expect(setAuthState).not.toHaveBeenCalled();
+
+    unmount();
+  });
+
+  it('returns to the provider list when leaving the models view of a new provider', async () => {
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderWithProviders(
+        <ProviderManagerDialog
+          setAuthState={setAuthState}
+          authError={null}
+          onAuthError={onAuthError}
+        />,
+        { config: mockConfig },
+      );
+
+    expect(lastFrame()).toContain('Provider Manager');
+
+    // Press 'a' to enter Add Provider view
+    await act(async () => {
+      stdin.write('a');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Add New Provider');
+    });
+
+    // Type provider ID
+    await act(async () => {
+      stdin.write('gemini-custom');
+    });
+    await waitUntilReady();
+
+    // Save via Escape and land in the models view
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Models for: gemini-custom');
+    });
+
+    // Escape from the models view goes back to the provider list
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
       expect(lastFrame()).toContain('default-gemini');
       expect(lastFrame()).toContain('gemini-custom');
     });
+
+    unmount();
+  });
+
+  it('activates and jumps to model management when creating the first provider', async () => {
+    mockProfiles = [];
+    activeProfileId = undefined;
+
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderWithProviders(
+        <ProviderManagerDialog
+          setAuthState={setAuthState}
+          authError={null}
+          onAuthError={onAuthError}
+        />,
+        { config: mockConfig },
+      );
+
+    expect(lastFrame()).toContain('No providers configured.');
+
+    // Press Enter to open Add Provider view
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(lastFrame()).toContain('Add New Provider');
+    });
+
+    // Type provider ID
+    await act(async () => {
+      stdin.write('gemini-first');
+    });
+    await waitUntilReady();
+
+    // Save via Escape
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+
+    // First provider is auto-activated without closing the dialog, which
+    // then lands in the model management view
+    await waitFor(() => {
+      expect(mockProfileService.activateProfile).toHaveBeenCalledWith(
+        'gemini-first',
+      );
+      expect(lastFrame()).toContain('Models for: gemini-first');
+    });
+    expect(setAuthState).not.toHaveBeenCalled();
 
     unmount();
   });

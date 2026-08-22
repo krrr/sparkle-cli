@@ -54,13 +54,8 @@ export function ProviderEditorView({
   const viewportWidth = Math.max(40, terminalWidth - 12);
 
   const idBuffer = useTextBuffer({
-    initialText:
-      profile?.id ||
-      (providerType === ProviderType.USE_GEMINI ? 'gemini' : 'openai'),
-    initialCursorOffset: (
-      profile?.id ||
-      (providerType === ProviderType.USE_GEMINI ? 'gemini' : 'openai')
-    ).length,
+    initialText: profile?.id || '',
+    initialCursorOffset: (profile?.id || '').length,
     viewport: { width: viewportWidth, height: 1 },
     inputFilter: (text) =>
       text.replace(/[^a-zA-Z0-9_-]/g, '').replace(/[\r\n]/g, ''),
@@ -68,13 +63,8 @@ export function ProviderEditorView({
   });
 
   const baseUrlBuffer = useTextBuffer({
-    initialText:
-      profile?.baseUrl ||
-      (providerType === ProviderType.USE_OPENAI ? DEFAULT_OPENAI_BASE_URL : ''),
-    initialCursorOffset: (
-      profile?.baseUrl ||
-      (providerType === ProviderType.USE_OPENAI ? DEFAULT_OPENAI_BASE_URL : '')
-    ).length,
+    initialText: profile?.baseUrl || '',
+    initialCursorOffset: (profile?.baseUrl || '').length,
     viewport: { width: viewportWidth, height: 1 },
     singleLine: true,
   });
@@ -169,17 +159,6 @@ export function ProviderEditorView({
               ? ProviderType.USE_OPENAI
               : ProviderType.USE_GEMINI;
           setProviderType(nextType);
-          if (!isEditing && !idBuffer.text.trim()) {
-            idBuffer.setText(
-              nextType === ProviderType.USE_GEMINI ? 'gemini' : 'openai',
-            );
-          }
-          if (
-            nextType === ProviderType.USE_OPENAI &&
-            !baseUrlBuffer.text.trim()
-          ) {
-            baseUrlBuffer.setText(DEFAULT_OPENAI_BASE_URL);
-          }
           return true;
         }
         if (keyMatchers[Command.RETURN](key)) {
