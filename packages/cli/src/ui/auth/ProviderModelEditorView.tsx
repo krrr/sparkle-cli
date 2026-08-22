@@ -14,6 +14,7 @@ import type {
   ReasoningEffort,
 } from 'sparkle-cli-core';
 import { TextInput } from '../components/shared/TextInput.js';
+import { InlineRadioGroup } from '../components/shared/InlineRadioGroup.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -73,24 +74,6 @@ export function ProviderModelEditorView({
     }
   };
 
-  const cycleTier = (forward: boolean) => {
-    const currentIdx = TIERS.indexOf(tier);
-    if (forward) {
-      setTier(TIERS[(currentIdx + 1) % TIERS.length]);
-    } else {
-      setTier(TIERS[(currentIdx - 1 + TIERS.length) % TIERS.length]);
-    }
-  };
-
-  const cycleEffort = (forward: boolean) => {
-    const currentIdx = EFFORTS.indexOf(effort);
-    if (forward) {
-      setEffort(EFFORTS[(currentIdx + 1) % EFFORTS.length]);
-    } else {
-      setEffort(EFFORTS[(currentIdx - 1 + EFFORTS.length) % EFFORTS.length]);
-    }
-  };
-
   const handleSaveAndExit = () => {
     const id = idBuffer.text.trim();
     if (!id) {
@@ -139,28 +122,6 @@ export function ProviderModelEditorView({
         moveFocus(true);
         return true;
       }
-      if (focusField === 'tier' || focusField === 'reasoningEffort') {
-        if (key.name === 'left') {
-          if (focusField === 'tier') {
-            cycleTier(false);
-          } else {
-            cycleEffort(false);
-          }
-          return true;
-        }
-        if (key.name === 'right' || key.name === 'space') {
-          if (focusField === 'tier') {
-            cycleTier(true);
-          } else {
-            cycleEffort(true);
-          }
-          return true;
-        }
-        if (keyMatchers[Command.RETURN](key)) {
-          handleSaveAndExit();
-          return true;
-        }
-      }
       return false;
     },
     { isActive: true },
@@ -200,70 +161,26 @@ export function ProviderModelEditorView({
       </Box>
 
       {/* Model Tier Selection */}
-      <Box marginTop={1} flexDirection="column">
-        <Text
-          color={focusField === 'tier' ? theme.text.accent : theme.text.primary}
-          bold={focusField === 'tier'}
-        >
-          Model Tier:{' '}
-          <Text color={theme.text.secondary}>
-            (Used for subagents, routing, and compression)
-          </Text>
-        </Text>
-        <Box flexDirection="row" marginTop={1}>
-          {TIERS.map((t) => {
-            const isSelected = tier === t;
-            return (
-              <Box key={t} marginRight={2}>
-                <Text
-                  color={
-                    isSelected ? theme.status.success : theme.text.secondary
-                  }
-                  bold={isSelected}
-                >
-                  {isSelected ? '[●] ' : '[ ] '}
-                  {t}
-                </Text>
-              </Box>
-            );
-          })}
-        </Box>
-      </Box>
+      <InlineRadioGroup
+        label="Model Tier:"
+        hint="(Used for subagents, routing, and compression)"
+        options={TIERS}
+        value={tier}
+        onChange={setTier}
+        focus={focusField === 'tier'}
+        onSubmit={handleSaveAndExit}
+      />
 
       {/* Reasoning Effort Selection */}
-      <Box marginTop={1} flexDirection="column">
-        <Text
-          color={
-            focusField === 'reasoningEffort'
-              ? theme.text.accent
-              : theme.text.primary
-          }
-          bold={focusField === 'reasoningEffort'}
-        >
-          Reasoning Effort:{' '}
-          <Text color={theme.text.secondary}>
-            (Thinking level; none disables thinking)
-          </Text>
-        </Text>
-        <Box flexDirection="row" marginTop={1}>
-          {EFFORTS.map((e) => {
-            const isSelected = effort === e;
-            return (
-              <Box key={e} marginRight={2}>
-                <Text
-                  color={
-                    isSelected ? theme.status.success : theme.text.secondary
-                  }
-                  bold={isSelected}
-                >
-                  {isSelected ? '[●] ' : '[ ] '}
-                  {e}
-                </Text>
-              </Box>
-            );
-          })}
-        </Box>
-      </Box>
+      <InlineRadioGroup
+        label="Reasoning Effort:"
+        hint="(none disables thinking)"
+        options={EFFORTS}
+        value={effort}
+        onChange={setEffort}
+        focus={focusField === 'reasoningEffort'}
+        onSubmit={handleSaveAndExit}
+      />
 
       {error && (
         <Box marginTop={1}>

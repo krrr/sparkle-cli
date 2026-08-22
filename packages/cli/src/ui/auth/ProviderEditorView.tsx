@@ -15,6 +15,10 @@ import {
   loadApiKeyForProfile,
 } from 'sparkle-cli-core';
 import { TextInput } from '../components/shared/TextInput.js';
+import {
+  InlineRadioGroup,
+  type InlineRadioOption,
+} from '../components/shared/InlineRadioGroup.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -36,6 +40,11 @@ export interface ProviderEditorViewProps {
 }
 
 type FocusField = 'id' | 'type' | 'baseUrl' | 'apiKey';
+
+const PROVIDER_TYPE_OPTIONS: ReadonlyArray<InlineRadioOption<ProviderType>> = [
+  { value: ProviderType.USE_GEMINI, label: 'Gemini' },
+  { value: ProviderType.USE_OPENAI, label: 'OpenAI-compatible' },
+];
 
 export function ProviderEditorView({
   profile,
@@ -148,24 +157,6 @@ export function ProviderEditorView({
         moveFocus(true);
         return true;
       }
-      if (focusField === 'type') {
-        if (
-          key.name === 'left' ||
-          key.name === 'right' ||
-          key.name === 'space'
-        ) {
-          const nextType =
-            providerType === ProviderType.USE_GEMINI
-              ? ProviderType.USE_OPENAI
-              : ProviderType.USE_GEMINI;
-          setProviderType(nextType);
-          return true;
-        }
-        if (keyMatchers[Command.RETURN](key)) {
-          setFocusField('baseUrl');
-          return true;
-        }
-      }
       return false;
     },
     { isActive: true },
@@ -203,40 +194,14 @@ export function ProviderEditorView({
       </Box>
 
       {/* Provider Type Selection */}
-      <Box marginTop={1} flexDirection="column">
-        <Text
-          color={focusField === 'type' ? theme.text.accent : theme.text.primary}
-          bold={focusField === 'type'}
-        >
-          Provider Type: <Text color={theme.text.secondary}></Text>
-        </Text>
-        <Box flexDirection="row" marginTop={1}>
-          <Box marginRight={2}>
-            <Text
-              color={
-                providerType === ProviderType.USE_GEMINI
-                  ? theme.status.success
-                  : theme.text.secondary
-              }
-            >
-              {providerType === ProviderType.USE_GEMINI ? '[●] ' : '[ ] '}
-              Gemini
-            </Text>
-          </Box>
-          <Box>
-            <Text
-              color={
-                providerType === ProviderType.USE_OPENAI
-                  ? theme.status.success
-                  : theme.text.secondary
-              }
-            >
-              {providerType === ProviderType.USE_OPENAI ? '[●] ' : '[ ] '}
-              OpenAI-compatible
-            </Text>
-          </Box>
-        </Box>
-      </Box>
+      <InlineRadioGroup
+        label="Provider Type:"
+        options={PROVIDER_TYPE_OPTIONS}
+        value={providerType}
+        onChange={setProviderType}
+        focus={focusField === 'type'}
+        onSubmit={() => setFocusField('baseUrl')}
+      />
 
       {/* Base URL Input */}
       <Box marginTop={1} flexDirection="column">
