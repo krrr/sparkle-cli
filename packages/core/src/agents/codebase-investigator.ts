@@ -105,10 +105,7 @@ export const CodebaseInvestigatorAgent = (
       },
     },
 
-    runConfig: {
-      maxTimeMinutes: 10,
-      maxTurns: 50,
-    },
+    runConfig: {},
 
     toolConfig: {
       // Grant access only to read-only tools.

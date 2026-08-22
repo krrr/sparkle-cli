@@ -170,7 +170,7 @@ export const BrowserAgentDefinition = (
     },
 
     runConfig: {
-      maxTimeMinutes: 10,
+      maxTimeMinutes: 15,
       maxTurns: 50,
     },
 
