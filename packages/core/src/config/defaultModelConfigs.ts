@@ -39,24 +39,11 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    [DEFAULT_GEMINI_MODEL]: {
-      extends: 'chat-base',
-      modelConfig: {
-        model: DEFAULT_GEMINI_MODEL,
-      },
-    },
-    [DEFAULT_GEMINI_FLASH_LITE_MODEL]: {
-      extends: 'chat-base',
-      modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-      },
-    },
-    [DEFAULT_GEMINI_FLASH_MODEL]: {
-      extends: 'chat-base',
-      modelConfig: {
-        model: DEFAULT_GEMINI_FLASH_MODEL,
-      },
-    },
+    // NOTE: Do not register aliases for concrete model IDs. An alias chain
+    // applies to every request keyed by that ID, including subagent calls
+    // and availability-fallback re-resolves, leaking chat sampling params
+    // into role-scoped calls. Chat requests reach 'chat-base' through the
+    // isChatModel fallback instead.
 
     'internal-tool-flash': {
       extends: 'base',
@@ -209,26 +196,6 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     'agent-history-provider-summarizer': {
       modelConfig: {
         model: 'flash',
-      },
-    },
-
-    // OpenAI-compatible providers (used with the 'openai' auth type).
-    'deepseek-base': {
-      extends: 'chat-base',
-      modelConfig: {
-        model: 'deepseek-v4-flash',
-        // temperature will be ignored when thinking mode enabled
-        // official default setting: thinking enabled, effort=high
-      },
-    },
-    'deepseek-v4-flash': {
-      extends: 'deepseek-base',
-      modelConfig: {},
-    },
-    'deepseek-v4-pro': {
-      extends: 'deepseek-base',
-      modelConfig: {
-        model: 'deepseek-v4-pro',
       },
     },
   },

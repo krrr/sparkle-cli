@@ -1270,6 +1270,16 @@ export async function startMemoryService(config: Config): Promise<void> {
     config.modelConfigService.registerRuntimeModelConfig(modelAlias, {
       modelConfig: agentDefinition.modelConfig,
     });
+    // Agent calls are keyed by the resolved model id, not by the alias, so
+    // the sampling config also needs the overrideScope override (mirrors
+    // AgentRegistry.registerAgent).
+    config.modelConfigService.registerRuntimeModelOverride({
+      match: { overrideScope: agentDefinition.name },
+      modelConfig: {
+        generateContentConfig:
+          agentDefinition.modelConfig.generateContentConfig,
+      },
+    });
     debugLogger.log(
       `[MemoryService] Starting extraction agent (model: ${agentDefinition.modelConfig.model}, maxTurns: 30, maxTime: 30min)`,
     );

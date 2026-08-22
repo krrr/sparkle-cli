@@ -28,9 +28,10 @@ import {
 } from '../config/models.js';
 import { normalizeModelId } from '../utils/modelUtils.js';
 import type { ModelSelectionResult } from './modelAvailabilityService.js';
-import type {
-  ModelConfigKey,
-  ResolutionContext,
+import {
+  ModelConfigService,
+  type ModelConfigKey,
+  type ResolutionContext,
 } from '../services/modelConfigService.js';
 import { ApprovalMode } from '../policy/types.js';
 
@@ -265,7 +266,14 @@ export function applyModelSelection(
       ...modelConfigKey,
       model: finalModel,
     });
-    generateContentConfig = fallbackResolved.generateContentConfig;
+    // The re-resolve is keyed by the fallback model id, which drops the
+    // role-scoped config attached to the original alias (e.g. the
+    // classifier's maxOutputTokens). Merge with the role config winning so
+    // the fallback model's config only fills in unset fields.
+    generateContentConfig = ModelConfigService.deepMerge(
+      fallbackResolved.generateContentConfig,
+      resolved.generateContentConfig,
+    );
   }
 
   if (modelConfigKey.isChatModel) {

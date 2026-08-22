@@ -478,6 +478,32 @@ describe('AgentRegistry', () => {
       );
     });
 
+    it('should register runtime overrides for fixed-model agents too', async () => {
+      const fixedAgent: LocalAgentDefinition = {
+        ...MOCK_AGENT_V1,
+        name: 'FixedAgent',
+        modelConfig: { ...MOCK_AGENT_V1.modelConfig, model: 'flash' },
+      };
+
+      const registerOverrideSpy = vi.spyOn(
+        mockConfig.modelConfigService,
+        'registerRuntimeModelOverride',
+      );
+
+      await registry.testRegisterAgent(fixedAgent);
+
+      // The sampling config must reach calls keyed by the resolved model id,
+      // which only happens through the overrideScope override.
+      expect(registerOverrideSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          match: { overrideScope: fixedAgent.name },
+          modelConfig: expect.objectContaining({
+            generateContentConfig: fixedAgent.modelConfig.generateContentConfig,
+          }),
+        }),
+      );
+    });
+
     it('should register a valid agent definition', async () => {
       await registry.testRegisterAgent(MOCK_AGENT_V1);
       expect(registry.getDefinition('MockAgent')).toEqual(MOCK_AGENT_V1);

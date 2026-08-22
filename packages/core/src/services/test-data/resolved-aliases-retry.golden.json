@@ -16,42 +16,6 @@
       "topK": 64
     }
   },
-  "gemini-pro-latest": {
-    "model": "gemini-pro-latest",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
-  },
-  "gemini-flash-lite-latest": {
-    "model": "gemini-flash-lite-latest",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
-  },
-  "gemini-flash-latest": {
-    "model": "gemini-flash-latest",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
-  },
   "internal-tool-flash": {
     "model": "flash",
     "generateContentConfig": {
@@ -207,41 +171,5 @@
   "agent-history-provider-summarizer": {
     "model": "flash",
     "generateContentConfig": {}
-  },
-  "deepseek-base": {
-    "model": "deepseek-v4-flash",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
-  },
-  "deepseek-v4-flash": {
-    "model": "deepseek-v4-flash",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
-  },
-  "deepseek-v4-pro": {
-    "model": "deepseek-v4-pro",
-    "generateContentConfig": {
-      "temperature": 1,
-      "topP": 0.95,
-      "thinkingConfig": {
-        "includeThoughts": true,
-        "thinkingLevel": "HIGH"
-      },
-      "topK": 64
-    }
   }
 }

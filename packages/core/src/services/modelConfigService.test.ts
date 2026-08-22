@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { ThinkingLevel } from '@google/genai';
 import {
   DEFAULT_CONTEXT_WINDOW,
   ModelConfigService,
@@ -49,6 +50,64 @@ describe('ModelConfigService', () => {
       expect(service.getContextWindow('totally-unknown-model')).toBe(
         DEFAULT_CONTEXT_WINDOW,
       );
+    });
+  });
+
+  describe('default model configs (no model-id aliases)', () => {
+    const CHAT_BASE_CONFIG = {
+      temperature: 1,
+      topP: 0.95,
+      topK: 64,
+      thinkingConfig: {
+        includeThoughts: true,
+        thinkingLevel: ThinkingLevel.HIGH,
+      },
+    };
+
+    it('gives chat requests for a default Gemini model the chat-base config via the isChatModel fallback', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const resolved = service.getResolvedConfig({
+        model: DEFAULT_GEMINI_MODEL,
+        isChatModel: true,
+      });
+
+      expect(resolved.model).toBe(DEFAULT_GEMINI_MODEL);
+      expect(resolved.generateContentConfig).toEqual(CHAT_BASE_CONFIG);
+    });
+
+    it('gives non-chat requests for a default Gemini model an empty config', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const resolved = service.getResolvedConfig({
+        model: DEFAULT_GEMINI_MODEL,
+      });
+
+      expect(resolved.model).toBe(DEFAULT_GEMINI_MODEL);
+      expect(resolved.generateContentConfig).toEqual({});
+    });
+
+    it('gives chat requests for a built-in DeepSeek model the chat-base config', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const resolved = service.getResolvedConfig({
+        model: 'deepseek-v4-flash',
+        isChatModel: true,
+      });
+
+      expect(resolved.model).toBe('deepseek-v4-flash');
+      expect(resolved.generateContentConfig).toEqual(CHAT_BASE_CONFIG);
+    });
+
+    it('gives non-chat requests for a built-in DeepSeek model an empty config', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const resolved = service.getResolvedConfig({
+        model: 'deepseek-v4-flash',
+      });
+
+      expect(resolved.model).toBe('deepseek-v4-flash');
+      expect(resolved.generateContentConfig).toEqual({});
     });
   });
 

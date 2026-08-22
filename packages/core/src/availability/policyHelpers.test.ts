@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ThinkingLevel } from '@google/genai';
 import {
   resolvePolicyChain,
   buildFallbackPolicyContext,
@@ -228,7 +229,7 @@ describe('policyHelpers', () => {
       expect(config.setActiveModel).toHaveBeenCalledWith('gemini-pro');
     });
 
-    it('switches to backup model and updates config if requested is unavailable', () => {
+    it('switches to backup model and merges config with the role config winning', () => {
       const config = createExtendedMockConfig();
       mockModelConfigService.getResolvedConfig
         .mockReturnValueOnce({
@@ -250,7 +251,7 @@ describe('policyHelpers', () => {
 
       expect(result.model).toBe('gemini-flash');
       expect(result.config).toEqual({
-        temperature: 0.1,
+        temperature: 0.9,
         topP: 1,
       });
 
@@ -263,6 +264,35 @@ describe('policyHelpers', () => {
         isChatModel: true,
       });
       expect(config.setActiveModel).toHaveBeenCalledWith('gemini-flash');
+    });
+
+    it('keeps role-scoped fields from the original alias when falling back', () => {
+      const config = createExtendedMockConfig();
+      mockModelConfigService.getResolvedConfig
+        .mockReturnValueOnce({
+          model: 'classifier',
+          generateContentConfig: {
+            temperature: 0,
+            maxOutputTokens: 1024,
+            thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+          },
+        })
+        .mockReturnValueOnce({
+          model: 'gemini-flash',
+          generateContentConfig: { temperature: 1 },
+        });
+      mockAvailabilityService.selectFirstAvailable.mockReturnValue({
+        selectedModel: 'gemini-flash',
+      });
+
+      const result = applyModelSelection(config, { model: 'classifier' });
+
+      expect(result.model).toBe('gemini-flash');
+      expect(result.config).toEqual({
+        temperature: 0,
+        maxOutputTokens: 1024,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+      });
     });
 
     it('does not call setActiveModel if isChatModel is false', () => {

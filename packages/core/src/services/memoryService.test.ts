@@ -551,6 +551,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         sandboxManager: undefined,
       } as unknown as Parameters<typeof startMemoryService>[0];
@@ -640,6 +641,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         sandboxManager: undefined,
       } as unknown as Parameters<typeof startMemoryService>[0];
@@ -740,6 +742,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         sandboxManager: undefined,
       } as unknown as Parameters<typeof startMemoryService>[0];
@@ -992,6 +995,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         getTargetDir: vi.fn().mockReturnValue(tmpDir),
         sandboxManager: undefined,
@@ -2133,6 +2137,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         sandboxManager: undefined,
       } as unknown as Parameters<typeof startMemoryService>[0];
@@ -2214,6 +2219,7 @@ describe('memoryService', () => {
         getSkillManager: vi.fn().mockReturnValue({ getSkills: () => [] }),
         modelConfigService: {
           registerRuntimeModelConfig: vi.fn(),
+          registerRuntimeModelOverride: vi.fn(),
         },
         sandboxManager: undefined,
       } as unknown as Parameters<typeof startMemoryService>[0];

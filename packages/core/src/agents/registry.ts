@@ -24,7 +24,6 @@ import { A2AAuthProviderFactory } from './auth-provider/factory.js';
 import type { AuthenticationHandler } from '@a2a-js/sdk/client';
 import { type z } from 'zod';
 import { debugLogger } from '../utils/debugLogger.js';
-import { isAutoModel } from '../config/models.js';
 import {
   type ModelConfig,
   ModelConfigService,
@@ -683,19 +682,19 @@ export class AgentRegistry {
       },
     );
 
-    if (
-      agentModelConfig.model &&
-      isAutoModel(agentModelConfig.model, this.config)
-    ) {
-      this.config.modelConfigService.registerRuntimeModelOverride({
-        match: {
-          overrideScope: definition.name,
-        },
-        modelConfig: {
-          generateContentConfig: agentModelConfig.generateContentConfig,
-        },
-      });
-    }
+    // Agent calls are keyed by the resolved model id (see
+    // LocalAgentExecutor), not by the `-config` alias above, so the
+    // sampling config only reaches the actual requests via an
+    // overrideScope override. This must be registered for fixed-model
+    // agents too, not just auto-routed ones.
+    this.config.modelConfigService.registerRuntimeModelOverride({
+      match: {
+        overrideScope: definition.name,
+      },
+      modelConfig: {
+        generateContentConfig: agentModelConfig.generateContentConfig,
+      },
+    });
   }
 
   /**
