@@ -140,6 +140,9 @@ jobs:
           node-version: '${{ matrix.node-version }}'
           cache: 'npm'
 
+      - name: 'Build vendored ink fork'
+        uses: './.github/actions/build-vendored-ink'
+
       - name: 'Build project'
         run: 'npm run build'
 
@@ -148,9 +151,6 @@ jobs:
           sudo apt-get update -qq && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq bubblewrap
           # Ubuntu 24.04+ requires this to allow bwrap to function in CI
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
-
-      - name: 'Build vendored ink fork'
-        uses: './.github/actions/build-vendored-ink'
 
       - name: 'Install dependencies for testing'
         run: 'npm ci'
