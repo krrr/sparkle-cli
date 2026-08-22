@@ -13,6 +13,7 @@ import {
   SPARKLE_MODEL_ALIAS_PRO,
   SPARKLE_MODEL_ALIAS_FLASH,
   SPARKLE_MODEL_ALIAS_FLASH_LITE,
+  DEFAULT_OPENAI_MODEL,
 } from '../config/models.js';
 import { ProviderType } from '../config/constants.js';
 import type { ProviderProfile } from '../config/providerProfile.js';
@@ -205,7 +206,7 @@ export class ModelConfigService {
         ? profile.defaultModel
         : undefined;
     const proTarget =
-      proModel?.id || defaultTarget || models[0]?.id || 'gpt-4o';
+      proModel?.id || defaultTarget || models[0]?.id || DEFAULT_OPENAI_MODEL;
     const flashTarget = flashModel?.id || proTarget;
     const liteTarget = liteModel?.id || flashTarget;
     const autoTarget = defaultTarget || flashTarget;

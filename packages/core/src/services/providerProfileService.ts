@@ -8,6 +8,7 @@ import { ProviderType } from '../config/constants.js';
 import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_OPENAI_MODEL,
 } from '../config/models.js';
 import {
   type ProviderProfile,
@@ -122,7 +123,7 @@ export class ProviderProfileService {
       } else {
         defaultModels = [
           {
-            id: 'gpt-4o',
+            id: DEFAULT_OPENAI_MODEL,
             tier: 'pro',
           },
           {
@@ -130,7 +131,7 @@ export class ProviderProfileService {
             tier: 'flash',
           },
         ];
-        defaultModel = defaultModel || 'gpt-4o';
+        defaultModel = defaultModel || DEFAULT_OPENAI_MODEL;
       }
     }
 
@@ -329,7 +330,7 @@ export class ProviderProfileService {
       chosenModel =
         targetProfile.providerType === ProviderType.USE_GEMINI
           ? DEFAULT_GEMINI_MODEL
-          : 'gpt-4o';
+          : DEFAULT_OPENAI_MODEL;
     }
 
     this.config.modelConfigService?.applyProfile(targetProfile);

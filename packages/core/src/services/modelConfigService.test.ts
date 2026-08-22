@@ -13,6 +13,7 @@ import {
 import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_OPENAI_MODEL,
 } from '../config/models.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 import { ProviderType } from '../config/constants.js';
@@ -1238,26 +1239,26 @@ describe('ModelConfigService', () => {
         id: 'openai-profile',
         providerType: ProviderType.USE_OPENAI,
         models: [
-          { id: 'gpt-4o', tier: 'pro' },
+          { id: DEFAULT_OPENAI_MODEL, tier: 'pro' },
           { id: 'gpt-4o-mini', tier: 'flash' },
         ],
-        defaultModel: 'gpt-4o',
+        defaultModel: DEFAULT_OPENAI_MODEL,
       };
 
       service.applyProfile(openAiProfile);
 
       // Model resolutions under OpenAI profile
-      expect(service.resolveModelId('pro')).toBe('gpt-4o');
+      expect(service.resolveModelId('pro')).toBe(DEFAULT_OPENAI_MODEL);
       expect(service.resolveModelId('flash')).toBe('gpt-4o-mini');
       expect(service.resolveModelId('flash-lite')).toBe('gpt-4o-mini');
-      expect(service.resolveModelId('auto')).toBe('gpt-4o');
-      expect(service.resolveClassifierModelId('flash', 'gpt-4o')).toBe(
-        'gpt-4o-mini',
-      );
+      expect(service.resolveModelId('auto')).toBe(DEFAULT_OPENAI_MODEL);
+      expect(
+        service.resolveClassifierModelId('flash', DEFAULT_OPENAI_MODEL),
+      ).toBe('gpt-4o-mini');
 
       // Chains resolve through the recompiled config
       const chain = service.resolveChain('auto-default');
-      expect(chain?.[0]?.model).toBe('gpt-4o');
+      expect(chain?.[0]?.model).toBe(DEFAULT_OPENAI_MODEL);
       expect(chain?.[1]?.model).toBe('gpt-4o-mini');
 
       // Reset back to Gemini

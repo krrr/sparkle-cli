@@ -7,7 +7,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ProviderProfileService } from './providerProfileService.js';
 import { ProviderType } from '../config/constants.js';
-import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
+import {
+  DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_OPENAI_MODEL,
+} from '../config/models.js';
 import type { Config } from '../config/config.js';
 import type { ProviderProfile } from '../config/providerProfile.js';
 
@@ -77,14 +80,16 @@ describe('ProviderProfileService', () => {
         id: 'work-openai',
         providerType: ProviderType.USE_OPENAI,
         baseUrl: 'https://api.openai.com/v1',
-        models: [{ id: 'gpt-4o', tier: 'pro' }],
-        defaultModel: 'gpt-4o',
+        models: [{ id: DEFAULT_OPENAI_MODEL, tier: 'pro' }],
+        defaultModel: DEFAULT_OPENAI_MODEL,
       });
 
       expect(profile.id).toBe('work-openai');
       expect(profile.baseUrl).toBe('https://api.openai.com/v1');
-      expect(profile.models).toEqual([{ id: 'gpt-4o', tier: 'pro' }]);
-      expect(profile.defaultModel).toBe('gpt-4o');
+      expect(profile.models).toEqual([
+        { id: DEFAULT_OPENAI_MODEL, tier: 'pro' },
+      ]);
+      expect(profile.defaultModel).toBe(DEFAULT_OPENAI_MODEL);
     });
 
     it('should reject invalid profile ID or empty ID', async () => {
@@ -369,11 +374,11 @@ describe('ProviderProfileService', () => {
         id: 'openai-models',
         providerType: ProviderType.USE_OPENAI,
         models: [
-          { id: 'gpt-4o', tier: 'pro' },
+          { id: DEFAULT_OPENAI_MODEL, tier: 'pro' },
           { id: 'gpt-4o-mini', tier: 'flash' },
         ],
 
-        defaultModel: 'gpt-4o',
+        defaultModel: DEFAULT_OPENAI_MODEL,
       });
 
       (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
@@ -386,7 +391,10 @@ describe('ProviderProfileService', () => {
         'unknown-model',
       );
       await service.activateProfile(p.id);
-      expect(mockConfig.setModel).toHaveBeenCalledWith('gpt-4o', true);
+      expect(mockConfig.setModel).toHaveBeenCalledWith(
+        DEFAULT_OPENAI_MODEL,
+        true,
+      );
     });
   });
 });

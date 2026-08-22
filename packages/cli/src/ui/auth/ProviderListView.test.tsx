@@ -8,7 +8,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { act } from 'react';
 import { ProviderListView } from './ProviderListView.js';
-import { ProviderType, type ProviderProfile } from 'sparkle-cli-core';
+import {
+  DEFAULT_OPENAI_MODEL,
+  ProviderType,
+  type ProviderProfile,
+} from 'sparkle-cli-core';
 
 describe('ProviderListView', () => {
   const mockProfiles: ProviderProfile[] = [
@@ -22,8 +26,8 @@ describe('ProviderListView', () => {
       id: 'profile-2',
       providerType: ProviderType.USE_OPENAI,
       baseUrl: 'https://api.openai.com/v1',
-      defaultModel: 'gpt-4o',
-      models: [{ id: 'gpt-4o' }],
+      defaultModel: DEFAULT_OPENAI_MODEL,
+      models: [{ id: DEFAULT_OPENAI_MODEL }],
     },
   ];
 

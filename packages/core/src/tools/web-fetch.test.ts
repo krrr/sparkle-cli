@@ -32,6 +32,7 @@ import {
   WebFetchFallbackAttemptEvent,
 } from '../telemetry/index.js';
 import { convert } from 'html-to-text';
+import { DEFAULT_OPENAI_MODEL } from 'src/config/models.js';
 
 const mockGenerateContent = vi.fn();
 const mockGetGeminiClient = vi.fn(() => ({
@@ -593,7 +594,9 @@ describe('WebFetchTool', () => {
 
     it('should skip the primary fetch and use fallback directly for non-Gemini models', async () => {
       vi.spyOn(fetchUtils, 'isPrivateIp').mockReturnValue(false);
-      vi.spyOn(mockConfig, 'getActiveModel').mockReturnValue('gpt-4o');
+      vi.spyOn(mockConfig, 'getActiveModel').mockReturnValue(
+        DEFAULT_OPENAI_MODEL,
+      );
 
       // Fallback HTTP fetch succeeds
       mockFetch('https://url1.com/', {

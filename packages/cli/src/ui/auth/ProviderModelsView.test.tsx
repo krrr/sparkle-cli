@@ -9,7 +9,11 @@ import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
 import { act } from 'react';
 import { ProviderModelsView } from './ProviderModelsView.js';
-import { ProviderType, type ProviderProfile } from 'sparkle-cli-core';
+import {
+  DEFAULT_OPENAI_MODEL,
+  ProviderType,
+  type ProviderProfile,
+} from 'sparkle-cli-core';
 
 describe('ProviderModelsView', () => {
   const mockProfile: ProviderProfile = {
@@ -17,11 +21,11 @@ describe('ProviderModelsView', () => {
     providerType: ProviderType.USE_OPENAI,
     models: [
       {
-        id: 'gpt-4o',
+        id: DEFAULT_OPENAI_MODEL,
         tier: 'pro',
       },
     ],
-    defaultModel: 'gpt-4o',
+    defaultModel: DEFAULT_OPENAI_MODEL,
   };
 
   const onAddModel = vi.fn();
@@ -47,7 +51,7 @@ describe('ProviderModelsView', () => {
     );
 
     expect(lastFrame()).toContain('Models for: test-profile');
-    expect(lastFrame()).toContain('gpt-4o');
+    expect(lastFrame()).toContain(DEFAULT_OPENAI_MODEL);
     expect(lastFrame()).toContain('tier: pro');
     expect(lastFrame()).toContain('[a] Add model');
     expect(lastFrame()).toContain('[Esc] Back');
@@ -71,14 +75,14 @@ describe('ProviderModelsView', () => {
       stdin.write('s');
     });
     await waitUntilReady();
-    expect(onSetDefaultModel).toHaveBeenCalledWith('gpt-4o');
+    expect(onSetDefaultModel).toHaveBeenCalledWith(DEFAULT_OPENAI_MODEL);
 
     // Press 'd' to delete
     await act(async () => {
       stdin.write('d');
     });
     await waitUntilReady();
-    expect(onDeleteModel).toHaveBeenCalledWith('gpt-4o');
+    expect(onDeleteModel).toHaveBeenCalledWith(DEFAULT_OPENAI_MODEL);
 
     // Press Esc to back
     await act(async () => {

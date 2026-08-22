@@ -11,6 +11,7 @@ import {
   type ProviderProfile,
   type Config,
   makeFakeConfig,
+  DEFAULT_OPENAI_MODEL,
 } from 'sparkle-cli-core';
 import { ProviderManagerDialog } from './ProviderManagerDialog.js';
 import { renderWithProviders } from '../../test-utils/render.js';
@@ -49,13 +50,13 @@ describe('Multi-Provider CLI components logic', () => {
     };
 
     // User only specifies ID, omitting displayName and aliases
-    const newModel = { id: 'gpt-4o' };
+    const newModel = { id: DEFAULT_OPENAI_MODEL };
     profile.models.push(newModel);
     profile.defaultModel = newModel.id;
 
     expect(profile.models).toHaveLength(1);
-    expect(profile.models[0].id).toBe('gpt-4o');
-    expect(profile.defaultModel).toBe('gpt-4o');
+    expect(profile.models[0].id).toBe(DEFAULT_OPENAI_MODEL);
+    expect(profile.defaultModel).toBe(DEFAULT_OPENAI_MODEL);
   });
 });
 
@@ -106,8 +107,8 @@ describe('ProviderManagerDialog', () => {
           id: data.id,
           providerType: data.providerType,
           baseUrl: data.baseUrl,
-          defaultModel: 'gpt-4o',
-          models: [{ id: 'gpt-4o' }],
+          defaultModel: DEFAULT_OPENAI_MODEL,
+          models: [{ id: DEFAULT_OPENAI_MODEL }],
         };
         mockProfiles.push(newProfile);
         return newProfile;
@@ -181,7 +182,7 @@ describe('ProviderManagerDialog', () => {
 
     await waitFor(() => {
       expect(lastFrame()).toContain('Models for: gemini-custom');
-      expect(lastFrame()).toContain('gpt-4o');
+      expect(lastFrame()).toContain(DEFAULT_OPENAI_MODEL);
     });
     // An active profile already exists, so no activation should occur
     expect(mockProfileService.activateProfile).not.toHaveBeenCalled();
@@ -347,8 +348,8 @@ describe('ProviderManagerDialog', () => {
     mockProfiles.push({
       id: 'p2',
       providerType: ProviderType.USE_OPENAI,
-      defaultModel: 'gpt-4o',
-      models: [{ id: 'gpt-4o' }],
+      defaultModel: DEFAULT_OPENAI_MODEL,
+      models: [{ id: DEFAULT_OPENAI_MODEL }],
     });
 
     const { lastFrame, stdin, waitUntilReady, unmount } =

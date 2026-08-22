@@ -5,6 +5,7 @@
  */
 
 import {
+  DEFAULT_OPENAI_MODEL,
   ProviderType,
   loadApiKeyForProfile,
   type ProviderProfile,
@@ -80,7 +81,7 @@ describe('validateProfileAuth', () => {
     const baseOpenAiProfile: ProviderProfile = {
       id: 'openai-profile',
       providerType: ProviderType.USE_OPENAI,
-      models: [{ id: 'gpt-4o' }],
+      models: [{ id: DEFAULT_OPENAI_MODEL }],
     };
 
     it('should return null even if OPENAI_API_KEY is not set', async () => {

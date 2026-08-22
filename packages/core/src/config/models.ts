@@ -49,6 +49,8 @@ export const DEFAULT_GEMINI_MODEL = 'gemini-pro-latest';
 export const DEFAULT_GEMINI_FLASH_MODEL = 'gemini-flash-latest';
 export const DEFAULT_GEMINI_FLASH_LITE_MODEL = 'gemini-flash-lite-latest';
 
+export const DEFAULT_OPENAI_MODEL = 'gpt-4o';
+
 // Model aliases for user convenience.
 export const SPARKLE_MODEL_ALIAS_AUTO = 'auto';
 export const SPARKLE_MODEL_ALIAS_PRO = 'pro';

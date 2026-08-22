@@ -18,6 +18,7 @@ import {
 } from './contentGenerator.js';
 import { LlmRole } from '../telemetry/llmRole.js';
 import { resetVersionCache } from '../utils/version.js';
+import { DEFAULT_OPENAI_MODEL } from 'src/config/models.js';
 
 vi.mock('../telemetry/loggers.js', () => ({
   logApiRequest: vi.fn(),
@@ -235,7 +236,7 @@ describe('getOpenAiProvider', () => {
           authType: ProviderType.USE_OPENAI,
           baseUrl: 'https://api.openai.com/v1',
         },
-        'gpt-4o',
+        DEFAULT_OPENAI_MODEL,
       ),
     ).toBe('openai');
     expect(
@@ -256,7 +257,7 @@ describe('getOpenAiProvider', () => {
           authType: ProviderType.USE_OPENAI,
           baseUrl: 'https://api.openai.com/v1',
         },
-        'gpt-4o',
+        DEFAULT_OPENAI_MODEL,
       ),
     ).toBe('custom');
     vi.unstubAllEnvs();

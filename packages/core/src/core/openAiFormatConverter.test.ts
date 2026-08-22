@@ -30,6 +30,7 @@ import type {
   OpenAiStreamChunk,
   OpenAiUsage,
 } from './openAiTypes.js';
+import { DEFAULT_OPENAI_MODEL } from 'src/config/models.js';
 
 describe('extractSystemInstructionText', () => {
   it('returns strings as-is', () => {
@@ -772,7 +773,7 @@ describe('openAiChatCompletionToGeminiResponse', () => {
   it('converts a non-streaming response', () => {
     const completion: OpenAiChatCompletion = {
       id: 'resp_1',
-      model: 'gpt-4o',
+      model: DEFAULT_OPENAI_MODEL,
       choices: [
         {
           message: {
@@ -794,7 +795,7 @@ describe('openAiChatCompletionToGeminiResponse', () => {
     };
     const response = openAiChatCompletionToGeminiResponse(completion);
     expect(response.responseId).toBe('resp_1');
-    expect(response.modelVersion).toBe('gpt-4o');
+    expect(response.modelVersion).toBe(DEFAULT_OPENAI_MODEL);
     expect(response.candidates![0].content!.parts).toEqual([
       { text: 'hidden reasoning', thought: true },
       { text: 'Hello' },
