@@ -17,7 +17,7 @@ import {
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { SettingsContext } from '../contexts/SettingsContext.js';
 import { createMockSettings } from '../../test-utils/settings.js';
-import { ApprovalMode, tokenLimit, CoreToolCallStatus } from 'sparkle-cli-core';
+import { ApprovalMode, CoreToolCallStatus } from 'sparkle-cli-core';
 import type { Config } from 'sparkle-cli-core';
 import { StreamingState } from '../types.js';
 import { TransientMessageType } from '../../utils/events.js';
@@ -232,6 +232,9 @@ const createMockConfig = (overrides = {}): Config =>
       getMcpServers: () => ({}),
       getBlockedMcpServers: () => [],
     }),
+    getModelConfigService: vi.fn(() => ({
+      getContextWindow: vi.fn(() => 1_048_576),
+    })),
     ...overrides,
   }) as unknown as Config;
 
@@ -758,7 +761,8 @@ describe('Composer', () => {
           sessionStartTime: new Date(),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           metrics: {} as any,
-          lastPromptTokenCount: Math.floor(tokenLimit(model) * 0.7),
+          // 70% of the 1M-token default context window
+          lastPromptTokenCount: Math.floor(1_048_576 * 0.7),
           promptCount: 0,
         },
       });

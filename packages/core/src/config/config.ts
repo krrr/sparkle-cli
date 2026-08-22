@@ -66,7 +66,6 @@ import { createSandboxManager } from '../services/sandboxManagerFactory.js';
 import { SandboxedFileSystemService } from '../services/sandboxedFileSystemService.js';
 import { initializeTelemetry, uiTelemetryService } from '../telemetry/index.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
-import { tokenLimit } from '../core/tokenLimits.js';
 import {
   DEFAULT_GEMINI_EMBEDDING_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
@@ -3022,7 +3021,8 @@ export class Config implements McpContext, AgentLoopContext {
     return Math.min(
       // Estimate remaining context window in characters (1 token ~= 4 chars).
       4 *
-        (tokenLimit(this.model) - uiTelemetryService.getLastPromptTokenCount()),
+        (this.getModelConfigService().getContextWindow(this.model) -
+          uiTelemetryService.getLastPromptTokenCount()),
       this.truncateToolOutputThreshold,
     );
   }

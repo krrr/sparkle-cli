@@ -23,7 +23,6 @@ import {
   ToolConfirmationOutcome,
   MessageBusType,
   promptIdContext,
-  tokenLimit,
   debugLogger,
   runInDevTraceSpan,
   EDIT_TOOL_NAMES,
@@ -1358,7 +1357,9 @@ export const useGeminiStream = (
         setPendingHistoryItem(null);
       }
 
-      const limit = tokenLimit(config.getModel());
+      const limit = config
+        .getModelConfigService()
+        .getContextWindow(config.getModel());
       const originalPercentage = Math.round(
         ((eventValue?.originalTokenCount ?? 0) / limit) * 100,
       );
@@ -1395,7 +1396,9 @@ export const useGeminiStream = (
     (estimatedRequestTokenCount: number, remainingTokenCount: number) => {
       onCancelSubmit(true);
 
-      const limit = tokenLimit(config.getModel());
+      const limit = config
+        .getModelConfigService()
+        .getContextWindow(config.getModel());
 
       const isMoreThan25PercentUsed =
         limit > 0 && remainingTokenCount < limit * 0.75;

@@ -45,7 +45,6 @@ import {
   ToolErrorType,
   ToolConfirmationOutcome,
   MessageBusType,
-  tokenLimit,
   debugLogger,
   coreEvents,
   CoreEvent,
@@ -79,6 +78,7 @@ const mockMessageBus = {
   subscribe: vi.fn(),
   unsubscribe: vi.fn(),
 };
+const mockGetContextWindow = vi.fn().mockReturnValue(100);
 
 const MockedGeminiClientClass = vi.hoisted(() =>
   vi.fn().mockImplementation(function (this: any, _config: any) {
@@ -162,7 +162,6 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     UserPromptEvent: MockedUserPromptEvent,
     ValidationRequiredError: MockValidationRequiredError,
     parseAndFormatApiError: mockParseAndFormatApiError,
-    tokenLimit: vi.fn().mockReturnValue(100), // Mock tokenLimit
     recordToolCallInteractions: vi.fn().mockResolvedValue(undefined),
     runInDevTraceSpan: mockRunInDevTraceSpan,
   };
@@ -341,6 +340,9 @@ describe('useGeminiStream', () => {
     setQuotaErrorOccurred: vi.fn(),
     getQuotaErrorOccurred: vi.fn(() => false),
     getModel: vi.fn(() => 'gemini-2.5-pro'),
+    getModelConfigService: vi.fn(() => ({
+      getContextWindow: mockGetContextWindow,
+    })),
     getContentGeneratorConfig: vi.fn(() => ({
       model: 'test-model',
       apiKey: 'test-key',
@@ -2891,7 +2893,7 @@ describe('useGeminiStream', () => {
 
     describe('ContextWindowWillOverflow event', () => {
       beforeEach(() => {
-        vi.mocked(tokenLimit).mockReturnValue(100);
+        mockGetContextWindow.mockReturnValue(100);
       });
 
       it.each([
@@ -2989,7 +2991,7 @@ describe('useGeminiStream', () => {
     });
 
     it('should add informational messages when ChatCompressed event is received', async () => {
-      vi.mocked(tokenLimit).mockReturnValue(10000);
+      mockGetContextWindow.mockReturnValue(10000);
       // Setup mock to return a stream with ChatCompressed event
       mockSendMessageStream.mockReturnValue(
         (async function* () {

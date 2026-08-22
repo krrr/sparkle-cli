@@ -6,6 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
+  DEFAULT_CONTEXT_WINDOW,
   ModelConfigService,
   type ModelConfigAlias,
   type ModelConfigServiceConfig,
@@ -20,6 +21,37 @@ import { ProviderType } from '../config/constants.js';
 import type { ProviderProfile } from '../config/providerProfile.js';
 
 describe('ModelConfigService', () => {
+  describe('getContextWindow', () => {
+    it('returns the contextWindow declared on the Gemini model definitions', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      expect(service.getContextWindow(DEFAULT_GEMINI_MODEL)).toBe(1_048_576);
+      expect(service.getContextWindow(DEFAULT_GEMINI_FLASH_MODEL)).toBe(
+        1_048_576,
+      );
+    });
+
+    it('resolves model aliases before reading the context window', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      expect(service.getContextWindow('auto')).toBe(1_048_576);
+    });
+
+    it('returns the model-specific contextWindow for OpenAI-compatible models', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      expect(service.getContextWindow('deepseek-v4-flash')).toBe(1000000);
+    });
+
+    it('falls back to DEFAULT_CONTEXT_WINDOW for models without a definition', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      expect(service.getContextWindow('totally-unknown-model')).toBe(
+        DEFAULT_CONTEXT_WINDOW,
+      );
+    });
+  });
+
   it('should resolve a basic alias to its model and settings', () => {
     const config: ModelConfigServiceConfig = {
       aliases: {

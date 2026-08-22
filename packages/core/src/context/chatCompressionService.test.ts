@@ -20,7 +20,6 @@ import { getInitialChatHistory } from '../utils/environmentContext.js';
 
 const { TOOL_OUTPUTS_DIR } = fileUtils;
 import * as tokenCalculation from '../utils/tokenCalculation.js';
-import { tokenLimit } from '../core/tokenLimits.js';
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -34,7 +33,6 @@ import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 
 vi.mock('../telemetry/loggers.js');
 vi.mock('../utils/environmentContext.js');
-vi.mock('../core/tokenLimits.js');
 
 describe('findCompressSplitPoint', () => {
   it('should throw an error for non-positive numbers', () => {
@@ -214,6 +212,9 @@ describe('ChatCompressionService', () => {
       get config() {
         return this;
       },
+      getModelConfigService: vi
+        .fn()
+        .mockReturnValue({ getContextWindow: vi.fn().mockReturnValue(1000) }),
       getCompressionThreshold: vi.fn(),
       getBaseLlmClient: vi.fn().mockReturnValue({
         generateContent: mockGenerateContent,
@@ -283,7 +284,6 @@ describe('ChatCompressionService', () => {
       { role: 'user', parts: [{ text: 'hi' }] },
     ]);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600);
-    vi.mocked(tokenLimit).mockReturnValue(1000);
     // Threshold is 0.5 * 1000 = 500. 600 > 500, so it SHOULD compress.
     // Wait, the default threshold is 0.5.
     // Let's set it explicitly.
@@ -379,7 +379,6 @@ describe('ChatCompressionService', () => {
     ];
     vi.mocked(mockChat.getHistory).mockReturnValue(history);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(800);
-    vi.mocked(tokenLimit).mockReturnValue(1000);
 
     await service.compress(
       mockChat,
@@ -524,7 +523,6 @@ describe('ChatCompressionService', () => {
     ];
     vi.mocked(mockChat.getHistory).mockReturnValue(history);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(800);
-    vi.mocked(tokenLimit).mockReturnValue(1000);
 
     // Completely override the LLM client for this test
     const mockLlmClient = {
@@ -852,7 +850,9 @@ describe('ChatCompressionService', () => {
 
       vi.mocked(mockChat.getHistory).mockReturnValue(history);
       vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600000);
-      vi.mocked(tokenLimit).mockReturnValue(1_000_000);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(1_000_000);
 
       const result = await service.compress(
         mockChat,
@@ -909,7 +909,9 @@ describe('ChatCompressionService', () => {
       ];
 
       vi.mocked(mockChat.getHistory).mockReturnValue(history);
-      vi.mocked(tokenLimit).mockReturnValue(1_000_000);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(1_000_000);
 
       const result = await service.compress(
         mockChat,

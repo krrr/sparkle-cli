@@ -22,7 +22,6 @@ vi.mock('../core/client.js', () => ({
 
 vi.mock('../core/contentGenerator.js');
 vi.mock('../telemetry/index.js');
-vi.mock('../core/tokenLimits.js');
 vi.mock('../services/fileDiscoveryService.js');
 vi.mock('../services/gitService.js');
 vi.mock('../services/trackerService.js');

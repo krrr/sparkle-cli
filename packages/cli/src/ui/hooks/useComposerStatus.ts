@@ -7,6 +7,7 @@
 import { useMemo } from 'react';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
+import { useConfig } from '../contexts/ConfigContext.js';
 import { CoreToolCallStatus, ApprovalMode } from 'sparkle-cli-core';
 import { type HistoryItemToolGroup, StreamingState } from '../types.js';
 import { INTERACTIVE_SHELL_WAITING_PHRASE } from './usePhraseCycler.js';
@@ -19,6 +20,7 @@ import { theme } from '../semantic-colors.js';
 export const useComposerStatus = () => {
   const uiState = useUIState();
   const settings = useSettings();
+  const config = useConfig();
 
   const hasPendingToolConfirmation = useMemo(
     () =>
@@ -80,7 +82,7 @@ export const useComposerStatus = () => {
 
   const showMinimalContext = isContextUsageHigh(
     uiState.sessionStats.lastPromptTokenCount,
-    uiState.currentModel,
+    config,
     settings.merged.model?.compressionThreshold,
   );
 

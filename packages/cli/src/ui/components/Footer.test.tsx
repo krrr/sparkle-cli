@@ -78,6 +78,9 @@ const mockConfigPlain = {
   getContentGeneratorConfig: () => ({ authType: undefined }),
   getSandboxEnabled: () => false,
   getSessionId: () => 'test-session-id',
+  getModelConfigService: () => ({
+    getContextWindow: () => 1_048_576,
+  }),
 };
 
 const mockConfig = mockConfigPlain as unknown as Config;

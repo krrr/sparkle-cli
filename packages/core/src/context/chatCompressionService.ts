@@ -8,7 +8,6 @@ import type { Content } from '@google/genai';
 import type { Config } from '../config/config.js';
 import type { GeminiChat } from '../core/geminiChat.js';
 import { type ChatCompressionInfo, CompressionStatus } from '../core/turn.js';
-import { tokenLimit } from '../core/tokenLimits.js';
 import { getCompressionPrompt } from '../core/prompts.js';
 import { getResponseText } from '../utils/partUtils.js';
 import { logChatCompression } from '../telemetry/loggers.js';
@@ -254,12 +253,16 @@ export class ChatCompressionService {
 
     const originalTokenCount = chat.getLastPromptTokenCount();
 
+    const contextWindow = config
+      .getModelConfigService()
+      .getContextWindow(model);
+
     // Don't compress if not forced and we are under the limit.
     if (!force) {
       const threshold =
         (await config.getCompressionThreshold()) ??
         DEFAULT_COMPRESSION_TOKEN_THRESHOLD;
-      if (originalTokenCount < threshold * tokenLimit(model)) {
+      if (originalTokenCount < threshold * contextWindow) {
         return {
           newHistory: null,
           info: {
@@ -333,7 +336,7 @@ export class ChatCompressionService {
     );
 
     const historyForSummarizer =
-      originalToCompressTokenCount < tokenLimit(model)
+      originalToCompressTokenCount < contextWindow
         ? originalHistoryToCompress
         : historyToCompressTruncated;
 

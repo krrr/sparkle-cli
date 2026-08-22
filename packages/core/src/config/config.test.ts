@@ -238,7 +238,6 @@ vi.mock('../context/memoryContextManager.js', () => ({
 }));
 
 import { BaseLlmClient } from '../core/baseLlmClient.js';
-import { tokenLimit } from '../core/tokenLimits.js';
 import { MemoryContextManager } from '../context/memoryContextManager.js';
 import type {
   ModelConfigService,
@@ -246,9 +245,6 @@ import type {
 } from '../services/modelConfigService.js';
 
 vi.mock('../core/baseLlmClient.js');
-vi.mock('../core/tokenLimits.js', () => ({
-  tokenLimit: vi.fn(),
-}));
 vi.mock('../experiments/experiments.js');
 
 afterEach(() => {
@@ -1105,7 +1101,10 @@ describe('Server Config (config.ts)', () => {
 
     it('should return the calculated threshold when it is smaller than the default', () => {
       const config = new Config(baseParams);
-      vi.mocked(tokenLimit).mockReturnValue(32000);
+      vi.spyOn(
+        config.getModelConfigService(),
+        'getContextWindow',
+      ).mockReturnValue(32000);
       vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
         1000,
       );
@@ -1116,7 +1115,10 @@ describe('Server Config (config.ts)', () => {
 
     it('should return the default threshold when the calculated value is larger', () => {
       const config = new Config(baseParams);
-      vi.mocked(tokenLimit).mockReturnValue(2_000_000);
+      vi.spyOn(
+        config.getModelConfigService(),
+        'getContextWindow',
+      ).mockReturnValue(2_000_000);
       vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
         500_000,
       );
@@ -1131,7 +1133,10 @@ describe('Server Config (config.ts)', () => {
         truncateToolOutputThreshold: 50000,
       };
       const config = new Config(customParams);
-      vi.mocked(tokenLimit).mockReturnValue(8000);
+      vi.spyOn(
+        config.getModelConfigService(),
+        'getContextWindow',
+      ).mockReturnValue(8000);
       vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
         2000,
       );
@@ -1139,7 +1144,10 @@ describe('Server Config (config.ts)', () => {
       // custom threshold is 50000
       expect(config.getTruncateToolOutputThreshold()).toBe(24000);
 
-      vi.mocked(tokenLimit).mockReturnValue(32000);
+      vi.spyOn(
+        config.getModelConfigService(),
+        'getContextWindow',
+      ).mockReturnValue(32000);
       vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
         1000,
       );

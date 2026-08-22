@@ -36,7 +36,6 @@ import {
 } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
 import { getErrorMessage, isAbortError } from '../utils/errors.js';
-import { tokenLimit } from './tokenLimits.js';
 import type {
   ChatRecordingService,
   ResumedSessionData,
@@ -687,7 +686,8 @@ export class GeminiClient {
     }
 
     const remainingTokenCount =
-      tokenLimit(modelForLimitCheck) - this.getChat().getLastPromptTokenCount();
+      this.config.getModelConfigService().getContextWindow(modelForLimitCheck) -
+      this.getChat().getLastPromptTokenCount();
 
     await this.tryMaskToolOutputs();
 

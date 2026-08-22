@@ -145,6 +145,12 @@ export interface ModelConfigServiceConfig {
   modelChains?: Record<string, ModelPolicy[]>;
 }
 
+/**
+ * Fallback context window (in tokens), matching the 1M-token Gemini models.
+ * Used when a model definition does not declare a `contextWindow`.
+ */
+export const DEFAULT_CONTEXT_WINDOW = 1_048_576;
+
 const MAX_ALIAS_CHAIN_DEPTH = 100;
 
 /**
@@ -325,6 +331,20 @@ export class ModelConfigService {
 
   getModelDefinitions(): Record<string, ModelDefinition> {
     return this.currentConfig.modelDefinitions ?? {};
+  }
+
+  /**
+   * Returns the context window size (in tokens) for the given model, reading
+   * the `contextWindow` field from its model definition (resolving aliases
+   * such as 'auto' first). Falls back to DEFAULT_CONTEXT_WINDOW when the
+   * definition does not declare one.
+   */
+  getContextWindow(modelId: string): number {
+    const resolvedId = this.resolveModelId(modelId);
+    return (
+      this.getModelDefinition(resolvedId)?.contextWindow ??
+      DEFAULT_CONTEXT_WINDOW
+    );
   }
 
   /**

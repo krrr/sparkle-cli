@@ -248,18 +248,21 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       tier: 'flash-lite',
       family: 'gemini-3',
       isVisible: true,
+      contextWindow: 1_048_576,
       features: { thinking: false, multimodalToolUse: true },
     },
     [DEFAULT_GEMINI_FLASH_MODEL]: {
       tier: 'flash',
       family: 'gemini-3',
       isVisible: true,
+      contextWindow: 1_048_576,
       features: { thinking: true, multimodalToolUse: true },
     },
     [DEFAULT_GEMINI_MODEL]: {
       tier: 'pro',
       family: 'gemini-3',
       isVisible: true,
+      contextWindow: 1_048_576,
       features: { thinking: true, multimodalToolUse: true },
     },
 

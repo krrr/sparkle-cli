@@ -40,7 +40,6 @@ import {
 } from '../config/models.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { setSimulate429 } from '../utils/testUtils.js';
-import { tokenLimit } from './tokenLimits.js';
 import { ideContextStore } from '../ide/ideContext.js';
 import type { ModelRouterService } from '../routing/modelRouterService.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
@@ -337,6 +336,9 @@ describe('Gemini Client (client.ts)', () => {
       getModelAvailabilityService: vi
         .fn()
         .mockReturnValue(createAvailabilityServiceMock()),
+      getModelConfigService: vi.fn().mockReturnValue({
+        getContextWindow: vi.fn(),
+      }),
     } as unknown as Config;
     mockConfig.getHookSystem = vi.fn().mockReturnValue(mockHookSystem);
 
@@ -488,10 +490,6 @@ describe('Gemini Client (client.ts)', () => {
     const mockGetHistory = vi.fn();
 
     beforeEach(() => {
-      vi.mock('./tokenLimits', () => ({
-        tokenLimit: vi.fn(),
-      }));
-
       client['chat'] = {
         getHistory: mockGetHistory,
         addHistory: vi.fn(),
@@ -1565,7 +1563,9 @@ ${JSON.stringify(
     it('should yield ContextWindowWillOverflow when the context window is about to overflow', async () => {
       // Arrange
       const MOCKED_TOKEN_LIMIT = 1000;
-      vi.mocked(tokenLimit).mockReturnValue(MOCKED_TOKEN_LIMIT);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(MOCKED_TOKEN_LIMIT);
 
       // Set last prompt token count
       const lastPromptTokenCount = 900;
@@ -1621,7 +1621,9 @@ ${JSON.stringify(
       const CONFIG_MODEL_LIMIT = 2000;
 
       // Set up token limits
-      vi.mocked(tokenLimit).mockImplementation((model) => {
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockImplementation((model: string) => {
         if (model === STICKY_MODEL) return STICKY_MODEL_LIMIT;
         return CONFIG_MODEL_LIMIT;
       });
@@ -1671,14 +1673,18 @@ ${JSON.stringify(
           remainingTokenCount,
         },
       });
-      expect(tokenLimit).toHaveBeenCalledWith(STICKY_MODEL);
+      expect(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).toHaveBeenCalledWith(STICKY_MODEL);
       expect(mockTurnRunFn).not.toHaveBeenCalled();
     });
 
     it('should attempt compression before overflow check and proceed if compression frees space', async () => {
       // Arrange
       const MOCKED_TOKEN_LIMIT = 1000;
-      vi.mocked(tokenLimit).mockReturnValue(MOCKED_TOKEN_LIMIT);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(MOCKED_TOKEN_LIMIT);
 
       // Initial state: 950 tokens used, 50 remaining.
       const initialTokenCount = 950;
@@ -1770,7 +1776,9 @@ ${JSON.stringify(
     it('should handle massive function responses by truncating them and then yielding overflow warning', async () => {
       // Arrange
       const MOCKED_TOKEN_LIMIT = 1000;
-      vi.mocked(tokenLimit).mockReturnValue(MOCKED_TOKEN_LIMIT);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(MOCKED_TOKEN_LIMIT);
 
       // History has a large compressible part and a massive function response at the end.
       const massiveText = 'a'.repeat(200000);
@@ -1841,7 +1849,9 @@ ${JSON.stringify(
     it('should not trigger overflow warning for requests with large binary data (PDFs/images)', async () => {
       // Arrange
       const MOCKED_TOKEN_LIMIT = 1000000; // 1M tokens
-      vi.mocked(tokenLimit).mockReturnValue(MOCKED_TOKEN_LIMIT);
+      vi.mocked(
+        mockConfig.getModelConfigService().getContextWindow,
+      ).mockReturnValue(MOCKED_TOKEN_LIMIT);
 
       const lastPromptTokenCount = 10000;
       const mockChat: Partial<GeminiChat> = {

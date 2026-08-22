@@ -441,11 +441,6 @@ export const StatusRow: React.FC<StatusRowProps> = ({
               <Box marginLeft={LAYOUT.INDICATOR_LEFT_MARGIN}>
                 <ContextUsageDisplay
                   promptTokenCount={uiState.sessionStats.lastPromptTokenCount}
-                  model={
-                    typeof uiState.currentModel === 'string'
-                      ? uiState.currentModel
-                      : undefined
-                  }
                   terminalWidth={terminalWidth}
                 />
               </Box>
