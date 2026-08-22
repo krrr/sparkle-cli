@@ -38,10 +38,15 @@ describe('ModelConfigService', () => {
       expect(service.getContextWindow('auto')).toBe(1_048_576);
     });
 
-    it('returns the model-specific contextWindow for OpenAI-compatible models', () => {
+    it('returns the model-specific contextWindow for profile models', () => {
       const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+      service.applyProfile({
+        id: 'test-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'custom-model', tier: 'flash', contextWindow: 200_000 }],
+      });
 
-      expect(service.getContextWindow('deepseek-v4-flash')).toBe(1000000);
+      expect(service.getContextWindow('custom-model')).toBe(200_000);
     });
 
     it('falls back to DEFAULT_CONTEXT_WINDOW for models without a definition', () => {
@@ -87,26 +92,26 @@ describe('ModelConfigService', () => {
       expect(resolved.generateContentConfig).toEqual({});
     });
 
-    it('gives chat requests for a built-in DeepSeek model the chat-base config', () => {
+    it('gives chat requests for an unrecognized custom model the chat-base config', () => {
       const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
 
       const resolved = service.getResolvedConfig({
-        model: 'deepseek-v4-flash',
+        model: 'my-custom-model',
         isChatModel: true,
       });
 
-      expect(resolved.model).toBe('deepseek-v4-flash');
+      expect(resolved.model).toBe('my-custom-model');
       expect(resolved.generateContentConfig).toEqual(CHAT_BASE_CONFIG);
     });
 
-    it('gives non-chat requests for a built-in DeepSeek model an empty config', () => {
+    it('gives non-chat requests for an unrecognized custom model an empty config', () => {
       const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
 
       const resolved = service.getResolvedConfig({
-        model: 'deepseek-v4-flash',
+        model: 'my-custom-model',
       });
 
-      expect(resolved.model).toBe('deepseek-v4-flash');
+      expect(resolved.model).toBe('my-custom-model');
       expect(resolved.generateContentConfig).toEqual({});
     });
   });
@@ -1210,117 +1215,6 @@ describe('ModelConfigService', () => {
           useCustomTools: false,
         }),
       ).toBe('gemini-2.5-flash');
-    });
-
-    it('should resolve tier aliases within the family of a custom model', () => {
-      const config: ModelConfigServiceConfig = {
-        modelDefinitions: {
-          'deepseek-v4-flash': { tier: 'flash', family: 'deepseek' },
-          'deepseek-v4-pro': { tier: 'pro', family: 'deepseek' },
-          'gemini-pro-latest': { tier: 'pro', family: 'gemini-3' },
-        },
-        modelIdResolutions: {
-          auto: {
-            default: 'gemini-pro-latest',
-            contexts: [
-              { condition: { isCustomModel: true }, target: 'active' },
-            ],
-          },
-          pro: {
-            default: 'gemini-pro-latest',
-            contexts: [
-              {
-                condition: { isCustomModel: true },
-                target: { familyTier: 'pro' },
-              },
-            ],
-          },
-          flash: {
-            default: 'gemini-flash-latest',
-            contexts: [
-              {
-                condition: { isCustomModel: true },
-                target: { familyTier: 'flash' },
-              },
-            ],
-          },
-          'flash-lite': {
-            default: 'gemini-flash-lite-latest',
-            contexts: [
-              {
-                condition: { isCustomModel: true },
-                target: { familyTier: 'flash-lite' },
-              },
-            ],
-          },
-        },
-      };
-      const service = new ModelConfigService(config);
-
-      // DeepSeek flash active: 'pro' resolves to the deepseek pro model.
-      expect(
-        service.resolveModelId('pro', { requestedModel: 'deepseek-v4-flash' }),
-      ).toBe('deepseek-v4-pro');
-      // DeepSeek pro active: 'flash' resolves to the deepseek flash model.
-      expect(
-        service.resolveModelId('flash', { requestedModel: 'deepseek-v4-pro' }),
-      ).toBe('deepseek-v4-flash');
-      // 'auto' resolves to the active model itself for custom models.
-      expect(
-        service.resolveModelId('auto', { requestedModel: 'deepseek-v4-flash' }),
-      ).toBe('deepseek-v4-flash');
-      // Gemini models are unaffected: conditions do not match.
-      expect(
-        service.resolveModelId('pro', { requestedModel: 'gemini-pro-latest' }),
-      ).toBe('gemini-pro-latest');
-      // No matching tier in the family falls back to the requested model.
-      expect(
-        service.resolveModelId('flash-lite', {
-          requestedModel: 'deepseek-v4-pro',
-        }),
-      ).toBe('deepseek-v4-pro');
-    });
-
-    it('should resolve classifier tier choices within the family of a custom model', () => {
-      const config: ModelConfigServiceConfig = {
-        modelDefinitions: {
-          'deepseek-v4-flash': { tier: 'flash', family: 'deepseek' },
-          'deepseek-v4-pro': { tier: 'pro', family: 'deepseek' },
-          'gemini-pro-latest': { tier: 'pro', family: 'gemini-3' },
-        },
-        classifierIdResolutions: {
-          flash: {
-            default: 'gemini-flash-latest',
-            contexts: [
-              {
-                condition: { isCustomModel: true },
-                target: { familyTier: 'flash' },
-              },
-            ],
-          },
-          pro: {
-            default: 'gemini-pro-latest',
-            contexts: [
-              {
-                condition: { isCustomModel: true },
-                target: { familyTier: 'pro' },
-              },
-            ],
-          },
-        },
-      };
-      const service = new ModelConfigService(config);
-
-      expect(service.resolveClassifierModelId('flash', 'deepseek-v4-pro')).toBe(
-        'deepseek-v4-flash',
-      );
-      expect(service.resolveClassifierModelId('pro', 'deepseek-v4-flash')).toBe(
-        'deepseek-v4-pro',
-      );
-      // Gemini requested model keeps the default resolution.
-      expect(
-        service.resolveClassifierModelId('flash', 'gemini-pro-latest'),
-      ).toBe('gemini-flash-latest');
     });
 
     it('should recompile resolutions and definitions when applyProfile is called', () => {

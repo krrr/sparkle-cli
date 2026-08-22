@@ -1111,8 +1111,7 @@ const SETTINGS_SCHEMA = {
         category: 'Model',
         requiresRestart: true,
         default: DEFAULT_MODEL_CONFIGS.modelDefinitions,
-        description:
-          'Registry of model metadata, including tier, family, and features.',
+        description: 'Registry of model metadata, including tier and features.',
         showInDialog: false,
         additionalProperties: {
           type: 'object',
@@ -3076,7 +3075,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
     properties: {
       displayName: { type: 'string' },
       tier: { enum: ['pro', 'flash', 'flash-lite', 'custom', 'auto'] },
-      family: { type: 'string' },
       isVisible: { type: 'boolean' },
       dialogDescription: {
         type: 'string',

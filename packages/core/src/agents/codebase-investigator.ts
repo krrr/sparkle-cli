@@ -52,8 +52,8 @@ export const CodebaseInvestigatorAgent = (
 ): LocalAgentDefinition<typeof CodebaseInvestigationReportSchema> => {
   // Use the default flash tier alias if the main model supports modern
   // features. If the main model is not a modern model, use the pro tier
-  // alias. Tier aliases resolve within the family of the active model
-  // instead of hardcoding Gemini model names.
+  // alias. Tier aliases resolve to the active provider's models instead
+  // of hardcoding Gemini model names.
   const model = supportsModernFeatures(config.getModel())
     ? SPARKLE_MODEL_ALIAS_FLASH
     : SPARKLE_MODEL_ALIAS_PRO;

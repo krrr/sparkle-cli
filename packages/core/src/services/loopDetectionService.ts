@@ -628,8 +628,8 @@ export class LoopDetectionService {
 
     // Resolve to the concrete model that will actually serve the double-check
     // call. The alias may resolve to a bare tier alias (pro/flash/flash-lite);
-    // anchoring on the active model's family keeps the availability pre-check
-    // consistent with the model used for the LLM call.
+    // the active provider profile's tier resolution keeps the availability
+    // pre-check consistent with the model used for the LLM call.
     const doubleCheckModelName = this.resolveModelName(
       DOUBLE_CHECK_MODEL_ALIAS,
     );
@@ -707,9 +707,9 @@ export class LoopDetectionService {
   /**
    * Resolves an internal model-config alias (e.g. 'loop-detection') to the
    * concrete model that will actually serve the request. Since the alias may
-   * resolve to a bare tier alias (pro/flash/flash-lite), we anchor resolution
-   * on the active model's family (see resolvePolicyChain) so the availability
-   * pre-check reports the same concrete model the LLM call uses.
+   * resolve to a bare tier alias (pro/flash/flash-lite), resolution runs
+   * against the active provider profile (see resolvePolicyChain) so the
+   * availability pre-check reports the same concrete model the LLM call uses.
    *
    * Note: mirrors selectModelForAvailability's chain resolution but must not
    * reuse it — that helper falls back to the last-resort model when nothing

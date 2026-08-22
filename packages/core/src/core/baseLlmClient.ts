@@ -246,7 +246,6 @@ export class BaseLlmClient {
           this.config.modelConfigService.getResolvedConfig(
             options.modelConfigKey,
           ).model,
-          { requestedModel: activeModel },
         )
       : activeModel;
     const result = await this.contentGenerator.countTokens({

@@ -21,6 +21,7 @@ import { LoopDetectionService } from './loopDetectionService.js';
 import { ModelConfigService } from './modelConfigService.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
+import { ProviderType } from '../config/constants.js';
 
 vi.mock('../telemetry/loggers.js', () => ({
   logLoopDetected: vi.fn(),
@@ -1291,12 +1292,21 @@ describe('LoopDetectionService LLM Checks', () => {
     });
   });
 
-  it('resolves tier-alias loop-detection models within the active family', async () => {
+  it('resolves tier-alias loop-detection models using active profile tiers', async () => {
     // Use the real ModelConfigService so 'loop-detection-double-check' and
     // 'loop-detection' resolve to the bare tier aliases ('pro'/'flash').
+    const modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+    modelConfigService.applyProfile({
+      id: 'test-profile',
+      providerType: ProviderType.USE_OPENAI,
+      models: [
+        { id: 'deepseek-v4-pro', tier: 'pro' },
+        { id: 'deepseek-v4-flash', tier: 'flash' },
+      ],
+    });
     (
       mockConfig as unknown as { modelConfigService: ModelConfigService }
-    ).modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+    ).modelConfigService = modelConfigService;
     vi.mocked(mockConfig.getActiveModel).mockReturnValue('deepseek-v4-flash');
 
     const availability = mockConfig.getModelAvailabilityService();
@@ -1313,14 +1323,14 @@ describe('LoopDetectionService LLM Checks', () => {
 
     await advanceTurns(30);
 
-    // The availability pre-check must use the concrete family model, not the
+    // The availability pre-check must use the concrete profile model, not the
     // bare 'pro' tier alias resolved from 'loop-detection-double-check'.
-    expect(availability.snapshot).toHaveBeenCalledWith('deepseek-v4-flash');
+    expect(availability.snapshot).toHaveBeenCalledWith('deepseek-v4-pro');
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(2);
     expect(loggers.logLoopDetected).toHaveBeenCalledWith(
       mockConfig,
       expect.objectContaining({
-        confirmed_by_model: 'deepseek-v4-flash',
+        confirmed_by_model: 'deepseek-v4-pro',
       }),
     );
   });

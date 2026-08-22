@@ -563,24 +563,6 @@ their corresponding top-level category object in your `settings.json` file.
           }
         }
       },
-      "gemini-pro-latest": {
-        "extends": "chat-base",
-        "modelConfig": {
-          "model": "gemini-pro-latest"
-        }
-      },
-      "gemini-flash-lite-latest": {
-        "extends": "chat-base",
-        "modelConfig": {
-          "model": "gemini-flash-lite-latest"
-        }
-      },
-      "gemini-flash-latest": {
-        "extends": "chat-base",
-        "modelConfig": {
-          "model": "gemini-flash-latest"
-        }
-      },
       "internal-tool-flash": {
         "extends": "base",
         "modelConfig": {
@@ -737,22 +719,6 @@ their corresponding top-level category object in your `settings.json` file.
         "modelConfig": {
           "model": "flash"
         }
-      },
-      "deepseek-base": {
-        "extends": "chat-base",
-        "modelConfig": {
-          "model": "deepseek-v4-flash"
-        }
-      },
-      "deepseek-v4-flash": {
-        "extends": "deepseek-base",
-        "modelConfig": {}
-      },
-      "deepseek-v4-pro": {
-        "extends": "deepseek-base",
-        "modelConfig": {
-          "model": "deepseek-v4-pro"
-        }
       }
     }
     ```
@@ -778,16 +744,15 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.modelDefinitions`** (object):
 
-  - **Description:** Registry of model metadata, including tier, family, and
-    features.
+  - **Description:** Registry of model metadata, including tier and features.
   - **Default:**
 
     ```json
     {
       "gemini-flash-lite-latest": {
         "tier": "flash-lite",
-        "family": "gemini-3",
         "isVisible": true,
+        "contextWindow": 1048576,
         "features": {
           "thinking": false,
           "multimodalToolUse": true
@@ -795,8 +760,8 @@ their corresponding top-level category object in your `settings.json` file.
       },
       "gemini-flash-latest": {
         "tier": "flash",
-        "family": "gemini-3",
         "isVisible": true,
+        "contextWindow": 1048576,
         "features": {
           "thinking": true,
           "multimodalToolUse": true
@@ -804,8 +769,8 @@ their corresponding top-level category object in your `settings.json` file.
       },
       "gemini-pro-latest": {
         "tier": "pro",
-        "family": "gemini-3",
         "isVisible": true,
+        "contextWindow": 1048576,
         "features": {
           "thinking": true,
           "multimodalToolUse": true
@@ -843,26 +808,6 @@ their corresponding top-level category object in your `settings.json` file.
           "thinking": false,
           "multimodalToolUse": false
         }
-      },
-      "deepseek-v4-flash": {
-        "tier": "flash",
-        "family": "deepseek",
-        "isVisible": true,
-        "contextWindow": 1000000,
-        "features": {
-          "thinking": true,
-          "multimodalToolUse": false
-        }
-      },
-      "deepseek-v4-pro": {
-        "tier": "pro",
-        "family": "deepseek",
-        "isVisible": true,
-        "contextWindow": 1000000,
-        "features": {
-          "thinking": true,
-          "multimodalToolUse": false
-        }
       }
     }
     ```
@@ -878,54 +823,16 @@ their corresponding top-level category object in your `settings.json` file.
     ```json
     {
       "auto": {
-        "default": "gemini-pro-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": "active"
-          }
-        ]
+        "default": "gemini-pro-latest"
       },
       "pro": {
-        "default": "gemini-pro-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": {
-              "familyTier": "pro"
-            }
-          }
-        ]
+        "default": "gemini-pro-latest"
       },
       "flash": {
-        "default": "gemini-flash-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": {
-              "familyTier": "flash"
-            }
-          }
-        ]
+        "default": "gemini-flash-latest"
       },
       "flash-lite": {
-        "default": "gemini-flash-lite-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": {
-              "familyTier": "flash-lite"
-            }
-          }
-        ]
+        "default": "gemini-flash-lite-latest"
       }
     }
     ```
@@ -941,30 +848,10 @@ their corresponding top-level category object in your `settings.json` file.
     ```json
     {
       "flash": {
-        "default": "gemini-flash-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": {
-              "familyTier": "flash"
-            }
-          }
-        ]
+        "default": "gemini-flash-latest"
       },
       "pro": {
-        "default": "gemini-pro-latest",
-        "contexts": [
-          {
-            "condition": {
-              "isCustomModel": true
-            },
-            "target": {
-              "familyTier": "pro"
-            }
-          }
-        ]
+        "default": "gemini-pro-latest"
       }
     }
     ```

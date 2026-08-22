@@ -16,7 +16,6 @@ export interface IModelConfigService {
   getModelDefinition(modelId: string):
     | {
         tier?: string;
-        family?: string;
         displayName?: string;
         features?: {
           thinking?: boolean;

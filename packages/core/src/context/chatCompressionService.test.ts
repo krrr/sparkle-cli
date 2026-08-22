@@ -133,39 +133,24 @@ describe('modelStringToModelConfigAlias', () => {
     );
   });
 
-  it('maps deepseek models to the default compression alias', () => {
-    expect(modelStringToModelConfigAlias('deepseek-v4-flash')).toBe(
+  it('maps custom models to the default compression alias', () => {
+    expect(modelStringToModelConfigAlias('custom-model-flash')).toBe(
       'chat-compression-default',
     );
-    expect(modelStringToModelConfigAlias('deepseek-v4-pro')).toBe(
+    expect(modelStringToModelConfigAlias('custom-model-pro')).toBe(
       'chat-compression-default',
     );
   });
 
-  it('resolves the default compression alias within the deepseek family', () => {
+  it('resolves the default compression alias to pro tier and uses active profile target', () => {
     const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
     const resolved = service.getResolvedConfig({
       model: 'chat-compression-default',
     });
     // The alias chain resolves to the 'pro' tier alias...
     expect(resolved.model).toBe('pro');
-    // ...which then resolves within the family of the active model.
-    expect(
-      service.resolveModelId(resolved.model, {
-        requestedModel: 'deepseek-v4-flash',
-      }),
-    ).toBe('deepseek-v4-pro');
-    expect(
-      service.resolveModelId(resolved.model, {
-        requestedModel: 'deepseek-v4-pro',
-      }),
-    ).toBe('deepseek-v4-pro');
-    // Gemini active model keeps the default resolution.
-    expect(
-      service.resolveModelId(resolved.model, {
-        requestedModel: DEFAULT_GEMINI_MODEL,
-      }),
-    ).toBe(DEFAULT_GEMINI_MODEL);
+    // ...which defaults to Gemini pro without a profile.
+    expect(service.resolveModelId(resolved.model)).toBe(DEFAULT_GEMINI_MODEL);
   });
 });
 

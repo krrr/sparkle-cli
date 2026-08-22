@@ -72,7 +72,6 @@ export interface ModelConfigAlias {
 export interface ModelDefinition {
   displayName?: string;
   tier?: string; // 'pro' | 'flash' | 'flash-lite' | 'custom' | 'auto'
-  family?: string; // The gemini family, e.g. 'gemini-3' | 'gemini-2'
   // Specifies whether the model should be visible in the dialog.
   isVisible?: boolean;
   /** A short description of the model for the dialog. */
@@ -102,18 +101,7 @@ export interface ModelResolution {
   }>;
 }
 
-/**
- * The target of a model resolution condition. In addition to a concrete model
- * ID, a target can be:
- *
- * - `'active'`: resolves to the currently requested/active model itself.
- * - `{ familyTier: 'pro' }`: resolves to the model with the given tier within
- *   the family of the requested model, falling back to the requested model
- *   when the family has no such model. This enables provider-aware routing:
- *   tier aliases (pro/flash/flash-lite/auto) resolve within the family of the
- *   active model instead of always mapping to Gemini models.
- */
-export type ModelResolutionTarget = string | { familyTier: string };
+export type ModelResolutionTarget = string;
 
 /** The actual state of the current session. */
 export interface ResolutionContext {
@@ -126,12 +114,6 @@ export interface ResolutionCondition {
   useCustomTools?: boolean;
   /** Matches if the current model is in this list. */
   requestedModels?: string[];
-  /**
-   * Matches if the current requested/active model is a custom model (i.e. not
-   * a Gemini model). Enables provider-aware routing so tier aliases resolve
-   * to models of the same family as the active model.
-   */
-  isCustomModel?: boolean;
 }
 
 export interface ModelConfigServiceConfig {
@@ -321,7 +303,6 @@ export class ModelConfigService {
     if (!modelId.startsWith('gemini-') || this.isCustomProvider) {
       return {
         tier: 'custom',
-        family: 'custom',
         features: {},
       };
     }
@@ -347,63 +328,6 @@ export class ModelConfigService {
     );
   }
 
-  /**
-   * Determines whether a model should be treated as a custom (non-Gemini)
-   * model. Mirrors the semantics of `isCustomModel` in config/models.ts
-   * without depending on the full Config object: a model is custom if its
-   * definition tier is 'custom' or its resolved name does not start with
-   * 'gemini-'.
-   */
-  private isCustomModelForResolution(model: string): boolean {
-    const resolved = this.resolveModelId(model);
-    const definition = this.currentConfig.modelDefinitions?.[resolved];
-    return (
-      this.isCustomProvider ||
-      definition?.tier === 'custom' ||
-      (definition?.family !== undefined && definition.family !== 'gemini-3') ||
-      !resolved.startsWith('gemini-')
-    );
-  }
-
-  /**
-   * Resolves a resolution target to a concrete model ID. String targets are
-   * returned as-is except for the special 'active' value, which resolves to
-   * the requested model itself. Object targets ({ familyTier }) resolve to
-   * the model with the given tier within the family of the requested model,
-   * falling back to the requested model when the family has no such model.
-   */
-  private resolveTarget(
-    target: ModelResolutionTarget,
-    context: ResolutionContext,
-  ): string {
-    if (typeof target === 'string') {
-      return target === 'active' ? (context.requestedModel ?? target) : target;
-    }
-
-    // { familyTier: 'pro' }
-    const requested = context.requestedModel;
-    if (!requested) {
-      // Without an anchor model we cannot determine a family; fall back to
-      // the tier name itself (conditions that reach here always provide a
-      // requestedModel, so this is defensive only).
-      return target.familyTier;
-    }
-
-    // 之前刚加openai支持的时候留下来的遗迹，加入多provider之后就不需要锚点机制了。暂时未去除，待调查需不需要考虑无profile的情况。
-    const resolvedRequested = this.resolveModelId(requested);
-    const family =
-      this.currentConfig.modelDefinitions?.[resolvedRequested]?.family;
-    if (!family) {
-      return requested;
-    }
-    const match = Object.entries(
-      this.currentConfig.modelDefinitions ?? {},
-    ).find(
-      ([_id, def]) => def.family === family && def.tier === target.familyTier,
-    );
-    return match?.[0] ?? requested;
-  }
-
   private matches(
     condition: ResolutionCondition,
     context: ResolutionContext,
@@ -420,10 +344,6 @@ export class ModelConfigService {
             !!context.requestedModel &&
             value.includes(context.requestedModel)
           );
-        case 'isCustomModel': {
-          const model = context.requestedModel;
-          return !!model && value === this.isCustomModelForResolution(model);
-        }
         default:
           return false;
       }
@@ -442,7 +362,7 @@ export class ModelConfigService {
 
     for (const ctx of resolution.contexts ?? []) {
       if (this.matches(ctx.condition, context)) {
-        return this.resolveTarget(ctx.target, context);
+        return ctx.target;
       }
     }
 
@@ -465,7 +385,7 @@ export class ModelConfigService {
 
     for (const ctx of resolution.contexts ?? []) {
       if (this.matches(ctx.condition, fullContext)) {
-        return this.resolveTarget(ctx.target, fullContext);
+        return ctx.target;
       }
     }
 

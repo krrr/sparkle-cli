@@ -31,8 +31,8 @@ Google-specific features, rebrands the project, adds OpenAI API compatibility.
   older configuration path.
 - Hid tool calls and other non-meaningful entries from the rewind menu.
 - Use model aliases in subagent configuration instead of concrete model names.
-- Dynamic routing of tool models by active model family, letting models on the
-  same tier chain (for example, DeepSeek) be reused.
+- Dynamic routing of tool models by the active provider profile, so tier aliases
+  (pro/flash/flash-lite) resolve to the active provider's models.
 - Reworked the `/stats` statistics page: cache reads are now shown as a cache
   hit rate percentage, and the summary layout was simplified.
 

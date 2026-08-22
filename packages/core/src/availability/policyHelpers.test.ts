@@ -24,6 +24,7 @@ import {
 import { ModelConfigService } from '../services/modelConfigService.js';
 import { DEFAULT_MODEL_CONFIGS } from '../config/defaultModelConfigs.js';
 import { ApprovalMode } from '../policy/types.js';
+import { ProviderType } from '../config/constants.js';
 
 const createMockConfig = (overrides: Partial<Config> = {}): Config => {
   const config = {
@@ -130,8 +131,18 @@ describe('policyHelpers', () => {
       expect(chain[1]?.actions).toEqual(SILENT_ACTIONS);
     });
 
-    it('routes a deepseek flash model through the default chain sliced to the active model', () => {
+    it('routes a provider flash model through the default chain sliced to the active model', () => {
+      const modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+      modelConfigService.applyProfile({
+        id: 'test-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          { id: 'deepseek-v4-pro', tier: 'pro' },
+          { id: 'deepseek-v4-flash', tier: 'flash' },
+        ],
+      });
       const config = createMockConfig({
+        modelConfigService,
         getModel: () => 'deepseek-v4-flash',
       });
       const chain = resolvePolicyChain(config);
@@ -143,14 +154,24 @@ describe('policyHelpers', () => {
       expect(chain[0]?.model).toBe('deepseek-v4-flash');
     });
 
-    it('keeps both deepseek tiers in the chain when deepseek pro is active', () => {
+    it('keeps both provider tiers in the chain when provider pro is active', () => {
+      const modelConfigService = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+      modelConfigService.applyProfile({
+        id: 'test-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          { id: 'deepseek-v4-pro', tier: 'pro' },
+          { id: 'deepseek-v4-flash', tier: 'flash' },
+        ],
+      });
       const config = createMockConfig({
+        modelConfigService,
         getModel: () => 'deepseek-v4-pro',
       });
       const chain = resolvePolicyChain(config);
 
       // pro is the chain head, so the full [deepseek-v4-pro, deepseek-v4-flash]
-      // chain is retained, providing downgrade semantics for the family.
+      // chain is retained, providing downgrade semantics for the provider.
       expect(chain).toHaveLength(2);
       expect(chain[0]?.model).toBe('deepseek-v4-pro');
       expect(chain[1]?.model).toBe('deepseek-v4-flash');

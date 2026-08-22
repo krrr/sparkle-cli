@@ -411,9 +411,8 @@ export const SkillExtractionAgent = (
     schema: SkillExtractionSchema,
   },
   modelConfig: {
-    // Tier alias so the extraction agent resolves within the family of the
-    // active model (Gemini flash by default; e.g. deepseek-v4-flash when a
-    // DeepSeek model is active) instead of hardcoding a Gemini model name.
+    // Tier alias so the extraction agent resolves to the active provider's
+    // flash-tier model instead of hardcoding a Gemini model name.
     model: SPARKLE_MODEL_ALIAS_FLASH,
   },
   memoryInboxAccess: true,

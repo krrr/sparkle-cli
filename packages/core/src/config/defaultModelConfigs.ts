@@ -170,9 +170,8 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    // Compression aliases use tier aliases so they resolve within the family
-    // of the active model (Gemini by default; e.g. deepseek when a DeepSeek
-    // model is active) instead of hardcoding Gemini model names.
+    // Compression aliases use tier aliases so they resolve to the active
+    // provider's tier models instead of hardcoding Gemini model names.
     'chat-compression-pro': {
       modelConfig: {
         model: 'pro',
@@ -213,21 +212,18 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
     // Concrete Models
     [DEFAULT_GEMINI_FLASH_LITE_MODEL]: {
       tier: 'flash-lite',
-      family: 'gemini-3',
       isVisible: true,
       contextWindow: 1_048_576,
       features: { thinking: false, multimodalToolUse: true },
     },
     [DEFAULT_GEMINI_FLASH_MODEL]: {
       tier: 'flash',
-      family: 'gemini-3',
       isVisible: true,
       contextWindow: 1_048_576,
       features: { thinking: true, multimodalToolUse: true },
     },
     [DEFAULT_GEMINI_MODEL]: {
       tier: 'pro',
-      family: 'gemini-3',
       isVisible: true,
       contextWindow: 1_048_576,
       features: { thinking: true, multimodalToolUse: true },
@@ -255,88 +251,34 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       isVisible: false,
       features: { thinking: false, multimodalToolUse: false },
     },
-
-    // OpenAI-compatible models. The tier mirrors the Gemini tier semantics so
-    // that provider-aware routing can resolve tier aliases (pro/flash) within
-    // the 'deepseek' family when a DeepSeek model is active.
-    'deepseek-v4-flash': {
-      tier: 'flash',
-      family: 'deepseek',
-      isVisible: true,
-      contextWindow: 1000000,
-      features: { thinking: true, multimodalToolUse: false },
-    },
-    'deepseek-v4-pro': {
-      tier: 'pro',
-      family: 'deepseek',
-      isVisible: true,
-      contextWindow: 1000000,
-      features: { thinking: true, multimodalToolUse: false },
-    },
   },
   modelIdResolutions: {
     auto: {
       default: DEFAULT_GEMINI_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: 'active',
-        },
-      ],
     },
     pro: {
       default: DEFAULT_GEMINI_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: { familyTier: 'pro' },
-        },
-      ],
     },
     flash: {
       default: DEFAULT_GEMINI_FLASH_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: { familyTier: 'flash' },
-        },
-      ],
     },
     'flash-lite': {
       default: DEFAULT_GEMINI_FLASH_LITE_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: { familyTier: 'flash-lite' },
-        },
-      ],
     },
   },
   classifierIdResolutions: {
     flash: {
       default: DEFAULT_GEMINI_FLASH_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: { familyTier: 'flash' },
-        },
-      ],
     },
     pro: {
       default: DEFAULT_GEMINI_MODEL,
-      contexts: [
-        {
-          condition: { isCustomModel: true },
-          target: { familyTier: 'pro' },
-        },
-      ],
     },
   },
   modelChains: {
     // Chain models use tier aliases (pro/flash/flash-lite) which resolve via
     // modelIdResolutions. With a Gemini active model they map to the default
-    // Gemini models; with a custom (e.g. deepseek) active model they resolve
-    // within that model's family, providing the same downgrade semantics.
+    // Gemini models; with a custom provider profile active model they resolve
+    // to the active profile's tier models.
     default: [
       {
         model: 'pro',

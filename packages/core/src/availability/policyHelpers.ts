@@ -31,23 +31,8 @@ import type { ModelSelectionResult } from './modelAvailabilityService.js';
 import {
   ModelConfigService,
   type ModelConfigKey,
-  type ResolutionContext,
 } from '../services/modelConfigService.js';
 import { ApprovalMode } from '../policy/types.js';
-
-/**
- * Resolves the active policy chain for the given config, ensuring the
- * user-selected active model is represented.
- */
-const TIER_ALIASES = new Set(['pro', 'flash', 'flash-lite', 'auto']);
-
-/**
- * True if the model string is a generic tier alias (pro/flash/flash-lite/auto)
- * that carries no family information.
- */
-function isTierAlias(model: string): boolean {
-  return TIER_ALIASES.has(model);
-}
 
 export function resolvePolicyChain(
   config: Config,
@@ -59,20 +44,11 @@ export function resolvePolicyChain(
   const activeModel = normalizeModelId(
     config.getActiveModel?.() ?? config.getModel(),
   );
-  // Tier aliases carry no family information. When a preferred model is such
-  // an alias (e.g. a tool request resolved to 'pro' through a model config
-  // alias), anchor resolution on the active model so the tier maps within the
-  // active model's family instead of always resolving to Gemini models.
-  const anchorModel =
-    normalizedPreferredModel && isTierAlias(normalizedPreferredModel)
-      ? activeModel
-      : (normalizedPreferredModel ?? activeModel);
-  const modelFromConfig = anchorModel;
+  const modelFromConfig = normalizedPreferredModel ?? activeModel;
   const configuredModel = normalizeModelId(config.getModel());
 
   let chain: ModelPolicyChain | undefined;
 
-  // Capture the original family intent before any normalization or early downgrade.
   // All Gemini models are treated as Gemini 3.
   const isOriginallyGemini3 = !isCustomModel(modelFromConfig, config);
 
@@ -82,13 +58,6 @@ export function resolvePolicyChain(
     : false;
   const isAutoConfigured = isAutoModel(configuredModel, config);
 
-  // Pass the requested model through as the resolution anchor so tier aliases
-  // (pro/flash/flash-lite) inside chains resolve within the family of the
-  // active model (e.g. deepseek models) instead of always mapping to Gemini.
-  const resolutionContext: ResolutionContext = {
-    requestedModel: modelFromConfig,
-  };
-
   const tier =
     config.modelConfigService.getModelDefinition(resolvedModel)?.tier;
 
@@ -96,7 +65,7 @@ export function resolvePolicyChain(
     resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL ||
     tier === 'flash-lite'
   ) {
-    chain = config.modelConfigService.resolveChain('lite', resolutionContext);
+    chain = config.modelConfigService.resolveChain('lite');
   } else if (
     isOriginallyGemini3 ||
     isAutoPreferred ||
@@ -110,19 +79,13 @@ export function resolvePolicyChain(
       isAutoConfigured &&
       config.modelConfigService.getModelChain(configuredModel)
     ) {
-      chain = config.modelConfigService.resolveChain(
-        configuredModel,
-        resolutionContext,
-      );
+      chain = config.modelConfigService.resolveChain(configuredModel);
     }
-    // 2. Fallback to family-based auto-routing
+    // 2. Fallback to auto-routing
     if (!chain) {
       const isAutoSelection = isAutoPreferred || isAutoConfigured;
       const autoPrefix = isAutoSelection ? 'auto-' : '';
-      chain = config.modelConfigService.resolveChain(
-        `${autoPrefix}default`,
-        resolutionContext,
-      );
+      chain = config.modelConfigService.resolveChain(`${autoPrefix}default`);
     }
   }
   if (!chain) {
