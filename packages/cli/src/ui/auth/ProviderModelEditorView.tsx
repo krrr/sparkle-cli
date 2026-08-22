@@ -8,7 +8,11 @@ import type React from 'react';
 import { useState } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import type { ModelTier, ProviderModel } from 'sparkle-cli-core';
+import type {
+  ModelTier,
+  ProviderModel,
+  ReasoningEffort,
+} from 'sparkle-cli-core';
 import { TextInput } from '../components/shared/TextInput.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
@@ -23,8 +27,17 @@ export interface ProviderModelEditorViewProps {
   error?: string | null;
 }
 
-type ModelFormField = 'id' | 'tier';
+type ModelFormField = 'id' | 'tier' | 'reasoningEffort';
 const TIERS: Array<ModelTier | 'none'> = ['none', 'flash-lite', 'flash', 'pro'];
+// The UI exposes the common levels; the full set (minimal/medium/xhigh/...)
+// can be set directly in settings.json.
+const EFFORTS: Array<ReasoningEffort | 'default'> = [
+  'default',
+  'none',
+  'low',
+  'high',
+  'max',
+];
 
 export function ProviderModelEditorView({
   model,
@@ -35,6 +48,9 @@ export function ProviderModelEditorView({
   const keyMatchers = useKeyMatchers();
   const [focusField, setFocusField] = useState<ModelFormField>('id');
   const [tier, setTier] = useState<ModelTier | 'none'>(model?.tier || 'none');
+  const [effort, setEffort] = useState<ReasoningEffort | 'default'>(
+    model?.generateConfig?.reasoningEffort ?? 'default',
+  );
 
   const { terminalWidth } = useUIState();
   const viewportWidth = Math.max(40, terminalWidth - 12);
@@ -46,7 +62,7 @@ export function ProviderModelEditorView({
     singleLine: true,
   });
 
-  const fields: ModelFormField[] = ['id', 'tier'];
+  const fields: ModelFormField[] = ['id', 'tier', 'reasoningEffort'];
 
   const moveFocus = (forward: boolean) => {
     const currentIdx = fields.indexOf(focusField);
@@ -66,6 +82,15 @@ export function ProviderModelEditorView({
     }
   };
 
+  const cycleEffort = (forward: boolean) => {
+    const currentIdx = EFFORTS.indexOf(effort);
+    if (forward) {
+      setEffort(EFFORTS[(currentIdx + 1) % EFFORTS.length]);
+    } else {
+      setEffort(EFFORTS[(currentIdx - 1 + EFFORTS.length) % EFFORTS.length]);
+    }
+  };
+
   const handleSaveAndExit = () => {
     const id = idBuffer.text.trim();
     if (!id) {
@@ -73,10 +98,25 @@ export function ProviderModelEditorView({
       return;
     }
 
+    // Spread the original model so fields without UI controls
+    // (contextWindow, features, ...) survive an edit.
+    const generateConfig = { ...model?.generateConfig };
+    if (effort === 'default') {
+      delete generateConfig.reasoningEffort;
+    } else {
+      generateConfig.reasoningEffort = effort;
+    }
+
     const newModel: ProviderModel = {
+      ...model,
       id,
       tier: tier === 'none' ? undefined : tier,
     };
+    if (Object.keys(generateConfig).length > 0) {
+      newModel.generateConfig = generateConfig;
+    } else {
+      delete newModel.generateConfig;
+    }
 
     void onSave(newModel);
   };
@@ -99,13 +139,21 @@ export function ProviderModelEditorView({
         moveFocus(true);
         return true;
       }
-      if (focusField === 'tier') {
+      if (focusField === 'tier' || focusField === 'reasoningEffort') {
         if (key.name === 'left') {
-          cycleTier(false);
+          if (focusField === 'tier') {
+            cycleTier(false);
+          } else {
+            cycleEffort(false);
+          }
           return true;
         }
         if (key.name === 'right' || key.name === 'space') {
-          cycleTier(true);
+          if (focusField === 'tier') {
+            cycleTier(true);
+          } else {
+            cycleEffort(true);
+          }
           return true;
         }
         if (keyMatchers[Command.RETURN](key)) {
@@ -182,6 +230,41 @@ export function ProviderModelEditorView({
         </Box>
       </Box>
 
+      {/* Reasoning Effort Selection */}
+      <Box marginTop={1} flexDirection="column">
+        <Text
+          color={
+            focusField === 'reasoningEffort'
+              ? theme.text.accent
+              : theme.text.primary
+          }
+          bold={focusField === 'reasoningEffort'}
+        >
+          Reasoning Effort:{' '}
+          <Text color={theme.text.secondary}>
+            (Thinking level; none disables thinking)
+          </Text>
+        </Text>
+        <Box flexDirection="row" marginTop={1}>
+          {EFFORTS.map((e) => {
+            const isSelected = effort === e;
+            return (
+              <Box key={e} marginRight={2}>
+                <Text
+                  color={
+                    isSelected ? theme.status.success : theme.text.secondary
+                  }
+                  bold={isSelected}
+                >
+                  {isSelected ? '[●] ' : '[ ] '}
+                  {e}
+                </Text>
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+
       {error && (
         <Box marginTop={1}>
           <Text color={theme.status.error}>{error}</Text>
@@ -190,7 +273,7 @@ export function ProviderModelEditorView({
 
       <Box marginTop={1}>
         <Text color={theme.text.secondary}>
-          (↑/↓ or Tab to switch fields, ←/→ to toggle tier, Esc to save &
+          (↑/↓ or Tab to switch fields, ←/→ to toggle radio, Esc to save &
           return)
         </Text>
       </Box>

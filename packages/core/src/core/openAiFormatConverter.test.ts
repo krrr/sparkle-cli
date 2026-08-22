@@ -347,6 +347,41 @@ describe('geminiConfigToOpenAiConfig', () => {
     expect(out.reasoning_effort).toBeUndefined();
   });
 
+  it('maps reasoning_effort none to a disabled thinking switch for deepseek', () => {
+    const out = geminiConfigToOpenAiConfig(
+      {
+        openaiExtraBody: { reasoning_effort: 'none' },
+        thinkingConfig: {
+          includeThoughts: true,
+          thinkingLevel: ThinkingLevel.HIGH,
+        },
+      },
+      'deepseek',
+    );
+    expect(out.extra_body).toEqual({ thinking: { type: 'disabled' } });
+    expect(out.reasoning_effort).toBeUndefined();
+  });
+
+  it('passes reasoning_effort none through for non-deepseek providers', () => {
+    const out = geminiConfigToOpenAiConfig(
+      { openaiExtraBody: { reasoning_effort: 'none' } },
+      'openai',
+    );
+    expect(out.reasoning_effort).toBe('none');
+    expect(out.extra_body).toBeUndefined();
+  });
+
+  it('does not clobber a hand-written extra_body thinking switch', () => {
+    const out = geminiConfigToOpenAiConfig(
+      {
+        openaiExtraBody: { thinking: { type: 'disabled' } },
+        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+      },
+      'deepseek',
+    );
+    expect(out.extra_body).toEqual({ thinking: { type: 'disabled' } });
+  });
+
   it('returns empty object for undefined config', () => {
     expect(geminiConfigToOpenAiConfig(undefined, 'openai')).toEqual({});
   });

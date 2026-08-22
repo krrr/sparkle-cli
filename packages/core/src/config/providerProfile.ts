@@ -17,6 +17,22 @@ export type ModelTier =
   | typeof SPARKLE_MODEL_ALIAS_FLASH
   | typeof SPARKLE_MODEL_ALIAS_FLASH_LITE;
 
+/**
+ * Thinking effort levels accepted by OpenAI-compatible providers. The union
+ * covers the values used across providers (OpenAI, DeepSeek, GLM, ...);
+ * providers that reject a level will surface the error. `none` is special:
+ * it disables thinking entirely (e.g. DeepSeek's
+ * `extra_body.thinking.type = "disabled"`).
+ */
+export type ReasoningEffort =
+  | 'none'
+  | 'minimal'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'xhigh'
+  | 'max';
+
 export interface ProviderModel {
   id: string;
   tier?: ModelTier;
@@ -29,10 +45,13 @@ export interface ProviderModel {
     toolUse?: boolean;
     multimodalToolUse?: boolean;
   };
-  // for future use
+  // Per-model sampling parameters. Applied via a model-matched override to
+  // every request keyed by this model's id. No UI for temperature/topP yet;
+  // they are honored when set directly in settings.json.
   generateConfig?: {
     temperature?: number;
     topP?: number;
+    reasoningEffort?: ReasoningEffort;
   };
 }
 

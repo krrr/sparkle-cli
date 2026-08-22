@@ -3163,6 +3163,21 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
         enum: ['pro', 'flash', 'flash-lite'],
       },
       contextWindow: { type: 'number' },
+      generateConfig: {
+        type: 'object',
+        description:
+          'Sampling parameters applied to every request using this model.',
+        properties: {
+          temperature: { type: 'number' },
+          topP: { type: 'number' },
+          reasoningEffort: {
+            type: 'string',
+            description:
+              'Thinking effort level. "none" disables thinking; unset uses the provider default.',
+            enum: ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+          },
+        },
+      },
     },
     required: ['id'],
   },

@@ -10,7 +10,6 @@ import {
   type Content,
   type ContentUnion,
   FunctionCallingConfigMode,
-  type GenerateContentConfig,
   GenerateContentResponse,
   type GenerateContentResponseUsageMetadata,
   type Part,
@@ -18,6 +17,7 @@ import {
   type Tool,
 } from '@google/genai';
 import { isRecord } from '../utils/markdownUtils.js';
+import type { SparkleGenerateContentConfig } from '../services/modelConfigService.js';
 import type {
   OpenAiChatCompletion,
   OpenAiContentPart,
@@ -193,15 +193,14 @@ export function geminiToolsToOpenAiTools(
 
 /**
  * Extracts the provider-specific `openaiExtraBody` custom field from a
- * GenerateContentConfig (used for arbitrary extra_body passthrough).
+ * GenerateContentConfig (used for arbitrary extra_body passthrough). The
+ * runtime guard stays because the value originates from user-edited
+ * settings, which the type system cannot vouch for.
  */
 export function extractOpenAiExtraBody(
-  config: GenerateContentConfig,
+  config: SparkleGenerateContentConfig,
 ): Record<string, unknown> {
-  if (!('openaiExtraBody' in config)) {
-    return {};
-  }
-  const extra = config['openaiExtraBody'];
+  const extra = config.openaiExtraBody;
   return isRecord(extra) ? { ...extra } : {};
 }
 
@@ -213,7 +212,7 @@ export function extractOpenAiExtraBody(
  * OpenAI-compatible APIs reject unknown request fields.
  */
 export function geminiConfigToOpenAiConfig(
-  config: GenerateContentConfig | undefined,
+  config: SparkleGenerateContentConfig | undefined,
   provider: string,
   nameMapper?: FunctionNameMapper,
 ): Partial<OpenAiRequest> {
@@ -291,9 +290,17 @@ export function geminiConfigToOpenAiConfig(
   // `reasoning_effort` is a top-level request parameter for both OpenAI and
   // DeepSeek, not an extra_body field. Lift it out of the passthrough.
   const explicitEffort = extraBody['reasoning_effort'];
-  if (typeof explicitEffort === 'string' && explicitEffort.length > 0) {
-    out.reasoning_effort = explicitEffort;
+  const hasExplicitEffort =
+    typeof explicitEffort === 'string' && explicitEffort.length > 0;
+  if (hasExplicitEffort) {
     delete extraBody['reasoning_effort'];
+    if (explicitEffort === 'none' && provider === 'deepseek') {
+      // `none` disables thinking. DeepSeek has a dedicated switch for it;
+      // other providers receive the value as-is via the top-level parameter.
+      extraBody['thinking'] = { type: 'disabled' };
+    } else {
+      out.reasoning_effort = explicitEffort;
+    }
   }
 
   const thinking = config.thinkingConfig;
@@ -301,15 +308,18 @@ export function geminiConfigToOpenAiConfig(
     // DeepSeek: thinking is enabled via `extra_body: {"thinking":
     // {"type": "enabled"}}` and the effort level via the top-level
     // `reasoning_effort` parameter (low/high/max). DeepSeek does not support
-    // budget_tokens.
+    // budget_tokens. An explicit extraBody `thinking` (e.g. the `none`
+    // effort's disabled switch) always wins over thinkingConfig, and an
+    // explicit effort suppresses the thinkingLevel-derived fallback below.
     if (
-      thinking.includeThoughts === true ||
-      thinking.thinkingLevel !== undefined ||
-      (thinking.thinkingBudget !== undefined && thinking.thinkingBudget > 0)
+      extraBody['thinking'] === undefined &&
+      (thinking.includeThoughts === true ||
+        thinking.thinkingLevel !== undefined ||
+        (thinking.thinkingBudget !== undefined && thinking.thinkingBudget > 0))
     ) {
       extraBody['thinking'] = { type: 'enabled' };
     }
-    if (out.reasoning_effort === undefined) {
+    if (!hasExplicitEffort && out.reasoning_effort === undefined) {
       if (thinking.thinkingLevel === ThinkingLevel.HIGH) {
         out.reasoning_effort = 'high';
       } else if (thinking.thinkingLevel === ThinkingLevel.LOW) {

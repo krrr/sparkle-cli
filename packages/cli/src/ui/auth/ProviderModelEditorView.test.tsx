@@ -26,6 +26,7 @@ describe('ProviderModelEditorView', () => {
     expect(lastFrame()).toContain('Add Model');
     expect(lastFrame()).toContain('Model ID:');
     expect(lastFrame()).toContain('Model Tier:');
+    expect(lastFrame()).toContain('Reasoning Effort:');
     expect(lastFrame()).toContain('Esc to save & return');
     unmount();
   });
@@ -129,6 +130,87 @@ describe('ProviderModelEditorView', () => {
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalled();
       expect(onSave).not.toHaveBeenCalled();
+    });
+
+    unmount();
+  });
+
+  it('cycles reasoning effort and saves the selection', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Type model id
+    await act(async () => {
+      stdin.write('deepseek-reasoner');
+    });
+    await waitUntilReady();
+
+    // Enter moves from the id field to tier
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    // Down arrow moves to the reasoning effort field
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+
+    // Right arrow cycles default -> none
+    await act(async () => {
+      stdin.write('\u001b[C');
+    });
+    await waitUntilReady();
+
+    // Press Enter on the effort field to submit
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'deepseek-reasoner',
+          generateConfig: { reasoningEffort: 'none' },
+        }),
+      );
+    });
+
+    unmount();
+  });
+
+  it('preserves fields without UI controls when editing', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView
+        model={{
+          id: 'reasoner-v1',
+          tier: 'flash',
+          contextWindow: 64000,
+          features: { thinking: false },
+        }}
+        onSave={onSave}
+        onCancel={onCancel}
+      />,
+    );
+
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\x1b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'reasoner-v1',
+          tier: 'flash',
+          contextWindow: 64000,
+          features: { thinking: false },
+        }),
+      );
     });
 
     unmount();

@@ -1326,6 +1326,104 @@ describe('ModelConfigService', () => {
         multimodalToolUse: false,
       });
     });
+
+    it('should apply per-model generateConfig via model-matched overrides', () => {
+      const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
+
+      const profile: ProviderProfile = {
+        id: 'effort-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          {
+            id: 'reasoner-v1',
+            generateConfig: { reasoningEffort: 'high' },
+          },
+          {
+            id: 'cheap-v1',
+            generateConfig: { temperature: 0.2, topP: 0.8 },
+          },
+          { id: 'plain-v1' },
+        ],
+        defaultModel: 'reasoner-v1',
+      };
+
+      service.applyProfile(profile);
+
+      // Chat-keyed requests pick up the effort through openaiExtraBody,
+      // layered on top of the chat-base fallback config.
+      const reasoned = service.getResolvedConfig({
+        model: 'reasoner-v1',
+        isChatModel: true,
+      });
+      expect(reasoned.generateContentConfig.openaiExtraBody).toEqual({
+        reasoning_effort: 'high',
+      });
+      expect(reasoned.generateContentConfig.thinkingConfig).toBeDefined();
+
+      // Sampling parameters pass through alongside the effort.
+      const sampled = service.getResolvedConfig({
+        model: 'cheap-v1',
+        isChatModel: true,
+      });
+      expect(sampled.generateContentConfig.temperature).toBe(0.2);
+      expect(sampled.generateContentConfig.topP).toBe(0.8);
+
+      // Models without a generateConfig keep the plain fallback config.
+      const plain = service.getResolvedConfig({
+        model: 'plain-v1',
+        isChatModel: true,
+      });
+      expect(plain.generateContentConfig.openaiExtraBody).toBeUndefined();
+
+      // Non-chat requests keyed by the model id also receive the effort,
+      // without inheriting chat-base sampling params.
+      const subagent = service.getResolvedConfig({ model: 'reasoner-v1' });
+      expect(subagent.generateContentConfig.openaiExtraBody).toEqual({
+        reasoning_effort: 'high',
+      });
+      expect(subagent.generateContentConfig.temperature).toBeUndefined();
+
+      // Resetting the profile clears the dynamic overrides.
+      service.applyProfile(undefined);
+      const reset = service.getResolvedConfig({
+        model: 'reasoner-v1',
+        isChatModel: true,
+      });
+      expect(reset.generateContentConfig.openaiExtraBody).toBeUndefined();
+    });
+
+    it('should let user customOverrides win over profile generateConfig', () => {
+      const service = new ModelConfigService({
+        ...DEFAULT_MODEL_CONFIGS,
+        customOverrides: [
+          {
+            match: { model: 'reasoner-v1' },
+            modelConfig: {
+              generateContentConfig: {
+                openaiExtraBody: { reasoning_effort: 'low' },
+              },
+            },
+          },
+        ],
+      });
+
+      service.applyProfile({
+        id: 'effort-profile',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          { id: 'reasoner-v1', generateConfig: { reasoningEffort: 'high' } },
+        ],
+        defaultModel: 'reasoner-v1',
+      });
+
+      const resolved = service.getResolvedConfig({
+        model: 'reasoner-v1',
+        isChatModel: true,
+      });
+      expect(resolved.generateContentConfig.openaiExtraBody).toEqual({
+        reasoning_effort: 'low',
+      });
+    });
   });
 
   describe('getAvailableModelOptions', () => {

@@ -16,7 +16,10 @@ import {
   DEFAULT_OPENAI_MODEL,
 } from '../config/models.js';
 import { ProviderType } from '../config/constants.js';
-import type { ProviderProfile } from '../config/providerProfile.js';
+import type {
+  ProviderModel,
+  ProviderProfile,
+} from '../config/providerProfile.js';
 
 // The primary key for the ModelConfig is the model string. However, we also
 // support a secondary key to limit the override scope, typically an agent name.
@@ -47,9 +50,24 @@ export interface ModelConfigKey {
   lastStreamError?: unknown;
 }
 
+/**
+ * The SDK's `GenerateContentConfig` extended with Sparkle-owned fields that
+ * ride along the config pipeline and are consumed only by the
+ * OpenAI-compatible adapter. The native Gemini path ignores (and may reject)
+ * these fields, so they must only be set for custom providers.
+ */
+export interface SparkleGenerateContentConfig extends GenerateContentConfig {
+  /**
+   * Request-body passthrough for OpenAI-compatible providers. Keys use the
+   * wire format (snake_case); `reasoning_effort` is lifted to the top-level
+   * request parameter by the adapter's config converter.
+   */
+  openaiExtraBody?: Record<string, unknown>;
+}
+
 export interface ModelConfig {
   model?: string;
-  generateContentConfig?: GenerateContentConfig;
+  generateContentConfig?: SparkleGenerateContentConfig;
 }
 
 export interface ModelConfigOverride {
@@ -154,7 +172,34 @@ export type ResolvedModelConfig = _ResolvedModelConfig & {
 
 export interface _ResolvedModelConfig {
   model: string; // The actual, resolved model name
-  generateContentConfig: GenerateContentConfig;
+  generateContentConfig: SparkleGenerateContentConfig;
+}
+
+/**
+ * Maps a profile model's `generateConfig` onto the config pipeline's
+ * shape. `reasoningEffort` travels via `openaiExtraBody` — the adapter's
+ * config converter lifts it to the top-level `reasoning_effort` request
+ * parameter. Returns undefined when there is nothing to apply.
+ */
+function providerModelToGenerateContentConfig(
+  generateConfig: ProviderModel['generateConfig'],
+): SparkleGenerateContentConfig | undefined {
+  if (!generateConfig) {
+    return undefined;
+  }
+  const config: SparkleGenerateContentConfig = {};
+  if (generateConfig.temperature !== undefined) {
+    config.temperature = generateConfig.temperature;
+  }
+  if (generateConfig.topP !== undefined) {
+    config.topP = generateConfig.topP;
+  }
+  if (generateConfig.reasoningEffort) {
+    config.openaiExtraBody = {
+      reasoning_effort: generateConfig.reasoningEffort,
+    };
+  }
+  return Object.keys(config).length > 0 ? config : undefined;
 }
 
 export class ModelConfigService {
@@ -211,13 +256,32 @@ export class ModelConfigService {
       };
     }
 
-    // 3. Build merged currentConfig
+    // 3. Convert per-model generate configs into model-matched overrides so
+    // sampling parameters (reasoningEffort, temperature, topP) reach every
+    // request keyed by the model id. Injected into the product `overrides`
+    // array, ahead of the user's `customOverrides`, so user-written overrides
+    // always win ties against profile settings.
+    const dynamicOverrides: ModelConfigOverride[] = [];
+    for (const m of models) {
+      const generateContentConfig = providerModelToGenerateContentConfig(
+        m.generateConfig,
+      );
+      if (generateContentConfig) {
+        dynamicOverrides.push({
+          match: { model: m.id },
+          modelConfig: { generateContentConfig },
+        });
+      }
+    }
+
+    // 4. Build merged currentConfig
     this.currentConfig = {
       ...this.baseConfig,
       modelDefinitions: {
         ...this.baseConfig.modelDefinitions,
         ...dynamicDefinitions,
       },
+      overrides: [...(this.baseConfig.overrides ?? []), ...dynamicOverrides],
       modelIdResolutions: {
         ...this.baseConfig.modelIdResolutions,
         pro: { default: proTarget },
@@ -456,7 +520,7 @@ export class ModelConfigService {
    */
   private internalGetResolvedConfig(context: ModelConfigKey): {
     model: string | undefined;
-    generateContentConfig: GenerateContentConfig;
+    generateContentConfig: SparkleGenerateContentConfig;
   } {
     const {
       aliases = {},
@@ -689,9 +753,9 @@ export class ModelConfigService {
   }
 
   static deepMerge(
-    config1: GenerateContentConfig | undefined,
-    config2: GenerateContentConfig | undefined,
-  ): GenerateContentConfig {
+    config1: SparkleGenerateContentConfig | undefined,
+    config2: SparkleGenerateContentConfig | undefined,
+  ): SparkleGenerateContentConfig {
     return ModelConfigService.genericDeepMerge(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       config1 as Record<string, unknown> | undefined,
