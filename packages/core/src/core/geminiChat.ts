@@ -56,6 +56,7 @@ import { scrubHistory, scrubContents } from '../utils/historyHardening.js';
 import {
   partListUnionToString,
   ensureStableToolIds,
+  convertSessionToClientHistory,
 } from '../utils/sessionUtils.js';
 import { BINARY_INJECTION_KEY } from '../utils/generateContentResponseUtilities.js';
 import type { ModelConfigKey } from '../services/modelConfigService.js';
@@ -314,19 +315,15 @@ export class GeminiChat {
           : { id: randomUUID(), content: item },
       );
     } else if (resumedSessionData) {
-      // Otherwise, if resuming from disk, build from the persisted record.
-      initialHistory = resumedSessionData.conversation.messages
-        .filter((m) => m.type === 'user' || m.type === 'gemini')
-        .map((m) => ({
-          id: m.id,
-          content: {
-            role: m.type === 'user' ? 'user' : 'model',
-            parts: Array.isArray(m.content)
-              ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-                (m.content as Part[])
-              : [{ text: String(m.content) }],
-          },
-        }));
+      // Otherwise, if resuming from disk, rebuild through the same canonical
+      // converter every resume entry point uses. 'gemini' message records
+      // store tool-call metadata in a separate `toolCalls` field while
+      // `content` only holds text, so rebuilding parts from `content` alone
+      // would drop every functionCall and orphan the recorded user
+      // functionResponse turns — strict OpenAI-compatible APIs reject those.
+      initialHistory = convertSessionToClientHistory(
+        resumedSessionData.conversation.messages,
+      );
     } else {
       initialHistory = [];
     }
@@ -1641,29 +1638,56 @@ export function isInvalidArgumentError(errorMessage: string): boolean {
 }
 
 export function stripToolCallIdPrefixes(contents: Content[]): Content[] {
+  // A functionCall and its functionResponse share one id but can carry
+  // different names (e.g. a tail-chained request is renamed while responses
+  // keep reporting the original name). Deciding the strip per-part from that
+  // part's own name can transform only one side of the pair and desynchronize
+  // the ids. Decide once per id — if any name associated with the id matches
+  // its prefix, strip — and apply that decision uniformly to every part
+  // sharing the id.
+  const strippedIds = new Map<string, string>();
+  const considerName = (
+    id: string | undefined,
+    rawName: string | undefined,
+  ): void => {
+    if (!id || strippedIds.has(id)) {
+      return;
+    }
+    const name = rawName?.trim() || 'generic_tool';
+    if (id.startsWith(`${name}__`)) {
+      strippedIds.set(id, id.substring(name.length + 2));
+    }
+  };
+  for (const content of contents) {
+    for (const part of content.parts || []) {
+      considerName(part.functionCall?.id, part.functionCall?.name);
+      considerName(part.functionResponse?.id, part.functionResponse?.name);
+    }
+  }
+
   return contents.map((content) => ({
     ...content,
     parts: (content.parts || []).map((part) => {
       const newPart = { ...part };
       if (newPart.functionCall) {
         const fc = newPart.functionCall;
-        const name = fc.name?.trim() || 'generic_tool';
-        if (fc.id && fc.id.startsWith(`${name}__`)) {
+        const stripped = fc.id ? strippedIds.get(fc.id) : undefined;
+        if (stripped !== undefined) {
           newPart.functionCall = {
             name: fc.name,
             args: fc.args,
-            id: fc.id.substring(name.length + 2),
+            id: stripped,
           };
         }
       }
       if (newPart.functionResponse) {
         const fr = newPart.functionResponse;
-        const name = fr.name?.trim() || 'generic_tool';
-        if (fr.id && fr.id.startsWith(`${name}__`)) {
+        const stripped = fr.id ? strippedIds.get(fr.id) : undefined;
+        if (stripped !== undefined) {
           newPart.functionResponse = {
             name: fr.name,
             response: fr.response,
-            id: fr.id.substring(name.length + 2),
+            id: stripped,
           };
         }
       }

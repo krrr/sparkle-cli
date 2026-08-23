@@ -321,6 +321,74 @@ describe('GeminiChat', () => {
       expect(finalHistory).toHaveLength(1);
       expect(finalHistory[0].id).toBe('summary-1');
     });
+
+    it('reconstructs functionCall parts from toolCalls metadata when resuming from disk', () => {
+      // 'gemini' message records store tool-call metadata in a separate
+      // `toolCalls` field — `content` only ever holds the model's text.
+      // Rebuilding parts from `content` alone drops every functionCall the
+      // model made while the matching functionResponse on the following
+      // 'user' record survives, orphaning the tool response.
+      const resumedSessionData = {
+        conversation: {
+          messages: [
+            {
+              id: 'u1',
+              type: 'user',
+              content: [{ text: 'show system info' }],
+              create_time: new Date(),
+            },
+            {
+              id: 'g1',
+              type: 'gemini',
+              content: '',
+              toolCalls: [
+                {
+                  id: 'run_shell_command__abc123',
+                  name: 'run_shell_command',
+                  args: { command: 'systeminfo' },
+                  status: 'success',
+                },
+              ],
+              create_time: new Date(),
+            },
+            {
+              id: 'u2',
+              type: 'user',
+              content: [
+                {
+                  functionResponse: {
+                    id: 'run_shell_command__abc123',
+                    name: 'run_shell_command',
+                    response: { output: 'OS Name: Windows' },
+                  },
+                },
+              ],
+              create_time: new Date(),
+            },
+          ],
+        },
+      } as unknown as ResumedSessionData;
+
+      const chat = new GeminiChat(mockConfig, '', [], [], resumedSessionData);
+
+      const finalHistory = chat.getHistoryTurns();
+      expect(finalHistory).toHaveLength(3);
+
+      const modelTurn = finalHistory[1];
+      expect(modelTurn.content.role).toBe('model');
+      expect(modelTurn.content.parts).toContainEqual({
+        functionCall: {
+          id: 'run_shell_command__abc123',
+          name: 'run_shell_command',
+          args: { command: 'systeminfo' },
+        },
+      });
+
+      const responseTurn = finalHistory[2];
+      expect(responseTurn.content.parts?.[0]?.functionResponse?.id).toBe(
+        'run_shell_command__abc123',
+      );
+    });
   });
 
   describe('setHistory', () => {
@@ -4565,6 +4633,56 @@ describe('GeminiChat', () => {
       const stripped = stripToolCallIdPrefixes(contents);
       expect(stripped[0].parts![0].functionCall!.id).toBe('call_123');
       expect(stripped[1].parts![0].functionResponse!.id).toBe('call_123');
+    });
+
+    it('should strip both sides of a pair whose call and response carry different names for one id', () => {
+      // A tail-chained request can be renamed while the response reports the
+      // original name (or vice versa). The strip decision must be made once
+      // per id so the pair stays synchronized.
+      const contents: Content[] = [
+        {
+          role: 'model',
+          parts: [
+            {
+              functionCall: {
+                id: 'run_shell_command__call_9',
+                name: 'run_shell_command',
+                args: {},
+              },
+            },
+          ],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                id: 'run_shell_command__call_9',
+                name: 'generic_tool',
+                response: { result: 'success' },
+              },
+            },
+          ],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                id: 'call_7',
+                name: 'read_file',
+                response: { result: 'success' },
+              },
+            },
+          ],
+        },
+      ];
+
+      const stripped = stripToolCallIdPrefixes(contents);
+      expect(stripped[0].parts![0].functionCall!.id).toBe('call_9');
+      expect(stripped[1].parts![0].functionResponse!.id).toBe('call_9');
+      // An id with no matching name prefix stays untouched.
+      expect(stripped[2].parts![0].functionResponse!.id).toBe('call_7');
     });
   });
 
