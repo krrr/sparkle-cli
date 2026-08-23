@@ -3072,7 +3072,7 @@ describe('PolicyEngine', () => {
             modes: [ApprovalMode.PLAN],
           },
           {
-            toolName: 'google_web_search',
+            toolName: 'web_search',
             decision: PolicyDecision.ALLOW,
             priority: 70,
             modes: [ApprovalMode.PLAN],
@@ -3123,7 +3123,7 @@ describe('PolicyEngine', () => {
         'grep_search',
         'read_file',
         'list_directory',
-        'google_web_search',
+        'web_search',
         'activate_skill',
         'ask_user',
         'exit_plan_mode',
@@ -3163,7 +3163,7 @@ describe('PolicyEngine', () => {
       expect(excluded.has('grep_search')).toBe(false);
       expect(excluded.has('read_file')).toBe(false);
       expect(excluded.has('list_directory')).toBe(false);
-      expect(excluded.has('google_web_search')).toBe(false);
+      expect(excluded.has('web_search')).toBe(false);
       expect(excluded.has('activate_skill')).toBe(false);
       expect(excluded.has('web_fetch')).toBe(false);
       expect(excluded.has('ask_user')).toBe(false);

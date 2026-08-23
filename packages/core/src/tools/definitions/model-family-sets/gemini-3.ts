@@ -393,7 +393,7 @@ The user has the ability to modify the \`new_string\` content. If modified, this
     },
   },
 
-  google_web_search: {
+  web_search: {
     name: WEB_SEARCH_TOOL_NAME,
     description: `Performs a grounded Google Search to find information across the internet. Returns a synthesized answer with citations (e.g., [1]) and source URIs. Best for finding up-to-date documentation, troubleshooting obscure errors, or broad research. Use this when you don't have a specific URL. If a search result requires deeper analysis, follow up by using '${WEB_FETCH_TOOL_NAME}' on the provided URI.`,
     parametersJsonSchema: {

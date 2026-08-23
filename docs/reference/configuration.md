@@ -1269,10 +1269,27 @@ their corresponding top-level category object in your `settings.json` file.
   - **Requires restart:** Yes
 
 - **`tools.disableLLMCorrection`** (boolean):
+
   - **Description:** Disable LLM-based error correction for edit tools. When
     enabled, tools will fail immediately if exact string matches are not found,
     instead of attempting to self-correct.
   - **Default:** `true`
+  - **Requires restart:** Yes
+
+- **`tools.webSearch.thirdPartyProvider`** (enum):
+
+  - **Description:** Third-party search API to use when the active provider is
+    not Gemini. Requires the matching API key in tools.webSearch.apiKey.
+  - **Default:** `undefined`
+  - **Values:** `"exa"`
+  - **Requires restart:** Yes
+
+- **`tools.webSearch.apiKey`** (string):
+  - **Description:** API key for the provider selected in
+    tools.webSearch.thirdPartyProvider. Supports environment variable references
+    such as ${EXA_API_KEY}; the EXA_API_KEY environment variable takes
+    precedence over this value.
+  - **Default:** `undefined`
   - **Requires restart:** Yes
 
 #### `mcp`

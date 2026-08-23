@@ -40,7 +40,7 @@ export interface CoreToolSet {
     enableToolSandboxing: boolean,
   ) => FunctionDeclaration;
   replace: FunctionDeclaration;
-  google_web_search: FunctionDeclaration;
+  web_search: FunctionDeclaration;
   web_fetch: FunctionDeclaration;
   read_many_files: FunctionDeclaration;
   write_todos: FunctionDeclaration;

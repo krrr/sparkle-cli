@@ -340,7 +340,7 @@ describe('Policy Engine Integration Tests', () => {
         (await engine.check({ name: 'read_file' }, undefined)).decision,
       ).toBe(PolicyDecision.ALLOW);
       expect(
-        (await engine.check({ name: 'google_web_search' }, undefined)).decision,
+        (await engine.check({ name: 'web_search' }, undefined)).decision,
       ).toBe(PolicyDecision.ALLOW);
       expect(
         (await engine.check({ name: 'list_directory' }, undefined)).decision,

@@ -71,7 +71,7 @@ describe('coreTools snapshots for specific models', () => {
       definition: getShellDefinition(true, true, true),
     },
     { name: 'replace', definition: EDIT_DEFINITION },
-    { name: 'google_web_search', definition: WEB_SEARCH_DEFINITION },
+    { name: 'web_search', definition: WEB_SEARCH_DEFINITION },
     { name: 'web_fetch', definition: WEB_FETCH_DEFINITION },
     { name: 'read_many_files', definition: READ_MANY_FILES_DEFINITION },
     { name: 'write_todos', definition: WRITE_TODOS_DEFINITION },

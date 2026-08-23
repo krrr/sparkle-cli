@@ -111,7 +111,7 @@ describe('JsonFormatter', () => {
           auto_accept: 1,
         },
         byName: {
-          google_web_search: {
+          web_search: {
             count: 1,
             success: 1,
             fail: 0,

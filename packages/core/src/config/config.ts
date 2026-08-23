@@ -532,6 +532,18 @@ export interface WorktreeSettings {
   baseSha: string;
 }
 
+/**
+ * Third-party web search settings (from tools.webSearch in settings.json).
+ * Used by the web search tool when the active provider does not support
+ * Google Search grounding.
+ */
+export interface WebSearchConfig {
+  /** Third-party search provider id (e.g. 'exa'). */
+  thirdPartyProvider?: string;
+  /** API key for the selected provider. Env vars (e.g. EXA_API_KEY) win. */
+  apiKey?: string;
+}
+
 export interface ConfigParameters {
   sessionId: string;
   clientName?: string;
@@ -545,6 +557,7 @@ export interface ConfigParameters {
 
   coreTools?: string[];
   mainAgentTools?: string[];
+  webSearchConfig?: WebSearchConfig;
   /** @deprecated Use Policy Engine instead */
   allowedTools?: string[];
   /** @deprecated Use Policy Engine instead */
@@ -714,6 +727,7 @@ export class Config implements McpContext, AgentLoopContext {
 
   private readonly coreTools: string[] | undefined;
   private readonly mainAgentTools: string[] | undefined;
+  private readonly webSearchConfig: WebSearchConfig | undefined;
   /** @deprecated Use Policy Engine instead */
   private readonly allowedTools: string[] | undefined;
   /** @deprecated Use Policy Engine instead */
@@ -949,6 +963,7 @@ export class Config implements McpContext, AgentLoopContext {
 
     this.coreTools = params.coreTools;
     this.mainAgentTools = params.mainAgentTools;
+    this.webSearchConfig = params.webSearchConfig;
     this.allowedTools = params.allowedTools;
     this.excludeTools = params.excludeTools;
     this.toolDiscoveryCommand = params.toolDiscoveryCommand;
@@ -1902,6 +1917,10 @@ export class Config implements McpContext, AgentLoopContext {
 
   getMainAgentTools(): string[] | undefined {
     return this.mainAgentTools;
+  }
+
+  getWebSearchConfig(): WebSearchConfig | undefined {
+    return this.webSearchConfig;
   }
 
   getAllowedTools(): string[] | undefined {

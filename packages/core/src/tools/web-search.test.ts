@@ -18,38 +18,72 @@ import type { Config } from '../config/config.js';
 import { GeminiClient } from '../core/client.js';
 import { ToolErrorType } from './tool-error.js';
 import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
+import { ProviderType } from '../config/constants.js';
+import { fetchWithTimeout } from '../utils/fetch.js';
 
 // Mock GeminiClient and Config constructor
 vi.mock('../core/client.js');
 vi.mock('../config/config.js');
 
+vi.mock('../utils/fetch.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/fetch.js')>();
+  return { ...actual, fetchWithTimeout: vi.fn() };
+});
+
+function mockExaResponse(results: Array<Record<string, unknown>>) {
+  return {
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    json: async () => ({ requestId: 'test', results }),
+  };
+}
+
 describe('WebSearchTool', () => {
   const abortSignal = new AbortController().signal;
   let mockGeminiClient: GeminiClient;
   let tool: WebSearchTool;
+  let mockConfigInstance: {
+    getContentGeneratorConfig: Mock;
+    getWebSearchConfig: Mock;
+    [key: string]: unknown;
+  };
 
   beforeEach(() => {
-    const mockConfigInstance = {
+    mockConfigInstance = {
       getGeminiClient: () => mockGeminiClient,
       get geminiClient() {
         return mockGeminiClient;
       },
       getProxy: () => undefined,
+      getContentGeneratorConfig: vi.fn(() => ({
+        authType: ProviderType.USE_GEMINI,
+      })),
+      getWebSearchConfig: vi.fn(() => undefined),
       generationConfigService: {
         getResolvedConfig: vi.fn().mockImplementation(({ model }) => ({
           model,
           sdkConfig: {},
         })),
       },
-    } as unknown as Config;
+    } as unknown as {
+      getContentGeneratorConfig: Mock;
+      getWebSearchConfig: Mock;
+      [key: string]: unknown;
+    };
     (
       mockConfigInstance as unknown as { config: Config; promptId: string }
-    ).config = mockConfigInstance;
+    ).config = mockConfigInstance as unknown as Config;
     (
       mockConfigInstance as unknown as { config: Config; promptId: string }
     ).promptId = 'test-prompt-id';
-    mockGeminiClient = new GeminiClient(mockConfigInstance);
-    tool = new WebSearchTool(mockConfigInstance, createMockMessageBus());
+    mockGeminiClient = new GeminiClient(
+      mockConfigInstance as unknown as Config,
+    );
+    tool = new WebSearchTool(
+      mockConfigInstance as unknown as Config,
+      createMockMessageBus(),
+    );
   });
 
   afterEach(() => {
@@ -268,6 +302,104 @@ Sources:
         'Search results for "multibyte query" returned.',
       );
       expect(result.sources).toHaveLength(3);
+    });
+  });
+
+  describe('execute with non-Gemini provider', () => {
+    beforeEach(() => {
+      mockConfigInstance.getContentGeneratorConfig.mockReturnValue({
+        authType: ProviderType.USE_OPENAI,
+      });
+    });
+
+    it('should use the configured third-party provider and skip the Gemini path', async () => {
+      mockConfigInstance.getWebSearchConfig.mockReturnValue({
+        thirdPartyProvider: 'exa',
+        apiKey: 'test-key',
+      });
+      (fetchWithTimeout as Mock).mockResolvedValue(
+        mockExaResponse([
+          {
+            title: 'Exa Result',
+            url: 'https://exa.example/result',
+            publishedDate: '2026-01-15',
+            highlights: ['key point one', 'key point two'],
+          },
+          {
+            title: 'Another Result',
+            url: 'https://another.example',
+            highlights: [],
+          },
+        ]),
+      );
+
+      const invocation = tool.build({ query: 'exa query' });
+      const result = await invocation.execute({ abortSignal });
+
+      expect(mockGeminiClient.generateContent).not.toHaveBeenCalled();
+      expect(result.returnDisplay).toBe(
+        'Search results for "exa query" returned.',
+      );
+      expect(result.llmContent).toContain(
+        '[1] Exa Result (https://exa.example/result)',
+      );
+      expect(result.llmContent).toContain('Published: 2026-01-15');
+      expect(result.llmContent).toContain('- key point one');
+      expect(result.llmContent).toContain(
+        '[2] Another Result (https://another.example)',
+      );
+      expect(result.sources).toEqual([
+        { web: { uri: 'https://exa.example/result', title: 'Exa Result' } },
+        { web: { uri: 'https://another.example', title: 'Another Result' } },
+      ]);
+    });
+
+    it('should report no results when the third-party provider returns none', async () => {
+      mockConfigInstance.getWebSearchConfig.mockReturnValue({
+        thirdPartyProvider: 'exa',
+        apiKey: 'test-key',
+      });
+      (fetchWithTimeout as Mock).mockResolvedValue(mockExaResponse([]));
+
+      const invocation = tool.build({ query: 'empty query' });
+      const result = await invocation.execute({ abortSignal });
+
+      expect(result.llmContent).toBe(
+        'No search results or information found for query: "empty query"',
+      );
+      expect(result.returnDisplay).toBe('No information found.');
+    });
+
+    it('should return a configuration error when no provider is configured', async () => {
+      const invocation = tool.build({ query: 'unconfigured query' });
+      const result = await invocation.execute({ abortSignal });
+
+      expect(mockGeminiClient.generateContent).not.toHaveBeenCalled();
+      expect(fetchWithTimeout).not.toHaveBeenCalled();
+      expect(result.error?.type).toBe(ToolErrorType.WEB_SEARCH_FAILED);
+      expect(result.llmContent).toContain(
+        'does not support Google Search grounding',
+      );
+      expect(result.llmContent).toContain('tools.webSearch.thirdPartyProvider');
+      expect(result.returnDisplay).toBe('Web search is not configured.');
+    });
+
+    it('should return a WEB_SEARCH_FAILED error when the provider request fails', async () => {
+      mockConfigInstance.getWebSearchConfig.mockReturnValue({
+        thirdPartyProvider: 'exa',
+        apiKey: 'test-key',
+      });
+      (fetchWithTimeout as Mock).mockRejectedValue(
+        new Error('Exa search request failed with status 401 Unauthorized'),
+      );
+
+      const invocation = tool.build({ query: 'failing query' });
+      const result = await invocation.execute({ abortSignal });
+
+      expect(result.error?.type).toBe(ToolErrorType.WEB_SEARCH_FAILED);
+      expect(result.llmContent).toContain('exa');
+      expect(result.llmContent).toContain('401');
+      expect(result.returnDisplay).toBe('Error performing web search.');
     });
   });
 });

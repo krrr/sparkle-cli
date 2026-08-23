@@ -1904,6 +1904,29 @@
           "markdownDescription": "Disable LLM-based error correction for edit tools. When enabled, tools will fail immediately if exact string matches are not found, instead of attempting to self-correct.\n\n- Category: `Tools`\n- Requires restart: `yes`\n- Default: `true`",
           "default": true,
           "type": "boolean"
+        },
+        "webSearch": {
+          "title": "Web Search",
+          "description": "Settings for the built-in web search tool. When the active provider does not support Google Search grounding (e.g. OpenAI-compatible providers), the tool falls back to the configured third-party search API.",
+          "markdownDescription": "Settings for the built-in web search tool. When the active provider does not support Google Search grounding (e.g. OpenAI-compatible providers), the tool falls back to the configured third-party search API.\n\n- Category: `Tools`\n- Requires restart: `yes`\n- Default: `{}`",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "thirdPartyProvider": {
+              "title": "Third-Party Search Provider",
+              "description": "Third-party search API to use when the active provider is not Gemini. Requires the matching API key in tools.webSearch.apiKey.",
+              "markdownDescription": "Third-party search API to use when the active provider is not Gemini. Requires the matching API key in tools.webSearch.apiKey.\n\n- Category: `Tools`\n- Requires restart: `yes`",
+              "type": "string",
+              "enum": ["exa"]
+            },
+            "apiKey": {
+              "title": "Third-Party Search API Key",
+              "description": "API key for the provider selected in tools.webSearch.thirdPartyProvider. Supports environment variable references such as ${EXA_API_KEY}; the EXA_API_KEY environment variable takes precedence over this value.",
+              "markdownDescription": "API key for the provider selected in tools.webSearch.thirdPartyProvider. Supports environment variable references such as ${EXA_API_KEY}; the EXA_API_KEY environment variable takes precedence over this value.\n\n- Category: `Tools`\n- Requires restart: `yes`",
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

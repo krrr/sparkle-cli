@@ -143,9 +143,9 @@ export const RIP_GREP_DEFINITION: ToolDefinition = {
 
 export const WEB_SEARCH_DEFINITION: ToolDefinition = {
   get base() {
-    return GEMINI_3_SET.google_web_search;
+    return GEMINI_3_SET.web_search;
   },
-  overrides: (modelId) => getToolSet(modelId).google_web_search,
+  overrides: (modelId) => getToolSet(modelId).web_search,
 };
 
 export const EDIT_DEFINITION: ToolDefinition = {

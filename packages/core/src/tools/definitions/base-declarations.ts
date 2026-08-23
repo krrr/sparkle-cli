@@ -68,8 +68,8 @@ export const EDIT_PARAM_OLD_STRING = 'old_string';
 export const EDIT_PARAM_NEW_STRING = 'new_string';
 export const EDIT_PARAM_ALLOW_MULTIPLE = 'allow_multiple';
 
-// -- google_web_search --
-export const WEB_SEARCH_TOOL_NAME = 'google_web_search';
+// -- web_search --
+export const WEB_SEARCH_TOOL_NAME = 'web_search';
 export const WEB_SEARCH_PARAM_QUERY = 'query';
 
 // -- write_todos --

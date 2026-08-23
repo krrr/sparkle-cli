@@ -24,6 +24,11 @@ import { WEB_SEARCH_DEFINITION } from './definitions/coreTools.js';
 import { resolveToolDeclaration } from './definitions/resolver.js';
 import { LlmRole } from '../telemetry/llmRole.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
+import { ProviderType } from '../config/constants.js';
+import {
+  formatThirdPartySearchResults,
+  resolveThirdPartySearchProvider,
+} from './websearch/third-party-search.js';
 
 interface GroundingChunkWeb {
   uri?: string;
@@ -88,6 +93,15 @@ class WebSearchToolInvocation extends BaseToolInvocation<
   async execute({
     abortSignal: signal,
   }: ExecuteOptions): Promise<WebSearchToolResult> {
+    // The primary search path relies on the Gemini API's Google Search
+    // grounding, which is not available to non-Gemini providers (the
+    // googleSearch tool parameter is dropped there). Use the configured
+    // third-party search API in that case.
+    const authType = this.context.config.getContentGeneratorConfig()?.authType;
+    if (authType !== undefined && authType !== ProviderType.USE_GEMINI) {
+      return this.executeThirdPartySearch(signal);
+    }
+
     const geminiClient = this.context.geminiClient;
 
     try {
@@ -187,6 +201,61 @@ class WebSearchToolInvocation extends BaseToolInvocation<
       const errorMessage = `Error during web search for query "${
         this.params.query
       }": ${getErrorMessage(error)}`;
+      debugLogger.warn(errorMessage, error);
+      return {
+        llmContent: `Error: ${errorMessage}`,
+        returnDisplay: `Error performing web search.`,
+        error: {
+          message: errorMessage,
+          type: ToolErrorType.WEB_SEARCH_FAILED,
+        },
+      };
+    }
+  }
+
+  private async executeThirdPartySearch(
+    signal: AbortSignal,
+  ): Promise<WebSearchToolResult> {
+    const resolution = resolveThirdPartySearchProvider(this.context.config);
+    if (!resolution.provider) {
+      const message = `Web search is unavailable: the active provider does not support Google Search grounding. ${resolution.reason}`;
+      debugLogger.warn(message);
+      return {
+        llmContent: `Error: ${message}`,
+        returnDisplay: 'Web search is not configured.',
+        error: {
+          message,
+          type: ToolErrorType.WEB_SEARCH_FAILED,
+        },
+      };
+    }
+
+    try {
+      const results = await resolution.provider.search(
+        this.params.query,
+        signal,
+      );
+      if (results.length === 0) {
+        return {
+          llmContent: `No search results or information found for query: "${this.params.query}"`,
+          returnDisplay: 'No information found.',
+        };
+      }
+      return {
+        llmContent: `Web search results for "${this.params.query}":\n\n${formatThirdPartySearchResults(results)}`,
+        returnDisplay: `Search results for "${this.params.query}" returned.`,
+        sources: results.map((result) => ({
+          web: { uri: result.url, title: result.title },
+        })),
+      };
+    } catch (error: unknown) {
+      if (isAbortError(error)) {
+        return {
+          llmContent: 'Web search was cancelled.',
+          returnDisplay: 'Search cancelled.',
+        };
+      }
+      const errorMessage = `Error during ${resolution.provider.name} web search for query "${this.params.query}": ${getErrorMessage(error)}`;
       debugLogger.warn(errorMessage, error);
       return {
         llmContent: `Error: ${errorMessage}`,

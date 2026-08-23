@@ -233,25 +233,6 @@ exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snaps
 }
 `;
 
-exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: google_web_search 1`] = `
-{
-  "description": "Performs a grounded Google Search to find information across the internet. Returns a synthesized answer with citations (e.g., [1]) and source URIs. Best for finding up-to-date documentation, troubleshooting obscure errors, or broad research. Use this when you don't have a specific URL. If a search result requires deeper analysis, follow up by using 'web_fetch' on the provided URI.",
-  "name": "google_web_search",
-  "parametersJsonSchema": {
-    "properties": {
-      "query": {
-        "description": "The search query. Supports natural language questions (e.g., 'Latest breaking changes in React 19') or specific technical queries.",
-        "type": "string",
-      },
-    },
-    "required": [
-      "query",
-    ],
-    "type": "object",
-  },
-}
-`;
-
 exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: grep_search 1`] = `
 {
   "description": "Searches for a regular expression pattern within file contents. Max 100 matches.",
@@ -639,6 +620,25 @@ exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snaps
 }
 `;
 
+exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: web_search 1`] = `
+{
+  "description": "Performs a grounded Google Search to find information across the internet. Returns a synthesized answer with citations (e.g., [1]) and source URIs. Best for finding up-to-date documentation, troubleshooting obscure errors, or broad research. Use this when you don't have a specific URL. If a search result requires deeper analysis, follow up by using 'web_fetch' on the provided URI.",
+  "name": "web_search",
+  "parametersJsonSchema": {
+    "properties": {
+      "query": {
+        "description": "The search query. Supports natural language questions (e.g., 'Latest breaking changes in React 19') or specific technical queries.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "query",
+    ],
+    "type": "object",
+  },
+}
+`;
+
 exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: write_file 1`] = `
 {
   "description": "Writes the complete content to a file, automatically creating missing parent directories. Overwrites existing files. The user has the ability to modify 'content' before it is saved. Best for new or small files; use 'replace' for targeted edits to large files to minimize token usage and simplify reviews.",
@@ -999,25 +999,6 @@ exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview >
     },
     "required": [
       "pattern",
-    ],
-    "type": "object",
-  },
-}
-`;
-
-exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: google_web_search 1`] = `
-{
-  "description": "Performs a grounded Google Search to find information across the internet. Returns a synthesized answer with citations (e.g., [1]) and source URIs. Best for finding up-to-date documentation, troubleshooting obscure errors, or broad research. Use this when you don't have a specific URL. If a search result requires deeper analysis, follow up by using 'web_fetch' on the provided URI.",
-  "name": "google_web_search",
-  "parametersJsonSchema": {
-    "properties": {
-      "query": {
-        "description": "The search query. Supports natural language questions (e.g., 'Latest breaking changes in React 19') or specific technical queries.",
-        "type": "string",
-      },
-    },
-    "required": [
-      "query",
     ],
     "type": "object",
   },
@@ -1405,6 +1386,25 @@ exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview >
     },
     "required": [
       "prompt",
+    ],
+    "type": "object",
+  },
+}
+`;
+
+exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: web_search 1`] = `
+{
+  "description": "Performs a grounded Google Search to find information across the internet. Returns a synthesized answer with citations (e.g., [1]) and source URIs. Best for finding up-to-date documentation, troubleshooting obscure errors, or broad research. Use this when you don't have a specific URL. If a search result requires deeper analysis, follow up by using 'web_fetch' on the provided URI.",
+  "name": "web_search",
+  "parametersJsonSchema": {
+    "properties": {
+      "query": {
+        "description": "The search query. Supports natural language questions (e.g., 'Latest breaking changes in React 19') or specific technical queries.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "query",
     ],
     "type": "object",
   },

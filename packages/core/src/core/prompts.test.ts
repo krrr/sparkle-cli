@@ -561,7 +561,7 @@ describe('Core System Prompt (prompts.ts)', () => {
       expect(prompt).toContain('`ask_user`');
 
       // Should NOT include tools not in getAllTools()
-      expect(prompt).not.toContain('`google_web_search`');
+      expect(prompt).not.toContain('`web_search`');
       expect(prompt).not.toContain('`list_directory`');
       expect(prompt).not.toContain('`grep_search`');
     });

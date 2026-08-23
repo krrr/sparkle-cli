@@ -393,7 +393,7 @@ describe('eval-coverage', () => {
       const result = makeCoverageResult({
         uncovered: [
           { name: 'web_fetch', category: 'web' },
-          { name: 'google_web_search', category: 'web' },
+          { name: 'web_search', category: 'web' },
           { name: 'glob', category: 'file-system' },
         ],
       });
@@ -403,7 +403,7 @@ describe('eval-coverage', () => {
       expect(report).toContain('[web]');
       expect(report).toContain('[file-system]');
       expect(report).toContain('web_fetch');
-      expect(report).toContain('google_web_search');
+      expect(report).toContain('web_search');
       expect(report).toContain('glob');
     });
 

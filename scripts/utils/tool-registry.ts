@@ -42,7 +42,7 @@ const TOOL_CATEGORIES: Record<
   write_file: 'file-system',
   replace: 'file-system',
   run_shell_command: 'shell',
-  google_web_search: 'web',
+  web_search: 'web',
   web_fetch: 'web',
   enter_plan_mode: 'planning',
   exit_plan_mode: 'planning',

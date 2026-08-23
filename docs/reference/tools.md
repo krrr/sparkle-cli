@@ -148,10 +148,10 @@ each tool.
 
 ### Web
 
-| Tool                                          | Kind     | Description                                                                                                                                                                                                                                                                     |
-| :-------------------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`google_web_search`](../tools/web-search.md) | `Search` | Performs a Google Search to find up-to-date information.                                                                                                                                                                                                                        |
-| [`web_fetch`](../tools/web-fetch.md)          | `Fetch`  | Retrieves and processes content from specific URLs. **Warning:** This tool can access local and private network addresses (for example, localhost), which may pose a security risk if used with untrusted prompts. In Plan Mode, this tool requires explicit user confirmation. |
+| Tool                                   | Kind     | Description                                                                                                                                                                                                                                                                     |
+| :------------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`web_search`](../tools/web-search.md) | `Search` | Performs a Google Search to find up-to-date information.                                                                                                                                                                                                                        |
+| [`web_fetch`](../tools/web-fetch.md)   | `Fetch`  | Retrieves and processes content from specific URLs. **Warning:** This tool can access local and private network addresses (for example, localhost), which may pose a security risk if used with untrusted prompts. In Plan Mode, this tool requires explicit user confirmation. |
 
 ### Tool argument keys
 
@@ -183,7 +183,7 @@ representation of each tool's arguments.
 | `tracker_add_dependency` | `taskId`, `dependencyId`                                                                                                                                                                             |
 | `tracker_visualize`      | _(none)_                                                                                                                                                                                             |
 | `update_topic`           | `title`, `summary`, `strategic_intent`                                                                                                                                                               |
-| `google_web_search`      | `query`                                                                                                                                                                                              |
+| `web_search`             | `query`                                                                                                                                                                                              |
 | `web_fetch`              | `prompt`                                                                                                                                                                                             |
 
 For example, to write a policy rule that blocks any `write_file` call targeting

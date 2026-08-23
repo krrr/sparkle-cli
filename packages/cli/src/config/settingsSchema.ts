@@ -1684,6 +1684,48 @@ const SETTINGS_SCHEMA = {
         `,
         showInDialog: true,
       },
+      webSearch: {
+        type: 'object',
+        label: 'Web Search',
+        category: 'Tools',
+        requiresRestart: true,
+        default: {},
+        description: oneLine`
+          Settings for the built-in web search tool.
+          When the active provider does not support Google Search grounding
+          (e.g. OpenAI-compatible providers), the tool falls back to the
+          configured third-party search API.
+        `,
+        showInDialog: false,
+        properties: {
+          thirdPartyProvider: {
+            type: 'enum',
+            label: 'Third-Party Search Provider',
+            category: 'Tools',
+            requiresRestart: true,
+            default: undefined as string | undefined,
+            description: oneLine`
+              Third-party search API to use when the active provider is not Gemini.
+              Requires the matching API key in tools.webSearch.apiKey.
+            `,
+            showInDialog: false,
+            options: [{ label: 'Exa', value: 'exa' }],
+          },
+          apiKey: {
+            type: 'string',
+            label: 'Third-Party Search API Key',
+            category: 'Tools',
+            requiresRestart: true,
+            default: undefined as string | undefined,
+            description: oneLine`
+              API key for the provider selected in tools.webSearch.thirdPartyProvider.
+              Supports environment variable references such as \${EXA_API_KEY};
+              the EXA_API_KEY environment variable takes precedence over this value.
+            `,
+            showInDialog: false,
+          },
+        },
+      },
     },
   },
 

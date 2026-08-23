@@ -29,7 +29,7 @@ describe('getToolGroupBorderAppearance', () => {
       type: 'tool_group' as const,
       tools: [
         {
-          name: 'google_web_search',
+          name: 'web_search',
           status: CoreToolCallStatus.Executing,
           resultDisplay: '',
           callId: 'call-1',
@@ -46,7 +46,7 @@ describe('getToolGroupBorderAppearance', () => {
       type: 'tool_group' as const,
       tools: [
         {
-          name: 'google_web_search',
+          name: 'web_search',
           status: CoreToolCallStatus.Executing,
           resultDisplay: '',
           callId: 'call-1',
@@ -109,7 +109,7 @@ describe('getToolGroupBorderAppearance', () => {
 });
 
 describe('MainContent tool group border SVG snapshots', () => {
-  it('should render SVG snapshot for a pending search dialog (google_web_search)', async () => {
+  it('should render SVG snapshot for a pending search dialog (web_search)', async () => {
     const renderResult = await renderWithProviders(<MainContent />, {
       ...altBufferOptions,
       uiState: {
@@ -119,7 +119,7 @@ describe('MainContent tool group border SVG snapshots', () => {
             type: 'tool_group',
             tools: [
               {
-                name: 'google_web_search',
+                name: 'web_search',
                 status: CoreToolCallStatus.Executing,
                 resultDisplay: 'Searching...',
                 callId: 'call-1',
@@ -144,7 +144,7 @@ describe('MainContent tool group border SVG snapshots', () => {
             type: 'tool_group',
             tools: [
               {
-                name: 'google_web_search',
+                name: 'web_search',
                 status: CoreToolCallStatus.Executing,
                 resultDisplay: 'Searching...',
                 callId: 'call-1',

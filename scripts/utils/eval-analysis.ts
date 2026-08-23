@@ -486,7 +486,7 @@ const TOOL_NAME_TO_CONSTANT: Record<
   run_shell_command: 'SHELL_TOOL_NAME',
   write_file: 'WRITE_FILE_TOOL_NAME',
   replace: 'EDIT_TOOL_NAME',
-  google_web_search: 'WEB_SEARCH_TOOL_NAME',
+  web_search: 'WEB_SEARCH_TOOL_NAME',
   write_todos: 'WRITE_TODOS_TOOL_NAME',
   web_fetch: 'WEB_FETCH_TOOL_NAME',
   read_many_files: 'READ_MANY_FILES_TOOL_NAME',

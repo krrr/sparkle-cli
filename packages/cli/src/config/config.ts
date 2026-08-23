@@ -900,6 +900,7 @@ export async function loadCliConfig(
     worktreeSettings,
 
     coreTools: settings.tools?.core || undefined,
+    webSearchConfig: settings.tools?.webSearch,
     experimentalContextManagementConfig: profileSelector,
     allowedTools: allowedTools.length > 0 ? allowedTools : undefined,
     policyEngineConfig,
