@@ -657,10 +657,9 @@ describe('OpenAiChunkConverter', () => {
   });
 
   it('buffers reasoning_content and emits one consolidated thought part per block', () => {
-    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(5_000);
     const converter = new OpenAiChunkConverter();
-    // Reasoning fragments emit throttled partial updates while the block is
-    // in progress; the consolidated part is only emitted when the block ends.
+    // The first fragment of a block emits an immediate live partial; the
+    // consolidated part is only emitted when the block ends.
     const r1 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'think' } }],
     });
@@ -670,8 +669,7 @@ describe('OpenAiChunkConverter', () => {
     const r2 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'ing...' } }],
     });
-    // Within the throttle window and below the character threshold: no new
-    // partial is emitted.
+    // Below the character threshold: no new partial is emitted.
     expect(r2.candidates).toBeUndefined();
     // The block ends when content starts; the whole reasoning block is emitted
     // as ONE consolidated thought part (without the partial marker) instead
@@ -683,41 +681,52 @@ describe('OpenAiChunkConverter', () => {
       { text: 'thinking...', thought: true },
       { text: 'Answer' },
     ]);
-    expect(nowSpy).toHaveBeenCalled();
   });
 
   it('emits live partials with the reasoning text accumulated so far', () => {
-    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(1_000);
     const converter = new OpenAiChunkConverter();
+    // The first fragment of a block always emits an immediate live partial.
     const r1 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'first ' } }],
     });
     expect(r1.candidates![0].content!.parts).toEqual([
       { text: 'first ', thought: true, thoughtPartial: true },
     ]);
-    // Within the throttle window: no new partial.
-    nowSpy.mockReturnValue(1_100);
+    // Below the character threshold: no new partial yet.
     const r2 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'second' } }],
     });
     expect(r2.candidates).toBeUndefined();
-    // Past the throttle window: a partial carries the full text so far.
-    nowSpy.mockReturnValue(1_200);
+    // Crossing the threshold: a partial carries the full text so far.
     const r3 = converter.toGeminiChunk({
-      choices: [{ delta: { reasoning_content: ' third' } }],
+      choices: [
+        {
+          delta: {
+            reasoning_content: ' third fourth fifth sixth seventh eighth',
+          },
+        },
+      ],
     });
     expect(r3.candidates![0].content!.parts).toEqual([
-      { text: 'first second third', thought: true, thoughtPartial: true },
+      {
+        text: 'first second third fourth fifth sixth seventh eighth',
+        thought: true,
+        thoughtPartial: true,
+      },
     ]);
   });
 
   it('flushes a live partial once enough reasoning characters accumulate', () => {
-    vi.spyOn(Date, 'now').mockReturnValue(5_000);
     const converter = new OpenAiChunkConverter();
-    // Pin time so only the character threshold can trigger the flush.
-    converter.toGeminiChunk({
+    // The first fragment emits an immediate live partial...
+    const r1 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'x'.repeat(10) } }],
     });
+    expect(r1.candidates![0].content!.parts).toEqual([
+      { text: 'x'.repeat(10), thought: true, thoughtPartial: true },
+    ]);
+    // ...and the next one waits until PARTIAL_THOUGHT_MIN_CHARS new
+    // characters have accumulated.
     const r2 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'y'.repeat(80) } }],
     });
@@ -731,7 +740,6 @@ describe('OpenAiChunkConverter', () => {
   });
 
   it('does not end a reasoning block on chunks that merely omit reasoning_content', () => {
-    vi.spyOn(Date, 'now').mockReturnValue(5_000);
     const converter = new OpenAiChunkConverter();
     converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'part one ' } }],

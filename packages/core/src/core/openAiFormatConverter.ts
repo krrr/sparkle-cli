@@ -37,8 +37,10 @@ export const MAX_OPENAI_TOOLS = 128;
 
 /**
  * Live reasoning updates are coalesced so the UI updates at a comfortable
- * rate instead of once per token: a partial thought part is emitted when at
- * least this many new reasoning characters have accumulated...
+ * rate instead of once per token: after a block's first partial (which is
+ * always emitted immediately so reasoning shows up without delay), a new
+ * partial thought part is emitted only once at least this many new reasoning
+ * characters have accumulated.
  */
 export const PARTIAL_THOUGHT_MIN_CHARS = 24;
 
@@ -651,7 +653,13 @@ export class OpenAiChunkConverter {
       } else {
         const unflushedChars =
           this.pendingReasoningText.length - this.partialEmittedLength;
-        if (unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS) {
+        // The first partial of a block is always emitted immediately so the
+        // UI shows reasoning as soon as it starts; later ones are coalesced
+        // by the character threshold.
+        if (
+          this.partialEmittedLength === 0 ||
+          unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS
+        ) {
           const partial: PartialThoughtPart = {
             text: this.pendingReasoningText,
             thought: true,
