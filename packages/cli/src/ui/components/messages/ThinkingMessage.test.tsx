@@ -77,7 +77,11 @@ describe('ThinkingMessage', () => {
   it('uses description when subject is empty', async () => {
     const renderResult = await renderWithProviders(
       <ThinkingMessage
-        thought={{ subject: '', description: 'Processing details' }}
+        thought={{
+          subject: '',
+          description:
+            'Processing details\nChecking the second step\nFinalizing the result',
+        }}
         terminalWidth={80}
         isFirstThinking={true}
       />,
@@ -85,9 +89,36 @@ describe('ThinkingMessage', () => {
     await renderResult.waitUntilReady();
 
     const output = renderResult.lastFrame();
+    // With no subject, every line is treated as description body text.
     expect(output).toContain('Processing details');
+    expect(output).toContain('Checking the second step');
+    expect(output).toContain('Finalizing the result');
     expect(output).toContain('│');
     expect(output).toMatchSnapshot();
+    await expect(renderResult).toMatchSvgSnapshot();
+    renderResult.unmount();
+  });
+
+  it('keeps description lines verbatim when subject is empty (OpenAI path)', async () => {
+    const renderResult = await renderWithProviders(
+      <ThinkingMessage
+        thought={{
+          subject: '',
+          description:
+            'Step one:\n    indented detail stays\n\n  two-space indent',
+        }}
+        terminalWidth={80}
+        isFirstThinking={false}
+      />,
+    );
+    await renderResult.waitUntilReady();
+
+    const output = renderResult.lastFrame();
+    // OpenAI path: lines are rendered verbatim — indentation and blank
+    // lines are preserved rather than trimmed away.
+    expect(output).toContain('    indented detail stays');
+    expect(output).toContain('  two-space indent');
+    expect(renderResult.lastFrame()).toMatchSnapshot();
     await expect(renderResult).toMatchSvgSnapshot();
     renderResult.unmount();
   });

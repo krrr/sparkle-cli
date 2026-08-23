@@ -4,6 +4,9 @@ exports[`ThinkingMessage > filters out progress dots and empty lines 1`] = `
 " Thought 
  │
  │ Thinking
+ │ .
+ │ ..
+ │ ...
  │ Done
 "
 `;
@@ -12,7 +15,25 @@ exports[`ThinkingMessage > filters out progress dots and empty lines 2`] = `
 " Thought 
  │
  │ Thinking
+ │ .
+ │ ..
+ │ ...
  │ Done"
+`;
+
+exports[`ThinkingMessage > keeps description lines verbatim when subject is empty (OpenAI path) 1`] = `
+" │
+ │ Step one:
+ │     indented detail stays
+ │   two-space indent
+"
+`;
+
+exports[`ThinkingMessage > keeps description lines verbatim when subject is empty (OpenAI path) 2`] = `
+" │
+ │ Step one:
+ │     indented detail stays
+ │   two-space indent"
 `;
 
 exports[`ThinkingMessage > normalizes escaped newline tokens 1`] = `
@@ -134,11 +155,15 @@ exports[`ThinkingMessage > uses description when subject is empty 1`] = `
 " Thought 
  │
  │ Processing details
+ │ Checking the second step
+ │ Finalizing the result
 "
 `;
 
 exports[`ThinkingMessage > uses description when subject is empty 2`] = `
 " Thought 
  │
- │ Processing details"
+ │ Processing details
+ │ Checking the second step
+ │ Finalizing the result"
 `;

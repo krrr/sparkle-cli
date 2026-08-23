@@ -23,30 +23,43 @@ const THINKING_LEFT_PADDING = 1;
 /** Maximum rendered characters of the headline in compact mode. */
 const COMPACT_HEADLINE_MAX_CHARS = 120;
 
-function normalizeThoughtLines(thought: ThoughtSummary): string[] {
+interface NormalizedThought {
+  lines: string[];
+  /** True when a valid (non-noise) subject line exists and is `lines[0]`. */
+  hasSubject: boolean;
+}
+
+function normalizeThoughtLines(thought: ThoughtSummary): NormalizedThought {
   const subject = normalizeEscapedNewlines(thought.subject).trim();
-  const description = normalizeEscapedNewlines(thought.description).trim();
+  const description = normalizeEscapedNewlines(thought.description);
 
   const isNoise = (text: string) => {
     const trimmed = text.trim();
     return !trimmed || /^\.+$/.test(trimmed);
   };
 
+  const hasSubject = !!subject && !isNoise(subject);
   const lines: string[] = [];
 
-  if (subject && !isNoise(subject)) {
+  if (hasSubject) {
     lines.push(subject);
+    if (description) {
+      const descriptionLines = description
+        .trim()
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => !isNoise(line));
+      lines.push(...descriptionLines);
+    }
+  } else if (description.trim()) {
+    // OpenAI path: OpenAI-compatible providers stream reasoning without a
+    // wrapped subject line, so parseThought leaves the whole text in the
+    // description. Those lines may rely on indentation and blank lines for
+    // structure, so keep each line verbatim instead of trimming.
+    lines.push(...description.split('\n'));
   }
 
-  if (description) {
-    const descriptionLines = description
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => !isNoise(line));
-    lines.push(...descriptionLines);
-  }
-
-  return lines;
+  return { lines, hasSubject };
 }
 
 /**
@@ -62,7 +75,10 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   isFirstThinking,
   mode = 'full',
 }) => {
-  const fullLines = useMemo(() => normalizeThoughtLines(thought), [thought]);
+  const { lines: fullLines, hasSubject } = useMemo(
+    () => normalizeThoughtLines(thought),
+    [thought],
+  );
 
   if (fullLines.length === 0) {
     return null;
@@ -120,12 +136,12 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
         flexDirection="column"
       >
         <Text> </Text>
-        {fullLines.length > 0 && (
+        {hasSubject && (
           <Text color={theme.text.primary} bold italic>
             {fullLines[0]}
           </Text>
         )}
-        {fullLines.slice(1).map((line, index) => (
+        {(hasSubject ? fullLines.slice(1) : fullLines).map((line, index) => (
           <Text key={`body-line-${index}`} color={theme.text.secondary} italic>
             {line}
           </Text>
