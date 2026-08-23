@@ -15,8 +15,7 @@ import {
 } from './tools.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { WRITE_TODOS_TOOL_NAME } from './tool-names.js';
-import { WRITE_TODOS_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { WRITE_TODOS_DECLARATION } from './definitions/coreTools.js';
 
 const TODO_STATUSES = [
   'pending',
@@ -84,17 +83,17 @@ export class WriteTodosTool extends BaseDeclarativeTool<
     super(
       WriteTodosTool.Name,
       'WriteTodos',
-      WRITE_TODOS_DEFINITION.base.description!,
+      WRITE_TODOS_DECLARATION.description!,
       Kind.Other,
-      WRITE_TODOS_DEFINITION.base.parametersJsonSchema,
+      WRITE_TODOS_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(WRITE_TODOS_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return WRITE_TODOS_DECLARATION;
   }
 
   protected override validateToolParamValues(

@@ -40,8 +40,7 @@ import {
   DEFAULT_TOTAL_MAX_MATCHES,
   DEFAULT_SEARCH_TIMEOUT_MS,
 } from './constants.js';
-import { RIP_GREP_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { RIP_GREP_DECLARATION } from './definitions/coreTools.js';
 import { type GrepMatch, formatGrepResults } from './grep-utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -632,9 +631,9 @@ export class RipGrepTool extends BaseDeclarativeTool<
     super(
       RipGrepTool.Name,
       'SearchText',
-      RIP_GREP_DEFINITION.base.description!,
+      RIP_GREP_DECLARATION.description!,
       Kind.Search,
-      RIP_GREP_DEFINITION.base.parametersJsonSchema,
+      RIP_GREP_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
@@ -740,7 +739,7 @@ export class RipGrepTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(RIP_GREP_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return RIP_GREP_DECLARATION;
   }
 }

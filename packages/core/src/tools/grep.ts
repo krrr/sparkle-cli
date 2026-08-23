@@ -38,8 +38,7 @@ import { ToolErrorType } from './tool-error.js';
 import { GREP_TOOL_NAME, GREP_DISPLAY_NAME } from './tool-names.js';
 import { buildPatternArgsPattern } from '../policy/utils.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import { GREP_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { GREP_DECLARATION } from './definitions/coreTools.js';
 import { type GrepMatch, formatGrepResults } from './grep-utils.js';
 
 // --- Interfaces ---
@@ -623,9 +622,9 @@ export class GrepTool extends BaseDeclarativeTool<GrepToolParams, ToolResult> {
     super(
       GrepTool.Name,
       GREP_DISPLAY_NAME,
-      GREP_DEFINITION.base.description!,
+      GREP_DECLARATION.description!,
       Kind.Search,
-      GREP_DEFINITION.base.parametersJsonSchema,
+      GREP_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -718,7 +717,7 @@ export class GrepTool extends BaseDeclarativeTool<GrepToolParams, ToolResult> {
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(GREP_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return GREP_DECLARATION;
   }
 }

@@ -30,8 +30,7 @@ import { GLOB_TOOL_NAME, GLOB_DISPLAY_NAME } from './tool-names.js';
 import { buildPatternArgsPattern } from '../policy/utils.js';
 import { getErrorMessage } from '../utils/errors.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import { GLOB_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { GLOB_DECLARATION } from './definitions/coreTools.js';
 
 // Subset of 'Path' interface provided by 'glob' that we can implement for testing
 export interface GlobPath {
@@ -318,9 +317,9 @@ export class GlobTool extends BaseDeclarativeTool<GlobToolParams, ToolResult> {
     super(
       GlobTool.Name,
       GLOB_DISPLAY_NAME,
-      GLOB_DEFINITION.base.description!,
+      GLOB_DECLARATION.description!,
       Kind.Search,
-      GLOB_DEFINITION.base.parametersJsonSchema,
+      GLOB_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -388,7 +387,7 @@ export class GlobTool extends BaseDeclarativeTool<GlobToolParams, ToolResult> {
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(GLOB_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return GLOB_DECLARATION;
   }
 }

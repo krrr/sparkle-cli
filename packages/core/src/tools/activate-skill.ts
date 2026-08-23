@@ -20,8 +20,7 @@ import {
 import type { Config } from '../config/config.js';
 import { ACTIVATE_SKILL_TOOL_NAME } from './tool-names.js';
 import { ToolErrorType } from './tool-error.js';
-import { getActivateSkillDefinition } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { getActivateSkillDeclaration } from './definitions/dynamic-declaration-helpers.js';
 
 /**
  * Parameters for the ActivateSkill tool
@@ -169,14 +168,14 @@ export class ActivateSkillTool extends BaseDeclarativeTool<
   ) {
     const skills = config.getSkillManager().getSkills();
     const skillNames = skills.map((s) => s.name);
-    const definition = getActivateSkillDefinition(skillNames);
+    const declaration = getActivateSkillDeclaration(skillNames);
 
     super(
       ActivateSkillTool.Name,
       'Activate Skill',
-      definition.base.description!,
+      declaration.description!,
       Kind.Other,
-      definition.base.parametersJsonSchema,
+      declaration.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -198,12 +197,9 @@ export class ActivateSkillTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
+  override getSchema(_modelId?: string) {
     const skills = this.config.getSkillManager().getSkills();
     const skillNames = skills.map((s) => s.name);
-    return resolveToolDeclaration(
-      getActivateSkillDefinition(skillNames),
-      modelId,
-    );
+    return getActivateSkillDeclaration(skillNames);
   }
 }

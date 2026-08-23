@@ -18,8 +18,7 @@ import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import type { Config } from '../config/config.js';
 import { ENTER_PLAN_MODE_TOOL_NAME } from './tool-names.js';
 import { ApprovalMode } from '../policy/types.js';
-import { ENTER_PLAN_MODE_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { ENTER_PLAN_MODE_DECLARATION } from './definitions/coreTools.js';
 import { debugLogger } from '../utils/debugLogger.js';
 
 export interface EnterPlanModeParams {
@@ -39,9 +38,9 @@ export class EnterPlanModeTool extends BaseDeclarativeTool<
     super(
       EnterPlanModeTool.Name,
       'Enter Plan Mode',
-      ENTER_PLAN_MODE_DEFINITION.base.description!,
+      ENTER_PLAN_MODE_DECLARATION.description!,
       Kind.Plan,
-      ENTER_PLAN_MODE_DEFINITION.base.parametersJsonSchema,
+      ENTER_PLAN_MODE_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -61,8 +60,8 @@ export class EnterPlanModeTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(ENTER_PLAN_MODE_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return ENTER_PLAN_MODE_DECLARATION;
   }
 }
 

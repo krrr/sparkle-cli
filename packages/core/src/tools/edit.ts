@@ -60,8 +60,7 @@ import {
 } from './tool-names.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import levenshtein from 'fast-levenshtein';
-import { EDIT_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { EDIT_DECLARATION } from './definitions/coreTools.js';
 import { detectOmissionPlaceholders } from './omissionPlaceholderDetector.js';
 import { discoverJitContext, appendJitContext } from './jit-context.js';
 import { resolveAndValidatePlanPath } from '../utils/planUtils.js';
@@ -1101,9 +1100,9 @@ export class EditTool
     super(
       EditTool.Name,
       EDIT_DISPLAY_NAME,
-      EDIT_DEFINITION.base.description!,
+      EDIT_DECLARATION.description!,
       Kind.Edit,
-      EDIT_DEFINITION.base.parametersJsonSchema,
+      EDIT_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
@@ -1193,8 +1192,8 @@ export class EditTool
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(EDIT_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return EDIT_DECLARATION;
   }
 
   getModifyContext(_: AbortSignal): ModifyContext<EditToolParams> {

@@ -15,95 +15,90 @@ vi.mock('node:os', async (importOriginal) => {
   };
 });
 
-import { resolveToolDeclaration } from './resolver.js';
 import {
-  READ_FILE_DEFINITION,
-  WRITE_FILE_DEFINITION,
-  GREP_DEFINITION,
-  RIP_GREP_DEFINITION,
-  GLOB_DEFINITION,
-  LS_DEFINITION,
-  getShellDefinition,
-  EDIT_DEFINITION,
-  WEB_SEARCH_DEFINITION,
-  WEB_FETCH_DEFINITION,
-  READ_MANY_FILES_DEFINITION,
-  WRITE_TODOS_DEFINITION,
-  GET_INTERNAL_DOCS_DEFINITION,
-  ASK_USER_DEFINITION,
-  ENTER_PLAN_MODE_DEFINITION,
-  getExitPlanModeDefinition,
-  getActivateSkillDefinition,
+  READ_FILE_DECLARATION,
+  WRITE_FILE_DECLARATION,
+  GREP_DECLARATION,
+  RIP_GREP_DECLARATION,
+  GLOB_DECLARATION,
+  LS_DECLARATION,
+  EDIT_DECLARATION,
+  WEB_SEARCH_DECLARATION,
+  WEB_FETCH_DECLARATION,
+  READ_MANY_FILES_DECLARATION,
+  WRITE_TODOS_DECLARATION,
+  GET_INTERNAL_DOCS_DECLARATION,
+  ASK_USER_DECLARATION,
+  ENTER_PLAN_MODE_DECLARATION,
+  READ_MCP_RESOURCE_DECLARATION,
+  LIST_MCP_RESOURCES_DECLARATION,
 } from './coreTools.js';
+import {
+  getShellDeclaration,
+  getExitPlanModeDeclaration,
+  getActivateSkillDeclaration,
+} from './dynamic-declaration-helpers.js';
 
-describe('coreTools snapshots for specific models', () => {
-  const mockPlatform = (platform: string) => {
+describe('core tool declaration snapshots', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    // Stub process.platform to 'linux' by default for deterministic snapshots across OSes
     vi.stubGlobal(
       'process',
       Object.create(process, {
         platform: {
-          get: () => platform,
+          get: () => 'linux',
         },
       }),
     );
-  };
-
-  beforeEach(() => {
-    vi.resetAllMocks();
-    // Stub process.platform to 'linux' by default for deterministic snapshots across OSes
-    mockPlatform('linux');
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  const modelIds = ['gemini-2.5-pro', 'gemini-3-pro-preview'];
   const tools = [
-    { name: 'read_file', definition: READ_FILE_DEFINITION },
-    { name: 'write_file', definition: WRITE_FILE_DEFINITION },
-    { name: 'grep_search', definition: GREP_DEFINITION },
-    { name: 'grep_search_ripgrep', definition: RIP_GREP_DEFINITION },
-    { name: 'glob', definition: GLOB_DEFINITION },
-    { name: 'list_directory', definition: LS_DEFINITION },
+    { name: 'read_file', declaration: READ_FILE_DECLARATION },
+    { name: 'write_file', declaration: WRITE_FILE_DECLARATION },
+    { name: 'grep_search', declaration: GREP_DECLARATION },
+    { name: 'grep_search_ripgrep', declaration: RIP_GREP_DECLARATION },
+    { name: 'glob', declaration: GLOB_DECLARATION },
+    { name: 'list_directory', declaration: LS_DECLARATION },
     {
       name: 'run_shell_command',
-      definition: getShellDefinition(true, true, true),
+      declaration: getShellDeclaration(true, true, true),
     },
-    { name: 'replace', definition: EDIT_DEFINITION },
-    { name: 'web_search', definition: WEB_SEARCH_DEFINITION },
-    { name: 'web_fetch', definition: WEB_FETCH_DEFINITION },
-    { name: 'read_many_files', definition: READ_MANY_FILES_DEFINITION },
-    { name: 'write_todos', definition: WRITE_TODOS_DEFINITION },
-    { name: 'get_internal_docs', definition: GET_INTERNAL_DOCS_DEFINITION },
-    { name: 'ask_user', definition: ASK_USER_DEFINITION },
-    { name: 'enter_plan_mode', definition: ENTER_PLAN_MODE_DEFINITION },
-    {
-      name: 'exit_plan_mode',
-      definition: getExitPlanModeDefinition(),
-    },
+    { name: 'replace', declaration: EDIT_DECLARATION },
+    { name: 'web_search', declaration: WEB_SEARCH_DECLARATION },
+    { name: 'web_fetch', declaration: WEB_FETCH_DECLARATION },
+    { name: 'read_many_files', declaration: READ_MANY_FILES_DECLARATION },
+    { name: 'write_todos', declaration: WRITE_TODOS_DECLARATION },
+    { name: 'get_internal_docs', declaration: GET_INTERNAL_DOCS_DECLARATION },
+    { name: 'ask_user', declaration: ASK_USER_DECLARATION },
+    { name: 'enter_plan_mode', declaration: ENTER_PLAN_MODE_DECLARATION },
+    { name: 'exit_plan_mode', declaration: getExitPlanModeDeclaration() },
     {
       name: 'activate_skill',
-      definition: getActivateSkillDefinition(['skill1', 'skill2']),
+      declaration: getActivateSkillDeclaration(['skill1', 'skill2']),
     },
     {
       name: 'activate_skill_empty',
-      definition: getActivateSkillDefinition([]),
+      declaration: getActivateSkillDeclaration([]),
     },
     {
       name: 'activate_skill_single',
-      definition: getActivateSkillDefinition(['skill1']),
+      declaration: getActivateSkillDeclaration(['skill1']),
+    },
+    { name: 'read_mcp_resource', declaration: READ_MCP_RESOURCE_DECLARATION },
+    {
+      name: 'list_mcp_resources',
+      declaration: LIST_MCP_RESOURCES_DECLARATION,
     },
   ];
 
-  for (const modelId of modelIds) {
-    describe(`Model: ${modelId}`, () => {
-      for (const tool of tools) {
-        it(`snapshot for tool: ${tool.name}`, () => {
-          const resolved = resolveToolDeclaration(tool.definition, modelId);
-          expect(resolved).toMatchSnapshot();
-        });
-      }
+  for (const tool of tools) {
+    it(`snapshot for tool: ${tool.name}`, () => {
+      expect(tool.declaration).toMatchSnapshot();
     });
   }
 });

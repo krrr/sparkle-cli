@@ -24,8 +24,7 @@ import { ToolErrorType } from './tool-error.js';
 import { LS_TOOL_NAME, LS_DISPLAY_NAME } from './tool-names.js';
 import { buildDirPathArgsPattern } from '../policy/utils.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import { LS_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { LS_DECLARATION } from './definitions/coreTools.js';
 import { discoverJitContext, appendJitContext } from './jit-context.js';
 
 /**
@@ -320,9 +319,9 @@ export class LSTool extends BaseDeclarativeTool<LSToolParams, ToolResult> {
     super(
       LSTool.Name,
       LS_DISPLAY_NAME,
-      LS_DEFINITION.base.description!,
+      LS_DECLARATION.description!,
       Kind.Search,
-      LS_DEFINITION.base.parametersJsonSchema,
+      LS_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -359,7 +358,7 @@ export class LSTool extends BaseDeclarativeTool<LSToolParams, ToolResult> {
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(LS_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return LS_DECLARATION;
   }
 }

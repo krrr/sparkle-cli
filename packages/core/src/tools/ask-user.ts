@@ -18,8 +18,7 @@ import { ToolErrorType } from './tool-error.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { QuestionType, type Question } from '../confirmation-bus/types.js';
 import { ASK_USER_TOOL_NAME, ASK_USER_DISPLAY_NAME } from './tool-names.js';
-import { ASK_USER_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { ASK_USER_DECLARATION } from './definitions/coreTools.js';
 
 export interface AskUserParams {
   questions: Question[];
@@ -35,9 +34,9 @@ export class AskUserTool extends BaseDeclarativeTool<
     super(
       AskUserTool.Name,
       ASK_USER_DISPLAY_NAME,
-      ASK_USER_DEFINITION.base.description!,
+      ASK_USER_DECLARATION.description!,
       Kind.Communicate,
-      ASK_USER_DEFINITION.base.parametersJsonSchema,
+      ASK_USER_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -144,8 +143,8 @@ export class AskUserTool extends BaseDeclarativeTool<
     return result;
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(ASK_USER_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return ASK_USER_DECLARATION;
   }
 }
 

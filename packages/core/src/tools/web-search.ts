@@ -20,8 +20,7 @@ import { ToolErrorType } from './tool-error.js';
 import { getErrorMessage, isAbortError } from '../utils/errors.js';
 import { getResponseText } from '../utils/partUtils.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import { WEB_SEARCH_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { WEB_SEARCH_DECLARATION } from './definitions/coreTools.js';
 import { LlmRole } from '../telemetry/llmRole.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 import { ProviderType } from '../config/constants.js';
@@ -285,9 +284,9 @@ export class WebSearchTool extends BaseDeclarativeTool<
     super(
       WebSearchTool.Name,
       WEB_SEARCH_DISPLAY_NAME,
-      WEB_SEARCH_DEFINITION.base.description!,
+      WEB_SEARCH_DECLARATION.description!,
       Kind.Search,
-      WEB_SEARCH_DEFINITION.base.parametersJsonSchema,
+      WEB_SEARCH_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
@@ -323,7 +322,7 @@ export class WebSearchTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(WEB_SEARCH_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return WEB_SEARCH_DECLARATION;
   }
 }

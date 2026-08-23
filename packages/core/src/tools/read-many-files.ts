@@ -42,8 +42,7 @@ import {
   READ_MANY_FILES_TOOL_NAME,
   READ_MANY_FILES_DISPLAY_NAME,
 } from './tool-names.js';
-import { READ_MANY_FILES_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { READ_MANY_FILES_DECLARATION } from './definitions/coreTools.js';
 
 import { REFERENCE_CONTENT_END } from '../utils/constants.js';
 import {
@@ -523,9 +522,9 @@ export class ReadManyFilesTool extends BaseDeclarativeTool<
     super(
       ReadManyFilesTool.Name,
       READ_MANY_FILES_DISPLAY_NAME,
-      READ_MANY_FILES_DEFINITION.base.description!,
+      READ_MANY_FILES_DECLARATION.description!,
       Kind.Read,
-      READ_MANY_FILES_DEFINITION.base.parametersJsonSchema,
+      READ_MANY_FILES_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
@@ -547,7 +546,7 @@ export class ReadManyFilesTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(READ_MANY_FILES_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return READ_MANY_FILES_DECLARATION;
   }
 }

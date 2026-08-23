@@ -27,8 +27,7 @@ import {
 import { ApprovalMode } from '../policy/types.js';
 import { logPlanExecution } from '../telemetry/loggers.js';
 import { PlanExecutionEvent } from '../telemetry/types.js';
-import { getExitPlanModeDefinition } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { getExitPlanModeDeclaration } from './definitions/dynamic-declaration-helpers.js';
 import { getPlanModeExitMessage } from '../utils/approvalModeUtils.js';
 
 export interface ExitPlanModeParams {
@@ -45,13 +44,13 @@ export class ExitPlanModeTool extends BaseDeclarativeTool<
     private config: Config,
     messageBus: MessageBus,
   ) {
-    const definition = getExitPlanModeDefinition();
+    const declaration = getExitPlanModeDeclaration();
     super(
       ExitPlanModeTool.Name,
       'Exit Plan Mode',
-      definition.base.description!,
+      declaration.description!,
       Kind.Plan,
-      definition.base.parametersJsonSchema,
+      declaration.parametersJsonSchema,
       messageBus,
     );
   }
@@ -90,8 +89,8 @@ export class ExitPlanModeTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(getExitPlanModeDefinition(), modelId);
+  override getSchema(_modelId?: string) {
+    return getExitPlanModeDeclaration();
   }
 }
 

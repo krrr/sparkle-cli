@@ -38,8 +38,7 @@ import { logFileOperation } from '../telemetry/loggers.js';
 import { FileOperationEvent } from '../telemetry/types.js';
 import { READ_FILE_TOOL_NAME, READ_FILE_DISPLAY_NAME } from './tool-names.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
-import { READ_FILE_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { READ_FILE_DECLARATION } from './definitions/coreTools.js';
 import {
   discoverJitContext,
   appendJitContext,
@@ -237,9 +236,9 @@ export class ReadFileTool extends BaseDeclarativeTool<
     super(
       ReadFileTool.Name,
       READ_FILE_DISPLAY_NAME,
-      READ_FILE_DEFINITION.base.description!,
+      READ_FILE_DECLARATION.description!,
       Kind.Read,
-      READ_FILE_DEFINITION.base.parametersJsonSchema,
+      READ_FILE_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -315,7 +314,7 @@ export class ReadFileTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(READ_FILE_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return READ_FILE_DECLARATION;
   }
 }

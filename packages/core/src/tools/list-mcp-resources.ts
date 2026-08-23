@@ -13,7 +13,7 @@ import {
 } from './tools.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { LIST_MCP_RESOURCES_TOOL_NAME } from './tool-names.js';
-import { LIST_MCP_RESOURCES_DEFINITION } from './definitions/coreTools.js';
+import { LIST_MCP_RESOURCES_DECLARATION } from './definitions/coreTools.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 import { ToolErrorType } from './tool-error.js';
 
@@ -34,9 +34,9 @@ export class ListMcpResourcesTool extends BaseDeclarativeTool<
     super(
       ListMcpResourcesTool.Name,
       'List MCP Resources',
-      LIST_MCP_RESOURCES_DEFINITION.base.description!,
+      LIST_MCP_RESOURCES_DECLARATION.description!,
       Kind.Search,
-      LIST_MCP_RESOURCES_DEFINITION.base.parametersJsonSchema,
+      LIST_MCP_RESOURCES_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,

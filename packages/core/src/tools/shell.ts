@@ -48,8 +48,7 @@ import { SHELL_TOOL_NAME } from './tool-names.js';
 import { PARAM_ADDITIONAL_PERMISSIONS } from './definitions/base-declarations.js';
 import { ApprovalMode } from '../policy/types.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
-import { getShellDefinition } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { getShellDeclaration } from './definitions/dynamic-declaration-helpers.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 import { toPathKey, isSubpath, resolveToRealPath } from '../utils/paths.js';
 import {
@@ -1100,7 +1099,7 @@ export class ShellTool extends BaseDeclarativeTool<
     void initializeShellParsers().catch(() => {
       // Errors are surfaced when parsing commands.
     });
-    const definition = getShellDefinition(
+    const declaration = getShellDeclaration(
       context.config.isInteractiveShellEnabled(),
       context.config.getEnableShellOutputEfficiency(),
       context.config.getSandboxEnabled(),
@@ -1108,9 +1107,9 @@ export class ShellTool extends BaseDeclarativeTool<
     super(
       ShellTool.Name,
       'Shell',
-      definition.base.description!,
+      declaration.description!,
       Kind.Execute,
-      definition.base.parametersJsonSchema,
+      declaration.parametersJsonSchema,
       messageBus,
       false, // output is not markdown
       true, // output can be updated
@@ -1149,12 +1148,11 @@ export class ShellTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    const definition = getShellDefinition(
+  override getSchema(_modelId?: string) {
+    return getShellDeclaration(
       this.context.config.isInteractiveShellEnabled(),
       this.context.config.getEnableShellOutputEfficiency(),
       this.context.config.getSandboxEnabled(),
     );
-    return resolveToolDeclaration(definition, modelId);
   }
 }

@@ -7,14 +7,13 @@
 import type { Config } from '../config/config.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import {
-  TRACKER_ADD_DEPENDENCY_DEFINITION,
-  TRACKER_CREATE_TASK_DEFINITION,
-  TRACKER_GET_TASK_DEFINITION,
-  TRACKER_LIST_TASKS_DEFINITION,
-  TRACKER_UPDATE_TASK_DEFINITION,
-  TRACKER_VISUALIZE_DEFINITION,
+  TRACKER_ADD_DEPENDENCY_DECLARATION,
+  TRACKER_CREATE_TASK_DECLARATION,
+  TRACKER_GET_TASK_DECLARATION,
+  TRACKER_LIST_TASKS_DECLARATION,
+  TRACKER_UPDATE_TASK_DECLARATION,
+  TRACKER_VISUALIZE_DECLARATION,
 } from './definitions/trackerTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
 import {
   TRACKER_ADD_DEPENDENCY_TOOL_NAME,
   TRACKER_CREATE_TASK_TOOL_NAME,
@@ -183,9 +182,9 @@ export class TrackerCreateTaskTool extends BaseDeclarativeTool<
     super(
       TrackerCreateTaskTool.Name,
       'Create Task',
-      TRACKER_CREATE_TASK_DEFINITION.base.description!,
+      TRACKER_CREATE_TASK_DECLARATION.description!,
       Kind.Edit,
-      TRACKER_CREATE_TASK_DEFINITION.base.parametersJsonSchema,
+      TRACKER_CREATE_TASK_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -197,8 +196,8 @@ export class TrackerCreateTaskTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_CREATE_TASK_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_CREATE_TASK_DECLARATION;
   }
 }
 
@@ -269,9 +268,9 @@ export class TrackerUpdateTaskTool extends BaseDeclarativeTool<
     super(
       TrackerUpdateTaskTool.Name,
       'Update Task',
-      TRACKER_UPDATE_TASK_DEFINITION.base.description!,
+      TRACKER_UPDATE_TASK_DECLARATION.description!,
       Kind.Edit,
-      TRACKER_UPDATE_TASK_DEFINITION.base.parametersJsonSchema,
+      TRACKER_UPDATE_TASK_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -283,8 +282,8 @@ export class TrackerUpdateTaskTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_UPDATE_TASK_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_UPDATE_TASK_DECLARATION;
   }
 }
 
@@ -343,9 +342,9 @@ export class TrackerGetTaskTool extends BaseDeclarativeTool<
     super(
       TrackerGetTaskTool.Name,
       'Get Task',
-      TRACKER_GET_TASK_DEFINITION.base.description!,
+      TRACKER_GET_TASK_DECLARATION.description!,
       Kind.Read,
-      TRACKER_GET_TASK_DEFINITION.base.parametersJsonSchema,
+      TRACKER_GET_TASK_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -357,8 +356,8 @@ export class TrackerGetTaskTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_GET_TASK_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_GET_TASK_DECLARATION;
   }
 }
 
@@ -433,9 +432,9 @@ export class TrackerListTasksTool extends BaseDeclarativeTool<
     super(
       TrackerListTasksTool.Name,
       'List Tasks',
-      TRACKER_LIST_TASKS_DEFINITION.base.description!,
+      TRACKER_LIST_TASKS_DECLARATION.description!,
       Kind.Search,
-      TRACKER_LIST_TASKS_DEFINITION.base.parametersJsonSchema,
+      TRACKER_LIST_TASKS_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -447,8 +446,8 @@ export class TrackerListTasksTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_LIST_TASKS_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_LIST_TASKS_DECLARATION;
   }
 }
 
@@ -547,9 +546,9 @@ export class TrackerAddDependencyTool extends BaseDeclarativeTool<
     super(
       TrackerAddDependencyTool.Name,
       'Add Dependency',
-      TRACKER_ADD_DEPENDENCY_DEFINITION.base.description!,
+      TRACKER_ADD_DEPENDENCY_DECLARATION.description!,
       Kind.Edit,
-      TRACKER_ADD_DEPENDENCY_DEFINITION.base.parametersJsonSchema,
+      TRACKER_ADD_DEPENDENCY_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -564,8 +563,8 @@ export class TrackerAddDependencyTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_ADD_DEPENDENCY_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_ADD_DEPENDENCY_DECLARATION;
   }
 }
 
@@ -671,9 +670,9 @@ export class TrackerVisualizeTool extends BaseDeclarativeTool<
     super(
       TrackerVisualizeTool.Name,
       'Visualize Tracker',
-      TRACKER_VISUALIZE_DEFINITION.base.description!,
+      TRACKER_VISUALIZE_DECLARATION.description!,
       Kind.Read,
-      TRACKER_VISUALIZE_DEFINITION.base.parametersJsonSchema,
+      TRACKER_VISUALIZE_DECLARATION.parametersJsonSchema,
       messageBus,
     );
   }
@@ -688,7 +687,7 @@ export class TrackerVisualizeTool extends BaseDeclarativeTool<
       this.name,
     );
   }
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(TRACKER_VISUALIZE_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return TRACKER_VISUALIZE_DECLARATION;
   }
 }

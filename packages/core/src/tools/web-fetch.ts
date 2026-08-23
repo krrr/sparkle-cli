@@ -34,8 +34,7 @@ import { WEB_FETCH_TOOL_NAME, WEB_FETCH_DISPLAY_NAME } from './tool-names.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents } from '../utils/events.js';
 import { retryWithBackoff, getRetryErrorType } from '../utils/retry.js';
-import { WEB_FETCH_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { WEB_FETCH_DECLARATION } from './definitions/coreTools.js';
 import { LRUCache } from 'mnemonist';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 
@@ -920,9 +919,9 @@ export class WebFetchTool extends BaseDeclarativeTool<
     super(
       WebFetchTool.Name,
       WEB_FETCH_DISPLAY_NAME,
-      WEB_FETCH_DEFINITION.base.description!,
+      WEB_FETCH_DECLARATION.description!,
       Kind.Fetch,
-      WEB_FETCH_DEFINITION.base.parametersJsonSchema,
+      WEB_FETCH_DECLARATION.parametersJsonSchema,
       messageBus,
       true, // isOutputMarkdown
       false, // canUpdateOutput
@@ -976,11 +975,10 @@ export class WebFetchTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    const schema = resolveToolDeclaration(WEB_FETCH_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
     if (this.context.config.getDirectWebFetch()) {
       return {
-        ...schema,
+        ...WEB_FETCH_DECLARATION,
         description:
           'Fetch content from a URL directly. Send multiple requests for this tool if multiple URL fetches are needed.',
         parametersJsonSchema: {
@@ -996,6 +994,6 @@ export class WebFetchTool extends BaseDeclarativeTool<
         },
       };
     }
-    return schema;
+    return WEB_FETCH_DECLARATION;
   }
 }

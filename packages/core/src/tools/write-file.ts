@@ -51,8 +51,7 @@ import { getSpecificMimeType } from '../utils/fileUtils.js';
 import { getLanguageFromFilePath } from '../utils/language-detection.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import { WRITE_FILE_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { WRITE_FILE_DECLARATION } from './definitions/coreTools.js';
 import { detectOmissionPlaceholders } from './omissionPlaceholderDetector.js';
 import { resolveAndValidatePlanPath } from '../utils/planUtils.js';
 import { discoverJitContext, appendJitContext } from './jit-context.js';
@@ -584,9 +583,9 @@ export class WriteFileTool
     super(
       WriteFileTool.Name,
       WRITE_FILE_DISPLAY_NAME,
-      WRITE_FILE_DEFINITION.base.description!,
+      WRITE_FILE_DECLARATION.description!,
       Kind.Edit,
-      WRITE_FILE_DEFINITION.base.parametersJsonSchema,
+      WRITE_FILE_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,
@@ -668,8 +667,8 @@ export class WriteFileTool
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(WRITE_FILE_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return WRITE_FILE_DECLARATION;
   }
 
   getModifyContext(

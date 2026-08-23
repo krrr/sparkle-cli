@@ -32,3 +32,8 @@ SPARKLE_MODEL=deepseek-v4-flash
 #SPARKLE_MODEL=gpt-5.6-luna
 OPENAI_BASE_URL=https://opencode.ai/zen/go/v1
 ```
+
+## Fork
+
+Initially forked from https://github.com/google-gemini/gemini-cli/commits
+57f9688 in main branch.

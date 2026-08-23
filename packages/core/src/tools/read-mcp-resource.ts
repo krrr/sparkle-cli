@@ -13,7 +13,7 @@ import {
 } from './tools.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import { READ_MCP_RESOURCE_TOOL_NAME } from './tool-names.js';
-import { READ_MCP_RESOURCE_DEFINITION } from './definitions/coreTools.js';
+import { READ_MCP_RESOURCE_DECLARATION } from './definitions/coreTools.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 import { ToolErrorType } from './tool-error.js';
 import type { MCPResource } from '../resources/resource-registry.js';
@@ -35,9 +35,9 @@ export class ReadMcpResourceTool extends BaseDeclarativeTool<
     super(
       ReadMcpResourceTool.Name,
       'Read MCP Resource',
-      READ_MCP_RESOURCE_DEFINITION.base.description!,
+      READ_MCP_RESOURCE_DECLARATION.description!,
       Kind.Read,
-      READ_MCP_RESOURCE_DEFINITION.base.parametersJsonSchema,
+      READ_MCP_RESOURCE_DECLARATION.parametersJsonSchema,
       messageBus,
       true,
       false,

@@ -20,8 +20,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 import { ToolErrorType } from './tool-error.js';
-import { GET_INTERNAL_DOCS_DEFINITION } from './definitions/coreTools.js';
-import { resolveToolDeclaration } from './definitions/resolver.js';
+import { GET_INTERNAL_DOCS_DECLARATION } from './definitions/coreTools.js';
 
 /**
  * Parameters for the GetInternalDocs tool.
@@ -164,9 +163,9 @@ export class GetInternalDocsTool extends BaseDeclarativeTool<
     super(
       GetInternalDocsTool.Name,
       'GetInternalDocs',
-      GET_INTERNAL_DOCS_DEFINITION.base.description!,
+      GET_INTERNAL_DOCS_DECLARATION.description!,
       Kind.Think,
-      GET_INTERNAL_DOCS_DEFINITION.base.parametersJsonSchema,
+      GET_INTERNAL_DOCS_DECLARATION.parametersJsonSchema,
       messageBus,
       /* isOutputMarkdown */ true,
       /* canUpdateOutput */ false,
@@ -187,7 +186,7 @@ export class GetInternalDocsTool extends BaseDeclarativeTool<
     );
   }
 
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(GET_INTERNAL_DOCS_DEFINITION, modelId);
+  override getSchema(_modelId?: string) {
+    return GET_INTERNAL_DOCS_DECLARATION;
   }
 }
