@@ -840,7 +840,10 @@ describe('Turn', () => {
               {
                 content: {
                   parts: [
-                    { text: '**Planning** the solution', thought: 'planning' },
+                    {
+                      text: '**Planning**\nthe solution',
+                      thought: 'planning',
+                    },
                     { text: 'I will help you with that.' },
                   ],
                 },

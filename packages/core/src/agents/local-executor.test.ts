@@ -294,7 +294,7 @@ const mockModelResponse = (
   const parts: Part[] = [];
   if (thought) {
     parts.push({
-      text: `**${thought}** This is the reasoning part.`,
+      text: `**${thought}**\nThis is the reasoning part.`,
       thought: true,
     });
   }

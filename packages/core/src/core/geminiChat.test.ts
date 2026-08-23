@@ -1624,7 +1624,7 @@ describe('GeminiChat', () => {
                     parts: [
                       {
                         thought: true,
-                        text: '**Fresh subject** Fresh description',
+                        text: '**Fresh subject**\nFresh description',
                       },
                       { text: 'successful retry response' },
                     ],

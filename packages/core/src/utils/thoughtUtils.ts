@@ -24,40 +24,46 @@ const END_DELIMITER = '**';
 /**
  * Parses a raw thought string into a structured ThoughtSummary object.
  *
- * Thoughts are expected to have a bold "subject" part enclosed in double
- * asterisks (e.g., **Subject**). The rest of the string is considered
- * the description. This function only parses the first valid subject found.
+ * A subject is recognized only when the entire first line is wrapped in
+ * double asterisks (e.g., `**Subject**`), the format the Gemini API uses
+ * for its thoughts. Other occurrences of double asterisks (inline bold,
+ * markdown fragments, as commonly produced by OpenAI-compatible providers'
+ * plain reasoning text) are left untouched: the subject stays empty and the
+ * whole text is treated as the description.
  *
  * @param rawText The raw text of the thought.
  * @returns A ThoughtSummary object. If no valid subject is found, the entire
  * string is treated as the description.
  */
 export function parseThought(rawText: string): ThoughtSummary {
-  const startIndex = rawText.indexOf(START_DELIMITER);
-  if (startIndex === -1) {
-    // No start delimiter found, the whole text is the description.
-    return { subject: '', description: rawText.trim() };
-  }
-
-  const endIndex = rawText.indexOf(
-    END_DELIMITER,
-    startIndex + START_DELIMITER.length,
-  );
-  if (endIndex === -1) {
-    // Start delimiter found but no end delimiter, so it's not a valid subject.
-    // Treat the entire string as the description.
-    return { subject: '', description: rawText.trim() };
-  }
-
-  const subject = rawText
-    .substring(startIndex + START_DELIMITER.length, endIndex)
-    .trim();
-
-  // The description is everything before the start delimiter and after the end delimiter.
-  const description = (
-    rawText.substring(0, startIndex) +
-    rawText.substring(endIndex + END_DELIMITER.length)
+  const normalized = rawText.trim().replaceAll('\r', '');
+  const newlineIndex = normalized.indexOf('\n');
+  const firstLine = (
+    newlineIndex === -1 ? normalized : normalized.slice(0, newlineIndex)
   ).trim();
+
+  if (
+    !firstLine.startsWith(START_DELIMITER) ||
+    !firstLine.endsWith(END_DELIMITER)
+  ) {
+    // The first line is not a fully wrapped subject; keep the whole text as
+    // the description rather than guessing at inline bold fragments.
+    return { subject: '', description: normalized };
+  }
+
+  const inner = firstLine.slice(
+    START_DELIMITER.length,
+    firstLine.length - END_DELIMITER.length,
+  );
+  // A line like "**First** some text **Second**" spans several bold fragments;
+  // that is not a wrapped subject line.
+  if (inner.includes(START_DELIMITER)) {
+    return { subject: '', description: normalized };
+  }
+
+  const subject = inner.trim();
+  const description =
+    newlineIndex === -1 ? '' : normalized.slice(newlineIndex + 1).trim();
 
   return { subject, description };
 }

@@ -25,6 +25,7 @@ import { AgentChatHistory, type HistoryTurn } from './agentChatHistory.js';
 import { randomUUID } from 'node:crypto';
 import { toParts } from './partUtils.js';
 import { isPartialThoughtPart } from './thoughtStreaming.js';
+import { parseThought, type ThoughtSummary } from '../utils/thoughtUtils.js';
 import {
   retryWithBackoff,
   isRetryableError,
@@ -1613,7 +1614,7 @@ export class GeminiChat {
    */
   private extractThoughtFromContent(
     content: Content,
-  ): { subject: string; description: string } | undefined {
+  ): ThoughtSummary | undefined {
     if (!content.parts || content.parts.length === 0) {
       return undefined;
     }
@@ -1625,18 +1626,7 @@ export class GeminiChat {
         (part) => !isPartialThoughtPart(part) && part.thought,
       ) ?? content.parts[0];
     if (thoughtPart.text) {
-      // Extract subject and description using the same logic as turn.ts
-      const rawText = thoughtPart.text;
-      const subjectStringMatches = rawText.match(/\*\*(.*?)\*\*/s);
-      const subject = subjectStringMatches
-        ? subjectStringMatches[1].trim()
-        : '';
-      const description = rawText.replace(/\*\*(.*?)\*\*/s, '').trim();
-
-      return {
-        subject,
-        description,
-      };
+      return parseThought(thoughtPart.text);
     }
     return undefined;
   }
