@@ -26,6 +26,8 @@ enum TerminalKeys {
   ESCAPE = '\u001B',
   BACKSPACE = '\u0008',
   CTRL_L = '\u000C',
+  PAGE_UP = '\u001B[5~',
+  PAGE_DOWN = '\u001B[6~',
 }
 
 const createMockItems = (count = 4): SettingsDialogItem[] => {
@@ -272,6 +274,102 @@ describe('BaseSettingsDialog', () => {
       // Should wrap to last item - verify no crash
       await waitFor(() => {
         expect(mockOnClose).not.toHaveBeenCalled();
+      });
+      unmount();
+    });
+
+    it('should page down through the item list with PageDown', async () => {
+      const items = createMockItems(10);
+      const { lastFrame, stdin, waitUntilReady, unmount } = await renderDialog({
+        items,
+        maxItemsToShow: 3,
+      });
+
+      // Initially the first page (first three items) is visible
+      expect(lastFrame()).toContain('Boolean Setting');
+
+      await act(async () => {
+        stdin.write(TerminalKeys.PAGE_DOWN);
+      });
+      await waitUntilReady();
+
+      await waitFor(() => {
+        const frame = lastFrame();
+        // The window advanced to the next page of items
+        expect(frame).toContain('Enum Setting');
+        expect(frame).not.toContain('Boolean Setting');
+      });
+      unmount();
+    });
+
+    it('should stop at the last item when paging down repeatedly', async () => {
+      const items = createMockItems(10);
+      const { lastFrame, stdin, waitUntilReady, unmount } = await renderDialog({
+        items,
+        maxItemsToShow: 3,
+      });
+
+      // Page down three times; selection should clamp at the end
+      for (let i = 0; i < 3; i++) {
+        await act(async () => {
+          stdin.write(TerminalKeys.PAGE_DOWN);
+        });
+        await waitUntilReady();
+      }
+
+      await waitFor(() => {
+        const frame = lastFrame();
+        // Final page shows the last items
+        expect(frame).toContain('Extra Setting 8');
+        expect(frame).toContain('Extra Setting 9');
+        expect(frame).not.toContain('Boolean Setting');
+      });
+      unmount();
+    });
+
+    it('should stay on the first page when paging up at the top', async () => {
+      const items = createMockItems(10);
+      const { lastFrame, stdin, waitUntilReady, unmount } = await renderDialog({
+        items,
+        maxItemsToShow: 3,
+      });
+
+      await act(async () => {
+        stdin.write(TerminalKeys.PAGE_UP);
+      });
+      await waitUntilReady();
+
+      await waitFor(() => {
+        const frame = lastFrame();
+        // Still on the first page
+        expect(frame).toContain('Boolean Setting');
+        expect(frame).not.toContain('Extra Setting 9');
+      });
+      unmount();
+    });
+
+    it('should return to the previous page with PageUp', async () => {
+      const items = createMockItems(10);
+      const { lastFrame, stdin, waitUntilReady, unmount } = await renderDialog({
+        items,
+        maxItemsToShow: 3,
+      });
+
+      await act(async () => {
+        stdin.write(TerminalKeys.PAGE_DOWN);
+      });
+      await waitUntilReady();
+
+      await act(async () => {
+        stdin.write(TerminalKeys.PAGE_UP);
+      });
+      await waitUntilReady();
+
+      await waitFor(() => {
+        const frame = lastFrame();
+        // Back on the first page
+        expect(frame).toContain('Boolean Setting');
+        expect(frame).not.toContain('Extra Setting 9');
       });
       unmount();
     });

@@ -27,22 +27,35 @@ const NOISE_LINE = /^\.+$/;
  * indicator, so reasoning can be observed in real time without flooding the
  * scrollback history.
  */
+/**
+ * Splits accumulated reasoning into the tail lines to display: normalizes
+ * escaped newlines, strips ANSI escapes, drops blank/noise lines, and keeps
+ * leading indentation verbatim (OpenAI-path reasoning relies on it for
+ * structure) while trimming only trailing whitespace.
+ */
+export function getLiveThinkingTailLines(
+  text: string | null,
+  maxLines: number = DEFAULT_MAX_LINES,
+): string[] {
+  if (!text) {
+    return [];
+  }
+  return normalizeEscapedNewlines(stripAnsi(text))
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .filter((line) => line.length > 0 && !NOISE_LINE.test(line))
+    .slice(-maxLines);
+}
+
 export const LiveThinkingTail: React.FC<LiveThinkingTailProps> = ({
   text,
   terminalWidth,
   maxLines = DEFAULT_MAX_LINES,
 }) => {
-  const lines = useMemo(() => {
-    if (!text) {
-      return [];
-    }
-    const normalized = normalizeEscapedNewlines(stripAnsi(text));
-    return normalized
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0 && !NOISE_LINE.test(line))
-      .slice(-maxLines);
-  }, [text, maxLines]);
+  const lines = useMemo(
+    () => getLiveThinkingTailLines(text, maxLines),
+    [text, maxLines],
+  );
 
   if (lines.length === 0) {
     return null;

@@ -11,6 +11,7 @@ export const providerCommand: SlashCommand = {
   name: 'provider',
   description: 'Setup LLM API providers',
   kind: CommandKind.BUILT_IN,
+  autoExecute: true,
   action: (_context, _args): OpenDialogActionReturn => ({
     type: 'dialog',
     dialog: 'auth',

@@ -94,6 +94,7 @@ export const rewindCommand: SlashCommand = {
   name: 'rewind',
   description: 'Jump back to a specific message and restart the conversation',
   kind: CommandKind.BUILT_IN,
+  autoExecute: true,
   action: (context) => {
     const agentContext = context.services.agentContext;
     const config = agentContext?.config;

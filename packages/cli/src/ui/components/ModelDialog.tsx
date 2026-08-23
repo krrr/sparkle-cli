@@ -69,7 +69,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
       const profileModelOptions = activeProfile.models.map((m) => {
         const isDefault = activeProfile.defaultModel === m.id;
-        const tierStr = m.tier ? `tier: ${m.tier}` : '';
+        const tierStr = m.tier ? `tier: ${m.tier}` : 'tier: not set';
         const desc = [isDefault ? 'remembered' : '', tierStr]
           .filter(Boolean)
           .join(', ');

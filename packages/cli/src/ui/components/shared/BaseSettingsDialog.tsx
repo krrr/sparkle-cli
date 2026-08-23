@@ -235,10 +235,11 @@ export function BaseSettingsDialog({
   ]);
 
   // Internal state
-  const { activeIndex, windowStart, moveUp, moveDown } = useSettingsNavigation({
-    items,
-    maxItemsToShow: effectiveMaxItemsToShow,
-  });
+  const { activeIndex, windowStart, moveUp, moveDown, moveBy } =
+    useSettingsNavigation({
+      items,
+      maxItemsToShow: effectiveMaxItemsToShow,
+    });
 
   const { editState, editDispatch, startEditing, commitEdit, cursorVisible } =
     useInlineEditBuffer({
@@ -357,6 +358,18 @@ export function BaseSettingsDialog({
           return;
         }
 
+        // PageUp/PageDown in edit mode - commit and move by a full page
+        if (keyMatchers[Command.PAGE_UP](key)) {
+          commitEdit();
+          moveBy(-effectiveMaxItemsToShow);
+          return;
+        }
+        if (keyMatchers[Command.PAGE_DOWN](key)) {
+          commitEdit();
+          moveBy(effectiveMaxItemsToShow);
+          return;
+        }
+
         // Character input
         if (key.sequence) {
           editDispatch({
@@ -377,6 +390,16 @@ export function BaseSettingsDialog({
         }
         if (keyMatchers[Command.DIALOG_NAVIGATION_DOWN](key)) {
           moveDown();
+          return true;
+        }
+
+        // PageUp/PageDown - move selection by a full page (clamped, no wrap)
+        if (keyMatchers[Command.PAGE_UP](key)) {
+          moveBy(-effectiveMaxItemsToShow);
+          return true;
+        }
+        if (keyMatchers[Command.PAGE_DOWN](key)) {
+          moveBy(effectiveMaxItemsToShow);
           return true;
         }
 

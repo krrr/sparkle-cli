@@ -8,8 +8,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ProviderProfileService } from './providerProfileService.js';
 import { ProviderType } from '../config/constants.js';
 import {
+  DEFAULT_GEMINI_FLASH_LITE_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
+  DEFAULT_GEMINI_MODEL,
   DEFAULT_OPENAI_MODEL,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_FLASH_LITE,
+  SPARKLE_MODEL_ALIAS_PRO,
 } from '../config/models.js';
 import type { Config } from '../config/config.js';
 import type { ProviderProfile } from '../config/providerProfile.js';
@@ -69,7 +74,20 @@ describe('ProviderProfileService', () => {
 
       expect(profile.id).toBe('personal-gemini');
       expect(profile.providerType).toBe(ProviderType.USE_GEMINI);
-      expect(profile.models.length).toBe(2);
+      expect(profile.models).toEqual([
+        {
+          id: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+          tier: SPARKLE_MODEL_ALIAS_FLASH_LITE,
+        },
+        {
+          id: DEFAULT_GEMINI_FLASH_MODEL,
+          tier: SPARKLE_MODEL_ALIAS_FLASH,
+        },
+        {
+          id: DEFAULT_GEMINI_MODEL,
+          tier: SPARKLE_MODEL_ALIAS_PRO,
+        },
+      ]);
       expect(profile.defaultModel).toBe(DEFAULT_GEMINI_FLASH_MODEL);
       expect(storedProfiles).toHaveLength(1);
       expect(storedSelectedId).toBe(profile.id);
@@ -240,6 +258,29 @@ describe('ProviderProfileService', () => {
       updated = service.getProfile(profile.id);
       expect(updated?.models.some((m) => m.id === 'o1-preview')).toBe(false);
       expect(updated?.defaultModel).not.toBe('o1-preview');
+    });
+
+    it('should clear generateConfig when a patch resets it to undefined', async () => {
+      const profile = await service.createProfile({
+        id: 'reset-config',
+        providerType: ProviderType.USE_OPENAI,
+      });
+      await service.addModel(profile.id, {
+        id: 'reasoner-v1',
+        generateConfig: { reasoningEffort: 'none' },
+      });
+
+      // Mimics the model editor saving "Reasoning Effort: default": the
+      // key is present but cleared, signaling the stored value must go.
+      await service.updateModel(profile.id, 'reasoner-v1', {
+        id: 'reasoner-v1',
+        generateConfig: undefined,
+      });
+
+      const updated = service.getProfile(profile.id);
+      expect(
+        updated?.models.find((m) => m.id === 'reasoner-v1')?.generateConfig,
+      ).toBeUndefined();
     });
 
     it('should delete a profile and clear credentials', async () => {

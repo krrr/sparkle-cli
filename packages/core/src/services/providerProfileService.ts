@@ -9,6 +9,10 @@ import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_OPENAI_MODEL,
+  DEFAULT_GEMINI_FLASH_LITE_MODEL,
+  SPARKLE_MODEL_ALIAS_FLASH_LITE,
+  SPARKLE_MODEL_ALIAS_FLASH,
+  SPARKLE_MODEL_ALIAS_PRO,
 } from '../config/models.js';
 import {
   type ProviderProfile,
@@ -111,12 +115,16 @@ export class ProviderProfileService {
       if (input.providerType === ProviderType.USE_GEMINI) {
         defaultModels = [
           {
+            id: DEFAULT_GEMINI_FLASH_LITE_MODEL,
+            tier: SPARKLE_MODEL_ALIAS_FLASH_LITE,
+          },
+          {
             id: DEFAULT_GEMINI_FLASH_MODEL,
-            tier: 'flash',
+            tier: SPARKLE_MODEL_ALIAS_FLASH,
           },
           {
             id: DEFAULT_GEMINI_MODEL,
-            tier: 'pro',
+            tier: SPARKLE_MODEL_ALIAS_PRO,
           },
         ];
         defaultModel = defaultModel || DEFAULT_GEMINI_FLASH_MODEL;
@@ -124,11 +132,11 @@ export class ProviderProfileService {
         defaultModels = [
           {
             id: DEFAULT_OPENAI_MODEL,
-            tier: 'pro',
+            tier: SPARKLE_MODEL_ALIAS_PRO,
           },
           {
             id: 'gpt-4o-mini',
-            tier: 'flash',
+            tier: SPARKLE_MODEL_ALIAS_FLASH,
           },
         ];
         defaultModel = defaultModel || DEFAULT_OPENAI_MODEL;

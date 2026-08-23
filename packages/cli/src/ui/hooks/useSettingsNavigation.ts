@@ -16,7 +16,10 @@ type NavState = {
   windowStart: number;
 };
 
-type NavAction = { type: 'MOVE_UP' } | { type: 'MOVE_DOWN' };
+type NavAction =
+  | { type: 'MOVE_UP' }
+  | { type: 'MOVE_DOWN' }
+  | { type: 'MOVE_BY'; delta: number };
 
 function calculateSlidingWindow(
   start: number,
@@ -72,6 +75,23 @@ function createNavReducer(
           ),
         };
       }
+      case 'MOVE_BY': {
+        // Paged movement (e.g. PageUp/PageDown): clamp at the edges instead
+        // of wrapping so a page jump never skips across the whole list.
+        const newIndex = Math.max(
+          0,
+          Math.min(items.length - 1, activeIndex + action.delta),
+        );
+        return {
+          activeItemKey: items[newIndex].key,
+          windowStart: calculateSlidingWindow(
+            state.windowStart,
+            newIndex,
+            items.length,
+            maxItemsToShow,
+          ),
+        };
+      }
       default: {
         return state;
       }
@@ -113,6 +133,10 @@ export function useSettingsNavigation({
 
   const moveUp = useCallback(() => dispatch({ type: 'MOVE_UP' }), []);
   const moveDown = useCallback(() => dispatch({ type: 'MOVE_DOWN' }), []);
+  const moveBy = useCallback(
+    (delta: number) => dispatch({ type: 'MOVE_BY', delta }),
+    [],
+  );
 
   return {
     activeItemKey: state.activeItemKey,
@@ -120,5 +144,6 @@ export function useSettingsNavigation({
     windowStart,
     moveUp,
     moveDown,
+    moveBy,
   };
 }

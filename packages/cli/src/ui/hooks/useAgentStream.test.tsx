@@ -174,7 +174,7 @@ describe('useAgentStream', () => {
       eventHandler({
         type: 'message',
         role: 'agent',
-        content: [{ type: 'thought', thought: '**Thinking** about tests' }],
+        content: [{ type: 'thought', thought: '**Thinking**\n about tests' }],
         id: '1',
         timestamp: '',
         streamId: '',

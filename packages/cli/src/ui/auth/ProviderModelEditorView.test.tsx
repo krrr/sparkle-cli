@@ -241,4 +241,51 @@ describe('ProviderModelEditorView', () => {
 
     unmount();
   });
+
+  it('clears a previously saved reasoning effort when reset to default', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView
+        model={{
+          id: 'deepseek-reasoner',
+          generateConfig: { reasoningEffort: 'none' },
+        }}
+        onSave={onSave}
+        onCancel={onCancel}
+      />,
+    );
+    await waitUntilReady();
+
+    // Navigate to the reasoning effort field and cycle none -> default.
+    await act(async () => {
+      stdin.write('\x1b[B'); // down -> tier
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\x1b[B'); // down -> reasoning effort
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\x1b[D'); // left -> default
+    });
+    await waitUntilReady();
+
+    // Esc saves & exits.
+    await act(async () => {
+      stdin.write('\x1b');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledTimes(1);
+    });
+
+    const saved = onSave.mock.calls[0][0];
+    // The generateConfig key must stay present (with an undefined value):
+    // the profile service merges updates via spread, so omitting the key
+    // would resurrect the stale reasoningEffort from the stored model.
+    expect('generateConfig' in saved).toBe(true);
+    expect(saved.generateConfig).toBeUndefined();
+
+    unmount();
+  });
 });

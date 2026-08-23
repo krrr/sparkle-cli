@@ -81,6 +81,18 @@ describe('<ModelDialog />', () => {
     unmount();
   });
 
+  it('shows "tier: not set" for profile models without a configured tier', async () => {
+    const { lastFrame, unmount } = await renderComponent();
+
+    // Both fakeProfile models lack a tier; the non-default one (gemini-pro-latest)
+    // should show the hint instead of no description at all.
+    await waitFor(() => {
+      expect(lastFrame()).toContain('tier: not set');
+      expect(lastFrame()).toContain('remembered, tier: not set');
+    });
+    unmount();
+  });
+
   it('sets model and closes when a model is selected', async () => {
     const { stdin, waitUntilReady, unmount } = await renderComponent();
 

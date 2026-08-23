@@ -16,7 +16,7 @@ import { theme } from '../semantic-colors.js';
 import { ThemedGradient } from './ThemedGradient.js';
 import { CliSpinner } from './CliSpinner.js';
 
-import { ProviderType } from 'sparkle-cli-core';
+import { ProviderType, type ProviderProfile } from 'sparkle-cli-core';
 
 interface AppHeaderProps {
   version: string;
@@ -34,15 +34,15 @@ const DEFAULT_ICON = `   ⣰⣆
  */
 const NARROW_TERMINAL_BREAKPOINT = 60;
 
-function getProviderLabel(authType: ProviderType | undefined): string | null {
-  switch (authType) {
-    case ProviderType.USE_GEMINI:
-      return 'Gemini';
-    case ProviderType.USE_OPENAI:
-      return 'OpenAI Compatible';
-    default:
-      return null;
+function getProviderLabel(providerProfile?: ProviderProfile): string | null {
+  if (!providerProfile) {
+    return null;
   }
+  const type =
+    providerProfile.providerType === ProviderType.USE_GEMINI
+      ? 'Gemini'
+      : 'OpenAI Compatible';
+  return `${providerProfile.id} (${type})`;
 }
 
 export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
@@ -53,9 +53,8 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
   const { bannerText } = useBanner(bannerData);
   const { showTips } = useTips();
 
-  const generatorConfig = config.getContentGeneratorConfig();
-  const authType = generatorConfig?.authType;
-  const providerLabel = getProviderLabel(authType);
+  const activeProvider = config.getProviderProfileService()?.getActiveProfile();
+  const providerLabel = getProviderLabel(activeProvider);
 
   const showHeader = !(
     settings.merged.ui.hideBanner || config.getScreenReader()

@@ -40,10 +40,7 @@ export const MAX_OPENAI_TOOLS = 128;
  * rate instead of once per token: a partial thought part is emitted when at
  * least this many new reasoning characters have accumulated...
  */
-export const PARTIAL_THOUGHT_MIN_CHARS = 64;
-
-/** ...or when this much time has passed since the last emitted partial. */
-export const PARTIAL_THOUGHT_MIN_INTERVAL_MS = 120;
+export const PARTIAL_THOUGHT_MIN_CHARS = 24;
 
 /**
  * Maps Gemini function names to OpenAI-compatible names and back.
@@ -618,8 +615,6 @@ export class OpenAiChunkConverter {
   private pendingReasoningText = '';
   /** Characters of the current block already covered by a partial emission. */
   private partialEmittedLength = 0;
-  /** Timestamp of the last partial emission (0 = none yet in this block). */
-  private lastPartialFlushAt = 0;
 
   constructor(private readonly nameMapper?: FunctionNameMapper) {}
 
@@ -653,15 +648,10 @@ export class OpenAiChunkConverter {
         parts.push({ text: this.pendingReasoningText, thought: true });
         this.pendingReasoningText = '';
         this.partialEmittedLength = 0;
-        this.lastPartialFlushAt = 0;
       } else {
         const unflushedChars =
           this.pendingReasoningText.length - this.partialEmittedLength;
-        const now = Date.now();
-        if (
-          unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS ||
-          now - this.lastPartialFlushAt >= PARTIAL_THOUGHT_MIN_INTERVAL_MS
-        ) {
+        if (unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS) {
           const partial: PartialThoughtPart = {
             text: this.pendingReasoningText,
             thought: true,
@@ -669,7 +659,6 @@ export class OpenAiChunkConverter {
           };
           parts.push(partial);
           this.partialEmittedLength = this.pendingReasoningText.length;
-          this.lastPartialFlushAt = now;
         }
       }
     }
@@ -718,7 +707,6 @@ export class OpenAiChunkConverter {
       });
       this.pendingReasoningText = '';
       this.partialEmittedLength = 0;
-      this.lastPartialFlushAt = 0;
     }
     for (const [index, call] of this.toolCalls) {
       if (this.emittedCalls.has(index) || !call.name) {

@@ -94,12 +94,13 @@ export function ProviderModelEditorView({
       ...model,
       id,
       tier: tier === 'none' ? undefined : tier,
+      // Assign (instead of deleting) so the key stays present when cleared.
+      // updateModel() folds patches in with a spread merge, so omitting the
+      // key would silently keep the stale generateConfig (e.g. a previously
+      // saved reasoningEffort) from the stored model.
+      generateConfig:
+        Object.keys(generateConfig).length > 0 ? generateConfig : undefined,
     };
-    if (Object.keys(generateConfig).length > 0) {
-      newModel.generateConfig = generateConfig;
-    } else {
-      delete newModel.generateConfig;
-    }
 
     void onSave(newModel);
   };

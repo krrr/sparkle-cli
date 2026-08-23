@@ -118,4 +118,49 @@ describe('useSettingsNavigation', () => {
     expect(result.current.activeItemKey).toBe('c');
     expect(result.current.activeIndex).toBe(1); // 'c' is now at index 1
   });
+
+  describe('moveBy (paging)', () => {
+    it('should move down by the given delta', async () => {
+      const { result } = await renderHook(() =>
+        useSettingsNavigation({ items: mockItems, maxItemsToShow: 2 }),
+      );
+
+      act(() => result.current.moveBy(2));
+      expect(result.current.activeIndex).toBe(2);
+      expect(result.current.activeItemKey).toBe('c');
+      // Window slides so the active item stays visible
+      expect(result.current.windowStart).toBe(1);
+    });
+
+    it('should move up by the given delta', async () => {
+      const { result } = await renderHook(() =>
+        useSettingsNavigation({ items: mockItems, maxItemsToShow: 2 }),
+      );
+
+      act(() => result.current.moveBy(4)); // to 'e'
+      act(() => result.current.moveBy(-2)); // back to 'c'
+      expect(result.current.activeIndex).toBe(2);
+    });
+
+    it('should clamp at the end of the list instead of wrapping', async () => {
+      const { result } = await renderHook(() =>
+        useSettingsNavigation({ items: mockItems, maxItemsToShow: 2 }),
+      );
+
+      act(() => result.current.moveBy(100));
+      expect(result.current.activeIndex).toBe(4);
+      expect(result.current.windowStart).toBe(3);
+    });
+
+    it('should clamp at the start of the list instead of wrapping', async () => {
+      const { result } = await renderHook(() =>
+        useSettingsNavigation({ items: mockItems, maxItemsToShow: 2 }),
+      );
+
+      act(() => result.current.moveBy(4)); // to 'e'
+      act(() => result.current.moveBy(-100));
+      expect(result.current.activeIndex).toBe(0);
+      expect(result.current.windowStart).toBe(0);
+    });
+  });
 });
