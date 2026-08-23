@@ -280,7 +280,10 @@ export function translateEvent(
       // Elicitations are handled separately by the session layer
       break;
 
-    // Internal concerns — no AgentEvent emitted
+    // Internal concerns — no AgentEvent emitted. Live reasoning updates
+    // (ThoughtDelta) are transient: the consolidated thought arrives as a
+    // Thought event when the reasoning block completes.
+    case GeminiEventType.ThoughtDelta:
     case GeminiEventType.ChatCompressed:
     case GeminiEventType.Retry:
       break;

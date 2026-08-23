@@ -789,6 +789,48 @@ describe('Turn', () => {
       expect(events).toEqual([expectedEvent]);
     });
 
+    it('should yield ThoughtDelta instead of Thought for partial thought parts', async () => {
+      const mockResponseStream = (async function* () {
+        yield {
+          type: StreamEventType.CHUNK,
+          value: {
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    {
+                      text: 'reasoning so far',
+                      thought: true,
+                      thoughtPartial: true,
+                    },
+                  ],
+                },
+              },
+            ],
+            responseId: 'trace-delta',
+          } as unknown as GenerateContentResponse,
+        };
+      })();
+      mockSendMessageStream.mockResolvedValue(mockResponseStream);
+
+      const events = [];
+      for await (const event of turn.run(
+        { model: 'gemini' },
+        [{ text: 'Hi' }],
+        new AbortController().signal,
+      )) {
+        events.push(event);
+      }
+
+      expect(events).toEqual([
+        {
+          type: GeminiEventType.ThoughtDelta,
+          value: { text: 'reasoning so far' },
+          traceId: 'trace-delta',
+        },
+      ]);
+    });
+
     it('should process all parts when thought is first part in chunk', async () => {
       const mockResponseStream = (async function* () {
         yield {

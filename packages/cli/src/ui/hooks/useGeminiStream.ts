@@ -215,6 +215,22 @@ function calculateStreamingState(
 }
 
 /**
+ * Live reasoning tail transition: a ThoughtDelta event carries the reasoning
+ * text accumulated so far in the current block, so it replaces the tail; any
+ * other event means the block ended (or the turn moved on), so the tail is
+ * cleared. Returns the same reference when nothing changes.
+ */
+export function nextLiveThoughtFromEvent(
+  current: string | null,
+  event: GeminiEvent,
+): string | null {
+  if (event.type === ServerGeminiEventType.ThoughtDelta) {
+    return event.value.text;
+  }
+  return current === null ? current : null;
+}
+
+/**
  * Manages the Gemini stream, including user input, command processing,
  * API interaction, and tool call lifecycle.
  */
@@ -262,6 +278,9 @@ export const useGeminiStream = (
     useStateAndRef<boolean>(false);
   const [thought, thoughtRef, setThought] =
     useStateAndRef<ThoughtSummary | null>(null);
+  const [liveThought, liveThoughtRef, setLiveThought] = useStateAndRef<
+    string | null
+  >(null);
   const [pendingHistoryItem, pendingHistoryItemRef, setPendingHistoryItem] =
     useStateAndRef<HistoryItemWithoutId | null>(null);
 
@@ -1142,7 +1161,7 @@ export const useGeminiStream = (
     (eventValue: ThoughtSummary, _userMessageTimestamp: number) => {
       setThought(eventValue);
 
-      if (getInlineThinkingMode(settings) === 'full') {
+      if (getInlineThinkingMode(settings) !== 'off') {
         addItem({
           type: 'thinking',
           thought: eventValue,
@@ -1185,12 +1204,14 @@ export const useGeminiStream = (
       );
       setIsResponding(false);
       setThought(null); // Reset thought when user cancels
+      setLiveThought(null);
     },
     [
       addItem,
       pendingHistoryItemRef,
       setPendingHistoryItem,
       setThought,
+      setLiveThought,
       setIsResponding,
     ],
   );
@@ -1216,6 +1237,7 @@ export const useGeminiStream = (
       );
       maybeAddLowVerbosityFailureNote(userMessageTimestamp);
       setThought(null); // Reset thought when there's an error
+      setLiveThought(null);
     },
     [
       addItem,
@@ -1223,6 +1245,7 @@ export const useGeminiStream = (
       setPendingHistoryItem,
       config,
       setThought,
+      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
     ],
@@ -1270,12 +1293,14 @@ export const useGeminiStream = (
       );
       maybeAddLowVerbosityFailureNote(userMessageTimestamp);
       setThought(null); // Reset thought when there's an error
+      setLiveThought(null);
     },
     [
       addItem,
       pendingHistoryItemRef,
       setPendingHistoryItem,
       setThought,
+      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
       config,
@@ -1529,11 +1554,21 @@ export const useGeminiStream = (
         ) {
           setThought(null);
         }
+        const nextLiveThought = nextLiveThoughtFromEvent(
+          liveThoughtRef.current,
+          event,
+        );
+        if (nextLiveThought !== liveThoughtRef.current) {
+          setLiveThought(nextLiveThought);
+        }
 
         switch (event.type) {
           case ServerGeminiEventType.Thought:
             setLastGeminiActivityTime(Date.now());
             handleThoughtEvent(event.value, userMessageTimestamp);
+            break;
+          case ServerGeminiEventType.ThoughtDelta:
+            setLastGeminiActivityTime(Date.now());
             break;
           case ServerGeminiEventType.Content:
             setLastGeminiActivityTime(Date.now());
@@ -1624,6 +1659,8 @@ export const useGeminiStream = (
       handleContentEvent,
       handleThoughtEvent,
       thoughtRef,
+      liveThoughtRef,
+      setLiveThought,
       handleUserCancelledEvent,
       handleErrorEvent,
       scheduleToolCalls,
@@ -1714,6 +1751,7 @@ export const useGeminiStream = (
               }
               startNewPrompt();
               setThought(null); // Reset thought when starting a new prompt
+              setLiveThought(null);
             }
 
             setIsResponding(true);
@@ -1823,6 +1861,7 @@ export const useGeminiStream = (
       startNewPrompt,
       getPromptCount,
       setThought,
+      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
       isRespondingRef,
@@ -2226,6 +2265,7 @@ export const useGeminiStream = (
     initError,
     pendingHistoryItems,
     thought,
+    liveThought,
     cancelOngoingRequest,
     pendingToolCalls: toolCalls,
     handleApprovalModeChange,

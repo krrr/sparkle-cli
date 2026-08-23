@@ -17,6 +17,7 @@ import { theme } from '../semantic-colors.js';
 import { GENERIC_WORKING_LABEL } from '../textConstants.js';
 import { INTERACTIVE_SHELL_WAITING_PHRASE } from '../hooks/usePhraseCycler.js';
 import { LoadingIndicator } from './LoadingIndicator.js';
+import { LiveThinkingTail } from './LiveThinkingTail.js';
 import { StatusDisplay } from './StatusDisplay.js';
 import { ContextUsageDisplay } from './ContextUsageDisplay.js';
 import { HorizontalLine } from './shared/HorizontalLine.js';
@@ -365,12 +366,21 @@ export const StatusRow: React.FC<StatusRowProps> = ({
           >
             {/* 
                 We always render the tip node so it can be measured by ResizeObserver.
-                When hidden, we use absolute positioning so it can still be measured 
+                When hidden, we use absolute positioning so it can still be measured
                 but doesn't affect the layout of Row 1. This prevents layout loops.
             */}
             {!isNarrow && tipContentStr && renderTipNode()}
           </Box>
         </Box>
+      )}
+
+      {/* Live reasoning tail: its own row so the status line keeps sharing
+          Row 1 with the tip on the right. */}
+      {showRow1 && showLoadingIndicator && uiState.activeHooks.length === 0 && (
+        <LiveThinkingTail
+          text={uiState.liveThought}
+          terminalWidth={terminalWidth}
+        />
       )}
 
       {/* Internal Separator */}

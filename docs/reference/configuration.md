@@ -279,9 +279,10 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.inlineThinkingMode`** (enum):
 
-  - **Description:** Display model thinking inline: off or full.
-  - **Default:** `"off"`
-  - **Values:** `"off"`, `"full"`
+  - **Description:** Model thinking display: compact (one-line summaries in
+    history, live streaming tail), full (full text), or off.
+  - **Default:** `"compact"`
+  - **Values:** `"off"`, `"compact"`, `"full"`
 
 - **`ui.showStatusInTitle`** (boolean):
 

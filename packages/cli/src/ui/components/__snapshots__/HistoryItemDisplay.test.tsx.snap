@@ -388,8 +388,8 @@ exports[`<HistoryItemDisplay /> > renders InfoMessage for "info" type with multi
 "
 `;
 
-exports[`<HistoryItemDisplay /> > thinking items > renders "Thinking..." header when isFirstThinking is true 1`] = `
-" Thinking... 
+exports[`<HistoryItemDisplay /> > thinking items > renders "Thought" header when isFirstThinking is true 1`] = `
+" Thought 
  │
  │ Thinking
  │ test

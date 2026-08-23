@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ThinkingMessage > filters out progress dots and empty lines 1`] = `
-" Thinking... 
+" Thought 
  │
  │ Thinking
  │ Done
@@ -9,14 +9,14 @@ exports[`ThinkingMessage > filters out progress dots and empty lines 1`] = `
 `;
 
 exports[`ThinkingMessage > filters out progress dots and empty lines 2`] = `
-" Thinking... 
+" Thought 
  │
  │ Thinking
  │ Done"
 `;
 
 exports[`ThinkingMessage > normalizes escaped newline tokens 1`] = `
-" Thinking... 
+" Thought 
  │
  │ Matching the Blocks
  │ Some more text
@@ -24,29 +24,51 @@ exports[`ThinkingMessage > normalizes escaped newline tokens 1`] = `
 `;
 
 exports[`ThinkingMessage > normalizes escaped newline tokens 2`] = `
-" Thinking... 
+" Thought 
  │
  │ Matching the Blocks
  │ Some more text"
 `;
 
-exports[`ThinkingMessage > renders "Thinking..." header when isFirstThinking is true 1`] = `
-" Thinking... 
+exports[`ThinkingMessage > renders "Thought" header when isFirstThinking is true 1`] = `
+" Thought 
  │
  │ Summary line
  │ First body line
 "
 `;
 
-exports[`ThinkingMessage > renders "Thinking..." header when isFirstThinking is true 2`] = `
-" Thinking... 
+exports[`ThinkingMessage > renders "Thought" header when isFirstThinking is true 2`] = `
+" Thought 
  │
  │ Summary line
  │ First body line"
 `;
 
+exports[`ThinkingMessage > renders compact mode as a single headline line with hidden-line count 1`] = `
+" Thought 
+ │ Let me analyze the request. (+2 lines)
+"
+`;
+
+exports[`ThinkingMessage > renders compact mode as a single headline line with hidden-line count 2`] = `
+" Thought 
+ │ Let me analyze the request. (+2 lines)"
+`;
+
+exports[`ThinkingMessage > renders compact mode without a line count for single-line thoughts 1`] = `
+" Thought 
+ │ Only one line of reasoning
+"
+`;
+
+exports[`ThinkingMessage > renders compact mode without a line count for single-line thoughts 2`] = `
+" Thought 
+ │ Only one line of reasoning"
+`;
+
 exports[`ThinkingMessage > renders full mode with left border and full text 1`] = `
-" Thinking... 
+" Thought 
  │
  │ Planning
  │ I am planning the solution.
@@ -54,14 +76,14 @@ exports[`ThinkingMessage > renders full mode with left border and full text 1`] 
 `;
 
 exports[`ThinkingMessage > renders full mode with left border and full text 2`] = `
-" Thinking... 
+" Thought 
  │
  │ Planning
  │ I am planning the solution."
 `;
 
 exports[`ThinkingMessage > renders multiple thinking messages sequentially correctly 1`] = `
-" Thinking... 
+" Thought 
  │
  │ Initial analysis
  │ This is a multiple line paragraph for the first thinking message of how the
@@ -78,7 +100,7 @@ exports[`ThinkingMessage > renders multiple thinking messages sequentially corre
 `;
 
 exports[`ThinkingMessage > renders multiple thinking messages sequentially correctly 2`] = `
-" Thinking... 
+" Thought 
  │
  │ Initial analysis
  │ This is a multiple line paragraph for the first thinking message of how the
@@ -93,30 +115,30 @@ exports[`ThinkingMessage > renders multiple thinking messages sequentially corre
  │ refine the solution."
 `;
 
-exports[`ThinkingMessage > renders subject line with vertical rule and "Thinking..." header 1`] = `
-" Thinking... 
+exports[`ThinkingMessage > renders subject line with vertical rule and "Thought" header 1`] = `
+" Thought 
  │
  │ Planning
  │ test
 "
 `;
 
-exports[`ThinkingMessage > renders subject line with vertical rule and "Thinking..." header 2`] = `
-" Thinking... 
+exports[`ThinkingMessage > renders subject line with vertical rule and "Thought" header 2`] = `
+" Thought 
  │
  │ Planning
  │ test"
 `;
 
 exports[`ThinkingMessage > uses description when subject is empty 1`] = `
-" Thinking... 
+" Thought 
  │
  │ Processing details
 "
 `;
 
 exports[`ThinkingMessage > uses description when subject is empty 2`] = `
-" Thinking... 
+" Thought 
  │
  │ Processing details"
 `;

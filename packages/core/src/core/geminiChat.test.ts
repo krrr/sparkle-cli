@@ -854,6 +854,81 @@ describe('GeminiChat', () => {
       );
     });
 
+    it('should pass partial thought parts through the stream but keep them out of history', async () => {
+      // 1. Mock the API to stream a live reasoning partial followed by the
+      //    consolidated thought part and the visible text.
+      const partialThoughtStream = (async function* () {
+        yield {
+          candidates: [
+            {
+              content: {
+                role: 'model',
+                parts: [
+                  {
+                    text: 'reasoning so far',
+                    thought: true,
+                    thoughtPartial: true,
+                  },
+                ],
+              },
+            },
+          ],
+        } as unknown as GenerateContentResponse;
+        yield {
+          candidates: [
+            {
+              content: {
+                role: 'model',
+                parts: [
+                  { text: 'full reasoning', thought: true },
+                  { text: 'Visible answer.' },
+                ],
+              },
+              finishReason: 'STOP',
+            },
+          ],
+        } as unknown as GenerateContentResponse;
+      })();
+
+      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(
+        partialThoughtStream,
+      );
+
+      // 2. Consume the stream, collecting the yielded chunks.
+      const stream = await chat.sendMessageStream(
+        { model: 'test-model' },
+        'test message',
+        'prompt-id-partial-thought',
+        new AbortController().signal,
+        LlmRole.MAIN,
+      );
+      const chunks: GenerateContentResponse[] = [];
+      for await (const streamEvent of stream) {
+        if (streamEvent.type === 'chunk') {
+          chunks.push(streamEvent.value);
+        }
+      }
+
+      // 3. The partial flows through so the UI can render live reasoning.
+      const partialChunk = chunks.find((c) =>
+        c.candidates?.[0]?.content?.parts?.some(
+          (p) => (p as Record<string, unknown>)['thoughtPartial'] === true,
+        ),
+      );
+      expect(partialChunk).toBeDefined();
+
+      // 4. Recorded history (viewed with thoughts preserved, as the
+      // OpenAI-compatible path does) contains only the consolidated thought
+      // and the text — never the transient partial.
+      const history = chat.getHistoryTurns(true, true);
+      const modelTurn = history[1].content;
+      expect(modelTurn.role).toBe('model');
+      expect(modelTurn.parts).toEqual([
+        { text: 'full reasoning', thought: true },
+        { text: 'Visible answer.' },
+      ]);
+    });
+
     it('should throw an error when a tool call is followed by an empty stream response', async () => {
       // 1. Setup: A history where the model has just made a function call.
       const initialHistory: HistoryTurn[] = [

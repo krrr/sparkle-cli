@@ -88,6 +88,7 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
           thought={itemForDisplay.thought}
           terminalWidth={terminalWidth}
           isFirstThinking={isFirstThinking}
+          mode={inlineThinkingMode}
         />
       )}
       {itemForDisplay.type === 'hint' && (

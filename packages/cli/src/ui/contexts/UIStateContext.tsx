@@ -74,6 +74,8 @@ export interface UIState {
   initError: string | null;
   pendingGeminiHistoryItems: HistoryItemWithoutId[];
   thought: ThoughtSummary | null;
+  /** Live reasoning text (accumulated so far) while the model is thinking. */
+  liveThought: string | null;
   isInputActive: boolean;
   isVoiceModeEnabled: boolean;
   isResuming: boolean;

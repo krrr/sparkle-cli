@@ -297,7 +297,7 @@ describe('<HistoryItemDisplay />', () => {
       unmount();
     });
 
-    it('renders "Thinking..." header when isFirstThinking is true', async () => {
+    it('renders "Thought" header when isFirstThinking is true', async () => {
       const item: HistoryItem = {
         ...baseItem,
         type: 'thinking',
@@ -310,7 +310,7 @@ describe('<HistoryItemDisplay />', () => {
         },
       );
 
-      expect(lastFrame()).toContain(' Thinking...');
+      expect(lastFrame()).toContain(' Thought');
       expect(lastFrame()).toMatchSnapshot();
       unmount();
     });

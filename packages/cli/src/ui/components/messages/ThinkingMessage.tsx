@@ -10,14 +10,18 @@ import { Box, Text } from 'ink';
 import type { ThoughtSummary } from 'sparkle-cli-core';
 import { theme } from '../../semantic-colors.js';
 import { normalizeEscapedNewlines } from '../../utils/textUtils.js';
+import type { InlineThinkingMode } from '../../utils/inlineThinkingMode.js';
 
 interface ThinkingMessageProps {
   thought: ThoughtSummary;
   terminalWidth: number;
   isFirstThinking?: boolean;
+  mode?: InlineThinkingMode;
 }
 
 const THINKING_LEFT_PADDING = 1;
+/** Maximum rendered characters of the headline in compact mode. */
+const COMPACT_HEADLINE_MAX_CHARS = 120;
 
 function normalizeThoughtLines(thought: ThoughtSummary): string[] {
   const subject = normalizeEscapedNewlines(thought.subject).trim();
@@ -48,11 +52,15 @@ function normalizeThoughtLines(thought: ThoughtSummary): string[] {
 /**
  * Renders a model's thought as a distinct bubble.
  * Leverages Ink layout for wrapping and borders.
+ *
+ * In compact mode only a single headline line (plus a hidden-line count) is
+ * rendered, keeping long chains of thought from flooding the scrollback.
  */
 export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   thought,
   terminalWidth,
   isFirstThinking,
+  mode = 'full',
 }) => {
   const fullLines = useMemo(() => normalizeThoughtLines(thought), [thought]);
 
@@ -60,12 +68,43 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
     return null;
   }
 
+  if (mode === 'compact') {
+    const headline = fullLines[0].slice(0, COMPACT_HEADLINE_MAX_CHARS);
+    const hiddenLines = fullLines.length - 1;
+    return (
+      <Box width={terminalWidth} flexDirection="column">
+        {isFirstThinking && (
+          <Text color={theme.text.primary} italic>
+            {' '}
+            Thought{' '}
+          </Text>
+        )}
+        <Box
+          marginLeft={THINKING_LEFT_PADDING}
+          paddingLeft={1}
+          width={Math.max(20, terminalWidth - THINKING_LEFT_PADDING - 2)}
+          borderStyle="single"
+          borderLeft={true}
+          borderRight={false}
+          borderTop={false}
+          borderBottom={false}
+          borderColor={theme.text.secondary}
+        >
+          <Text color={theme.text.secondary} italic wrap="truncate-end">
+            {headline}
+            {hiddenLines > 0 ? ` (+${hiddenLines} lines)` : ''}
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box width={terminalWidth} flexDirection="column">
       {isFirstThinking && (
         <Text color={theme.text.primary} italic>
           {' '}
-          Thinking...{' '}
+          Thought{' '}
         </Text>
       )}
 

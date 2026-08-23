@@ -18,6 +18,7 @@ import {
 } from '@google/genai';
 import { isRecord } from '../utils/markdownUtils.js';
 import type { SparkleGenerateContentConfig } from '../services/modelConfigService.js';
+import type { PartialThoughtPart } from './thoughtStreaming.js';
 import type {
   OpenAiChatCompletion,
   OpenAiContentPart,
@@ -33,6 +34,16 @@ import stableStringify from 'json-stable-stringify';
 
 /** OpenAI rejects requests with more than 128 function tools. */
 export const MAX_OPENAI_TOOLS = 128;
+
+/**
+ * Live reasoning updates are coalesced so the UI updates at a comfortable
+ * rate instead of once per token: a partial thought part is emitted when at
+ * least this many new reasoning characters have accumulated...
+ */
+export const PARTIAL_THOUGHT_MIN_CHARS = 64;
+
+/** ...or when this much time has passed since the last emitted partial. */
+export const PARTIAL_THOUGHT_MIN_INTERVAL_MS = 120;
 
 /**
  * Maps Gemini function names to OpenAI-compatible names and back.
@@ -590,9 +601,12 @@ function parseArgs(argsJson: string): Record<string, unknown> | undefined {
  * on to avoid duplicate tool executions.
  *
  * Reasoning content (`reasoning_content`) is streamed one tiny fragment per
- * chunk, so fragments are likewise buffered and emitted as a single
- * consolidated thought part per reasoning block, matching how Gemini delivers
- * complete thoughts.
+ * chunk, so the consolidated thought part for a reasoning block is only
+ * emitted when the block ends, matching how Gemini delivers complete
+ * thoughts. In addition, throttled partial thought parts (marked
+ * `thoughtPartial`, carrying the text accumulated so far) are emitted while
+ * the block is still streaming so the UI can show reasoning in real time;
+ * consumers keep those out of recorded history.
  */
 export class OpenAiChunkConverter {
   private readonly toolCalls = new Map<
@@ -600,8 +614,12 @@ export class OpenAiChunkConverter {
     { id?: string; name?: string; args: string }
   >();
   private readonly emittedCalls = new Set<number>();
-  /** Reasoning fragments received but not yet emitted as a thought part. */
-  private pendingReasoning: string[] = [];
+  /** Reasoning text of the current block, accumulated across fragments. */
+  private pendingReasoningText = '';
+  /** Characters of the current block already covered by a partial emission. */
+  private partialEmittedLength = 0;
+  /** Timestamp of the last partial emission (0 = none yet in this block). */
+  private lastPartialFlushAt = 0;
 
   constructor(private readonly nameMapper?: FunctionNameMapper) {}
 
@@ -619,27 +637,41 @@ export class OpenAiChunkConverter {
     const parts: Part[] = [];
 
     if (delta?.reasoning_content) {
-      this.pendingReasoning.push(delta.reasoning_content);
+      this.pendingReasoningText += delta.reasoning_content;
     }
 
-    // OpenAI-compatible APIs stream reasoning content one tiny fragment per
-    // SSE chunk. Buffer those fragments and emit a single consolidated thought
-    // part when the reasoning block ends (content/tool calls/finish reason
-    // arrives, or the stream moves on to another chunk). This mirrors Gemini,
-    // which delivers each thought as one complete part. Emitting a part per
-    // fragment would turn every reasoning token into its own Thought event and
-    // flood the UI with one "thinking" line per token.
+    // The reasoning block ends when the provider moves on to content, tool
+    // calls, or the finish reason. A chunk that merely omits
+    // reasoning_content (e.g. a usage-only chunk) does not end the block.
     const reasoningEnded =
-      !delta?.reasoning_content ||
       (typeof delta?.content === 'string' && delta.content.length > 0) ||
       !!delta?.tool_calls ||
       !!choice?.finish_reason;
-    if (reasoningEnded && this.pendingReasoning.length > 0) {
-      parts.push({
-        text: this.pendingReasoning.join(''),
-        thought: true,
-      });
-      this.pendingReasoning = [];
+
+    if (this.pendingReasoningText.length > 0) {
+      if (reasoningEnded) {
+        parts.push({ text: this.pendingReasoningText, thought: true });
+        this.pendingReasoningText = '';
+        this.partialEmittedLength = 0;
+        this.lastPartialFlushAt = 0;
+      } else {
+        const unflushedChars =
+          this.pendingReasoningText.length - this.partialEmittedLength;
+        const now = Date.now();
+        if (
+          unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS ||
+          now - this.lastPartialFlushAt >= PARTIAL_THOUGHT_MIN_INTERVAL_MS
+        ) {
+          const partial: PartialThoughtPart = {
+            text: this.pendingReasoningText,
+            thought: true,
+            thoughtPartial: true,
+          };
+          parts.push(partial);
+          this.partialEmittedLength = this.pendingReasoningText.length;
+          this.lastPartialFlushAt = now;
+        }
+      }
     }
     if (typeof delta?.content === 'string' && delta.content.length > 0) {
       parts.push({ text: delta.content });
@@ -677,14 +709,16 @@ export class OpenAiChunkConverter {
    */
   toFinalGeminiChunk(): GenerateContentResponse | undefined {
     const parts: Part[] = [];
-    // Flush reasoning fragments still buffered (some providers end the stream
-    // without a finish reason or a trailing content chunk).
-    if (this.pendingReasoning.length > 0) {
+    // Flush reasoning still buffered (some providers end the stream without a
+    // finish reason or a trailing content chunk).
+    if (this.pendingReasoningText.length > 0) {
       parts.push({
-        text: this.pendingReasoning.join(''),
+        text: this.pendingReasoningText,
         thought: true,
       });
-      this.pendingReasoning = [];
+      this.pendingReasoningText = '';
+      this.partialEmittedLength = 0;
+      this.lastPartialFlushAt = 0;
     }
     for (const [index, call] of this.toolCalls) {
       if (this.emittedCalls.has(index) || !call.name) {

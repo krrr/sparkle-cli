@@ -9,6 +9,15 @@ export type ThoughtSummary = {
   description: string;
 };
 
+/**
+ * A live (in-progress) reasoning update streamed while a reasoning block is
+ * still being generated.
+ */
+export type ThoughtDeltaSummary = {
+  /** Reasoning text accumulated so far in the current reasoning block. */
+  text: string;
+};
+
 const START_DELIMITER = '**';
 const END_DELIMITER = '**';
 

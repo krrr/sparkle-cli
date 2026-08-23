@@ -575,6 +575,8 @@ export const useAgentStream = ({
     initError,
     pendingHistoryItems,
     thought,
+    // Agent streams do not emit live reasoning deltas.
+    liveThought: null,
     cancelOngoingRequest,
     pendingToolCalls,
     handleApprovalModeChange,

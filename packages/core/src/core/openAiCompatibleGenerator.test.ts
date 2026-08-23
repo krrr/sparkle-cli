@@ -334,10 +334,18 @@ describe('OpenAiCompatibleGenerator', () => {
       const thoughtChunks = chunks.filter(
         (c) => c.candidates?.[0]?.content?.parts?.[0]?.thought,
       );
-      expect(thoughtChunks).toHaveLength(1);
-      expect(thoughtChunks[0].candidates![0].content!.parts![0].text).toBe(
-        'thinking',
-      );
+      // The reasoning fragment first arrives as a live partial update...
+      expect(thoughtChunks).toHaveLength(2);
+      expect(thoughtChunks[0].candidates![0].content!.parts![0]).toEqual({
+        text: 'thinking',
+        thought: true,
+        thoughtPartial: true,
+      });
+      // ...then as the consolidated thought part when the block ends.
+      expect(thoughtChunks[1].candidates![0].content!.parts![0]).toEqual({
+        text: 'thinking',
+        thought: true,
+      });
 
       const functionCalls = chunks
         .flatMap((c) => c.functionCalls ?? [])

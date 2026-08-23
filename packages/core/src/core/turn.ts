@@ -27,7 +27,12 @@ import {
   toFriendlyError,
 } from '../utils/errors.js';
 import { InvalidStreamError, type GeminiChat } from './geminiChat.js';
-import { parseThought, type ThoughtSummary } from '../utils/thoughtUtils.js';
+import {
+  parseThought,
+  type ThoughtDeltaSummary,
+  type ThoughtSummary,
+} from '../utils/thoughtUtils.js';
+import { isPartialThoughtPart } from './thoughtStreaming.js';
 import type { ModelConfigKey } from '../services/modelConfigService.js';
 import { getCitations } from '../utils/generateContentResponseUtilities.js';
 import { LlmRole } from '../telemetry/types.js';
@@ -61,6 +66,7 @@ export enum GeminiEventType {
   Error = 'error',
   ChatCompressed = 'chat_compressed',
   Thought = 'thought',
+  ThoughtDelta = 'thought_delta',
   MaxSessionTurns = 'max_session_turns',
   Finished = 'finished',
   LoopDetected = 'loop_detected',
@@ -156,6 +162,12 @@ export type ServerGeminiThoughtEvent = {
   traceId?: string;
 };
 
+export type ServerGeminiThoughtDeltaEvent = {
+  type: GeminiEventType.ThoughtDelta;
+  value: ThoughtDeltaSummary;
+  traceId?: string;
+};
+
 export type ServerGeminiToolCallRequestEvent = {
   type: GeminiEventType.ToolCallRequest;
   value: ToolCallRequestInfo;
@@ -239,6 +251,7 @@ export type ServerGeminiStreamEvent =
   | ServerGeminiLoopDetectedEvent
   | ServerGeminiMaxSessionTurnsEvent
   | ServerGeminiThoughtEvent
+  | ServerGeminiThoughtDeltaEvent
   | ServerGeminiToolCallConfirmationEvent
   | ServerGeminiToolCallRequestEvent
   | ServerGeminiToolCallResponseEvent
@@ -363,6 +376,16 @@ export class Turn {
         const parts = resp.candidates?.[0]?.content?.parts ?? [];
         for (const part of parts) {
           if (part.thought) {
+            if (isPartialThoughtPart(part)) {
+              // Live reasoning update: text accumulated so far in the
+              // current block. Not a complete thought; never recorded as one.
+              yield {
+                type: GeminiEventType.ThoughtDelta,
+                value: { text: part.text ?? '' },
+                traceId,
+              };
+              continue;
+            }
             const thought = parseThought(part.text ?? '');
             yield {
               type: GeminiEventType.Thought,

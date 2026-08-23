@@ -17,7 +17,10 @@ import {
 import { act } from 'react';
 import { renderHookWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
-import { useGeminiStream } from './useGeminiStream.js';
+import {
+  nextLiveThoughtFromEvent,
+  useGeminiStream,
+} from './useGeminiStream.js';
 import { useKeypress } from './useKeypress.js';
 import * as atCommandProcessor from './atCommandProcessor.js';
 import {
@@ -407,7 +410,7 @@ describe('useGeminiStream', () => {
   const mockLoadedSettings: LoadedSettings = {
     merged: {
       preferredEditor: 'vscode',
-      ui: { errorVerbosity: 'full' },
+      ui: { errorVerbosity: 'full', inlineThinkingMode: 'off' },
     },
     user: { path: '/user/settings.json', settings: {} },
     workspace: { path: '/workspace/.sparkle/settings.json', settings: {} },
@@ -3433,6 +3436,143 @@ describe('useGeminiStream', () => {
           thought: expect.objectContaining({ subject: 'Full thought' }),
         }),
       );
+    });
+
+    it('should record thinking entries in history when mode is compact', async () => {
+      const compactThinkingSettings: LoadedSettings = {
+        // eslint-disable-next-line @typescript-eslint/no-misused-spread
+        ...mockLoadedSettings,
+        merged: {
+          ...mockLoadedSettings.merged,
+          ui: { inlineThinkingMode: 'compact' },
+        },
+      } as unknown as LoadedSettings;
+
+      mockSendMessageStream.mockReturnValue(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.Thought,
+            value: {
+              subject: 'Compact thought',
+              description: 'Detailed thinking',
+            },
+          };
+          yield {
+            type: ServerGeminiEventType.Content,
+            value: 'Response',
+          };
+        })(),
+      );
+
+      const { result } = await renderHookWithProviders(() =>
+        useGeminiStream(
+          new MockedGeminiClientClass(mockConfig),
+          [],
+          mockAddItem,
+          mockConfig,
+          compactThinkingSettings,
+          mockOnDebugMessage,
+          mockHandleSlashCommand,
+          false,
+          () => 'vscode' as EditorType,
+          () => {},
+          () => Promise.resolve(),
+          false,
+          () => {},
+          () => {},
+          () => {},
+          80,
+          24,
+        ),
+      );
+
+      await act(async () => {
+        await result.current.submitQuery('Test query');
+      });
+
+      expect(mockAddItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'thinking',
+          thought: expect.objectContaining({ subject: 'Compact thought' }),
+        }),
+      );
+    });
+
+    it('should not add history items for ThoughtDelta events', async () => {
+      mockSendMessageStream.mockReturnValue(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: 'first fragment' },
+          };
+          yield {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: 'first fragment second fragment' },
+          };
+          yield {
+            type: ServerGeminiEventType.Content,
+            value: 'Response',
+          };
+          yield {
+            type: ServerGeminiEventType.Finished,
+            value: { reason: 'STOP', usageMetadata: undefined },
+          };
+        })(),
+      );
+
+      const { result } = await renderTestHook();
+
+      await act(async () => {
+        await result.current.submitQuery('Test query');
+      });
+
+      // Live reasoning updates are transient and never recorded as history.
+      expect(mockAddItem).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'thinking' }),
+        expect.any(Number),
+      );
+      expect(result.current.liveThought).toBeNull();
+    });
+
+    describe('nextLiveThoughtFromEvent', () => {
+      it('tracks the accumulated text across ThoughtDelta events', () => {
+        expect(
+          nextLiveThoughtFromEvent(null, {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: 'first' },
+          }),
+        ).toBe('first');
+        expect(
+          nextLiveThoughtFromEvent('first', {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: 'first second' },
+          }),
+        ).toBe('first second');
+      });
+
+      it('clears the tail on any non-delta event', () => {
+        expect(
+          nextLiveThoughtFromEvent('streaming reasoning', {
+            type: ServerGeminiEventType.Thought,
+            value: { subject: 'Done', description: 'streaming reasoning' },
+          }),
+        ).toBeNull();
+        expect(
+          nextLiveThoughtFromEvent('streaming reasoning', {
+            type: ServerGeminiEventType.Content,
+            value: 'Answer',
+          }),
+        ).toBeNull();
+      });
+
+      it('keeps a null tail unchanged', () => {
+        expect(
+          nextLiveThoughtFromEvent(null, {
+            type: ServerGeminiEventType.Content,
+            value: 'Answer',
+          }),
+        ).toBeNull();
+      });
     });
 
     it('keeps thought transient and clears it on first non-thought event', async () => {

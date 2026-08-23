@@ -551,11 +551,13 @@ const SETTINGS_SCHEMA = {
         label: 'Inline Thinking',
         category: 'UI',
         requiresRestart: false,
-        default: 'off',
-        description: 'Display model thinking inline: off or full.',
+        default: 'compact',
+        description:
+          'Model thinking display: compact (one-line summaries in history, live streaming tail), full (full text), or off.',
         showInDialog: true,
         options: [
           { value: 'off', label: 'Off' },
+          { value: 'compact', label: 'Compact' },
           { value: 'full', label: 'Full' },
         ],
       },

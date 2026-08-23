@@ -189,4 +189,98 @@ describe('<StatusRow />', () => {
     expect(lastFrame()).toContain('Executing...');
     expect(lastFrame()).not.toContain('Thinking...');
   });
+
+  it('keeps the tip on the status line while the live reasoning tail renders on its own row', async () => {
+    (useComposerStatus as Mock).mockReturnValue({
+      isInteractiveShellWaiting: false,
+      showLoadingIndicator: true,
+      showTips: true,
+      showWit: false,
+      modeContentObj: null,
+      showMinimalContext: false,
+    });
+
+    const uiState: Partial<UIState> = {
+      ...defaultUiState,
+      currentTip: 'Test Tip',
+      liveThought: 'analyzing the request\nchecking the files',
+    };
+
+    const { lastFrame, waitUntilReady } = await renderWithProviders(
+      <StatusRow
+        showUiDetails={false}
+        isNarrow={false}
+        terminalWidth={100}
+        hideContextSummary={false}
+        hideUiDetailsForSuggestions={false}
+        hasPendingActionRequired={false}
+      />,
+      {
+        width: 100,
+        uiState,
+      },
+    );
+
+    await waitUntilReady();
+    const output = lastFrame();
+    expect(output).toContain('analyzing the request');
+    expect(output).toContain('checking the files');
+    expect(output).toContain('Tip: Test Tip');
+    // The tip shares the first line with the status; the tail starts on the
+    // line directly below it.
+    const lines = output.split('\n');
+    const tipLineIndex = lines.findIndex((line) =>
+      line.includes('Tip: Test Tip'),
+    );
+    const firstTailLineIndex = lines.findIndex((line) =>
+      line.includes('analyzing the request'),
+    );
+    expect(tipLineIndex).toBeGreaterThanOrEqual(0);
+    expect(firstTailLineIndex).toBe(tipLineIndex + 1);
+  });
+
+  it('hides the live reasoning tail while hooks are executing', async () => {
+    (useComposerStatus as Mock).mockReturnValue({
+      isInteractiveShellWaiting: false,
+      showLoadingIndicator: true,
+      showTips: true,
+      showWit: false,
+      modeContentObj: null,
+      showMinimalContext: false,
+    });
+
+    const uiState: Partial<UIState> = {
+      ...defaultUiState,
+      liveThought: 'stale reasoning text',
+      activeHooks: [
+        {
+          eventName: 'test-ev',
+          source: 'test',
+          name: 'my-hook',
+          index: 1,
+          total: 1,
+        },
+      ],
+    };
+
+    const { lastFrame, waitUntilReady } = await renderWithProviders(
+      <StatusRow
+        showUiDetails={false}
+        isNarrow={false}
+        terminalWidth={100}
+        hideContextSummary={false}
+        hideUiDetailsForSuggestions={false}
+        hasPendingActionRequired={false}
+      />,
+      {
+        width: 100,
+        uiState,
+      },
+    );
+
+    await waitUntilReady();
+    const output = lastFrame();
+    expect(output).toContain('Executing Hook');
+    expect(output).not.toContain('stale reasoning text');
+  });
 });

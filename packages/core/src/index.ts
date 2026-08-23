@@ -45,6 +45,7 @@ export * from './core/geminiChat.js';
 export * from './core/logger.js';
 export * from './core/prompts.js';
 export * from './core/turn.js';
+export * from './core/thoughtStreaming.js';
 export * from './core/geminiRequest.js';
 export * from './scheduler/scheduler.js';
 export * from './scheduler/types.js';

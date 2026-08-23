@@ -10,7 +10,52 @@ import { ThinkingMessage } from './ThinkingMessage.js';
 import React from 'react';
 
 describe('ThinkingMessage', () => {
-  it('renders subject line with vertical rule and "Thinking..." header', async () => {
+  it('renders compact mode as a single headline line with hidden-line count', async () => {
+    const renderResult = await renderWithProviders(
+      <ThinkingMessage
+        thought={{
+          subject: '',
+          description:
+            'Let me analyze the request.\nI need to check the file.\nThen run the tests.',
+        }}
+        terminalWidth={80}
+        isFirstThinking={true}
+        mode="compact"
+      />,
+    );
+    await renderResult.waitUntilReady();
+
+    const output = renderResult.lastFrame();
+    expect(output).toContain('Thought');
+    expect(output).toContain('Let me analyze the request.');
+    expect(output).toContain('(+2 lines)');
+    // Full body lines are hidden in compact mode.
+    expect(output).not.toContain('I need to check the file.');
+    expect(output).toMatchSnapshot();
+    await expect(renderResult).toMatchSvgSnapshot();
+    renderResult.unmount();
+  });
+
+  it('renders compact mode without a line count for single-line thoughts', async () => {
+    const renderResult = await renderWithProviders(
+      <ThinkingMessage
+        thought={{ subject: '', description: 'Only one line of reasoning' }}
+        terminalWidth={80}
+        isFirstThinking={true}
+        mode="compact"
+      />,
+    );
+    await renderResult.waitUntilReady();
+
+    const output = renderResult.lastFrame();
+    expect(output).toContain('Only one line of reasoning');
+    expect(output).not.toContain('(+');
+    expect(output).toMatchSnapshot();
+    await expect(renderResult).toMatchSvgSnapshot();
+    renderResult.unmount();
+  });
+
+  it('renders subject line with vertical rule and "Thought" header', async () => {
     const renderResult = await renderWithProviders(
       <ThinkingMessage
         thought={{ subject: 'Planning', description: 'test' }}
@@ -21,7 +66,7 @@ describe('ThinkingMessage', () => {
     await renderResult.waitUntilReady();
 
     const output = renderResult.lastFrame();
-    expect(output).toContain(' Thinking...');
+    expect(output).toContain(' Thought');
     expect(output).toContain('│');
     expect(output).toContain('Planning');
     expect(output).toMatchSnapshot();
@@ -69,7 +114,7 @@ describe('ThinkingMessage', () => {
     renderResult.unmount();
   });
 
-  it('renders "Thinking..." header when isFirstThinking is true', async () => {
+  it('renders "Thought" header when isFirstThinking is true', async () => {
     const renderResult = await renderWithProviders(
       <ThinkingMessage
         thought={{
@@ -83,7 +128,7 @@ describe('ThinkingMessage', () => {
     await renderResult.waitUntilReady();
 
     const output = renderResult.lastFrame();
-    expect(output).toContain(' Thinking...');
+    expect(output).toContain(' Thought');
     expect(output).toContain('Summary line');
     expect(output).toContain('│');
     expect(output).toMatchSnapshot();

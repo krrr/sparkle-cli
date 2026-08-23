@@ -14,7 +14,7 @@
     <text x="27" y="53" fill="#ffffff" textLength="135" lengthAdjust="spacingAndGlyphs">Plan a solution</text>
     <rect x="162" y="51" width="738" height="17" fill="#141414" />
     <text x="0" y="70" fill="#141414" textLength="900" lengthAdjust="spacingAndGlyphs">▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀</text>
-    <text x="0" y="87" fill="#ffffff" textLength="117" lengthAdjust="spacingAndGlyphs" font-style="italic"> Thinking... </text>
+    <text x="0" y="87" fill="#ffffff" textLength="81" lengthAdjust="spacingAndGlyphs" font-style="italic"> Thought </text>
     <text x="9" y="104" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="9" y="121" fill="#afafaf" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="27" y="121" fill="#ffffff" textLength="144" lengthAdjust="spacingAndGlyphs" font-weight="bold" font-style="italic">Initial analysis</text>

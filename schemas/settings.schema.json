@@ -313,11 +313,11 @@
         },
         "inlineThinkingMode": {
           "title": "Inline Thinking",
-          "description": "Display model thinking inline: off or full.",
-          "markdownDescription": "Display model thinking inline: off or full.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `off`",
-          "default": "off",
+          "description": "Model thinking display: compact (one-line summaries in history, live streaming tail), full (full text), or off.",
+          "markdownDescription": "Model thinking display: compact (one-line summaries in history, live streaming tail), full (full text), or off.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `compact`",
+          "default": "compact",
           "type": "string",
-          "enum": ["off", "full"]
+          "enum": ["off", "compact", "full"]
         },
         "showStatusInTitle": {
           "title": "Show Thoughts in Title",

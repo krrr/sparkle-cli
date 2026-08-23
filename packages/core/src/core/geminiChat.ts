@@ -24,6 +24,7 @@ import { AgentChatHistory, type HistoryTurn } from './agentChatHistory.js';
 
 import { randomUUID } from 'node:crypto';
 import { toParts } from './partUtils.js';
+import { isPartialThoughtPart } from './thoughtStreaming.js';
 import {
   retryWithBackoff,
   isRetryableError,
@@ -1313,21 +1314,29 @@ export class GeminiChat {
       if (isValidResponse(chunk)) {
         const content = chunk.candidates?.[0]?.content;
         if (content?.parts) {
-          if (content.parts.some((part) => part.thought)) {
+          // Partial thought parts are transient live-reasoning updates; only
+          // durable parts may reach history, recording, and validation.
+          const durableParts = content.parts.filter(
+            (part) => !isPartialThoughtPart(part),
+          );
+          if (durableParts.some((part) => part.thought)) {
             // Record thoughts
             hasThoughts = true;
-            const thought = this.extractThoughtFromContent(content);
+            const thought = this.extractThoughtFromContent({
+              ...content,
+              parts: durableParts,
+            });
             if (thought) {
               bufferedThoughts.push(thought);
             }
           }
-          if (content.parts.some((part) => part.functionCall)) {
+          if (durableParts.some((part) => part.functionCall)) {
             hasToolCall = true;
           }
 
           let localFunctionCallCounter = 0;
           modelResponseParts.push(
-            ...content.parts.map((part) => {
+            ...durableParts.map((part) => {
               if (!this.context.config.isContextManagementEnabled()) {
                 return part;
               }
@@ -1609,7 +1618,12 @@ export class GeminiChat {
       return undefined;
     }
 
-    const thoughtPart = content.parts[0];
+    // Partial thought parts are transient live-reasoning updates; skip them
+    // so the first durable part is treated as the thought.
+    const thoughtPart =
+      content.parts.find(
+        (part) => !isPartialThoughtPart(part) && part.thought,
+      ) ?? content.parts[0];
     if (thoughtPart.text) {
       // Extract subject and description using the same logic as turn.ts
       const rawText = thoughtPart.text;
