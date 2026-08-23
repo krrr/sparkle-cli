@@ -831,7 +831,11 @@ export async function loadCliConfig(
       ? argv.screenReader
       : (settings.ui?.accessibility?.screenReader ?? false);
 
-  const ptyInfo = await getPty();
+  // ptyInfo only feeds Config.isInteractiveShellEnabled(), which returns
+  // false whenever interactive is false, so headless runs can skip loading
+  // the native pty binding entirely (ShellExecutionService loads it lazily
+  // if an interactive shell is ever requested).
+  const ptyInfo = interactive ? await getPty() : null;
 
   const mcpEnabled = true;
   const extensionsEnabled = true;
