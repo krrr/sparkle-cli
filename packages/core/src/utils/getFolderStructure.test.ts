@@ -98,6 +98,68 @@ ${testRootDir}${path.sep}
     );
   });
 
+  it('should ignore common development dot-folders by default', async () => {
+    await createTestFile('file1.txt');
+    await createEmptyDir('.github', 'workflows');
+    await createTestFile('.idea', 'workspace.xml');
+    await createTestFile('.next', 'cache.js');
+    await createTestFile('.venv', 'lib', 'python.py');
+
+    const structure = await getFolderStructure(testRootDir);
+    expect(structure.trim()).toBe(
+      `
+Showing up to 200 items (files + folders). Folders or files indicated with ... contain more items not shown, were ignored, or the display limit (200 items) was reached.
+
+${testRootDir}${path.sep}
+├───file1.txt
+├───.github${path.sep}
+│   └───workflows${path.sep}
+├───.idea${path.sep}...
+├───.next${path.sep}...
+└───.venv${path.sep}...
+`.trim(),
+    );
+  });
+
+  it('should mark folders skipped due to maxItems as truncated', async () => {
+    await createTestFile('f1.txt');
+    await createTestFile('f2.txt');
+    await createTestFile('f3.txt');
+    await createTestFile('f4.txt');
+    await createTestFile('f5.txt');
+    await createTestFile('A', 'x1.txt');
+    await createTestFile('A', 'x2.txt');
+    await createTestFile('A', 'x3.txt');
+    await createTestFile('B', 'y1.txt');
+    await createTestFile('B', 'y2.txt');
+    await createTestFile('B', 'y3.txt');
+    await createTestFile('C', 'z1.txt');
+
+    const structure = await getFolderStructure(testRootDir, {
+      maxItems: 12,
+    });
+    expect(structure.trim()).toBe(
+      `
+Showing up to 12 items (files + folders). Folders or files indicated with ... contain more items not shown, were ignored, or the display limit (12 items) was reached.
+
+${testRootDir}${path.sep}
+├───f1.txt
+├───f2.txt
+├───f3.txt
+├───f4.txt
+├───f5.txt
+├───A${path.sep}
+│   ├───x1.txt
+│   ├───x2.txt
+│   └───x3.txt
+├───B${path.sep}
+│   └───y1.txt
+│   └───...
+└───C${path.sep}...
+`.trim(),
+    );
+  });
+
   it('should ignore folders specified in custom ignoredFolders', async () => {
     await createTestFile('.hiddenfile');
     await createTestFile('file1.txt');
@@ -148,12 +210,12 @@ ${testRootDir}${path.sep}
       maxItems: 3,
     });
     const expected = `
-Showing up to 3 items (files + folders).
+Showing up to 3 items (files + folders). Folders or files indicated with ... contain more items not shown, were ignored, or the display limit (3 items) was reached.
 
 ${testRootDir}${path.sep}
 ├───fileA1.ts
 ├───fileA2.js
-└───subfolderB${path.sep}
+└───subfolderB${path.sep}...
 `.trim();
     expect(structure.trim()).toBe(expected);
   });
@@ -170,10 +232,10 @@ ${testRootDir}${path.sep}
 Showing up to 4 items (files + folders). Folders or files indicated with ... contain more items not shown, were ignored, or the display limit (4 items) was reached.
 
 ${testRootDir}${path.sep}
-├───folder-0${path.sep}
-├───folder-1${path.sep}
-├───folder-2${path.sep}
-├───folder-3${path.sep}
+├───folder-0${path.sep}...
+├───folder-1${path.sep}...
+├───folder-2${path.sep}...
+├───folder-3${path.sep}...
 └───...
 `.trim();
     expect(structure.trim()).toBe(expectedRevised);
@@ -192,7 +254,6 @@ Showing up to 1 items (files + folders). Folders or files indicated with ... con
 
 ${testRootDir}${path.sep}
 ├───fileA1.ts
-├───...
 └───...
 `.trim();
     expect(structure.trim()).toBe(expected);
@@ -231,12 +292,12 @@ ${testRootDir}${path.sep}
       maxItems: 3,
     });
     const expected = `
-Showing up to 3 items (files + folders).
+Showing up to 3 items (files + folders). Folders or files indicated with ... contain more items not shown, were ignored, or the display limit (3 items) was reached.
 
 ${testRootDir}${path.sep}
 └───level1${path.sep}
     └───level2${path.sep}
-        └───level3${path.sep}
+        └───level3${path.sep}...
 `.trim();
     expect(structure.trim()).toBe(expected);
   });

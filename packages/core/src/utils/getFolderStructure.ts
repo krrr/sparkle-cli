@@ -20,11 +20,45 @@ import { debugLogger } from './debugLogger.js';
 
 const MAX_ITEMS = 200;
 const TRUNCATION_INDICATOR = '...';
+// Common VCS metadata, IDE state, build/tool cache, and dependency store
+// directories that carry no useful context. High-signal configuration
+// directories (.github, .vscode, .husky, .devcontainer, etc.) intentionally
+// remain visible.
 const DEFAULT_IGNORED_FOLDERS = new Set([
   'node_modules',
-  '.git',
   'dist',
   '__pycache__',
+  // Version control
+  '.git',
+  '.svn',
+  '.hg',
+  // IDE / editor state
+  '.idea',
+  // JavaScript frameworks & build tools
+  '.next',
+  '.nuxt',
+  '.turbo',
+  '.parcel-cache',
+  '.angular',
+  '.svelte-kit',
+  '.astro',
+  '.expo',
+  // JavaScript package managers
+  '.yarn',
+  '.pnpm-store',
+  // Python
+  '.venv',
+  '.pytest_cache',
+  '.mypy_cache',
+  '.ruff_cache',
+  '.ipynb_checkpoints',
+  // JVM
+  '.gradle',
+  // Other languages & infrastructure
+  '.bundle',
+  '.dart_tool',
+  '.terraform',
+  '.cache',
 ]);
 
 // --- Interfaces ---
@@ -60,6 +94,7 @@ interface FullFolderInfo {
   totalChildren: number; // Number of files and subfolders included from this folder during BFS scan
   totalFiles: number; // Number of files included from this folder during BFS scan
   isIgnored?: boolean; // Flag to easily identify ignored folders later
+  skippedByBudget?: boolean; // Folder was queued but never scanned because maxItems was reached when it was dequeued
   hasMoreFiles?: boolean; // Indicates if files were truncated for this specific folder
   hasMoreSubfolders?: boolean; // Indicates if subfolders were truncated for this specific folder
 }
@@ -99,9 +134,12 @@ async function readFullStructure(
     processedPaths.add(currentPath);
 
     if (currentItemCount >= options.maxItems) {
-      // If the root itself caused us to exceed, we can't really show anything.
-      // Otherwise, this folder won't be processed further.
-      // The parent that queued this would have set its own hasMoreSubfolders flag.
+      // The budget ran out after this folder was queued by its parent — most
+      // likely while an earlier sibling's contents were being scanned — so
+      // the parent never got a chance to set its own hasMoreSubfolders flag.
+      // Mark the folder explicitly so it renders with '...' instead of
+      // looking like an empty directory.
+      folderInfo.skippedByBudget = true;
       continue;
     }
 
@@ -136,6 +174,12 @@ async function readFullStructure(
       respectSparkleIgnore: options.fileFilteringOptions?.respectSparkleIgnore,
     };
 
+    // TODO: Files are counted toward maxItems before this folder's
+    // subdirectories are even considered, so a single file-heavy folder can
+    // exhaust the entire budget and hide every remaining folder in the tree
+    // behind a single '...' marker. Consider prioritizing directory breadth
+    // (scanning subdirectories first) or applying a per-directory cap on
+    // listed files.
     // Process files first in the current directory
     for (const entry of entries) {
       if (entry.isFile()) {
@@ -243,9 +287,11 @@ function formatStructure(
   // is not printed with a connector line itself, only its name as a header.
   // Its children are printed relative to that conceptual root.
   // Ignored root nodes ARE printed with a connector.
-  if (!isProcessingRootNode || node.isIgnored) {
+  if (!isProcessingRootNode || node.isIgnored || node.skippedByBudget) {
+    const suffix =
+      node.isIgnored || node.skippedByBudget ? TRUNCATION_INDICATOR : '';
     builder.push(
-      `${currentIndent}${connector}${node.name}${path.sep}${node.isIgnored ? TRUNCATION_INDICATOR : ''}`,
+      `${currentIndent}${connector}${node.name}${path.sep}${suffix}`,
     );
   }
 
@@ -266,9 +312,11 @@ function formatStructure(
     const fileConnector = isLastFileAmongSiblings ? '└───' : '├───';
     builder.push(`${indentForChildren}${fileConnector}${node.files[i]}`);
   }
-  if (node.hasMoreFiles) {
-    const isLastIndicatorAmongSiblings =
-      node.subFolders.length === 0 && !node.hasMoreSubfolders;
+  // When subfolders were also truncated, the trailing '...' emitted below for
+  // hasMoreSubfolders already signals that more items exist — emitting a
+  // second file-specific indicator would be redundant.
+  if (node.hasMoreFiles && !node.hasMoreSubfolders) {
+    const isLastIndicatorAmongSiblings = node.subFolders.length === 0;
     const fileConnector = isLastIndicatorAmongSiblings ? '└───' : '├───';
     builder.push(`${indentForChildren}${fileConnector}${TRUNCATION_INDICATOR}`);
   }
@@ -332,7 +380,12 @@ export async function getFolderStructure(
 
     // 3. Build the final output string
     function isTruncated(node: FullFolderInfo): boolean {
-      if (node.hasMoreFiles || node.hasMoreSubfolders || node.isIgnored) {
+      if (
+        node.hasMoreFiles ||
+        node.hasMoreSubfolders ||
+        node.isIgnored ||
+        node.skippedByBudget
+      ) {
         return true;
       }
       for (const sub of node.subFolders) {
