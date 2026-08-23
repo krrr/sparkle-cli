@@ -22,16 +22,22 @@ vi.mock('sparkle-cli-core', async () => {
 });
 
 import { uiTelemetryService, type GeminiClient } from 'sparkle-cli-core';
+import { MessageType } from '../types.js';
 
 describe('clearCommand', () => {
   let mockContext: CommandContext;
   let mockResetChat: ReturnType<typeof vi.fn>;
   let mockHintClear: ReturnType<typeof vi.fn>;
+  let mockDeleteCurrentSession: ReturnType<typeof vi.fn>;
+  let mockGetChatRecordingService: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockResetChat = vi.fn().mockResolvedValue(undefined);
     mockHintClear = vi.fn();
-    const mockGetChatRecordingService = vi.fn();
+    mockDeleteCurrentSession = vi.fn().mockResolvedValue(undefined);
+    mockGetChatRecordingService = vi
+      .fn()
+      .mockReturnValue({ deleteCurrentSessionAsync: mockDeleteCurrentSession });
     vi.clearAllMocks();
 
     mockContext = createMockCommandContext({
@@ -51,6 +57,7 @@ describe('clearCommand', () => {
           },
           geminiClient: {
             resetChat: mockResetChat,
+            getChatRecordingService: mockGetChatRecordingService,
             getChat: () => ({
               getChatRecordingService: mockGetChatRecordingService,
             }),
@@ -115,5 +122,93 @@ describe('clearCommand', () => {
     expect(uiTelemetryService.clear).toHaveBeenCalled();
     expect(uiTelemetryService.clear).toHaveBeenCalledTimes(1);
     expect(nullConfigContext.ui.clear).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['--delete', '-d'])(
+    'should delete the current session record when invoked with %s',
+    async (flag) => {
+      if (!clearCommand.action) {
+        throw new Error('clearCommand must have an action.');
+      }
+
+      await clearCommand.action(mockContext, flag);
+
+      expect(mockDeleteCurrentSession).toHaveBeenCalledTimes(1);
+
+      // Deletion must happen before the new session state replaces the old one.
+      const deleteOrder = mockDeleteCurrentSession.mock.invocationCallOrder[0];
+      const resetNewSessionStateOrder = (
+        mockContext.services.agentContext?.config.resetNewSessionState as Mock
+      ).mock.invocationCallOrder[0];
+      expect(deleteOrder).toBeLessThan(resetNewSessionStateOrder);
+
+      // The confirmation message is added after the UI is cleared.
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        {
+          type: MessageType.INFO,
+          text: 'Previous session record deleted.',
+        },
+        expect.any(Number),
+      );
+      const clearOrder = (mockContext.ui.clear as Mock).mock
+        .invocationCallOrder[0];
+      const addItemOrder = (mockContext.ui.addItem as Mock).mock
+        .invocationCallOrder[0];
+      expect(clearOrder).toBeLessThan(addItemOrder);
+
+      // The rest of the clear flow still runs.
+      expect(mockResetChat).toHaveBeenCalledTimes(1);
+      expect(mockContext.ui.clear).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('should not delete the session record when no flag is passed', async () => {
+    if (!clearCommand.action) {
+      throw new Error('clearCommand must have an action.');
+    }
+
+    await clearCommand.action(mockContext, '');
+
+    expect(mockDeleteCurrentSession).not.toHaveBeenCalled();
+    expect(mockContext.ui.addItem).not.toHaveBeenCalled();
+  });
+
+  it('should not block starting a new session when deletion fails', async () => {
+    if (!clearCommand.action) {
+      throw new Error('clearCommand must have an action.');
+    }
+
+    mockDeleteCurrentSession.mockRejectedValue(new Error('disk error'));
+
+    await clearCommand.action(mockContext, '--delete');
+
+    expect(mockDeleteCurrentSession).toHaveBeenCalledTimes(1);
+    expect(
+      mockContext.services.agentContext?.config.resetNewSessionState,
+    ).toHaveBeenCalledTimes(1);
+    expect(mockResetChat).toHaveBeenCalledTimes(1);
+    expect(mockContext.ui.clear).toHaveBeenCalledTimes(1);
+    expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+      {
+        type: MessageType.ERROR,
+        text: 'Failed to delete the previous session record.',
+      },
+      expect.any(Number),
+    );
+  });
+
+  it('should do nothing when -d is passed but no chat recording service exists', async () => {
+    if (!clearCommand.action) {
+      throw new Error('clearCommand must have an action.');
+    }
+
+    mockGetChatRecordingService.mockReturnValue(undefined);
+
+    await clearCommand.action(mockContext, '-d');
+
+    expect(mockDeleteCurrentSession).not.toHaveBeenCalled();
+    expect(mockContext.ui.addItem).not.toHaveBeenCalled();
+    expect(mockResetChat).toHaveBeenCalledTimes(1);
+    expect(mockContext.ui.clear).toHaveBeenCalledTimes(1);
   });
 });

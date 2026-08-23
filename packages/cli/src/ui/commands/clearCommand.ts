@@ -21,9 +21,13 @@ export const clearCommand: SlashCommand = {
   description: 'Clear the screen and start a new session',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (context, _args) => {
+  action: async (context, args) => {
     const geminiClient = context.services.agentContext?.geminiClient;
     const config = context.services.agentContext?.config;
+    const deleteOldSession = args
+      .trim()
+      .split(/\s+/)
+      .some((arg) => arg === '-d' || arg === '--delete');
 
     // Fire SessionEnd hook before clearing
     const hookSystem = config?.getHookSystem();
@@ -33,6 +37,24 @@ export const clearCommand: SlashCommand = {
 
     // Reset user steering hints
     config?.injectionService.clear();
+
+    // Delete the old session's on-disk record when invoked with -d/--delete.
+    // Must run before resetNewSessionState() swaps in the new session id,
+    // since deleteCurrentSessionAsync targets the current session.
+    let sessionRecordDeleted = false;
+    let sessionDeleteFailed = false;
+    if (deleteOldSession && geminiClient) {
+      const chatRecordingService = geminiClient.getChatRecordingService();
+      if (chatRecordingService) {
+        try {
+          await chatRecordingService.deleteCurrentSessionAsync();
+          sessionRecordDeleted = true;
+        } catch {
+          // A failed deletion must not block starting the new session.
+          sessionDeleteFailed = true;
+        }
+      }
+    }
 
     // Start a new conversation recording with a new session ID
     // We MUST do this before calling resetChat() so the new ChatRecordingService
@@ -80,6 +102,18 @@ export const clearCommand: SlashCommand = {
         {
           type: MessageType.INFO,
           text: result.systemMessage,
+        },
+        Date.now(),
+      );
+    }
+
+    if (sessionRecordDeleted || sessionDeleteFailed) {
+      context.ui.addItem(
+        {
+          type: sessionDeleteFailed ? MessageType.ERROR : MessageType.INFO,
+          text: sessionDeleteFailed
+            ? 'Failed to delete the previous session record.'
+            : 'Previous session record deleted.',
         },
         Date.now(),
       );
