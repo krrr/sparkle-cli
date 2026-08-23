@@ -52,19 +52,6 @@ export function createDefaultPolicy(
   return definePolicy({ model, isLastResort: options?.isLastResort });
 }
 
-export function validateModelPolicyChain(chain: ModelPolicyChain): void {
-  if (chain.length === 0) {
-    throw new Error('Model policy chain must include at least one model.');
-  }
-  const lastResortCount = chain.filter((policy) => policy.isLastResort).length;
-  if (lastResortCount === 0) {
-    throw new Error('Model policy chain must include an `isLastResort` model.');
-  }
-  if (lastResortCount > 1) {
-    throw new Error('Model policy chain must only have one `isLastResort`.');
-  }
-}
-
 /**
  * Helper to define a ModelPolicy with default actions and state transitions.
  * Ensures every policy is a fresh instance to avoid shared state.

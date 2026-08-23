@@ -9,7 +9,6 @@ import {
   resolveModel,
   resolveClassifierModel,
   isCustomModel,
-  supportsModernFeatures,
   isAutoModel,
   getDisplayString,
   DEFAULT_GEMINI_MODEL,
@@ -138,17 +137,6 @@ describe('isCustomModel', () => {
     expect(() => isCustomModel(['gemini-2.0-flash', 'gpt-4'])).not.toThrow();
     // @ts-expect-error - testing invalid runtime input
     expect(isCustomModel(['gemini-2.0-flash', 'gpt-4'])).toBe(true); // last one is custom
-  });
-});
-
-describe('supportsModernFeatures', () => {
-  it('should return true for all models', () => {
-    expect(supportsModernFeatures('gemini-3-pro-preview')).toBe(true);
-    expect(supportsModernFeatures('gemini-3-flash-preview')).toBe(true);
-    expect(supportsModernFeatures('testing')).toBe(true);
-    expect(supportsModernFeatures('some-custom-model')).toBe(true);
-    expect(supportsModernFeatures(SPARKLE_MODEL_ALIAS_PRO)).toBe(true);
-    expect(supportsModernFeatures(SPARKLE_MODEL_ALIAS_AUTO)).toBe(true);
   });
 });
 

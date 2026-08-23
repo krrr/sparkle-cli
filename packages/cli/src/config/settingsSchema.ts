@@ -3147,7 +3147,6 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<
             condition: {
               type: 'object',
               properties: {
-                useCustomTools: { type: 'boolean' },
                 requestedModels: {
                   type: 'array',
                   items: { type: 'string' },

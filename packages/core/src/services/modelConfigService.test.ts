@@ -1150,31 +1150,6 @@ describe('ModelConfigService', () => {
 
   // Resolves a model ID to a concrete model ID based on the provided context.
   describe('resolveModelId', () => {
-    it('should resolve based on useCustomTools condition', () => {
-      const config: ModelConfigServiceConfig = {
-        modelIdResolutions: {
-          flash: {
-            default: 'gemini-2.0-flash',
-            contexts: [
-              {
-                condition: { useCustomTools: true },
-                target: 'gemini-3.5-flash',
-              },
-            ],
-          },
-        },
-      };
-      const service = new ModelConfigService(config);
-
-      expect(service.resolveModelId('flash', { useCustomTools: true })).toBe(
-        'gemini-3.5-flash',
-      );
-      expect(service.resolveModelId('flash', { useCustomTools: false })).toBe(
-        'gemini-2.0-flash',
-      );
-      expect(service.resolveModelId('flash', {})).toBe('gemini-2.0-flash');
-    });
-
     it('should resolve based on requestedModels condition', () => {
       const config: ModelConfigServiceConfig = {
         modelIdResolutions: {
@@ -1184,10 +1159,6 @@ describe('ModelConfigService', () => {
               {
                 condition: { requestedModels: ['gemini-2.5-pro'] },
                 target: 'gemini-2.5-flash',
-              },
-              {
-                condition: { useCustomTools: true },
-                target: 'gemini-3.5-flash',
               },
             ],
           },
@@ -1202,17 +1173,10 @@ describe('ModelConfigService', () => {
         }),
       ).toBe('gemini-2.5-flash');
 
-      // Case 2: No matching requested model, custom tools enabled
+      // Case 2: No conditions met
       expect(
         service.resolveModelId('gemini-flash', {
-          useCustomTools: true,
-        }),
-      ).toBe('gemini-3.5-flash');
-
-      // Case 3: No conditions met
-      expect(
-        service.resolveModelId('gemini-flash', {
-          useCustomTools: false,
+          requestedModel: 'gemini-2.5-flash',
         }),
       ).toBe('gemini-2.5-flash');
     });

@@ -11,11 +11,7 @@ import {
   LS_TOOL_NAME,
   READ_FILE_TOOL_NAME,
 } from '../tools/tool-names.js';
-import {
-  SPARKLE_MODEL_ALIAS_FLASH,
-  SPARKLE_MODEL_ALIAS_PRO,
-  supportsModernFeatures,
-} from '../config/models.js';
+import { SPARKLE_MODEL_ALIAS_FLASH } from '../config/models.js';
 import { z } from 'zod';
 import type { Config } from '../config/config.js';
 import { ThinkingLevel } from '@google/genai';
@@ -48,15 +44,11 @@ const CodebaseInvestigationReportSchema = z.object({
  * dependencies, and technologies.
  */
 export const CodebaseInvestigatorAgent = (
-  config: Config,
+  _config: Config,
 ): LocalAgentDefinition<typeof CodebaseInvestigationReportSchema> => {
-  // Use the default flash tier alias if the main model supports modern
-  // features. If the main model is not a modern model, use the pro tier
-  // alias. Tier aliases resolve to the active provider's models instead
-  // of hardcoding Gemini model names.
-  const model = supportsModernFeatures(config.getModel())
-    ? SPARKLE_MODEL_ALIAS_FLASH
-    : SPARKLE_MODEL_ALIAS_PRO;
+  // Use the default flash tier alias. Tier aliases resolve to the active
+  // provider's models instead of hardcoding Gemini model names.
+  const model = SPARKLE_MODEL_ALIAS_FLASH;
 
   const listCommand =
     process.platform === 'win32'

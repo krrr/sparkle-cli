@@ -115,21 +115,17 @@ export interface ModelResolution {
     // The condition to check for.
     condition: ResolutionCondition;
     // The model ID to use when the condition is met.
-    target: ModelResolutionTarget;
+    target: string;
   }>;
 }
 
-export type ModelResolutionTarget = string;
-
 /** The actual state of the current session. */
 export interface ResolutionContext {
-  useCustomTools?: boolean;
   requestedModel?: string;
 }
 
 /** The requirements defined in the registry. */
 export interface ResolutionCondition {
-  useCustomTools?: boolean;
   /** Matches if the current model is in this list. */
   requestedModels?: string[];
 }
@@ -374,10 +370,6 @@ export class ModelConfigService {
     return undefined;
   }
 
-  getModelDefinitions(): Record<string, ModelDefinition> {
-    return this.currentConfig.modelDefinitions ?? {};
-  }
-
   /**
    * Returns the context window size (in tokens) for the given model, reading
    * the `contextWindow` field from its model definition (resolving aliases
@@ -400,8 +392,6 @@ export class ModelConfigService {
       if (value === undefined) return true;
 
       switch (key) {
-        case 'useCustomTools':
-          return value === context.useCustomTools;
         case 'requestedModels':
           return (
             Array.isArray(value) &&

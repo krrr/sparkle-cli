@@ -32,7 +32,7 @@ import {
   getRetryErrorType,
 } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
-import { resolveModel, supportsModernFeatures } from '../config/models.js';
+import { resolveModel } from '../config/models.js';
 import { ProviderType } from '../config/constants.js';
 import { hasCycleInSchema } from '../tools/tools.js';
 import type { StructuredError } from './turn.js';
@@ -849,12 +849,9 @@ export class GeminiChat {
         }
       }
 
-      // All models are treated as Gemini 3 (unless custom, which also supports
-      // modern features), so the modern path is always taken: send contents
-      // with thought signatures added to active function-call loops.
-      let contentsToUse: Content[] = supportsModernFeatures(modelToUse)
-        ? [...contentsForPreviewModel]
-        : [...requestContents];
+      // All models are treated as Gemini 3, so always send contents with
+      // thought signatures added to active function-call loops.
+      let contentsToUse: Content[] = [...contentsForPreviewModel];
 
       const hookSystem = this.context.config.getHookSystem();
       if (hookSystem) {
@@ -891,12 +888,8 @@ export class GeminiChat {
             this.context.config,
           );
           lastModelToUse = modelToUse;
-          // Re-evaluate contentsToUse based on the new model's feature support.
-          // All models are treated as Gemini 3, so this always keeps the
-          // thought-signature contents.
-          contentsToUse = supportsModernFeatures(modelToUse)
-            ? [...contentsForPreviewModel]
-            : [...requestContents];
+          // Contents don't depend on the model: all models are treated as
+          // Gemini 3 and always get the thought-signature contents.
         }
         if (beforeModelResult.modifiedConfig) {
           Object.assign(config, beforeModelResult.modifiedConfig);
@@ -1055,17 +1048,12 @@ export class GeminiChat {
         : scrubHistory(history);
     }
 
-    const model = this.context.config.getModel();
     // All models are treated as Gemini 3 (custom models support modern
     // features too), so history is always cleaned up for replay: strip
     // thought parts and merge consecutive same-role turns to avoid 400s.
-    if (supportsModernFeatures(model)) {
-      return preserveThoughts
-        ? coalesceConsecutiveRoles(history)
-        : coalesceConsecutiveRoles(stripThoughts(history));
-    }
-
-    return history;
+    return preserveThoughts
+      ? coalesceConsecutiveRoles(history)
+      : coalesceConsecutiveRoles(stripThoughts(history));
   }
 
   /**

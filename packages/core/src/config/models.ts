@@ -5,7 +5,6 @@
  */
 
 export interface ModelResolutionContext {
-  useCustomTools?: boolean;
   requestedModel?: string;
 }
 
@@ -82,9 +81,7 @@ export function resolveModel(
       : requestedModel.trim() || '';
 
   if (config) {
-    return config.modelConfigService.resolveModelId(normalizedModel, {
-      useCustomTools: false,
-    });
+    return config.modelConfigService.resolveModelId(normalizedModel);
   }
 
   // Static fallback matching the default dynamic resolution for standard aliases.
@@ -191,18 +188,6 @@ export function isCustomModel(
   }
   const resolved = resolveModel(model);
   return !resolved.startsWith('gemini-');
-}
-
-/**
- * Checks if the model should be treated as a modern model.
- * All Gemini models are treated as Gemini 3, and custom models are also
- * treated as modern.
- *
- * @param model The model name to check.
- * @returns True if the model supports modern features like thoughts.
- */
-export function supportsModernFeatures(_model: string): boolean {
-  return true;
 }
 
 /**
