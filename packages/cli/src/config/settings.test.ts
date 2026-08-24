@@ -554,7 +554,7 @@ describe('Settings Loading and Merging', () => {
 
       expect(settings.errors.length).toBeGreaterThan(0);
       expect(settings.errors[0].message).toContain(
-        'Expected number, received string',
+        'expected number, received string',
       );
       // Should fall back to the expanded string value
       expect(settings.merged.model.maxSessionTurns).toBe('not-a-number');

@@ -36,7 +36,7 @@ export const TrackerTaskSchema = z.object({
   parentId: z.string().optional(),
   dependencies: z.array(z.string()),
   subagentSessionId: z.string().optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type TrackerTask = z.infer<typeof TrackerTaskSchema>;

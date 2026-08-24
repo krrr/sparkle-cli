@@ -17,9 +17,8 @@ import {
   COMPLETE_TASK_DISPLAY_NAME,
 } from './definitions/base-declarations.js';
 import { type OutputConfig } from '../agents/types.js';
-import { type z } from 'zod';
+import { z } from 'zod';
 import { type MessageBus } from '../confirmation-bus/message-bus.js';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 
 /**
  * Tool for signaling task completion and optionally returning structured output.
@@ -51,7 +50,9 @@ export class CompleteTaskTool<
     outputConfig?: OutputConfig<z.ZodTypeAny>,
   ): unknown {
     if (outputConfig) {
-      const jsonSchema = zodToJsonSchema(outputConfig.schema);
+      const jsonSchema = z.toJSONSchema(outputConfig.schema, {
+        target: 'draft-07',
+      });
       const {
         $schema: _$schema,
         definitions: _definitions,
@@ -149,8 +150,12 @@ export class CompleteTaskInvocation<
     if (this.outputConfig) {
       outputValue = this.params[this.outputConfig.outputName];
       if (this.processOutput) {
-        // We validated the params in validateToolParamValues, so safe to cast
-        submittedOutput = this.processOutput(outputValue as z.infer<TOutput>);
+        // Params were already validated against this schema in
+        // validateToolParamValues; re-parsing yields the typed output without
+        // relying on an unsafe assertion.
+        submittedOutput = this.processOutput(
+          this.outputConfig.schema.parse(outputValue),
+        );
       } else {
         submittedOutput =
           typeof outputValue === 'string'

@@ -326,7 +326,9 @@ Body`);
         const error = await parseAgentMarkdown(filePath).catch((e) => e);
         expect(error).toBeInstanceOf(AgentLoadError);
         expect(error.message).toContain('Validation failed');
-        expect(error.message).toContain('description: Required');
+        expect(error.message).toContain(
+          'description: Invalid input: expected string, received undefined',
+        );
         expect(error.message).not.toContain('Remote Agent');
       });
 
@@ -341,7 +343,9 @@ Body`);
         const error = await parseAgentMarkdown(filePath).catch((e) => e);
         expect(error).toBeInstanceOf(AgentLoadError);
         expect(error.message).toContain('Validation failed');
-        expect(error.message).toContain('description: Required');
+        expect(error.message).toContain(
+          'description: Invalid input: expected string, received undefined',
+        );
         expect(error.message).not.toContain('Remote Agent');
       });
 
@@ -355,7 +359,9 @@ Body`);
         const error = await parseAgentMarkdown(filePath).catch((e) => e);
         expect(error).toBeInstanceOf(AgentLoadError);
         expect(error.message).toContain('Validation failed');
-        expect(error.message).toContain('agent_card_url: Required');
+        expect(error.message).toContain(
+          'agent_card_url: Invalid input: expected string, received undefined',
+        );
         expect(error.message).not.toContain('Local Agent');
       });
 
@@ -371,7 +377,9 @@ Body`);
         const error = await parseAgentMarkdown(filePath).catch((e) => e);
         expect(error).toBeInstanceOf(AgentLoadError);
         expect(error.message).toContain('Validation failed');
-        expect(error.message).toContain('agent_card_url: Required');
+        expect(error.message).toContain(
+          'agent_card_url: Invalid input: expected string, received undefined',
+        );
         expect(error.message).not.toContain('Local Agent');
       });
 
@@ -386,8 +394,12 @@ Body`);
         expect(error.message).toContain('Validation failed');
         expect(error.message).toContain('(Local Agent)');
         expect(error.message).toContain('(Remote Agent)');
-        expect(error.message).toContain('description: Required');
-        expect(error.message).toContain('agent_card_url: Required');
+        expect(error.message).toContain(
+          'description: Invalid input: expected string, received undefined',
+        );
+        expect(error.message).toContain(
+          'agent_card_url: Invalid input: expected string, received undefined',
+        );
       });
 
       it('should format errors without a stray colon when the path is empty (e.g. strict object with unknown keys)', async () => {
@@ -400,9 +412,7 @@ unknown_field: true
 Body`);
         const error = await parseAgentMarkdown(filePath).catch((e) => e);
         expect(error).toBeInstanceOf(AgentLoadError);
-        expect(error.message).toContain(
-          "Unrecognized key(s) in object: 'unknown_field'",
-        );
+        expect(error.message).toContain('Unrecognized key: "unknown_field"');
         expect(error.message).not.toContain(': Unrecognized key(s)');
         expect(error.message).not.toContain('Required');
       });
@@ -837,7 +847,7 @@ auth:
 ---
 `);
       await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
-        /auth\.key.*Required/,
+        /auth\.key.*expected string, received undefined/,
       );
     });
 
@@ -963,7 +973,7 @@ auth:
   authorization_url: not-a-valid-url
 ---
 `);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Invalid url/);
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Invalid URL/);
     });
 
     it('should reject oauth2 auth with invalid token_url', async () => {
@@ -977,10 +987,10 @@ auth:
   token_url: not-a-valid-url
 ---
 `);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Invalid url/);
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Invalid URL/);
     });
 
-    it('should convert oauth2 auth config in markdownToAgentDefinition', () => {
+    it('should convert oauth2 auth config in markdownToAgentDefinition', async () => {
       const markdown = {
         kind: 'remote' as const,
         name: 'oauth2-convert-agent',

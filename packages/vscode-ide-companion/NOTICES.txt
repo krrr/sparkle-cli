@@ -2304,7 +2304,7 @@ SOFTWARE.
 
 
 ============================================================
-zod@3.25.76
+zod@4.4.3
 (git+https://github.com/colinhacks/zod.git)
 
 MIT License

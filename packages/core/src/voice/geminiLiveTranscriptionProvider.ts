@@ -15,7 +15,7 @@ import type {
 import { z } from 'zod';
 
 const LiveAPIResponseSchema = z.object({
-  setupComplete: z.record(z.unknown()).optional(),
+  setupComplete: z.record(z.string(), z.unknown()).optional(),
   serverContent: z
     .object({
       turnComplete: z.boolean().optional(),

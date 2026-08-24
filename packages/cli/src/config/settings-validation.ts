@@ -86,28 +86,11 @@ function buildEnumSchema(
     );
   }
   const values = options.map((opt) => opt.value);
-  if (values.every((v) => typeof v === 'string')) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return z.enum(values as [string, ...string[]]);
-  } else if (values.every((v) => typeof v === 'number')) {
-    return z.union(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      values.map((v) => z.literal(v)) as [
-        z.ZodLiteral<number>,
-        z.ZodLiteral<number>,
-        ...Array<z.ZodLiteral<number>>,
-      ],
-    );
-  } else {
-    return z.union(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      values.map((v) => z.literal(v)) as [
-        z.ZodLiteral<unknown>,
-        z.ZodLiteral<unknown>,
-        ...Array<z.ZodLiteral<unknown>>,
-      ],
-    );
+  const stringValues = values.filter((v): v is string => typeof v === 'string');
+  if (stringValues.length === values.length) {
+    return z.enum(stringValues);
   }
+  return z.union(values.map((v) => z.literal(v)));
 }
 
 /**
@@ -316,21 +299,21 @@ export function formatValidationError(
   const displayedIssues = error.issues.slice(0, MAX_ERRORS_TO_DISPLAY);
 
   for (const issue of displayedIssues) {
-    const path = issue.path.reduce(
-      (acc, curr) =>
-        typeof curr === 'number'
-          ? `${acc}[${curr}]`
-          : `${acc ? acc + '.' : ''}${curr}`,
-      '',
-    );
+    const path = issue.path
+      .map((segment) =>
+        typeof segment === 'number' ? `[${segment}]` : String(segment),
+      )
+      .reduce(
+        (acc, segment) =>
+          segment.startsWith('[')
+            ? `${acc}${segment}`
+            : acc
+              ? `${acc}.${segment}`
+              : segment,
+        '',
+      );
     lines.push(`Error in: ${path || '(root)'}`);
     lines.push(`    ${issue.message}`);
-
-    if (issue.code === 'invalid_type') {
-      const expected = issue.expected;
-      const received = issue.received;
-      lines.push(`Expected: ${expected}, but received: ${received}`);
-    }
     lines.push('');
   }
 

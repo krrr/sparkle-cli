@@ -691,7 +691,7 @@ const keybindingsSchema = z.array(
         const result = z.nativeEnum(Command).safeParse(commandId);
         if (!result.success) {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: `Invalid command: "${val}".`,
           });
           return z.NEVER;

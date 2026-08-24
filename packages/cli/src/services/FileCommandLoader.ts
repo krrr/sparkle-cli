@@ -54,8 +54,10 @@ export interface CommandFileGroup {
  */
 const TomlCommandDefSchema = z.object({
   prompt: z.string({
-    required_error: "The 'prompt' field is required.",
-    invalid_type_error: "The 'prompt' field must be a string.",
+    error: (issue) =>
+      issue.input === undefined
+        ? "The 'prompt' field is required."
+        : "The 'prompt' field must be a string.",
   }),
   description: z.string().optional(),
 });

@@ -102,7 +102,7 @@ export class GeminiAgent {
       // Extract gateway details if present
       const gatewaySchema = z.object({
         baseUrl: z.string().optional(),
-        headers: z.record(z.string()).optional(),
+        headers: z.record(z.string(), z.string()).optional(),
       });
 
       let baseUrl: string | undefined;

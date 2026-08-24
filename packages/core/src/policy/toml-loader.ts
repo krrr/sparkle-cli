@@ -52,8 +52,10 @@ const PolicyRuleSchema = z.object({
   // - Tier 4 (user): range [4.000, 4.999]
   priority: z
     .number({
-      required_error: 'priority is required',
-      invalid_type_error: 'priority must be a number',
+      error: (issue) =>
+        issue.input === undefined
+          ? 'priority is required'
+          : 'priority must be a number',
     })
     .int({ message: 'priority must be an integer' })
     .min(0, { message: 'priority must be >= 0' })
@@ -63,7 +65,7 @@ const PolicyRuleSchema = z.object({
     }),
   modes: z.array(z.nativeEnum(ApprovalMode)).optional(),
   interactive: z.boolean().optional(),
-  toolAnnotations: z.record(z.any()).optional(),
+  toolAnnotations: z.record(z.string(), z.any()).optional(),
   allowRedirection: z.boolean().optional(),
   allow_redirection: z.boolean().optional(), // deprecated snake_case for backward compatibility
   denyMessage: z.string().optional(),
@@ -81,19 +83,19 @@ const SafetyCheckerRuleSchema = z.object({
   commandRegex: z.string().optional(),
   priority: z.number().int().default(0),
   modes: z.array(z.nativeEnum(ApprovalMode)).optional(),
-  toolAnnotations: z.record(z.any()).optional(),
+  toolAnnotations: z.record(z.string(), z.any()).optional(),
   checker: z.discriminatedUnion('type', [
     z.object({
       type: z.literal('in-process'),
       name: z.nativeEnum(InProcessCheckerType),
       required_context: z.array(z.string()).optional(),
-      config: z.record(z.unknown()).optional(),
+      config: z.record(z.string(), z.unknown()).optional(),
     }),
     z.object({
       type: z.literal('external'),
       name: z.string(),
       required_context: z.array(z.string()).optional(),
-      config: z.record(z.unknown()).optional(),
+      config: z.record(z.string(), z.unknown()).optional(),
     }),
   ]),
 });

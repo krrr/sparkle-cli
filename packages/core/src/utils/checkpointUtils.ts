@@ -26,7 +26,7 @@ export interface ToolCallData<HistoryType = unknown, ArgsType = unknown> {
 const ContentSchema = z
   .object({
     role: z.string().optional(),
-    parts: z.array(z.record(z.unknown())),
+    parts: z.array(z.record(z.string(), z.unknown())),
   })
   .passthrough();
 
@@ -39,7 +39,7 @@ export function getToolCallDataSchema(historyItemSchema?: z.ZodTypeAny) {
     commitHash: z.string().optional(),
     toolCall: z.object({
       name: z.string(),
-      args: z.record(z.unknown()),
+      args: z.record(z.string(), z.unknown()),
     }),
     messageId: z.string().optional(),
   });

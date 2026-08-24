@@ -125,7 +125,7 @@ describe('Settings Validation Warning', () => {
     // Should have recorded a warning in the settings object
     expect(
       settings?.errors.some((e) =>
-        e.message.includes("Unrecognized key(s) in object: 'DiffModified'"),
+        e.message.includes('Unrecognized key: "DiffModified"'),
       ),
     ).toBe(true);
   });

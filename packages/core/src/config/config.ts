@@ -498,7 +498,7 @@ export const ConfigSchema = z.object({
     .superRefine((data, ctx) => {
       if (data.enabled && !data.command) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'Sandbox command is required when sandbox is enabled',
           path: ['command'],
         });
