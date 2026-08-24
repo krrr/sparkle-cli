@@ -587,6 +587,27 @@ function parseArgs(argsJson: string): Record<string, unknown> | undefined {
 }
 
 /**
+ * Extracts the reasoning text carried by an OpenAI-compatible response
+ * fragment (a streaming delta or a non-streaming message). Providers use
+ * incompatible conventions for this concept: DeepSeek-style
+ * `reasoning_content` and OpenRouter's normalized `reasoning` /
+ * `reasoning_details` pair (`reasoning_details` duplicates `reasoning`).
+ */
+function extractReasoningText(
+  fragment: { reasoning_content?: string; reasoning?: string } | undefined,
+): string | null {
+  if (!fragment) {
+    return null;
+  }
+  if (fragment.reasoning_content) {
+    return fragment.reasoning_content;
+  } else if (fragment.reasoning) {
+    return fragment.reasoning;
+  }
+  return null;
+}
+
+/**
  * Stateful converter that turns an OpenAI SSE stream chunk into a Gemini
  * GenerateContentResponse.
  *
@@ -599,11 +620,12 @@ function parseArgs(argsJson: string): Record<string, unknown> | undefined {
  * which both the GeminiChat context-management path and the legacy path rely
  * on to avoid duplicate tool executions.
  *
- * Reasoning content (`reasoning_content`) is streamed one tiny fragment per
- * chunk, so the consolidated thought part for a reasoning block is only
- * emitted when the block ends, matching how Gemini delivers complete
- * thoughts. In addition, throttled partial thought parts (marked
- * `thoughtPartial`, carrying the text accumulated so far) are emitted while
+ * Reasoning content (`reasoning_content` / OpenRouter's `reasoning`)
+ * is streamed one tiny fragment per chunk, so the
+ * consolidated thought part for a reasoning block is only emitted when the
+ * block ends, matching how Gemini delivers complete thoughts. In addition,
+ * throttled partial thought parts (marked `thoughtPartial`, carrying the
+ * text accumulated so far) are emitted while
  * the block is still streaming so the UI can show reasoning in real time;
  * consumers keep those out of recorded history.
  */
@@ -633,13 +655,14 @@ export class OpenAiChunkConverter {
     const delta = choice?.delta;
     const parts: Part[] = [];
 
-    if (delta?.reasoning_content) {
-      this.pendingReasoningText += delta.reasoning_content;
+    const reasoning = extractReasoningText(delta);
+    if (reasoning) {
+      this.pendingReasoningText += reasoning;
     }
 
     // The reasoning block ends when the provider moves on to content, tool
-    // calls, or the finish reason. A chunk that merely omits
-    // reasoning_content (e.g. a usage-only chunk) does not end the block.
+    // calls, or the finish reason. A chunk that carries none of the reasoning
+    // fields (e.g. a usage-only chunk) does not end the block.
     const reasoningEnded =
       (typeof delta?.content === 'string' && delta.content.length > 0) ||
       !!delta?.tool_calls ||
@@ -788,8 +811,9 @@ export function openAiChatCompletionToGeminiResponse(
 
   const choice = completion.choices?.[0];
   const parts: Part[] = [];
-  if (choice?.message?.reasoning_content) {
-    parts.push({ text: choice.message.reasoning_content, thought: true });
+  const reasoning = extractReasoningText(choice?.message);
+  if (reasoning) {
+    parts.push({ text: reasoning, thought: true });
   }
   if (
     typeof choice?.message?.content === 'string' &&

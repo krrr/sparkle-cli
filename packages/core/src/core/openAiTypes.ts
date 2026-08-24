@@ -20,6 +20,8 @@ export interface OpenAiMessage {
   tool_call_id?: string;
   /** DeepSeek-specific: reasoning content produced by the model. */
   reasoning_content?: string;
+  /** OpenRouter-style normalized reasoning text. */
+  reasoning?: string;
   name?: string;
 }
 
@@ -125,6 +127,7 @@ export interface OpenAiStreamChunk {
     delta?: {
       content?: string | null;
       reasoning_content?: string;
+      reasoning?: string;
       tool_calls?: OpenAiToolCallDelta[];
     };
     finish_reason?: string | null;
@@ -142,6 +145,7 @@ export interface OpenAiChatCompletion {
       role?: string;
       content?: string | null;
       reasoning_content?: string;
+      reasoning?: string;
       tool_calls?: OpenAiToolCall[];
     };
     finish_reason?: string | null;
