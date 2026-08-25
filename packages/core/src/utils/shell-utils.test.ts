@@ -24,6 +24,7 @@ import {
   normalizeCommand,
   hasRedirection,
   resolveExecutable,
+  detectCommandSubstitution,
 } from './shell-utils.js';
 import path from 'node:path';
 
@@ -674,5 +675,61 @@ describe('resolveExecutable', () => {
     mockPlatform.mockReturnValue('linux');
 
     expect(resolveExecutable('anything')).toBeUndefined();
+  });
+});
+
+describe('detectCommandSubstitution', () => {
+  describe('Bash (POSIX)', () => {
+    beforeEach(() => {
+      mockPlatform.mockReturnValue('linux');
+    });
+
+    it('should block $() command substitution', () => {
+      expect(detectCommandSubstitution('echo $(whoami)')).toBe(true);
+    });
+
+    it('should block backtick command substitution', () => {
+      expect(detectCommandSubstitution('echo `whoami`')).toBe(true);
+    });
+
+    it('should block process substitution <() and >()', () => {
+      expect(detectCommandSubstitution('diff <(ls) >(cat)')).toBe(true);
+    });
+
+    it('should allow single quoted strings', () => {
+      expect(detectCommandSubstitution("echo '$(whoami)'")).toBe(false);
+      expect(detectCommandSubstitution("echo '`whoami`'")).toBe(false);
+    });
+  });
+
+  describe('PowerShell (Windows)', () => {
+    beforeEach(() => {
+      mockPlatform.mockReturnValue('win32');
+    });
+
+    it('should block $() subexpressions', () => {
+      expect(detectCommandSubstitution('echo $(whoami)')).toBe(true);
+      expect(detectCommandSubstitution('echo "$(whoami)"')).toBe(true);
+    });
+
+    it('should block @() array subexpressions outside double quotes', () => {
+      expect(detectCommandSubstitution('echo @(whoami)')).toBe(true);
+    });
+
+    it('should allow single quoted strings containing $() or @()', () => {
+      expect(detectCommandSubstitution("echo '$(whoami)'")).toBe(false);
+      expect(detectCommandSubstitution("echo '@(whoami)'")).toBe(false);
+    });
+
+    it('should allow arithmetic, string multiplication, and grouping expressions', () => {
+      expect(detectCommandSubstitution('echo (1 + 2)')).toBe(false);
+      expect(
+        detectCommandSubstitution(
+          '1..150 | ForEach-Object { $line = "TaskB-line-$_ :: " + ("Lorem ipsum dolor sit amet " * 15); Write-Output $line }',
+        ),
+      ).toBe(false);
+      expect(detectCommandSubstitution('$str.Substring(0, 5)')).toBe(false);
+      expect(detectCommandSubstitution('[string](123)')).toBe(false);
+    });
   });
 });

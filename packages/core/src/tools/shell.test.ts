@@ -1767,14 +1767,28 @@ EOF`;
       });
       expect(result.returnDisplay).toContain('Blocked');
     });
-    it('should block PowerShell bare () grouping operator', async () => {
+    it('should allow PowerShell bare () grouping expressions', async () => {
       mockPlatform.mockReturnValue('win32');
+      mockShellExecutionService.mockImplementation((_cmd, _cwd, _callback) => ({
+        pid: 12345,
+        result: Promise.resolve({
+          output: 'result',
+          rawOutput: Buffer.from('result'),
+          exitCode: 0,
+          signal: null,
+          error: null,
+          aborted: false,
+          pid: 12345,
+          executionMethod: 'child_process',
+          backgrounded: false,
+        }),
+      }));
       const tool = new ShellTool(mockConfig, createMockMessageBus());
-      const invocation = tool.build({ command: 'echo (whoami)' });
+      const invocation = tool.build({ command: 'echo (1 + 2)' });
       const result = await invocation.execute({
         abortSignal: new AbortController().signal,
       });
-      expect(result.returnDisplay).toContain('Blocked');
+      expect(result.returnDisplay).not.toContain('Blocked');
     });
 
     it('should allow escaped $() inside double quotes', async () => {

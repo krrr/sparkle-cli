@@ -1158,9 +1158,6 @@ function detectBashSubstitution(command: string): boolean {
   return false;
 }
 
-const POWERSHELL_KEYWORD_RE =
-  /\b(if|elseif|else|foreach|for|while|do|switch|try|catch|finally|until|trap|function|filter)(\s+[-\w]+)*\s*$/i;
-
 function detectPowerShellSubstitution(command: string): boolean {
   let inSingleQuote = false;
   let inDoubleQuote = false;
@@ -1191,19 +1188,6 @@ function detectPowerShellSubstitution(command: string): boolean {
       return true;
     }
     if (!inDoubleQuote && char === '@' && command[i + 1] === '(') {
-      return true;
-    }
-    if (!inDoubleQuote && char === '(') {
-      const before = command.slice(0, i).trimEnd();
-      const prevChar = before[before.length - 1];
-      if (prevChar === '(') {
-        i++;
-        continue;
-      }
-      if (POWERSHELL_KEYWORD_RE.test(before)) {
-        i++;
-        continue;
-      }
       return true;
     }
 
