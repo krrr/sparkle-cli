@@ -306,6 +306,10 @@ export const useExecutionLifecycle = (
             });
           }
         },
+        // The REGISTER_TASK initialOutput already carries the output
+        // snapshot captured at registration time; replaying the full buffer
+        // on top of it would duplicate the prefix in string mode.
+        { suppressSnapshotReplay: true },
       );
 
       m.subscriptions.set(pid, () => {
@@ -457,13 +461,10 @@ export const useExecutionLifecycle = (
                 }
 
                 if (executionPid && m.backgroundedPids.has(executionPid)) {
-                  // If already backgrounded, let the background shell subscription handle it.
-                  dispatch({
-                    type: 'APPEND_TASK_OUTPUT',
-                    pid: executionPid,
-                    chunk:
-                      event.type === 'data' ? event.chunk : cumulativeStdout,
-                  });
+                  // Already backgrounded: the ExecutionLifecycleService
+                  // subscription from registerBackgroundTask is the single
+                  // writer for this task's card output — appending here as
+                  // well would duplicate every string chunk.
                   return;
                 }
 

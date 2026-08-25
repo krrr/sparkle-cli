@@ -24,6 +24,7 @@ import {
 } from './shellExecutionService.js';
 import { NoopSandboxManager } from './sandboxManager.js';
 import { ExecutionLifecycleService } from './executionLifecycleService.js';
+import { InjectionService } from '../config/injectionService.js';
 import type { AnsiOutput, AnsiToken } from '../utils/terminalSerializer.js';
 
 // Hoisted Mocks
@@ -85,9 +86,13 @@ vi.mock('node:child_process', async (importOriginal) => {
     spawn: mockCpSpawn,
   };
 });
-vi.mock('../utils/textUtils.js', () => ({
-  isBinary: mockIsBinary,
-}));
+vi.mock('../utils/textUtils.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/textUtils.js')>();
+  return {
+    ...actual,
+    isBinary: mockIsBinary,
+  };
+});
 vi.mock('node:os', () => ({
   default: {
     platform: mockPlatform,
@@ -959,10 +964,24 @@ describe('ShellExecutionService', () => {
       expect(processes.some((p) => p.pid === 1)).toBe(false);
     });
 
-    it('should throw error if sessionId is missing for background operations', () => {
+    it('should throw error if sessionId is missing for a tracked execution', () => {
+      // Seed a tracked child process whose sessionId is undefined; the UI's
+      // Ctrl+B path calls background(pid) without an explicit sessionId, so
+      // the service must fall back to the tracked one or fail loudly.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ShellExecutionService as any).activeChildProcesses.set(102, {
+        process: {},
+        state: { output: '' },
+        command: 'cmd-102',
+        sessionId: undefined,
+      });
+
       expect(() => ShellExecutionService.background(102)).toThrow(
         'Session ID is required for background operations',
       );
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ShellExecutionService as any).activeChildProcesses.delete(102);
     });
 
     it('should throw error if sessionId is missing for listBackgroundProcesses', () => {
@@ -2197,5 +2216,167 @@ describe('ShellExecutionService environment variables', () => {
     await new Promise(process.nextTick);
 
     vi.unstubAllEnvs();
+  });
+
+  describe('background task regressions', () => {
+    let fakeChildProcess: EventEmitter & Partial<ChildProcess>;
+    let onOutputEvent: Mock<(event: ShellOutputEvent) => void>;
+
+    const runFallbackExecution = async (
+      command: string,
+      config: ShellExecutionConfig = shellExecutionConfig,
+    ) => {
+      const abortController = new AbortController();
+      const handle = await ShellExecutionService.execute(
+        command,
+        '/test/dir',
+        onOutputEvent,
+        abortController.signal,
+        true,
+        config,
+      );
+      await new Promise((resolve) => process.nextTick(resolve));
+      return handle;
+    };
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      ExecutionLifecycleService.resetForTest();
+      ShellExecutionService.resetForTest();
+      mockIsBinary.mockReturnValue(false);
+      mockPlatform.mockReturnValue('linux');
+      mockResolveExecutable.mockImplementation((exe: string) => exe);
+      // Force the child_process fallback path.
+      mockGetPty.mockResolvedValue(null);
+      onOutputEvent = vi.fn();
+
+      fakeChildProcess = new EventEmitter() as EventEmitter &
+        Partial<ChildProcess>;
+      // The stdio emitters intentionally never emit 'end'/'close': a detached
+      // descendant process keeps the inherited pipes open.
+      fakeChildProcess.stdout = new EventEmitter() as Readable;
+      fakeChildProcess.stderr = new EventEmitter() as Readable;
+      Object.defineProperty(fakeChildProcess, 'pid', {
+        value: 54321,
+        configurable: true,
+      });
+      mockCpSpawn.mockReturnValue(fakeChildProcess);
+    });
+
+    it('resolves the result when the direct child exits even though "close" never fires', async () => {
+      const handle = await runFallbackExecution('spawn-detached-daemon');
+
+      fakeChildProcess.stdout?.emit('data', Buffer.from('partial output\n'));
+      // Direct shell exits while the descendant still holds the pipes, so
+      // Node emits 'exit' but never 'close'.
+      fakeChildProcess.emit('exit', 0, null);
+
+      let settled = false;
+      void handle.result.then(() => {
+        settled = true;
+      });
+      // Give the implementation ample time to settle on the 'exit' event.
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      try {
+        expect(settled).toBe(true);
+      } finally {
+        if (!settled && handle.pid !== undefined) {
+          // Force-settle so no pending execution leaks into other tests.
+          await ShellExecutionService.kill(handle.pid);
+          await handle.result.catch(() => {});
+        }
+      }
+    });
+
+    it('does not throw when asked to background an unknown pid', () => {
+      // The UI's Ctrl+B handler calls background(pid) without a sessionId;
+      // for a pid that has already exited and been cleaned up this used to
+      // throw 'Session ID is required' from inside the key handler.
+      expect(() => ShellExecutionService.background(999999)).not.toThrow();
+    });
+
+    it('does not throw when asked to background an execution that already completed', async () => {
+      const handle = await runFallbackExecution('already-done');
+      fakeChildProcess.emit('exit', 0, null);
+      fakeChildProcess.emit('close', 0, null);
+      await handle.result;
+      // Allow the async cleanup of internal maps to complete.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(() => ShellExecutionService.background(handle.pid!)).not.toThrow();
+    });
+
+    it('includes the originating command in the injected completion text', async () => {
+      const injectionService = new InjectionService(() => true);
+      const injectionListener = vi.fn();
+      injectionService.onInjection(injectionListener);
+      ExecutionLifecycleService.setInjectionService(injectionService);
+
+      const config: ShellExecutionConfig = {
+        ...shellExecutionConfig,
+        sessionId: 'injection-session',
+        backgroundCompletionBehavior: 'notify',
+        originalCommand: 'UNIQUE_MARKER_COMMAND --watch',
+      };
+      const handle = await runFallbackExecution(
+        'UNIQUE_MARKER_COMMAND --watch',
+        config,
+      );
+
+      fakeChildProcess.stdout?.emit('data', Buffer.from('watching...\n'));
+      ShellExecutionService.background(handle.pid!, 'injection-session');
+      fakeChildProcess.emit('exit', 0, null);
+      fakeChildProcess.emit('close', 0, null);
+
+      const result = await handle.result;
+      expect(result.backgrounded).toBe(true);
+
+      await vi.waitFor(() => {
+        expect(injectionListener).toHaveBeenCalledTimes(1);
+      });
+      const [injectedText, source] = injectionListener.mock.calls[0];
+      expect(source).toBe('background_completion');
+      // With several background tasks finishing around the same time, the
+      // model must be able to tell WHICH command produced the output.
+      expect(injectedText).toContain('UNIQUE_MARKER_COMMAND --watch');
+    });
+
+    it('collapses multi-line whitespace and truncates long commands in the completion header', async () => {
+      const injectionService = new InjectionService(() => true);
+      const injectionListener = vi.fn();
+      injectionService.onInjection(injectionListener);
+      ExecutionLifecycleService.setInjectionService(injectionService);
+
+      const longCommand =
+        "python3 -c \"import sys, time; print('starting'); " +
+        "x = [i**2 for i in range(1000)]; print('done with calculations'); " +
+        'sys.stdout.flush()"\n\n  --extra-arg-1 --extra-arg-2';
+
+      const config: ShellExecutionConfig = {
+        ...shellExecutionConfig,
+        sessionId: 'truncation-session',
+        backgroundCompletionBehavior: 'notify',
+        originalCommand: longCommand,
+      };
+      const handle = await runFallbackExecution('python3 -c ...', config);
+
+      ShellExecutionService.background(handle.pid!, 'truncation-session');
+      fakeChildProcess.emit('exit', 0, null);
+      fakeChildProcess.emit('close', 0, null);
+
+      await handle.result;
+
+      await vi.waitFor(() => {
+        expect(injectionListener).toHaveBeenCalledTimes(1);
+      });
+      const [injectedText] = injectionListener.mock.calls[0];
+      // Multi-line newlines should be collapsed to single spaces and truncated with ...
+      expect(injectedText).not.toContain('\n\n  --extra-arg');
+      expect(injectedText).toContain('...');
+      expect(injectedText).toMatch(
+        /\[Background command python3 -c .*?\.\.\. \(PID: \d+\) completed successfully\./,
+      );
+    });
   });
 });

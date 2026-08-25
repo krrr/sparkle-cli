@@ -1,2 +1,3 @@
 packages/core/src/services/scripts/*.exe
 gha-creds-*.json
+node_modules

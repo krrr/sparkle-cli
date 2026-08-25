@@ -278,6 +278,22 @@ describe('Server Config (config.ts)', () => {
     usageStatisticsEnabled: false,
   };
 
+  describe('shellBackgroundCompletionBehavior', () => {
+    it('should default to notify', () => {
+      const config = new Config(baseParams);
+      expect(config.getShellBackgroundCompletionBehavior()).toBe('notify');
+    });
+
+    it('should fall back to notify for unrecognized values', () => {
+      const config = new Config({
+        ...baseParams,
+         
+        shellBackgroundCompletionBehavior: 'bogus' as 'notify',
+      });
+      expect(config.getShellBackgroundCompletionBehavior()).toBe('notify');
+    });
+  });
+
   describe('maxAttempts', () => {
     it('should default to DEFAULT_MAX_ATTEMPTS', () => {
       const config = new Config(baseParams);

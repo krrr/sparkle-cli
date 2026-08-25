@@ -33,7 +33,6 @@ import {
   coreEvents,
   CoreEvent,
   CoreToolCallStatus,
-  buildUserSteeringHintPrompt,
   GeminiCliOperation,
   getPlanModeExitMessage,
   isBackgroundExecutionData,
@@ -2157,9 +2156,10 @@ export const useGeminiStream = (
       if (consumeUserHint) {
         const userHint = consumeUserHint();
         if (userHint && userHint.trim().length > 0) {
-          const hintText = userHint.trim();
+          // The hint text arrives fully formatted per its source (steering
+          // wrapper or background-output data-safety block); deliver as-is.
           responsesToSend.unshift({
-            text: buildUserSteeringHintPrompt(hintText),
+            text: userHint.trim(),
           });
         }
       }

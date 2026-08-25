@@ -521,14 +521,26 @@ export class ExecutionLifecycleService {
   static subscribe(
     executionId: number,
     listener: (event: ExecutionOutputEvent) => void,
+    options?: { suppressSnapshotReplay?: boolean },
   ): () => void {
+    // Executions are keyed by OS PID, which the OS may recycle. Registering a
+    // listener against an already-settled (or unknown) execution would leak
+    // it into whatever future execution reuses this ID — silently feeding
+    // another process's output to stale subscribers. Refuse instead.
+    if (
+      !this.activeExecutions.has(executionId) &&
+      !this.activeResolvers.has(executionId)
+    ) {
+      return () => {};
+    }
+
     if (!this.activeListeners.has(executionId)) {
       this.activeListeners.set(executionId, new Set());
     }
     this.activeListeners.get(executionId)?.add(listener);
 
     const execution = this.activeExecutions.get(executionId);
-    if (execution) {
+    if (execution && !options?.suppressSnapshotReplay) {
       const snapshot =
         execution.getSubscriptionSnapshot?.() ??
         (execution.output.length > 0 ? execution.output : undefined);

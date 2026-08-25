@@ -305,16 +305,30 @@ export class ShellExecutionService {
     behavior: string,
     output: string,
     error?: Error,
+    originalCommand?: string,
   ): string {
     const logPath = ShellExecutionService.getLogFilePath(pid);
     const status = error ? `with error: ${error.message}` : 'successfully';
+    // Attribution matters: several background tasks can finish around the
+    // same time and the model must be able to tell which one produced this.
+    // Collapse multi-line whitespace and truncate overly long commands so
+    // the single-line completion header remains clean and readable.
+    let label = `PID: ${pid}`;
+    if (originalCommand) {
+      const normalizedCmd = originalCommand.trim().replace(/\s+/g, ' ');
+      if (normalizedCmd) {
+        const truncatedCmd = truncateString(normalizedCmd, 80, '...');
+        label = `${truncatedCmd} (PID: ${pid})`;
+      }
+    }
+    const header = `[Background command ${label} completed ${status}. Output saved to ${logPath}]`;
 
     if (behavior === 'inject') {
       const truncated = truncateString(output, 5000);
-      return `[Background command completed ${status}. Output saved to ${logPath}]\n\n${truncated}`;
+      return `${header}\n\n${truncated}`;
     }
 
-    return `[Background command completed ${status}. Output saved to ${logPath}]`;
+    return header;
   }
 
   static getLogFilePath(pid: number): string {
@@ -638,6 +652,7 @@ export class ShellExecutionService {
                 shellExecutionConfig.backgroundCompletionBehavior || 'silent',
                 output,
                 error ?? undefined,
+                shellExecutionConfig.originalCommand,
               ),
             completionBehavior:
               shellExecutionConfig.backgroundCompletionBehavior || 'silent',
@@ -798,9 +813,26 @@ export class ShellExecutionService {
 
       child.stdout.on('data', (data) => handleOutput(data, 'stdout'));
       child.stderr.on('data', (data) => handleOutput(data, 'stderr'));
+      // 'exit' fires when the direct child terminates; 'close' additionally
+      // requires the stdio streams to close. Detached descendants that
+      // inherit those pipes keep 'close' pending indefinitely, which used to
+      // hang the result promise forever. Make handling idempotent and settle
+      // shortly after 'exit' if 'close' never arrives.
+      let exitHandled = false;
+      const handleExitOnce = (
+        code: number | null,
+        signal: NodeJS.Signals | null,
+      ) => {
+        if (exitHandled) {
+          return;
+        }
+        exitHandled = true;
+        handleExit(code, signal);
+      };
+
       child.on('error', (err) => {
         error = err;
-        handleExit(1, null);
+        handleExitOnce(1, null);
       });
 
       const abortHandler = async () => {
@@ -815,8 +847,21 @@ export class ShellExecutionService {
 
       abortSignal.addEventListener('abort', abortHandler, { once: true });
 
-      child.on('close', (code, signal) => {
-        handleExit(code, signal);
+      child.on('close', handleExitOnce);
+
+      child.on('exit', (code, signal) => {
+        if (exitHandled) {
+          return;
+        }
+        // Give already-buffered stdio data a brief window to drain before
+        // settling without 'close'. The timer is unref'd so it never keeps
+        // the process alive on its own.
+        const drainTimer = setTimeout(() => handleExitOnce(code, signal), 100);
+        drainTimer.unref();
+        child.once('close', () => {
+          clearTimeout(drainTimer);
+          handleExitOnce(code, signal);
+        });
       });
 
       function cleanup() {
@@ -1039,6 +1084,7 @@ export class ShellExecutionService {
             shellExecutionConfig.backgroundCompletionBehavior || 'silent',
             output,
             error ?? undefined,
+            shellExecutionConfig.originalCommand,
           ),
         completionBehavior:
           shellExecutionConfig.backgroundCompletionBehavior || 'silent',
@@ -1420,6 +1466,15 @@ export class ShellExecutionService {
   static background(pid: number, sessionId?: string, command?: string): void {
     const activePty = this.activePtys.get(pid);
     const activeChild = this.activeChildProcesses.get(pid);
+
+    if (!activePty && !activeChild) {
+      // The execution already completed and was cleaned up (or never
+      // belonged to this service). Backgrounding must be a safe no-op: the
+      // UI's Ctrl+B handler can race process exit and used to throw from
+      // inside the key handler here.
+      ExecutionLifecycleService.background(pid);
+      return;
+    }
 
     const resolvedSessionId =
       sessionId ?? activePty?.sessionId ?? activeChild?.sessionId;

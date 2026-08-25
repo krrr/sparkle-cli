@@ -11,6 +11,9 @@ import {
   generateFastAckText,
   truncateFastAckInput,
   generateSteeringAckMessage,
+  type PendingHintEntry,
+  formatPendingHintForDelivery,
+  formatPendingHintsForDelivery,
 } from './fastAckHelper.js';
 import { LlmRole } from 'src/telemetry/llmRole.js';
 
@@ -142,5 +145,42 @@ describe('generateSteeringAckMessage', () => {
 
     const result = await generateSteeringAckMessage(llmClient, '   ');
     expect(result).toBe('Understood. Adjusting the plan.');
+  });
+});
+
+describe('pendingHintFormatting', () => {
+  it('formats user_steering entries with the steering prompt wrapper', () => {
+    const entry: PendingHintEntry = {
+      text: 'please also update the docs',
+      source: 'user_steering',
+    };
+    const formatted = formatPendingHintForDelivery(entry);
+    expect(formatted).toContain('User steering update');
+    expect(formatted).toContain('please also update the docs');
+  });
+
+  it('formats background_completion entries with the data-safety wrapper', () => {
+    const entry: PendingHintEntry = {
+      text: '[Background command npm test (PID: 42) completed successfully]',
+      source: 'background_completion',
+    };
+    const formatted = formatPendingHintForDelivery(entry);
+    expect(formatted).toContain('<background_output>');
+    expect(formatted).toContain(
+      '[Background command npm test (PID: 42) completed successfully]',
+    );
+    // Completions must NOT be framed as plan-steering instructions.
+    expect(formatted).not.toContain('User steering update');
+  });
+
+  it('joins mixed-source batches with blank lines, each formatted per source', () => {
+    const entries: PendingHintEntry[] = [
+      { text: 'steer left', source: 'user_steering' },
+      { text: 'task A finished', source: 'background_completion' },
+    ];
+    const formatted = formatPendingHintsForDelivery(entries);
+    expect(formatted).toContain('User steering update');
+    expect(formatted).toContain('<background_output>');
+    expect(formatted).toContain('\n\n');
   });
 });

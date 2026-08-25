@@ -1164,10 +1164,14 @@ export class Config implements McpContext, AgentLoopContext {
     this.enableInteractiveShell = params.enableInteractiveShell ?? false;
 
     const requestedBehavior = params.shellBackgroundCompletionBehavior;
-    if (requestedBehavior === 'inject' || requestedBehavior === 'notify') {
+    if (
+      requestedBehavior === 'inject' ||
+      requestedBehavior === 'notify' ||
+      requestedBehavior === 'silent'
+    ) {
       this.shellBackgroundCompletionBehavior = requestedBehavior;
     } else {
-      this.shellBackgroundCompletionBehavior = 'silent';
+      this.shellBackgroundCompletionBehavior = 'notify';
     }
 
     this.skipNextSpeakerCheck = params.skipNextSpeakerCheck ?? true;

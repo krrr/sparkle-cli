@@ -1183,10 +1183,10 @@ their corresponding top-level category object in your `settings.json` file.
 - **`tools.shell.backgroundCompletionBehavior`** (enum):
 
   - **Description:** Controls what happens when a background shell command
-    finishes. 'silent' (default): quietly exits in background. 'inject':
-    automatically returns output to agent. 'notify': shows brief message in
-    chat.
-  - **Default:** `"silent"`
+    finishes. 'silent': quietly exits in background. 'inject': automatically
+    returns output to agent. 'notify' (default): sends a brief completion
+    message with a pointer to the full output log.
+  - **Default:** `"notify"`
   - **Values:** `"silent"`, `"inject"`, `"notify"`
 
 - **`tools.shell.pager`** (string):

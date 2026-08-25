@@ -1530,9 +1530,9 @@ const SETTINGS_SCHEMA = {
             label: 'Background Completion Behavior',
             category: 'Tools',
             requiresRestart: false,
-            default: 'silent',
+            default: 'notify',
             description:
-              "Controls what happens when a background shell command finishes. 'silent' (default): quietly exits in background. 'inject': automatically returns output to agent. 'notify': shows brief message in chat.",
+              "Controls what happens when a background shell command finishes. 'silent': quietly exits in background. 'inject': automatically returns output to agent. 'notify' (default): sends a brief completion message with a pointer to the full output log.",
             showInDialog: false,
             options: [
               { label: 'Silent', value: 'silent' },

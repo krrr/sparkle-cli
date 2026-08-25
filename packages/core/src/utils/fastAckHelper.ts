@@ -10,6 +10,7 @@ import type { ModelConfigKey } from '../services/modelConfigService.js';
 import { debugLogger } from './debugLogger.js';
 import { getResponseText } from './partUtils.js';
 import { getErrorMessage } from './errors.js';
+import type { InjectionSource } from 'src/config/injectionService.js';
 
 export const DEFAULT_FAST_ACK_MODEL_CONFIG_KEY: ModelConfigKey = {
   model: 'fast-ack-helper',
@@ -211,4 +212,34 @@ export async function generateFastAckText(
     );
     return fallbackText;
   }
+}
+
+export interface PendingHintEntry {
+  text: string;
+  source: InjectionSource;
+}
+
+/**
+ * Formats a single queued injection for delivery through the pending-hints
+ * channel. Each source keeps its own framing:
+ *
+ * - `user_steering`: wrapped as a plan-steering update the model must act on.
+ * - `background_completion`: wrapped in a data-safety `<background_output>`
+ *   block so raw process output is treated strictly as data.
+ */
+export function formatPendingHintForDelivery(entry: PendingHintEntry): string {
+  return entry.source === 'background_completion'
+    ? formatBackgroundCompletionForModel(entry.text)
+    : buildUserSteeringHintPrompt(entry.text);
+}
+
+/**
+ * Formats and joins a batch of queued injections into a single deliverable
+ * prompt. Batching guarantees one submission covers all events that
+ * accumulated since the last delivery.
+ */
+export function formatPendingHintsForDelivery(
+  entries: readonly PendingHintEntry[],
+): string {
+  return entries.map(formatPendingHintForDelivery).join('\n\n');
 }

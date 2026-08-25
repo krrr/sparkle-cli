@@ -76,9 +76,10 @@ import {
   generateSummary,
   type ConsentRequestPayload,
   type AgentsDiscoveredPayload,
-  buildUserSteeringHintPrompt,
   LegacyAgentProtocol,
   type InjectionSource,
+  formatPendingHintsForDelivery,
+  type PendingHintEntry,
 } from 'sparkle-cli-core';
 import process from 'node:process';
 import { useHistory } from './hooks/useHistoryManager.js';
@@ -920,14 +921,18 @@ export const AppContainer = (props: AppContainerProps) => {
     }
   }, [pendingRestorePrompt, inputHistory, historyManager.history]);
 
-  const pendingHintsRef = useRef<string[]>([]);
+  const pendingHintsRef = useRef<PendingHintEntry[]>([]);
   const [pendingHintCount, setPendingHintCount] = useState(0);
 
   const consumePendingHints = useCallback(() => {
     if (pendingHintsRef.current.length === 0) {
       return null;
     }
-    const hint = pendingHintsRef.current.join('\n');
+    // Format per source: steering hints keep their plan-update framing while
+    // background completions get the data-safety output wrapper. This is the
+    // single delivery channel for both, so background completions are never
+    // duplicated by a second consumer.
+    const hint = formatPendingHintsForDelivery(pendingHintsRef.current);
     pendingHintsRef.current = [];
     setPendingHintCount(0);
     return hint;
@@ -938,7 +943,7 @@ export const AppContainer = (props: AppContainerProps) => {
       if (source !== 'user_steering' && source !== 'background_completion') {
         return;
       }
-      pendingHintsRef.current.push(text);
+      pendingHintsRef.current.push({ text, source });
       setPendingHintCount((prev) => prev + 1);
     };
     config.injectionService.onInjection(hintListener);
@@ -2073,7 +2078,6 @@ export const AppContainer = (props: AppContainerProps) => {
   useEffect(() => {
     if (
       !isConfigInitialized ||
-      !config.isModelSteeringEnabled() ||
       streamingState !== StreamingState.Idle ||
       !isMcpReady ||
       isToolAwaitingConfirmation(pendingHistoryItems)
@@ -2086,9 +2090,10 @@ export const AppContainer = (props: AppContainerProps) => {
       return;
     }
 
-    void submitQuery([{ text: buildUserSteeringHintPrompt(pendingHint) }]);
+    // consumePendingHints already applied the per-source framing (steering
+    // wrapper vs background-output data-safety block); send it verbatim.
+    void submitQuery([{ text: pendingHint }]);
   }, [
-    config,
     historyManager,
     isConfigInitialized,
     isMcpReady,

@@ -1799,9 +1799,9 @@
             },
             "backgroundCompletionBehavior": {
               "title": "Background Completion Behavior",
-              "description": "Controls what happens when a background shell command finishes. 'silent' (default): quietly exits in background. 'inject': automatically returns output to agent. 'notify': shows brief message in chat.",
-              "markdownDescription": "Controls what happens when a background shell command finishes. 'silent' (default): quietly exits in background. 'inject': automatically returns output to agent. 'notify': shows brief message in chat.\n\n- Category: `Tools`\n- Requires restart: `no`\n- Default: `silent`",
-              "default": "silent",
+              "description": "Controls what happens when a background shell command finishes. 'silent': quietly exits in background. 'inject': automatically returns output to agent. 'notify' (default): sends a brief completion message with a pointer to the full output log.",
+              "markdownDescription": "Controls what happens when a background shell command finishes. 'silent': quietly exits in background. 'inject': automatically returns output to agent. 'notify' (default): sends a brief completion message with a pointer to the full output log.\n\n- Category: `Tools`\n- Requires restart: `no`\n- Default: `notify`",
+              "default": "notify",
               "type": "string",
               "enum": ["silent", "inject", "notify"]
             },

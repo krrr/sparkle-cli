@@ -899,6 +899,7 @@ describe('useExecutionLifecycle', () => {
       expect(mockLifecycleSubscribe).toHaveBeenCalledWith(
         1001,
         expect.any(Function),
+        { suppressSnapshotReplay: true },
       );
     });
 
@@ -1047,6 +1048,66 @@ describe('useExecutionLifecycle', () => {
       // Should be auto-dismissed from the panel
       expect(result.current.backgroundTaskCount).toBe(0);
       expect(result.current.backgroundTasks.has(999)).toBe(false);
+    });
+
+    it('appends backgrounded output chunks exactly once when both the direct callback and subscription fire', async () => {
+      mockShellExecutionService.mockImplementation((_cmd, _cwd, callback) => {
+        mockShellOutputCallback = callback;
+        return Promise.resolve({
+          pid: 777,
+          result: new Promise((resolve) => {
+            resolveExecutionPromise = resolve;
+          }),
+        });
+      });
+
+      const { result } = await renderProcessorHook();
+
+      await act(async () => {
+        result.current.handleShellCommand(
+          'tail -f app.log',
+          new AbortController().signal,
+        );
+      });
+      expect(result.current.activeShellPtyId).toBe(777);
+
+      act(() => {
+        result.current.backgroundCurrentExecution();
+      });
+
+      await act(async () => {
+        resolveExecutionPromise(
+          createMockServiceResult({
+            backgrounded: true,
+            pid: 777,
+            output: '',
+          }),
+        );
+      });
+      await act(async () => await onExecMock.mock.calls[0][0]);
+
+      expect(result.current.backgroundTaskCount).toBe(1);
+      expect(result.current.backgroundTasks.get(777)?.output).toBe('');
+
+      // In production the same data event reaches the UI through two
+      // channels: the direct execute() output callback (which routes to
+      // APPEND_TASK_OUTPUT once the pid is marked backgrounded) and the
+      // ExecutionLifecycleService subscription registered by
+      // registerBackgroundTask.
+      act(() => {
+        mockShellOutputCallback({ type: 'data', chunk: 'CHUNK' });
+      });
+      const subscribeCallback = mockLifecycleSubscribe.mock.calls.find(
+        (call) => call[0] === 777,
+      )?.[1];
+      expect(subscribeCallback).toBeDefined();
+      if (subscribeCallback) {
+        act(() => {
+          subscribeCallback({ type: 'data', chunk: 'CHUNK' });
+        });
+      }
+
+      expect(result.current.backgroundTasks.get(777)?.output).toBe('CHUNK');
     });
 
     it('should NOT trigger re-render on background shell output when visible', async () => {

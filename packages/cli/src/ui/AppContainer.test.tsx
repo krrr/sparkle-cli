@@ -940,6 +940,34 @@ describe('AppContainer State Management', () => {
     });
   });
 
+  describe('Background completion delivery', () => {
+    it('delivers background completions exactly once via the completion bridge', async () => {
+      const injectionService = mockConfig.injectionService;
+      expect(injectionService).toBeDefined();
+
+      const { unmount } = await act(async () => renderAppContainer());
+
+      await act(async () => {
+        injectionService.addInjection(
+          'BG-DONE-MARKER task finished',
+          'background_completion',
+        );
+      });
+
+      await waitFor(() => {
+        expect(mockedUseGeminiStream().submitQuery).toHaveBeenCalledTimes(1);
+      });
+      const payload = JSON.stringify(
+        mockedUseGeminiStream().submitQuery.mock.calls[0][0],
+      );
+      expect(payload).toContain('BG-DONE-MARKER');
+      expect(payload).toContain('<background_output>');
+      // Must NOT be duplicated through the steering-hint channel.
+      expect(payload).not.toContain('User steering update');
+      unmount();
+    });
+  });
+
   describe('Settings Integration', () => {
     it('handles settings with all display options disabled', async () => {
       const settingsAllHidden = createMockSettings({

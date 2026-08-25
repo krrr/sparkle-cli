@@ -901,15 +901,12 @@ describe('useGeminiStream', () => {
 
     const sentParts = mockSendMessageStream.mock.calls[0][0] as Part[];
     const injectedHintPart = sentParts[0] as { text?: string };
-    expect(injectedHintPart.text).toContain('User steering update:');
-    expect(injectedHintPart.text).toContain(
-      '<user_input>\nfocus on tests only\n</user_input>',
-    );
-    expect(injectedHintPart.text).toContain(
+    // consumeUserHint is pre-formatted upstream (AppContainer applies the
+    // per-source framing); the stream layer must deliver it verbatim.
+    expect(injectedHintPart.text).toBe('focus on tests only');
+    expect(injectedHintPart.text).not.toContain('User steering update:');
+    expect(injectedHintPart.text).not.toContain(
       'Classify it as ADD_TASK, MODIFY_TASK, CANCEL_TASK, or EXTRA_CONTEXT.',
-    );
-    expect(injectedHintPart.text).toContain(
-      'Do not cancel/skip tasks unless the user explicitly cancels them.',
     );
 
     expect(mockRunInDevTraceSpan).toHaveBeenCalledWith(

@@ -735,4 +735,32 @@ describe('ExecutionLifecycleService', () => {
       expect(injectionListener).not.toHaveBeenCalled();
     });
   });
+
+  it('does not deliver events from a reused execution ID to subscribers registered after settlement', async () => {
+    const handle = ExecutionLifecycleService.createExecution();
+    const executionId = handle.pid!;
+    ExecutionLifecycleService.completeExecution(executionId, { exitCode: 0 });
+    await handle.result;
+
+    // Simulates the UI registering a background task right after the process
+    // already exited: registerBackgroundTask subscribes for data updates.
+    const staleListener = vi.fn();
+    ExecutionLifecycleService.subscribe(executionId, staleListener);
+
+    // The OS reuses the execution ID for an unrelated new execution.
+    ExecutionLifecycleService.attachExecution(executionId, {
+      executionMethod: 'child_process',
+    });
+    ExecutionLifecycleService.emitEvent(executionId, {
+      type: 'data',
+      chunk: 'OUTPUT OF THE NEW PROCESS',
+    });
+
+    // The stale subscriber registered against the dead execution must not
+    // receive the new execution's output.
+    expect(staleListener).not.toHaveBeenCalled();
+
+    // Clean up the replacement execution.
+    ExecutionLifecycleService.completeExecution(executionId, { exitCode: 0 });
+  });
 });
