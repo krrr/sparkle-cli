@@ -498,6 +498,52 @@ describe('ShellTool', () => {
       await promise;
     });
 
+    it('should return output when a background-requested command completes quickly', async () => {
+      vi.useFakeTimers();
+      const invocation = shellTool.build({
+        command: 'echo done',
+        is_background: true,
+      });
+      const promise = invocation.execute({ abortSignal: mockAbortSignal });
+
+      // The command finishes within the observation window without ever
+      // being transitioned to a managed background execution, so the
+      // collected output must be returned like a foreground command.
+      resolveShellExecution({ output: 'fast exit output', exitCode: 0 });
+
+      await vi.advanceTimersByTimeAsync(250);
+      const result = await promise;
+
+      expect(result.llmContent).toContain('Output: fast exit output');
+      expect(result.llmContent).not.toContain('Output hidden');
+    });
+
+    it('should hide output when the execution result reports backgrounded state', async () => {
+      vi.useFakeTimers();
+      const invocation = shellTool.build({
+        command: 'sleep 10',
+        is_background: true,
+      });
+      const promise = invocation.execute({ abortSignal: mockAbortSignal });
+
+      // Still running when the observation window ends: the lifecycle
+      // resolves the result with backgrounded=true once the delayed
+      // transition fires.
+      resolveShellExecution({
+        output: 'partial output',
+        backgrounded: true,
+        exitCode: null,
+      });
+
+      await vi.advanceTimersByTimeAsync(250);
+      const result = await promise;
+
+      expect(result.llmContent).toContain(
+        'Command moved to background (PID: 12345)',
+      );
+      expect(result.llmContent).not.toContain('partial output');
+    });
+
     itWindowsOnly(
       'should not wrap command on windows',
       async () => {
