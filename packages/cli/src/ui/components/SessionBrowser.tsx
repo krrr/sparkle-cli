@@ -5,7 +5,7 @@
  */
 
 import type React from 'react';
-import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import { getContrastingTextColor } from '../themes/color-utils.js';
@@ -140,7 +140,7 @@ const SessionTableHeader = ({
   state: SessionBrowserState;
 }): React.JSX.Element => (
   <Box flexDirection="row" marginTop={1}>
-    <Text>{state.scrollOffset > 0 ? <Text>▲ </Text> : '  '}</Text>
+    <Text color={Colors.Gray}>{state.scrollOffset > 0 ? '▲ ' : '  '}</Text>
 
     <Box width={5} flexShrink={0}>
       <Text color={Colors.Gray} bold>
@@ -203,178 +203,214 @@ const MatchSnippetDisplay = ({
 };
 
 /**
- * Individual session row component.
+ * Individual session row props. All values are primitives or
+ * referentially stable so that React.memo can skip re-rendering unchanged rows.
  */
-const SessionItem = ({
-  session,
-  state,
-  terminalWidth,
-  formatRelativeTime,
-}: {
+interface SessionItemProps {
   session: SessionInfo;
-  state: SessionBrowserState;
+  /** Absolute index of this row within the full filtered list. */
+  index: number;
+  isActive: boolean;
+  isPendingDelete: boolean;
+  searchQuery: string;
   terminalWidth: number;
-  formatRelativeTime: (dateString: string, style: 'short' | 'long') => string;
-}): React.JSX.Element => {
-  const originalIndex =
-    state.startIndex + state.visibleSessions.indexOf(session);
-  const isActive = originalIndex === state.activeIndex;
-  const isDisabled = session.isCurrentSession;
-  const isPendingDelete = state.pendingDeleteSessionId === session.id;
-  // Pick black or white text by the actual AccentRed luminance so contrast
-  // holds on both light and dark themes. Skipped in color-less terminals where
-  // AccentRed is empty.
-  const pendingDeleteTextColor =
-    isPendingDelete && Colors.AccentRed
-      ? getContrastingTextColor(Colors.AccentRed)
-      : undefined;
-  const textColor = (c: string = Colors.Foreground) => {
-    if (pendingDeleteTextColor) {
-      return pendingDeleteTextColor;
+  /** Pre-computed short relative age (e.g. "5m"), formatted once at load. */
+  ageLabel: string;
+}
+
+/**
+ * Individual session row component.
+ *
+ * Memoized so moving the selection only re-renders the two rows whose
+ * highlight changed rather than the whole visible list on every keypress.
+ */
+const SessionItem = memo(
+  ({
+    session,
+    index,
+    isActive,
+    isPendingDelete,
+    searchQuery,
+    terminalWidth,
+    ageLabel,
+  }: SessionItemProps): React.JSX.Element => {
+    const originalIndex = index;
+    const isDisabled = session.isCurrentSession;
+    // Pick black or white text by the actual AccentRed luminance so contrast
+    // holds on both light and dark themes. Skipped in color-less terminals where
+    // AccentRed is empty.
+    const pendingDeleteTextColor =
+      isPendingDelete && Colors.AccentRed
+        ? getContrastingTextColor(Colors.AccentRed)
+        : undefined;
+    const textColor = (c: string = Colors.Foreground) => {
+      if (pendingDeleteTextColor) {
+        return pendingDeleteTextColor;
+      }
+      if (isDisabled) {
+        return Colors.Gray;
+      }
+      return isActive ? theme.ui.focus : c;
+    };
+
+    const prefix = isActive ? '❯ ' : '  ';
+    let additionalInfo = '';
+    let matchDisplay = null;
+
+    // Add "(current)" label for the current session
+    if (session.isCurrentSession) {
+      additionalInfo = ' (current)';
     }
-    if (isDisabled) {
-      return Colors.Gray;
+
+    // Show match snippets if searching and matches exist
+    if (
+      searchQuery &&
+      session.matchSnippets &&
+      session.matchSnippets.length > 0
+    ) {
+      matchDisplay = (
+        <MatchSnippetDisplay session={session} textColor={textColor} />
+      );
+
+      if (session.matchCount && session.matchCount > 1) {
+        additionalInfo += ` (+${session.matchCount - 1} more)`;
+      }
     }
-    return isActive ? theme.ui.focus : c;
-  };
 
-  const prefix = isActive ? '❯ ' : '  ';
-  let additionalInfo = '';
-  let matchDisplay = null;
-
-  // Add "(current)" label for the current session
-  if (session.isCurrentSession) {
-    additionalInfo = ' (current)';
-  }
-
-  // Show match snippets if searching and matches exist
-  if (
-    state.searchQuery &&
-    session.matchSnippets &&
-    session.matchSnippets.length > 0
-  ) {
-    matchDisplay = (
-      <MatchSnippetDisplay session={session} textColor={textColor} />
+    // Reserve a few characters for metadata like " (current)" so the name doesn't wrap awkwardly.
+    const reservedForMeta = additionalInfo ? additionalInfo.length + 1 : 0;
+    const availableMessageWidth = Math.max(
+      20,
+      terminalWidth - FIXED_SESSION_COLUMNS_WIDTH - reservedForMeta,
     );
 
-    if (session.matchCount && session.matchCount > 1) {
-      additionalInfo += ` (+${session.matchCount - 1} more)`;
-    }
-  }
+    const truncatedMessage =
+      matchDisplay ||
+      (session.displayName.length === 0 ? (
+        <Text color={textColor(Colors.Gray)} dimColor>
+          (No messages)
+        </Text>
+      ) : session.displayName.length > availableMessageWidth ? (
+        session.displayName.slice(0, availableMessageWidth - 1) + '…'
+      ) : (
+        session.displayName
+      ));
 
-  // Reserve a few characters for metadata like " (current)" so the name doesn't wrap awkwardly.
-  const reservedForMeta = additionalInfo ? additionalInfo.length + 1 : 0;
-  const availableMessageWidth = Math.max(
-    20,
-    terminalWidth - FIXED_SESSION_COLUMNS_WIDTH - reservedForMeta,
-  );
-
-  const truncatedMessage =
-    matchDisplay ||
-    (session.displayName.length === 0 ? (
-      <Text color={textColor(Colors.Gray)} dimColor>
-        (No messages)
-      </Text>
-    ) : session.displayName.length > availableMessageWidth ? (
-      session.displayName.slice(0, availableMessageWidth - 1) + '…'
-    ) : (
-      session.displayName
-    ));
-
-  return (
-    <Box
-      flexDirection="row"
-      backgroundColor={
-        isPendingDelete
-          ? Colors.AccentRed
-          : isActive
-            ? theme.background.focus
-            : undefined
-      }
-    >
-      <Text color={textColor()} dimColor={isDisabled}>
-        {prefix}
-      </Text>
-      {/* Visual hierarchy: index/msgs are secondary anchors (Comment);
+    return (
+      <Box
+        flexDirection="row"
+        backgroundColor={
+          isPendingDelete
+            ? Colors.AccentRed
+            : isActive
+              ? theme.background.focus
+              : undefined
+        }
+      >
+        <Text color={textColor()} dimColor={isDisabled}>
+          {prefix}
+        </Text>
+        {/* Visual hierarchy: index/msgs are secondary anchors (Comment);
           age and the session name carry the primary information. */}
-      <Box width={5}>
-        <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
-          #{originalIndex + 1}
+        <Box width={5}>
+          <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
+            #{originalIndex + 1}
+          </Text>
+        </Box>
+        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
+          {' '}
+          │{' '}
         </Text>
-      </Box>
-      <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
-        {' '}
-        │{' '}
-      </Text>
-      <Box width={4}>
-        <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
-          {session.messageCount}
+        <Box width={4}>
+          <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
+            {session.messageCount}
+          </Text>
+        </Box>
+        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
+          {' '}
+          │{' '}
         </Text>
-      </Box>
-      <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
-        {' '}
-        │{' '}
-      </Text>
-      <Box width={4}>
-        <Text color={textColor()} dimColor={isDisabled}>
-          {formatRelativeTime(session.lastUpdated, 'short')}
+        <Box width={4}>
+          <Text color={textColor()} dimColor={isDisabled}>
+            {ageLabel}
+          </Text>
+        </Box>
+        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
+          {' '}
+          │{' '}
         </Text>
+        <Box flexGrow={1}>
+          <Text color={textColor()} dimColor={isDisabled}>
+            {truncatedMessage}
+            {additionalInfo && (
+              <Text color={textColor(Colors.Gray)} dimColor bold={false}>
+                {additionalInfo}
+              </Text>
+            )}
+          </Text>
+        </Box>
       </Box>
-      <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
-        {' '}
-        │{' '}
-      </Text>
-      <Box flexGrow={1}>
-        <Text color={textColor()} dimColor={isDisabled}>
-          {truncatedMessage}
-          {additionalInfo && (
-            <Text color={textColor(Colors.Gray)} dimColor bold={false}>
-              {additionalInfo}
-            </Text>
-          )}
-        </Text>
-      </Box>
-    </Box>
-  );
-};
+    );
+  },
+);
+SessionItem.displayName = 'SessionItem';
 
 /**
  * Session list container component.
  */
 const SessionList = ({
   state,
-  formatRelativeTime,
 }: {
   state: SessionBrowserState;
-  formatRelativeTime: (dateString: string, style: 'short' | 'long') => string;
-}): React.JSX.Element => (
-  <Box flexDirection="column">
-    {/* Table Header */}
+}): React.JSX.Element => {
+  // Relative ages are formatted exactly once per list load and
+  // reused on every later render, so navigating the list never reparses
+  // timestamps.
+  const ageLabels = useMemo(
+    () =>
+      new Map(
+        state.sessions.map(
+          (s) => [s.id, formatRelativeTime(s.lastUpdated, 'short')] as const,
+        ),
+      ),
+    [state.sessions],
+  );
+
+  return (
     <Box flexDirection="column">
-      {!state.isSearchMode &&
-        (state.pendingDeleteSessionId !== null ? (
-          <DeleteConfirmDisplay />
-        ) : (
-          <NavigationHelpDisplay />
-        ))}
-      <SessionTableHeader state={state} />
+      {/* Table Header */}
+      <Box flexDirection="column">
+        {!state.isSearchMode &&
+          (state.pendingDeleteSessionId !== null ? (
+            <DeleteConfirmDisplay />
+          ) : (
+            <NavigationHelpDisplay />
+          ))}
+        <SessionTableHeader state={state} />
+      </Box>
+
+      {state.visibleSessions.map((session, idx) => {
+        const originalIndex = state.startIndex + idx;
+        return (
+          <SessionItem
+            key={session.id}
+            session={session}
+            index={originalIndex}
+            isActive={originalIndex === state.activeIndex}
+            isPendingDelete={state.pendingDeleteSessionId === session.id}
+            searchQuery={state.searchQuery}
+            terminalWidth={state.terminalWidth}
+            ageLabel={ageLabels.get(session.id) ?? ''}
+          />
+        );
+      })}
+
+      <Text color={Colors.Gray}>
+        <Text dimColor={state.endIndex >= state.totalSessions}>▼</Text>
+      </Text>
     </Box>
-
-    {state.visibleSessions.map((session) => (
-      <SessionItem
-        key={session.id}
-        session={session}
-        state={state}
-        terminalWidth={state.terminalWidth}
-        formatRelativeTime={formatRelativeTime}
-      />
-    ))}
-
-    <Text color={Colors.Gray}>
-      {state.endIndex < state.totalSessions ? <>▼</> : <Text dimColor>▼</Text>}
-    </Text>
-  </Box>
-);
+  );
+};
 
 /**
  * Hook to manage all SessionBrowser state.
@@ -765,7 +801,7 @@ export function SessionBrowserView({
       {state.totalSessions === 0 ? (
         <NoResultsDisplay state={state} />
       ) : (
-        <SessionList state={state} formatRelativeTime={formatRelativeTime} />
+        <SessionList state={state} />
       )}
     </Box>
   );
