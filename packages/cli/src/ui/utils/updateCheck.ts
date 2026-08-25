@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import latestVersion from 'latest-version';
-import semver from 'semver';
+import type semver from 'semver';
 import { getPackageJson, debugLogger } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../../config/settings.js';
 import { fileURLToPath } from 'node:url';
@@ -47,6 +46,13 @@ export async function checkForUpdates(
     }
 
     const { name, version: currentVersion } = packageJson;
+    const [latestVersionModule, semverModule] = await Promise.all([
+      import('latest-version'),
+      import('semver'),
+    ]);
+    const latestVersion = latestVersionModule.default;
+    const semver = semverModule.default;
+
     const latestUpdate = await latestVersion(name);
     if (!latestUpdate) {
       return null;

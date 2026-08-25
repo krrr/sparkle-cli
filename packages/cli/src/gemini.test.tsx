@@ -1742,33 +1742,38 @@ describe('startInteractiveUI', () => {
   });
 
   it('should perform all startup tasks in correct order', async () => {
+    vi.useFakeTimers();
     const { getVersion } = await import('sparkle-cli-core');
     const { checkForUpdates } = await import('./ui/utils/updateCheck.js');
     const { registerCleanup } = await import('./utils/cleanup.js');
+    vi.mocked(checkForUpdates).mockClear();
 
-    await startTestInteractiveUI(
-      mockConfig,
-      mockSettings,
-      mockStartupWarnings,
-      mockWorkspaceRoot,
-      undefined,
-      mockInitializationResult,
-    );
+    try {
+      await startTestInteractiveUI(
+        mockConfig,
+        mockSettings,
+        mockStartupWarnings,
+        mockWorkspaceRoot,
+        undefined,
+        mockInitializationResult,
+      );
 
-    // Verify all startup tasks were called
-    expect(getVersion).toHaveBeenCalledTimes(1);
-    // 6 cleanups: mouseEvents, lineWrapping, non-resumable session cleanup,
-    // instance.unmount, TTY check, and consolePatcher
-    expect(registerCleanup).toHaveBeenCalledTimes(6);
+      // Verify all startup tasks were called
+      expect(getVersion).toHaveBeenCalledTimes(1);
+      // 6 cleanups: mouseEvents, lineWrapping, non-resumable session cleanup,
+      // instance.unmount, TTY check, and consolePatcher
+      expect(registerCleanup).toHaveBeenCalledTimes(6);
 
-    // Verify cleanup handler is registered with unmount function
-    const cleanupFn = vi.mocked(registerCleanup).mock.calls[0][0];
-    expect(typeof cleanupFn).toBe('function');
+      // Verify cleanup handler is registered with unmount function
+      const cleanupFn = vi.mocked(registerCleanup).mock.calls[0][0];
+      expect(typeof cleanupFn).toBe('function');
 
-    // checkForUpdates should be called asynchronously (not waited for)
-    // We need a small delay to let it execute
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(checkForUpdates).toHaveBeenCalledTimes(1);
+      // checkForUpdates should be called asynchronously after idle delay
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(checkForUpdates).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('should not recordSlowRender when less than threshold', async () => {
