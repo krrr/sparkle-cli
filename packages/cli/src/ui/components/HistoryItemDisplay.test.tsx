@@ -137,17 +137,23 @@ describe('<HistoryItemDisplay />', () => {
     const item: HistoryItem = {
       ...baseItem,
       type: MessageType.ABOUT,
-      cliVersion: '1.0.0',
-      osVersion: 'test-os',
-      sandboxEnv: 'test-env',
-      modelVersion: 'test-model',
-      selectedAuthType: 'test-auth',
-      ideClient: 'test-ide',
+      about: {
+        cliVersion: '1.0.0',
+        osVersion: 'test-os',
+        sandboxEnv: 'test-env',
+        nodeVersion: 'v20.19.0',
+        memoryUsage: '512.0 MB',
+        modelVersion: 'test-model',
+        selectedAuthType: 'test-auth',
+        ideClient: 'test-ide',
+      },
     };
     const { lastFrame, unmount } = await renderWithProviders(
       <HistoryItemDisplay {...baseItem} item={item} />,
     );
     expect(lastFrame()).toContain('About Sparkle CLI');
+    expect(lastFrame()).toContain('Node Version');
+    expect(lastFrame()).toContain('Memory Usage');
     unmount();
   });
 

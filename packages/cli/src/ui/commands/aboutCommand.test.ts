@@ -27,6 +27,8 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 describe('aboutCommand', () => {
   let mockContext: CommandContext;
   const originalPlatform = process.platform;
+  const originalVersion = process.version;
+  const memoryUsageSpy = vi.spyOn(process, 'memoryUsage');
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
@@ -65,12 +67,23 @@ describe('aboutCommand', () => {
     Object.defineProperty(process, 'platform', {
       value: 'test-os',
     });
+    Object.defineProperty(process, 'version', {
+      value: 'v20.19.0',
+      configurable: true,
+    });
+    memoryUsageSpy.mockReturnValue({
+      rss: 100 * 1024 * 1024,
+    } as NodeJS.MemoryUsage);
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
     Object.defineProperty(process, 'platform', {
       value: originalPlatform,
+    });
+    Object.defineProperty(process, 'version', {
+      value: originalVersion,
+      configurable: true,
     });
     process.env = originalEnv;
     vi.clearAllMocks();
@@ -91,12 +104,16 @@ describe('aboutCommand', () => {
 
     expect(mockContext.ui.addItem).toHaveBeenCalledWith({
       type: MessageType.ABOUT,
-      cliVersion: 'test-version',
-      osVersion: 'test-os',
-      sandboxEnv: 'no sandbox',
-      modelVersion: 'test-model',
-      selectedAuthType: 'test-auth (gemini-api-key)',
-      ideClient: 'test-ide',
+      about: {
+        cliVersion: 'test-version',
+        osVersion: 'test-os',
+        sandboxEnv: 'no sandbox',
+        nodeVersion: 'v20.19.0',
+        memoryUsage: '100.0 MB',
+        modelVersion: 'test-model',
+        selectedAuthType: 'test-auth (gemini-api-key)',
+        ideClient: 'test-ide',
+      },
     });
   });
 
@@ -110,7 +127,9 @@ describe('aboutCommand', () => {
 
     expect(mockContext.ui.addItem).toHaveBeenCalledWith(
       expect.objectContaining({
-        sandboxEnv: 'sparkle-sandbox',
+        about: expect.objectContaining({
+          sandboxEnv: 'sparkle-sandbox',
+        }),
       }),
     );
   });
@@ -130,12 +149,16 @@ describe('aboutCommand', () => {
     expect(mockContext.ui.addItem).toHaveBeenCalledWith(
       expect.objectContaining({
         type: MessageType.ABOUT,
-        cliVersion: 'test-version',
-        osVersion: 'test-os',
-        sandboxEnv: 'no sandbox',
-        modelVersion: 'test-model',
-        selectedAuthType: 'test-auth (gemini-api-key)',
-        ideClient: '',
+        about: expect.objectContaining({
+          cliVersion: 'test-version',
+          osVersion: 'test-os',
+          sandboxEnv: 'no sandbox',
+          nodeVersion: 'v20.19.0',
+          memoryUsage: '100.0 MB',
+          modelVersion: 'test-model',
+          selectedAuthType: 'test-auth (gemini-api-key)',
+          ideClient: '',
+        }),
       }),
     );
   });

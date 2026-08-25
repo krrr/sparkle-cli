@@ -9,20 +9,14 @@ import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import { GIT_COMMIT_INFO } from '../../generated/git-commit.js';
 import { getDisplayString } from 'sparkle-cli-core';
+import type { AboutInfo } from '../types.js';
 
-interface AboutBoxProps {
-  cliVersion: string;
-  osVersion: string;
-  sandboxEnv: string;
-  modelVersion: string;
-  selectedAuthType: string;
-  ideClient: string;
-}
-
-export const AboutBox: React.FC<AboutBoxProps> = ({
+export const AboutBox: React.FC<AboutInfo> = ({
   cliVersion,
   osVersion,
   sandboxEnv,
+  nodeVersion,
+  memoryUsage,
   modelVersion,
   selectedAuthType,
   ideClient,
@@ -92,6 +86,26 @@ export const AboutBox: React.FC<AboutBoxProps> = ({
       </Box>
       <Box>
         <Text color={theme.text.primary}>{osVersion}</Text>
+      </Box>
+    </Box>
+    <Box flexDirection="row">
+      <Box width="35%">
+        <Text bold color={theme.text.link}>
+          Node Version
+        </Text>
+      </Box>
+      <Box>
+        <Text color={theme.text.primary}>{nodeVersion}</Text>
+      </Box>
+    </Box>
+    <Box flexDirection="row">
+      <Box width="35%">
+        <Text bold color={theme.text.link}>
+          Memory Usage
+        </Text>
+      </Box>
+      <Box>
+        <Text color={theme.text.primary}>{memoryUsage}</Text>
       </Box>
     </Box>
     {ideClient && (

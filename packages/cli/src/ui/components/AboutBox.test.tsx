@@ -18,6 +18,8 @@ describe('AboutBox', () => {
     cliVersion: '1.0.0',
     osVersion: 'macOS',
     sandboxEnv: 'default',
+    nodeVersion: 'v20.19.0',
+    memoryUsage: '512.0 MB',
     modelVersion: 'gemini-pro',
     selectedAuthType: 'gemini-api-key',
     ideClient: '',
@@ -34,6 +36,10 @@ describe('AboutBox', () => {
     expect(output).toContain('gemini-pro');
     expect(output).toContain('default');
     expect(output).toContain('macOS');
+    expect(output).toContain('Node Version');
+    expect(output).toContain('v20.19.0');
+    expect(output).toContain('Memory Usage');
+    expect(output).toContain('512.0 MB');
     expect(output).toContain('gemini-api-key');
     unmount();
   });

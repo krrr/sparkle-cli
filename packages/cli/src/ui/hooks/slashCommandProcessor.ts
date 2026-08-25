@@ -150,12 +150,7 @@ export const useSlashCommandProcessor = (
       if (message.type === MessageType.ABOUT) {
         historyItemContent = {
           type: 'about',
-          cliVersion: message.cliVersion,
-          osVersion: message.osVersion,
-          sandboxEnv: message.sandboxEnv,
-          modelVersion: message.modelVersion,
-          selectedAuthType: message.selectedAuthType,
-          ideClient: message.ideClient,
+          about: message.about,
         };
       } else if (message.type === MessageType.HELP) {
         historyItemContent = {

@@ -192,15 +192,23 @@ export type HistoryItemWarning = HistoryItemBase & {
   text: string;
 };
 
-export type HistoryItemAbout = HistoryItemBase & {
-  type: 'about';
+/**
+ * Shared payload for the About dialog; consumed directly as AboutBox props.
+ */
+export type AboutInfo = {
   cliVersion: string;
   osVersion: string;
   sandboxEnv: string;
+  nodeVersion: string;
+  memoryUsage: string;
   modelVersion: string;
   selectedAuthType: string;
   ideClient: string;
-  userEmail?: string;
+};
+
+export type HistoryItemAbout = HistoryItemBase & {
+  type: 'about';
+  about: AboutInfo;
 };
 
 export type HistoryItemHelp = HistoryItemBase & {
@@ -451,13 +459,7 @@ export type Message =
   | {
       type: MessageType.ABOUT;
       timestamp: Date;
-      cliVersion: string;
-      osVersion: string;
-      sandboxEnv: string;
-      modelVersion: string;
-      selectedAuthType: string;
-      ideClient: string;
-      userEmail?: string;
+      about: AboutInfo;
       content?: string; // Optional content, not really used for ABOUT
     }
   | {

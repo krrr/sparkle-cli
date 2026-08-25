@@ -12,6 +12,7 @@ import {
 import process from 'node:process';
 import { MessageType, type HistoryItemAbout } from '../types.js';
 import { IdeClient, getVersion } from 'sparkle-cli-core';
+import { formatBytes } from '../utils/formatters.js';
 
 export const aboutCommand: SlashCommand = {
   name: 'about',
@@ -38,12 +39,16 @@ export const aboutCommand: SlashCommand = {
 
     const aboutItem: Omit<HistoryItemAbout, 'id'> = {
       type: MessageType.ABOUT,
-      cliVersion,
-      osVersion,
-      sandboxEnv,
-      modelVersion,
-      selectedAuthType,
-      ideClient,
+      about: {
+        cliVersion,
+        osVersion,
+        sandboxEnv,
+        nodeVersion: process.version,
+        memoryUsage: formatBytes(process.memoryUsage().rss),
+        modelVersion,
+        selectedAuthType,
+        ideClient,
+      },
     };
 
     context.ui.addItem(aboutItem);

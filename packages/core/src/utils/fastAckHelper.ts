@@ -10,7 +10,7 @@ import type { ModelConfigKey } from '../services/modelConfigService.js';
 import { debugLogger } from './debugLogger.js';
 import { getResponseText } from './partUtils.js';
 import { getErrorMessage } from './errors.js';
-import type { InjectionSource } from 'src/config/injectionService.js';
+import type { InjectionSource } from '../config/injectionService.js';
 
 export const DEFAULT_FAST_ACK_MODEL_CONFIG_KEY: ModelConfigKey = {
   model: 'fast-ack-helper',
