@@ -6,7 +6,6 @@
 
 import {
   type StartupWarning,
-  WarningPriority,
   type Config,
   type ResumedSessionData,
   type WorktreeInfo,
@@ -39,7 +38,6 @@ import {
 import { loadCliConfig, parseArguments } from './config/config.js';
 import * as cliConfig from './config/config.js';
 import { readStdin } from './utils/readStdin.js';
-import { createHash } from 'node:crypto';
 import v8 from 'node:v8';
 import os from 'node:os';
 import dns from 'node:dns';
@@ -55,7 +53,6 @@ import {
   loadTrustedFolders,
   type TrustedFoldersError,
 } from './config/trustedFolders.js';
-import { getStartupWarnings } from './utils/startupWarnings.js';
 import { getUserStartupWarnings } from './utils/userStartupWarnings.js';
 import { ConsolePatcher } from './ui/utils/ConsolePatcher.js';
 import { runNonInteractive } from './nonInteractiveCli.js';
@@ -401,8 +398,6 @@ export async function main() {
     parseArgsHandle?.end();
   });
 
-  const rawStartupWarningsPromise = getStartupWarnings();
-
   // Report settings errors once during startup
   settings.errors.forEach((error) => {
     coreEvents.emitFeedback('warning', error.message);
@@ -683,17 +678,13 @@ export async function main() {
       config.getUseAlternateBuffer(),
       config.getScreenReader(),
     );
-    const rawStartupWarnings = await rawStartupWarningsPromise;
-    const startupWarnings: StartupWarning[] = [
-      ...rawStartupWarnings.map((message) => ({
-        id: `startup-${createHash('sha256').update(message).digest('hex').substring(0, 16)}`,
-        message,
-        priority: WarningPriority.High,
-      })),
-      ...(await getUserStartupWarnings(settings.merged, undefined, {
+    const startupWarnings: StartupWarning[] = await getUserStartupWarnings(
+      settings.merged,
+      undefined,
+      {
         isAlternateBuffer: useAlternateBuffer,
-      })),
-    ];
+      },
+    );
 
     cliStartupHandle?.end();
 

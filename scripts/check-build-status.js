@@ -4,9 +4,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os'; // Import os module
 
 // --- Configuration ---
 const cliPackageDir = path.resolve('packages', 'cli'); // Base directory for the CLI package
@@ -17,7 +29,6 @@ const filesToWatch = [
   path.join(cliPackageDir, 'tsconfig.json'),
 ]; // Specific files within the CLI package
 const buildDir = path.join(cliPackageDir, 'dist'); // Build output directory within the CLI package
-const warningsFilePath = path.join(os.tmpdir(), 'sparkle-cli-warnings.txt'); // Temp file for warnings
 // ---------------------
 
 function getMtime(filePath) {
@@ -52,34 +63,16 @@ function findSourceFiles(dir, allFiles = []) {
 
 console.log('Checking build status...');
 
-// Clean up old warnings file before check
-try {
-  if (fs.existsSync(warningsFilePath)) {
-    fs.unlinkSync(warningsFilePath);
-  }
-} catch (err) {
-  console.warn(
-    `[Check Script] Warning: Could not delete previous warnings file: ${err.message}`,
-  );
-}
-
 const buildMtime = getMtime(buildTimestampPath);
 if (!buildMtime) {
-  // If build is missing, write that as a warning and exit(0) so app can display it
-  const errorMessage = `ERROR: Build timestamp file (${path.relative(process.cwd(), buildTimestampPath)}) not found. Run \`npm run build\` first.`;
-  console.error(errorMessage); // Still log error here
-  try {
-    fs.writeFileSync(warningsFilePath, errorMessage);
-  } catch (writeErr) {
-    console.error(
-      `[Check Script] Error writing missing build warning file: ${writeErr.message}`,
-    );
-  }
-  process.exit(0); // Allow app to start and show the error
+  // If build is missing, warn and exit(0) so the app can still start
+  console.error(
+    `ERROR: Build timestamp file (${path.relative(process.cwd(), buildTimestampPath)}) not found. Run \`npm run build\` first.`,
+  );
+  process.exit(0); // Allow app to start
 }
 
 let newerSourceFileFound = false;
-const warningMessages = []; // Collect warnings here
 const allSourceFiles = [];
 
 // Collect files from specified directories
@@ -109,40 +102,18 @@ for (const file of allSourceFiles) {
   const isNewer = sourceMtime && sourceMtime > buildMtime;
 
   if (isNewer) {
-    const warning = `Warning: Source file "${relativePath}" has been modified since the last build.`;
-    console.warn(warning); // Keep console warning for script debugging
-    warningMessages.push(warning);
+    console.warn(
+      `Warning: Source file "${relativePath}" has been modified since the last build.`,
+    );
     newerSourceFileFound = true;
     // break; // Uncomment to stop checking after the first newer file
   }
 }
 
 if (newerSourceFileFound) {
-  const finalWarning =
-    '\nRun "npm run build" to incorporate changes before starting.';
-  warningMessages.push(finalWarning);
-  console.warn(finalWarning);
-
-  // Write warnings to the temp file
-  try {
-    fs.writeFileSync(warningsFilePath, warningMessages.join('\n'));
-    // Removed debug log
-  } catch (err) {
-    console.error(`[Check Script] Error writing warnings file: ${err.message}`);
-    // Proceed without writing, app won't show warnings
-  }
+  console.warn('\nRun "npm run build" to incorporate changes before starting.');
 } else {
   console.log('Build is up-to-date.');
-  // Ensure no stale warning file exists if build is ok
-  try {
-    if (fs.existsSync(warningsFilePath)) {
-      fs.unlinkSync(warningsFilePath);
-    }
-  } catch (err) {
-    console.warn(
-      `[Check Script] Warning: Could not delete previous warnings file: ${err.message}`,
-    );
-  }
 }
 
 process.exit(0); // Always exit successfully so the app starts
