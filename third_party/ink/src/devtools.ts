@@ -35,6 +35,6 @@ if (await isDevToolsReachable()) {
 	(devtools as any).connectToDevTools();
 } else {
 	console.warn(
-		'DEV is set to true, but the React DevTools server is not running. Start it with:\n\n$ npx react-devtools\n',
+		'$DEV is true, but React DevTools server is not running. Start it with: `npx react-devtools`\n',
 	);
 }

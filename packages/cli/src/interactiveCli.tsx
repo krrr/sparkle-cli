@@ -33,7 +33,6 @@ import {
 import type { InitializationResult } from './core/initializer.js';
 import type { LoadedSettings } from './config/settings.js';
 import { SettingsContext } from './ui/contexts/SettingsContext.js';
-import { MouseProvider } from './ui/contexts/MouseContext.js';
 import { StreamingState } from './ui/types.js';
 import { computeTerminalTitle } from './utils/windowTitle.js';
 
@@ -42,8 +41,6 @@ import { VimModeProvider } from './ui/contexts/VimModeContext.js';
 import { KeyMatchersProvider } from './ui/hooks/useKeyMatchers.js';
 import { loadKeyMatchers } from './ui/key/keyMatchers.js';
 import { KeypressProvider } from './ui/contexts/KeypressContext.js';
-import { useKittyKeyboardProtocol } from './ui/hooks/useKittyKeyboardProtocol.js';
-import { ScrollProvider } from './ui/contexts/ScrollProvider.js';
 import { TerminalProvider } from './ui/contexts/TerminalContext.js';
 import { OverflowProvider } from './ui/contexts/OverflowContext.js';
 import { profiler } from './ui/components/DebugProfiler.js';
@@ -76,12 +73,14 @@ export async function startInteractiveUI(
     });
   }
 
-  const { matchers, errors } = await loadKeyMatchers();
+  const [{ matchers, errors }, version] = await Promise.all([
+    loadKeyMatchers(),
+    getVersion(),
+  ]);
   errors.forEach((error) => {
     coreEvents.emitFeedback('warning', error);
   });
 
-  const version = await getVersion();
   setWindowTitle(basename(workspaceRoot), settings);
 
   const consolePatcher = new ConsolePatcher({
@@ -97,37 +96,29 @@ export async function startInteractiveUI(
   const isShpool = !!process.env['SHPOOL_SESSION_NAME'];
 
   // Create wrapper component to use hooks inside render
-  const AppWrapper = () => {
-    useKittyKeyboardProtocol();
-
-    return (
-      <SettingsContext.Provider value={settings}>
-        <KeyMatchersProvider value={matchers}>
-          <KeypressProvider config={config}>
-            <MouseProvider mouseEventsEnabled={mouseEventsEnabled}>
-              <TerminalProvider>
-                <ScrollProvider>
-                  <OverflowProvider>
-                    <SessionStatsProvider sessionId={config.getSessionId()}>
-                      <VimModeProvider>
-                        <AppContainer
-                          config={config}
-                          startupWarnings={startupWarnings}
-                          version={version}
-                          resumedSessionData={resumedSessionData}
-                          initializationResult={initializationResult}
-                        />
-                      </VimModeProvider>
-                    </SessionStatsProvider>
-                  </OverflowProvider>
-                </ScrollProvider>
-              </TerminalProvider>
-            </MouseProvider>
-          </KeypressProvider>
-        </KeyMatchersProvider>
-      </SettingsContext.Provider>
-    );
-  };
+  const AppWrapper = () => (
+    <SettingsContext.Provider value={settings}>
+      <KeyMatchersProvider value={matchers}>
+        <KeypressProvider config={config}>
+          <TerminalProvider>
+            <OverflowProvider>
+              <SessionStatsProvider sessionId={config.getSessionId()}>
+                <VimModeProvider>
+                  <AppContainer
+                    config={config}
+                    startupWarnings={startupWarnings}
+                    version={version}
+                    resumedSessionData={resumedSessionData}
+                    initializationResult={initializationResult}
+                  />
+                </VimModeProvider>
+              </SessionStatsProvider>
+            </OverflowProvider>
+          </TerminalProvider>
+        </KeypressProvider>
+      </KeyMatchersProvider>
+    </SettingsContext.Provider>
+  );
 
   if (isShpool) {
     // Wait a moment for shpool to stabilize terminal size and state.
@@ -147,6 +138,7 @@ export async function startInteractiveUI(
       stdin: process.stdin,
       exitOnCtrlC: false,
       concurrent: true,
+      maxFps: 60,
       isScreenReaderEnabled: config.getScreenReader(),
       onRender: ({ renderTime }: { renderTime: number }) => {
         if (renderTime > SLOW_RENDER_MS) {
