@@ -2,6 +2,9 @@ Ink fork by Google employee jacob314. https://github.com/jacob314/ink
 synced git version: 0c5453b
 
 ## 已同步上游提交
+
+Complete list: https://github.com/jacob314/ink/compare/master...vadimdemedes%3Aink%3Amaster
+
 - 7c0f383b (Update dependencies), 6c47b49 (Fix CI), 0a685a7 (Update dependencies)
 - c587da3 (Add support for concurrent rendering)
 - 969cae4b (useInput home/end key support)

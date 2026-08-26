@@ -117,6 +117,27 @@ describe(`useKeypress`, () => {
     );
   });
 
+  it('should call the latest onKeypress callback when re-rendered with new callback reference', async () => {
+    let captured = '';
+    const { rerender } = await renderHookWithProviders(
+      ({ val }: { val: string }) =>
+        useKeypress(
+          () => {
+            captured = val;
+          },
+          { isActive: true },
+        ),
+      { initialProps: { val: 'first' } },
+    );
+
+    act(() => stdin.write('a'));
+    expect(captured).toBe('first');
+
+    rerender({ val: 'second' });
+    act(() => stdin.write('b'));
+    expect(captured).toBe('second');
+  });
+
   describe.each([
     {
       description: 'PASTE_WORKAROUND true',

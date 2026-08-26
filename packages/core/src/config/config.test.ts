@@ -287,7 +287,7 @@ describe('Server Config (config.ts)', () => {
     it('should fall back to notify for unrecognized values', () => {
       const config = new Config({
         ...baseParams,
-         
+
         shellBackgroundCompletionBehavior: 'bogus' as 'notify',
       });
       expect(config.getShellBackgroundCompletionBehavior()).toBe('notify');
