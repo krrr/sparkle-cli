@@ -109,6 +109,47 @@ test('incremental rendering - surgical updates', t => {
 	t.false(secondCall.includes('Line 3')); // Doesn't rewrite unchanged
 });
 
+test('incremental rendering - writes line content before erasing tail to avoid flicker', t => {
+	const stdout = createStdout();
+	const render = logUpdate.create(stdout, {incremental: true});
+
+	render('Short');
+	render('A much longer replacement');
+
+	const secondCall = (stdout.write as any).secondCall.args[0] as string;
+	const contentIndex = secondCall.indexOf('A much longer replacement');
+	const eraseEndIndex = secondCall.indexOf(ansiEscapes.eraseEndLine);
+	const fullEraseIndex = secondCall.indexOf(ansiEscapes.eraseLine);
+
+	t.true(secondCall.includes(ansiEscapes.cursorTo(0)));
+	t.true(contentIndex !== -1);
+	t.true(eraseEndIndex !== -1);
+	// Content must be written BEFORE clearing the rest of the line so that
+	// the terminal never displays an intermediate blank frame.
+	t.true(contentIndex < eraseEndIndex);
+	// The old flickering pattern erased the whole line before writing content.
+	t.true(fullEraseIndex === -1 || fullEraseIndex > contentIndex);
+});
+
+test('incremental IME cursor - writes line content before erasing tail', t => {
+	const stdout = createStdout();
+	const render = logUpdate.create(stdout, {incremental: true});
+
+	render('Hello', [], undefined, {row: 0, col: 2});
+	render('World', [], undefined, {row: 0, col: 2});
+
+	t.is((stdout.write as any).callCount, 2);
+	const secondCall = (stdout.write as any).secondCall.args[0] as string;
+	const contentIndex = secondCall.indexOf('World');
+	const eraseEndIndex = secondCall.indexOf(ansiEscapes.eraseEndLine);
+	const fullEraseIndex = secondCall.indexOf(ansiEscapes.eraseLine);
+
+	t.true(contentIndex !== -1);
+	t.true(eraseEndIndex !== -1);
+	t.true(contentIndex < eraseEndIndex);
+	t.true(fullEraseIndex === -1 || fullEraseIndex > contentIndex);
+});
+
 test('incremental rendering - clears extra lines when output shrinks', t => {
 	const stdout = createStdout();
 	const render = logUpdate.create(stdout, {incremental: true});

@@ -632,7 +632,11 @@ const createIncremental = (
 						continue;
 					}
 
-					buffer += ansiEscapes.eraseLine + nextLines[i] + '\n';
+					buffer +=
+						ansiEscapes.cursorTo(0) +
+						nextLines[i] +
+						ansiEscapes.eraseEndLine +
+						'\n';
 				}
 
 				buffer += ansiEscapes.cursorSavePosition;
@@ -698,7 +702,12 @@ const createIncremental = (
 				? colorize(lineToWrite, debugRainbowColor, 'background')
 				: lineToWrite;
 
-			buffer.push(ansiEscapes.eraseLine + lineToWrite + '\n');
+			buffer.push(
+				ansiEscapes.cursorTo(0) +
+					lineToWrite +
+					ansiEscapes.eraseEndLine +
+					'\n',
+			);
 		}
 
 		skippedLines = moveCursorDown(buffer, skippedLines);

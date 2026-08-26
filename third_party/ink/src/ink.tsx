@@ -140,6 +140,7 @@ export default class Ink {
 	private lastOutput: string;
 	private lastOutputHeight: number;
 	private lastCursorPosition?: {row: number; col: number} | undefined;
+	private lastTerminalWidth: number;
 	private readonly container: FiberRoot;
 	private node: ReactNode;
 	// This variable is used only in debug mode to store full static output
@@ -254,6 +255,7 @@ export default class Ink {
 		// Store last output to only rerender when needed
 		this.lastOutput = '';
 		this.lastOutputHeight = 0;
+		this.lastTerminalWidth = this.getTerminalWidth();
 
 		// This variable is used only in debug mode to store full static output
 		// so that it's rerendered every time, not just new static parts, like in non-debug mode
@@ -300,16 +302,31 @@ export default class Ink {
 		}
 	}
 
+	getTerminalWidth = () => {
+		// The 'columns' property can be undefined or 0 when not using a TTY.
+		// In that case we fall back to 80.
+		return this.options.stdout.columns || 80;
+	};
+
 	resized = () => {
-		const terminalWidth = this.options.stdout.columns ?? 80;
+		const currentWidth = this.getTerminalWidth();
+
+		if (currentWidth < this.lastTerminalWidth) {
+			// We clear the screen when decreasing terminal width to prevent duplicate overlapping re-renders.
+			this.log.clear();
+			this.lastOutput = '';
+		}
+
 		const terminalHeight = this.options.stdout.rows ?? 24;
 
 		clearToStyledCharactersCache();
-		this.terminalBuffer?.resize(terminalWidth, terminalHeight);
+		this.terminalBuffer?.resize(currentWidth, terminalHeight);
 		this.resetScrollbackPadding(this.rootNode);
 		this.isTerminalResized = true;
 		this.calculateLayout();
 		void this.onRender();
+
+		this.lastTerminalWidth = currentWidth;
 	};
 
 	getSelection(): Selection {
@@ -332,9 +349,7 @@ export default class Ink {
 
 		this.prepareYogaTree(this.rootNode);
 
-		// The 'columns' property can be undefined or 0 when not using a TTY.
-		// In that case we fall back to 80.
-		const terminalWidth = this.options.stdout.columns ?? 80;
+		const terminalWidth = this.getTerminalWidth();
 
 		this.rootNode.yogaNode!.setWidth(terminalWidth);
 
