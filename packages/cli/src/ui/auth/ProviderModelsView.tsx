@@ -145,9 +145,6 @@ export function ProviderModelsView({
           <Text color={theme.text.secondary}>
             No models configured for this provider.
           </Text>
-          <Text color={theme.text.secondary}>
-            Add a model to start configuring custom models.
-          </Text>
         </Box>
         {error && (
           <Box marginTop={1}>

@@ -341,7 +341,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
       {showUserIdentity && selectedAuthType && (
         <Box>
           <Box width={28}>
-            <Text color={theme.text.link}>Auth Method:</Text>
+            <Text color={theme.text.link}>Provider:</Text>
           </Box>
           <Text color={theme.text.primary}>{selectedAuthType}</Text>
         </Box>

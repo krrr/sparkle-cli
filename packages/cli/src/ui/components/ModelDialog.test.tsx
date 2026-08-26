@@ -276,6 +276,28 @@ describe('<ModelDialog />', () => {
     unmount();
   });
 
+  it('deletes the selected model from the settings view with d', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderComponent();
+
+    await act(async () => {
+      stdin.write('m');
+    });
+    await waitUntilReady();
+
+    await act(async () => {
+      stdin.write('d');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(mockRemoveModel).toHaveBeenCalledWith(
+        fakeProfile.id,
+        DEFAULT_GEMINI_FLASH_MODEL,
+      );
+    });
+    unmount();
+  });
+
   it('opens the settings view via m when the provider has no models', async () => {
     mockProfileService.getActiveProfile.mockReturnValue({
       ...fakeProfile,

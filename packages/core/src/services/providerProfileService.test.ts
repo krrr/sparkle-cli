@@ -12,6 +12,7 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
   DEFAULT_GEMINI_MODEL,
   DEFAULT_OPENAI_MODEL,
+  SPARKLE_MODEL_ALIAS_AUTO,
   SPARKLE_MODEL_ALIAS_FLASH,
   SPARKLE_MODEL_ALIAS_FLASH_LITE,
   SPARKLE_MODEL_ALIAS_PRO,
@@ -301,7 +302,93 @@ describe('ProviderProfileService', () => {
       expect(service.getActiveProfile()?.id).toBe(p2.id);
     });
 
-    it('should set active profile to undefined when last profile deleted', async () => {
+    it('should update config model when removing the default model from the active profile', async () => {
+      const profile = await service.createProfile({
+        id: 'active-prof',
+        providerType: ProviderType.USE_OPENAI,
+        models: [
+          { id: 'model-a', tier: 'pro' },
+          { id: 'model-b', tier: 'flash' },
+        ],
+        defaultModel: 'model-a',
+      });
+      storedSelectedId = profile.id;
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
+        'model-a',
+      );
+
+      await service.removeModel(profile.id, 'model-a');
+
+      const updated = service.getProfile(profile.id);
+      expect(updated?.defaultModel).toBe('model-b');
+      expect(mockConfig.setModel).toHaveBeenCalledWith('model-b', false);
+    });
+
+    it('should fallback to default provider model when removing the last model from active profile', async () => {
+      const profile = await service.createProfile({
+        id: 'single-model-prof',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'only-model', tier: 'pro' }],
+        defaultModel: 'only-model',
+      });
+      storedSelectedId = profile.id;
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
+        'only-model',
+      );
+
+      await service.removeModel(profile.id, 'only-model');
+
+      const updated = service.getProfile(profile.id);
+      expect(updated?.models).toHaveLength(0);
+      expect(updated?.defaultModel).toBeUndefined();
+      expect(mockConfig.setModel).toHaveBeenCalledWith(
+        SPARKLE_MODEL_ALIAS_AUTO,
+        false,
+      );
+    });
+
+    it('should not update config model when removing a model from an inactive profile', async () => {
+      const active = await service.createProfile({
+        id: 'active-prof',
+        providerType: ProviderType.USE_GEMINI,
+      });
+      const inactive = await service.createProfile({
+        id: 'inactive-prof',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'custom-1' }, { id: 'custom-2' }],
+        defaultModel: 'custom-1',
+      });
+      storedSelectedId = active.id;
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
+        DEFAULT_GEMINI_FLASH_MODEL,
+      );
+
+      (mockConfig.setModel as ReturnType<typeof vi.fn>).mockClear();
+      await service.removeModel(inactive.id, 'custom-1');
+
+      expect(mockConfig.setModel).not.toHaveBeenCalled();
+    });
+
+    it('should update config model when renaming the active model via updateModel', async () => {
+      const profile = await service.createProfile({
+        id: 'rename-prof',
+        providerType: ProviderType.USE_OPENAI,
+        models: [{ id: 'old-model-name', tier: 'pro' }],
+        defaultModel: 'old-model-name',
+      });
+      storedSelectedId = profile.id;
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
+        'old-model-name',
+      );
+
+      await service.updateModel(profile.id, 'old-model-name', {
+        id: 'new-model-name',
+      });
+
+      expect(mockConfig.setModel).toHaveBeenCalledWith('new-model-name', false);
+    });
+
+    it('should set active profile to undefined and reset config model when last profile deleted', async () => {
       const p1 = await service.createProfile({
         id: 'p1',
         providerType: ProviderType.USE_GEMINI,
@@ -311,6 +398,10 @@ describe('ProviderProfileService', () => {
       await service.deleteProfile(p1.id);
       expect(service.listProfiles()).toHaveLength(0);
       expect(service.getActiveProfile()).toBeUndefined();
+      expect(mockConfig.setModel).toHaveBeenCalledWith(
+        DEFAULT_GEMINI_MODEL,
+        false,
+      );
     });
   });
 

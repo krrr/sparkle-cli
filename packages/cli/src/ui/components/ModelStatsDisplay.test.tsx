@@ -682,12 +682,12 @@ describe('<ModelStatsDisplay />', () => {
     });
 
     const { lastFrame, unmount } = await render(
-      <ModelStatsDisplay selectedAuthType="oauth" />,
+      <ModelStatsDisplay selectedAuthType="test-provider" />,
     );
 
     const output = lastFrame();
-    expect(output).toContain('Auth Method:');
-    expect(output).toContain('oauth');
+    expect(output).toContain('Provider:');
+    expect(output).toContain('test-provider');
     unmount();
   });
 

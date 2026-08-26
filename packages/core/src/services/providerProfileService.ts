@@ -13,6 +13,7 @@ import {
   SPARKLE_MODEL_ALIAS_FLASH_LITE,
   SPARKLE_MODEL_ALIAS_FLASH,
   SPARKLE_MODEL_ALIAS_PRO,
+  SPARKLE_MODEL_ALIAS_AUTO,
 } from '../config/models.js';
 import {
   type ProviderProfile,
@@ -204,16 +205,12 @@ export class ProviderProfileService {
         patch.providerType !== undefined
           ? patch.providerType
           : existing.providerType,
-      baseUrl: patch.baseUrl !== undefined ? patch.baseUrl : existing.baseUrl,
+      baseUrl: 'baseUrl' in patch ? patch.baseUrl : existing.baseUrl,
       customHeaders:
-        patch.customHeaders !== undefined
-          ? patch.customHeaders
-          : existing.customHeaders,
+        'customHeaders' in patch ? patch.customHeaders : existing.customHeaders,
       models: patch.models !== undefined ? [...patch.models] : existing.models,
       defaultModel:
-        patch.defaultModel !== undefined
-          ? patch.defaultModel
-          : existing.defaultModel,
+        'defaultModel' in patch ? patch.defaultModel : existing.defaultModel,
     };
 
     profiles[index] = updated;
@@ -251,6 +248,7 @@ export class ProviderProfileService {
       } else {
         await this.storageDelegate.saveProfiles(remaining, undefined);
         this.config.modelConfigService?.applyProfile(undefined);
+        this.config.setModel(DEFAULT_GEMINI_MODEL, false);
       }
     } else {
       await this.storageDelegate.saveProfiles(remaining, selectedId);
@@ -408,6 +406,13 @@ export class ProviderProfileService {
       models: updatedModels,
       defaultModel,
     });
+
+    if (
+      this.getActiveProfile()?.id === profileId &&
+      this.config.getModel() === modelId
+    ) {
+      this.config.setModel(defaultModel || SPARKLE_MODEL_ALIAS_AUTO, false);
+    }
   }
 
   async setDefaultModel(
@@ -476,5 +481,15 @@ export class ProviderProfileService {
       models: updatedModels,
       defaultModel,
     });
+
+    const activeProfile = this.getActiveProfile();
+    if (activeProfile?.id === profileId) {
+      if (patch.id && patch.id !== modelId) {
+        const currentModel = this.config.getModel();
+        if (currentModel === modelId) {
+          this.config.setModel(patch.id, false);
+        }
+      }
+    }
   }
 }
