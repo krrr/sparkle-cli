@@ -17,6 +17,8 @@ import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
 import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
+import { ProviderModelsView } from '../auth/ProviderModelsView.js';
+import { useProfileModelActions } from '../auth/useProfileModelActions.js';
 
 interface ModelDialogProps {
   onClose: () => void;
@@ -25,9 +27,23 @@ interface ModelDialogProps {
 export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const config = useContext(ConfigContext);
   const [persistMode, setPersistMode] = useState(false);
+  const [showModelSettings, setShowModelSettings] = useState(false);
+  // Bumped after model mutations so the active profile is re-read on the next
+  // render and the settings view reflects the latest state.
+  const [, bumpActiveProfile] = useState(0);
 
   const profileService = config?.getProviderProfileService();
   const activeProfile = profileService?.getActiveProfile();
+
+  const refreshActiveProfile = useCallback(
+    () => bumpActiveProfile((count) => count + 1),
+    [],
+  );
+  const modelActions = useProfileModelActions(
+    profileService,
+    activeProfile?.id,
+    refreshActiveProfile,
+  );
 
   // Determine current preferred model
   const preferredModel =
@@ -37,12 +53,20 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
   useKeypress(
     (key) => {
+      if (showModelSettings) {
+        // The models settings view handles its own keyboard input.
+        return false;
+      }
       if (key.name === 'escape') {
         onClose();
         return true;
       }
       if (key.name === 'tab') {
         setPersistMode((prev) => !prev);
+        return true;
+      }
+      if (key.name === 'm' && activeProfile) {
+        setShowModelSettings(true);
         return true;
       }
       return false;
@@ -134,6 +158,28 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     [config, activeProfile, profileService, onClose, persistMode],
   );
 
+  if (showModelSettings && activeProfile) {
+    return (
+      <Box
+        borderStyle="round"
+        borderColor={theme.border.default}
+        flexDirection="column"
+        padding={1}
+        width="100%"
+      >
+        <ProviderModelsView
+          profile={activeProfile}
+          onAddModel={modelActions.addModel}
+          onUpdateModel={modelActions.updateModel}
+          onDeleteModel={modelActions.deleteModel}
+          onSetDefaultModel={modelActions.setDefaultModel}
+          onBack={() => setShowModelSettings(false)}
+          error={modelActions.error}
+        />
+      </Box>
+    );
+  }
+
   if (!activeProfile && options.length === 0) {
     return (
       <Box
@@ -173,7 +219,10 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
           </Text>
         </Box>
         <Box marginTop={1}>
-          <Text color={theme.text.secondary}>(Press Esc to close)</Text>
+          <Text color={theme.text.secondary}>
+            <Text color={theme.text.accent}>[m]</Text> Manage models{'   '}
+            <Text color={theme.text.secondary}>[Esc] Close</Text>
+          </Text>
         </Box>
       </Box>
     );
@@ -211,7 +260,14 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         </Box>
       </Box>
       <Box marginTop={1} flexDirection="column">
-        <Text color={theme.text.secondary}>(Press Esc to close)</Text>
+        <Text color={theme.text.secondary}>
+          {activeProfile && (
+            <>
+              <Text color={theme.text.accent}>[m]</Text> Manage models{'   '}
+            </>
+          )}
+          (Press Esc to close)
+        </Text>
       </Box>
     </Box>
   );

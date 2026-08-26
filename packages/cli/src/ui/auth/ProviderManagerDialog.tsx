@@ -10,7 +10,6 @@ import { Box } from 'ink';
 import { theme } from '../semantic-colors.js';
 import {
   type ProviderProfile,
-  type ProviderModel,
   saveApiKeyForProfile,
   getErrorMessage,
   type ProviderType,
@@ -20,6 +19,7 @@ import { AuthState } from '../types.js';
 import { ProviderListView } from './ProviderListView.js';
 import { ProviderEditorView } from './ProviderEditorView.js';
 import { ProviderModelsView } from './ProviderModelsView.js';
+import { useProfileModelActions } from './useProfileModelActions.js';
 
 export interface ProviderManagerDialogProps {
   setAuthState: (state: AuthState) => void;
@@ -186,60 +186,10 @@ export function ProviderManagerDialog({
     [profileService, editingProfile, activeProfile, profiles, refreshProfiles],
   );
 
-  const handleAddModel = useCallback(
-    async (model: ProviderModel) => {
-      if (!profileService || !modelsProfileId) return;
-      try {
-        setLocalError(null);
-        await profileService.addModel(modelsProfileId, model);
-        refreshProfiles();
-      } catch (e) {
-        setLocalError(getErrorMessage(e));
-      }
-    },
-    [profileService, modelsProfileId, refreshProfiles],
-  );
-
-  const handleUpdateModel = useCallback(
-    async (oldModelId: string, model: ProviderModel) => {
-      if (!profileService || !modelsProfileId) return;
-      try {
-        setLocalError(null);
-        await profileService.updateModel(modelsProfileId, oldModelId, model);
-        refreshProfiles();
-      } catch (e) {
-        setLocalError(getErrorMessage(e));
-      }
-    },
-    [profileService, modelsProfileId, refreshProfiles],
-  );
-
-  const handleDeleteModel = useCallback(
-    async (modelId: string) => {
-      if (!profileService || !modelsProfileId) return;
-      try {
-        setLocalError(null);
-        await profileService.removeModel(modelsProfileId, modelId);
-        refreshProfiles();
-      } catch (e) {
-        setLocalError(getErrorMessage(e));
-      }
-    },
-    [profileService, modelsProfileId, refreshProfiles],
-  );
-
-  const handleSetDefaultModel = useCallback(
-    async (modelId: string) => {
-      if (!profileService || !modelsProfileId) return;
-      try {
-        setLocalError(null);
-        await profileService.setDefaultModel(modelsProfileId, modelId);
-        refreshProfiles();
-      } catch (e) {
-        setLocalError(getErrorMessage(e));
-      }
-    },
-    [profileService, modelsProfileId, refreshProfiles],
+  const modelActions = useProfileModelActions(
+    profileService,
+    modelsProfileId,
+    refreshProfiles,
   );
 
   return (
@@ -279,15 +229,15 @@ export function ProviderManagerDialog({
       {view === 'models' && modelsProfile && (
         <ProviderModelsView
           profile={modelsProfile}
-          onAddModel={handleAddModel}
-          onUpdateModel={handleUpdateModel}
-          onDeleteModel={handleDeleteModel}
-          onSetDefaultModel={handleSetDefaultModel}
+          onAddModel={modelActions.addModel}
+          onUpdateModel={modelActions.updateModel}
+          onDeleteModel={modelActions.deleteModel}
+          onSetDefaultModel={modelActions.setDefaultModel}
           onBack={() => {
             setLocalError(null);
             setView('list');
           }}
-          error={localError}
+          error={modelActions.error}
         />
       )}
     </Box>
