@@ -17,6 +17,16 @@ test.serial('exit normally without unmount() or exit()', async t => {
 	t.true(output.includes('exited'));
 });
 
+test.serial('exit when DEV is set', async t => {
+	const output = await run('exit-normally', {
+		env: {
+			DEV: 'true',
+		},
+	});
+	// Warning output depends on whether a local React DevTools server is running.
+	t.true(output.includes('exited'));
+});
+
 test.serial('exit on unmount()', async t => {
 	const output = await run('exit-on-unmount');
 	t.true(output.includes('exited'));

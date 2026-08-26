@@ -58,8 +58,11 @@ test('does not use alternate buffer when disabled', async t => {
 
 	t.false(output.includes(ansiEscapes.enterAlternativeScreen));
 	t.false(output.includes(ansiEscapes.exitAlternativeScreen));
-	t.false(output.includes(enterSynchronizedOutput));
-	t.false(output.includes(exitSynchronizedOutput));
+	// Unlike upstream, frames are intentionally always wrapped in
+	// synchronized-output sequences (fork anti-flicker customization,
+	// see `enableSynchronizedOutput` in src/log-update.ts).
+	t.true(output.includes(enterSynchronizedOutput));
+	t.true(output.includes(exitSynchronizedOutput));
 	t.true(output.includes('Hello World'));
 });
 

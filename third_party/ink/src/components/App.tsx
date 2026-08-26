@@ -67,6 +67,12 @@ export default class App extends PureComponent<Props, State> {
 
 	internal_eventEmitter = new EventEmitter();
 
+	constructor(props: Props) {
+		super(props);
+		// Each useInput hook adds a listener, so the count can legitimately exceed the default limit of 10.
+		this.internal_eventEmitter.setMaxListeners(Infinity);
+	}
+
 	// Determines if TTY is supported on the provided stdin
 	isRawModeSupported(): boolean {
 		return this.props.stdin.isTTY;

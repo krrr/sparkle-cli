@@ -2,12 +2,18 @@ import process from 'node:process';
 import url from 'node:url';
 import path from 'node:path';
 import test, {type ExecutionContext} from 'ava';
-import stripAnsi from 'strip-ansi';
+import xtermHeadless, {type Terminal} from '@xterm/headless';
 import {spawn} from 'node-pty';
+
+const {Terminal: XtermTerminal} = xtermHeadless;
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-const term = (fixture: string, args: string[] = []) => {
+const term = (
+	fixture: string,
+	args: string[] = [],
+	env: Record<string, string> = {},
+) => {
 	let resolve: (value?: any) => void;
 	let reject: (error?: Error) => void;
 
@@ -17,12 +23,18 @@ const term = (fixture: string, args: string[] = []) => {
 		reject = reject2;
 	});
 
-	const env: Record<string, string> = {
+	const env2: Record<string, string> = {
 		...process.env,
 
 		NODE_NO_WARNINGS: '1',
 
 		CI: 'false',
+
+		// Neutralize ambient DEV so the React DevTools warning can't pollute
+		// captured output; tests that need it can opt back in via `env`.
+		DEV: 'false',
+
+		...env,
 	};
 
 	const ps = spawn(
@@ -36,7 +48,7 @@ const term = (fixture: string, args: string[] = []) => {
 			name: 'xterm-color',
 			cols: 100,
 			cwd: __dirname,
-			env,
+			env: env2,
 		},
 	);
 
@@ -317,17 +329,40 @@ test.serial(
 	},
 );
 
+test.serial(
+	'useInput - no MaxListenersExceededWarning with many useInput hooks',
+	async t => {
+		const ps = term('use-input-many');
+		await ps.waitForExit();
+		t.false(ps.output.includes('MaxListenersExceededWarning'));
+		t.true(ps.output.includes('exited'));
+	},
+);
+
 test.serial('useStdout - write to stdout', async t => {
 	const ps = term('use-stdout');
 	await ps.waitForExit();
 
-	const lines = stripAnsi(ps.output).split('\r\n');
+	// Assert the final *visual* screen state instead of raw byte order:
+	// this fork paints the first frame before passive effects run (see
+	// `standardReactLayoutTiming`), so `useStdout().write()` bytes interleave
+	// between frames differently than upstream, while the resulting screen
+	// is identical.
+	const terminal = new XtermTerminal({
+		cols: 100,
+		rows: 24,
+		allowProposedApi: true,
+	});
+	await new Promise<void>(resolve => {
+		terminal.write(ps.output, resolve);
+	});
 
-	t.deepEqual(lines.slice(1, -1), [
-		'Hello from Ink to stdout',
-		'Hello World',
-		'exited',
-	]);
+	const line = (index: number): string =>
+		terminal.buffer.active.getLine(index)?.translateToString(true) ?? '';
+
+	t.is(line(0), 'Hello from Ink to stdout');
+	t.is(line(1), 'Hello World');
+	t.is(line(2), 'exited');
 });
 
 // `node-pty` doesn't support streaming stderr output, so I need to figure out

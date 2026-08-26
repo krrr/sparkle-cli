@@ -1,9 +1,33 @@
 Ink fork by Google employee jacob314. https://github.com/jacob314/ink
 synced git version: 0c5453b
-cherry-picked upstream commits: 7c0f383b, 6c47b49 (Fix CI), 0a685a7 (Update dependencies), c587da3 (Add support for concurrent rendering), 969cae4b (useInput home/end key support), a006d769 (Fix some flicker in incremental rendering, also applied to fork-specific IME cursor branch), 557b029 (Fix handling of terminal resize)
+
+## 已同步上游提交
+- 7c0f383b (Update dependencies), 6c47b49 (Fix CI), 0a685a7 (Update dependencies)
+- c587da3 (Add support for concurrent rendering)
+- 969cae4b (useInput home/end key support)
+- a006d769 (Fix some flicker in incremental rendering, also applied to fork-specific IME cursor branch)
+- 557b029 (Fix handling of terminal resize)
+- 390549d0 (Fix MaxListenersExceededWarning when using many `useInput` hooks; adapted to class-based App constructor)
+- 156bb75 (Fix process hanging when `DEV=true` but DevTools server is not running；同时修复此前记录的 PTY 子进程不退出、ava 测试挂起问题，`env -u DEV` 已不再必要)
+
+## 待同步上游改动（以后再弄）
+
+- `5e35d737` Fix: Make unmount flush pending renders and await stdout drain (#863, fixes #796) —— **有价值，需手动适配，不能直接 cherry-pick**（fork 的 ink.tsx 重构幅度大）。
+  上游修两个问题；其中问题 ② 与本 fork 相关：unmount 时 exit promise 在 stdout 写入排空前就 resolve，进程退出会截断最后几帧输出。fork 的 unmount() 直接调裸 onRender()（问题 ① trailing throttle 未 flush 基本不存在），但 `terminalBuffer.done()` 没有 await 就走到 `resolveExitPromise()`，worker/terminalBuffer 异步写盘场景下存在同类竞态。
+  移植思路：在 resolve exit promise 前给 worker 管线加 drain 屏障，等待终端写入队列清空。
+
+- `c183c53a` Add kitty keyboard protocol support (#855) —— **潜在价值高，需专项手动适配，不能直接 cherry-pick**（+1691 行，含 ~1100 行测试）。
+  内容：kitty CSI-u 按键解析、`Key` 类型扩展（super/hyper/capsLock/numLock/eventType）、协议 push/pop 与终端能力探测（opt-in，auto 模式优雅降级）。
+  冲突面：`parse-keypress.ts` 上游在与 fork 相同的 enquirer 基底上重写（fork 现 242 行），建议以新版为基底回移 fork 改动；`ink.tsx`(+116) fork 重构幅度大需手工对位；`render.ts` 需合并 alternateBuffer 等选项；`use-input.ts` 已含 home/end 定制需保留。unmount 时 pop 序列（`\u001B[<u`）的写入时序与 worker 输出管线相关，同属 5e35d737 的 drain 问题族。
+  移植顺序建议：`kitty-keyboard.ts`（全新无冲突）→ `parse-keypress.ts` 以新版为基底 → `use-input.ts` Key 扩展 → 最后接 `ink.tsx`/`render.ts` 并补 PTY 测试。
 
 
-## Changes
+## 已拉黑上游提交
+
+- `bd2f6a4f` and its fix `ad9e3ea` 内容：在 `Output` 类上挂 `OutputCaches`，用 3 个无上限 Map 按整行字符串缓存 `styledCharsFromTokens(tokenize())` / 单行 `stringWidth()` / 块级 `widestLine()`。fork 已有严格更强的等价实现——`measure-text.ts` 中 `toStyledCharactersCache`（有界 LRU、可失效清除）+ `inkCharacterWidth()` 的全局 `widthCache`（含 ASCII 快速路径），且为模块级跨帧缓存；
+
+
+## Fork Changes
 
 该fork相对上游（vadimdemedes/ink）有一些深度定制要注意：针对全屏交互式 TUI、长文本滚动和性能优化进行了大幅扩展与重构。主要改动如下：
 
