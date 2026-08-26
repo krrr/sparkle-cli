@@ -432,6 +432,8 @@ export const render = async (
       debug: false,
       exitOnCtrlC: false,
       patchConsole: false,
+      // Match production: Ink's React tree renders in concurrent mode.
+      concurrent: true,
       onRender: (metrics: RenderMetrics) => {
         const output = isInkRenderMetrics(metrics) ? metrics.output : '...';
         const staticOutput = isInkRenderMetrics(metrics)

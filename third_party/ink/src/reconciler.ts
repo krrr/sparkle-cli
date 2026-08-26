@@ -4,6 +4,7 @@ import {
 	DefaultEventPriority,
 	NoEventPriority,
 } from 'react-reconciler/constants.js';
+import * as Scheduler from 'scheduler';
 import Yoga from 'yoga-layout';
 import {createContext} from 'react';
 import {
@@ -315,6 +316,14 @@ export default createReconciler<
 	supportsMutation: true,
 	supportsPersistence: false,
 	supportsHydration: false,
+	// Scheduler integration for concurrent mode
+	supportsMicrotasks: true,
+	scheduleMicrotask: queueMicrotask,
+	// @ts-expect-error @types/react-reconciler is outdated and doesn't include scheduleCallback
+	scheduleCallback: Scheduler.unstable_scheduleCallback,
+	cancelCallback: Scheduler.unstable_cancelCallback,
+	shouldYield: Scheduler.unstable_shouldYield,
+	now: Scheduler.unstable_now,
 	scheduleTimeout: setTimeout,
 	cancelTimeout: clearTimeout,
 	noTimeout: -1,
@@ -465,7 +474,8 @@ export default createReconciler<
 		return DefaultEventPriority;
 	},
 	maySuspendCommit() {
-		return false;
+		// Return true to enable Suspense resource preloading
+		return true;
 	},
 
 	NotPendingTransition: undefined,

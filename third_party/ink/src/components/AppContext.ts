@@ -17,6 +17,14 @@ export type InkOptions = {
 	 * terminals to force scrolling to the bottom.
 	 */
 	readonly forceScrollToBottomOnBackbufferRefresh?: boolean;
+
+	/**
+	Enable React Concurrent Rendering mode. Only takes effect on first render for a given stdout.
+
+	@default false
+	@experimental
+	*/
+	readonly concurrent?: boolean;
 };
 
 export type Props = {

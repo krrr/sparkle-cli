@@ -146,6 +146,7 @@ export async function startInteractiveUI(
       stderr: inkStderr,
       stdin: process.stdin,
       exitOnCtrlC: false,
+      concurrent: true,
       isScreenReaderEnabled: config.getScreenReader(),
       onRender: ({ renderTime }: { renderTime: number }) => {
         if (renderTime > SLOW_RENDER_MS) {

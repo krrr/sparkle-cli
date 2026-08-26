@@ -16,7 +16,7 @@ const signalExit = (
 	options?: {alwaysLast?: boolean},
 ) => () => void;
 import patchConsole from 'patch-console';
-import {LegacyRoot} from 'react-reconciler/constants.js';
+import {ConcurrentRoot, LegacyRoot} from 'react-reconciler/constants.js';
 import {type FiberRoot} from 'react-reconciler';
 import Yoga from 'yoga-layout';
 import wrapAnsi from 'wrap-ansi';
@@ -82,6 +82,21 @@ export type Options = {
 	isAlternateBufferEnabled?: boolean;
 	stickyHeadersInBackbuffer?: boolean;
 	incrementalRendering?: boolean;
+
+	/**
+	Enable React Concurrent Rendering mode.
+
+	When enabled:
+	- Suspense boundaries work correctly with async data
+	- `useTransition` and `useDeferredValue` are fully functional
+	- Updates can be interrupted for higher priority work
+
+	Note: Concurrent mode changes the timing of renders. Some tests may need to use `act()` to properly await updates. The `concurrent` option only takes effect on the first render for a given stdout. If you need to change the rendering mode, call `unmount()` first.
+
+	@default false
+	@experimental
+	*/
+	concurrent?: boolean;
 	debugRainbow?: boolean;
 	animatedScroll?: boolean;
 	animationInterval?: number;
@@ -134,6 +149,11 @@ export default class Ink {
 	private readonly terminalBuffer?: TerminalBuffer;
 	private readonly pendingStaticRenderCallbacks = new Set<dom.DOMElement>();
 	private optionsState: InkOptions;
+
+	/**
+	Whether this instance is using concurrent rendering mode.
+	*/
+	readonly isConcurrent: boolean;
 
 	// Ignore last render after unmounting a tree to prevent empty output before exit
 	private isUnmounted: boolean;
@@ -252,6 +272,9 @@ export default class Ink {
 		// Ignore last render after unmounting a tree to prevent empty output before exit
 		this.isUnmounted = false;
 
+		// Store concurrent mode setting
+		this.isConcurrent = options.concurrent ?? false;
+
 		// Store last output to only rerender when needed
 		this.lastOutput = '';
 		this.lastOutputHeight = 0;
@@ -261,10 +284,13 @@ export default class Ink {
 		// so that it's rerendered every time, not just new static parts, like in non-debug mode
 		this.fullStaticOutput = '';
 
+		// Use ConcurrentRoot for concurrent mode, LegacyRoot for legacy mode
+		const rootTag = options.concurrent ? ConcurrentRoot : LegacyRoot;
+
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		this.container = reconciler.createContainer(
 			this.rootNode,
-			LegacyRoot,
+			rootTag,
 			null,
 			false,
 			null,
@@ -273,7 +299,6 @@ export default class Ink {
 			() => {},
 			() => {},
 			() => {},
-			null,
 		);
 
 		// Unmount when process exits
@@ -525,12 +550,14 @@ export default class Ink {
 			</AccessibilityContext.Provider>
 		);
 
-		// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
-
-		reconciler.updateContainerSync(tree, this.container, null, noop);
-		// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
-
-		reconciler.flushSyncWork();
+		if (this.options.concurrent) {
+			// Concurrent mode: use updateContainer (async scheduling)
+			reconciler.updateContainer(tree, this.container, null, noop);
+		} else {
+			// Legacy mode: use updateContainerSync + flushSyncWork (sync)
+			reconciler.updateContainerSync(tree, this.container, null, noop);
+			reconciler.flushSyncWork();
+		}
 	}
 
 	writeToStdout(data: string): void {
@@ -614,12 +641,15 @@ export default class Ink {
 
 		this.isUnmounted = true;
 
-		// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
+		if (this.options.concurrent) {
+			// Concurrent mode: use updateContainer (async scheduling)
+			reconciler.updateContainer(null, this.container, null, noop);
+		} else {
+			// Legacy mode: use updateContainerSync + flushSyncWork (sync)
+			reconciler.updateContainerSync(null, this.container, null, noop);
+			reconciler.flushSyncWork();
+		}
 
-		reconciler.updateContainerSync(null, this.container, null, noop);
-		// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
-
-		reconciler.flushSyncWork();
 		instances.delete(this.options.stdout);
 
 		if (error instanceof Error) {

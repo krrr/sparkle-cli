@@ -54,7 +54,6 @@ export const renderToRegion = (
 		noop,
 		noop,
 		noop,
-		null,
 	);
 
 	const tree = (
@@ -63,9 +62,7 @@ export const renderToRegion = (
 		</accessibilityContext.Provider>
 	);
 
-	// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
 	reconciler.updateContainerSync(tree, container, null, noop);
-	// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
 	reconciler.flushSyncWork();
 
 	renderPendingStaticRenderNodes(rootNode, options.width);
@@ -74,7 +71,6 @@ export const renderToRegion = (
 		skipStaticElements: false,
 	});
 
-	// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
 	reconciler.flushSyncWork();
 
 	const region = rootNode.cachedRender;
@@ -82,9 +78,7 @@ export const renderToRegion = (
 		throw new Error('renderToRegion failed to produce a cached region');
 	}
 
-	// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
 	reconciler.updateContainerSync(null, container, null, noop);
-	// @ts-expect-error the types for `react-reconciler` are not up to date with the library.
 	reconciler.flushSyncWork();
 
 	return region;

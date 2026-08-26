@@ -1,6 +1,6 @@
 Ink fork by Google employee jacob314. https://github.com/jacob314/ink
 synced git version: 0c5453b
-cherry-picked upstream commits: 7c0f383b (vadimdemedes/ink, Update dependencies), 969cae4b (useInput home/end key support), a006d769 (Fix some flicker in incremental rendering, also applied to fork-specific IME cursor branch), 557b029 (Fix handling of terminal resize)
+cherry-picked upstream commits: 7c0f383b, 6c47b49 (Fix CI), 0a685a7 (Update dependencies), c587da3 (Add support for concurrent rendering), 969cae4b (useInput home/end key support), a006d769 (Fix some flicker in incremental rendering, also applied to fork-specific IME cursor branch), 557b029 (Fix handling of terminal resize)
 
 
 ## Changes
