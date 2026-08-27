@@ -342,11 +342,14 @@ export class ProviderProfileService {
     this.config.modelConfigService?.applyProfile(targetProfile);
     this.config.setModel(chosenModel, true);
 
-    // Update selectedProviderId in storage
-    await this.storageDelegate.saveProfiles(
-      this.listProfiles(),
-      targetProfile.id,
-    );
+    // Update selectedProviderId in storage only if it actually changed.
+    const currentSelectedId = this.storageDelegate.getSelectedProfileId();
+    if (currentSelectedId !== targetProfile.id) {
+      await this.storageDelegate.saveProfiles(
+        this.listProfiles(),
+        targetProfile.id,
+      );
+    }
 
     // Notify UI / listeners
     coreEvents.emitModelChanged(chosenModel);

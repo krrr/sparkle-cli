@@ -36,9 +36,11 @@ describe('ProviderProfileService', () => {
   let storedSelectedId: string | undefined;
   let env: Record<string, string | undefined>;
   let service: ProviderProfileService;
+  let saveProfilesMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    saveProfilesMock = vi.fn();
     storedProfiles = [];
     storedSelectedId = undefined;
     env = {};
@@ -60,6 +62,7 @@ describe('ProviderProfileService', () => {
         saveProfiles: (profiles, selectedId) => {
           storedProfiles = [...profiles];
           storedSelectedId = selectedId;
+          saveProfilesMock(profiles, selectedId);
         },
       },
       env,
@@ -527,6 +530,41 @@ describe('ProviderProfileService', () => {
         DEFAULT_OPENAI_MODEL,
         true,
       );
+    });
+
+    it('should skip saveProfiles when activating the already-selected profile', async () => {
+      // createProfile already selects the new profile in storage.
+      const p = await service.createProfile({
+        id: 'gemini-active',
+        providerType: ProviderType.USE_GEMINI,
+      });
+      expect(storedSelectedId).toBe(p.id);
+
+      saveProfilesMock.mockClear();
+      await service.activateProfile(p.id);
+      expect(saveProfilesMock).not.toHaveBeenCalled();
+    });
+
+    it('should call saveProfiles when switching to a different profile', async () => {
+      const p1 = await service.createProfile({
+        id: 'p1',
+        providerType: ProviderType.USE_GEMINI,
+      });
+      const p2 = await service.createProfile({
+        id: 'p2',
+        providerType: ProviderType.USE_OPENAI,
+      });
+
+      // createProfile only sets selectedId when none exists yet, so p1 remains
+      // selected after creating p2. Activating p2 must persist the switch.
+      expect(storedSelectedId).toBe(p1.id);
+      saveProfilesMock.mockClear();
+      await service.activateProfile(p2.id);
+      expect(saveProfilesMock).toHaveBeenCalledWith(
+        expect.arrayContaining([expect.objectContaining({ id: 'p2' })]),
+        p2.id,
+      );
+      expect(storedSelectedId).toBe(p2.id);
     });
   });
 });
