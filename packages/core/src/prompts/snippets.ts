@@ -119,7 +119,6 @@ export interface PlanningWorkflowOptions {
 export interface AgentSkillOptions {
   name: string;
   description: string;
-  location: string;
 }
 
 export interface SubAgentOptions {
@@ -318,7 +317,6 @@ export function renderAgentSkills(skills?: AgentSkillOptions[]): string {
       (skill) => `  <skill>
     <name>${skill.name}</name>
     <description>${skill.description}</description>
-    <location>${skill.location}</location>
   </skill>`,
     )
     .join('\n');

@@ -109,7 +109,6 @@ export class PromptProvider {
         skills.map((s) => ({
           name: s.name,
           description: s.description,
-          location: s.location,
         })),
       );
       basePrompt = applySubstitutions(basePrompt, context.config, skillsPrompt);
@@ -152,7 +151,6 @@ export class PromptProvider {
             skills.map((s) => ({
               name: s.name,
               description: s.description,
-              location: s.location,
             })),
           skills.length > 0,
         ),

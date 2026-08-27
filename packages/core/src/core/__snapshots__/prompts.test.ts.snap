@@ -1772,7 +1772,6 @@ You have access to the following specialized skills. To activate a skill and rec
   <skill>
     <name>test-skill</name>
     <description>A test skill description</description>
-    <location>/path/to/test-skill/SKILL.md</location>
   </skill>
 </available_skills>
 

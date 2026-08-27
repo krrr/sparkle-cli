@@ -1383,7 +1383,6 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
           skills.map((s) => ({
             name: s.name,
             description: s.description,
-            location: s.location,
           })),
         );
         finalPrompt += `\n\n${skillsPrompt}`;

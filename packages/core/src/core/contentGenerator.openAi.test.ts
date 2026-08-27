@@ -327,7 +327,7 @@ describe('createContentGenerator with USE_OPENAI', () => {
         'hello from openai',
       );
       const body = fake.lastBody() as { model: string; messages: unknown[] };
-      expect(body.model).toBe('deepseek-v4-flash');
+      expect(body.model).toBe('deepseek/deepseek-v4-flash');
       expect(body.messages).toHaveLength(1);
     } finally {
       await fake.close();
