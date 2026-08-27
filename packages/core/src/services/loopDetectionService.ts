@@ -46,19 +46,19 @@ const LLM_CHECK_AFTER_TURNS = 30;
  * The default interval, in number of turns, at which the LLM-based loop check is performed.
  * This value is adjusted dynamically based on the LLM's confidence.
  */
-const DEFAULT_LLM_CHECK_INTERVAL = 10;
+const DEFAULT_LLM_CHECK_INTERVAL = 20;
 
 /**
  * The minimum interval for LLM-based loop checks.
  * This is used when the confidence of a loop is high, to check more frequently.
  */
-const MIN_LLM_CHECK_INTERVAL = 5;
+const MIN_LLM_CHECK_INTERVAL = 10;
 
 /**
  * The maximum interval for LLM-based loop checks.
  * This is used when the confidence of a loop is low, to check less frequently.
  */
-const MAX_LLM_CHECK_INTERVAL = 15;
+const MAX_LLM_CHECK_INTERVAL = 30;
 
 /**
  * The confidence threshold above which the LLM is considered to have detected a loop.
@@ -66,7 +66,7 @@ const MAX_LLM_CHECK_INTERVAL = 15;
 const LLM_CONFIDENCE_THRESHOLD = 0.9;
 const DOUBLE_CHECK_MODEL_ALIAS = 'loop-detection-double-check';
 
-const LOOP_DETECTION_SYSTEM_PROMPT = `You are a diagnostic agent that determines whether a conversational AI assistant is stuck in an unproductive loop. Analyze the conversation history (and, if provided, the original user request) to make this determination.
+const LOOP_DETECTION_SYSTEM_PROMPT = `You are a diagnostic agent that determines whether a conversational AI assistant is stuck in an unproductive loop. Analyze the conversation history to make this determination.
 
 ## What constitutes an unproductive state
 
@@ -99,21 +99,20 @@ A loop exists only when the same tool is called with semantically equivalent arg
 
 ## Using the original user request
 
-If the original user request is provided, use it to contextualize the assistant's behavior. If the request implies a batch or multi-step operation (e.g., "update all files", "refactor every module", "add tests for each function"), then repetitive tool calls with varying arguments are expected and should weigh heavily against flagging a loop.`;
+If the original user request is provided, use it to contextualize the assistant's behavior. If the request implies a batch or multi-step operation (e.g., "update all files", "refactor every module", "add tests for each function"), then repetitive tool calls with varying arguments are expected and should weigh heavily against flagging a loop.
+
+## Response Format
+
+{"unproductive_state_analysis": "Your reasoning on if the conversation is looping without forward progress", "unproductive_state_confidence": <A number between 0.0 and 1.0 representing your confidence that the conversation is in an unproductive state>}
+`;
 
 const LOOP_DETECTION_SCHEMA: Record<string, unknown> = {
   type: 'object',
   properties: {
-    unproductive_state_analysis: {
-      type: 'string',
-      description:
-        'Your reasoning on if the conversation is looping without forward progress.',
-    },
-    unproductive_state_confidence: {
-      type: 'number',
-      description:
-        'A number between 0.0 and 1.0 representing your confidence that the conversation is in an unproductive state.',
-    },
+    // Only Gemini and GPT models are able to read description in json schema.
+    // Placing desc in prompt for other open-source models.
+    unproductive_state_analysis: { type: 'string' },
+    unproductive_state_confidence: { type: 'number' },
   },
   required: ['unproductive_state_analysis', 'unproductive_state_confidence'],
 };

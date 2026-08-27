@@ -980,14 +980,14 @@ describe('LoopDetectionService LLM Checks', () => {
     );
 
     // The confidence of 0.85 will result in a low interval.
-    // The interval will be: 5 + (15 - 5) * (1 - 0.85) = 5 + 10 * 0.15 = 6.5 -> rounded to 7
-    await advanceTurns(6); // advance to turn 36
+    // The interval will be: 10 + (30 - 10) * (1 - 0.85) = 10 + 20 * 0.15 = 13
+    await advanceTurns(12); // advance to turn 42
 
     mockBaseLlmClient.generateJson = vi.fn().mockResolvedValue({
       unproductive_state_confidence: 0.95,
       unproductive_state_analysis: 'Repetitive actions',
     });
-    const finalResult = await service.turnStarted(abortController.signal); // This is turn 37
+    const finalResult = await service.turnStarted(abortController.signal); // This is turn 43
 
     expect(finalResult.count).toBe(1);
     expect(loggers.logLoopDetected).toHaveBeenCalledWith(
@@ -1012,18 +1012,18 @@ describe('LoopDetectionService LLM Checks', () => {
   });
 
   it('should adjust the check interval based on confidence', async () => {
-    // Confidence is 0.0, so interval should be MAX_LLM_CHECK_INTERVAL (15)
-    // Interval = 5 + (15 - 5) * (1 - 0.0) = 15
+    // Confidence is 0.0, so interval should be MAX_LLM_CHECK_INTERVAL (30)
+    // Interval = 10 + (30 - 10) * (1 - 0.0) = 30
     mockBaseLlmClient.generateJson = vi
       .fn()
       .mockResolvedValue({ unproductive_state_confidence: 0.0 });
     await advanceTurns(30); // First check at turn 30
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
 
-    await advanceTurns(14); // Advance to turn 44
+    await advanceTurns(29); // Advance to turn 59
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
 
-    await service.turnStarted(abortController.signal); // Turn 45
+    await service.turnStarted(abortController.signal); // Turn 60
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(2);
   });
 
@@ -1201,12 +1201,12 @@ describe('LoopDetectionService LLM Checks', () => {
     expect(loggers.logLoopDetected).not.toHaveBeenCalled();
 
     // But should have updated the interval based on the main model's confidence (0.89)
-    // Interval = 5 + (15-5) * (1 - 0.89) = 5 + 10 * 0.11 = 5 + 1.1 = 6.1 -> 6
+    // Interval = 10 + (30-10) * (1 - 0.89) = 10 + 20 * 0.11 = 12.2 -> 12
 
-    // Advance by 5 turns
-    await advanceTurns(5);
+    // Advance by 11 turns
+    await advanceTurns(11);
 
-    // Next turn (36) should trigger another check
+    // Next turn (42) should trigger another check
     await service.turnStarted(abortController.signal);
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(3);
   });

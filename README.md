@@ -5,10 +5,10 @@ from the shape of Gemini's icon.
 
 ## Main Changes
 
-- Add OpenAI API support (works well with DeepSeek v4)
+- Add OpenAI API support (Chat Completions)
 - Add multi LLM provider switching
 - Remove Google Cloud and Enterprise features (keep Gemini API)
-- Boost startup speed
+- Boost startup speed, optimize UI smoothness
 
 ## Installation
 
