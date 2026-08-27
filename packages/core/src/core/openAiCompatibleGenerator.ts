@@ -38,9 +38,6 @@ import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
 /** The default OpenAI-compatible API base URL. */
 export const DEFAULT_OPENAI_BASE_URL = 'https://api.openai.com/v1';
 
-/** Known provider prefixes that may be prefixed to a model name. */
-const MODEL_PROVIDER_PREFIXES = ['deepseek/', 'openai/'];
-
 /** A list of model prefixes for the model name resolution. */
 export type OpenAiProvider = 'openai' | 'deepseek' | 'custom';
 
@@ -168,7 +165,7 @@ export class OpenAiCompatibleGenerator {
       .map((part) => part.text ?? '')
       .join('\n');
     const body = {
-      model: this.stripProviderPrefix(request.model),
+      model: request.model,
       input: text,
     };
     const response = await this.postJson(
@@ -219,7 +216,7 @@ export class OpenAiCompatibleGenerator {
     );
 
     return {
-      model: this.stripProviderPrefix(request.model),
+      model: request.model,
       messages,
       stream: streaming,
       ...(streaming ? { stream_options: { include_usage: true } } : {}),
@@ -242,19 +239,6 @@ export class OpenAiCompatibleGenerator {
         typeof tool === 'object' &&
         'functionDeclarations' in tool,
     );
-  }
-
-  /**
-   * Strips a known provider prefix (e.g. `deepseek/deepseek-v4-flash` ->
-   * `deepseek-v4-flash`) from the model name before sending it to the API.
-   */
-  private stripProviderPrefix(model: string): string {
-    for (const prefix of MODEL_PROVIDER_PREFIXES) {
-      if (model.startsWith(prefix)) {
-        return model.slice(prefix.length);
-      }
-    }
-    return model;
   }
 
   private getAbortSignal(request: {

@@ -153,24 +153,6 @@ describe('OpenAiCompatibleGenerator', () => {
       );
     });
 
-    it('strips provider prefixes from the model name', async () => {
-      fakeServer.on('/v1/chat/completions', (body) => {
-        expect(body.model).toBe('deepseek-v4-flash');
-        return {
-          status: 200,
-          body: JSON.stringify({ choices: [{ message: { content: 'ok' } }] }),
-        };
-      });
-      await generator.generateContent(
-        {
-          model: 'deepseek/deepseek-v4-flash',
-          contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
-        },
-        'p',
-        LlmRole.MAIN,
-      );
-    });
-
     it('maps tool calls and reasoning content', async () => {
       fakeServer.on('/v1/chat/completions', () => ({
         status: 200,
