@@ -23,6 +23,7 @@ import type {
   OpenAiChatCompletion,
   OpenAiContentPart,
   OpenAiMessage,
+  OpenAiReasoningFields,
   OpenAiRequest,
   OpenAiStreamChunk,
   OpenAiTool,
@@ -588,13 +589,11 @@ function parseArgs(argsJson: string): Record<string, unknown> | undefined {
 
 /**
  * Extracts the reasoning text carried by an OpenAI-compatible response
- * fragment (a streaming delta or a non-streaming message). Providers use
- * incompatible conventions for this concept: DeepSeek-style
- * `reasoning_content` and OpenRouter's normalized `reasoning` /
- * `reasoning_details` pair (`reasoning_details` duplicates `reasoning`).
+ * fragment (a streaming delta or a non-streaming message). The accepted
+ * field conventions are declared once in {@link OpenAiReasoningFields}.
  */
 function extractReasoningText(
-  fragment: { reasoning_content?: string; reasoning?: string } | undefined,
+  fragment: OpenAiReasoningFields | undefined,
 ): string | null {
   if (!fragment) {
     return null;
@@ -603,6 +602,8 @@ function extractReasoningText(
     return fragment.reasoning_content;
   } else if (fragment.reasoning) {
     return fragment.reasoning;
+  } else if (fragment.thinking) {
+    return fragment.thinking;
   }
   return null;
 }

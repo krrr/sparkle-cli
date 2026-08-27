@@ -12,16 +12,27 @@
  * https://platform.openai.com/docs/api-reference/chat
  */
 
+/**
+ * Reasoning/thinking content fields carried by OpenAI-compatible responses.
+ *
+ * Providers use incompatible conventions for the same concept, so response
+ * fragments (messages, streaming deltas) share one declaration.
+ */
+export interface OpenAiReasoningFields {
+  /** DeepSeek and most Chinese official API. */
+  reasoning_content?: string;
+  /** OpenRouter-style normalized reasoning text. */
+  reasoning?: string;
+  /** Some router sites */
+  thinking?: string;
+}
+
 /** A single message in the OpenAI chat format. */
-export interface OpenAiMessage {
+export interface OpenAiMessage extends OpenAiReasoningFields {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string | OpenAiContentPart[] | null;
   tool_calls?: OpenAiToolCall[];
   tool_call_id?: string;
-  /** DeepSeek-specific: reasoning content produced by the model. */
-  reasoning_content?: string;
-  /** OpenRouter-style normalized reasoning text. */
-  reasoning?: string;
   name?: string;
 }
 
@@ -124,10 +135,8 @@ export interface OpenAiStreamChunk {
   id?: string;
   model?: string;
   choices?: Array<{
-    delta?: {
+    delta?: OpenAiReasoningFields & {
       content?: string | null;
-      reasoning_content?: string;
-      reasoning?: string;
       tool_calls?: OpenAiToolCallDelta[];
     };
     finish_reason?: string | null;
@@ -141,11 +150,9 @@ export interface OpenAiChatCompletion {
   id?: string;
   model?: string;
   choices?: Array<{
-    message?: {
+    message?: OpenAiReasoningFields & {
       role?: string;
       content?: string | null;
-      reasoning_content?: string;
-      reasoning?: string;
       tool_calls?: OpenAiToolCall[];
     };
     finish_reason?: string | null;

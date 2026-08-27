@@ -705,6 +705,28 @@ describe('OpenAiChunkConverter', () => {
     ]);
   });
 
+  it('buffers relay-style thinking and emits one consolidated thought part per block', () => {
+    const converter = new OpenAiChunkConverter();
+    const r1 = converter.toGeminiChunk({
+      choices: [{ delta: { thinking: 'think' } }],
+    });
+    expect(r1.candidates![0].content!.parts).toEqual([
+      { text: 'think', thought: true, thoughtPartial: true },
+    ]);
+    const r2 = converter.toGeminiChunk({
+      choices: [{ delta: { thinking: 'ing...' } }],
+    });
+    // Below the character threshold: no new partial is emitted.
+    expect(r2.candidates).toBeUndefined();
+    const r3 = converter.toGeminiChunk({
+      choices: [{ delta: { content: 'Answer' } }],
+    });
+    expect(r3.candidates![0].content!.parts).toEqual([
+      { text: 'thinking...', thought: true },
+      { text: 'Answer' },
+    ]);
+  });
+
   it('does not duplicate reasoning when a chunk carries reasoning alongside reasoning_details', () => {
     const converter = new OpenAiChunkConverter();
     const r1 = converter.toGeminiChunk({
@@ -986,6 +1008,27 @@ describe('openAiChatCompletionToGeminiResponse', () => {
             role: 'assistant',
             content: 'Hello',
             reasoning: 'hidden reasoning',
+          },
+          finish_reason: 'stop',
+        },
+      ],
+    });
+    expect(response.candidates![0].content!.parts).toEqual([
+      { text: 'hidden reasoning', thought: true },
+      { text: 'Hello' },
+    ]);
+  });
+
+  it('converts relay-style message.thinking into a thought part', () => {
+    const response = openAiChatCompletionToGeminiResponse({
+      id: 'gen-1',
+      model: DEFAULT_OPENAI_MODEL,
+      choices: [
+        {
+          message: {
+            role: 'assistant',
+            content: 'Hello',
+            thinking: 'hidden reasoning',
           },
           finish_reason: 'stop',
         },
