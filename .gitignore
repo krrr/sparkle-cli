@@ -25,7 +25,6 @@ bower_components
 *.iml
 
 # OS metadata
-.DS_Store
 Thumbs.db
 
 # TypeScript build info files
@@ -52,8 +51,7 @@ packages/devtools/src/_client-assets.ts
 packages/vscode-ide-companion/*.vsix
 packages/cli/download-ripgrep*/
 
-# GHA credentials
-gha-creds-*.json
+*.tgz
 
 # Log files
 patch_output.log

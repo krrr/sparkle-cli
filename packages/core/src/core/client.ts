@@ -36,6 +36,7 @@ import {
 } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
 import { getErrorMessage, isAbortError } from '../utils/errors.js';
+import { isFunctionResponse } from '../utils/messageInspectors.js';
 import type {
   ChatRecordingService,
   ResumedSessionData,
@@ -738,6 +739,20 @@ export class GeminiClient {
     turn = new Turn(this.getChat(), prompt_id);
 
     const loopResult = await this.loopDetector.turnStarted(signal);
+    // LLM-based loop check runs before the current request is recorded
+    // into history. If the request is a tool response (functionResponse) and
+    // a loop is detected here, the response would otherwise be dropped,
+    // leaving the preceding model turn's functionCall dangling. That
+    // corrupts every subsequent request for OpenAI-compatible endpoints
+    // (an assistant message with tool_calls that lacks a matching tool
+    // response is rejected, e.g. DeepSeek's invalid_request_error). Commit
+    // the response first so the functionCall stays paired.
+    if (
+      loopResult.count > 0 &&
+      isFunctionResponse(createUserContent(request))
+    ) {
+      this.getChat().addHistory(createUserContent(request));
+    }
     if (loopResult.count > 1) {
       yield { type: GeminiEventType.LoopDetected };
       return turn;

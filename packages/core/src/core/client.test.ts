@@ -3229,6 +3229,79 @@ ${JSON.stringify(
           'Hi',
         );
       });
+
+      it('should record a pending tool response before recovering from an LLM-detected loop', async () => {
+        // Arrange
+        // turnStarted detects Strike 1 BEFORE the request is recorded into
+        // history. The request is a tool response (functionResponse); without
+        // the fix it is dropped, leaving the preceding functionCall dangling
+        // (OpenAI-compatible APIs reject assistant tool_calls without a
+        // matching tool response).
+        vi.spyOn(client['loopDetector'], 'turnStarted')
+          .mockResolvedValueOnce({
+            count: 1,
+            detail: 'LLM detected loop',
+          })
+          .mockResolvedValue({ count: 0 });
+        vi.spyOn(client['loopDetector'], 'addAndCheck').mockReturnValue({
+          count: 0,
+        });
+
+        const sendMessageStreamSpy = vi.spyOn(client, 'sendMessageStream');
+        const addHistorySpy = vi.spyOn(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (client as any)['chat'],
+          'addHistory',
+        );
+
+        mockTurnRunFn.mockImplementation(() =>
+          (async function* () {
+            yield { type: GeminiEventType.Content, value: 'Event' };
+          })(),
+        );
+
+        const toolResponse: Part[] = [
+          {
+            functionResponse: {
+              id: 'call_1',
+              name: 'run_shell_command',
+              response: { output: 'done' },
+            },
+          },
+        ];
+
+        // Act
+        const stream = client.sendMessageStream(
+          toolResponse,
+          new AbortController().signal,
+          'prompt-id-loop-tool-response',
+        );
+        const events = [];
+        for await (const event of stream) {
+          events.push(event);
+        }
+
+        // Assert
+        // Recovery must proceed with feedback injected.
+        expect(sendMessageStreamSpy).toHaveBeenCalledTimes(2);
+
+        // The tool response must be committed to history so the preceding
+        // functionCall stays paired.
+        expect(addHistorySpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            role: 'user',
+            parts: toolResponse,
+          }),
+        );
+        // The tool response must be committed exactly once (no duplicate).
+        expect(
+          addHistorySpy.mock.calls.filter((call) =>
+            (call[0] as { parts?: Part[] })?.parts?.some(
+              (part) => !!part.functionResponse,
+            ),
+          ),
+        ).toHaveLength(1);
+      });
     });
   });
 
