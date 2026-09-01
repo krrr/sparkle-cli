@@ -284,7 +284,16 @@ export class AgentExecutionBlockedError extends Error {
  * conversation context.
  *
  * @remarks
- * The session maintains all the turns between user and model.
+ * Architecture & Responsibility Boundary:
+ * - Canonical History: `GeminiChat` strictly maintains the unified Canonical History
+ *   (`agentHistory`), containing complete turns (user prompt, model thoughts, tool
+ *   calls, and tool responses).
+ * - Provider-Agnostic: `GeminiChat` must NEVER branch on specific LLM providers
+ *   (e.g., Gemini vs. OpenAI) or mutate/strip thoughts in place.
+ * - Wire Adaptation: Provider-specific wire transformations (such as stripping thought
+ *   parts and injecting synthetic thought signatures for Gemini, or extracting
+ *   `reasoning_content` for OpenAI) are the sole responsibility of downstream
+ *   `ContentGenerator` adapters.
  */
 export class GeminiChat {
   // A promise to represent the current state of the message being sent to the
@@ -1005,7 +1014,10 @@ export class GeminiChat {
   }
 
   /**
-   * Returns the chat history as HistoryTurns.
+   * Returns the canonical chat history as HistoryTurns with consecutive roles coalesced.
+   *
+   * Note: Thoughts are intentionally preserved in the canonical model. Downstream
+   * `ContentGenerator` adapters handle any provider-specific wire formatting.
    *
    * @param curated - whether to return the curated history or the comprehensive
    * history.
@@ -1080,24 +1092,6 @@ export class GeminiChat {
     this.chatRecordingService.updateMessagesFromHistory(
       this.agentHistory.get(),
     );
-  }
-
-  stripThoughtsFromHistory(): void {
-    const newHistory = this.agentHistory.map((turn) => {
-      const newContent = { ...turn.content };
-      if (newContent.parts) {
-        newContent.parts = newContent.parts.map((part) => {
-          if (part && typeof part === 'object' && 'thoughtSignature' in part) {
-            const newPart = { ...part };
-            delete (newPart as { thoughtSignature?: string }).thoughtSignature;
-            return newPart;
-          }
-          return part;
-        });
-      }
-      return { id: turn.id, content: newContent };
-    });
-    this.agentHistory.set(newHistory);
   }
 
   setTools(tools: Tool[]): void {

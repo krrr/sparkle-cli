@@ -3360,49 +3360,6 @@ describe('GeminiChat', () => {
     );
   });
 
-  describe('stripThoughtsFromHistory', () => {
-    it('should strip thought signatures', () => {
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'thinking...', thoughtSignature: 'thought-123' },
-            {
-              functionCall: { name: 'test', args: {} },
-              thoughtSignature: 'thought-456',
-            },
-          ],
-        },
-      ]);
-
-      chat.stripThoughtsFromHistory();
-
-      expect(chat.getHistory()).toEqual([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'thinking...' },
-            {
-              functionCall: {
-                name: 'test',
-                args: {},
-                id: expect.stringMatching(/^synth_test_/),
-              },
-            },
-          ],
-        },
-      ]);
-    });
-  });
-
   describe('getHistoryTurns with thoughts', () => {
     it('should keep thought parts in getHistoryTurns', () => {
       chat.setHistory([

@@ -128,6 +128,9 @@ export function estimateTokenCountSync(
 
   let totalTokens = 0;
   for (const part of parts) {
+    if (!part || (part as { thought?: boolean }).thought) {
+      continue;
+    }
     if (typeof part.text === 'string') {
       totalTokens += estimateTextTokens(part.text, charsPerToken);
     } else if (part.functionResponse) {

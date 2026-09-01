@@ -16,7 +16,11 @@ import type {
   ToolOutputMaskingConfig,
 } from '../context/types.js';
 export type { ConversationRecord };
-import { ProviderType } from './constants.js';
+import type { ProviderType ,
+  DEFAULT_FILE_FILTERING_OPTIONS,
+  DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
+  type FileFilteringOptions,
+} from './constants.js';
 import {
   createContentGenerator,
   createContentGeneratorConfig,
@@ -403,11 +407,6 @@ export interface ExtensionInstallMetadata {
 }
 
 import { DEFAULT_MAX_ATTEMPTS } from '../utils/retry.js';
-import {
-  DEFAULT_FILE_FILTERING_OPTIONS,
-  DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
-  type FileFilteringOptions,
-} from './constants.js';
 import {
   DEFAULT_TOOL_PROTECTION_THRESHOLD,
   DEFAULT_MIN_PRUNABLE_TOKENS_THRESHOLD,
@@ -1455,16 +1454,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.modelAvailabilityService.reset();
     this.fallbackOverrides.clear();
     this.modelConfigService.clearRuntimeOverrides();
-
-    // Vertex and Genai have incompatible encryption and sending history with
-    // thoughtSignature from Genai to Vertex will fail, we need to strip them
-    if (
-      this.contentGeneratorConfig?.authType === ProviderType.USE_GEMINI &&
-      authMethod !== ProviderType.USE_GEMINI
-    ) {
-      // Restore the conversation history to the new client
-      this._geminiClient.stripThoughtsFromHistory();
-    }
 
     // Reset availability status when switching auth (e.g. from limited key to OAuth)
     this.modelAvailabilityService.reset();

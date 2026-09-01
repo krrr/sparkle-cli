@@ -300,6 +300,19 @@ describe('tokenCalculation', () => {
       expect(estimateTokenCountSync(massiveParts, 0, 3)).toBe(40_000);
     });
 
+    it('should ignore thought parts when estimating token count', () => {
+      const parts: Part[] = [
+        {
+          text: 'internal monologue that takes thousands of tokens...',
+          thought: true,
+        } as unknown as Part,
+        { text: 'Hello' },
+      ];
+      // Only 'Hello' (5 chars -> ~1 token) should be counted, thought should be skipped
+      const tokens = estimateTokenCountSync(parts);
+      expect(tokens).toBe(1);
+    });
+
     it('should handle empty or nullish inputs gracefully', () => {
       expect(estimateTokenCountSync([])).toBe(0);
       expect(estimateTokenCountSync([{ text: '' }])).toBe(0);

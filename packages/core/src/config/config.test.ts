@@ -144,7 +144,6 @@ vi.mock('../core/contentGenerator.js');
 vi.mock('../core/client.js', () => ({
   GeminiClient: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
-    stripThoughtsFromHistory: vi.fn(),
     isInitialized: vi.fn().mockReturnValue(false),
     setTools: vi.fn().mockResolvedValue(undefined),
     updateSystemInstruction: vi.fn(),
@@ -582,46 +581,6 @@ describe('Server Config (config.ts)', () => {
       await config.refreshAuth(ProviderType.USE_GEMINI);
 
       expect(spy).toHaveBeenCalled();
-    });
-
-    it('should strip thoughts when switching from GenAI to OpenAI', async () => {
-      const config = new Config(baseParams);
-
-      vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: ProviderType | undefined) =>
-          ({
-            authType,
-          }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
-      );
-
-      await config.refreshAuth(ProviderType.USE_GEMINI);
-
-      await config.refreshAuth(ProviderType.USE_OPENAI);
-
-      const loopContext: AgentLoopContext = config;
-      expect(
-        loopContext.geminiClient.stripThoughtsFromHistory,
-      ).toHaveBeenCalledWith();
-    });
-
-    it('should not strip thoughts when switching from OpenAI to GenAI', async () => {
-      const config = new Config(baseParams);
-
-      vi.mocked(createContentGeneratorConfig).mockImplementation(
-        async (_: Config, authType: ProviderType | undefined) =>
-          ({
-            authType,
-          }) as Partial<ContentGeneratorConfig> as ContentGeneratorConfig,
-      );
-
-      await config.refreshAuth(ProviderType.USE_OPENAI);
-
-      await config.refreshAuth(ProviderType.USE_GEMINI);
-
-      const loopContext: AgentLoopContext = config;
-      expect(
-        loopContext.geminiClient.stripThoughtsFromHistory,
-      ).not.toHaveBeenCalledWith();
     });
   });
 

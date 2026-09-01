@@ -114,9 +114,7 @@ describe('ShellTool', () => {
       get config() {
         return this;
       },
-      geminiClient: {
-        stripThoughtsFromHistory: vi.fn(),
-      },
+      geminiClient: {},
 
       getAllowedTools: vi.fn().mockReturnValue([]),
       getApprovalMode: vi.fn().mockReturnValue('strict'),
