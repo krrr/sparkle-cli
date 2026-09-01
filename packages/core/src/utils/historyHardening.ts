@@ -500,3 +500,79 @@ export function scrubPart(part: Part): Part {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   return scrubbed as unknown as Part;
 }
+
+/**
+ * To ensure Gemini API requests validate, the first function call in every model
+ * turn within the active loop must have a `thoughtSignature` property.
+ * If we do not do this, we will get back 400 errors from the API.
+ */
+export function ensureActiveLoopHasThoughtSignatures(
+  requestContents: readonly Content[],
+): Content[] {
+  // First, find the start of the active loop by finding the last user turn
+  // with a text message, i.e. that is not a function response. Testing for
+  // text alone is not enough: `coalesceConsecutiveRoles` can merge a function
+  // response turn with the prompt that follows it, and starting the loop at
+  // such a turn starts it later than the API starts the turn, leaving earlier
+  // function calls unsigned but still validated.
+  let activeLoopStartIndex = -1;
+  for (let i = requestContents.length - 1; i >= 0; i--) {
+    const content = requestContents[i];
+    if (
+      content.role === 'user' &&
+      content.parts?.some((part) => part.text) &&
+      !content.parts?.some((part) => part.functionResponse)
+    ) {
+      activeLoopStartIndex = i;
+      break;
+    }
+  }
+
+  if (activeLoopStartIndex === -1) {
+    return [...requestContents];
+  }
+
+  const newContents = requestContents.map((c) => ({
+    ...c,
+    parts: c.parts ? [...c.parts] : undefined,
+  }));
+
+  // Iterate through every message in the active loop, ensuring that the first
+  // function call in each message's list of parts has a valid
+  // thoughtSignature property. If it does not we replace the function call
+  // with a copy that uses the synthetic thought signature.
+  for (let i = activeLoopStartIndex; i < newContents.length; i++) {
+    const content = newContents[i];
+    if (content.role === 'model' && content.parts) {
+      const newParts = content.parts.slice();
+      for (let j = 0; j < newParts.length; j++) {
+        const part = newParts[j];
+        if (part.functionCall) {
+          if (!part.thoughtSignature) {
+            newParts[j] = {
+              ...part,
+              thoughtSignature: SYNTHETIC_THOUGHT_SIGNATURE,
+            };
+            newContents[i] = {
+              ...content,
+              parts: newParts,
+            };
+          }
+          break; // Only consider the first function call
+        }
+      }
+    }
+  }
+
+  return newContents;
+}
+
+/**
+ * Prepares canonical Content objects for Gemini API by stripping thoughts,
+ * scrubbing non-standard properties, coalescing same-role turns, and ensuring
+ * thought signatures on active function call loops.
+ */
+export function prepareGeminiContents(contents: Content[]): Content[] {
+  const scrubbed = scrubContents(contents);
+  return ensureActiveLoopHasThoughtSignatures(scrubbed);
+}

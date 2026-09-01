@@ -22,7 +22,6 @@ import {
   stripToolCallIdPrefixes,
   type HistoryTurn,
   coalesceConsecutiveRoles,
-  stripThoughts,
 } from './geminiChat.js';
 import {
   type CompletedToolCall,
@@ -44,6 +43,7 @@ import type { HookSystem } from '../hooks/hookSystem.js';
 import { LlmRole } from '../telemetry/types.js';
 import { BINARY_INJECTION_KEY } from '../utils/generateContentResponseUtilities.js';
 import type { ResumedSessionData } from '../services/chatRecordingTypes.js';
+import { ensureActiveLoopHasThoughtSignatures } from 'src/utils/historyHardening.js';
 
 // Mock fs module to prevent actual file system operations during tests
 const mockFileSystem = new Map<string, string>();
@@ -845,11 +845,9 @@ describe('GeminiChat', () => {
       const modelTurn = history[1].content;
       expect(modelTurn.role).toBe('model');
 
-      // CRUCIAL ASSERTION:
-      // The buggy code would fail here, resulting in parts.length being 0.
-      // The corrected code will pass, preserving the single visible text part.
-      expect(modelTurn?.parts?.length).toBe(1);
-      expect(modelTurn?.parts![0].text).toBe(
+      // The corrected code will pass, preserving both thought and visible text parts.
+      expect(modelTurn?.parts?.length).toBe(2);
+      expect(modelTurn?.parts![1].text).toBe(
         'This is the visible text that should not be lost.',
       );
     });
@@ -917,10 +915,9 @@ describe('GeminiChat', () => {
       );
       expect(partialChunk).toBeDefined();
 
-      // 4. Recorded history (viewed with thoughts preserved, as the
-      // OpenAI-compatible path does) contains only the consolidated thought
+      // 4. Recorded history contains only the consolidated thought
       // and the text — never the transient partial.
-      const history = chat.getHistoryTurns(true, true);
+      const history = chat.getHistoryTurns(true);
       const modelTurn = history[1].content;
       expect(modelTurn.role).toBe('model');
       expect(modelTurn.parts).toEqual([
@@ -3406,10 +3403,8 @@ describe('GeminiChat', () => {
     });
   });
 
-  describe('thought leakage in getHistoryTurns', () => {
-    it('should completely filter out thought parts from getHistoryTurns when context management is enabled', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
-
+  describe('getHistoryTurns with thoughts', () => {
+    it('should keep thought parts in getHistoryTurns', () => {
       chat.setHistory([
         {
           role: 'user',
@@ -3425,33 +3420,6 @@ describe('GeminiChat', () => {
       ]);
 
       const turns = chat.getHistoryTurns(true);
-
-      expect(turns).toHaveLength(2);
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts).toHaveLength(1);
-      expect(modelTurn.content.parts![0]).toEqual({
-        text: 'actual conversational response',
-      });
-    });
-
-    it('should keep thought parts when preserveThoughts is true (context management enabled)', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
-
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'internal monologue', thought: true } as unknown as Part,
-            { text: 'actual conversational response' },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true, true);
 
       expect(turns).toHaveLength(2);
       const modelTurn = turns[1];
@@ -3460,212 +3428,13 @@ describe('GeminiChat', () => {
         text: 'internal monologue',
         thought: true,
       });
-    });
-
-    it('should keep thought parts when preserveThoughts is true (modern model, no context management)', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-3.1-pro-preview');
-
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'internal monologue', thought: true } as unknown as Part,
-            { text: 'actual conversational response' },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true, true);
-
-      expect(turns).toHaveLength(2);
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts).toHaveLength(2);
-      expect(modelTurn.content.parts![0]).toEqual({
-        text: 'internal monologue',
-        thought: true,
-      });
-    });
-
-    it('should completely filter out thought parts from getHistoryTurns when context management is disabled but model is gemini-2/modern', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
-
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'internal monologue', thought: true } as unknown as Part,
-            { text: 'actual conversational response' },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      expect(turns).toHaveLength(2);
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts).toHaveLength(1);
-      expect(modelTurn.content.parts![0]).toEqual({
+      expect(modelTurn.content.parts![1]).toEqual({
         text: 'actual conversational response',
       });
-    });
-
-    it('should completely filter out thought parts from getHistoryTurns when model supports modern features', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-3.1-pro-preview');
-
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'internal monologue', thought: true } as unknown as Part,
-            { text: 'actual conversational response' },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      expect(turns).toHaveLength(2);
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts).toHaveLength(1);
-      expect(modelTurn.content.parts![0]).toEqual({
-        text: 'actual conversational response',
-      });
-    });
-
-    it('should completely filter out model turns that end up with empty parts after stripping thoughts', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
-
-      chat.setHistory([
-        {
-          role: 'user',
-          parts: [{ text: 'hello' }],
-        },
-        {
-          role: 'model',
-          parts: [
-            { text: 'internal monologue', thought: true } as unknown as Part,
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      // Since the model turn contains only a thought part, it should be filtered out entirely.
-      expect(turns).toHaveLength(1);
-      expect(turns[0].content.role).toBe('user');
-    });
-
-    it('should coalesce consecutive user turns when an intermediate model turn is stripped', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
-
-      chat.setHistory([
-        { role: 'user', parts: [{ text: 'Question 1' }] },
-        {
-          role: 'model',
-          parts: [{ text: 'thinking...', thought: true } as unknown as Part],
-        },
-        { role: 'user', parts: [{ text: 'Question 2' }] },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      // The model turn contains only a thought part, so it is stripped.
-      // The two adjacent user turns must be coalesced into one user turn.
-      expect(turns).toHaveLength(1);
-      expect(turns[0].content.role).toBe('user');
-      expect(turns[0].content.parts).toHaveLength(2);
-      expect(turns[0].content.parts![0].text).toBe('Question 1');
-      expect(turns[0].content.parts![1].text).toBe('Question 2');
-    });
-
-    it('should inject a synthetic thoughtSignature onto a functionCall left signature-less after stripping a thought part that carried it (regression test for #28604)', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
-
-      chat.setHistory([
-        { role: 'user', parts: [{ text: 'activate the skill' }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: 'internal monologue',
-              thought: true,
-              thoughtSignature: 'real-sig-from-api',
-            } as unknown as Part,
-            {
-              functionCall: { name: 'activate_skill', args: {} },
-            },
-          ],
-        },
-        {
-          role: 'user',
-          parts: [
-            { functionResponse: { name: 'activate_skill', response: {} } },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts).toHaveLength(1);
-      expect(modelTurn.content.parts![0].functionCall?.name).toBe(
-        'activate_skill',
-      );
-      expect(modelTurn.content.parts![0].thoughtSignature).toBe(
-        SYNTHETIC_THOUGHT_SIGNATURE,
-      );
-    });
-
-    it('should leave an existing thoughtSignature on a functionCall untouched when stripping thoughts', () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(false);
-      vi.mocked(mockConfig.getModel).mockReturnValue('gemini-2.5-pro');
-
-      chat.setHistory([
-        { role: 'user', parts: [{ text: 'activate the skill' }] },
-        {
-          role: 'model',
-          parts: [
-            {
-              text: 'internal monologue',
-              thought: true,
-              thoughtSignature: 'real-sig-from-api',
-            } as unknown as Part,
-            {
-              functionCall: { name: 'activate_skill', args: {} },
-              thoughtSignature: 'existing-sig-on-call',
-            },
-          ],
-        },
-      ]);
-
-      const turns = chat.getHistoryTurns(true);
-
-      const modelTurn = turns[1];
-      expect(modelTurn.content.parts![0].thoughtSignature).toBe(
-        'existing-sig-on-call',
-      );
     });
   });
 
-  describe('preserveThoughts in request history scrubbing', () => {
+  describe('canonical request history passed to contentGenerator', () => {
     function pushToolLoopHistory(chat: GeminiChat) {
       chat.agentHistory.push({
         id: 'u1',
@@ -3704,11 +3473,7 @@ describe('GeminiChat', () => {
       });
     }
 
-    it('keeps thought parts when context management is enabled and the generator is OpenAI-compatible', async () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
-      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: ProviderType.USE_OPENAI,
-      });
+    it('passes canonical history with thought parts to contentGenerator without provider branching', async () => {
       pushToolLoopHistory(chat);
 
       let capturedContents: Content[] = [];
@@ -3734,7 +3499,7 @@ describe('GeminiChat', () => {
       const stream = await chat.sendMessageStream(
         { model: 'test-model' },
         'and then?',
-        'prompt-preserve-thoughts-openai',
+        'prompt-canonical-history',
         new AbortController().signal,
         LlmRole.MAIN,
       );
@@ -3746,54 +3511,10 @@ describe('GeminiChat', () => {
       expect(modelTurn).toBeDefined();
       expect(modelTurn!.parts!.some((p) => p.thought)).toBe(true);
     });
-
-    it('strips thought parts when context management is enabled and the generator is Gemini-native', async () => {
-      vi.mocked(mockConfig.isContextManagementEnabled).mockReturnValue(true);
-      vi.mocked(mockConfig.getContentGeneratorConfig).mockReturnValue({
-        authType: ProviderType.USE_GEMINI,
-      });
-      pushToolLoopHistory(chat);
-
-      let capturedContents: Content[] = [];
-      vi.mocked(mockContentGenerator.generateContentStream).mockImplementation(
-        async (req) => {
-          capturedContents = req.contents as Content[];
-          return (async function* () {
-            yield {
-              candidates: [
-                {
-                  content: {
-                    role: 'model',
-                    parts: [{ text: 'ok' }],
-                  },
-                  finishReason: 'STOP',
-                },
-              ],
-            } as unknown as GenerateContentResponse;
-          })();
-        },
-      );
-
-      const stream = await chat.sendMessageStream(
-        { model: 'test-model' },
-        'and then?',
-        'prompt-preserve-thoughts-gemini',
-        new AbortController().signal,
-        LlmRole.MAIN,
-      );
-      for await (const _ of stream) {
-        // consume
-      }
-
-      const modelTurn = capturedContents.find((c) => c.role === 'model');
-      expect(modelTurn).toBeDefined();
-      expect(modelTurn!.parts!.some((p) => p.thought)).toBe(false);
-    });
   });
 
   describe('ensureActiveLoopHasThoughtSignatures', () => {
     it('should add thoughtSignature to the first functionCall in each model turn of the active loop', () => {
-      const chat = new GeminiChat(mockConfig, '', [], []);
       const history: Content[] = [
         { role: 'user', parts: [{ text: 'Old message' }] },
         {
@@ -3826,7 +3547,7 @@ describe('GeminiChat', () => {
         },
       ];
 
-      const newContents = chat.ensureActiveLoopHasThoughtSignatures(history);
+      const newContents = ensureActiveLoopHasThoughtSignatures(history);
 
       // Outside active loop - unchanged
       expect(newContents[1]?.parts?.[0]).not.toHaveProperty('thoughtSignature');
@@ -3850,7 +3571,6 @@ describe('GeminiChat', () => {
     });
 
     it('should skip a user turn that has text alongside a functionResponse when locating the active loop', () => {
-      const chat = new GeminiChat(mockConfig, '', [], []);
       // `coalesceConsecutiveRoles` can merge a function response turn with the
       // prompt that follows it, producing a user turn holding both.
       const history: Content[] = [
@@ -3871,7 +3591,7 @@ describe('GeminiChat', () => {
         },
       ];
 
-      const newContents = chat.ensureActiveLoopHasThoughtSignatures(history);
+      const newContents = ensureActiveLoopHasThoughtSignatures(history);
 
       // The merged turn must not be taken as the loop start, otherwise the
       // model turn before it is left unsigned while the API still validates it.
@@ -3881,7 +3601,6 @@ describe('GeminiChat', () => {
     });
 
     it('should not modify contents if there is no user text message', () => {
-      const chat = new GeminiChat(mockConfig, '', [], []);
       const history: Content[] = [
         {
           role: 'user',
@@ -3892,22 +3611,20 @@ describe('GeminiChat', () => {
           parts: [{ functionCall: { name: 'tool2', args: {} } }],
         },
       ];
-      const newContents = chat.ensureActiveLoopHasThoughtSignatures(history);
+      const newContents = ensureActiveLoopHasThoughtSignatures(history);
       expect(newContents).toEqual(history);
       expect(newContents[1]?.parts?.[0]).not.toHaveProperty('thoughtSignature');
     });
 
     it('should handle an empty history', () => {
-      const chat = new GeminiChat(mockConfig, '', []);
       const history: Content[] = [];
-      const newContents = chat.ensureActiveLoopHasThoughtSignatures(history);
+      const newContents = ensureActiveLoopHasThoughtSignatures(history);
       expect(newContents).toEqual([]);
     });
 
     it('should handle history with only a user message', () => {
-      const chat = new GeminiChat(mockConfig, '', []);
       const history: Content[] = [{ role: 'user', parts: [{ text: 'Hello' }] }];
-      const newContents = chat.ensureActiveLoopHasThoughtSignatures(history);
+      const newContents = ensureActiveLoopHasThoughtSignatures(history);
       expect(newContents).toEqual(history);
     });
   });
@@ -4381,15 +4098,15 @@ describe('GeminiChat', () => {
       }
 
       // Verify history expansion
-      // The synthetic model acknowledgment is a thought-only turn, which is
-      // stripped for modern models, and the two consecutive user turns are
-      // coalesced into a single user turn.
-      expect(capturedContents).toHaveLength(1);
+      expect(capturedContents).toHaveLength(3);
       expect(capturedContents[0].role).toBe('user');
       expect(capturedContents[0].parts![0].functionResponse!.response).toEqual({
         output: 'Success',
       });
-      expect(capturedContents[0].parts![1].inlineData!.mimeType).toBe(
+      expect(capturedContents[1].role).toBe('model');
+      expect(capturedContents[1].parts![0].thought).toBe(true);
+      expect(capturedContents[2].role).toBe('user');
+      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
         'audio/mpeg',
       );
     });
@@ -4454,21 +4171,23 @@ describe('GeminiChat', () => {
       // Turn 1: Cleaned tool responses (both)
       // Turn 2: Model Ack
       // Turn 3: Both binary parts combined
-      // The synthetic model acknowledgment is a thought-only turn, which is
-      // stripped for modern models, and the two consecutive user turns are
-      // coalesced into a single user turn.
-      expect(capturedContents).toHaveLength(1);
-      expect(capturedContents[0].parts).toHaveLength(4);
+      expect(capturedContents).toHaveLength(3);
+      expect(capturedContents[0].role).toBe('user');
+      expect(capturedContents[0].parts).toHaveLength(2);
       expect(capturedContents[0].parts![0].functionResponse!.response).toEqual({
         output: 'Success 1',
       });
       expect(capturedContents[0].parts![1].functionResponse!.response).toEqual({
         output: 'Success 2',
       });
-      expect(capturedContents[0].parts![2].inlineData!.mimeType).toBe(
+      expect(capturedContents[1].role).toBe('model');
+      expect(capturedContents[1].parts![0].thought).toBe(true);
+      expect(capturedContents[2].role).toBe('user');
+      expect(capturedContents[2].parts).toHaveLength(2);
+      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
         'audio/mpeg',
       );
-      expect(capturedContents[0].parts![3].inlineData!.mimeType).toBe(
+      expect(capturedContents[2].parts![1].inlineData!.mimeType).toBe(
         'video/mp4',
       );
     });
@@ -4816,96 +4535,6 @@ describe('GeminiChat', () => {
         { id: '2', content: { parts: [{ text: 'world' }] } },
       ];
       expect(coalesceConsecutiveRoles(history)).toEqual(history);
-    });
-  });
-
-  describe('stripThoughts', () => {
-    it('should return empty history if empty array is passed', () => {
-      expect(stripThoughts([])).toEqual([]);
-    });
-
-    it('should strip thought parts and keep the turn if other parts remain', () => {
-      const history: HistoryTurn[] = [
-        {
-          id: '1',
-          content: {
-            role: 'model',
-            parts: [
-              { text: 'internal monologue', thought: true } as unknown as Part,
-              { text: 'visible response' },
-            ],
-          },
-        },
-      ];
-      expect(stripThoughts(history)).toEqual([
-        {
-          id: '1',
-          content: {
-            role: 'model',
-            parts: [{ text: 'visible response' }],
-          },
-        },
-      ]);
-    });
-
-    it('should completely remove a turn if all its parts are thought parts', () => {
-      const history: HistoryTurn[] = [
-        {
-          id: '1',
-          content: {
-            role: 'user',
-            parts: [{ text: 'hello' }],
-          },
-        },
-        {
-          id: '2',
-          content: {
-            role: 'model',
-            parts: [
-              { text: 'internal monologue', thought: true } as unknown as Part,
-            ],
-          },
-        },
-      ];
-      expect(stripThoughts(history)).toEqual([
-        {
-          id: '1',
-          content: {
-            role: 'user',
-            parts: [{ text: 'hello' }],
-          },
-        },
-      ]);
-    });
-
-    it('should preserve turns that do not have parts arrays', () => {
-      const history: HistoryTurn[] = [{ id: '1', content: { role: 'user' } }];
-      expect(stripThoughts(history)).toEqual(history);
-    });
-
-    it('should preserve top-level metadata when stripping thoughts', () => {
-      const history: HistoryTurn[] = [
-        {
-          id: '1',
-          content: {
-            role: 'model',
-            parts: [
-              { text: 'internal monologue', thought: true } as unknown as Part,
-              { text: 'visible response' },
-            ],
-          },
-          // top-level turn metadata
-          timestamp: '2026-07-23T00:00:00.000Z',
-          metadata: { some: 'value' },
-        } as unknown as HistoryTurn,
-      ];
-      const stripped = stripThoughts(history);
-      expect(stripped).toHaveLength(1);
-      expect(stripped[0]).toHaveProperty(
-        'timestamp',
-        '2026-07-23T00:00:00.000Z',
-      );
-      expect(stripped[0]).toHaveProperty('metadata', { some: 'value' });
     });
   });
 });

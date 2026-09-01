@@ -33,7 +33,6 @@ import {
 } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
 import { resolveModel } from '../config/models.js';
-import { ProviderType } from '../config/constants.js';
 import { hasCycleInSchema } from '../tools/tools.js';
 import type { StructuredError } from './turn.js';
 import type { CompletedToolCall } from '../scheduler/types.js';
@@ -54,7 +53,6 @@ import {
 } from '../telemetry/types.js';
 import { handleFallback } from '../fallback/handler.js';
 import { isFunctionResponse } from '../utils/messageInspectors.js';
-import { scrubHistory, scrubContents } from '../utils/historyHardening.js';
 import {
   partListUnionToString,
   ensureStableToolIds,
@@ -539,14 +537,7 @@ export class GeminiChat {
       }
     }
 
-    // OpenAI-compatible endpoints (DeepSeek thinking mode) require the
-    // reasoning_content of tool-call turns to be passed back; keep thought
-    // parts for those paths so the message converter can derive it. Gemini
-    // paths strip thoughts at request time instead.
-    const preserveThoughts =
-      this.context.config.getContentGeneratorConfig()?.authType ===
-      ProviderType.USE_OPENAI;
-    const requestHistory = this.getHistoryTurns(true, preserveThoughts);
+    const requestHistory = this.getHistoryTurns(true);
 
     const streamWithRetries = async function* (
       this: GeminiChat,
@@ -576,7 +567,6 @@ export class GeminiChat {
               signal,
               role,
               apiHistoryOverride,
-              preserveThoughts,
             );
             isConnectionPhase = false;
             for await (const chunk of stream) {
@@ -754,24 +744,15 @@ export class GeminiChat {
     abortSignal: AbortSignal,
     role: LlmRole,
     apiHistoryOverride?: Content[],
-    preserveThoughts: boolean = false,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
-    // getHistoryTurns has already scrubbed the request history (thought
-    // stripping / field whitelisting based on preserveThoughts happens there).
-    // Only coalesce consecutive same-role turns here to prevent 400 Bad
-    // Request errors.
     const scrubbedHistory = coalesceConsecutiveRoles([...requestHistory]);
-
     const scrubbedContents = scrubbedHistory.map((h) => h.content);
 
     const requestContents = apiHistoryOverride
-      ? preserveThoughts
-        ? apiHistoryOverride
-        : scrubContents(apiHistoryOverride)
+      ? coalesceConsecutiveRoles(
+          apiHistoryOverride.map((content) => ({ id: '', content })),
+        ).map((h) => h.content)
       : scrubbedContents;
-
-    const contentsForPreviewModel =
-      this.ensureActiveLoopHasThoughtSignatures(requestContents);
 
     // Track final request parameters for AfterModel hooks
     const {
@@ -849,9 +830,7 @@ export class GeminiChat {
         }
       }
 
-      // All models are treated as Gemini 3, so always send contents with
-      // thought signatures added to active function-call loops.
-      let contentsToUse: Content[] = [...contentsForPreviewModel];
+      let contentsToUse: Content[] = [...requestContents];
 
       const hookSystem = this.context.config.getHookSystem();
       if (hookSystem) {
@@ -1030,30 +1009,13 @@ export class GeminiChat {
    *
    * @param curated - whether to return the curated history or the comprehensive
    * history.
-   * @param preserveThoughts - when true, thought parts are kept (used by
-   * OpenAI-compatible request paths, which derive `reasoning_content` from
-   * them). Defaults to false: Gemini/Vertex replay strips thought parts.
    */
-  getHistoryTurns(
-    curated: boolean = false,
-    preserveThoughts: boolean = false,
-  ): HistoryTurn[] {
+  getHistoryTurns(curated: boolean = false): HistoryTurn[] {
     const history = curated
       ? extractCuratedHistory(this.agentHistory.get())
       : [...this.agentHistory.get()];
 
-    if (this.context.config.isContextManagementEnabled()) {
-      return preserveThoughts
-        ? coalesceConsecutiveRoles(history)
-        : scrubHistory(history);
-    }
-
-    // All models are treated as Gemini 3 (custom models support modern
-    // features too), so history is always cleaned up for replay: strip
-    // thought parts and merge consecutive same-role turns to avoid 400s.
-    return preserveThoughts
-      ? coalesceConsecutiveRoles(history)
-      : coalesceConsecutiveRoles(stripThoughts(history));
+    return coalesceConsecutiveRoles(history);
   }
 
   /**
@@ -1136,65 +1098,6 @@ export class GeminiChat {
       return { id: turn.id, content: newContent };
     });
     this.agentHistory.set(newHistory);
-  }
-
-  // To ensure our requests validate, the first function call in every model
-  // turn within the active loop must have a `thoughtSignature` property.
-  // If we do not do this, we will get back 400 errors from the API.
-  ensureActiveLoopHasThoughtSignatures(
-    requestContents: readonly Content[],
-  ): readonly Content[] {
-    // First, find the start of the active loop by finding the last user turn
-    // with a text message, i.e. that is not a function response. Testing for
-    // text alone is not enough: `coalesceConsecutiveRoles` can merge a function
-    // response turn with the prompt that follows it, and starting the loop at
-    // such a turn starts it later than the API starts the turn, leaving earlier
-    // function calls unsigned but still validated.
-    let activeLoopStartIndex = -1;
-    for (let i = requestContents.length - 1; i >= 0; i--) {
-      const content = requestContents[i];
-      if (
-        content.role === 'user' &&
-        content.parts?.some((part) => part.text) &&
-        !content.parts?.some((part) => part.functionResponse)
-      ) {
-        activeLoopStartIndex = i;
-        break;
-      }
-    }
-
-    if (activeLoopStartIndex === -1) {
-      return requestContents;
-    }
-
-    // Iterate through every message in the active loop, ensuring that the first
-    // function call in each message's list of parts has a valid
-    // thoughtSignature property. If it does not we replace the function call
-    // with a copy that uses the synthetic thought signature.
-    const newContents = requestContents.slice(); // Shallow copy the array
-    for (let i = activeLoopStartIndex; i < newContents.length; i++) {
-      const content = newContents[i];
-      if (content.role === 'model' && content.parts) {
-        const newParts = content.parts.slice();
-        for (let j = 0; j < newParts.length; j++) {
-          const part = newParts[j];
-          if (part.functionCall) {
-            if (!part.thoughtSignature) {
-              newParts[j] = {
-                ...part,
-                thoughtSignature: SYNTHETIC_THOUGHT_SIGNATURE,
-              };
-              newContents[i] = {
-                ...content,
-                parts: newParts,
-              };
-            }
-            break; // Only consider the first function call
-          }
-        }
-      }
-    }
-    return newContents;
   }
 
   setTools(tools: Tool[]): void {
@@ -1714,46 +1617,4 @@ export function coalesceConsecutiveRoles(
     }
   }
   return result;
-}
-
-export function stripThoughts(history: HistoryTurn[]): HistoryTurn[] {
-  return history
-    .map((turn) => {
-      if (!turn.content.parts) return turn;
-      const hasThought = turn.content.parts.some((p) => p && p.thought);
-      if (!hasThought) return turn;
-
-      const nonThoughtParts = turn.content.parts.filter((p) => p && !p.thought);
-
-      // The thoughtSignature the API requires on the first functionCall of a
-      // model turn is sometimes only carried by the thought part we just
-      // removed, not by the functionCall part itself. Without it, replaying
-      // this turn in a later request gets rejected with a 400 "missing
-      // thought_signature" error, so inject a synthetic one if needed.
-      let patchedFirstCall = false;
-      const finalParts =
-        turn.content.role === 'model'
-          ? nonThoughtParts.map((p) => {
-              if (!patchedFirstCall && p.functionCall) {
-                patchedFirstCall = true;
-                if (!p.thoughtSignature) {
-                  return {
-                    ...p,
-                    thoughtSignature: SYNTHETIC_THOUGHT_SIGNATURE,
-                  };
-                }
-              }
-              return p;
-            })
-          : nonThoughtParts;
-
-      return {
-        ...turn,
-        content: {
-          ...turn.content,
-          parts: finalParts,
-        },
-      };
-    })
-    .filter((turn) => !turn.content.parts || turn.content.parts.length > 0);
 }

@@ -30,6 +30,7 @@ import {
   OpenAiCompatibleGenerator,
   type OpenAiProvider,
 } from './openAiCompatibleGenerator.js';
+import { GoogleGenAiContentGenerator } from './googleGenAiContentGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -264,7 +265,10 @@ export async function createContentGenerator(
           },
         }),
       });
-      return new LoggingContentGenerator(googleGenAI.models, gcConfig);
+      return new LoggingContentGenerator(
+        new GoogleGenAiContentGenerator(googleGenAI.models),
+        gcConfig,
+      );
     } else if (config.authType === ProviderType.USE_OPENAI) {
       const model = resolveModel(gcConfig.getModel(), gcConfig);
       const provider = getOpenAiProvider(gcConfig, config, model);

@@ -16,6 +16,7 @@ import { GoogleGenAI } from '@google/genai';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import type { Config } from '../config/config.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
+import { GoogleGenAiContentGenerator } from './googleGenAiContentGenerator.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { resetVersionCache } from '../utils/version.js';
@@ -177,7 +178,10 @@ describe('createContentGenerator', () => {
       }),
     });
     expect(generator).toEqual(
-      new LoggingContentGenerator(mockGenerator.models, mockConfig),
+      new LoggingContentGenerator(
+        new GoogleGenAiContentGenerator(mockGenerator.models),
+        mockConfig,
+      ),
     );
   });
 
@@ -568,7 +572,10 @@ describe('createContentGenerator', () => {
       }),
     });
     expect(generator).toEqual(
-      new LoggingContentGenerator(mockGenerator.models, mockConfig),
+      new LoggingContentGenerator(
+        new GoogleGenAiContentGenerator(mockGenerator.models),
+        mockConfig,
+      ),
     );
   });
 
@@ -829,8 +836,6 @@ describe('createContentGenerator', () => {
       expect.objectContaining({
         model: 'gemini-3-flash',
       }),
-      'prompt-id',
-      'user',
     );
   });
 });
