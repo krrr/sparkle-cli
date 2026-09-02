@@ -522,7 +522,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Requires restart:** Yes
 
 - **`model.disableLoopDetection`** (boolean):
-
   - **Description:** Disable automatic detection and prevention of infinite
     loops.
   - **Default:** `false`

@@ -1,5 +1,9 @@
 # Sparkle CLI
 
+[![CI Badge](https://github.com/krrr/sparkle-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/krrr/sparkle-cli/actions/workflows/ci.yml)
+
+![Main CLI Screenshot](/docs/assets/gemini-screenshot.png)
+
 Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent). The name is taken
 from the shape of Gemini's icon.
 

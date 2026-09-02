@@ -127,6 +127,13 @@
       "topP": 1
     }
   },
+  "llm-edit-fixer": {
+    "model": "flash",
+    "generateContentConfig": {
+      "temperature": 0,
+      "topP": 1
+    }
+  },
   "context-snapshotter": {
     "model": "flash",
     "generateContentConfig": {
