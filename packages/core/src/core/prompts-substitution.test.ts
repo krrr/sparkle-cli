@@ -103,7 +103,7 @@ describe('Core System Prompt Substitution', () => {
     const prompt = getCoreSystemPrompt(mockConfig);
 
     expect(prompt).toContain('Agents:');
-    expect(prompt).toContain('# Available Sub-Agents');
+    expect(prompt).toContain('# Sub-Agents');
     expect(prompt).toContain('<name>test-agent</name>');
     expect(prompt).toContain(
       '<description>Test Agent Description</description>',

@@ -15,8 +15,8 @@ import type {
   ContextManagementConfig,
   ToolOutputMaskingConfig,
 } from '../context/types.js';
-export type { ConversationRecord };
-import type { ProviderType ,
+import {
+  type ProviderType,
   DEFAULT_FILE_FILTERING_OPTIONS,
   DEFAULT_MEMORY_FILE_FILTERING_OPTIONS,
   type FileFilteringOptions,

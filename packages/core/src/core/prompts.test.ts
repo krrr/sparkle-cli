@@ -154,9 +154,9 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue(skills);
     const prompt = getCoreSystemPrompt(mockConfig);
 
-    expect(prompt).toContain('# Available Agent Skills');
+    expect(prompt).toContain('# Skills');
     expect(prompt).toContain(
-      "To activate a skill and receive its detailed instructions, call the `activate_skill` tool with the skill's name.",
+      'Call `activate_skill` tool to activate a skill and load its instructions.',
     );
     expect(prompt).toMatchSnapshot();
   });
@@ -165,7 +165,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue([]);
     const prompt = getCoreSystemPrompt(mockConfig);
 
-    expect(prompt).not.toContain('# Available Agent Skills');
+    expect(prompt).not.toContain('# Skills');
     expect(prompt).not.toContain('Skill Guidance');
     expect(prompt).not.toContain('activate_skill');
   });
@@ -189,7 +189,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     );
     const prompt = getCoreSystemPrompt(mockConfig);
 
-    expect(prompt).toContain('# Available Sub-Agents');
+    expect(prompt).toContain('# Sub-Agents');
     expect(prompt).toContain('<available_subagents>');
     expect(prompt).toContain('<subagent>');
     expect(prompt).toContain('<name>test-agent</name>');
@@ -218,7 +218,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     );
     const prompt = getCoreSystemPrompt(mockConfig);
 
-    expect(prompt).not.toContain('# Available Sub-Agents');
+    expect(prompt).not.toContain('# Sub-Agents');
     expect(prompt).not.toContain('<available_subagents>');
     expect(prompt).not.toContain('<subagent>');
     expect(prompt).not.toContain('<name>test-agent</name>');
