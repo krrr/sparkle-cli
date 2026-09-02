@@ -134,13 +134,6 @@
       "topP": 1
     }
   },
-  "next-speaker-checker": {
-    "model": "flash",
-    "generateContentConfig": {
-      "temperature": 0,
-      "topP": 1
-    }
-  },
   "context-snapshotter": {
     "model": "flash",
     "generateContentConfig": {

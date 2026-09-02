@@ -153,10 +153,6 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       extends: 'internal-tool-flash',
       modelConfig: {},
     },
-    'next-speaker-checker': {
-      extends: 'internal-tool-flash',
-      modelConfig: {},
-    },
     'context-snapshotter': {
       extends: 'internal-tool-flash',
       modelConfig: {

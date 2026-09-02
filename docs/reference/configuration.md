@@ -528,10 +528,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `false`
   - **Requires restart:** Yes
 
-- **`model.skipNextSpeakerCheck`** (boolean):
-  - **Description:** Skip the next speaker check.
-  - **Default:** `true`
-
 #### `modelConfigs`
 
 - **`modelConfigs.aliases`** (object):
@@ -676,10 +672,6 @@ their corresponding top-level category object in your `settings.json` file.
         }
       },
       "llm-edit-fixer": {
-        "extends": "internal-tool-flash",
-        "modelConfig": {}
-      },
-      "next-speaker-checker": {
         "extends": "internal-tool-flash",
         "modelConfig": {}
       },

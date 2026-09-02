@@ -920,38 +920,6 @@ export class LoopDetectionDisabledEvent implements BaseTelemetryEvent {
   }
 }
 
-export const EVENT_NEXT_SPEAKER_CHECK = 'gemini_cli.next_speaker_check';
-export class NextSpeakerCheckEvent implements BaseTelemetryEvent {
-  'event.name': 'next_speaker_check';
-  'event.timestamp': string;
-  prompt_id: string;
-  finish_reason: string;
-  result: string;
-
-  constructor(prompt_id: string, finish_reason: string, result: string) {
-    this['event.name'] = 'next_speaker_check';
-    this['event.timestamp'] = new Date().toISOString();
-    this.prompt_id = prompt_id;
-    this.finish_reason = finish_reason;
-    this.result = result;
-  }
-
-  toOpenTelemetryAttributes(config: Config): LogAttributes {
-    return {
-      ...getCommonAttributes(config),
-      'event.name': EVENT_NEXT_SPEAKER_CHECK,
-      'event.timestamp': this['event.timestamp'],
-      prompt_id: this.prompt_id,
-      finish_reason: this.finish_reason,
-      result: this.result,
-    };
-  }
-
-  toLogBody(): string {
-    return `Next speaker check.`;
-  }
-}
-
 export const EVENT_SLASH_COMMAND = 'gemini_cli.slash_command';
 export interface SlashCommandEvent extends BaseTelemetryEvent {
   'event.name': 'slash_command';
@@ -1782,7 +1750,6 @@ export type TelemetryEvent =
   | FlashFallbackEvent
   | LoopDetectedEvent
   | LoopDetectionDisabledEvent
-  | NextSpeakerCheckEvent
   | MalformedJsonResponseEvent
   | IdeConnectionEvent
   | ConversationFinishedEvent

@@ -425,7 +425,7 @@ describe('settings-validation', () => {
         security: {
           auth: {
             selectedProviderId: {
-              skipNextSpeakerCheck: true,
+              someInvalidProperty: true,
             },
           },
         },

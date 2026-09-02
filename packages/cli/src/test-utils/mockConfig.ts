@@ -142,7 +142,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     reloadAgents: vi.fn().mockResolvedValue(undefined),
     getUseRipgrep: vi.fn().mockReturnValue(false),
     getEnableInteractiveShell: vi.fn().mockReturnValue(false),
-    getSkipNextSpeakerCheck: vi.fn().mockReturnValue(false),
     getRetryFetchErrors: vi.fn().mockReturnValue(true),
     getEnableShellOutputEfficiency: vi.fn().mockReturnValue(true),
     getShellToolInactivityTimeout: vi.fn().mockReturnValue(300000),

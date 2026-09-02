@@ -1046,15 +1046,6 @@ const SETTINGS_SCHEMA = {
           'Disable automatic detection and prevention of infinite loops.',
         showInDialog: true,
       },
-      skipNextSpeakerCheck: {
-        type: 'boolean',
-        label: 'Skip Next Speaker Check',
-        category: 'Model',
-        requiresRestart: false,
-        default: true,
-        description: 'Skip the next speaker check.',
-        showInDialog: true,
-      },
     },
   },
 

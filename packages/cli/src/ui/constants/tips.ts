@@ -67,7 +67,6 @@ export const INFORMATIVE_TIPS = [
   'Show Sparkle CLI status in the terminal window title (/settings)…',
   'Use the entire width of the terminal for output (/settings)…',
   'Enable screen reader mode for better accessibility (/settings)…',
-  'Skip the next speaker check for faster responses (/settings)…',
   'Use ripgrep for faster file content search (/settings)…',
   'Enable truncation of large tool outputs to save tokens (/settings)…',
   'Set the character threshold for truncating tool outputs (/settings)…',

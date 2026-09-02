@@ -21,7 +21,6 @@ import {
   type ToolCallEvent,
   type UserPromptEvent,
   type FlashFallbackEvent,
-  type NextSpeakerCheckEvent,
   type LoopDetectedEvent,
   type LoopDetectionDisabledEvent,
   type SlashCommandEvent,
@@ -334,20 +333,6 @@ export function logLoopDetected(
 export function logLoopDetectionDisabled(
   config: Config,
   event: LoopDetectionDisabledEvent,
-): void {
-  bufferTelemetryEvent(() => {
-    const logger = logs.getLogger(SERVICE_NAME);
-    const logRecord: LogRecord = {
-      body: event.toLogBody(),
-      attributes: event.toOpenTelemetryAttributes(config),
-    };
-    logger.emit(logRecord);
-  });
-}
-
-export function logNextSpeakerCheck(
-  config: Config,
-  event: NextSpeakerCheckEvent,
 ): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);

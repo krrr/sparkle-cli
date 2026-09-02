@@ -625,7 +625,6 @@ export interface ConfigParameters {
   useRipgrep?: boolean;
   enableInteractiveShell?: boolean;
   shellBackgroundCompletionBehavior?: string;
-  skipNextSpeakerCheck?: boolean;
   shellExecutionConfig?: ShellExecutionConfig;
   extensionManagement?: boolean;
   extensionRegistryURI?: string;
@@ -808,7 +807,6 @@ export class Config implements McpContext, AgentLoopContext {
     | 'inject'
     | 'notify'
     | 'silent';
-  private readonly skipNextSpeakerCheck: boolean;
   private readonly useBackgroundColor: boolean;
   private readonly useAlternateBuffer: boolean;
   private readonly useTerminalBuffer: boolean;
@@ -1174,7 +1172,6 @@ export class Config implements McpContext, AgentLoopContext {
       this.shellBackgroundCompletionBehavior = 'notify';
     }
 
-    this.skipNextSpeakerCheck = params.skipNextSpeakerCheck ?? true;
     this.shellExecutionConfig = {
       terminalWidth: params.shellExecutionConfig?.terminalWidth ?? 80,
       terminalHeight: params.shellExecutionConfig?.terminalHeight ?? 24,
@@ -2991,10 +2988,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getShellBackgroundCompletionBehavior(): 'inject' | 'notify' | 'silent' {
     return this.shellBackgroundCompletionBehavior;
-  }
-
-  getSkipNextSpeakerCheck(): boolean {
-    return this.skipNextSpeakerCheck;
   }
 
   getRetryFetchErrors(): boolean {

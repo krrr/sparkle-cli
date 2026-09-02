@@ -27,7 +27,6 @@ import {
 import type { Config } from '../config/config.js';
 import { type AgentLoopContext } from '../config/agent-loop-context.js';
 import { getCoreSystemPrompt } from './prompts.js';
-import { checkNextSpeaker } from '../utils/nextSpeakerChecker.js';
 import { reportError } from '../utils/errorReporting.js';
 import { GeminiChat } from './geminiChat.js';
 import {
@@ -48,12 +47,11 @@ import { AgentHistoryProvider } from '../context/agentHistoryProvider.js';
 import type { ContextManager } from '../context/contextManager.js';
 import type { HistoryTurn } from './agentChatHistory.js';
 import { ideContextStore } from '../ide/ideContext.js';
-import { logNextSpeakerCheck } from '../telemetry/loggers.js';
 import type {
   DefaultHookOutput,
   AfterAgentHookOutput,
 } from '../hooks/types.js';
-import { NextSpeakerCheckEvent, LlmRole } from '../telemetry/types.js';
+import { LlmRole } from '../telemetry/types.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 import type { IdeContext, File } from '../ide/types.js';
 import { handleFallback } from '../fallback/handler.js';
@@ -880,38 +878,6 @@ export class GeminiClient {
       }
     }
 
-    if (!turn.pendingToolCalls.length && signal && !signal.aborted) {
-      if (
-        !this.config.getQuotaErrorOccurred() &&
-        !this.config.getSkipNextSpeakerCheck()
-      ) {
-        const nextSpeakerCheck = await checkNextSpeaker(
-          this.getChat(),
-          this.config.getBaseLlmClient(),
-          signal,
-          prompt_id,
-        );
-        logNextSpeakerCheck(
-          this.config,
-          new NextSpeakerCheckEvent(
-            prompt_id,
-            turn.finishReason?.toString() || '',
-            nextSpeakerCheck?.next_speaker || '',
-          ),
-        );
-        if (nextSpeakerCheck?.next_speaker === 'model') {
-          const nextRequest = [{ text: 'Please continue.' }];
-          turn = yield* this.sendMessageStream(
-            nextRequest,
-            signal,
-            prompt_id,
-            boundedTurns - 1,
-            displayContent,
-          );
-          return turn;
-        }
-      }
-    }
     return turn;
   }
 
