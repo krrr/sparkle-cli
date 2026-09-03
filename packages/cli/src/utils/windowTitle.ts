@@ -71,7 +71,7 @@ export function computeTerminalTitle({
     const context = truncate(displayContext, maxContextLen);
     title = `${base}${getSuffix(context)}`;
   } else if (streamingState === StreamingState.Idle) {
-    const base = '◇  Ready';
+    const base = '✧  Ready';
     // Max context length is 80 - base.length - 3 (for ' (' and ')')
     const maxContextLen = MAX_LEN - base.length - 3;
     const context = truncate(displayContext, maxContextLen);

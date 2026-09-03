@@ -27,7 +27,7 @@ describe('computeTerminalTitle', () => {
         showThoughts: false,
         useDynamicTitle: true,
       } as TerminalTitleOptions,
-      expected: '◇  Ready (my-project)',
+      expected: '✧  Ready (my-project)',
     },
     {
       description: 'legacy title when useDynamicTitle is false',
@@ -183,7 +183,7 @@ describe('computeTerminalTitle', () => {
       useDynamicTitle: true,
     });
 
-    expect(title).toContain('◇  Ready (EnvOverride)');
+    expect(title).toContain('✧  Ready (EnvOverride)');
     expect(title).not.toContain('my-project');
     expect(title.length).toBe(80);
   });
@@ -192,13 +192,13 @@ describe('computeTerminalTitle', () => {
     {
       name: 'folder name',
       folderName: 'A'.repeat(100),
-      expected: '◇  Ready (AAAAA',
+      expected: '✧  Ready (AAAAA',
     },
     {
       name: 'CLI_TITLE',
       folderName: 'my-project',
       envTitle: 'B'.repeat(100),
-      expected: '◇  Ready (BBBBB',
+      expected: '✧  Ready (BBBBB',
     },
   ])(
     'should truncate very long $name to fit within 80 characters',
