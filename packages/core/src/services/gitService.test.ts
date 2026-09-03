@@ -181,7 +181,13 @@ describe('GitService', () => {
     let gitConfigPath: string;
 
     beforeEach(async () => {
-      repoDir = path.join(homedir, SPARKLE_DIR, 'history', PROJECT_SLUG);
+      repoDir = path.join(
+        homedir,
+        SPARKLE_DIR,
+        'data',
+        PROJECT_SLUG,
+        'history',
+      );
       gitConfigPath = path.join(repoDir, '.gitconfig');
     });
 

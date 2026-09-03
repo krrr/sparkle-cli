@@ -20,7 +20,6 @@ export const OAUTH_FILE = 'oauth_creds.json';
 export const TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json';
 const TMP_DIR_NAME = 'tmp';
 const DATA_DIR_NAME = 'data';
-const BIN_DIR_NAME = 'bin';
 const AGENTS_DIR_NAME = '.agents';
 
 export const AUTO_SAVED_POLICY_FILENAME = 'auto-saved.toml';
@@ -149,10 +148,6 @@ export class Storage {
     return path.join(Storage.getGlobalGeminiDir(), DATA_DIR_NAME);
   }
 
-  static getGlobalBinDir(): string {
-    return path.join(Storage.getGlobalTempDir(), BIN_DIR_NAME);
-  }
-
   getGeminiDir(): string {
     return path.join(this.targetDir, SPARKLE_DIR);
   }
@@ -238,7 +233,6 @@ export class Storage {
       const registry = new ProjectRegistry(registryPath, [
         Storage.getGlobalTempDir(),
         Storage.getGlobalDataDir(),
-        path.join(Storage.getGlobalGeminiDir(), 'history'),
       ]);
       await registry.initialize();
 
@@ -249,9 +243,7 @@ export class Storage {
   }
 
   getHistoryDir(): string {
-    const identifier = this.getProjectIdentifier();
-    const historyDir = path.join(Storage.getGlobalGeminiDir(), 'history');
-    return path.join(historyDir, identifier);
+    return path.join(this.getProjectDataDir(), 'history');
   }
 
   getProjectMemoryDir(): string {

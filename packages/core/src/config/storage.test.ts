@@ -158,11 +158,6 @@ describe('Storage – additional helpers', () => {
     expect(Storage.getMcpOAuthTokensPath()).toBe(expected);
   });
 
-  it('getGlobalBinDir returns ~/.sparkle/tmp/bin', () => {
-    const expected = path.join(os.homedir(), SPARKLE_DIR, 'tmp', 'bin');
-    expect(Storage.getGlobalBinDir()).toBe(expected);
-  });
-
   it('getProjectPlansDir returns ~/.sparkle/data/<identifier>/plans when no sessionId is provided', async () => {
     await storage.initialize();
     const dataDir = storage.getProjectDataDir();
