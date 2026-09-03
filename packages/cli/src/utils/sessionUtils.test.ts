@@ -34,6 +34,7 @@ describe('SessionSelector', () => {
     // Mock storage
     storage = {
       getProjectTempDir: () => tmpDir,
+      getProjectDataDir: () => tmpDir,
     } as Partial<Storage> as Storage;
   });
 
@@ -428,6 +429,7 @@ describe('SessionSelector', () => {
 
     const emptyStorage = {
       getProjectTempDir: () => tmpDir,
+      getProjectDataDir: () => tmpDir,
     } as Partial<Storage> as Storage;
 
     const sessionSelector = new SessionSelector(emptyStorage);

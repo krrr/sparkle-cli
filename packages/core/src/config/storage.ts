@@ -19,6 +19,7 @@ import { ProjectRegistry } from './projectRegistry.js';
 export const OAUTH_FILE = 'oauth_creds.json';
 export const TRUSTED_FOLDERS_FILENAME = 'trustedFolders.json';
 const TMP_DIR_NAME = 'tmp';
+const DATA_DIR_NAME = 'data';
 const BIN_DIR_NAME = 'bin';
 const AGENTS_DIR_NAME = '.agents';
 
@@ -144,6 +145,10 @@ export class Storage {
     return path.join(Storage.getGlobalGeminiDir(), TMP_DIR_NAME);
   }
 
+  static getGlobalDataDir(): string {
+    return path.join(Storage.getGlobalGeminiDir(), DATA_DIR_NAME);
+  }
+
   static getGlobalBinDir(): string {
     return path.join(Storage.getGlobalTempDir(), BIN_DIR_NAME);
   }
@@ -171,6 +176,12 @@ export class Storage {
     const identifier = this.getProjectIdentifier();
     const tempDir = Storage.getGlobalTempDir();
     return path.join(tempDir, identifier);
+  }
+
+  getProjectDataDir(): string {
+    const identifier = this.getProjectIdentifier();
+    const dataDir = Storage.getGlobalDataDir();
+    return path.join(dataDir, identifier);
   }
 
   getWorkspacePoliciesDir(): string {
@@ -226,6 +237,7 @@ export class Storage {
       );
       const registry = new ProjectRegistry(registryPath, [
         Storage.getGlobalTempDir(),
+        Storage.getGlobalDataDir(),
         path.join(Storage.getGlobalGeminiDir(), 'history'),
       ]);
       await registry.initialize();
@@ -243,15 +255,11 @@ export class Storage {
   }
 
   getProjectMemoryDir(): string {
-    return this.getProjectMemoryTempDir();
-  }
-
-  getProjectMemoryTempDir(): string {
-    return path.join(this.getProjectTempDir(), 'memory');
+    return path.join(this.getProjectDataDir(), 'memory');
   }
 
   getProjectSkillsMemoryDir(): string {
-    return path.join(this.getProjectMemoryTempDir(), 'skills');
+    return path.join(this.getProjectMemoryDir(), 'skills');
   }
 
   getWorkspaceSettingsPath(): string {
@@ -274,26 +282,26 @@ export class Storage {
     return path.join(this.getGeminiDir(), 'agents');
   }
 
-  getProjectTempCheckpointsDir(): string {
-    return path.join(this.getProjectTempDir(), 'checkpoints');
+  getProjectCheckpointsDir(): string {
+    return path.join(this.getProjectDataDir(), 'checkpoints');
   }
 
-  getProjectTempLogsDir(): string {
-    return path.join(this.getProjectTempDir(), 'logs');
+  getProjectLogsDir(): string {
+    return path.join(this.getProjectDataDir(), 'logs');
   }
 
-  getProjectTempPlansDir(): string {
+  getProjectPlansDir(): string {
     if (this.sessionId) {
-      return path.join(this.getProjectTempDir(), this.sessionId, 'plans');
+      return path.join(this.getProjectDataDir(), this.sessionId, 'plans');
     }
-    return path.join(this.getProjectTempDir(), 'plans');
+    return path.join(this.getProjectDataDir(), 'plans');
   }
 
-  getProjectTempTrackerDir(): string {
+  getProjectTrackerDir(): string {
     if (this.sessionId) {
-      return path.join(this.getProjectTempDir(), this.sessionId, 'tracker');
+      return path.join(this.getProjectDataDir(), this.sessionId, 'tracker');
     }
-    return path.join(this.getProjectTempDir(), 'tracker');
+    return path.join(this.getProjectDataDir(), 'tracker');
   }
 
   getPlansDir(): string {
@@ -313,20 +321,20 @@ export class Storage {
 
       return resolvedPath;
     }
-    return this.getProjectTempPlansDir();
+    return this.getProjectPlansDir();
   }
 
-  getProjectTempTasksDir(): string {
+  getProjectTasksDir(): string {
     if (this.sessionId) {
-      return path.join(this.getProjectTempDir(), this.sessionId, 'tasks');
+      return path.join(this.getProjectDataDir(), this.sessionId, 'tasks');
     }
-    return path.join(this.getProjectTempDir(), 'tasks');
+    return path.join(this.getProjectDataDir(), 'tasks');
   }
 
   async listProjectChatFiles(): Promise<
     Array<{ filePath: string; lastUpdated: string }>
   > {
-    const chatsDir = path.join(this.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(this.getProjectDataDir(), 'chats');
     try {
       const files = await fs.promises.readdir(chatsDir);
       const jsonFiles = files.filter(
@@ -362,26 +370,6 @@ export class Storage {
     }
   }
 
-  async loadProjectTempFile<T>(filePath: string): Promise<T | null> {
-    const absolutePath = path.join(this.getProjectTempDir(), filePath);
-    try {
-      const content = await fs.promises.readFile(absolutePath, 'utf8');
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      return JSON.parse(content) as T;
-    } catch (e) {
-      // If file doesn't exist, return null
-      if (
-        e instanceof Error &&
-        'code' in e &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        (e as NodeJS.ErrnoException).code === 'ENOENT'
-      ) {
-        return null;
-      }
-      throw e;
-    }
-  }
-
   getExtensionsDir(): string {
     return path.join(this.getGeminiDir(), 'extensions');
   }
@@ -391,6 +379,6 @@ export class Storage {
   }
 
   getHistoryFilePath(): string {
-    return path.join(this.getProjectTempDir(), 'shell_history');
+    return path.join(this.getProjectDataDir(), 'shell_history');
   }
 }

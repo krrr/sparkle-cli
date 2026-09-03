@@ -77,7 +77,7 @@ export async function initializeContextManager(
   );
 
   const storage = config.storage;
-  const logDir = storage.getProjectTempLogsDir();
+  const logDir = storage.getProjectLogsDir();
   const projectTempDir = storage.getProjectTempDir();
 
   const tracer = new ContextTracer({

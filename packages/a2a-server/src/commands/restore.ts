@@ -49,7 +49,7 @@ export class RestoreCommand implements Command {
         ? argsStr
         : `${argsStr}.json`;
 
-      const checkpointDir = config.storage.getProjectTempCheckpointsDir();
+      const checkpointDir = config.storage.getProjectCheckpointsDir();
       const filePath = path.join(checkpointDir, selectedFile);
 
       let data: string;
@@ -120,7 +120,7 @@ export class ListCheckpointsCommand implements Command {
     const { config } = context;
 
     try {
-      const checkpointDir = config.storage.getProjectTempCheckpointsDir();
+      const checkpointDir = config.storage.getProjectCheckpointsDir();
       await fs.mkdir(checkpointDir, { recursive: true });
       const files = await fs.readdir(checkpointDir);
       const jsonFiles = files.filter((file) => file.endsWith('.json'));

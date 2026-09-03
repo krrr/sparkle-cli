@@ -110,7 +110,7 @@ interactive = true
 
 # Allow write_file and replace for .md files in the plans directory (cross-platform).
 # This rule employs split, traversal-safe, and ReDoS-safe patterns to provide defense-in-depth:
-# - Absolute paths must strictly be inside the designated plans directory under `.sparkle/tmp/`
+# - Absolute paths must strictly be inside the designated plans directory under `.sparkle/data/`
 # - Relative paths must be clean (no path traversal `..` and no absolute prefixes)
 
 # 1. Absolute paths with session ID
@@ -119,7 +119,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"[^\\\"]+[\\\\/]+\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"[^\\\"]+[\\\\/]+\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 2. Absolute paths without session ID
 [[rule]]
@@ -127,7 +127,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"[^\\\"]+[\\\\/]+\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"[^\\\"]+[\\\\/]+\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 3. Relative paths starting with .sparkle (with session ID)
 [[rule]]
@@ -135,7 +135,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 4. Relative paths starting with .sparkle (without session ID)
 [[rule]]
@@ -143,7 +143,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 5. Relative paths starting with ./.sparkle (with session ID)
 [[rule]]
@@ -151,7 +151,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"\\.[\\\\/]+\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"\\.[\\\\/]+\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 6. Relative paths starting with ./.sparkle (without session ID)
 [[rule]]
@@ -159,7 +159,7 @@ toolName = ["write_file", "replace"]
 decision = "allow"
 priority = 70
 modes = ["plan"]
-argsPattern = "\\x00\"file_path\":\"\\.[\\\\/]+\\.sparkle[\\\\/]+tmp[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
+argsPattern = "\\x00\"file_path\":\"\\.[\\\\/]+\\.sparkle[\\\\/]+data[\\\\/]+[\\w-]+[\\\\/]+plans[\\\\/]+[\\w-]+\\.md\"\\x00"
 
 # 7. Clean relative filename (no directories, e.g. plan.md)
 [[rule]]

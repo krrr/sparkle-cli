@@ -133,7 +133,7 @@ export async function listInboxSkills(config: Config): Promise<InboxSkill[]> {
   }
 
   // Load extraction state to get dates
-  const memoryDir = config.storage.getProjectMemoryTempDir();
+  const memoryDir = config.storage.getProjectMemoryDir();
   const statePath = path.join(memoryDir, '.extraction-state.json');
   const state = await readExtractionState(statePath);
 
@@ -707,7 +707,7 @@ async function augmentWithAutoPointers(
   appliedResults: readonly AppliedSkillPatchTarget[],
 ): Promise<AutoPointerAugmentation> {
   const memoryDir = await canonicalizeDirIfPresent(
-    config.storage.getProjectMemoryTempDir(),
+    config.storage.getProjectMemoryDir(),
   );
   const memoryMdPath = path.join(memoryDir, 'MEMORY.md');
 

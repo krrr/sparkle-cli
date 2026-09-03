@@ -326,7 +326,8 @@ describe('useGeminiStream', () => {
     contextFileName: undefined,
     storage: {
       getProjectTempDir: vi.fn(() => '/test/temp'),
-      getProjectTempCheckpointsDir: vi.fn(() => '/test/temp/checkpoints'),
+      getProjectDataDir: vi.fn(() => '/test/data'),
+      getProjectCheckpointsDir: vi.fn(() => '/test/data/checkpoints'),
     } as any,
     getToolRegistry: vi.fn(
       () => ({ getToolSchemaList: vi.fn(() => []) }) as any,

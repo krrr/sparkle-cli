@@ -198,7 +198,7 @@ describe('memory commands', () => {
       inboxConfig = {
         storage: {
           getProjectSkillsMemoryDir: () => skillsDir,
-          getProjectMemoryTempDir: () => memoryTempDir,
+          getProjectMemoryDir: () => memoryTempDir,
           getProjectSkillsDir: () => path.join(tmpDir, 'project-skills'),
         },
       } as unknown as Config;
@@ -256,7 +256,7 @@ describe('memory commands', () => {
       const missingConfig = {
         storage: {
           getProjectSkillsMemoryDir: () => path.join(tmpDir, 'nonexistent-dir'),
-          getProjectMemoryTempDir: () => memoryTempDir,
+          getProjectMemoryDir: () => memoryTempDir,
         },
       } as unknown as Config;
 
@@ -343,7 +343,6 @@ describe('memory commands', () => {
 
       patchConfig = {
         storage: {
-          getProjectMemoryTempDir: () => memoryTempDir,
           getProjectMemoryDir: () => memoryTempDir,
         },
         isTrustedFolder: () => true,
@@ -1248,7 +1247,7 @@ describe('memory commands', () => {
       patchConfig = {
         storage: {
           getProjectSkillsMemoryDir: () => skillsDir,
-          getProjectMemoryTempDir: () => memoryTempDir,
+          getProjectMemoryDir: () => memoryTempDir,
         },
       } as unknown as Config;
     });
@@ -1266,7 +1265,7 @@ describe('memory commands', () => {
       const badConfig = {
         storage: {
           getProjectSkillsMemoryDir: () => path.join(tmpDir, 'nonexistent-dir'),
-          getProjectMemoryTempDir: () => memoryTempDir,
+          getProjectMemoryDir: () => memoryTempDir,
         },
       } as unknown as Config;
 
@@ -1400,7 +1399,7 @@ describe('memory commands', () => {
       applyConfig = {
         storage: {
           getProjectSkillsMemoryDir: () => skillsDir,
-          getProjectMemoryTempDir: () => memoryTempDir,
+          getProjectMemoryDir: () => memoryTempDir,
           getProjectSkillsDir: () => projectSkillsDir,
         },
         isTrustedFolder: () => true,

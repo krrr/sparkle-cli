@@ -1131,11 +1131,11 @@ function prefixRelativePaths(
  * to extract and write SKILL.md files.
  */
 export async function startMemoryService(config: Config): Promise<void> {
-  const memoryDir = config.storage.getProjectMemoryTempDir();
+  const memoryDir = config.storage.getProjectMemoryDir();
   const skillsDir = config.storage.getProjectSkillsMemoryDir();
   const lockPath = path.join(memoryDir, LOCK_FILENAME);
   const statePath = path.join(memoryDir, STATE_FILENAME);
-  const chatsDir = path.join(config.storage.getProjectTempDir(), 'chats');
+  const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 
   // Ensure directories exist
   await fs.mkdir(skillsDir, { recursive: true });

@@ -50,6 +50,7 @@ describe('masking round-trip', () => {
       getProjectRoot: () => '/test/project/root',
       storage: {
         getProjectTempDir: () => testTempDir,
+        getProjectDataDir: () => testTempDir,
       },
       getModel: () => 'gemini-pro',
       isContextManagementEnabled: () => false,

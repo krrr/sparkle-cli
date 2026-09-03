@@ -131,7 +131,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
         try {
           const storage = new Storage(fs.realpathSync(rig.testDir!));
           await storage.initialize();
-          const chatsDir = path.join(storage.getProjectTempDir(), 'chats');
+          const chatsDir = path.join(storage.getProjectDataDir(), 'chats');
           fs.mkdirSync(chatsDir, { recursive: true });
 
           const conversation = {

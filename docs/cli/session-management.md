@@ -15,7 +15,7 @@ session.
   - All tool executions (inputs and outputs).
   - Token usage statistics (input, output, cached, etc.).
   - Assistant thoughts and reasoning summaries (when available).
-- **Location:** Sessions are stored in `~/.sparkle/tmp/<project-id>/chats/`,
+- **Location:** Sessions are stored in `~/.sparkle/data/<project-id>/chats/`,
   where `<project-id>` is a unique identifier for your project directory.
 - **Scope:** Sessions are project-specific. Switching directories to a different
   project switches to that project's session history.

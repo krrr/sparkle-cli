@@ -506,7 +506,7 @@ const useLoadSessions = (config: Config, state: SessionBrowserState) => {
   useEffect(() => {
     const loadSessions = async () => {
       try {
-        const chatsDir = path.join(config.storage.getProjectTempDir(), 'chats');
+        const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
         const sessionData = await getSessionFiles(
           chatsDir,
           config.getSessionId(),
@@ -530,7 +530,7 @@ const useLoadSessions = (config: Config, state: SessionBrowserState) => {
       if (isSearchMode && !hasLoadedFullContent) {
         try {
           const chatsDir = path.join(
-            config.storage.getProjectTempDir(),
+            config.storage.getProjectDataDir(),
             'chats',
           );
           const sessionData = await getSessionFiles(

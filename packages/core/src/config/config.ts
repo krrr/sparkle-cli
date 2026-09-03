@@ -1329,7 +1329,7 @@ export class Config implements McpContext, AgentLoopContext {
 
   private async _initialize(): Promise<void> {
     await this.storage.initialize();
-    ragLogger.initialize(this.storage.getProjectTempLogsDir());
+    ragLogger.initialize(this.storage.getProjectLogsDir());
 
     // Add pending directories to workspace context
     for (const dir of this.pendingIncludeDirectories) {
@@ -2459,7 +2459,7 @@ export class Config implements McpContext, AgentLoopContext {
   getTrackerService(): TrackerService {
     if (!this.trackerService) {
       this.trackerService = new TrackerService(
-        this.storage.getProjectTempTrackerDir(),
+        this.storage.getProjectTrackerDir(),
       );
     }
     return this.trackerService;
@@ -2619,7 +2619,7 @@ export class Config implements McpContext, AgentLoopContext {
 
     const normalizedPath = path.resolve(absolutePath);
     const resolvedMemoryRoot = resolveToRealPath(
-      this.storage.getProjectMemoryTempDir(),
+      this.storage.getProjectMemoryDir(),
     );
 
     // Reads: allow the inbox root and the per-kind subtrees so the extraction
@@ -2683,7 +2683,7 @@ export class Config implements McpContext, AgentLoopContext {
     return this.isScopedMemoryInboxPatchPathAllowed(
       absolutePath,
       resolvedPath,
-      path.join(this.storage.getProjectMemoryTempDir(), '.inbox'),
+      path.join(this.storage.getProjectMemoryDir(), '.inbox'),
     );
   }
 
@@ -2720,10 +2720,7 @@ export class Config implements McpContext, AgentLoopContext {
     // main agent must NOT drop files into it directly (that would let the
     // model bypass review). Deny first, even if the path also satisfies the
     // workspace or project-temp allowlists below.
-    const inboxRoot = path.join(
-      this.storage.getProjectMemoryTempDir(),
-      '.inbox',
-    );
+    const inboxRoot = path.join(this.storage.getProjectMemoryDir(), '.inbox');
     const resolvedInboxRoot = resolveToRealPath(inboxRoot);
     const normalizedPath = path.resolve(absolutePath);
     const normalizedInboxRoot = path.resolve(inboxRoot);
@@ -2753,6 +2750,16 @@ export class Config implements McpContext, AgentLoopContext {
     const projectTempDir = this.storage.getProjectTempDir();
     const resolvedTempDir = resolveToRealPath(projectTempDir);
     if (isSubpath(resolvedTempDir, resolvedPath)) {
+      return true;
+    }
+
+    // The persistent project data dir (~/.sparkle/data/<project-id>) holds
+    // chats, checkpoints, and memory. Like the temp dir, it must remain
+    // reachable by file tools so sessions can be written, resumed, and
+    // restored.
+    const projectDataDir = this.storage.getProjectDataDir();
+    const resolvedDataDir = resolveToRealPath(projectDataDir);
+    if (isSubpath(resolvedDataDir, resolvedPath)) {
       return true;
     }
 
@@ -2799,7 +2806,7 @@ export class Config implements McpContext, AgentLoopContext {
       ) {
         return null;
       }
-      return `Auto-memory extraction write denied: Attempted path "${absolutePath}" is outside the extraction write allowlist. Extraction may only write extracted skills under ${this.storage.getProjectSkillsMemoryDir()} and canonical inbox patches under ${path.join(this.storage.getProjectMemoryTempDir(), '.inbox', '{private,global}', 'extraction.patch')}.`;
+      return `Auto-memory extraction write denied: Attempted path "${absolutePath}" is outside the extraction write allowlist. Extraction may only write extracted skills under ${this.storage.getProjectSkillsMemoryDir()} and canonical inbox patches under ${path.join(this.storage.getProjectMemoryDir(), '.inbox', '{private,global}', 'extraction.patch')}.`;
     }
 
     // For read operations, check read-only paths first
@@ -2815,7 +2822,7 @@ export class Config implements McpContext, AgentLoopContext {
       // extraction.patch. Writes remain restricted to canonical paths.
       if (hasScopedMemoryInboxAccess()) {
         const inboxRoot = path.join(
-          this.storage.getProjectMemoryTempDir(),
+          this.storage.getProjectMemoryDir(),
           '.inbox',
         );
         if (

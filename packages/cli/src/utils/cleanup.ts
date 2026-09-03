@@ -5,7 +5,6 @@
  */
 
 import { promises as fs } from 'node:fs';
-import { join } from 'node:path';
 import {
   Storage,
   shutdownTelemetry,
@@ -187,8 +186,7 @@ export function setupTtyCheck(): () => void {
 export async function cleanupCheckpoints() {
   const storage = new Storage(process.cwd());
   await storage.initialize();
-  const tempDir = storage.getProjectTempDir();
-  const checkpointsDir = join(tempDir, 'checkpoints');
+  const checkpointsDir = storage.getProjectCheckpointsDir();
   try {
     await fs.rm(checkpointsDir, { recursive: true, force: true });
   } catch {

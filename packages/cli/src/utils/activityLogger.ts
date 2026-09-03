@@ -694,7 +694,7 @@ function setupFileLogging(
     customPath ||
     (config.storage
       ? path.join(
-          config.storage.getProjectTempLogsDir(),
+          config.storage.getProjectLogsDir(),
           `session-${config.getSessionId()}.jsonl`,
         )
       : null);

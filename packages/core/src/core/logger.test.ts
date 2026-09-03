@@ -30,14 +30,14 @@ import { SPARKLE_DIR } from '../utils/paths.js';
 import { debugLogger } from '../utils/debugLogger.js';
 
 const PROJECT_SLUG = 'project-slug';
-const TMP_DIR_NAME = 'tmp';
+const DATA_DIR_NAME = 'data';
 const LOG_FILE_NAME = 'logs.json';
 const CHECKPOINT_FILE_NAME = 'checkpoint.json';
 
 const TEST_SPARKLE_DIR = path.join(
   os.homedir(),
   SPARKLE_DIR,
-  TMP_DIR_NAME,
+  DATA_DIR_NAME,
   PROJECT_SLUG,
 );
 

@@ -41,8 +41,8 @@ chat regarding the proposed strategy BEFORE calling this tool.
 - **File:** `exit-plan-mode.ts`
 - **Parameters:**
   - `plan_path` (string, required): The path to the finalized Markdown plan
-    file. This file MUST be located within the project's temporary plans
-    directory (for example, `~/.sparkle/tmp/<project>/plans/`).
+    file. This file MUST be located within the project's managed data plans
+    directory (for example, `~/.sparkle/data/<project>/plans/`).
 - **Behavior:**
   - Validates that the `plan_path` is within the allowed directory and that the
     file exists and has content.

@@ -40,7 +40,7 @@ describe('RestoreCommand', () => {
         config: {
           getCheckpointingEnabled: vi.fn().mockReturnValue(true),
           storage: {
-            getProjectTempCheckpointsDir: vi
+            getProjectCheckpointsDir: vi
               .fn()
               .mockReturnValue('/tmp/checkpoints'),
           },
@@ -170,7 +170,7 @@ describe('ListCheckpointsCommand', () => {
         config: {
           getCheckpointingEnabled: vi.fn().mockReturnValue(true),
           storage: {
-            getProjectTempCheckpointsDir: vi
+            getProjectCheckpointsDir: vi
               .fn()
               .mockReturnValue('/tmp/checkpoints'),
           },

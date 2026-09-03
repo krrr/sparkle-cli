@@ -44,8 +44,7 @@ async function restoreAction(
   const { agentContext, git: gitService } = services;
   const { addItem, loadHistory } = ui;
 
-  const checkpointDir =
-    agentContext?.config.storage.getProjectTempCheckpointsDir();
+  const checkpointDir = agentContext?.config.storage.getProjectCheckpointsDir();
 
   if (!checkpointDir) {
     return {
@@ -146,8 +145,7 @@ async function completion(
 ): Promise<string[]> {
   const { services } = context;
   const { agentContext } = services;
-  const checkpointDir =
-    agentContext?.config.storage.getProjectTempCheckpointsDir();
+  const checkpointDir = agentContext?.config.storage.getProjectCheckpointsDir();
   if (!checkpointDir) {
     return [];
   }

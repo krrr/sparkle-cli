@@ -1374,22 +1374,22 @@ describe('Server Config (config.ts)', () => {
     });
 
     await config.initialize();
-    const tempDir = config.storage.getProjectTempDir();
-    const oldPlansDir = path.join(tempDir, 'session-one', 'plans');
+    const dataDir = config.storage.getProjectDataDir();
+    const oldPlansDir = path.join(dataDir, 'session-one', 'plans');
     const oldTrackerService = config.getTrackerService();
 
     config.setSessionId('session-two');
 
     expect(config.getSessionId()).toBe('session-two');
-    expect(config.storage.getProjectTempPlansDir()).toBe(
-      path.join(tempDir, 'session-two', 'plans'),
+    expect(config.storage.getProjectPlansDir()).toBe(
+      path.join(dataDir, 'session-two', 'plans'),
     );
-    expect(config.storage.getProjectTempTrackerDir()).toBe(
-      path.join(tempDir, 'session-two', 'tracker'),
+    expect(config.storage.getProjectTrackerDir()).toBe(
+      path.join(dataDir, 'session-two', 'tracker'),
     );
     expect(config.getTrackerService()).not.toBe(oldTrackerService);
     expect(config.getTrackerService().trackerDir).toBe(
-      path.join(tempDir, 'session-two', 'tracker'),
+      path.join(dataDir, 'session-two', 'tracker'),
     );
     expect(config.getWorkspaceContext().getDirectories()).not.toContain(
       oldPlansDir,
@@ -1419,7 +1419,7 @@ describe('Server Config (config.ts)', () => {
     });
 
     await config.initialize();
-    const missingPlansDir = config.storage.getProjectTempPlansDir();
+    const missingPlansDir = config.storage.getProjectPlansDir();
     const realpathMock = vi.mocked(fs.realpathSync);
     const originalImplementation = realpathMock.getMockImplementation();
 
@@ -2531,7 +2531,7 @@ describe('Config JIT Initialization', () => {
 
       const fakeMemoryTempDir = '/tmp/test-fake-temp/memory';
       const fakeProjectTempDir = '/tmp/test-fake-temp';
-      vi.spyOn(config.storage, 'getProjectMemoryTempDir').mockReturnValue(
+      vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
       vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(
@@ -2572,7 +2572,7 @@ describe('Config JIT Initialization', () => {
 
       const fakeMemoryTempDir = '/tmp/test-fake-temp/memory';
       const fakeProjectTempDir = '/tmp/test-fake-temp';
-      vi.spyOn(config.storage, 'getProjectMemoryTempDir').mockReturnValue(
+      vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
       vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(
@@ -2666,7 +2666,7 @@ describe('Config JIT Initialization', () => {
       const fakeMemoryTempDir = '/tmp/test-fake-temp/memory';
       const fakeProjectTempDir = '/tmp/test-fake-temp';
       const fakeSkillsMemoryDir = path.join(fakeMemoryTempDir, 'skills');
-      vi.spyOn(config.storage, 'getProjectMemoryTempDir').mockReturnValue(
+      vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
       vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(

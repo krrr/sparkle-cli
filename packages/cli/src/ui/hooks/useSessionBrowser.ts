@@ -53,7 +53,7 @@ export const useSessionBrowser = (
       async (session: SessionInfo) => {
         try {
           const chatsDir = path.join(
-            config.storage.getProjectTempDir(),
+            config.storage.getProjectDataDir(),
             'chats',
           );
 

@@ -53,7 +53,7 @@ describe('renderOperationalGuidelines - memory', () => {
 
   it('should include the Private Project Memory bullet with the absolute path when provided', () => {
     const userProjectMemoryPath =
-      '/Users/test/.sparkle/tmp/abc123/memory/MEMORY.md';
+      '/Users/test/.sparkle/data/abc123/memory/MEMORY.md';
     const result = renderOperationalGuidelines({
       ...baseOptions,
       userProjectMemoryPath,

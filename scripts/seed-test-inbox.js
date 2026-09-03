@@ -17,7 +17,7 @@
  *
  * The script will:
  *   1. Initialize Storage for the current working directory.
- *   2. Compute <projectMemoryDir> = ~/.sparkle/tmp/<projectId>/memory/.
+ *   2. Compute <projectMemoryDir> = ~/.sparkle/data/<projectId>/memory/.
  *   3. Seed `MEMORY.md` and TWO canonical inbox patches:
  *        - .inbox/private/extraction.patch  (multi-hunk: update MEMORY.md
  *          + create verify-workflow.md + add MEMORY.md pointer to it)
@@ -52,7 +52,7 @@ const cwd = process.cwd();
 const storage = new Storage(cwd);
 await storage.initialize();
 
-const memoryDir = storage.getProjectMemoryTempDir();
+const memoryDir = storage.getProjectMemoryDir();
 const inboxPrivate = path.join(memoryDir, '.inbox', 'private');
 const inboxGlobal = path.join(memoryDir, '.inbox', 'global');
 const homeDir = os.homedir();

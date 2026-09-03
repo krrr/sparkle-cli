@@ -66,7 +66,7 @@ describe('PromptProvider', () => {
         getProjectMemoryDir: vi
           .fn()
           .mockReturnValue('/tmp/project-temp/memory'),
-        getProjectTempTrackerDir: vi
+        getProjectTrackerDir: vi
           .fn()
           .mockReturnValue('/tmp/project-temp/tracker'),
       },
@@ -119,7 +119,7 @@ describe('PromptProvider', () => {
   it('should include the task tracker storage location in the system prompt', () => {
     vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
     const mockTrackerDir = '/mock/tracker/path';
-    vi.mocked(mockConfig.storage.getProjectTempTrackerDir).mockReturnValue(
+    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(
       mockTrackerDir,
     );
 
@@ -133,7 +133,7 @@ describe('PromptProvider', () => {
   it('should sanitize the task tracker storage location in the system prompt', () => {
     vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
     const mockTrackerDir = '/mock/tracker/path\nwith-newline]and-bracket';
-    vi.mocked(mockConfig.storage.getProjectTempTrackerDir).mockReturnValue(
+    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(
       mockTrackerDir,
     );
 

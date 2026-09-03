@@ -734,8 +734,7 @@ export class Task {
         }
 
         if (checkpointsToWrite.size > 0) {
-          const checkpointDir =
-            this.config.storage.getProjectTempCheckpointsDir();
+          const checkpointDir = this.config.storage.getProjectCheckpointsDir();
           await fs.mkdir(checkpointDir, { recursive: true });
           for (const [fileName, content] of checkpointsToWrite) {
             const filePath = path.join(checkpointDir, fileName);

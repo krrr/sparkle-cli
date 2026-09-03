@@ -2234,7 +2234,7 @@ export const useGeminiStream = (
         }
 
         if (checkpointsToWrite.size > 0) {
-          const checkpointDir = config.storage.getProjectTempCheckpointsDir();
+          const checkpointDir = config.storage.getProjectCheckpointsDir();
           try {
             await fs.mkdir(checkpointDir, { recursive: true });
             for (const [fileName, content] of checkpointsToWrite) {

@@ -98,9 +98,9 @@ describe('Core System Prompt (prompts.ts)', () => {
         getProjectMemoryDir: vi
           .fn()
           .mockReturnValue('/tmp/project-temp/memory'),
-        getProjectTempTrackerDir: vi
+        getProjectTrackerDir: vi
           .fn()
-          .mockReturnValue('/mock/.sparkle/tmp/session/tracker'),
+          .mockReturnValue('/mock/.sparkle/data/session/tracker'),
       },
       isInteractive: vi.fn().mockReturnValue(true),
       isInteractiveShellEnabled: vi.fn().mockReturnValue(true),

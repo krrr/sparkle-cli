@@ -123,7 +123,7 @@ interface InboxSnapshot {
 }
 
 async function snapshotInbox(config: Config): Promise<InboxSnapshot> {
-  const memoryDir = config.storage.getProjectMemoryTempDir();
+  const memoryDir = config.storage.getProjectMemoryDir();
   const inbox: InboxSnapshot = {
     privateFiles: [],
     globalFiles: [],
@@ -233,7 +233,7 @@ describe('Auto Memory Contract', () => {
     timeout: 240000,
     configOverrides: EXTRACTION_CONFIG_OVERRIDES,
     setup: async (config) => {
-      const memoryDir = config.storage.getProjectMemoryTempDir();
+      const memoryDir = config.storage.getProjectMemoryDir();
       const inboxPrivate = path.join(memoryDir, '.inbox', 'private');
       await fsp.mkdir(inboxPrivate, { recursive: true });
 
@@ -346,7 +346,7 @@ describe('Auto Memory Contract', () => {
     assert: async (config) => {
       await startMemoryService(config);
       const inbox = await snapshotInbox(config);
-      const memoryDir = config.storage.getProjectMemoryTempDir();
+      const memoryDir = config.storage.getProjectMemoryDir();
 
       // The agent might choose to add brief facts directly to MEMORY.md
       // without spawning a sibling. That's a valid outcome; we only enforce

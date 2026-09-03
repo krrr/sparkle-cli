@@ -90,7 +90,7 @@ async function cleanupSessionAndSubagentsAsync(
   config: Config,
 ): Promise<void> {
   const tempDir = config.storage.getProjectTempDir();
-  const chatsDir = path.join(tempDir, 'chats');
+  const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 
   await deleteSessionArtifactsAsync(sessionId, tempDir);
   await deleteSubagentSessionDirAndArtifactsAsync(sessionId, chatsDir, tempDir);
@@ -118,7 +118,7 @@ export async function cleanupExpiredSessions(
     }
 
     const retentionConfig = settings.general.sessionRetention;
-    const chatsDir = path.join(config.storage.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 
     // Validate retention configuration
     const validationErrorMessage = validateRetentionConfig(

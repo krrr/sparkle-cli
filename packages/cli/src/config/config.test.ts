@@ -3207,6 +3207,9 @@ describe('extension plan settings', () => {
     vi.spyOn(Storage.prototype, 'getProjectTempDir').mockReturnValue(
       '/mock/home/user/.sparkle/tmp/test-project',
     );
+    vi.spyOn(Storage.prototype, 'getProjectDataDir').mockReturnValue(
+      '/mock/home/user/.sparkle/data/test-project',
+    );
   });
 
   it('should use plan directory from active extension when user has not specified one', async () => {
@@ -3291,14 +3294,14 @@ describe('extension plan settings', () => {
     vi.spyOn(ExtensionManager.prototype, 'getExtensions').mockReturnValue([]);
 
     const config = await loadCliConfig(settings, 'test-session', argv);
-    // Should return the default managed temp directory path
+    // Should return the default managed data directory path
     expect(config.storage.getPlansDir()).toBe(
       path.join(
         '/mock',
         'home',
         'user',
         '.sparkle',
-        'tmp',
+        'data',
         'test-project',
         'test-session',
         'plans',

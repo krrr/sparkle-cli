@@ -557,7 +557,7 @@ export class ChatRecordingService {
         // Create new session
         this.sessionId = this.context.promptId;
         let chatsDir = path.join(
-          this.context.config.storage.getProjectTempDir(),
+          this.context.config.storage.getProjectDataDir(),
           'chats',
         );
 

@@ -61,6 +61,7 @@ describe('useSessionBrowser', () => {
   const mockConfig = {
     storage: {
       getProjectTempDir: vi.fn(),
+      getProjectDataDir: vi.fn(),
     },
     setSessionId: vi.fn(),
     getSessionId: vi.fn(),
@@ -78,6 +79,9 @@ describe('useSessionBrowser', () => {
     vi.spyOn(coreEvents, 'emitFeedback').mockImplementation(() => {});
     mockedPath.join.mockImplementation((...args) => args.join('/'));
     vi.mocked(mockConfig.storage.getProjectTempDir).mockReturnValue(
+      MOCKED_PROJECT_TEMP_DIR,
+    );
+    vi.mocked(mockConfig.storage.getProjectDataDir).mockReturnValue(
       MOCKED_PROJECT_TEMP_DIR,
     );
     vi.mocked(mockConfig.getSessionId).mockReturnValue(

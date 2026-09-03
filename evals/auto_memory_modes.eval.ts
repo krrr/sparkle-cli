@@ -101,7 +101,6 @@ vi.mock('../packages/core/src/utils/debugLogger', () => ({
 interface MockMemoryConfig {
   storage: {
     getProjectMemoryDir: () => string;
-    getProjectMemoryTempDir: () => string;
     getProjectSkillsMemoryDir: () => string;
     getProjectTempDir: () => string;
     getProjectRoot: () => string;
@@ -165,7 +164,7 @@ beforeEach(() => {
         }
 
         const config = context.config as MockMemoryConfig;
-        const memoryDir = config.storage.getProjectMemoryTempDir();
+        const memoryDir = config.storage.getProjectMemoryDir();
         const inboxDir = path.join(memoryDir, '.inbox');
 
         const homeDir = process.env['SPARKLE_CLI_HOME'] ?? os.homedir();
@@ -252,7 +251,6 @@ async function createFixture(): Promise<Fixture> {
   const config: MockMemoryConfig = {
     storage: {
       getProjectMemoryDir: () => memoryDir,
-      getProjectMemoryTempDir: () => memoryDir,
       getProjectSkillsMemoryDir: () => skillsDir,
       getProjectTempDir: () => projectTempDir,
       getProjectRoot: () => targetDir,

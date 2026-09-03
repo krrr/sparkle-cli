@@ -386,9 +386,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -418,9 +418,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -471,9 +471,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -541,9 +541,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -631,9 +631,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -732,9 +732,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -985,9 +985,9 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -2126,10 +2126,10 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectSkillsDir: vi.fn().mockReturnValue(projectSkillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),
@@ -2208,10 +2208,10 @@ describe('memoryService', () => {
       const mockConfig = {
         storage: {
           getProjectMemoryDir: vi.fn().mockReturnValue(memoryDir),
-          getProjectMemoryTempDir: vi.fn().mockReturnValue(memoryDir),
           getProjectSkillsMemoryDir: vi.fn().mockReturnValue(skillsDir),
           getProjectSkillsDir: vi.fn().mockReturnValue(projectSkillsDir),
           getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+          getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
         },
         getToolRegistry: vi.fn(),
         getMessageBus: vi.fn(),

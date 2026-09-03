@@ -275,7 +275,7 @@ export function getAllowedMemoryPatchRoots(
 ): string[] {
   switch (kind) {
     case 'private':
-      return [path.resolve(config.storage.getProjectMemoryTempDir())];
+      return [path.resolve(config.storage.getProjectMemoryDir())];
     case 'global':
       return [path.resolve(getGlobalMemoryFilePath())];
     default:
@@ -361,7 +361,7 @@ export async function getMemoryPatchTargetValidationContext(
   }
 
   const rawPrivateMemoryDir = path.resolve(
-    config.storage.getProjectMemoryTempDir(),
+    config.storage.getProjectMemoryDir(),
   );
   const canonicalPrivateMemoryDirs = await canonicalizeAllowedPatchRoots([
     rawPrivateMemoryDir,
@@ -466,7 +466,7 @@ export async function getInboxMemoryPatchSourcePath(
   }
 
   const patchRoot = path.resolve(
-    getMemoryPatchRoot(config.storage.getProjectMemoryTempDir(), kind),
+    getMemoryPatchRoot(config.storage.getProjectMemoryDir(), kind),
   );
   const sourcePath = path.resolve(patchRoot, ...normalizedPath.split('/'));
   if (!isSubpathOrSame(sourcePath, patchRoot)) {
@@ -488,7 +488,7 @@ export async function listInboxPatchFiles(
   kind: InboxMemoryPatchKind,
 ): Promise<string[]> {
   const patchRoot = getMemoryPatchRoot(
-    config.storage.getProjectMemoryTempDir(),
+    config.storage.getProjectMemoryDir(),
     kind,
   );
   const found: string[] = [];

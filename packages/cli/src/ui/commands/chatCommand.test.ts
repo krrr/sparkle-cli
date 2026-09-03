@@ -84,6 +84,7 @@ describe('chatCommand', () => {
             }),
             storage: {
               getProjectTempDir: () => '/project/root/.sparkle/tmp/mockhash',
+              getProjectDataDir: () => '/project/root/.sparkle/data/mockhash',
             },
           },
           geminiClient: {

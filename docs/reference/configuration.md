@@ -171,7 +171,7 @@ their corresponding top-level category object in your `settings.json` file.
 - **`general.plan.directory`** (string):
 
   - **Description:** The directory where planning artifacts are stored. If not
-    specified, defaults to the system temporary directory. A custom directory
+    specified, defaults to the managed data directory. A custom directory
     requires a policy to allow write access in Plan Mode.
   - **Default:** `undefined`
   - **Requires restart:** Yes
@@ -1899,7 +1899,7 @@ The CLI keeps a history of shell commands you run. To avoid conflicts between
 different projects, this history is stored in a project-specific directory
 within your user's home folder.
 
-- **Location:** `~/.sparkle/tmp/<project-id>/shell_history`
+- **Location:** `~/.sparkle/data/<project-id>/shell_history`
   - `<project-id>` is a unique identifier for your project directory.
   - The history is stored in a file named `shell_history`.
 

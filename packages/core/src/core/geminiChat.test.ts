@@ -179,6 +179,7 @@ describe('GeminiChat', () => {
       getProjectRoot: vi.fn().mockReturnValue('/test/project/root'),
       storage: {
         getProjectTempDir: vi.fn().mockReturnValue('/test/temp'),
+        getProjectDataDir: vi.fn().mockReturnValue('/test/data'),
       },
       getToolRegistry: vi.fn().mockReturnValue({
         getTool: vi.fn(),

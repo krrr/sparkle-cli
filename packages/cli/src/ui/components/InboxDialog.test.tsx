@@ -101,11 +101,11 @@ const inboxMemoryPatch: InboxMemoryPatch = {
   sourceFiles: ['update-memory.patch'],
   entries: [
     {
-      targetPath: '/home/user/.sparkle/tmp/project/memory/MEMORY.md',
+      targetPath: '/home/user/.sparkle/data/project/memory/MEMORY.md',
       isNewFile: false,
       diffContent: [
-        '--- /home/user/.sparkle/tmp/project/memory/MEMORY.md',
-        '+++ /home/user/.sparkle/tmp/project/memory/MEMORY.md',
+        '--- /home/user/.sparkle/data/project/memory/MEMORY.md',
+        '+++ /home/user/.sparkle/data/project/memory/MEMORY.md',
         '@@ -1,1 +1,1 @@',
         '-old',
         '+use focused tests',

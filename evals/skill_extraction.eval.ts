@@ -329,7 +329,7 @@ async function runExtractionAndReadState(
 ): Promise<ExtractionOutcome> {
   await startMemoryService(config);
 
-  const memoryDir = config.storage.getProjectMemoryTempDir();
+  const memoryDir = config.storage.getProjectMemoryDir();
   const skillsDir = config.storage.getProjectSkillsMemoryDir();
   const statePath = path.join(memoryDir, '.extraction-state.json');
 

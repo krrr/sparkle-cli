@@ -31,8 +31,8 @@ command. Restoring a checkpoint will:
 All checkpoint data, including the Git snapshot and conversation history, is
 stored locally on your machine. The Git snapshot is stored in the shadow
 repository while the conversation history and tool calls are saved in a JSON
-file in your project's temporary directory, typically located at
-`~/.sparkle/tmp/<project-id>/checkpoints`.
+file in your project's managed data directory, typically located at
+`~/.sparkle/data/<project-id>/checkpoints`.
 
 ## Enabling the feature
 

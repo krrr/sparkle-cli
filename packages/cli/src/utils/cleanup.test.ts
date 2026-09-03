@@ -6,11 +6,13 @@
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { promises as fs } from 'node:fs';
-import * as path from 'node:path';
 
 vi.mock('sparkle-cli-core', () => ({
   Storage: vi.fn().mockImplementation(() => ({
     getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
+    getProjectCheckpointsDir: vi
+      .fn()
+      .mockReturnValue('/tmp/project/checkpoints'),
     initialize: vi.fn().mockResolvedValue(undefined),
   })),
   shutdownTelemetry: vi.fn(),
@@ -151,13 +153,10 @@ describe('cleanup', () => {
   describe('cleanupCheckpoints', () => {
     it('should remove checkpoints directory', async () => {
       await cleanupCheckpoints();
-      expect(fs.rm).toHaveBeenCalledWith(
-        path.join('/tmp/project', 'checkpoints'),
-        {
-          recursive: true,
-          force: true,
-        },
-      );
+      expect(fs.rm).toHaveBeenCalledWith('/tmp/project/checkpoints', {
+        recursive: true,
+        force: true,
+      });
     });
 
     it('should ignore errors during checkpoint removal', async () => {

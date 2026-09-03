@@ -36,6 +36,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 
 describe('Session Cleanup (Refactored)', () => {
   let testTempDir: string;
+  let testDataDir: string;
   let chatsDir: string;
   let logsDir: string;
   let toolOutputsDir: string;
@@ -45,7 +46,8 @@ describe('Session Cleanup (Refactored)', () => {
     testTempDir = await fs.mkdtemp(
       path.join(os.tmpdir(), 'sparkle-cli-cleanup-test-'),
     );
-    chatsDir = path.join(testTempDir, 'chats');
+    testDataDir = path.join(testTempDir, 'data');
+    chatsDir = path.join(testDataDir, 'chats');
     logsDir = path.join(testTempDir, 'logs');
     toolOutputsDir = path.join(testTempDir, TOOL_OUTPUTS_DIR);
 
@@ -65,6 +67,7 @@ describe('Session Cleanup (Refactored)', () => {
     return {
       storage: {
         getProjectTempDir: () => testTempDir,
+        getProjectDataDir: () => testDataDir,
       },
       getSessionId: () => 'current123',
       getDebugMode: () => false,

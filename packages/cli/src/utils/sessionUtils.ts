@@ -418,7 +418,7 @@ export class SessionSelector {
    * Checks if a session with the given ID already exists on disk.
    */
   async sessionExists(id: string): Promise<boolean> {
-    const chatsDir = path.join(this.storage.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(this.storage.getProjectDataDir(), 'chats');
     const files = await fs.readdir(chatsDir).catch(() => []);
 
     // The filename format is `session-<TIMESTAMP>-<ID_SLICE(0,8)>.jsonl`
@@ -448,7 +448,7 @@ export class SessionSelector {
    * Lists all available sessions for the current project.
    */
   async listSessions(): Promise<SessionInfo[]> {
-    const chatsDir = path.join(this.storage.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(this.storage.getProjectDataDir(), 'chats');
     return getSessionFiles(chatsDir);
   }
 
@@ -492,7 +492,7 @@ export class SessionSelector {
       return sortedSessions[index - 1];
     }
 
-    const chatsDir = path.join(this.storage.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(this.storage.getProjectDataDir(), 'chats');
     throw SessionError.invalidSessionIdentifier(trimmedIdentifier, chatsDir);
   }
 
@@ -544,7 +544,7 @@ export class SessionSelector {
   private async selectSession(
     sessionInfo: SessionInfo,
   ): Promise<SessionSelectionResult> {
-    const chatsDir = path.join(this.storage.getProjectTempDir(), 'chats');
+    const chatsDir = path.join(this.storage.getProjectDataDir(), 'chats');
     const sessionPath = path.join(chatsDir, sessionInfo.fileName);
 
     try {

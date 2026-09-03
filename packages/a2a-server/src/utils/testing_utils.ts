@@ -74,7 +74,7 @@ export function createMockConfig(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     storage: {
       getProjectTempDir: () => tmpDir,
-      getProjectTempCheckpointsDir: () => path.join(tmpDir, 'checkpoints'),
+      getProjectCheckpointsDir: () => path.join(tmpDir, 'checkpoints'),
     } as Storage,
     getTruncateToolOutputThreshold: () =>
       DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,

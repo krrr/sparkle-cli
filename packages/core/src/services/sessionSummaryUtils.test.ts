@@ -138,6 +138,7 @@ describe('sessionSummaryUtils', () => {
       getSessionId: vi.fn().mockReturnValue('current-session'),
       storage: {
         getProjectTempDir: vi.fn().mockReturnValue(projectTempDir),
+        getProjectDataDir: vi.fn().mockReturnValue(projectTempDir),
       },
     } as unknown as Config;
 

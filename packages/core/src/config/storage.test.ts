@@ -137,12 +137,12 @@ describe('Storage – additional helpers', () => {
     expect(storage.getProjectAgentsDir()).toBe(expected);
   });
 
-  it('getProjectMemoryDir returns ~/.sparkle/tmp/<identifier>/memory', async () => {
+  it('getProjectMemoryDir returns ~/.sparkle/data/<identifier>/memory', async () => {
     await storage.initialize();
     const expected = path.join(
       os.homedir(),
       SPARKLE_DIR,
-      'tmp',
+      'data',
       PROJECT_SLUG,
       'memory',
     );
@@ -163,42 +163,42 @@ describe('Storage – additional helpers', () => {
     expect(Storage.getGlobalBinDir()).toBe(expected);
   });
 
-  it('getProjectTempPlansDir returns ~/.sparkle/tmp/<identifier>/plans when no sessionId is provided', async () => {
+  it('getProjectPlansDir returns ~/.sparkle/data/<identifier>/plans when no sessionId is provided', async () => {
     await storage.initialize();
-    const tempDir = storage.getProjectTempDir();
-    const expected = path.join(tempDir, 'plans');
-    expect(storage.getProjectTempPlansDir()).toBe(expected);
+    const dataDir = storage.getProjectDataDir();
+    const expected = path.join(dataDir, 'plans');
+    expect(storage.getProjectPlansDir()).toBe(expected);
   });
 
-  it('getProjectTempPlansDir returns ~/.sparkle/tmp/<identifier>/<sessionId>/plans when sessionId is provided', async () => {
+  it('getProjectPlansDir returns ~/.sparkle/data/<identifier>/<sessionId>/plans when sessionId is provided', async () => {
     const sessionId = 'test-session-id';
     const storageWithSession = new Storage(projectRoot, sessionId);
     ProjectRegistry.prototype.getShortId = vi
       .fn()
       .mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
-    const tempDir = storageWithSession.getProjectTempDir();
-    const expected = path.join(tempDir, sessionId, 'plans');
-    expect(storageWithSession.getProjectTempPlansDir()).toBe(expected);
+    const dataDir = storageWithSession.getProjectDataDir();
+    const expected = path.join(dataDir, sessionId, 'plans');
+    expect(storageWithSession.getProjectPlansDir()).toBe(expected);
   });
 
-  it('getProjectTempTrackerDir returns ~/.sparkle/tmp/<identifier>/tracker when no sessionId is provided', async () => {
+  it('getProjectTrackerDir returns ~/.sparkle/data/<identifier>/tracker when no sessionId is provided', async () => {
     await storage.initialize();
-    const tempDir = storage.getProjectTempDir();
-    const expected = path.join(tempDir, 'tracker');
-    expect(storage.getProjectTempTrackerDir()).toBe(expected);
+    const dataDir = storage.getProjectDataDir();
+    const expected = path.join(dataDir, 'tracker');
+    expect(storage.getProjectTrackerDir()).toBe(expected);
   });
 
-  it('getProjectTempTrackerDir returns ~/.sparkle/tmp/<identifier>/<sessionId>/tracker when sessionId is provided', async () => {
+  it('getProjectTrackerDir returns ~/.sparkle/data/<identifier>/<sessionId>/tracker when sessionId is provided', async () => {
     const sessionId = 'test-session-id';
     const storageWithSession = new Storage(projectRoot, sessionId);
     ProjectRegistry.prototype.getShortId = vi
       .fn()
       .mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
-    const tempDir = storageWithSession.getProjectTempDir();
-    const expected = path.join(tempDir, sessionId, 'tracker');
-    expect(storageWithSession.getProjectTempTrackerDir()).toBe(expected);
+    const dataDir = storageWithSession.getProjectDataDir();
+    const expected = path.join(dataDir, sessionId, 'tracker');
+    expect(storageWithSession.getProjectTrackerDir()).toBe(expected);
   });
 
   it('updates session-scoped directories when the sessionId changes', async () => {
@@ -207,18 +207,18 @@ describe('Storage – additional helpers', () => {
       .fn()
       .mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
-    const tempDir = storageWithSession.getProjectTempDir();
+    const dataDir = storageWithSession.getProjectDataDir();
 
     storageWithSession.setSessionId('session-two');
 
-    expect(storageWithSession.getProjectTempPlansDir()).toBe(
-      path.join(tempDir, 'session-two', 'plans'),
+    expect(storageWithSession.getProjectPlansDir()).toBe(
+      path.join(dataDir, 'session-two', 'plans'),
     );
-    expect(storageWithSession.getProjectTempTrackerDir()).toBe(
-      path.join(tempDir, 'session-two', 'tracker'),
+    expect(storageWithSession.getProjectTrackerDir()).toBe(
+      path.join(dataDir, 'session-two', 'tracker'),
     );
-    expect(storageWithSession.getProjectTempTasksDir()).toBe(
-      path.join(tempDir, 'session-two', 'tasks'),
+    expect(storageWithSession.getProjectTasksDir()).toBe(
+      path.join(dataDir, 'session-two', 'tasks'),
     );
   });
 
@@ -267,39 +267,6 @@ describe('Storage – additional helpers', () => {
       readdirSpy.mockRestore();
       statSpy.mockRestore();
     });
-
-    it('loadProjectTempFile loads and parses JSON from relative path', async () => {
-      const readFileSpy = vi
-        .spyOn(fs.promises, 'readFile')
-        .mockResolvedValue(JSON.stringify({ hello: 'world' }));
-
-      const result = await storage.loadProjectTempFile<{ hello: string }>(
-        'some/file.json',
-      );
-
-      expect(readFileSpy).toHaveBeenCalledWith(
-        expect.stringContaining(path.join(PROJECT_SLUG, 'some/file.json')),
-        'utf8',
-      );
-      expect(result).toEqual({ hello: 'world' });
-
-      readFileSpy.mockRestore();
-    });
-
-    it('loadProjectTempFile returns null if file does not exist', async () => {
-      const error = new Error('File not found');
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (error as any).code = 'ENOENT';
-      const readFileSpy = vi
-        .spyOn(fs.promises, 'readFile')
-        .mockRejectedValue(error);
-
-      const result = await storage.loadProjectTempFile('missing.json');
-
-      expect(result).toBeNull();
-
-      readFileSpy.mockRestore();
-    });
   });
 
   describe('getPlansDir', () => {
@@ -341,7 +308,7 @@ describe('Storage – additional helpers', () => {
       {
         name: 'default behavior when customDir is undefined',
         customDir: undefined,
-        expected: () => storage.getProjectTempPlansDir(),
+        expected: () => storage.getProjectPlansDir(),
       },
       {
         name: 'escaping relative path throws',

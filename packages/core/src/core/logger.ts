@@ -145,7 +145,7 @@ export class Logger {
     }
 
     await this.storage.initialize();
-    this.sparkleDir = this.storage.getProjectTempDir();
+    this.sparkleDir = this.storage.getProjectDataDir();
     this.logFilePath = path.join(this.sparkleDir, LOG_FILE_NAME);
 
     try {

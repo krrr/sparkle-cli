@@ -244,7 +244,7 @@ export async function resolveSessionId(
       sessionData.startTime = isoNow;
       sessionData.lastUpdated = isoNow;
 
-      const chatsDir = path.join(storage.getProjectTempDir(), 'chats');
+      const chatsDir = path.join(storage.getProjectDataDir(), 'chats');
       const newSessionPath = path.join(
         chatsDir,
         `session-${now}-${newSessionId.slice(0, 8)}.jsonl`,

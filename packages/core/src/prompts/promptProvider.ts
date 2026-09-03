@@ -71,7 +71,7 @@ export class PromptProvider {
     const contextFilenames = getAllGeminiMdFilenames();
 
     let trackerDir = context.config.isTrackerEnabled()
-      ? context.config.storage.getProjectTempTrackerDir()
+      ? context.config.storage.getProjectTrackerDir()
       : undefined;
 
     if (trackerDir) {

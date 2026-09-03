@@ -95,6 +95,7 @@ describe('ChatRecordingService', () => {
       getProjectRoot: vi.fn().mockReturnValue('/test/project/root'),
       storage: {
         getProjectTempDir: vi.fn().mockReturnValue(testTempDir),
+        getProjectDataDir: vi.fn().mockReturnValue(testTempDir),
       },
       getModel: vi.fn().mockReturnValue('gemini-pro'),
       getDebugMode: vi.fn().mockReturnValue(false),

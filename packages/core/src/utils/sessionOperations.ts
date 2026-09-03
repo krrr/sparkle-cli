@@ -305,8 +305,9 @@ export async function deleteStoredSession(
   sessionIdOrBasename: string,
 ): Promise<void> {
   try {
+    const dataDir = config.storage.getProjectDataDir();
+    const chatsDir = path.join(dataDir, 'chats');
     const tempDir = config.storage.getProjectTempDir();
-    const chatsDir = path.join(tempDir, 'chats');
     const shortId = deriveSessionShortId(sessionIdOrBasename);
 
     const chatsDirStat = await fs.stat(chatsDir).catch(() => null);

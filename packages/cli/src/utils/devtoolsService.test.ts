@@ -109,7 +109,7 @@ function createMockConfig(overrides: Record<string, unknown> = {}) {
     isInteractive: vi.fn().mockReturnValue(true),
     getSessionId: vi.fn().mockReturnValue('test-session'),
     getDebugMode: vi.fn().mockReturnValue(false),
-    storage: { getProjectTempLogsDir: vi.fn().mockReturnValue('/tmp/logs') },
+    storage: { getProjectLogsDir: vi.fn().mockReturnValue('/tmp/logs') },
     ...overrides,
   } as unknown as Config;
 }

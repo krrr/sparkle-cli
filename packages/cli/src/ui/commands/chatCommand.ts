@@ -42,7 +42,7 @@ const getSavedChatTags = async (
   mtSortDesc: boolean,
 ): Promise<ChatDetail[]> => {
   const cfg = context.services.agentContext?.config;
-  const geminiDir = cfg?.storage?.getProjectTempDir();
+  const geminiDir = cfg?.storage?.getProjectDataDir();
   if (!geminiDir) {
     return [];
   }

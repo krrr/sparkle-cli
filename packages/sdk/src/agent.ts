@@ -78,7 +78,7 @@ export class GeminiCliAgent {
 
     if (sessions.length === 0) {
       throw new Error(
-        `No sessions found in ${path.join(storage.getProjectTempDir(), 'chats')}`,
+        `No sessions found in ${path.join(storage.getProjectDataDir(), 'chats')}`,
       );
     }
 
@@ -95,13 +95,13 @@ export class GeminiCliAgent {
 
     for (const sessionFile of filesToCheck) {
       const absolutePath = path.join(
-        storage.getProjectTempDir(),
+        storage.getProjectDataDir(),
         sessionFile.filePath,
       );
       const loaded = await loadConversationRecord(absolutePath);
       if (loaded && loaded.sessionId === sessionId) {
         conversation = loaded;
-        filePath = path.join(storage.getProjectTempDir(), sessionFile.filePath);
+        filePath = path.join(storage.getProjectDataDir(), sessionFile.filePath);
         break;
       }
     }
