@@ -142,10 +142,7 @@ export async function deleteSubagentSessionDirAndArtifactsAsync(
       });
 
     for (const file of files) {
-      if (
-        file.isFile() &&
-        (file.name.endsWith('.json') || file.name.endsWith('.jsonl'))
-      ) {
+      if (file.isFile() && file.name.endsWith('.jsonl')) {
         const agentId = path.basename(file.name, path.extname(file.name));
         await deleteSessionArtifactsAsync(agentId, tempDir);
       }
@@ -175,7 +172,7 @@ export async function deleteSubagentSessionDirAndArtifactsAsync(
 export function deriveSessionShortId(sessionIdOrBasename: string): string {
   let shortId = sessionIdOrBasename;
   if (sessionIdOrBasename.startsWith(SESSION_FILE_PREFIX)) {
-    const withoutExt = sessionIdOrBasename.replace(/\.jsonl?$/, '');
+    const withoutExt = sessionIdOrBasename.replace(/\.jsonl$/, '');
     const parts = withoutExt.split('-');
     shortId = parts[parts.length - 1];
   } else if (sessionIdOrBasename.length >= 8) {
@@ -201,16 +198,14 @@ export async function getMatchingSessionFiles(
 ): Promise<string[]> {
   const files = await fs.readdir(chatsDir);
   return files.filter(
-    (f) =>
-      f.startsWith(SESSION_FILE_PREFIX) &&
-      (f.endsWith(`-${shortId}.json`) || f.endsWith(`-${shortId}.jsonl`)),
+    (f) => f.startsWith(SESSION_FILE_PREFIX) && f.endsWith(`-${shortId}.jsonl`),
   );
 }
 
 /**
  * Deletes a single session file and its associated logs, tool outputs, and
- * any subagent directory. Reads the file's first line (or full body as a
- * fallback) to recover the full session id required for artifact cleanup.
+ * any subagent directory. Reads the file's first line to recover the full
+ * session id required for artifact cleanup.
  */
 export async function deleteSessionFileAndArtifacts(
   chatsDir: string,
@@ -248,18 +243,6 @@ export async function deleteSessionFileAndArtifacts(
     } finally {
       if (fd !== undefined) {
         await fd.close();
-      }
-    }
-
-    if (!fullSessionId) {
-      try {
-        const fileContent = await fs.readFile(filePath, 'utf8');
-        const parsed = JSON.parse(fileContent) as unknown;
-        if (isSessionIdRecord(parsed)) {
-          fullSessionId = parsed.sessionId;
-        }
-      } catch {
-        // Ignore parse errors, we'll still try to unlink the file below.
       }
     }
 

@@ -30,10 +30,10 @@ const MULTIPLIERS = {
 };
 
 /**
- * Matches a trailing hyphen followed by exactly 8 alphanumeric characters before the .json or .jsonl extension.
- * Example: session-20250110-abcdef12.json -> captures "abcdef12"
+ * Matches a trailing hyphen followed by exactly 8 alphanumeric characters before the .jsonl extension.
+ * Example: session-20250110-abcdef12.jsonl -> captures "abcdef12"
  */
-const SHORT_ID_REGEX = /-([a-zA-Z0-9]{8})\.jsonl?$/;
+const SHORT_ID_REGEX = /-([a-zA-Z0-9]{8})\.jsonl$/;
 
 function hasProperty<T extends string>(
   obj: unknown,
@@ -72,10 +72,7 @@ export interface CleanupResult {
  * Derives an 8-character shortId from a session filename.
  */
 function deriveShortIdFromFileName(fileName: string): string | null {
-  if (
-    fileName.startsWith(SESSION_FILE_PREFIX) &&
-    (fileName.endsWith('.json') || fileName.endsWith('.jsonl'))
-  ) {
+  if (fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl')) {
     const match = fileName.match(SHORT_ID_REGEX);
     return match ? match[1] : null;
   }
@@ -162,8 +159,7 @@ export async function cleanupExpiredSessions(
             .filter(
               (f) =>
                 f.startsWith(SESSION_FILE_PREFIX) &&
-                (f.endsWith(`-${shortId}.json`) ||
-                  f.endsWith(`-${shortId}.jsonl`)),
+                f.endsWith(`-${shortId}.jsonl`),
             );
 
           for (const file of matchingFiles) {
@@ -193,20 +189,12 @@ export async function cleanupExpiredSessions(
                         fullSessionId = record.sessionId;
                       }
                     } catch {
-                      // Ignore first line parse error, try full parse for legacy pretty-printed JSON
+                      // Ignore first line parse error
                     }
                   }
                 } finally {
                   if (fd !== undefined) {
                     await fd.close();
-                  }
-                }
-
-                if (!fullSessionId) {
-                  const fileContent = await fs.readFile(filePath, 'utf8');
-                  const content: unknown = JSON.parse(fileContent);
-                  if (isSessionIdRecord(content)) {
-                    fullSessionId = content.sessionId;
                   }
                 }
               } catch {

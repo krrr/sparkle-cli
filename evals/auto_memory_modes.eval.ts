@@ -286,7 +286,7 @@ async function seedSession(
   const sessionFilePath = path.join(
     fixture.projectTempDir,
     'chats',
-    `${SESSION_FILE_PREFIX}2026-04-20T10-00-${sessionId}.json`,
+    `${SESSION_FILE_PREFIX}2026-04-20T10-00-${sessionId}.jsonl`,
   );
   const oldTimestamp = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
   const messages = Array.from({ length: 20 }, (_, index) => ({

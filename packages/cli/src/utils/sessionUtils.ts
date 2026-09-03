@@ -243,11 +243,7 @@ export const getAllSessionFiles = async (
   try {
     const files = await fs.readdir(chatsDir);
     const sessionFiles = files
-      .filter(
-        (f) =>
-          f.startsWith(SESSION_FILE_PREFIX) &&
-          (f.endsWith('.json') || f.endsWith('.jsonl')),
-      )
+      .filter((f) => f.startsWith(SESSION_FILE_PREFIX) && f.endsWith('.jsonl'))
       .sort(); // Sort by filename, which includes timestamp
 
     const sessionPromises = sessionFiles.map(
@@ -267,17 +263,8 @@ export const getAllSessionFiles = async (
             return { fileName: file, sessionInfo: null };
           }
 
-          const fileTimestamp =
-            !content.startTime || !content.lastUpdated
-              ? (
-                  await fs.stat(filePath).catch(() => undefined)
-                )?.mtime.toISOString()
-              : undefined;
-          const fallbackTimestamp = fileTimestamp ?? new Date().toISOString();
-          const startTime =
-            content.startTime || content.lastUpdated || fallbackTimestamp;
-          const lastUpdated =
-            content.lastUpdated || content.startTime || fallbackTimestamp;
+          const startTime = content.startTime;
+          const lastUpdated = content.lastUpdated;
 
           // Skip sessions with no resumable conversation content, including
           // startup-only, system-only, command-only, and internal-context-only
@@ -323,7 +310,7 @@ export const getAllSessionFiles = async (
 
           const sessionInfo: SessionInfo = {
             id: content.sessionId,
-            file: file.replace(/\.jsonl?$/, ''),
+            file: file.replace(/\.jsonl$/, ''),
             fileName: file,
             startTime,
             lastUpdated,
@@ -425,8 +412,7 @@ export class SessionSelector {
     const shortId = id.slice(0, 8);
     const candidateFiles = files.filter(
       (f) =>
-        f.startsWith(SESSION_FILE_PREFIX) &&
-        (f.endsWith(`-${shortId}.json`) || f.endsWith(`-${shortId}.jsonl`)),
+        f.startsWith(SESSION_FILE_PREFIX) && f.endsWith(`-${shortId}.jsonl`),
     );
 
     for (const fileName of candidateFiles) {

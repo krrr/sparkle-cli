@@ -86,7 +86,7 @@ describe('listSessions', () => {
       {
         id: 'session-1',
         file: 'session-2025-01-18T12-00-00-session-1',
-        fileName: 'session-2025-01-18T12-00-00-session-1.json',
+        fileName: 'session-2025-01-18T12-00-00-session-1.jsonl',
         startTime: twoDaysAgo.toISOString(),
         lastUpdated: twoDaysAgo.toISOString(),
         messageCount: 5,
@@ -98,7 +98,7 @@ describe('listSessions', () => {
       {
         id: 'session-2',
         file: 'session-2025-01-20T11-00-00-session-2',
-        fileName: 'session-2025-01-20T11-00-00-session-2.json',
+        fileName: 'session-2025-01-20T11-00-00-session-2.jsonl',
         startTime: oneHourAgo.toISOString(),
         lastUpdated: oneHourAgo.toISOString(),
         messageCount: 10,
@@ -110,7 +110,7 @@ describe('listSessions', () => {
       {
         id: 'current-session-id',
         file: 'session-2025-01-20T12-00-00-current-s',
-        fileName: 'session-2025-01-20T12-00-00-current-s.json',
+        fileName: 'session-2025-01-20T12-00-00-current-s.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 3,
@@ -170,7 +170,7 @@ describe('listSessions', () => {
       {
         id: 'session-2',
         file: 'session-2',
-        fileName: 'session-2.json',
+        fileName: 'session-2.jsonl',
         startTime: session2Time.toISOString(), // Middle
         lastUpdated: session2Time.toISOString(),
         messageCount: 5,
@@ -182,7 +182,7 @@ describe('listSessions', () => {
       {
         id: 'session-1',
         file: 'session-1',
-        fileName: 'session-1.json',
+        fileName: 'session-1.jsonl',
         startTime: session1Time.toISOString(), // Oldest
         lastUpdated: session1Time.toISOString(),
         messageCount: 5,
@@ -194,7 +194,7 @@ describe('listSessions', () => {
       {
         id: 'session-3',
         file: 'session-3',
-        fileName: 'session-3.json',
+        fileName: 'session-3.jsonl',
         startTime: session3Time.toISOString(), // Newest
         lastUpdated: session3Time.toISOString(),
         messageCount: 5,
@@ -233,7 +233,7 @@ describe('listSessions', () => {
       {
         id: 'abc123def456',
         file: 'session-file',
-        fileName: 'session-file.json',
+        fileName: 'session-file.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -268,7 +268,7 @@ describe('listSessions', () => {
       {
         id: 'single-session',
         file: 'session-file',
-        fileName: 'session-file.json',
+        fileName: 'session-file.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -303,7 +303,7 @@ describe('listSessions', () => {
       {
         id: 'session-with-summary',
         file: 'session-file',
-        fileName: 'session-file.json',
+        fileName: 'session-file.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 10,
@@ -385,7 +385,7 @@ describe('deleteSession', () => {
       {
         id: 'session-uuid-123',
         file: 'session-file-123',
-        fileName: 'session-file-123.json',
+        fileName: 'session-file-123.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -423,7 +423,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: oneHourAgo.toISOString(),
         lastUpdated: oneHourAgo.toISOString(),
         messageCount: 5,
@@ -435,7 +435,7 @@ describe('deleteSession', () => {
       {
         id: 'session-2',
         file: 'session-file-2',
-        fileName: 'session-file-2.json',
+        fileName: 'session-file-2.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 10,
@@ -470,7 +470,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -500,7 +500,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -530,7 +530,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -560,7 +560,7 @@ describe('deleteSession', () => {
       {
         id: 'current-session-id',
         file: 'current-session-file',
-        fileName: 'current-session-file.json',
+        fileName: 'current-session-file.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -590,7 +590,7 @@ describe('deleteSession', () => {
       {
         id: 'current-session-id',
         file: 'current-session-file',
-        fileName: 'current-session-file.json',
+        fileName: 'current-session-file.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -620,7 +620,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -656,7 +656,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: now.toISOString(),
         lastUpdated: now.toISOString(),
         messageCount: 5,
@@ -692,7 +692,7 @@ describe('deleteSession', () => {
       {
         id: 'session-3',
         file: 'session-file-3',
-        fileName: 'session-file-3.json',
+        fileName: 'session-file-3.jsonl',
         startTime: session3Time.toISOString(), // Newest
         lastUpdated: session3Time.toISOString(),
         messageCount: 5,
@@ -704,7 +704,7 @@ describe('deleteSession', () => {
       {
         id: 'session-1',
         file: 'session-file-1',
-        fileName: 'session-file-1.json',
+        fileName: 'session-file-1.jsonl',
         startTime: session1Time.toISOString(), // Oldest
         lastUpdated: session1Time.toISOString(),
         messageCount: 5,
@@ -716,7 +716,7 @@ describe('deleteSession', () => {
       {
         id: 'session-2',
         file: 'session-file-2',
-        fileName: 'session-file-2.json',
+        fileName: 'session-file-2.jsonl',
         startTime: session2Time.toISOString(), // Middle
         lastUpdated: session2Time.toISOString(),
         messageCount: 5,

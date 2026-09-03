@@ -84,12 +84,20 @@ describe('Session Cleanup (Refactored)', () => {
     const filePath = path.join(chatsDir, session.fileName);
     await fs.writeFile(
       filePath,
-      JSON.stringify({
-        sessionId: session.id,
-        lastUpdated: session.lastUpdated,
-        startTime: session.lastUpdated,
-        messages: [{ type: 'user', content: 'hello' }],
-      }),
+      [
+        JSON.stringify({
+          sessionId: session.id,
+          projectHash: 'test-project-hash',
+          startTime: session.lastUpdated,
+          lastUpdated: session.lastUpdated,
+        }),
+        JSON.stringify({
+          id: 'm1',
+          timestamp: session.lastUpdated,
+          type: 'user',
+          content: 'hello',
+        }),
+      ].join('\n') + '\n',
     );
   }
 
@@ -120,17 +128,17 @@ describe('Session Cleanup (Refactored)', () => {
     const sessions = [
       {
         id: 'current123',
-        fileName: 'session-20250101-current1.json',
+        fileName: 'session-20250101-current1.jsonl',
         lastUpdated: now.toISOString(),
       },
       {
         id: 'old789abc',
-        fileName: 'session-20250110-old789ab.json',
+        fileName: 'session-20250110-old789ab.jsonl',
         lastUpdated: twoWeeksAgo.toISOString(),
       },
       {
         id: 'ancient12',
-        fileName: 'session-20241225-ancient1.json',
+        fileName: 'session-20241225-ancient1.jsonl',
         lastUpdated: oneMonthAgo.toISOString(),
       },
     ];
@@ -281,45 +289,6 @@ describe('Session Cleanup (Refactored)', () => {
       expect(existsSync(path.join(chatsDir, sessions[1].id))).toBe(false); // Subagent chats directory should be deleted
     });
 
-    it('should delete legacy pretty-printed session files and their artifacts', async () => {
-      const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-      const sessionId = 'legacy-uuid';
-      const shortId = 'legacy12';
-      const fileName = `session-20250110-${shortId}.json`;
-      const filePath = path.join(chatsDir, fileName);
-
-      // Write pretty-printed JSON
-      await fs.writeFile(
-        filePath,
-        JSON.stringify(
-          {
-            sessionId,
-            lastUpdated: twoWeeksAgo.toISOString(),
-            startTime: twoWeeksAgo.toISOString(),
-            messages: [{ type: 'user', content: 'hello legacy' }],
-          },
-          null,
-          2,
-        ),
-      );
-
-      await writeArtifacts(sessionId);
-
-      const config = createMockConfig();
-      const settings: Settings = {
-        general: { sessionRetention: { enabled: true, maxAge: '10d' } },
-      };
-
-      const result = await cleanupExpiredSessions(config, settings);
-
-      expect(result.deleted).toBe(1);
-      expect(existsSync(filePath)).toBe(false);
-      // Artifacts should be gone because we extracted sessionId from legacy JSON
-      expect(
-        existsSync(path.join(toolOutputsDir, `session-${sessionId}`)),
-      ).toBe(false);
-    });
-
     it('should delete expired JSONL session files and their artifacts', async () => {
       const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
       const sessionId = 'jsonl-uuid';
@@ -330,6 +299,7 @@ describe('Session Cleanup (Refactored)', () => {
       // Write JSONL
       const metadata = {
         sessionId,
+        projectHash: 'test-project-hash',
         lastUpdated: twoWeeksAgo.toISOString(),
         startTime: twoWeeksAgo.toISOString(),
         kind: 'main',
@@ -359,7 +329,7 @@ describe('Session Cleanup (Refactored)', () => {
 
     it('should delete corrupted session files even if sessionId cannot be extracted', async () => {
       const shortId = 'corrupt1';
-      const fileName = `session-20250110-${shortId}.json`;
+      const fileName = `session-20250110-${shortId}.jsonl`;
       const filePath = path.join(chatsDir, fileName);
 
       await fs.writeFile(filePath, 'completely invalid json');
@@ -402,13 +372,13 @@ describe('Session Cleanup (Refactored)', () => {
 
       await writeSessionFile({
         id: 'recent3',
-        fileName: 'session-20250117-recent3.json',
+        fileName: 'session-20250117-recent3.jsonl',
         lastUpdated: threeDaysAgo.toISOString(),
       });
       await writeArtifacts('recent3');
       await writeSessionFile({
         id: 'recent5',
-        fileName: 'session-20250115-recent5.json',
+        fileName: 'session-20250115-recent5.jsonl',
         lastUpdated: fiveDaysAgo.toISOString(),
       });
       await writeArtifacts('recent5');
@@ -433,10 +403,10 @@ describe('Session Cleanup (Refactored)', () => {
       // Verify specifically WHICH files survived
       expect(existsSync(path.join(chatsDir, sessions[0].fileName))).toBe(true); // current
       expect(
-        existsSync(path.join(chatsDir, 'session-20250117-recent3.json')),
+        existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl')),
       ).toBe(true); // 3d
       expect(
-        existsSync(path.join(chatsDir, 'session-20250115-recent5.json')),
+        existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl')),
       ).toBe(true); // 5d
 
       // Verify the older ones were deleted
@@ -451,7 +421,7 @@ describe('Session Cleanup (Refactored)', () => {
       // Parent session (expired)
       await writeSessionFile({
         id: 'parent-uuid',
-        fileName: 'session-20250110-abc12345.json',
+        fileName: 'session-20250110-abc12345.jsonl',
         lastUpdated: twoWeeksAgo.toISOString(),
       });
       await writeArtifacts('parent-uuid');
@@ -459,7 +429,7 @@ describe('Session Cleanup (Refactored)', () => {
       // Subagent session (different UUID, same shortId)
       await writeSessionFile({
         id: 'sub-uuid',
-        fileName: 'session-20250110-subagent-abc12345.json',
+        fileName: 'session-20250110-subagent-abc12345.jsonl',
         lastUpdated: twoWeeksAgo.toISOString(),
       });
       await writeArtifacts('sub-uuid');
@@ -473,11 +443,11 @@ describe('Session Cleanup (Refactored)', () => {
 
       expect(result.deleted).toBe(2); // Both files should be deleted
       expect(
-        existsSync(path.join(chatsDir, 'session-20250110-abc12345.json')),
+        existsSync(path.join(chatsDir, 'session-20250110-abc12345.jsonl')),
       ).toBe(false);
       expect(
         existsSync(
-          path.join(chatsDir, 'session-20250110-subagent-abc12345.json'),
+          path.join(chatsDir, 'session-20250110-subagent-abc12345.jsonl'),
         ),
       ).toBe(false);
 
@@ -492,7 +462,7 @@ describe('Session Cleanup (Refactored)', () => {
 
     it('should delete corrupted session files', async () => {
       // Write a corrupted file (invalid JSON)
-      const corruptPath = path.join(chatsDir, 'session-corrupt.json');
+      const corruptPath = path.join(chatsDir, 'session-corrupt.jsonl');
       await fs.writeFile(corruptPath, 'invalid json');
 
       const config = createMockConfig();
@@ -512,7 +482,10 @@ describe('Session Cleanup (Refactored)', () => {
         general: { sessionRetention: { enabled: true, maxAge: '1d' } },
       };
 
-      const badJsonPath = path.join(chatsDir, 'session-20241225-badjson1.json');
+      const badJsonPath = path.join(
+        chatsDir,
+        'session-20241225-badjson1.jsonl',
+      );
       await fs.writeFile(badJsonPath, 'This is raw text, not JSON');
 
       const result = await cleanupExpiredSessions(config, settings);
@@ -528,7 +501,7 @@ describe('Session Cleanup (Refactored)', () => {
         general: { sessionRetention: { enabled: true, maxAge: '1d' } },
       };
 
-      const legacyPath = path.join(chatsDir, 'session-20241225-legacy.json');
+      const legacyPath = path.join(chatsDir, 'session-20241225-legacy.jsonl');
       // Create valid JSON so the parser succeeds, but shortId derivation fails
       await fs.writeFile(
         legacyPath,
@@ -548,7 +521,7 @@ describe('Session Cleanup (Refactored)', () => {
 
     it('should silently ignore ENOENT if file is already deleted before unlink', async () => {
       await seedSessions(); // Seeds older 2024 and 2025 sessions
-      const targetFile = path.join(chatsDir, 'session-20241225-ancient1.json');
+      const targetFile = path.join(chatsDir, 'session-20241225-ancient1.jsonl');
       let getSessionIdCalls = 0;
 
       const config = createMockConfig({
@@ -606,13 +579,13 @@ describe('Session Cleanup (Refactored)', () => {
 
       await writeSessionFile({
         id: 'recent3',
-        fileName: 'session-20250117-recent3.json',
+        fileName: 'session-20250117-recent3.jsonl',
         lastUpdated: threeDaysAgo.toISOString(),
       });
       await writeArtifacts('recent3');
       await writeSessionFile({
         id: 'recent5',
-        fileName: 'session-20250115-recent5.json',
+        fileName: 'session-20250115-recent5.jsonl',
         lastUpdated: fiveDaysAgo.toISOString(),
       });
       await writeArtifacts('recent5');
@@ -641,12 +614,12 @@ describe('Session Cleanup (Refactored)', () => {
       // Assert kept
       expect(existsSync(path.join(chatsDir, sessions[0].fileName))).toBe(true); // current
       expect(
-        existsSync(path.join(chatsDir, 'session-20250117-recent3.json')),
+        existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl')),
       ).toBe(true); // 3d
 
       // Assert deleted
       expect(
-        existsSync(path.join(chatsDir, 'session-20250115-recent5.json')),
+        existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl')),
       ).toBe(false); // 5d
       expect(existsSync(path.join(chatsDir, sessions[1].fileName))).toBe(false); // 14d
       expect(existsSync(path.join(chatsDir, sessions[2].fileName))).toBe(false); // 30d

@@ -329,12 +329,10 @@ export class Storage {
     const chatsDir = path.join(this.getProjectDataDir(), 'chats');
     try {
       const files = await fs.promises.readdir(chatsDir);
-      const jsonFiles = files.filter(
-        (f) => f.endsWith('.json') || f.endsWith('.jsonl'),
-      );
+      const sessionFiles = files.filter((f) => f.endsWith('.jsonl'));
 
       const sessions = await Promise.all(
-        jsonFiles.map(async (file) => {
+        sessionFiles.map(async (file) => {
           const absolutePath = path.join(chatsDir, file);
           const stats = await fs.promises.stat(absolutePath);
           return {

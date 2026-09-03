@@ -81,12 +81,13 @@ describe('Session Cleanup Integration', () => {
     const oldDate = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000); // 60 days ago
     const sessionFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-test123.json`,
+      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-test123.jsonl`,
     );
     await fs.writeFile(
       sessionFile,
       JSON.stringify({
         sessionId: 'test123',
+        projectHash: 'test-project-hash',
         messages: [],
         startTime: oldDate.toISOString(),
         lastUpdated: oldDate.toISOString(),
@@ -110,7 +111,7 @@ describe('Session Cleanup Integration', () => {
     // Verify the session file still exists (was not deleted)
     const filesAfter = await fs.readdir(chatsDir);
     expect(filesAfter).toContain(
-      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-test123.json`,
+      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-test123.jsonl`,
     );
 
     // Cleanup
@@ -166,46 +167,70 @@ describe('Session Cleanup Integration', () => {
     // Create an old session file that should be deleted
     const oldSessionFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2024-12-01T10-00-00-old12345.json`,
+      `${SESSION_FILE_PREFIX}2024-12-01T10-00-00-old12345.jsonl`,
     );
     await fs.writeFile(
       oldSessionFile,
-      JSON.stringify({
-        sessionId: 'old12345',
-        messages: [{ type: 'user', content: 'test message' }],
-        startTime: oldDate.toISOString(),
-        lastUpdated: oldDate.toISOString(),
-      }),
+      [
+        JSON.stringify({
+          sessionId: 'old12345',
+          projectHash: 'test-project-hash',
+          startTime: oldDate.toISOString(),
+          lastUpdated: oldDate.toISOString(),
+        }),
+        JSON.stringify({
+          id: 'm1',
+          timestamp: oldDate.toISOString(),
+          type: 'user',
+          content: 'test message',
+        }),
+      ].join('\n') + '\n',
     );
 
     // Create a recent session file that should be kept
     const recentSessionFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2025-01-15T10-00-00-recent789.json`,
+      `${SESSION_FILE_PREFIX}2025-01-15T10-00-00-recent789.jsonl`,
     );
     await fs.writeFile(
       recentSessionFile,
-      JSON.stringify({
-        sessionId: 'recent789',
-        messages: [{ type: 'user', content: 'test message' }],
-        startTime: recentDate.toISOString(),
-        lastUpdated: recentDate.toISOString(),
-      }),
+      [
+        JSON.stringify({
+          sessionId: 'recent789',
+          projectHash: 'test-project-hash',
+          startTime: recentDate.toISOString(),
+          lastUpdated: recentDate.toISOString(),
+        }),
+        JSON.stringify({
+          id: 'm1',
+          timestamp: recentDate.toISOString(),
+          type: 'user',
+          content: 'test message',
+        }),
+      ].join('\n') + '\n',
     );
 
     // Create a current session file that should always be kept
     const currentSessionFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-current123.json`,
+      `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-current123.jsonl`,
     );
     await fs.writeFile(
       currentSessionFile,
-      JSON.stringify({
-        sessionId: 'current123',
-        messages: [{ type: 'user', content: 'test message' }],
-        startTime: now.toISOString(),
-        lastUpdated: now.toISOString(),
-      }),
+      [
+        JSON.stringify({
+          sessionId: 'current123',
+          projectHash: 'test-project-hash',
+          startTime: now.toISOString(),
+          lastUpdated: now.toISOString(),
+        }),
+        JSON.stringify({
+          id: 'm1',
+          timestamp: now.toISOString(),
+          type: 'user',
+          content: 'test message',
+        }),
+      ].join('\n') + '\n',
     );
 
     // Configure test with real temp directory
@@ -242,13 +267,13 @@ describe('Session Cleanup Integration', () => {
       const remainingFiles = await fs.readdir(chatsDir);
       expect(remainingFiles).toHaveLength(2); // Only 2 files should remain
       expect(remainingFiles).toContain(
-        `${SESSION_FILE_PREFIX}2025-01-15T10-00-00-recent789.json`,
+        `${SESSION_FILE_PREFIX}2025-01-15T10-00-00-recent789.jsonl`,
       );
       expect(remainingFiles).toContain(
-        `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-current123.json`,
+        `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-current123.jsonl`,
       );
       expect(remainingFiles).not.toContain(
-        `${SESSION_FILE_PREFIX}2024-12-01T10-00-00-old12345.json`,
+        `${SESSION_FILE_PREFIX}2024-12-01T10-00-00-old12345.jsonl`,
       );
     } finally {
       // Clean up test directory
@@ -280,31 +305,31 @@ describe('Session Cleanup Integration', () => {
     const parentSessionId = 'parent-uuid-123';
     const parentFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-${sharedShortId}.json`,
+      `${SESSION_FILE_PREFIX}2024-01-01T10-00-00-${sharedShortId}.jsonl`,
     );
     await fs.writeFile(
       parentFile,
       JSON.stringify({
         sessionId: parentSessionId,
-        messages: [],
+        projectHash: 'test-project-hash',
         startTime: oldDate.toISOString(),
         lastUpdated: oldDate.toISOString(),
-      }),
+      }) + '\n',
     );
 
     const subagentSessionId = 'subagent-uuid-456';
     const subagentFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2024-01-01T10-05-00-${sharedShortId}.json`,
+      `${SESSION_FILE_PREFIX}2024-01-01T10-05-00-${sharedShortId}.jsonl`,
     );
     await fs.writeFile(
       subagentFile,
       JSON.stringify({
         sessionId: subagentSessionId,
-        messages: [],
+        projectHash: 'test-project-hash',
         startTime: oldDate.toISOString(),
         lastUpdated: oldDate.toISOString(),
-      }),
+      }) + '\n',
     );
 
     const parentLogFile = path.join(
@@ -342,22 +367,24 @@ describe('Session Cleanup Integration', () => {
     const currentShortId = 'current1';
     const currentFile = path.join(
       chatsDir,
-      `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-${currentShortId}.json`,
+      `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-${currentShortId}.jsonl`,
     );
     await fs.writeFile(
       currentFile,
-      JSON.stringify({
-        sessionId: 'current-session',
-        messages: [
-          {
-            type: 'user',
-            content: [{ type: 'text', text: 'hello' }],
-            timestamp: now.toISOString(),
-          },
-        ],
-        startTime: now.toISOString(),
-        lastUpdated: now.toISOString(),
-      }),
+      [
+        JSON.stringify({
+          sessionId: 'current-session',
+          projectHash: 'test-project-hash',
+          startTime: now.toISOString(),
+          lastUpdated: now.toISOString(),
+        }),
+        JSON.stringify({
+          id: 'm1',
+          timestamp: now.toISOString(),
+          type: 'user',
+          content: 'hello',
+        }),
+      ].join('\n') + '\n',
     );
 
     // Configure test
@@ -394,7 +421,7 @@ describe('Session Cleanup Integration', () => {
       const chats = await fs.readdir(chatsDir);
       expect(chats).toHaveLength(1);
       expect(chats).toContain(
-        `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-${currentShortId}.json`,
+        `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-${currentShortId}.jsonl`,
       ); // Only current is left
 
       const logs = await fs.readdir(logsDir);

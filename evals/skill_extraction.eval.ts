@@ -306,7 +306,7 @@ async function seedSessions(
       .toISOString()
       .slice(0, 16)
       .replace(/:/g, '-');
-    const filename = `${SESSION_FILE_PREFIX}${timestamp}-${session.sessionId.slice(0, 8)}.json`;
+    const filename = `${SESSION_FILE_PREFIX}${timestamp}-${session.sessionId.slice(0, 8)}.jsonl`;
     const conversation = {
       sessionId: session.sessionId,
       projectHash: getProjectHash(projectRoot),
@@ -316,10 +316,14 @@ async function seedSessions(
       lastUpdated: sessionTimestamp.toISOString(),
       messages: buildMessages(session.userTurns),
     };
+    const { messages, ...metadata } = conversation;
 
     await fsp.writeFile(
       path.join(chatsDir, filename),
-      JSON.stringify(conversation, null, 2),
+      [
+        JSON.stringify(metadata),
+        ...messages.map((message) => JSON.stringify(message)),
+      ].join('\n') + '\n',
     );
   }
 }

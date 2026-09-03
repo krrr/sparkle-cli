@@ -286,7 +286,7 @@ describe('Memory Usage Tests', () => {
           mkdirSync(targetChatsDir, { recursive: true });
           const targetHistoryPath = join(
             targetChatsDir,
-            'session-large-chat.json',
+            'session-large-chat.jsonl',
           );
           if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
           copyFileSync(sharedHistoryPath, targetHistoryPath);
@@ -333,7 +333,7 @@ describe('Memory Usage Tests', () => {
           mkdirSync(targetChatsDir, { recursive: true });
           const targetHistoryPath = join(
             targetChatsDir,
-            'session-large-chat.json',
+            'session-large-chat.jsonl',
           );
           if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
           copyFileSync(sharedHistoryPath, targetHistoryPath);
@@ -366,11 +366,15 @@ describe('Memory Usage Tests', () => {
 async function generateSharedLargeChatData(tempDir: string) {
   const resumeResponsesPath = join(tempDir, 'large-chat-resume-chat.responses');
   const activeResponsesPath = join(tempDir, 'large-chat-active-chat.responses');
-  const historyPath = join(tempDir, 'large-chat-history.json');
-  const sourceSessionPath = join(__dirname, 'large-chat-session.json');
+  const historyPath = join(tempDir, 'large-chat-history.jsonl');
+  const sourceSessionPath = join(__dirname, 'large-chat-session.jsonl');
 
-  const session = JSON.parse(readFileSync(sourceSessionPath, 'utf8'));
-  const messages = session.messages;
+  // The fixture is JSONL: line 1 is the metadata record, the remaining
+  // lines are the individual messages.
+  const sessionLines = readFileSync(sourceSessionPath, 'utf8')
+    .trim()
+    .split('\n');
+  const messages = sessionLines.slice(1).map((line) => JSON.parse(line));
 
   copyFileSync(sourceSessionPath, historyPath);
 

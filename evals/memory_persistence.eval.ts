@@ -33,9 +33,7 @@ async function loadLatestSessionRecord(homeDir: string, sessionId: string) {
   const candidates = fs
     .readdirSync(chatsDir)
     .filter(
-      (file) =>
-        file.startsWith(SESSION_FILE_PREFIX) &&
-        (file.endsWith('.json') || file.endsWith('.jsonl')),
+      (file) => file.startsWith(SESSION_FILE_PREFIX) && file.endsWith('.jsonl'),
     );
 
   const matchingRecords = [];

@@ -458,9 +458,9 @@ describe('memoryService', () => {
         sessionId: 'error-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-err00001.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-err00001.jsonl'),
+        conversation,
       );
 
       // Make LocalAgentExecutor.create throw
@@ -519,9 +519,9 @@ describe('memoryService', () => {
         sessionId: 'skill-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-skill001.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-skill001.jsonl'),
+        conversation,
       );
 
       // Override LocalAgentExecutor.create to return an executor whose run
@@ -594,9 +594,9 @@ describe('memoryService', () => {
         sessionId: 'inbox-only-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-inbox001.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-inbox001.jsonl'),
+        conversation,
       );
 
       vi.mocked(LocalAgentExecutor.create).mockResolvedValueOnce({
@@ -698,9 +698,9 @@ describe('memoryService', () => {
         sessionId: 'malformed-inbox-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-malformed.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-malformed.jsonl'),
+        conversation,
       );
 
       const malformedPatchPath = path.join(
@@ -1143,12 +1143,12 @@ describe('memoryService', () => {
         summary: 'A brand new session',
         messageCount: 20,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-brandnew.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-brandnew.jsonl`,
         ),
-        JSON.stringify(conversation),
+        conversation,
       );
 
       const result = await buildSessionIndex(chatsDir, { runs: [] });
@@ -1165,12 +1165,12 @@ describe('memoryService', () => {
         summary: 'An old session',
         messageCount: 20,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-oldsess1.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-oldsess1.jsonl`,
         ),
-        JSON.stringify(conversation),
+        conversation,
       );
 
       const state: ExtractionState = {
@@ -1189,7 +1189,7 @@ describe('memoryService', () => {
       expect(result.sessionIndex).not.toContain('[NEW]');
     });
 
-    it('treats resumed legacy sessions as [NEW] when lastUpdated moved past the old run', async () => {
+    it('treats resumed sessions as [NEW] when lastUpdated moved past the old run', async () => {
       const { buildSessionIndex } = await import('./memoryService.js');
 
       const conversation = createConversation({
@@ -1198,12 +1198,12 @@ describe('memoryService', () => {
         messageCount: 20,
         lastUpdated: '2025-01-01T03:00:00Z',
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-resumed01.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-resumed01.jsonl`,
         ),
-        JSON.stringify(conversation),
+        conversation,
       );
 
       const state: ExtractionState = {
@@ -1230,11 +1230,8 @@ describe('memoryService', () => {
         summary: 'Debugging the login flow',
         messageCount: 20,
       });
-      const fileName = `${SESSION_FILE_PREFIX}2025-01-01T00-00-detail01.json`;
-      await fs.writeFile(
-        path.join(chatsDir, fileName),
-        JSON.stringify(conversation),
-      );
+      const fileName = `${SESSION_FILE_PREFIX}2025-01-01T00-00-detail01.jsonl`;
+      await writeConversationJsonl(path.join(chatsDir, fileName), conversation);
 
       const result = await buildSessionIndex(chatsDir, { runs: [] });
 
@@ -1422,12 +1419,12 @@ describe('memoryService', () => {
         kind: 'subagent',
         messageCount: 20,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-sub00001.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-sub00001.jsonl`,
         ),
-        JSON.stringify(conversation),
+        conversation,
       );
 
       const result = await buildSessionIndex(chatsDir, { runs: [] });
@@ -1444,12 +1441,12 @@ describe('memoryService', () => {
         sessionId: 'short-session',
         messageCount: 2,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-short001.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-short001.jsonl`,
         ),
-        JSON.stringify(conversation),
+        conversation,
       );
 
       const result = await buildSessionIndex(chatsDir, { runs: [] });
@@ -1469,12 +1466,12 @@ describe('memoryService', () => {
           messageCount: 20,
         });
         const paddedIndex = String(i).padStart(4, '0');
-        await fs.writeFile(
+        await writeConversationJsonl(
           path.join(
             chatsDir,
-            `${SESSION_FILE_PREFIX}2025-01-0${i + 1}T00-00-cap${paddedIndex}.json`,
+            `${SESSION_FILE_PREFIX}2025-01-0${i + 1}T00-00-cap${paddedIndex}.jsonl`,
           ),
-          JSON.stringify(conversation),
+          conversation,
         );
       }
 
@@ -1494,12 +1491,12 @@ describe('memoryService', () => {
         summary: 'Old',
         messageCount: 20,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-proc0001.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-proc0001.jsonl`,
         ),
-        JSON.stringify(oldConv),
+        oldConv,
       );
 
       const newConv = createConversation({
@@ -1507,12 +1504,12 @@ describe('memoryService', () => {
         summary: 'New',
         messageCount: 20,
       });
-      await fs.writeFile(
+      await writeConversationJsonl(
         path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-02T00-00-fres0001.json`,
+          `${SESSION_FILE_PREFIX}2025-01-02T00-00-fres0001.jsonl`,
         ),
-        JSON.stringify(newConv),
+        newConv,
       );
 
       const state: ExtractionState = {
@@ -1583,12 +1580,12 @@ describe('memoryService', () => {
           messageCount: 20,
           lastUpdated: `2025-01-${day}T01:00:00Z`,
         });
-        await fs.writeFile(
+        await writeConversationJsonl(
           path.join(
             chatsDir,
-            `${SESSION_FILE_PREFIX}2025-01-${day}T00-00-backlog${i}.json`,
+            `${SESSION_FILE_PREFIX}2025-01-${day}T00-00-backlog${i}.jsonl`,
           ),
-          JSON.stringify(conversation),
+          conversation,
         );
       }
 
@@ -1629,9 +1626,9 @@ describe('memoryService', () => {
         });
         const filePath = path.join(
           chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-backlog${String(i).padStart(3, '0')}.json`,
+          `${SESSION_FILE_PREFIX}2025-01-01T00-00-backlog${String(i).padStart(3, '0')}.jsonl`,
         );
-        await fs.writeFile(filePath, JSON.stringify(conversation));
+        await writeConversationJsonl(filePath, conversation);
         await setSessionMtime(filePath, timestamp);
 
         if (i < 100) {
@@ -2095,9 +2092,9 @@ describe('memoryService', () => {
         sessionId: 'patch-only-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-patchonly.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-patchonly.jsonl'),
+        conversation,
       );
 
       vi.mocked(Storage.getUserSkillsDir).mockReturnValue(
@@ -2193,9 +2190,9 @@ describe('memoryService', () => {
         sessionId: 'old-patch-session',
         messageCount: 20,
       });
-      await fs.writeFile(
-        path.join(chatsDir, 'session-2025-01-01T00-00-oldpatch.json'),
-        JSON.stringify(conversation),
+      await writeConversationJsonl(
+        path.join(chatsDir, 'session-2025-01-01T00-00-oldpatch.jsonl'),
+        conversation,
       );
 
       vi.mocked(Storage.getUserSkillsDir).mockReturnValue(

@@ -313,7 +313,7 @@ describe('CPU Performance Tests', () => {
       __dirname,
       '..',
       'memory-tests',
-      'large-chat-session.json',
+      'large-chat-session.jsonl',
     );
 
     beforeAll(async () => {
@@ -342,7 +342,7 @@ describe('CPU Performance Tests', () => {
       writeFileSync(join(projectTempDir, '.project_root'), rig.testDir!);
       copyFileSync(
         LARGE_CHAT_SOURCE,
-        join(targetChatsDir, `session-${SESSION_ID}.json`),
+        join(targetChatsDir, `session-${SESSION_ID}.jsonl`),
       );
     });
 

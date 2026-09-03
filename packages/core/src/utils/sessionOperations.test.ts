@@ -97,8 +97,8 @@ describe('sessionOperations', () => {
       const subDir = path.join(chatsDir, parentSessionId);
       await fs.mkdir(subDir, { recursive: true });
 
-      await fs.writeFile(path.join(subDir, 'sub1.json'), '{}');
-      await fs.writeFile(path.join(subDir, 'sub2.json'), '{}');
+      await fs.writeFile(path.join(subDir, 'sub1.jsonl'), '{}');
+      await fs.writeFile(path.join(subDir, 'sub2.jsonl'), '{}');
 
       const logsDir = path.join(tempDir, 'logs');
       await fs.mkdir(logsDir, { recursive: true });

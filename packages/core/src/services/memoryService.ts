@@ -322,10 +322,6 @@ function compareIndexedSessions(a: IndexedSession, b: IndexedSession): number {
     return timestampDelta;
   }
 
-  if (a.filePath.endsWith('.jsonl') !== b.filePath.endsWith('.jsonl')) {
-    return a.filePath.endsWith('.jsonl') ? -1 : 1;
-  }
-
   return b.filePath.localeCompare(a.filePath);
 }
 
@@ -400,16 +396,12 @@ function getResolvedActivityFilePath(
 function getUserMessageCount(
   conversation: ConversationRecord & { userMessageCount?: number },
 ): number {
-  return (
-    conversation.userMessageCount ??
-    conversation.messages.filter((message) => message.type === 'user').length
-  );
+  return conversation.userMessageCount ?? 0;
 }
 
 function isSupportedSessionFile(fileName: string): boolean {
   return (
-    fileName.startsWith(SESSION_FILE_PREFIX) &&
-    (fileName.endsWith('.json') || fileName.endsWith('.jsonl'))
+    fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl')
   );
 }
 
@@ -569,7 +561,7 @@ function shouldProcessConversation(
 
 /**
  * Scans the chats directory for eligible session files, loading metadata from
- * both JSONL and legacy JSON sessions, deduplicating migrated sessions by
+ * JSONL sessions, deduplicating migrated sessions by
  * session ID, and sorting by actual lastUpdated. We scan the full directory
  * here so already-processed recent sessions cannot permanently block older
  * backlog sessions from surfacing as new candidates.

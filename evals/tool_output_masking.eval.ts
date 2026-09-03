@@ -121,11 +121,19 @@ Output too large. Full output available at: ${outputFilePath}
         .toISOString()
         .slice(0, 16)
         .replace(/:/g, '-');
+      const { messages: conversationMessages, ...conversationMetadata } =
+        conversation;
       const sessionFile = path.join(
         chatsDir,
-        `session-${timestamp}-${sessionId.slice(0, 8)}.json`,
+        `session-${timestamp}-${sessionId.slice(0, 8)}.jsonl`,
       );
-      fs.writeFileSync(sessionFile, JSON.stringify(conversation, null, 2));
+      fs.writeFileSync(
+        sessionFile,
+        [
+          JSON.stringify(conversationMetadata),
+          ...conversationMessages.map((message) => JSON.stringify(message)),
+        ].join('\n') + '\n',
+      );
 
       // 4. Trust folder
       const settingsDir = path.join(rig.homeDir!, '.sparkle');
@@ -258,11 +266,19 @@ Output too large. Full output available at: ${outputFilePath}
         .toISOString()
         .slice(0, 16)
         .replace(/:/g, '-');
+      const { messages: conversationMessages, ...conversationMetadata } =
+        conversation;
       const sessionFile = path.join(
         chatsDir,
-        `session-${timestamp}-${sessionId.slice(0, 8)}.json`,
+        `session-${timestamp}-${sessionId.slice(0, 8)}.jsonl`,
       );
-      fs.writeFileSync(sessionFile, JSON.stringify(conversation, null, 2));
+      fs.writeFileSync(
+        sessionFile,
+        [
+          JSON.stringify(conversationMetadata),
+          ...conversationMessages.map((message) => JSON.stringify(message)),
+        ].join('\n') + '\n',
+      );
 
       const settingsDir = path.join(rig.homeDir!, '.sparkle');
       fs.writeFileSync(

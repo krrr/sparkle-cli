@@ -227,15 +227,15 @@ describe('Storage – additional helpers', () => {
         .spyOn(fs.promises, 'readdir')
         /* eslint-disable @typescript-eslint/no-explicit-any */
         .mockResolvedValue([
-          'session-1.json',
-          'session-2.json',
+          'session-1.jsonl',
+          'session-2.jsonl',
           'not-a-session.txt',
         ] as any);
 
       const statSpy = vi
         .spyOn(fs.promises, 'stat')
         .mockImplementation(async (p: any) => {
-          if (p.toString().endsWith('session-1.json')) {
+          if (p.toString().endsWith('session-1.jsonl')) {
             return {
               mtime: new Date('2026-02-01'),
               mtimeMs: 1000,
@@ -253,8 +253,8 @@ describe('Storage – additional helpers', () => {
       expect(readdirSpy).toHaveBeenCalledWith(expect.stringContaining('chats'));
       expect(sessions).toHaveLength(2);
       // Sorted by mtime desc
-      expect(sessions[0].filePath).toBe(path.join('chats', 'session-2.json'));
-      expect(sessions[1].filePath).toBe(path.join('chats', 'session-1.json'));
+      expect(sessions[0].filePath).toBe(path.join('chats', 'session-2.jsonl'));
+      expect(sessions[1].filePath).toBe(path.join('chats', 'session-1.jsonl'));
       expect(sessions[0].lastUpdated).toBe(
         new Date('2026-02-02').toISOString(),
       );

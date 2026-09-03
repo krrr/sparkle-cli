@@ -378,47 +378,8 @@ export async function loadConversationRecord(
             ...record.$set,
           };
         } else if (isPartialMetadataRecord(record)) {
-          // Initial metadata line (or entire legacy record if on one line)
+          // Initial metadata line
           metadata = { ...metadata, ...record };
-          if (
-            hasProperty(record, 'messages') &&
-            Array.isArray(record.messages)
-          ) {
-            for (const msg of record.messages) {
-              if (isMessageRecord(msg)) {
-                const id = msg.id;
-                const isUser = msg.type === 'user';
-                const isResumable = isResumableMessageRecord(msg);
-
-                if (options?.metadataOnly) {
-                  messageIds.push(id);
-                  messageKinds.set(id, {
-                    isUser,
-                    isResumable,
-                  });
-                } else {
-                  messagesMap.set(id, msg);
-                }
-
-                if (
-                  !firstUserMessageStr &&
-                  isUser &&
-                  isResumable &&
-                  msg.content &&
-                  (Array.isArray(msg.content) ||
-                    typeof msg.content === 'string')
-                ) {
-                  if (Array.isArray(msg.content)) {
-                    firstUserMessageStr = msg.content
-                      .map((p: unknown) => (isTextPart(p) ? p.text : ''))
-                      .join('');
-                  } else {
-                    firstUserMessageStr = msg.content;
-                  }
-                }
-              }
-            }
-          }
         }
       } catch {
         // ignore parse errors on individual lines
@@ -426,7 +387,7 @@ export async function loadConversationRecord(
     }
 
     if (!metadata.sessionId || !metadata.projectHash) {
-      return await parseLegacyRecordFallback(filePath, options);
+      return null;
     }
 
     const loadedMessages = Array.from(messagesMap.values());
@@ -512,32 +473,6 @@ export class ChatRecordingService {
         if (loadedRecord) {
           this.cachedConversation = loadedRecord;
           this.projectHash = this.cachedConversation.projectHash;
-
-          if (this.conversationFile.endsWith('.json')) {
-            this.conversationFile = this.conversationFile + 'l'; // e.g. session-foo.jsonl
-
-            // Migrate the entire legacy record to the new file
-            const initialMetadata = {
-              sessionId: this.sessionId,
-              projectHash: this.projectHash,
-              startTime: this.cachedConversation.startTime,
-              lastUpdated: this.cachedConversation.lastUpdated,
-              kind: this.cachedConversation.kind,
-              directories: this.cachedConversation.directories,
-              summary: this.cachedConversation.summary,
-            };
-            this.appendRecord(initialMetadata);
-            for (const msg of this.cachedConversation.messages) {
-              this.appendRecord(msg);
-            }
-            if (this.cachedConversation.memoryScratchpad) {
-              this.appendRecord({
-                $set: {
-                  memoryScratchpad: this.cachedConversation.memoryScratchpad,
-                },
-              });
-            }
-          }
 
           // Update the session ID in the existing file
           this.updateMetadata({ sessionId: this.sessionId });
@@ -659,11 +594,6 @@ export class ChatRecordingService {
    */
   private rewriteConversationFile(conversation: ConversationRecord): void {
     if (!this.conversationFile) return;
-
-    // Normalize legacy `.json` paths to the `.jsonl` format we write.
-    if (this.conversationFile.endsWith('.json')) {
-      this.conversationFile = this.conversationFile + 'l';
-    }
 
     const { messages, memoryScratchpad, ...metadata } = conversation;
     const lines: string[] = [JSON.stringify(metadata)];
@@ -1125,67 +1055,4 @@ export class ChatRecordingService {
       throw error;
     }
   }
-}
-
-async function parseLegacyRecordFallback(
-  filePath: string,
-  options?: LoadConversationOptions,
-): Promise<
-  | (ConversationRecord & {
-      messageCount?: number;
-      userMessageCount?: number;
-      firstUserMessage?: string;
-      hasResumableContent?: boolean;
-    })
-  | null
-> {
-  try {
-    const fileContent = await fs.promises.readFile(filePath, 'utf8');
-    const parsed = JSON.parse(fileContent) as unknown;
-
-    const isLegacyRecord = (val: unknown): val is ConversationRecord =>
-      typeof val === 'object' && val !== null && 'sessionId' in val;
-
-    if (isLegacyRecord(parsed)) {
-      const legacyRecord = parsed;
-      if (options?.metadataOnly) {
-        let fallbackFirstUserMessageStr: string | undefined;
-        const firstUserMessage = legacyRecord.messages?.find(
-          (m) => m.type === 'user' && isResumableMessageRecord(m),
-        );
-        if (firstUserMessage) {
-          const rawContent = firstUserMessage.content;
-          if (Array.isArray(rawContent)) {
-            fallbackFirstUserMessageStr = rawContent
-              .map((p: unknown) => (isTextPart(p) ? p['text'] : ''))
-              .join('');
-          } else if (typeof rawContent === 'string') {
-            fallbackFirstUserMessageStr = rawContent;
-          }
-        }
-        return {
-          ...legacyRecord,
-          messages: [],
-          messageCount: legacyRecord.messages?.length || 0,
-          userMessageCount:
-            legacyRecord.messages?.filter((m) => m.type === 'user').length || 0,
-          firstUserMessage: fallbackFirstUserMessageStr,
-          hasResumableContent:
-            legacyRecord.messages?.some((m) => isResumableMessageRecord(m)) ||
-            false,
-        };
-      }
-      return {
-        ...legacyRecord,
-        userMessageCount:
-          legacyRecord.messages?.filter((m) => m.type === 'user').length || 0,
-        hasResumableContent:
-          legacyRecord.messages?.some((m) => isResumableMessageRecord(m)) ||
-          false,
-      };
-    }
-  } catch {
-    // ignore legacy fallback parse error
-  }
-  return null;
 }

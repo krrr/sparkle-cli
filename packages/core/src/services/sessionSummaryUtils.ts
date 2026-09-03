@@ -44,8 +44,7 @@ interface SessionFileCandidate {
 
 function isSupportedSessionFile(fileName: string): boolean {
   return (
-    fileName.startsWith(SESSION_FILE_PREFIX) &&
-    (fileName.endsWith('.json') || fileName.endsWith('.jsonl'))
+    fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl')
   );
 }
 
@@ -373,12 +372,10 @@ async function generateAndSaveSummary(
 
   let scratchpadSourceConversation = conversation;
 
-  // Re-read the file before writing to handle race conditions. For JSONL we
-  // only need the metadata; for legacy JSON we need the full record so we can
-  // round-trip the messages back to disk.
-  const isJsonl = sessionPath.endsWith('.jsonl');
+  // Re-read the file before writing to handle race conditions. We only need
+  // the metadata; JSONL metadata updates are appended as a $set line.
   const freshConversation = await loadConversationRecord(sessionPath, {
-    metadataOnly: isJsonl,
+    metadataOnly: true,
   });
   if (!freshConversation) {
     debugLogger.debug(`[SessionSummary] Could not re-read ${sessionPath}`);
@@ -428,26 +425,10 @@ async function generateAndSaveSummary(
     return;
   }
 
-  if (isJsonl) {
-    await fs.appendFile(
-      sessionPath,
-      `${JSON.stringify({ $set: metadataUpdate })}\n`,
-    );
-  } else {
-    const lastUpdated = freshConversation.lastUpdated;
-    await fs.writeFile(
-      sessionPath,
-      JSON.stringify(
-        {
-          ...freshConversation,
-          ...metadataUpdate,
-          lastUpdated,
-        },
-        null,
-        2,
-      ),
-    );
-  }
+  await fs.appendFile(
+    sessionPath,
+    `${JSON.stringify({ $set: metadataUpdate })}\n`,
+  );
   debugLogger.debug(
     `[SessionSummary] Saved summary metadata for ${sessionPath}${summary ? `: "${summary}"` : ''}`,
   );
@@ -506,11 +487,8 @@ export async function getPreviousSession(
 
         // Only generate summaries for sessions with more than 1 user message.
         // `loadConversationRecord` populates `userMessageCount` in metadataOnly
-        // mode; fall back to scanning messages for the legacy fallback path.
-        const userMessageCount =
-          conversation.userMessageCount ??
-          conversation.messages.filter((message) => message.type === 'user')
-            .length;
+        // mode.
+        const userMessageCount = conversation.userMessageCount ?? 0;
         if (userMessageCount <= MIN_MESSAGES_FOR_SUMMARY) {
           continue;
         }

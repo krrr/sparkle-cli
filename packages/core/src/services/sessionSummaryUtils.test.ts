@@ -48,27 +48,6 @@ interface SessionFixture {
   userMessageCount: number;
 }
 
-function buildLegacySessionJson(fixture: SessionFixture): string {
-  const messages =
-    fixture.messages ??
-    Array.from({ length: fixture.userMessageCount }, (_, i) => ({
-      id: String(i + 1),
-      timestamp: '2024-01-01T00:00:00Z',
-      type: 'user',
-      content: [{ text: `Message ${i + 1}` }],
-    }));
-  return JSON.stringify({
-    sessionId: fixture.sessionId ?? 'session-id',
-    projectHash: 'abc123',
-    startTime: fixture.startTime ?? '2024-01-01T00:00:00Z',
-    lastUpdated: fixture.lastUpdated ?? '2024-01-01T00:00:00Z',
-    summary: fixture.summary,
-    memoryScratchpad: fixture.memoryScratchpad,
-    ...(fixture.kind ? { kind: fixture.kind } : {}),
-    messages,
-  });
-}
-
 function buildJsonlSession(fixture: SessionFixture): string {
   const metadata = {
     sessionId: fixture.sessionId ?? 'session-id',
@@ -177,8 +156,8 @@ describe('sessionSummaryUtils', () => {
     it('should return null if most recent session already has summary metadata', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({
           userMessageCount: 5,
           summary: 'Existing summary',
           memoryScratchpad: {
@@ -196,8 +175,8 @@ describe('sessionSummaryUtils', () => {
     it('should return path if most recent session has summary but no scratchpad', async () => {
       const filePath = await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({
           userMessageCount: 5,
           summary: 'Existing summary',
         }),
@@ -211,8 +190,8 @@ describe('sessionSummaryUtils', () => {
     it('should return null if most recent session has scratchpad but no summary', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({
           userMessageCount: 5,
           memoryScratchpad: {
             version: 1,
@@ -229,8 +208,8 @@ describe('sessionSummaryUtils', () => {
     it('should return null if most recent session has 1 or fewer user messages', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({ userMessageCount: 1 }),
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({ userMessageCount: 1 }),
       );
 
       const result = await getPreviousSession(mockConfig);
@@ -241,8 +220,8 @@ describe('sessionSummaryUtils', () => {
     it('should return path if most recent session has more than 1 user message and no summary', async () => {
       const filePath = await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({ userMessageCount: 2 }),
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({ userMessageCount: 2 }),
       );
 
       const result = await getPreviousSession(mockConfig);
@@ -253,16 +232,16 @@ describe('sessionSummaryUtils', () => {
     it('should select most recently updated session', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-older000.json',
-        buildLegacySessionJson({
+        'session-2024-01-01T10-00-older000.jsonl',
+        buildJsonlSession({
           userMessageCount: 2,
           lastUpdated: '2024-01-01T10:00:00Z',
         }),
       );
       const newerPath = await writeSession(
         chatsDir,
-        'session-2024-01-02T10-00-newer000.json',
-        buildLegacySessionJson({
+        'session-2024-01-02T10-00-newer000.jsonl',
+        buildJsonlSession({
           userMessageCount: 2,
           lastUpdated: '2024-01-02T10:00:00Z',
         }),
@@ -276,7 +255,7 @@ describe('sessionSummaryUtils', () => {
     it('should ignore corrupted session files', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
+        'session-2024-01-01T10-00-abc12345.jsonl',
         'invalid json',
       );
 
@@ -395,28 +374,11 @@ describe('sessionSummaryUtils', () => {
       await expect(generateSummary(mockConfig)).resolves.not.toThrow();
     });
 
-    it('should generate and save summary for legacy JSON sessions', async () => {
-      const lastUpdated = '2024-01-01T10:00:00Z';
-      const filePath = await writeSession(
-        chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({ userMessageCount: 2, lastUpdated }),
-      );
-
-      await generateSummary(mockConfig);
-
-      expect(mockGenerateSummary).toHaveBeenCalledTimes(1);
-      const written = JSON.parse(await fs.readFile(filePath, 'utf-8'));
-      expect(written.summary).toBe('Add dark mode to the app');
-      expect(written.memoryScratchpad).toEqual({ version: 1 });
-      expect(written.lastUpdated).toBe(lastUpdated);
-    });
-
     it('should handle errors gracefully without throwing', async () => {
       await writeSession(
         chatsDir,
-        'session-2024-01-01T10-00-abc12345.json',
-        buildLegacySessionJson({ userMessageCount: 2 }),
+        'session-2024-01-01T10-00-abc12345.jsonl',
+        buildJsonlSession({ userMessageCount: 2 }),
       );
       mockGenerateSummary.mockRejectedValue(new Error('API Error'));
 

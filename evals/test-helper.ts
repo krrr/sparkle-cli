@@ -146,10 +146,14 @@ export async function internalEvalTest(evalCase: EvalCase) {
             .toISOString()
             .slice(0, 16)
             .replace(/:/g, '-');
-          const filename = `${SESSION_FILE_PREFIX}${timestamp}-${sessionId.slice(0, 8)}.json`;
+          const filename = `${SESSION_FILE_PREFIX}${timestamp}-${sessionId.slice(0, 8)}.jsonl`;
+          const { messages, ...metadata } = conversation;
           fs.writeFileSync(
             path.join(chatsDir, filename),
-            JSON.stringify(conversation, null, 2),
+            [
+              JSON.stringify(metadata),
+              ...messages.map((message) => JSON.stringify(message)),
+            ].join('\n') + '\n',
           );
         } catch (e) {
           // Storage initialization may fail in some environments; log and continue.
