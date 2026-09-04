@@ -33,7 +33,6 @@ export interface Settings {
     core?: string[];
   };
   telemetry?: TelemetrySettings;
-  showMemoryUsage?: boolean;
   checkpointing?: CheckpointingSettings;
   folderTrust?: boolean;
   general?: {

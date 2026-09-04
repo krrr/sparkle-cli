@@ -174,13 +174,11 @@ describe('Settings Repro', () => {
         accessibility: {
           screenReader: false,
         },
-        showMemoryUsage: true,
         showStatusInTitle: true,
         showCitations: true,
         useInkScrolling: true,
         footer: {
-          hideContextPercentage: false,
-          hideModelInfo: false,
+          items: ['workspace', 'model-name'],
         },
       },
       useWriteTodos: true,

@@ -124,8 +124,7 @@ describe('settings-validation', () => {
           theme: 'dark',
           hideWindowTitle: true,
           footer: {
-            hideCWD: false,
-            hideModelInfo: true,
+            items: ['workspace', 'model-name'],
           },
         },
         tools: {

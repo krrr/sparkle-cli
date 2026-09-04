@@ -5,96 +5,28 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  deriveItemsFromLegacySettings,
-  resolveFooterState,
-} from './footerItems.js';
+import { DEFAULT_ITEMS, resolveFooterState } from './footerItems.js';
 import { createMockSettings } from '../test-utils/settings.js';
 
 describe('footerItems', () => {
-  describe('deriveItemsFromLegacySettings', () => {
-    it('returns defaults when no legacy settings are customized', () => {
-      const settings = createMockSettings({
-        ui: { footer: { hideContextPercentage: true } },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).toEqual([
-        'workspace',
-        'git-branch',
-        'sandbox',
-        'model-name',
-      ]);
-    });
+  describe('resolveFooterState', () => {
+    it('defaults to DEFAULT_ITEMS when ui.footer.items is unset', () => {
+      const settings = createMockSettings({}).merged;
 
-    it('removes workspace when hideCWD is true', () => {
-      const settings = createMockSettings({
-        ui: { footer: { hideCWD: true, hideContextPercentage: true } },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).not.toContain('workspace');
-    });
-
-    it('removes sandbox when hideSandboxStatus is true', () => {
-      const settings = createMockSettings({
-        ui: {
-          footer: { hideSandboxStatus: true, hideContextPercentage: true },
-        },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).not.toContain('sandbox');
-    });
-
-    it('removes model-name and context-used when hideModelInfo is true', () => {
-      const settings = createMockSettings({
-        ui: { footer: { hideModelInfo: true, hideContextPercentage: true } },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).not.toContain('model-name');
-      expect(items).not.toContain('context-used');
-    });
-
-    it('includes context-used when hideContextPercentage is false', () => {
-      const settings = createMockSettings({
-        ui: { footer: { hideContextPercentage: false } },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).toContain('context-used');
-      // Should be after model-name
-      const modelIdx = items.indexOf('model-name');
-      const contextIdx = items.indexOf('context-used');
-      expect(contextIdx).toBe(modelIdx + 1);
-    });
-
-    it('includes memory-usage when showMemoryUsage is true', () => {
-      const settings = createMockSettings({
-        ui: { showMemoryUsage: true, footer: { hideContextPercentage: true } },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).toContain('memory-usage');
-    });
-
-    it('handles combination of settings', () => {
-      const settings = createMockSettings({
-        ui: {
-          showMemoryUsage: true,
-          footer: {
-            hideCWD: true,
-            hideModelInfo: true,
-            hideContextPercentage: false,
-          },
-        },
-      }).merged;
-      const items = deriveItemsFromLegacySettings(settings);
-      expect(items).toEqual([
-        'git-branch',
-        'sandbox',
+      const state = resolveFooterState(settings);
+      expect(state.orderedIds).toEqual([
+        ...DEFAULT_ITEMS,
         'context-used',
         'memory-usage',
+        'session-id',
+        'hostname',
+        'provider',
+        'code-changes',
+        'token-count',
       ]);
+      expect(state.selectedIds).toEqual(new Set(DEFAULT_ITEMS));
     });
-  });
 
-  describe('resolveFooterState', () => {
     it('filters out provider item when showProviderInfo is false', () => {
       const settings = createMockSettings({
         ui: {
@@ -152,41 +84,11 @@ describe('footerItems', () => {
       expect(state.selectedIds.has('provider')).toBe(true);
     });
 
-    it('includes context-used in selectedIds when hideContextPercentage is false and items is undefined', () => {
-      const settings = createMockSettings({
-        ui: {
-          footer: {
-            hideContextPercentage: false,
-          },
-        },
-      }).merged;
-
-      const state = resolveFooterState(settings);
-      expect(state.selectedIds.has('context-used')).toBe(true);
-      expect(state.orderedIds).toContain('context-used');
-    });
-
-    it('does not include context-used in selectedIds when hideContextPercentage is true (default)', () => {
-      const settings = createMockSettings({
-        ui: {
-          footer: {
-            hideContextPercentage: true,
-          },
-        },
-      }).merged;
-
-      const state = resolveFooterState(settings);
-      expect(state.selectedIds.has('context-used')).toBe(false);
-      // context-used should still be in orderedIds (as unselected)
-      expect(state.orderedIds).toContain('context-used');
-    });
-
-    it('persisted items array takes precedence over hideContextPercentage', () => {
+    it('respects persisted items array', () => {
       const settings = createMockSettings({
         ui: {
           footer: {
             items: ['workspace', 'model-name'],
-            hideContextPercentage: false,
           },
         },
       }).merged;

@@ -26,8 +26,8 @@ import { useVimMode } from '../contexts/VimModeContext.js';
 import { useInputState } from '../contexts/InputContext.js';
 import {
   ALL_ITEMS,
+  DEFAULT_ITEMS,
   type FooterItemId,
-  deriveItemsFromLegacySettings,
 } from '../../config/footerItems.js';
 import { isDevelopment } from '../../utils/installationInfo.js';
 
@@ -213,9 +213,7 @@ export const Footer: React.FC = () => {
     (isFullErrorVerbosity || debugMode || isDevelopment);
   const displayVimMode = vimEnabled ? vimMode : undefined;
 
-  const items =
-    settings.merged.ui.footer.items ??
-    deriveItemsFromLegacySettings(settings.merged);
+  const items = settings.merged.ui.footer.items ?? DEFAULT_ITEMS;
   const showLabels = settings.merged.ui.footer.showLabels !== false;
   const itemColor = showLabels ? theme.text.primary : theme.ui.comment;
 

@@ -92,7 +92,7 @@ describe('loadSettings', () => {
 
   it('should load other top-level settings correctly', () => {
     const settings = {
-      showMemoryUsage: true,
+      folderTrust: true,
       tools: {
         core: ['tool1', 'tool2'],
       },
@@ -109,7 +109,7 @@ describe('loadSettings', () => {
     fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(settings));
 
     const result = loadSettings(mockWorkspaceDir);
-    expect(result.showMemoryUsage).toBe(true);
+    expect(result.folderTrust).toBe(true);
     expect(result.tools?.core).toEqual(['tool1', 'tool2']);
     expect(result.mcpServers).toHaveProperty('server1');
     expect(result.fileFiltering?.respectGitIgnore).toBe(true);
@@ -129,7 +129,7 @@ describe('loadSettings', () => {
 
   it('should overwrite top-level settings from workspace (shallow merge)', () => {
     const userSettings = {
-      showMemoryUsage: false,
+      folderTrust: false,
       fileFiltering: {
         respectGitIgnore: true,
         enableRecursiveFileSearch: true,
@@ -138,7 +138,7 @@ describe('loadSettings', () => {
     fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
     const workspaceSettings = {
-      showMemoryUsage: true,
+      folderTrust: true,
       fileFiltering: {
         respectGitIgnore: false,
       },
@@ -151,7 +151,7 @@ describe('loadSettings', () => {
 
     const result = loadSettings(mockWorkspaceDir, true);
     // Primitive value overwritten
-    expect(result.showMemoryUsage).toBe(true);
+    expect(result.folderTrust).toBe(true);
 
     // Object value completely replaced (shallow merge behavior)
     expect(result.fileFiltering?.respectGitIgnore).toBe(false);
@@ -160,10 +160,10 @@ describe('loadSettings', () => {
 
   describe('security', () => {
     it('should NOT load workspace settings if workspace is NOT trusted', () => {
-      const userSettings = { showMemoryUsage: false };
+      const userSettings = { folderTrust: false };
       fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
-      const workspaceSettings = { showMemoryUsage: true };
+      const workspaceSettings = { folderTrust: true };
       const workspaceSettingsPath = path.join(
         mockGeminiWorkspaceDir,
         'settings.json',
@@ -175,7 +175,7 @@ describe('loadSettings', () => {
 
       // checkPathTrust is mocked to return isTrusted: false by default
       const result = loadSettings(mockWorkspaceDir);
-      expect(result.showMemoryUsage).toBe(false);
+      expect(result.folderTrust).toBe(false);
     });
 
     it('should load workspace settings if workspace IS trusted', () => {
@@ -183,10 +183,10 @@ describe('loadSettings', () => {
         isTrusted: true,
         source: 'file',
       });
-      const userSettings = { showMemoryUsage: false };
+      const userSettings = { folderTrust: false };
       fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
-      const workspaceSettings = { showMemoryUsage: true };
+      const workspaceSettings = { folderTrust: true };
       const workspaceSettingsPath = path.join(
         mockGeminiWorkspaceDir,
         'settings.json',
@@ -197,7 +197,7 @@ describe('loadSettings', () => {
       );
 
       const result = loadSettings(mockWorkspaceDir);
-      expect(result.showMemoryUsage).toBe(true);
+      expect(result.folderTrust).toBe(true);
     });
 
     it('should NOT allow workspace settings to override policyPaths even if trusted', () => {
@@ -212,7 +212,7 @@ describe('loadSettings', () => {
 
       const workspaceSettings = {
         policyPaths: ['./malicious/user'],
-        showMemoryUsage: true,
+        folderTrust: true,
       };
       const workspaceSettingsPath = path.join(
         mockGeminiWorkspaceDir,
@@ -224,7 +224,7 @@ describe('loadSettings', () => {
       );
 
       const result = loadSettings(mockWorkspaceDir);
-      expect(result.showMemoryUsage).toBe(true);
+      expect(result.folderTrust).toBe(true);
       expect(result.policyPaths).toEqual(['/trusted/user']);
     });
   });

@@ -411,34 +411,6 @@
               "markdownDescription": "Display a second line above the footer items with descriptive headers (e.g., /model).\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `true`",
               "default": true,
               "type": "boolean"
-            },
-            "hideCWD": {
-              "title": "Hide CWD",
-              "description": "Hide the current working directory in the footer.",
-              "markdownDescription": "Hide the current working directory in the footer.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `false`",
-              "default": false,
-              "type": "boolean"
-            },
-            "hideSandboxStatus": {
-              "title": "Hide Sandbox Status",
-              "description": "Hide the sandbox status indicator in the footer.",
-              "markdownDescription": "Hide the sandbox status indicator in the footer.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `false`",
-              "default": false,
-              "type": "boolean"
-            },
-            "hideModelInfo": {
-              "title": "Hide Model Info",
-              "description": "Hide the model name and context usage in the footer.",
-              "markdownDescription": "Hide the model name and context usage in the footer.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `false`",
-              "default": false,
-              "type": "boolean"
-            },
-            "hideContextPercentage": {
-              "title": "Hide Context Window Percentage",
-              "description": "Hides the context window usage percentage.",
-              "markdownDescription": "Hides the context window usage percentage.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `true`",
-              "default": true,
-              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -455,13 +427,6 @@
           "description": "Whether to collapse the UI drawer when a tool is awaiting confirmation.",
           "markdownDescription": "Whether to collapse the UI drawer when a tool is awaiting confirmation.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `true`",
           "default": true,
-          "type": "boolean"
-        },
-        "showMemoryUsage": {
-          "title": "Show Memory Usage",
-          "description": "Display memory usage information in the UI",
-          "markdownDescription": "Display memory usage information in the UI\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `false`",
-          "default": false,
           "type": "boolean"
         },
         "showLineNumbers": {

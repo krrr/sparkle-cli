@@ -682,7 +682,6 @@ export const renderWithProviders = async (
     config ||
     makeFakeConfig({
       useAlternateBuffer: settings.merged.ui?.useAlternateBuffer,
-      showMemoryUsage: settings.merged.ui?.showMemoryUsage,
       accessibility: settings.merged.ui?.accessibility,
     });
 

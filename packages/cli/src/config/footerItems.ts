@@ -80,35 +80,15 @@ export const DEFAULT_ORDER = [
   'token-count',
 ];
 
-export function deriveItemsFromLegacySettings(
-  settings: MergedSettings,
-): string[] {
-  const defaults = ['workspace', 'git-branch', 'sandbox', 'model-name'];
-  const items = [...defaults];
-
-  const remove = (arr: string[], id: string) => {
-    const idx = arr.indexOf(id);
-    if (idx !== -1) arr.splice(idx, 1);
-  };
-
-  if (settings.ui.footer.hideCWD) remove(items, 'workspace');
-  if (settings.ui.footer.hideSandboxStatus) remove(items, 'sandbox');
-  if (settings.ui.footer.hideModelInfo) {
-    remove(items, 'model-name');
-    remove(items, 'context-used');
-  }
-  if (
-    !settings.ui.footer.hideContextPercentage &&
-    !items.includes('context-used')
-  ) {
-    const modelIdx = items.indexOf('model-name');
-    if (modelIdx !== -1) items.splice(modelIdx + 1, 0, 'context-used');
-    else items.push('context-used');
-  }
-  if (settings.ui.showMemoryUsage) items.push('memory-usage');
-
-  return items;
-}
+/**
+ * Items shown when the user has not configured `ui.footer.items`.
+ */
+export const DEFAULT_ITEMS = [
+  'workspace',
+  'git-branch',
+  'sandbox',
+  'model-name',
+];
 
 const VALID_IDS: Set<string> = new Set(ALL_ITEMS.map((i) => i.id));
 
@@ -125,9 +105,9 @@ export function resolveFooterState(settings: MergedSettings): {
     ? VALID_IDS
     : new Set([...VALID_IDS].filter((id) => id !== 'provider'));
 
-  const source = (
-    settings.ui?.footer?.items ?? deriveItemsFromLegacySettings(settings)
-  ).filter((id: string) => filteredValidIds.has(id));
+  const source = (settings.ui?.footer?.items ?? DEFAULT_ITEMS).filter(
+    (id: string) => filteredValidIds.has(id),
+  );
 
   const others = DEFAULT_ORDER.filter(
     (id) => !source.includes(id) && filteredValidIds.has(id),

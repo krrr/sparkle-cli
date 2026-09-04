@@ -322,7 +322,6 @@ describe('useGeminiStream', () => {
     geminiMdFileCount: 0,
     alwaysSkipModificationConfirmation: false,
     vertexai: false,
-    showMemoryUsage: false,
     contextFileName: undefined,
     storage: {
       getProjectTempDir: vi.fn(() => '/test/temp'),

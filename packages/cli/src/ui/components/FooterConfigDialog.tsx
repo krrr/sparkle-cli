@@ -13,11 +13,7 @@ import { useUIState } from '../contexts/UIStateContext.js';
 import { useKeypress, type Key } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { FooterRow, type FooterRowItem } from './Footer.js';
-import {
-  ALL_ITEMS,
-  resolveFooterState,
-  deriveItemsFromLegacySettings,
-} from '../../config/footerItems.js';
+import { ALL_ITEMS, resolveFooterState } from '../../config/footerItems.js';
 import { SettingScope } from '../../config/settings.js';
 import { BaseSelectionList } from './shared/BaseSelectionList.js';
 import type { SelectionListItem } from '../hooks/useSelectionList.js';
@@ -141,12 +137,7 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
   const handleSaveAndClose = useCallback(() => {
     const finalItems = orderedIds.filter((id: string) => selectedIds.has(id));
     const currentSetting = settings.merged.ui?.footer?.items;
-    // When items haven't been explicitly set yet (legacy mode), compare against
-    // the legacy-derived items to avoid persisting items and silently overriding
-    // legacy boolean settings like hideContextPercentage.
-    const effectiveCurrent =
-      currentSetting ?? deriveItemsFromLegacySettings(settings.merged);
-    if (JSON.stringify(finalItems) !== JSON.stringify(effectiveCurrent)) {
+    if (JSON.stringify(finalItems) !== JSON.stringify(currentSetting)) {
       setSetting(SettingScope.User, 'ui.footer.items', finalItems);
     }
     onClose?.();
@@ -214,7 +205,7 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
     if (focusKey === 'reset') {
       return (
         <Text color={theme.ui.comment} italic>
-          Default footer (uses legacy settings)
+          Default footer
         </Text>
       );
     }

@@ -570,7 +570,6 @@ export interface ConfigParameters {
   geminiMdFileCount?: number;
   geminiMdFilePaths?: string[];
   approvalMode?: ApprovalMode;
-  showMemoryUsage?: boolean;
   contextFileName?: string | string[];
   accessibility?: AccessibilitySettings;
   telemetry?: TelemetrySettings;
@@ -740,7 +739,6 @@ export class Config implements McpContext, AgentLoopContext {
   private userMemory: string | HierarchicalMemory;
   private geminiMdFileCount: number;
   private geminiMdFilePaths: string[];
-  private readonly showMemoryUsage: boolean;
   private readonly logRagSnippets: boolean;
   private readonly accessibility: AccessibilitySettings;
   private readonly telemetrySettings: TelemetrySettings;
@@ -979,7 +977,6 @@ export class Config implements McpContext, AgentLoopContext {
     this.userMemory = params.userMemory ?? '';
     this.geminiMdFileCount = params.geminiMdFileCount ?? 0;
     this.geminiMdFilePaths = params.geminiMdFilePaths ?? [];
-    this.showMemoryUsage = params.showMemoryUsage ?? false;
     this.logRagSnippets = params.logRagSnippets ?? false;
     this.accessibility = params.accessibility ?? {};
     this.telemetrySettings = {
@@ -2336,10 +2333,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   clearPendingIncludeDirectories(): void {
     this.pendingIncludeDirectories = [];
-  }
-
-  getShowMemoryUsage(): boolean {
-    return this.showMemoryUsage;
   }
 
   getAccessibility(): AccessibilitySettings {

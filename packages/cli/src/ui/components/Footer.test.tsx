@@ -248,7 +248,13 @@ describe('<Footer />', () => {
       settings: createMockSettings({
         ui: {
           footer: {
-            hideContextPercentage: false,
+            items: [
+              'workspace',
+              'git-branch',
+              'sandbox',
+              'model-name',
+              'context-used',
+            ],
           },
         },
       }),
@@ -266,7 +272,13 @@ describe('<Footer />', () => {
       settings: createMockSettings({
         ui: {
           footer: {
-            hideContextPercentage: false,
+            items: [
+              'workspace',
+              'git-branch',
+              'sandbox',
+              'model-name',
+              'context-used',
+            ],
           },
         },
       }),
@@ -357,7 +369,13 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideContextPercentage: false,
+              items: [
+                'workspace',
+                'git-branch',
+                'sandbox',
+                'model-name',
+                'context-used',
+              ],
             },
           },
         }),
@@ -376,9 +394,7 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideCWD: true,
-              hideSandboxStatus: true,
-              hideModelInfo: true,
+              items: [],
             },
           },
         }),
@@ -399,9 +415,7 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideCWD: false,
-              hideSandboxStatus: false,
-              hideModelInfo: true,
+              items: ['workspace', 'sandbox'],
             },
           },
         }),
@@ -418,9 +432,7 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideCWD: true,
-              hideSandboxStatus: false,
-              hideModelInfo: true,
+              items: ['sandbox'],
             },
           },
         }),
@@ -431,7 +443,7 @@ describe('<Footer />', () => {
       unmount();
     });
 
-    it('hides the context percentage when hideContextPercentage is true', async () => {
+    it('hides the context percentage when context-used is not in items', async () => {
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
@@ -439,7 +451,7 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideContextPercentage: true,
+              items: ['workspace', 'git-branch', 'sandbox', 'model-name'],
             },
           },
         }),
@@ -448,7 +460,7 @@ describe('<Footer />', () => {
       expect(lastFrame()).not.toMatch(/\d+% used/);
       unmount();
     });
-    it('shows the context percentage when hideContextPercentage is false', async () => {
+    it('shows the context percentage when context-used is in items', async () => {
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
@@ -456,7 +468,13 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideContextPercentage: false,
+              items: [
+                'workspace',
+                'git-branch',
+                'sandbox',
+                'model-name',
+                'context-used',
+              ],
             },
           },
         }),
@@ -473,7 +491,13 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              hideContextPercentage: false,
+              items: [
+                'workspace',
+                'git-branch',
+                'sandbox',
+                'model-name',
+                'context-used',
+              ],
             },
           },
         }),

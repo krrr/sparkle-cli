@@ -312,7 +312,6 @@ export async function loadConfig(
     coreTools: settings.tools?.core || undefined,
     excludeTools: settings.tools?.exclude || undefined,
     allowedTools: settings.tools?.allowed || undefined,
-    showMemoryUsage: settings.showMemoryUsage || false,
     approvalMode,
     policyEngineConfig,
     mcpServers: settings.mcpServers,

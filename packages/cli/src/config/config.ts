@@ -938,7 +938,6 @@ export async function loadCliConfig(
     enableEnvironmentVariableRedaction:
       settings.security?.environmentVariableRedaction?.enabled,
     approvalMode,
-    showMemoryUsage: settings.ui?.showMemoryUsage || false,
     accessibility: {
       ...settings.ui?.accessibility,
       screenReader,

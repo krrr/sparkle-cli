@@ -341,7 +341,6 @@ describe('Composer', () => {
       const settings = createMockSettings({
         ui: {
           hideFooter: false,
-          showMemoryUsage: true,
         },
       });
       // Mock vim mode for this test
@@ -768,7 +767,7 @@ describe('Composer', () => {
       });
       const settings = createMockSettings({
         ui: {
-          footer: { hideContextPercentage: false },
+          footer: { items: ['model-name', 'context-used'] },
         },
       });
 

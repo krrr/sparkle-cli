@@ -495,7 +495,6 @@ describe('AppContainer State Management', () => {
       hideBanner: false,
       hideTips: false,
       hideFooter: false,
-      showMemoryUsage: false,
       theme: 'default',
       ui: {
         showStatusInTitle: false,
@@ -974,7 +973,6 @@ describe('AppContainer State Management', () => {
         hideBanner: true,
         hideTips: true,
         hideFooter: true,
-        showMemoryUsage: false,
       });
 
       const { unmount } = await act(async () =>
@@ -985,9 +983,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('handles settings with memory usage enabled', async () => {
-      const settingsWithMemory = createMockSettings({
-        showMemoryUsage: true,
-      });
+      const settingsWithMemory = createMockSettings({});
 
       const { unmount } = await act(async () =>
         renderAppContainer({ settings: settingsWithMemory }),

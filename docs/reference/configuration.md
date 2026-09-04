@@ -354,26 +354,6 @@ their corresponding top-level category object in your `settings.json` file.
     descriptive headers (e.g., /model).
   - **Default:** `true`
 
-- **`ui.footer.hideCWD`** (boolean):
-
-  - **Description:** Hide the current working directory in the footer.
-  - **Default:** `false`
-
-- **`ui.footer.hideSandboxStatus`** (boolean):
-
-  - **Description:** Hide the sandbox status indicator in the footer.
-  - **Default:** `false`
-
-- **`ui.footer.hideModelInfo`** (boolean):
-
-  - **Description:** Hide the model name and context usage in the footer.
-  - **Default:** `false`
-
-- **`ui.footer.hideContextPercentage`** (boolean):
-
-  - **Description:** Hides the context window usage percentage.
-  - **Default:** `true`
-
 - **`ui.hideFooter`** (boolean):
 
   - **Description:** Hide the footer from the UI
@@ -384,11 +364,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Description:** Whether to collapse the UI drawer when a tool is awaiting
     confirmation.
   - **Default:** `true`
-
-- **`ui.showMemoryUsage`** (boolean):
-
-  - **Description:** Display memory usage information in the UI
-  - **Default:** `false`
 
 - **`ui.showLineNumbers`** (boolean):
 

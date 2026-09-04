@@ -99,7 +99,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getSystemInstructionMemory: vi.fn().mockReturnValue(''),
     getSessionMemory: vi.fn().mockReturnValue(''),
     getGeminiMdFilePaths: vi.fn().mockReturnValue([]),
-    getShowMemoryUsage: vi.fn().mockReturnValue(false),
     getAccessibility: vi.fn().mockReturnValue({}),
     getTelemetryEnabled: vi.fn().mockReturnValue(false),
     getTelemetryLogPromptsEnabled: vi.fn().mockReturnValue(false),
