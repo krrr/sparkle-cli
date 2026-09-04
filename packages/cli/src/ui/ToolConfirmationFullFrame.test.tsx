@@ -141,7 +141,7 @@ describe('Full Terminal Tool Confirmation Snapshot', () => {
             ui: {
               useAlternateBuffer: true,
               theme: 'default',
-              showUserIdentity: false,
+              showProviderInfo: false,
               showShortcutsHint: false,
               footer: {
                 hideContextPercentage: false,

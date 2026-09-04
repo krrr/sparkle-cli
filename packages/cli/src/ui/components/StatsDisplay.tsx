@@ -228,7 +228,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   const computed = computeSessionStats(metrics);
   const settings = useSettings();
 
-  const showUserIdentity = settings.merged.ui.showUserIdentity;
+  const showProviderInfo = settings.merged.ui.showProviderInfo;
 
   const successThresholds = {
     green: TOOL_SUCCESS_RATE_HIGH,
@@ -270,7 +270,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         <StatRow title="Session ID:">
           <Text color={theme.text.primary}>{stats.sessionId}</Text>
         </StatRow>
-        {showUserIdentity && selectedAuthType && (
+        {showProviderInfo && selectedAuthType && (
           <StatRow title="Provider Type:">
             <Text color={theme.text.primary}>{selectedAuthType}</Text>
           </StatRow>

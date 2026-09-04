@@ -48,9 +48,9 @@ export const ALL_ITEMS = [
     description: 'Current machine hostname',
   },
   {
-    id: 'auth',
-    header: '/auth',
-    description: 'Current authentication info',
+    id: 'provider',
+    header: '/provider',
+    description: 'Current provider info',
   },
   {
     id: 'code-changes',
@@ -75,7 +75,7 @@ export const DEFAULT_ORDER = [
   'memory-usage',
   'session-id',
   'hostname',
-  'auth',
+  'provider',
   'code-changes',
   'token-count',
 ];
@@ -120,10 +120,10 @@ export function resolveFooterState(settings: MergedSettings): {
   orderedIds: string[];
   selectedIds: Set<string>;
 } {
-  const showUserIdentity = settings.ui?.showUserIdentity !== false;
-  const filteredValidIds = showUserIdentity
+  const showProviderInfo = settings.ui?.showProviderInfo !== false;
+  const filteredValidIds = showProviderInfo
     ? VALID_IDS
-    : new Set([...VALID_IDS].filter((id) => id !== 'auth'));
+    : new Set([...VALID_IDS].filter((id) => id !== 'provider'));
 
   const source = (
     settings.ui?.footer?.items ?? deriveItemsFromLegacySettings(settings)

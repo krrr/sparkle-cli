@@ -49,7 +49,7 @@ run through this checklist on the release candidate:
 
 - **Authentication:**
 
-  - [ ] In interactive mode, run `/auth` and verify the sign-in flow works:
+  - [ ] In interactive mode, run `/provider` and verify the sign-in flow works:
     - [ ] API Key
 
 - **Basic prompting:**

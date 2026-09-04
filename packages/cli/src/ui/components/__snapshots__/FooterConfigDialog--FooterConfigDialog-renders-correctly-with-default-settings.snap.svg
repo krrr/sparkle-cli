@@ -84,10 +84,10 @@
     <text x="891" y="359" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="0" y="376" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="45" y="376" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs">[ ]</text>
-    <text x="72" y="376" fill="#ffffff" textLength="45" lengthAdjust="spacingAndGlyphs"> auth</text>
+    <text x="72" y="376" fill="#ffffff" textLength="81" lengthAdjust="spacingAndGlyphs"> provider</text>
     <text x="891" y="376" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="0" y="393" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
-    <text x="45" y="393" fill="#afafaf" textLength="252" lengthAdjust="spacingAndGlyphs"> Current authentication info</text>
+    <text x="45" y="393" fill="#afafaf" textLength="198" lengthAdjust="spacingAndGlyphs"> Current provider info</text>
     <text x="891" y="393" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="0" y="410" fill="#333333" textLength="9" lengthAdjust="spacingAndGlyphs">│</text>
     <text x="45" y="410" fill="#afafaf" textLength="27" lengthAdjust="spacingAndGlyphs">[ ]</text>

@@ -46,7 +46,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 
   const { models } = stats.metrics;
   const settings = useSettings();
-  const showUserIdentity = settings.merged.ui.showUserIdentity;
+  const showProviderInfo = settings.merged.ui.showProviderInfo;
   const activeModels = Object.entries(models).filter(
     ([, metrics]) => metrics.api.totalRequests > 0,
   );
@@ -338,7 +338,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
       </Text>
       <Box height={1} />
 
-      {showUserIdentity && selectedAuthType && (
+      {showProviderInfo && selectedAuthType && (
         <Box>
           <Box width={28}>
             <Text color={theme.text.link}>Provider:</Text>
@@ -346,7 +346,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
           <Text color={theme.text.primary}>{selectedAuthType}</Text>
         </Box>
       )}
-      {showUserIdentity && <Box height={1} />}
+      {showProviderInfo && <Box height={1} />}
 
       <Table data={rows} columns={columns} />
     </Box>

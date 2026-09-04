@@ -613,11 +613,14 @@ describe('<Footer />', () => {
   });
 
   describe('Footer Custom Items', () => {
-    it('renders auth item with auth type', async () => {
+    it('renders provider item with provider name', async () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
           authType: ProviderType.USE_GEMINI,
+        }),
+        getProviderProfileService: () => ({
+          getActiveProfile: () => ({ id: 'my-provider' }),
         }),
       } as unknown as Config;
 
@@ -631,18 +634,50 @@ describe('<Footer />', () => {
         settings: createMockSettings({
           ui: {
             footer: {
-              items: ['auth'],
+              items: ['provider'],
             },
           },
         }),
       });
 
-      expect(lastFrame()).toContain('auth');
+      expect(lastFrame()).toContain('provider');
+      expect(lastFrame()).toContain('my-provider');
+      unmount();
+    });
+
+    it('falls back to auth type when no active provider profile exists', async () => {
+      const authConfig = {
+        ...mockConfigPlain,
+        getContentGeneratorConfig: () => ({
+          authType: ProviderType.USE_GEMINI,
+        }),
+        getProviderProfileService: () => ({
+          getActiveProfile: () => undefined,
+        }),
+      } as unknown as Config;
+
+      const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
+        config: authConfig,
+        width: 120,
+        uiState: {
+          currentModel: 'gemini-pro',
+          sessionStats: mockSessionStats,
+        },
+        settings: createMockSettings({
+          ui: {
+            footer: {
+              items: ['provider'],
+            },
+          },
+        }),
+      });
+
+      expect(lastFrame()).toContain('provider');
       expect(lastFrame()).toContain(ProviderType.USE_GEMINI);
       unmount();
     });
 
-    it('does NOT render auth item when showUserIdentity is false', async () => {
+    it('does NOT render provider item when showProviderInfo is false', async () => {
       const authConfig = {
         ...mockConfigPlain,
         getContentGeneratorConfig: () => ({
@@ -659,9 +694,9 @@ describe('<Footer />', () => {
         },
         settings: createMockSettings({
           ui: {
-            showUserIdentity: false,
+            showProviderInfo: false,
             footer: {
-              items: ['workspace', 'auth'],
+              items: ['workspace', 'provider'],
             },
           },
         }),
@@ -669,8 +704,8 @@ describe('<Footer />', () => {
 
       const output = lastFrame();
       expect(output).toContain('workspace');
-      expect(output).not.toContain('auth');
-      expect(output).not.toContain('test@example.com');
+      expect(output).not.toContain('provider');
+      expect(output).not.toContain('my-provider');
       unmount();
     });
 

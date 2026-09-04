@@ -54,7 +54,7 @@ const renderWithMockedStats = async (
   useSettingsMock.mockReturnValue({
     merged: {
       ui: {
-        showUserIdentity: true,
+        showProviderInfo: true,
       },
     },
   } as unknown as LoadedSettings);
@@ -630,7 +630,7 @@ describe('<ModelStatsDisplay />', () => {
     useSettingsMock.mockReturnValue({
       merged: {
         ui: {
-          showUserIdentity: true,
+          showProviderInfo: true,
         },
       },
     } as unknown as LoadedSettings);

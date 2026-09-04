@@ -117,7 +117,7 @@ export const INFORMATIVE_TIPS = [
   // Keyboard shortcut tips end here
   // Command tips start here
   'Show version info with /about',
-  'Change your authentication method with /auth',
+  'Change your provider with /provider',
   'File a bug report directly with /bug',
   'List your saved chat checkpoints with /resume list',
   'Save your current conversation with /resume save <tag>',

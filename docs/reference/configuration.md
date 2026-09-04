@@ -405,9 +405,9 @@ their corresponding top-level category object in your `settings.json` file.
   - **Description:** Show the model name in the chat for each model turn.
   - **Default:** `false`
 
-- **`ui.showUserIdentity`** (boolean):
+- **`ui.showProviderInfo`** (boolean):
 
-  - **Description:** Show the signed-in user's identity (e.g. email) in the UI.
+  - **Description:** Show the active provider's identity in the UI.
   - **Default:** `true`
 
 - **`ui.useAlternateBuffer`** (boolean):

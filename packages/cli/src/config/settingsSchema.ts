@@ -780,14 +780,13 @@ const SETTINGS_SCHEMA = {
         description: 'Show the model name in the chat for each model turn.',
         showInDialog: true,
       },
-      showUserIdentity: {
+      showProviderInfo: {
         type: 'boolean',
-        label: 'Show User Identity',
+        label: 'Show Provider Info',
         category: 'UI',
         requiresRestart: false,
         default: true,
-        description:
-          "Show the signed-in user's identity (e.g. email) in the UI.",
+        description: "Show the active provider's identity in the UI.",
         showInDialog: true,
       },
       useAlternateBuffer: {

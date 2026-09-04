@@ -37,10 +37,10 @@ Slash commands provide meta-level control over the CLI itself.
       adjust its model, temperature, or execution limits.
     - **Usage:** `/agents config <agent-name>`
 
-### `/auth`
+### `/provider`
 
-- **Description:** Open a dialog that lets you change the authentication method
-  (for example, signing in with a Gemini API key).
+- **Description:** Open a dialog that lets you configure LLM API providers (for
+  example, setting up a Gemini API key profile).
 
 ### `/bug`
 

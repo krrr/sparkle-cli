@@ -361,10 +361,13 @@ export const Footer: React.FC = () => {
         );
         break;
       }
-      case 'auth': {
-        if (!settings.merged.ui.showUserIdentity) break;
-        if (!authType) break;
-        const displayStr = authType;
+      case 'provider': {
+        if (!settings.merged.ui.showProviderInfo) break;
+        const activeProfile = config
+          .getProviderProfileService()
+          ?.getActiveProfile();
+        const displayStr = activeProfile?.id ?? authType;
+        if (!displayStr) break;
         addCol(
           id,
           header,

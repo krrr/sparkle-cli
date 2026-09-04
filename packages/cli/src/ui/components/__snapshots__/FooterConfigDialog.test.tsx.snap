@@ -23,8 +23,8 @@ exports[`<FooterConfigDialog /> > highlights the active item in the preview 1`] 
 │     Unique identifier for the current session                                                    │
 │    [ ] hostname                                                                                  │
 │     Current machine hostname                                                                     │
-│    [ ] auth                                                                                      │
-│     Current authentication info                                                                  │
+│    [ ] provider                                                                                  │
+│     Current provider info                                                                        │
 │  > [✓] code-changes                                                                              │
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │
@@ -68,8 +68,8 @@ exports[`<FooterConfigDialog /> > renders correctly with default settings 1`] = 
 │     Unique identifier for the current session                                                    │
 │    [ ] hostname                                                                                  │
 │     Current machine hostname                                                                     │
-│    [ ] auth                                                                                      │
-│     Current authentication info                                                                  │
+│    [ ] provider                                                                                  │
+│     Current provider info                                                                        │
 │    [ ] code-changes                                                                              │
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │
@@ -114,8 +114,8 @@ exports[`<FooterConfigDialog /> > renders correctly with default settings 2`] = 
 │     Unique identifier for the current session                                                    │
 │    [ ] hostname                                                                                  │
 │     Current machine hostname                                                                     │
-│    [ ] auth                                                                                      │
-│     Current authentication info                                                                  │
+│    [ ] provider                                                                                  │
+│     Current provider info                                                                        │
 │    [ ] code-changes                                                                              │
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │
@@ -159,8 +159,8 @@ exports[`<FooterConfigDialog /> > updates the preview when Show footer labels is
 │     Unique identifier for the current session                                                    │
 │    [ ] hostname                                                                                  │
 │     Current machine hostname                                                                     │
-│    [ ] auth                                                                                      │
-│     Current authentication info                                                                  │
+│    [ ] provider                                                                                  │
+│     Current provider info                                                                        │
 │    [ ] code-changes                                                                              │
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │

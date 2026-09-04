@@ -95,19 +95,19 @@ describe('footerItems', () => {
   });
 
   describe('resolveFooterState', () => {
-    it('filters out auth item when showUserIdentity is false', () => {
+    it('filters out provider item when showProviderInfo is false', () => {
       const settings = createMockSettings({
         ui: {
-          showUserIdentity: false,
+          showProviderInfo: false,
           footer: {
-            items: ['workspace', 'auth', 'model-name'],
+            items: ['workspace', 'provider', 'model-name'],
           },
         },
       }).merged;
 
       const state = resolveFooterState(settings);
-      expect(state.orderedIds).not.toContain('auth');
-      expect(state.selectedIds.has('auth')).toBe(false);
+      expect(state.orderedIds).not.toContain('provider');
+      expect(state.selectedIds.has('provider')).toBe(false);
       // It should also not be in the 'others' part of orderedIds
       expect(state.orderedIds).toEqual([
         'workspace',
@@ -123,33 +123,33 @@ describe('footerItems', () => {
       ]);
     });
 
-    it('includes auth item when showUserIdentity is true', () => {
+    it('includes provider item when showProviderInfo is true', () => {
       const settings = createMockSettings({
         ui: {
-          showUserIdentity: true,
+          showProviderInfo: true,
           footer: {
-            items: ['workspace', 'auth', 'model-name'],
+            items: ['workspace', 'provider', 'model-name'],
           },
         },
       }).merged;
 
       const state = resolveFooterState(settings);
-      expect(state.orderedIds).toContain('auth');
-      expect(state.selectedIds.has('auth')).toBe(true);
+      expect(state.orderedIds).toContain('provider');
+      expect(state.selectedIds.has('provider')).toBe(true);
     });
 
-    it('includes auth item by default when showUserIdentity is undefined (defaults to true)', () => {
+    it('includes provider item by default when showProviderInfo is undefined (defaults to true)', () => {
       const settings = createMockSettings({
         ui: {
           footer: {
-            items: ['workspace', 'auth', 'model-name'],
+            items: ['workspace', 'provider', 'model-name'],
           },
         },
       }).merged;
 
       const state = resolveFooterState(settings);
-      expect(state.orderedIds).toContain('auth');
-      expect(state.selectedIds.has('auth')).toBe(true);
+      expect(state.orderedIds).toContain('provider');
+      expect(state.selectedIds.has('provider')).toBe(true);
     });
 
     it('includes context-used in selectedIds when hideContextPercentage is false and items is undefined', () => {
