@@ -349,10 +349,10 @@ export function geminiConfigToOpenAiConfig(
  * Converts Gemini conversation contents into OpenAI messages, prepending the
  * system instruction if present.
  *
- * - Model turns: assistant messages with text, tool_calls, and (when the
- *   reasoning cache has an entry for the turn's function calls) the cached
- *   reasoning content so DeepSeek-style models can resume their chain of
- *   thought across tool-call rounds.
+ * - Model turns: assistant messages with text, tool_calls, and (for turns
+ *   with tool calls) the turn's own thought parts as `reasoning_content`, so
+ *   DeepSeek-style models can resume their chain of thought across tool-call
+ *   rounds.
  * - User turns: plain text / multimodal user messages, and tool messages for
  *   function response parts.
  */
@@ -446,11 +446,15 @@ function modelContentToOpenAiMessage(
     });
     message.tool_calls = toolCalls;
 
+    // Interleaved thinking support
     // DeepSeek's thinking mode requires the reasoning_content that accompanied
     // a turn's tool calls to be passed back on follow-up requests. Derive it
     // directly from the turn's own thought parts (which are kept in agent
     // history), so no cross-turn cache state is needed. Turns without tool
     // calls is not required to carry reasoning_content.
+    // Zhipu also supports this, but it is optional. It also supports preserved
+    // thinking, returning all thoughts regardless of whether it is a
+    // tool-calling turn.
     const thoughtText = parts
       .filter((part) => part.thought && typeof part.text === 'string')
       .map((part) => part.text)
