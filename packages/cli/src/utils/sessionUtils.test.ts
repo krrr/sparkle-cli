@@ -11,14 +11,18 @@ import {
   formatRelativeTime,
   SessionError,
   convertSessionToHistoryFormats,
+  getAllSessionFiles,
+  getSessionFiles,
 } from './sessionUtils.js';
 import {
   SESSION_FILE_PREFIX,
+  SESSION_INDEX_FILENAME,
   type Storage,
   type MessageRecord,
   CoreToolCallStatus,
 } from 'sparkle-cli-core';
 import * as fs from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
@@ -806,6 +810,198 @@ describe('SessionSelector', () => {
         return true;
       },
     );
+  });
+});
+
+describe('getAllSessionFiles with persistent index', () => {
+  let tmpDir: string;
+  let chatsDir: string;
+
+  beforeEach(async () => {
+    tmpDir = path.join(process.cwd(), '.tmp-test-sessions-index');
+    await fs.mkdir(tmpDir, { recursive: true });
+    chatsDir = path.join(tmpDir, 'chats');
+    await fs.mkdir(chatsDir, { recursive: true });
+  });
+
+  afterEach(async () => {
+    try {
+      await fs.rm(tmpDir, { recursive: true, force: true });
+    } catch {
+      // Ignore cleanup errors
+    }
+  });
+
+  async function writeSessionFile(
+    fileName: string,
+    sessionId: string,
+    messages: Array<Record<string, unknown>>,
+    metadata: Record<string, unknown> = {},
+  ): Promise<void> {
+    const lines = [
+      JSON.stringify({
+        sessionId,
+        projectHash: 'test-hash',
+        startTime: '2024-01-01T10:00:00.000Z',
+        lastUpdated: '2024-01-01T10:30:00.000Z',
+        ...metadata,
+      }),
+      ...messages.map((message) => JSON.stringify(message)),
+    ];
+    await fs.writeFile(path.join(chatsDir, fileName), lines.join('\n') + '\n');
+  }
+
+  const userMessage = (id: string, content: string) => ({
+    id,
+    timestamp: '2024-01-01T10:00:00.000Z',
+    type: 'user',
+    content,
+  });
+
+  const sessionFileName = (sessionId: string) =>
+    `${SESSION_FILE_PREFIX}2024-01-01T10-00-${sessionId.slice(0, 8)}.jsonl`;
+
+  it('writes the index on first load and reuses it on subsequent loads', async () => {
+    const sessionId = randomUUID();
+    await writeSessionFile(sessionFileName(sessionId), sessionId, [
+      userMessage('m1', 'Hello world'),
+    ]);
+
+    const first = await getAllSessionFiles(chatsDir);
+    expect(first).toHaveLength(1);
+    expect(first[0].sessionInfo).not.toBeNull();
+
+    const indexPath = path.join(chatsDir, SESSION_INDEX_FILENAME);
+    const indexAfterFirst = await fs.readFile(indexPath, 'utf-8');
+
+    const second = await getAllSessionFiles(chatsDir);
+    expect(second).toHaveLength(1);
+    expect(second[0].sessionInfo?.id).toBe(sessionId);
+
+    // Cache hit: the index was not rewritten on the second load.
+    const indexAfterSecond = await fs.readFile(indexPath, 'utf-8');
+    expect(indexAfterSecond).toBe(indexAfterFirst);
+  });
+
+  it('re-scans a session whose content changed', async () => {
+    const sessionId = randomUUID();
+    const fileName = sessionFileName(sessionId);
+    await writeSessionFile(fileName, sessionId, [userMessage('m1', 'Hello')]);
+    await getAllSessionFiles(chatsDir);
+
+    await fs.appendFile(
+      path.join(chatsDir, fileName),
+      JSON.stringify(userMessage('m2', 'Second message')) + '\n',
+    );
+
+    const sessions = await getAllSessionFiles(chatsDir);
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].sessionInfo?.messageCount).toBe(2);
+    expect(sessions[0].sessionInfo?.firstUserMessage).toBe('Hello');
+  });
+
+  it('truncates an over-long first user message in the rendered list', async () => {
+    const sessionId = randomUUID();
+    await writeSessionFile(sessionFileName(sessionId), sessionId, [
+      userMessage('m1', 'a'.repeat(300)),
+    ]);
+
+    const sessions = await getSessionFiles(chatsDir);
+
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].firstUserMessage).toBe('a'.repeat(150));
+  });
+
+  it('drops index entries for deleted session files', async () => {
+    const sessionId = randomUUID();
+    const fileName = sessionFileName(sessionId);
+    await writeSessionFile(fileName, sessionId, [userMessage('m1', 'Hello')]);
+    await getAllSessionFiles(chatsDir);
+
+    await fs.unlink(path.join(chatsDir, fileName));
+
+    const sessions = await getAllSessionFiles(chatsDir);
+    expect(sessions).toHaveLength(0);
+
+    const rebuilt = JSON.parse(
+      await fs.readFile(path.join(chatsDir, SESSION_INDEX_FILENAME), 'utf-8'),
+    );
+    expect(Object.keys(rebuilt.sessions)).toHaveLength(0);
+  });
+
+  it('returns null for corrupted files and caches the negative result', async () => {
+    const fileName = sessionFileName(randomUUID());
+    await fs.writeFile(path.join(chatsDir, fileName), 'not valid json\n');
+
+    const first = await getAllSessionFiles(chatsDir);
+    expect(first).toHaveLength(1);
+    expect(first[0].sessionInfo).toBeNull();
+
+    const indexPath = path.join(chatsDir, SESSION_INDEX_FILENAME);
+    const indexAfterFirst = await fs.readFile(indexPath, 'utf-8');
+
+    const second = await getAllSessionFiles(chatsDir);
+    expect(second[0].sessionInfo).toBeNull();
+
+    // The tombstone entry was reused without re-scanning.
+    const indexAfterSecond = await fs.readFile(indexPath, 'utf-8');
+    expect(indexAfterSecond).toBe(indexAfterFirst);
+  });
+
+  it('does not list non-resumable sessions but caches their metadata', async () => {
+    const sessionId = randomUUID();
+    const fileName = sessionFileName(sessionId);
+    await writeSessionFile(fileName, sessionId, [
+      {
+        id: 'm1',
+        timestamp: '2024-01-01T10:00:00.000Z',
+        type: 'info',
+        content: 'Session started',
+      },
+    ]);
+
+    const first = await getAllSessionFiles(chatsDir);
+    expect(first[0].sessionInfo).toBeNull();
+
+    const indexPath = path.join(chatsDir, SESSION_INDEX_FILENAME);
+    const indexAfterFirst = await fs.readFile(indexPath, 'utf-8');
+
+    await getAllSessionFiles(chatsDir);
+    const indexAfterSecond = await fs.readFile(indexPath, 'utf-8');
+    expect(indexAfterSecond).toBe(indexAfterFirst);
+  });
+
+  it('falls back to a full scan and rebuilds a corrupt index', async () => {
+    const sessionId = randomUUID();
+    await writeSessionFile(sessionFileName(sessionId), sessionId, [
+      userMessage('m1', 'Hello world'),
+    ]);
+
+    const indexPath = path.join(chatsDir, SESSION_INDEX_FILENAME);
+    await fs.writeFile(indexPath, 'corrupt', 'utf-8');
+
+    const sessions = await getAllSessionFiles(chatsDir);
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].sessionInfo).not.toBeNull();
+
+    const rebuilt = JSON.parse(await fs.readFile(indexPath, 'utf-8'));
+    expect(rebuilt.version).toBe(1);
+    expect(Object.keys(rebuilt.sessions)).toHaveLength(1);
+  });
+
+  it('bypasses the index in search mode and returns full content', async () => {
+    const sessionId = randomUUID();
+    await writeSessionFile(sessionFileName(sessionId), sessionId, [
+      userMessage('m1', 'Hello world'),
+    ]);
+
+    const sessions = await getSessionFiles(chatsDir, undefined, {
+      includeFullContent: true,
+    });
+
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].fullContent).toBe('Hello world');
+    expect(existsSync(path.join(chatsDir, SESSION_INDEX_FILENAME))).toBe(false);
   });
 });
 

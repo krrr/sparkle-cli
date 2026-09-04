@@ -5,10 +5,15 @@
  */
 
 import {
+  buildSessionIndexEntry,
   checkExhaustive,
   partListUnionToString,
+  readSessionsIndex,
+  writeSessionsIndex,
   SESSION_FILE_PREFIX,
+  SESSION_INDEX_VERSION,
   CoreToolCallStatus,
+  type SessionIndexEntry,
   type Storage,
   type ConversationRecord,
   type MessageRecord,
@@ -232,7 +237,20 @@ export interface GetSessionOptions {
 }
 
 /**
+ * Maximum number of session files scanned concurrently while building the
+ * index. Bounded to avoid a thundering herd of large-file parses on disk.
+ */
+const SCAN_CONCURRENCY_LIMIT = 8;
+
+/**
  * Loads all session files (including corrupted ones) from the chats directory.
+ *
+ * In list mode (default) metadata comes from a persistent sidecar index
+ * (`.sessions-index.json`), which is only refreshed for files whose
+ * size/mtime fingerprint changed since the last scan — avoiding re-parsing
+ * every jsonl file on each open. In search mode (`includeFullContent`) the
+ * index is bypassed and every file is read in full.
+ *
  * @returns Array of session file entries, with sessionInfo null for corrupted files
  */
 export const getAllSessionFiles = async (
@@ -246,95 +264,72 @@ export const getAllSessionFiles = async (
       .filter((f) => f.startsWith(SESSION_FILE_PREFIX) && f.endsWith('.jsonl'))
       .sort(); // Sort by filename, which includes timestamp
 
-    const sessionPromises = sessionFiles.map(
-      async (file): Promise<SessionFileEntry> => {
-        const filePath = path.join(chatsDir, file);
+    // Search mode needs full message content, which the index does not store.
+    if (options.includeFullContent) {
+      return await Promise.all(
+        sessionFiles.map((file) =>
+          scanSessionFile(path.join(chatsDir, file), file, currentSessionId),
+        ),
+      );
+    }
+
+    const stats = await Promise.all(
+      sessionFiles.map(async (file) => {
         try {
-          const content = await loadConversationRecord(filePath, {
-            metadataOnly: !options.includeFullContent,
-          });
-          if (!content) {
-            return { fileName: file, sessionInfo: null };
-          }
-
-          // Validate required fields
-          if (!content.sessionId) {
-            // Missing required fields - treat as corrupted
-            return { fileName: file, sessionInfo: null };
-          }
-
-          const startTime = content.startTime;
-          const lastUpdated = content.lastUpdated;
-
-          // Skip sessions with no resumable conversation content, including
-          // startup-only, system-only, command-only, and internal-context-only
-          // sessions.
-          if (!content.hasResumableContent) {
-            return { fileName: file, sessionInfo: null };
-          }
-
-          // Skip subagent sessions - these are implementation details of a tool call
-          // and shouldn't be surfaced for resumption in the main agent history.
-          if (content.kind === 'subagent') {
-            return { fileName: file, sessionInfo: null };
-          }
-
-          const firstUserMessage = content.firstUserMessage
-            ? cleanMessage(content.firstUserMessage)
-            : extractFirstUserMessage(content.messages);
-          const isCurrentSession = currentSessionId
-            ? file.includes(currentSessionId.slice(0, 8))
-            : false;
-
-          let fullContent: string | undefined;
-          let messages:
-            | Array<{ role: 'user' | 'assistant'; content: string }>
-            | undefined;
-
-          if (options.includeFullContent) {
-            fullContent = content.messages
-              .map((msg) =>
-                partListUnionToString(stripInternalDisplayParts(msg.content)),
-              )
-              .join(' ');
-            messages = content.messages.map((msg) => ({
-              role:
-                msg.type === 'user'
-                  ? ('user' as const)
-                  : ('assistant' as const),
-              content: partListUnionToString(
-                stripInternalDisplayParts(msg.content),
-              ),
-            }));
-          }
-
-          const sessionInfo: SessionInfo = {
-            id: content.sessionId,
-            file: file.replace(/\.jsonl$/, ''),
-            fileName: file,
-            startTime,
-            lastUpdated,
-            messageCount: content.messageCount ?? content.messages.length,
-            displayName: content.summary
-              ? stripUnsafeCharacters(content.summary)
-              : firstUserMessage,
-            firstUserMessage,
-            isCurrentSession,
-            index: 0, // Will be set after sorting valid sessions
-            summary: content.summary,
-            fullContent,
-            messages,
-          };
-
-          return { fileName: file, sessionInfo };
+          return await fs.stat(path.join(chatsDir, file));
         } catch {
-          // File is corrupted (can't read or parse JSON)
+          return null; // File vanished between readdir and stat.
+        }
+      }),
+    );
+
+    const cachedIndex = await readSessionsIndex(chatsDir);
+    const cached = cachedIndex?.sessions ?? {};
+
+    // Rebuild the index from the on-disk state. Entries whose fingerprint
+    // matches are reused as-is; everything else is re-scanned.
+    const next: Record<string, SessionIndexEntry> = {};
+
+    const entries = await mapWithConcurrencyLimit(
+      sessionFiles,
+      async (file, index): Promise<SessionFileEntry> => {
+        const stat = stats[index];
+        if (!stat) {
           return { fileName: file, sessionInfo: null };
         }
+        const cachedEntry = cached[file];
+        let entry: SessionIndexEntry;
+        if (
+          cachedEntry &&
+          cachedEntry.size === stat.size &&
+          cachedEntry.mtimeMs === stat.mtimeMs
+        ) {
+          entry = cachedEntry;
+        } else {
+          entry = await buildSessionIndexEntry(path.join(chatsDir, file), stat);
+        }
+        next[file] = entry;
+        return {
+          fileName: file,
+          sessionInfo: renderSessionInfo(entry, currentSessionId),
+        };
       },
     );
 
-    return await Promise.all(sessionPromises);
+    // Persist only when the index actually changed. A failed write is
+    // non-fatal: the list stays correct and the next load retries.
+    if (JSON.stringify(next) !== JSON.stringify(cached)) {
+      try {
+        await writeSessionsIndex(chatsDir, {
+          version: SESSION_INDEX_VERSION,
+          sessions: next,
+        });
+      } catch {
+        // Index persistence is an optimization; ignore write failures.
+      }
+    }
+
+    return entries;
   } catch (error) {
     // It's expected that the directory might not exist, which is not an error.
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
@@ -343,6 +338,162 @@ export const getAllSessionFiles = async (
     // For other errors (e.g., permissions), re-throw to be handled by the caller.
     throw error;
   }
+};
+
+/**
+ * Renders the listable `SessionInfo` from a (possibly cached) index entry,
+ * applying the same filters as the historical full-scan path: corrupted
+ * files, sessions without resumable content, and subagent sessions are all
+ * excluded.
+ */
+const renderSessionInfo = (
+  entry: SessionIndexEntry,
+  currentSessionId?: string,
+): SessionInfo | null => {
+  const metadata = entry.metadata;
+  if (!metadata) {
+    // Corrupted or unreadable session file.
+    return null;
+  }
+
+  // Skip sessions with no resumable conversation content, including
+  // startup-only, system-only, command-only, and internal-context-only
+  // sessions.
+  if (!metadata.hasResumableContent) {
+    return null;
+  }
+
+  // Skip subagent sessions - these are implementation details of a tool call
+  // and shouldn't be surfaced for resumption in the main agent history.
+  if (metadata.kind === 'subagent') {
+    return null;
+  }
+
+  const firstUserMessage = metadata.firstUserMessage
+    ? cleanMessage(metadata.firstUserMessage)
+    : 'Empty conversation';
+  const isCurrentSession = currentSessionId
+    ? entry.fileName.includes(currentSessionId.slice(0, 8))
+    : false;
+
+  return {
+    id: metadata.sessionId,
+    file: entry.fileName.replace(/\.jsonl$/, ''),
+    fileName: entry.fileName,
+    startTime: metadata.startTime,
+    lastUpdated: metadata.lastUpdated,
+    messageCount: metadata.messageCount,
+    displayName: metadata.summary
+      ? stripUnsafeCharacters(metadata.summary)
+      : firstUserMessage,
+    firstUserMessage,
+    isCurrentSession,
+    index: 0, // Will be set after sorting valid sessions
+    summary: metadata.summary,
+  };
+};
+
+/**
+ * Full-content scan path used by search mode (`includeFullContent`). Loads
+ * every session file in full and builds display entries with searchable
+ * content, mirroring the historical full-scan implementation.
+ */
+const scanSessionFile = async (
+  filePath: string,
+  file: string,
+  currentSessionId?: string,
+): Promise<SessionFileEntry> => {
+  try {
+    const content = await loadConversationRecord(filePath);
+    if (!content) {
+      return { fileName: file, sessionInfo: null };
+    }
+
+    // Validate required fields
+    if (!content.sessionId) {
+      // Missing required fields - treat as corrupted
+      return { fileName: file, sessionInfo: null };
+    }
+
+    const startTime = content.startTime;
+    const lastUpdated = content.lastUpdated;
+
+    // Skip sessions with no resumable conversation content, including
+    // startup-only, system-only, command-only, and internal-context-only
+    // sessions.
+    if (!content.hasResumableContent) {
+      return { fileName: file, sessionInfo: null };
+    }
+
+    // Skip subagent sessions - these are implementation details of a tool call
+    // and shouldn't be surfaced for resumption in the main agent history.
+    if (content.kind === 'subagent') {
+      return { fileName: file, sessionInfo: null };
+    }
+
+    const firstUserMessage = content.firstUserMessage
+      ? cleanMessage(content.firstUserMessage)
+      : extractFirstUserMessage(content.messages);
+    const isCurrentSession = currentSessionId
+      ? file.includes(currentSessionId.slice(0, 8))
+      : false;
+
+    const fullContent = content.messages
+      .map((msg) =>
+        partListUnionToString(stripInternalDisplayParts(msg.content)),
+      )
+      .join(' ');
+    const messages = content.messages.map((msg) => ({
+      role: msg.type === 'user' ? ('user' as const) : ('assistant' as const),
+      content: partListUnionToString(stripInternalDisplayParts(msg.content)),
+    }));
+
+    const sessionInfo: SessionInfo = {
+      id: content.sessionId,
+      file: file.replace(/\.jsonl$/, ''),
+      fileName: file,
+      startTime,
+      lastUpdated,
+      messageCount: content.messageCount ?? content.messages.length,
+      displayName: content.summary
+        ? stripUnsafeCharacters(content.summary)
+        : firstUserMessage,
+      firstUserMessage,
+      isCurrentSession,
+      index: 0, // Will be set after sorting valid sessions
+      summary: content.summary,
+      fullContent,
+      messages,
+    };
+
+    return { fileName: file, sessionInfo };
+  } catch {
+    // File is corrupted (can't read or parse JSON)
+    return { fileName: file, sessionInfo: null };
+  }
+};
+
+/**
+ * Maps items with a bounded concurrency limit, preserving input order.
+ */
+const mapWithConcurrencyLimit = async <T, R>(
+  items: T[],
+  mapper: (item: T, index: number) => Promise<R>,
+  limit = SCAN_CONCURRENCY_LIMIT,
+): Promise<R[]> => {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  const workers = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (nextIndex < items.length) {
+        const index = nextIndex++;
+        results[index] = await mapper(items[index], index);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
 };
 
 /**

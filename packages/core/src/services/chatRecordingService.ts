@@ -50,6 +50,12 @@ const ENOSPC_WARNING_MESSAGE =
   'The conversation will continue but will not be saved to disk. ' +
   'Free up disk space and restart to enable recording.';
 
+/**
+ * Maximum length of the extracted first user message used for session
+ * display. User messages can embed very long content (e.g. @ files).
+ */
+export const MAX_FIRST_USER_MESSAGE_LENGTH = 150;
+
 function hasProperty<T extends string>(
   obj: unknown,
   prop: T,
@@ -396,15 +402,15 @@ export async function loadConversationRecord(
         (message) =>
           message.type === 'user' && isResumableMessageRecord(message),
       ) ?? null;
-    let fallbackFirstUserMessage = firstUserMessageStr;
-    if (!fallbackFirstUserMessage && metadataFirstUserMessage) {
+    let fallbackFirstUserMsg = firstUserMessageStr;
+    if (!fallbackFirstUserMsg && metadataFirstUserMessage) {
       const rawContent = metadataFirstUserMessage.content;
       if (Array.isArray(rawContent)) {
-        fallbackFirstUserMessage = rawContent
+        fallbackFirstUserMsg = rawContent
           .map((part: unknown) => (isTextPart(part) ? part['text'] : ''))
           .join('');
       } else if (typeof rawContent === 'string') {
-        fallbackFirstUserMessage = rawContent;
+        fallbackFirstUserMsg = rawContent;
       }
     }
     const userMessageCount = options?.metadataOnly
@@ -431,7 +437,9 @@ export async function loadConversationRecord(
       memoryScratchpadIsStale: isTrackingMemoryScratchpadFreshness
         ? memoryScratchpadIsStale
         : undefined,
-      firstUserMessage: fallbackFirstUserMessage,
+      firstUserMessage: fallbackFirstUserMsg
+        ? fallbackFirstUserMsg.slice(0, MAX_FIRST_USER_MESSAGE_LENGTH)
+        : fallbackFirstUserMsg,
       hasResumableContent,
     };
   } catch (error) {
@@ -473,9 +481,6 @@ export class ChatRecordingService {
         if (loadedRecord) {
           this.cachedConversation = loadedRecord;
           this.projectHash = this.cachedConversation.projectHash;
-
-          // Update the session ID in the existing file
-          this.updateMetadata({ sessionId: this.sessionId });
         } else {
           // The file could not be reloaded (missing, corrupt metadata, or an
           // I/O error). Fall back to the in-memory conversation we were handed

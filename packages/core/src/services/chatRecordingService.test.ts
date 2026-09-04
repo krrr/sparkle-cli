@@ -40,6 +40,7 @@ vi.mock('node:fs', async (importOriginal) => {
 
 import {
   ChatRecordingService,
+  MAX_FIRST_USER_MESSAGE_LENGTH,
   hasResumableConversationContent,
   isResumableMessageRecord,
   loadConversationRecord,
@@ -468,6 +469,68 @@ describe('ChatRecordingService', () => {
       )) as ConversationRecord;
       expect(conversation.messages).toHaveLength(1);
       expect(conversation.messages[0].content).toBe('World');
+    });
+  });
+
+  describe('loadConversationRecord firstUserMessage truncation', () => {
+    function writeSessionWithFirstMessage(content: string): string {
+      const chatsDir = path.join(testTempDir, 'chats');
+      fs.mkdirSync(chatsDir, { recursive: true });
+      const sessionFile = path.join(chatsDir, 'session-truncate.jsonl');
+      fs.writeFileSync(
+        sessionFile,
+        [
+          JSON.stringify({
+            sessionId: 'truncate-session',
+            projectHash: 'test-project-hash',
+            startTime: '2024-01-01T00:00:00.000Z',
+            lastUpdated: '2024-01-01T00:01:00.000Z',
+          }),
+          JSON.stringify({
+            id: 'm1',
+            timestamp: '2024-01-01T00:00:00.000Z',
+            type: 'user',
+            content,
+          }),
+        ].join('\n') + '\n',
+      );
+      return sessionFile;
+    }
+
+    it('truncates an over-long first user message in metadataOnly mode', async () => {
+      const longContent = 'a'.repeat(300);
+      const sessionFile = writeSessionWithFirstMessage(longContent);
+
+      const conversation = (await loadConversationRecord(sessionFile, {
+        metadataOnly: true,
+      })) as ConversationRecord & { firstUserMessage?: string };
+
+      expect(conversation.firstUserMessage).toBe(
+        longContent.slice(0, MAX_FIRST_USER_MESSAGE_LENGTH),
+      );
+    });
+
+    it('truncates an over-long first user message in full-content mode', async () => {
+      const longContent = 'a'.repeat(300);
+      const sessionFile = writeSessionWithFirstMessage(longContent);
+
+      const conversation = (await loadConversationRecord(
+        sessionFile,
+      )) as ConversationRecord & { firstUserMessage?: string };
+
+      expect(conversation.firstUserMessage).toBe(
+        longContent.slice(0, MAX_FIRST_USER_MESSAGE_LENGTH),
+      );
+    });
+
+    it('keeps short first user messages unchanged', async () => {
+      const sessionFile = writeSessionWithFirstMessage('Hello world');
+
+      const conversation = (await loadConversationRecord(sessionFile, {
+        metadataOnly: true,
+      })) as ConversationRecord & { firstUserMessage?: string };
+
+      expect(conversation.firstUserMessage).toBe('Hello world');
     });
   });
 
