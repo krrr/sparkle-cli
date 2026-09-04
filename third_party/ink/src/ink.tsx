@@ -25,6 +25,10 @@ import reconciler from './reconciler.js';
 import render from './renderer.js';
 import * as dom from './dom.js';
 import logUpdate, {type LogUpdate, positionImeCursor} from './log-update.js';
+import {
+	enterSynchronizedOutput,
+	exitSynchronizedOutput,
+} from './log-update.js';
 import {renderToStatic} from './render-node-to-output.js';
 import instances from './instances.js';
 import App from './components/App.js';
@@ -866,7 +870,16 @@ export default class Ink {
 			buffer += positionImeCursor(lineCount, cursorPosition);
 		}
 
-		this.options.stdout.write(buffer);
+		// [sparkle patch] Wrap the full-frame rewrite in ANSI synchronized
+		// output so terminals that support DECSET 2026 buffer the entire
+		// clearTerminal + scrollback + frame sequence and present it
+		// atomically. Without this, every frame rendered by renderFullTerminal
+		// visually repaints the whole history, which shows up as flicker (e.g.
+		// when a dialog makes the dynamic region taller than the viewport and
+		// arrow-key navigation forces repeated full-frame rewrites).
+		this.options.stdout.write(
+			enterSynchronizedOutput + buffer + exitSynchronizedOutput,
+		);
 
 		this.lastOutput = output;
 		this.lastOutputHeight = outputHeight;

@@ -8,8 +8,8 @@ import colorize from './colorize.js';
 // Debugging option to simulate flicker if for terminals that do not support enableSynchronizedOutput.
 const enableSynchronizedOutput = true;
 
-const enterSynchronizedOutput = '\u001B[?2026h';
-const exitSynchronizedOutput = '\u001B[?2026l';
+export const enterSynchronizedOutput = '\u001B[?2026h';
+export const exitSynchronizedOutput = '\u001B[?2026l';
 
 export type CursorPosition = {
 	row: number;

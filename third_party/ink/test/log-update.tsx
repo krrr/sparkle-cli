@@ -3,7 +3,7 @@ import {type SinonSpy} from 'sinon';
 import ansiEscapes from 'ansi-escapes';
 import xtermHeadless from '@xterm/headless';
 import {type StyledLine} from '../src/styled-line.js';
-import logUpdate from '../src/log-update.js';
+import logUpdate, {enterSynchronizedOutput, exitSynchronizedOutput} from '../src/log-update.js';
 import createStdout from './helpers/create-stdout.js';
 
 const {Terminal} = xtermHeadless;
@@ -16,7 +16,9 @@ test('standard rendering - renders and updates output', t => {
 
 	render('Hello');
 	t.is((stdout.write as any).callCount, 1);
-	t.false(((stdout.write as any).firstCall.args[0] as string).endsWith('\n'));
+	const first = (stdout.write as any).firstCall.args[0] as string;
+	t.true(first.startsWith(enterSynchronizedOutput));
+	t.true(first.endsWith(exitSynchronizedOutput));
 
 	render('World');
 	t.is((stdout.write as any).callCount, 2);
