@@ -432,6 +432,175 @@ describe('ChatRecordingService', () => {
     });
   });
 
+  describe('lazy persistence (deferred file creation)', () => {
+    it('should buffer injected context and only write on the first real user message', async () => {
+      await chatRecordingService.initialize();
+
+      // Simulate GeminiChat.initialize: the bootstrap history only contains
+      // the injected <session_context> turn.
+      chatRecordingService.updateMessagesFromHistory([
+        {
+          id: 'env-1',
+          content: {
+            role: 'user',
+            parts: [
+              { text: '<session_context>Startup context</session_context>' },
+            ],
+          },
+        },
+      ]);
+
+      const conversationFile = chatRecordingService.getConversationFilePath()!;
+      // Nothing durable yet -> the file must not exist...
+      expect(fs.existsSync(conversationFile)).toBe(false);
+      // ...but the in-memory record is fully populated.
+      expect(chatRecordingService.getConversation()!.messages).toHaveLength(1);
+
+      // A real user message materializes the file with metadata first,
+      // followed by the buffered context and the user message in order.
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Hello world',
+        model: 'gemini-pro',
+      });
+
+      expect(fs.existsSync(conversationFile)).toBe(true);
+      const conversation = (await loadConversationRecord(
+        conversationFile,
+      )) as ConversationRecord;
+      expect(conversation.messages).toHaveLength(2);
+      expect(JSON.stringify(conversation.messages[0].content)).toContain(
+        '<session_context>',
+      );
+      expect(conversation.messages[1].content).toBe('Hello world');
+    });
+
+    it('should flush when the history sync carries a real user turn (context management flow)', async () => {
+      await chatRecordingService.initialize();
+
+      chatRecordingService.updateMessagesFromHistory([
+        {
+          id: 'env-1',
+          content: {
+            role: 'user',
+            parts: [
+              { text: '<session_context>Startup context</session_context>' },
+            ],
+          },
+        },
+        {
+          id: 'user-1',
+          content: { role: 'user', parts: [{ text: 'First question' }] },
+        },
+      ]);
+
+      const conversationFile = chatRecordingService.getConversationFilePath()!;
+      expect(fs.existsSync(conversationFile)).toBe(true);
+      const conversation = (await loadConversationRecord(
+        conversationFile,
+      )) as ConversationRecord;
+      expect(conversation.messages.map((m) => m.id)).toEqual([
+        'env-1',
+        'user-1',
+      ]);
+    });
+
+    it('should write metadata first and clear the buffer after flushing', async () => {
+      await chatRecordingService.initialize();
+      chatRecordingService.recordSyntheticMessage('user', [
+        { text: '<session_context>Buffered</session_context>' },
+      ]);
+
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Real prompt',
+        model: 'gemini-pro',
+      });
+
+      const conversationFile = chatRecordingService.getConversationFilePath()!;
+      const lines = fs
+        .readFileSync(conversationFile, 'utf-8')
+        .trim()
+        .split('\n');
+      const first = JSON.parse(lines[0]) as ConversationRecord;
+      expect(first.sessionId).toBe('test-session-id');
+      expect(first.messages).toBeUndefined();
+
+      // The in-memory buffer is cleared once the file is materialized.
+      // @ts-expect-error private property
+      expect(chatRecordingService.pendingMetadata).toBeNull();
+      // @ts-expect-error private property
+      expect(chatRecordingService.pendingRecords).toEqual([]);
+    });
+
+    it('should not flush for command-only or injected-context content', async () => {
+      await chatRecordingService.initialize();
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: '/resume',
+        model: 'gemini-pro',
+      });
+      chatRecordingService.recordSyntheticMessage('user', [
+        { text: '<hook_context>hook data</hook_context>' },
+      ]);
+
+      const conversationFile = chatRecordingService.getConversationFilePath()!;
+      expect(fs.existsSync(conversationFile)).toBe(false);
+      // The in-memory record still reflects everything.
+      expect(chatRecordingService.getConversation()!.messages).toHaveLength(2);
+    });
+
+    it('should retain the buffer and retry when the flush fails with a non-ENOSPC error', async () => {
+      await chatRecordingService.initialize();
+      chatRecordingService.recordSyntheticMessage('user', [
+        { text: '<session_context>Buffered</session_context>' },
+      ]);
+
+      const otherError = new Error('Permission denied');
+      (otherError as NodeJS.ErrnoException).code = 'EACCES';
+      const appendFileSyncSpy = vi
+        .mocked(fs.appendFileSync)
+        .mockImplementationOnce(() => {
+          throw otherError;
+        });
+
+      // The failed flush propagates and the message is not recorded.
+      expect(() =>
+        chatRecordingService.recordMessage({
+          type: 'user',
+          content: 'First attempt',
+          model: 'gemini-pro',
+        }),
+      ).toThrow('Permission denied');
+
+      const conversationFile = chatRecordingService.getConversationFilePath()!;
+      expect(fs.existsSync(conversationFile)).toBe(false);
+      // The buffered records (the context message plus its lastUpdated $set)
+      // survive the failed flush.
+      // @ts-expect-error private property
+      expect(chatRecordingService.pendingRecords).toHaveLength(2);
+
+      // A later flush retries with the preserved buffer.
+      appendFileSyncSpy.mockClear();
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Second attempt',
+        model: 'gemini-pro',
+      });
+
+      expect(fs.existsSync(conversationFile)).toBe(true);
+      const conversation = (await loadConversationRecord(
+        conversationFile,
+      )) as ConversationRecord;
+      const contents = conversation.messages.map((m) =>
+        JSON.stringify(m.content),
+      );
+      expect(contents).toHaveLength(2);
+      expect(contents[0]).toContain('<session_context>');
+      expect(conversation.messages[1].content).toBe('Second attempt');
+    });
+  });
+
   describe('recordMessage', () => {
     beforeEach(async () => {
       await chatRecordingService.initialize();
@@ -710,6 +879,13 @@ describe('ChatRecordingService', () => {
     });
 
     it('should add new tool calls to the last message', async () => {
+      // Mirrors the real flow: a genuine user prompt precedes the model's
+      // tool-call turn and materializes the session file (lazy persistence).
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Run a tool',
+        model: 'gemini-pro',
+      });
       chatRecordingService.recordMessage({
         type: 'gemini',
         content: '',
@@ -729,7 +905,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
-      const geminiMsg = conversation.messages[0] as MessageRecord & {
+      const geminiMsg = conversation.messages[1] as MessageRecord & {
         type: 'gemini';
       };
       expect(geminiMsg.toolCalls).toHaveLength(1);
@@ -737,6 +913,11 @@ describe('ChatRecordingService', () => {
     });
 
     it('should preserve dynamic description and NOT overwrite with generic one', async () => {
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Run a tool',
+        model: 'gemini-pro',
+      });
       chatRecordingService.recordMessage({
         type: 'gemini',
         content: '',
@@ -759,7 +940,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
-      const geminiMsg = conversation.messages[0] as MessageRecord & {
+      const geminiMsg = conversation.messages[1] as MessageRecord & {
         type: 'gemini';
       };
 
@@ -796,6 +977,11 @@ describe('ChatRecordingService', () => {
 
     it('should record agentId when provided', async () => {
       chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Run a tool',
+        model: 'gemini-pro',
+      });
+      chatRecordingService.recordMessage({
         type: 'gemini',
         content: '',
         model: 'gemini-pro',
@@ -815,7 +1001,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
-      const geminiMsg = conversation.messages[0] as MessageRecord & {
+      const geminiMsg = conversation.messages[1] as MessageRecord & {
         type: 'gemini';
       };
       expect(geminiMsg.toolCalls).toHaveLength(1);
@@ -1049,8 +1235,8 @@ describe('ChatRecordingService', () => {
     });
 
     it('should not throw if session file does not exist on disk', async () => {
-      // initialize() writes an initial metadata record synchronously, so
-      // delete the file manually to simulate the "missing on disk" scenario.
+      // Lazy persistence: initialize() performs no disk I/O, so the file is
+      // already missing; delete it manually anyway to simulate the scenario.
       await chatRecordingService.initialize();
       const conversationFile = chatRecordingService.getConversationFilePath();
       expect(conversationFile).not.toBeNull();
@@ -1063,48 +1249,34 @@ describe('ChatRecordingService', () => {
         chatRecordingService.deleteCurrentSessionAsync(),
       ).resolves.not.toThrow();
     });
-  });
 
-  describe('deleteCurrentSessionIfNotResumableAsync', () => {
-    it('should delete a startup-only session', async () => {
+    it('should invalidate the service so records cannot recreate the deleted file', async () => {
       await chatRecordingService.initialize();
-      const conversationFile = chatRecordingService.getConversationFilePath();
-      expect(conversationFile).not.toBeNull();
-      expect(fs.existsSync(conversationFile!)).toBe(true);
-
-      await chatRecordingService.deleteCurrentSessionIfNotResumableAsync();
-
-      expect(fs.existsSync(conversationFile!)).toBe(false);
-    });
-
-    it('should delete a command-only session', async () => {
-      await chatRecordingService.initialize();
+      // A real user message materializes the session file.
       chatRecordingService.recordMessage({
         type: 'user',
-        content: '/resume',
+        content: 'Hello',
         model: 'gemini-pro',
       });
       const conversationFile = chatRecordingService.getConversationFilePath();
-      expect(conversationFile).not.toBeNull();
+      expect(fs.existsSync(conversationFile!)).toBe(true);
 
-      await chatRecordingService.deleteCurrentSessionIfNotResumableAsync();
+      await chatRecordingService.deleteCurrentSessionAsync();
 
       expect(fs.existsSync(conversationFile!)).toBe(false);
-    });
+      expect(chatRecordingService.getConversationFilePath()).toBeNull();
+      expect(chatRecordingService.getConversation()).toBeNull();
 
-    it('should keep a session with a real user message', async () => {
-      await chatRecordingService.initialize();
+      // A later record (e.g. the UI's "Previous session record deleted." info
+      // message recorded right after /clear -d, which still targets the
+      // pre-reset service) must NOT recreate the file.
       chatRecordingService.recordMessage({
-        type: 'user',
-        content: 'Help me debug this test',
-        model: 'gemini-pro',
+        model: undefined,
+        type: 'info',
+        content: 'Previous session record deleted.',
       });
-      const conversationFile = chatRecordingService.getConversationFilePath();
-      expect(conversationFile).not.toBeNull();
-
-      await chatRecordingService.deleteCurrentSessionIfNotResumableAsync();
-
-      expect(fs.existsSync(conversationFile!)).toBe(true);
+      expect(fs.existsSync(conversationFile!)).toBe(false);
+      expect(chatRecordingService.getConversation()).toBeNull();
     });
   });
 
@@ -1393,20 +1565,21 @@ describe('ChatRecordingService', () => {
   });
 
   describe('ENOSPC (disk full) graceful degradation - issue #16266', () => {
-    it('should disable recording and not throw when ENOSPC occurs during initialize', async () => {
-      const enospcError = new Error('ENOSPC: no space left on device');
-      (enospcError as NodeJS.ErrnoException).code = 'ENOSPC';
-
-      const mkdirSyncSpy = vi.mocked(fs.mkdirSync).mockImplementation(() => {
-        throw enospcError;
-      });
+    it('should not perform any disk I/O during initialize (lazy persistence)', async () => {
+      const mkdirSyncSpy = vi.mocked(fs.mkdirSync);
+      const appendFileSyncSpy = vi.mocked(fs.appendFileSync);
 
       // Should not throw
       await expect(chatRecordingService.initialize()).resolves.not.toThrow();
 
-      // Recording should be disabled (conversationFile set to null)
-      expect(chatRecordingService.getConversationFilePath()).toBeNull();
-      mkdirSyncSpy.mockRestore();
+      // The session file is only materialized once real conversation content
+      // arrives; initialize must not touch the disk at all.
+      expect(mkdirSyncSpy).not.toHaveBeenCalled();
+      expect(appendFileSyncSpy).not.toHaveBeenCalled();
+
+      const conversationFile = chatRecordingService.getConversationFilePath();
+      expect(conversationFile).not.toBeNull();
+      expect(fs.existsSync(conversationFile!)).toBe(false);
     });
 
     it('should disable recording and not throw when ENOSPC occurs during writeConversation', async () => {

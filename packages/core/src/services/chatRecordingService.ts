@@ -457,6 +457,17 @@ export class ChatRecordingService {
   private queuedThoughts: Array<ThoughtSummary & { timestamp: string }> = [];
   private queuedTokens: TokensSummary | null = null;
   private context: AgentLoopContext;
+  /**
+   * Initial metadata of a brand-new session that has not been persisted yet.
+   * Doubles as the "lazy write" flag: while it is non-null, `appendRecord`
+   * buffers records in memory instead of touching the disk. The first
+   * resumable message (a real user prompt, or model content/tool activity)
+   * triggers `flushPendingRecords`, which writes the metadata line followed by
+   * every buffered record in order and clears the buffer. Sessions that never
+   * receive a real user message therefore never leave a jsonl file behind.
+   */
+  private pendingMetadata: Omit<ConversationRecord, 'messages'> | null = null;
+  private pendingRecords: unknown[] = [];
 
   constructor(context: AgentLoopContext) {
     this.context = context;
@@ -514,8 +525,6 @@ export class ChatRecordingService {
           chatsDir = path.join(chatsDir, safeParentId);
         }
 
-        fs.mkdirSync(chatsDir, { recursive: true });
-
         const timestamp = new Date()
           .toISOString()
           .slice(0, 16)
@@ -556,7 +565,10 @@ export class ChatRecordingService {
           directories,
         };
 
-        this.appendRecord(initialMetadata);
+        // Buffer the metadata instead of writing it immediately: the file is
+        // only created once real conversation content arrives (see
+        // flushPendingRecords).
+        this.pendingMetadata = initialMetadata;
         this.cachedConversation = {
           ...initialMetadata,
           messages: [],
@@ -579,12 +591,52 @@ export class ChatRecordingService {
   private appendRecord(record: unknown): void {
     if (!this.conversationFile) return;
     try {
+      if (this.pendingMetadata !== null) {
+        // Lazy mode: hold the record in memory until the first resumable
+        // message flushes the whole batch to disk (see flushPendingRecords).
+        this.pendingRecords.push(record);
+        return;
+      }
       const line = JSON.stringify(record) + '\n';
       fs.mkdirSync(path.dirname(this.conversationFile), { recursive: true });
       fs.appendFileSync(this.conversationFile, line);
     } catch (error) {
       if (isNodeError(error) && error.code === 'ENOSPC') {
         this.conversationFile = null;
+        debugLogger.warn(ENOSPC_WARNING_MESSAGE);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Materializes the session file once real conversation content arrives:
+   * writes the initial metadata line followed by every buffered record in
+   * order, then switches to direct appends. State is only cleared after a
+   * successful write, so a failed flush can be retried without losing
+   * records. Startup-only sessions (metadata + injected context such as
+   * `<session_context>`, but no real user message) never reach this point and
+   * leave no file behind.
+   */
+  private flushPendingRecords(): void {
+    if (!this.conversationFile || this.pendingMetadata === null) return;
+
+    try {
+      const lines = [
+        JSON.stringify(this.pendingMetadata),
+        ...this.pendingRecords.map((i) => JSON.stringify(i)),
+      ];
+      const content = lines.join('\n') + '\n';
+      fs.mkdirSync(path.dirname(this.conversationFile), { recursive: true });
+      fs.appendFileSync(this.conversationFile, content);
+      this.pendingMetadata = null;
+      this.pendingRecords = [];
+    } catch (error) {
+      if (isNodeError(error) && error.code === 'ENOSPC') {
+        this.conversationFile = null;
+        this.pendingMetadata = null;
+        this.pendingRecords = [];
         debugLogger.warn(ENOSPC_WARNING_MESSAGE);
       } else {
         throw error;
@@ -721,6 +773,14 @@ export class ChatRecordingService {
         msg.model = message.model;
         this.queuedThoughts = [];
         this.queuedTokens = null;
+      }
+      // Lazy persistence: do not touch disk until real conversation content
+      // exists (a genuine user prompt, or model output/tool activity). This
+      // materializes the session file for the first user message while
+      // keeping startup-only sessions (metadata + `<session_context>`) off
+      // the disk.
+      if (isResumableMessageRecord(msg)) {
+        this.flushPendingRecords();
       }
       this.pushMessage(msg);
       this.updateMetadata({ lastUpdated: new Date().toISOString() });
@@ -914,29 +974,20 @@ export class ChatRecordingService {
         // File may not exist; ignore.
       });
 
+      // Invalidate the service so no further record can recreate the deleted
+      // file (e.g. an info message recorded by the UI right after /clear -d
+      // still targets the pre-reset recording service). This must happen
+      // before artifact cleanup so a cleanup failure cannot leave a live
+      // service pointing at a deleted session.
+      this.conversationFile = null;
+      this.cachedConversation = null;
+
       // Delegate tool-output and log cleanup to the shared utility.
       await deleteSessionArtifactsAsync(this.sessionId, tempDir);
     } catch (error) {
       debugLogger.error('Error deleting current session.', error);
       throw error;
     }
-  }
-
-  /**
-   * Deletes the current session only if it has no resumable conversation
-   * content. This removes abandoned startup-only sessions while preserving any
-   * session with a real user prompt, model response, or tool activity.
-   */
-  async deleteCurrentSessionIfNotResumableAsync(): Promise<void> {
-    if (!this.conversationFile || !this.cachedConversation) {
-      return;
-    }
-
-    if (hasResumableConversationContent(this.cachedConversation.messages)) {
-      return;
-    }
-
-    await this.deleteCurrentSessionAsync();
   }
 
   /**
@@ -1047,6 +1098,14 @@ export class ChatRecordingService {
         newMessages.length !== this.cachedConversation.messages.length
       ) {
         this.cachedConversation.messages = newMessages;
+        // Lazy persistence: a sync that carries real conversation content
+        // (e.g. the first user turn recorded via setHistory in the context
+        // management flow) materializes the session file before the sync
+        // record is appended. Startup-only synced turns (`<session_context>`)
+        // stay buffered.
+        if (newMessages.some((m) => isResumableMessageRecord(m))) {
+          this.flushPendingRecords();
+        }
         this.updateMetadata({
           messages: newMessages,
           lastUpdated: new Date().toISOString(),

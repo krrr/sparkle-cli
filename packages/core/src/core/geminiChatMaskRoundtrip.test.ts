@@ -72,9 +72,9 @@ describe('masking round-trip', () => {
     chat = new GeminiChat(mockConfig);
     await chat.initialize();
 
-    const chatsDir = path.join(testTempDir, 'chats');
-    const files = fs.readdirSync(chatsDir).filter((f) => f.endsWith('.jsonl'));
-    sessionFilePath = path.join(chatsDir, files[0]);
+    // Lazy persistence: the session file is only materialized once real
+    // conversation content arrives, so sessionFilePath is resolved after the
+    // first setHistory() in the test body.
   });
 
   afterEach(async () => {
@@ -140,6 +140,12 @@ describe('masking round-trip', () => {
       },
     ];
     chat.setHistory(history);
+
+    // The first real user message in the history materializes the session
+    // file (lazy persistence).
+    const chatsDir = path.join(testTempDir, 'chats');
+    const files = fs.readdirSync(chatsDir).filter((f) => f.endsWith('.jsonl'));
+    sessionFilePath = path.join(chatsDir, files[0]);
 
     // Baseline: resuming drops only the injected session_context and keeps the
     // first user message.
