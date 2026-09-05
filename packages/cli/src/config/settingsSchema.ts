@@ -1619,18 +1619,6 @@ const SETTINGS_SCHEMA = {
           'Maximum characters to show when truncating large tool outputs. Set to 0 or negative to disable truncation.',
         showInDialog: true,
       },
-      disableLLMCorrection: {
-        type: 'boolean',
-        label: 'Disable LLM Correction',
-        category: 'Tools',
-        requiresRestart: true,
-        default: true,
-        description: oneLine`
-          Disable LLM-based error correction for edit tools.
-          When enabled, tools will fail immediately if exact string matches are not found, instead of attempting to self-correct.
-        `,
-        showInDialog: true,
-      },
       webSearch: {
         type: 'object',
         label: 'Web Search',

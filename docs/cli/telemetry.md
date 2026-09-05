@@ -276,17 +276,6 @@ Records the chosen edit strategy.
 
 </details>
 
-##### `gemini_cli.edit_correction`
-
-Records the result of an edit correction.
-
-<details>
-<summary>Attributes</summary>
-
-- `correction` (string: "success" or "failure")
-
-</details>
-
 ##### `gen_ai.client.inference.operation.details`
 
 Provides detailed GenAI operation data aligned with OpenTelemetry conventions.

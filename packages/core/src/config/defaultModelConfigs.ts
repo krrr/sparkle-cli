@@ -89,17 +89,6 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
         },
       },
     },
-    'edit-corrector': {
-      extends: 'base',
-      modelConfig: {
-        model: 'flash-lite',
-        generateContentConfig: {
-          thinkingConfig: {
-            thinkingLevel: ThinkingLevel.LOW,
-          },
-        },
-      },
-    },
     'summarizer-default': {
       extends: 'base',
       modelConfig: {
@@ -148,10 +137,6 @@ export const DEFAULT_MODEL_CONFIGS: ModelConfigServiceConfig = {
       modelConfig: {
         model: 'pro',
       },
-    },
-    'llm-edit-fixer': {
-      extends: 'internal-tool-flash',
-      modelConfig: {},
     },
     'context-snapshotter': {
       extends: 'internal-tool-flash',

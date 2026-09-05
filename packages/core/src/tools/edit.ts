@@ -7,7 +7,6 @@
 import * as fsPromises from 'node:fs/promises';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import * as crypto from 'node:crypto';
 import * as Diff from 'diff';
 import {
   BaseDeclarativeTool,
@@ -36,7 +35,6 @@ import {
 import { isNodeError } from '../utils/errors.js';
 import { correctPath } from '../utils/pathCorrector.js';
 import type { Config } from '../config/config.js';
-import { CoreToolCallStatus } from '../scheduler/types.js';
 
 import { DEFAULT_DIFF_OPTIONS, getDiffStat } from './diffOptions.js';
 import { getDiffContextSnippet } from './diff-utils.js';
@@ -45,13 +43,9 @@ import {
   type ModifyContext,
 } from './modifiable-tool.js';
 import { IdeClient } from '../ide/ide-client.js';
-import { FixLLMEditWithInstruction } from '../utils/llm-edit-fixer.js';
 import { safeLiteralReplace, detectLineEnding } from '../utils/textUtils.js';
-import { EditStrategyEvent, EditCorrectionEvent } from '../telemetry/types.js';
-import {
-  logEditStrategy,
-  logEditCorrectionEvent,
-} from '../telemetry/loggers.js';
+import { EditStrategyEvent } from '../telemetry/types.js';
+import { logEditStrategy } from '../telemetry/loggers.js';
 
 import {
   EDIT_TOOL_NAME,
@@ -103,15 +97,6 @@ export function applyReplacement(
 
   // Use intelligent replacement that handles $ sequences safely
   return safeLiteralReplace(currentContent, oldString, newString);
-}
-
-/**
- * Creates a SHA256 hash of the given content.
- * @param content The string content to hash.
- * @returns A hex-encoded hash string.
- */
-function hashContent(content: string): string {
-  return crypto.createHash('sha256').update(content).digest('hex');
 }
 
 function restoreTrailingNewline(
@@ -411,11 +396,6 @@ export interface EditToolParams {
   allow_multiple?: boolean;
 
   /**
-   * The instruction for what needs to be done.
-   */
-  instruction?: string;
-
-  /**
    * Whether the edit was modified manually by the user.
    */
   modified_by_user?: boolean;
@@ -544,115 +524,6 @@ class EditToolInvocation
     };
   }
 
-  private async attemptSelfCorrection(
-    params: EditToolParams,
-    currentContent: string,
-    initialError: { display: string; raw: string; type: ToolErrorType },
-    abortSignal: AbortSignal,
-    originalLineEnding: '\r\n' | '\n',
-  ): Promise<CalculatedEdit> {
-    // In order to keep from clobbering edits made outside our system,
-    // check if the file has been modified since we first read it.
-    let errorForLlmEditFixer = initialError.raw;
-    let contentForLlmEditFixer = currentContent;
-
-    const initialContentHash = hashContent(currentContent);
-    const onDiskContent = await this.config
-      .getFileSystemService()
-      .readTextFile(this.resolvedPath);
-    const onDiskContentHash = hashContent(onDiskContent.replace(/\r\n/g, '\n'));
-
-    if (initialContentHash !== onDiskContentHash) {
-      // The file has changed on disk since we first read it.
-      // Use the latest content for the correction attempt.
-      contentForLlmEditFixer = onDiskContent.replace(/\r\n/g, '\n');
-      errorForLlmEditFixer = `The initial edit attempt failed with the following error: "${initialError.raw}". However, the file has been modified by either the user or an external process since that edit attempt. The file content provided to you is the latest version. Please base your correction on this new content.`;
-    }
-
-    const fixedEdit = await FixLLMEditWithInstruction(
-      params.instruction ?? 'Apply the requested edit.',
-      params.old_string,
-      params.new_string,
-      errorForLlmEditFixer,
-      contentForLlmEditFixer,
-      this.config.getBaseLlmClient(),
-      abortSignal,
-    );
-
-    // If the self-correction attempt timed out, return the original error.
-    if (fixedEdit === null) {
-      return {
-        currentContent: contentForLlmEditFixer,
-        newContent: currentContent,
-        occurrences: 0,
-        isNewFile: false,
-        error: initialError,
-        originalLineEnding,
-      };
-    }
-
-    if (fixedEdit.noChangesRequired) {
-      return {
-        currentContent,
-        newContent: currentContent,
-        occurrences: 0,
-        isNewFile: false,
-        error: {
-          display: `No changes required. The file already meets the specified conditions.`,
-          raw: `A secondary check by an LLM determined that no changes were necessary to fulfill the instruction. Explanation: ${fixedEdit.explanation}. Original error with the parameters given: ${initialError.raw}`,
-          type: ToolErrorType.EDIT_NO_CHANGE_LLM_JUDGEMENT,
-        },
-        originalLineEnding,
-      };
-    }
-
-    const secondAttemptResult = await calculateReplacement(this.config, {
-      params: {
-        ...params,
-        old_string: fixedEdit.search,
-        new_string: fixedEdit.replace,
-      },
-      currentContent: contentForLlmEditFixer,
-      abortSignal,
-    });
-
-    const secondError = getErrorReplaceResult(
-      params,
-      secondAttemptResult.occurrences,
-      secondAttemptResult.finalOldString,
-      secondAttemptResult.finalNewString,
-    );
-
-    if (secondError) {
-      // The fix failed, log failure and return the original error
-      const event = new EditCorrectionEvent('failure');
-      logEditCorrectionEvent(this.config, event);
-
-      return {
-        currentContent: contentForLlmEditFixer,
-        newContent: currentContent,
-        occurrences: 0,
-        isNewFile: false,
-        error: initialError,
-        originalLineEnding,
-      };
-    }
-
-    const event = new EditCorrectionEvent(CoreToolCallStatus.Success);
-    logEditCorrectionEvent(this.config, event);
-
-    return {
-      currentContent: contentForLlmEditFixer,
-      newContent: secondAttemptResult.newContent,
-      occurrences: secondAttemptResult.occurrences,
-      isNewFile: false,
-      error: undefined,
-      originalLineEnding,
-      strategy: secondAttemptResult.strategy,
-      matchRanges: secondAttemptResult.matchRanges,
-    };
-  }
-
   /**
    * Calculates the potential outcome of an edit operation.
    * @param params Parameters for the edit operation
@@ -766,30 +637,14 @@ class EditToolInvocation
       };
     }
 
-    const fileExt = path.extname(this.resolvedPath).toLowerCase();
-    const isJsonOrIpynb = ['.json', '.ipynb', '.jsonc', '.json5'].includes(
-      fileExt,
-    );
-
-    if (this.config.getDisableLLMCorrection() || isJsonOrIpynb) {
-      return {
-        currentContent,
-        newContent: currentContent,
-        occurrences: replacementResult.occurrences,
-        isNewFile: false,
-        error: initialError,
-        originalLineEnding,
-      };
-    }
-
-    // If there was an error, try to self-correct.
-    return this.attemptSelfCorrection(
-      params,
+    return {
       currentContent,
-      initialError,
-      abortSignal,
+      newContent: currentContent,
+      occurrences: replacementResult.occurrences,
+      isNewFile: false,
+      error: initialError,
       originalLineEnding,
-    );
+    };
   }
 
   /**

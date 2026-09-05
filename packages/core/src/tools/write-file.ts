@@ -35,7 +35,6 @@ import {
   resolveToRealPath,
 } from '../utils/paths.js';
 import { getErrorMessage, isNodeError } from '../utils/errors.js';
-import { ensureCorrectFileContent } from '../utils/editCorrector.js';
 import { detectLineEnding } from '../utils/textUtils.js';
 import { DEFAULT_DIFF_OPTIONS, getDiffStat } from './diffOptions.js';
 import { getDiffContextSnippet } from './diff-utils.js';
@@ -95,19 +94,19 @@ export function isWriteFileToolParams(
   );
 }
 
-interface GetCorrectedFileContentResult {
+interface ResolveAndReadFileResult {
   originalContent: string;
   correctedContent: string;
   fileExists: boolean;
   error?: { message: string; code?: string };
 }
 
-export async function getCorrectedFileContent(
+export async function resolveAndReadFile(
   config: Config,
   filePath: string,
   proposedContent: string,
-  abortSignal: AbortSignal,
-): Promise<GetCorrectedFileContentResult> {
+  _abortSignal: AbortSignal,
+): Promise<ResolveAndReadFileResult> {
   let originalContent = '';
   let fileExists = false;
   let correctedContent = proposedContent;
@@ -191,22 +190,9 @@ export async function getCorrectedFileContent(
     }
   }
 
-  const fileExt = path.extname(filePath).toLowerCase();
-  const isJsonOrIpynb = ['.json', '.ipynb', '.jsonc', '.json5'].includes(
-    fileExt,
-  );
-
-  if (!isJsonOrIpynb) {
-    // All models are treated as Gemini 3, which never uses aggressive
-    // unescaping.
-    correctedContent = await ensureCorrectFileContent(
-      proposedContent,
-      config.getBaseLlmClient(),
-      abortSignal,
-      config.getDisableLLMCorrection(),
-      false,
-    );
-  }
+  // LLM-based content correction has been removed entirely; the proposed
+  // content is used as-is.
+  correctedContent = proposedContent;
 
   return { originalContent, correctedContent, fileExists };
 }
@@ -293,7 +279,7 @@ class WriteFileToolInvocation extends BaseToolInvocation<
   protected override async getConfirmationDetails(
     abortSignal: AbortSignal,
   ): Promise<ToolCallConfirmationDetails | false> {
-    const correctedContentResult = await getCorrectedFileContent(
+    const correctedContentResult = await resolveAndReadFile(
       this.config,
       this.resolvedPath,
       this.params.content,
@@ -367,7 +353,7 @@ class WriteFileToolInvocation extends BaseToolInvocation<
     }
 
     const { content, ai_proposed_content, modified_by_user } = this.params;
-    const correctedContentResult = await getCorrectedFileContent(
+    const correctedContentResult = await resolveAndReadFile(
       this.config,
       this.resolvedPath,
       content,
@@ -677,7 +663,7 @@ export class WriteFileTool
     return {
       getFilePath: (params: WriteFileToolParams) => params.file_path,
       getCurrentContent: async (params: WriteFileToolParams) => {
-        const correctedContentResult = await getCorrectedFileContent(
+        const correctedContentResult = await resolveAndReadFile(
           this.config,
           params.file_path,
           params.content,
@@ -686,7 +672,7 @@ export class WriteFileTool
         return correctedContentResult.originalContent;
       },
       getProposedContent: async (params: WriteFileToolParams) => {
-        const correctedContentResult = await getCorrectedFileContent(
+        const correctedContentResult = await resolveAndReadFile(
           this.config,
           params.file_path,
           params.content,

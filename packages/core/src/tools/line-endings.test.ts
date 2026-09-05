@@ -25,7 +25,6 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { GeminiClient } from '../core/client.js';
 import type { BaseLlmClient } from '../core/baseLlmClient.js';
-import { ensureCorrectFileContent } from '../utils/editCorrector.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 import { WorkspaceContext } from '../utils/workspaceContext.js';
 import {
@@ -37,7 +36,6 @@ const rootDir = path.resolve(os.tmpdir(), 'sparkle-cli-line-ending-test-root');
 
 // --- MOCKS ---
 vi.mock('../core/client.js');
-vi.mock('../utils/editCorrector.js');
 vi.mock('../ide/ide-client.js', () => ({
   IdeClient: {
     getInstance: vi.fn().mockResolvedValue({
@@ -49,7 +47,6 @@ vi.mock('../ide/ide-client.js', () => ({
 
 let mockGeminiClientInstance: Mocked<GeminiClient>;
 let mockBaseLlmClientInstance: Mocked<BaseLlmClient>;
-const mockEnsureCorrectFileContent = vi.fn<typeof ensureCorrectFileContent>();
 
 // Mock Config
 const fsService = new StandardFileSystemService();
@@ -76,7 +73,6 @@ const mockConfigInternal = {
   setUserMemory: vi.fn(),
   getGeminiMdFileCount: () => 0,
   setGeminiMdFileCount: vi.fn(),
-  getDisableLLMCorrection: vi.fn(() => false),
   getActiveModel: () => 'test-model',
   validatePathAccess: vi.fn().mockReturnValue(null),
   getToolRegistry: () =>
@@ -95,7 +91,6 @@ const mockConfig = mockConfigInternal as unknown as Config;
 vi.mock('../telemetry/loggers.js', () => ({
   logFileOperation: vi.fn(),
   logEditStrategy: vi.fn(),
-  logEditCorrectionEvent: vi.fn(),
 }));
 
 // --- END MOCKS ---
@@ -120,10 +115,6 @@ describe('Line Ending Preservation', () => {
     mockBaseLlmClientInstance = {
       generateJson: vi.fn(),
     } as unknown as Mocked<BaseLlmClient>;
-
-    vi.mocked(ensureCorrectFileContent).mockImplementation(
-      mockEnsureCorrectFileContent,
-    );
 
     mockConfigInternal.getGeminiClient.mockReturnValue(
       mockGeminiClientInstance,
@@ -176,9 +167,6 @@ describe('Line Ending Preservation', () => {
       // Proposed content from LLM (usually LF)
       const proposedContent = 'line1\nline2\nline3\n';
 
-      // Mock corrections to return proposed content as-is (but usually normalized)
-      mockEnsureCorrectFileContent.mockResolvedValue(proposedContent);
-
       const params = { file_path: filePath, content: proposedContent };
       const invocation = tool.build(params);
 
@@ -202,8 +190,6 @@ describe('Line Ending Preservation', () => {
     it('should use OS EOL for new files', async () => {
       const filePath = path.join(rootDir, 'new_os_eol_file.txt');
       const proposedContent = 'line1\nline2\n';
-
-      mockEnsureCorrectFileContent.mockResolvedValue(proposedContent);
 
       const params = { file_path: filePath, content: proposedContent };
       const invocation = tool.build(params);
@@ -251,7 +237,6 @@ describe('Line Ending Preservation', () => {
         file_path: filePath,
         old_string: oldString,
         new_string: newString,
-        instruction: 'Change line2 to modified',
       };
       const invocation = tool.build(params);
 

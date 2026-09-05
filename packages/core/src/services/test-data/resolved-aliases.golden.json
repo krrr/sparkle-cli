@@ -56,16 +56,6 @@
       }
     }
   },
-  "edit-corrector": {
-    "model": "flash-lite",
-    "generateContentConfig": {
-      "temperature": 0,
-      "topP": 1,
-      "thinkingConfig": {
-        "thinkingLevel": "LOW"
-      }
-    }
-  },
   "summarizer-default": {
     "model": "flash-lite",
     "generateContentConfig": {
@@ -122,13 +112,6 @@
   },
   "loop-detection-double-check": {
     "model": "pro",
-    "generateContentConfig": {
-      "temperature": 0,
-      "topP": 1
-    }
-  },
-  "llm-edit-fixer": {
-    "model": "flash",
     "generateContentConfig": {
       "temperature": 0,
       "topP": 1

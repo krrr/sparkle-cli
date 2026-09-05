@@ -1773,8 +1773,7 @@ export type TelemetryEvent =
   | ToolOutputMaskingEvent
   | EditStrategyEvent
   | PlanExecutionEvent
-  | RewindEvent
-  | EditCorrectionEvent;
+  | RewindEvent;
 
 export const EVENT_EXTENSION_DISABLE = 'gemini_cli.extension_disable';
 export class ExtensionDisableEvent implements BaseTelemetryEvent {
@@ -1837,32 +1836,6 @@ export class EditStrategyEvent implements BaseTelemetryEvent {
 
   toLogBody(): string {
     return `Edit Tool Strategy: ${this.strategy}`;
-  }
-}
-
-export const EVENT_EDIT_CORRECTION = 'gemini_cli.edit_correction';
-export class EditCorrectionEvent implements BaseTelemetryEvent {
-  'event.name': 'edit_correction';
-  'event.timestamp': string;
-  correction: CoreToolCallStatus.Success | 'failure';
-
-  constructor(correction: CoreToolCallStatus.Success | 'failure') {
-    this['event.name'] = 'edit_correction';
-    this['event.timestamp'] = new Date().toISOString();
-    this.correction = correction;
-  }
-
-  toOpenTelemetryAttributes(config: Config): LogAttributes {
-    return {
-      ...getCommonAttributes(config),
-      'event.name': EVENT_EDIT_CORRECTION,
-      'event.timestamp': this['event.timestamp'],
-      correction: this.correction,
-    };
-  }
-
-  toLogBody(): string {
-    return `Edit Tool Correction: ${this.correction}`;
   }
 }
 

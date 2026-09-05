@@ -63,7 +63,6 @@ export const WRITE_FILE_PARAM_CONTENT = 'content';
 
 // -- replace (edit) --
 export const EDIT_TOOL_NAME = 'replace';
-export const EDIT_PARAM_INSTRUCTION = 'instruction';
 export const EDIT_PARAM_OLD_STRING = 'old_string';
 export const EDIT_PARAM_NEW_STRING = 'new_string';
 export const EDIT_PARAM_ALLOW_MULTIPLE = 'allow_multiple';

@@ -669,7 +669,6 @@ export interface ConfigParameters {
   memoryBoundaryMarkers?: string[];
   topicUpdateNarration?: boolean;
 
-  disableLLMCorrection?: boolean;
   plan?: boolean;
   tracker?: boolean;
   planSettings?: PlanSettings;
@@ -869,7 +868,6 @@ export class Config implements McpContext, AgentLoopContext {
   private readonly experimentalContextManagementConfig?: string;
   private readonly memoryBoundaryMarkers: readonly string[];
   private readonly topicUpdateNarration: boolean;
-  private readonly disableLLMCorrection: boolean;
   private readonly planEnabled: boolean;
   private readonly voiceMode: boolean;
   private readonly trackerEnabled: boolean;
@@ -1022,7 +1020,6 @@ export class Config implements McpContext, AgentLoopContext {
     this._activeModel = params.model;
     this.enableAgents = params.enableAgents ?? true;
     this.agents = params.agents ?? {};
-    this.disableLLMCorrection = params.disableLLMCorrection ?? true;
     this.planEnabled = params.plan ?? true;
     this.voiceMode = params.voiceMode ?? false;
     this.trackerEnabled = params.tracker ?? false;
@@ -2515,10 +2512,6 @@ export class Config implements McpContext, AgentLoopContext {
 
   getEnableExtensionReloading(): boolean {
     return this.enableExtensionReloading;
-  }
-
-  getDisableLLMCorrection(): boolean {
-    return this.disableLLMCorrection;
   }
 
   isPlanEnabled(): boolean {

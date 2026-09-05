@@ -6,7 +6,6 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const mockFixLLMEditWithInstruction = vi.hoisted(() => vi.fn());
 const mockGenerateJson = vi.hoisted(() => vi.fn());
 const mockOpenDiff = vi.hoisted(() => vi.fn());
 
@@ -16,10 +15,6 @@ vi.mock('../ide/ide-client.js', () => ({
   IdeClient: {
     getInstance: vi.fn(),
   },
-}));
-
-vi.mock('../utils/llm-edit-fixer.js', () => ({
-  FixLLMEditWithInstruction: mockFixLLMEditWithInstruction,
 }));
 
 vi.mock('../core/client.js', () => ({
@@ -133,7 +128,6 @@ describe('EditTool', () => {
       setGeminiMdFileCount: vi.fn(),
       getToolRegistry: () => ({}) as any,
       isInteractive: () => false,
-      getDisableLLMCorrection: vi.fn(() => true),
       getExperiments: () => {},
       isPlanMode: vi.fn(() => false),
       storage: {
@@ -162,14 +156,6 @@ describe('EditTool', () => {
 
     (mockConfig.getApprovalMode as Mock).mockClear();
     (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.DEFAULT);
-
-    mockFixLLMEditWithInstruction.mockReset();
-    mockFixLLMEditWithInstruction.mockResolvedValue({
-      noChangesRequired: false,
-      search: '',
-      replace: '',
-      explanation: 'LLM fix failed',
-    });
 
     mockGenerateJson.mockReset();
     mockGenerateJson.mockImplementation(
@@ -353,7 +339,6 @@ describe('EditTool', () => {
         const result = await calculateReplacement(mockConfig, {
           params: {
             file_path: 'test.txt',
-            instruction: 'test',
             old_string,
             new_string,
           },
@@ -372,7 +357,6 @@ describe('EditTool', () => {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'test.js',
-          instruction: 'test',
           old_string: 'function myFunc(a, b) {', // Note the normalized whitespace
           new_string: 'const yourFunc = (a, b) => {',
         },
@@ -399,7 +383,6 @@ describe('EditTool', () => {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'config.ts',
-          instruction: 'update config',
           old_string: oldString,
           new_string: newString,
         },
@@ -422,7 +405,6 @@ describe('EditTool', () => {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'config.ts',
-          instruction: 'update config',
           old_string: oldString,
           new_string: newString,
         },
@@ -453,7 +435,6 @@ describe('EditTool', () => {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'test.ts',
-          instruction: 'update',
           old_string: oldString,
           new_string: newString,
         },
@@ -493,7 +474,6 @@ function doIt() {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'test.ts',
-          instruction: 'update',
           old_string: oldString,
           new_string: newString,
         },
@@ -604,7 +584,6 @@ function doIt() {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'test.js',
-          instruction: 'test',
           old_string: 'function  oldFunc() {\n    // some code\n  }', // Two spaces after function to trigger regex
           new_string: 'function newFunc() {\n  // new code\n}', // Unindented
         },
@@ -623,7 +602,6 @@ function doIt() {
       const result = await calculateReplacement(mockConfig, {
         params: {
           file_path: 'test.js',
-          instruction: 'test',
           old_string: '\nfunction oldFunc() {}',
           new_string: '\n  function newFunc() {}', // Include desired indentation
         },
@@ -641,7 +619,6 @@ function doIt() {
     it('should return null for valid params', () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'test.txt'),
-        instruction: 'An instruction',
         old_string: 'old',
         new_string: 'new',
       };
@@ -651,7 +628,6 @@ function doIt() {
     it('should return an error if path is outside the workspace', () => {
       const params: EditToolParams = {
         file_path: path.join(os.tmpdir(), 'outside.txt'),
-        instruction: 'An instruction',
         old_string: 'old',
         new_string: 'new',
       };
@@ -661,7 +637,6 @@ function doIt() {
     it('should reject omission placeholder in new_string when old_string does not contain that placeholder', () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'test.txt'),
-        instruction: 'An instruction',
         old_string: 'old content',
         new_string: '(rest of methods ...)',
       };
@@ -673,7 +648,6 @@ function doIt() {
     it('should reject new_string when it contains an additional placeholder not present in old_string', () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'test.txt'),
-        instruction: 'An instruction',
         old_string: '(rest of methods ...)',
         new_string: `(rest of methods ...)
 (unchanged code ...)`,
@@ -686,7 +660,6 @@ function doIt() {
     it('should allow omission placeholders when all are already present in old_string', () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'test.txt'),
-        instruction: 'An instruction',
         old_string: `(rest of methods ...)
 (unchanged code ...)`,
         new_string: `(unchanged code ...)
@@ -698,7 +671,6 @@ function doIt() {
     it('should allow normal code that contains placeholder text in a string literal', () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'test.ts'),
-        instruction: 'Update string literal',
         old_string: 'const msg = "old";',
         new_string: 'const msg = "(rest of methods ...)";',
       };
@@ -709,7 +681,6 @@ function doIt() {
       const badPath = path.resolve(rootDir, 'test\0.txt');
       const params: EditToolParams = {
         file_path: badPath,
-        instruction: 'An instruction',
         old_string: 'old',
         new_string: 'new',
       };
@@ -720,7 +691,6 @@ function doIt() {
       const badPath = path.resolve(rootDir, 'test\0.txt');
       const invocation = tool.build({
         file_path: badPath,
-        instruction: 'test',
         old_string: 'old',
         new_string: 'new',
       });
@@ -741,7 +711,6 @@ function doIt() {
     it('should reject when calculateEdit fails after an abort signal', async () => {
       const params: EditToolParams = {
         file_path: path.join(rootDir, 'abort-execute.txt'),
-        instruction: 'Abort during execute',
         old_string: 'old',
         new_string: 'new',
       };
@@ -772,7 +741,6 @@ function doIt() {
       fs.writeFileSync(filePath, initialContent, 'utf8');
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace old with new',
         old_string: 'old',
         new_string: 'new',
       };
@@ -804,12 +772,8 @@ function doIt() {
     it('should return error if old_string is not found in file', async () => {
       fs.writeFileSync(filePath, 'Some content.', 'utf8');
 
-      // Enable LLM correction for this test
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace non-existent text',
         old_string: 'nonexistent',
         new_string: 'replacement',
       };
@@ -821,40 +785,6 @@ function doIt() {
       expect(result.returnDisplay).toMatch(
         /Failed to edit, could not find the string to replace./,
       );
-      expect(mockFixLLMEditWithInstruction).toHaveBeenCalled();
-    });
-
-    it('should succeed if FixLLMEditWithInstruction corrects the params', async () => {
-      const initialContent = 'This is some original text.';
-      const finalContent = 'This is some brand new text.';
-      fs.writeFileSync(filePath, initialContent, 'utf8');
-
-      // Enable LLM correction for this test
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Replace original with brand new',
-        old_string: 'wrong text', // This will fail first
-        new_string: 'brand new text',
-      };
-
-      mockFixLLMEditWithInstruction.mockResolvedValueOnce({
-        noChangesRequired: false,
-        search: 'original text', // The corrected search string
-        replace: 'brand new text',
-        explanation: 'Corrected the search string to match the file content.',
-      });
-
-      const invocation = tool.build(params);
-      const result = await invocation.execute({
-        abortSignal: new AbortController().signal,
-      });
-
-      expect(result.error).toBeUndefined();
-      expect(result.llmContent).toMatch(/Successfully modified file/);
-      expect(fs.readFileSync(filePath, 'utf8')).toBe(finalContent);
-      expect(mockFixLLMEditWithInstruction).toHaveBeenCalledTimes(1);
     });
 
     it('should preserve CRLF line endings when editing a file', async () => {
@@ -863,7 +793,6 @@ function doIt() {
       fs.writeFileSync(filePath, initialContent, 'utf8');
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace two with three',
         old_string: 'line two',
         new_string: 'line three',
       };
@@ -879,7 +808,6 @@ function doIt() {
       const newContentWithCRLF = 'new line one\r\nnew line two\r\n';
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Create a new file',
         old_string: '',
         new_string: newContentWithCRLF,
       };
@@ -889,93 +817,6 @@ function doIt() {
 
       const finalContent = fs.readFileSync(filePath, 'utf8');
       expect(finalContent).toBe(newContentWithCRLF);
-    });
-
-    it('should return NO_CHANGE if FixLLMEditWithInstruction determines no changes are needed', async () => {
-      const initialContent = 'The price is $100.';
-      fs.writeFileSync(filePath, initialContent, 'utf8');
-
-      // Enable LLM correction for this test
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Ensure the price is $100',
-        old_string: 'price is $50', // Incorrect old string
-        new_string: 'price is $100',
-      };
-
-      mockFixLLMEditWithInstruction.mockResolvedValueOnce({
-        noChangesRequired: true,
-        search: '',
-        replace: '',
-        explanation: 'The price is already correctly set to $100.',
-      });
-
-      const invocation = tool.build(params);
-      const result = await invocation.execute({
-        abortSignal: new AbortController().signal,
-      });
-
-      expect(result.error?.type).toBe(
-        ToolErrorType.EDIT_NO_CHANGE_LLM_JUDGEMENT,
-      );
-      expect(result.llmContent).toMatch(
-        /A secondary check by an LLM determined/,
-      );
-      expect(fs.readFileSync(filePath, 'utf8')).toBe(initialContent); // File is unchanged
-    });
-  });
-
-  describe('self-correction with content refresh to pull in external edits', () => {
-    const testFile = 'test.txt';
-    let filePath: string;
-
-    beforeEach(() => {
-      filePath = path.join(rootDir, testFile);
-    });
-
-    it('should use refreshed file content for self-correction if file was modified externally', async () => {
-      const initialContent = 'This is the original content.';
-      const externallyModifiedContent =
-        'This is the externally modified content.';
-      fs.writeFileSync(filePath, initialContent, 'utf8');
-
-      // Enable LLM correction for this test
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction:
-          'Replace "externally modified content" with "externally modified string"',
-        old_string: 'externally modified content', // This will fail the first attempt, triggering self-correction.
-        new_string: 'externally modified string',
-      };
-
-      // Spy on `readTextFile` to simulate an external file change between reads.
-      const readTextFileSpy = vi
-        .spyOn(fileSystemService, 'readTextFile')
-        .mockResolvedValueOnce(initialContent) // First call in `calculateEdit`
-        .mockResolvedValueOnce(externallyModifiedContent); // Second call in `attemptSelfCorrection`
-
-      const invocation = tool.build(params);
-      await invocation.execute({ abortSignal: new AbortController().signal });
-
-      // Assert that the file was read twice (initial read, then re-read for hash comparison).
-      expect(readTextFileSpy).toHaveBeenCalledTimes(2);
-
-      // Assert that the self-correction LLM was called with the updated content and a specific message.
-      expect(mockFixLLMEditWithInstruction).toHaveBeenCalledWith(
-        expect.any(String), // instruction
-        params.old_string,
-        params.new_string,
-        expect.stringContaining(
-          'However, the file has been modified by either the user or an external process',
-        ), // errorForLlmEditFixer
-        externallyModifiedContent, // The new content for correction
-        expect.any(Object), // baseLlmClient
-        expect.any(Object), // abortSignal
-      );
     });
   });
 
@@ -1018,7 +859,6 @@ function doIt() {
         setup(filePath);
         const invocation = tool.build({
           file_path: filePath,
-          instruction: 'test',
           ...params,
         });
         const result = await invocation.execute({
@@ -1099,7 +939,6 @@ function doIt() {
         fs.writeFileSync(filePath, content, 'utf8');
         const params: EditToolParams = {
           file_path: filePath,
-          instruction: 'Replace all foo with bar',
           old_string: 'foo',
           new_string: 'bar',
           ...(allow_multiple !== undefined && { allow_multiple }),
@@ -1142,7 +981,6 @@ function doIt() {
       fs.writeFileSync(filePath, initialContent);
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'test',
         old_string: 'old',
         new_string: 'new',
       };
@@ -1173,7 +1011,6 @@ function doIt() {
       const filePath = path.join(rootDir, 'abort-confirmation.txt');
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Abort during confirmation',
         old_string: 'old',
         new_string: 'new',
       };
@@ -1243,7 +1080,6 @@ function doIt() {
       for (const file of files) {
         const params: EditToolParams = {
           file_path: file.path,
-          instruction: `Remove lines from the file`,
           old_string: file.toRemove,
           new_string: '', // Removing the content
           ai_proposed_content: '',
@@ -1288,89 +1124,6 @@ function doIt() {
     });
   });
 
-  describe('disableLLMCorrection', () => {
-    it('should NOT call FixLLMEditWithInstruction when disableLLMCorrection is true', async () => {
-      const filePath = path.join(rootDir, 'disable_llm_test.txt');
-      fs.writeFileSync(filePath, 'Some content.', 'utf8');
-
-      // Enable the setting
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(true);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Replace non-existent text',
-        old_string: 'nonexistent',
-        new_string: 'replacement',
-      };
-
-      const invocation = tool.build(params);
-      const result = await invocation.execute({
-        abortSignal: new AbortController().signal,
-      });
-
-      expect(result.error?.type).toBe(ToolErrorType.EDIT_NO_OCCURRENCE_FOUND);
-      expect(mockFixLLMEditWithInstruction).not.toHaveBeenCalled();
-    });
-
-    it('should call FixLLMEditWithInstruction when disableLLMCorrection is false', async () => {
-      const filePath = path.join(rootDir, 'enable_llm_test.txt');
-      fs.writeFileSync(filePath, 'Some content.', 'utf8');
-
-      // Now explicit as it's not the default anymore
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Replace non-existent text',
-        old_string: 'nonexistent',
-        new_string: 'replacement',
-      };
-
-      const invocation = tool.build(params);
-      await invocation.execute({ abortSignal: new AbortController().signal });
-
-      expect(mockFixLLMEditWithInstruction).toHaveBeenCalled();
-    });
-
-    it('should NOT call FixLLMEditWithInstruction for .json files even when disableLLMCorrection is false', async () => {
-      const filePath = path.join(rootDir, 'test.json');
-      fs.writeFileSync(filePath, '{"key": "value"}', 'utf8');
-
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Replace value',
-        old_string: 'nonexistent',
-        new_string: 'replacement',
-      };
-
-      const invocation = tool.build(params);
-      await invocation.execute({ abortSignal: new AbortController().signal });
-
-      expect(mockFixLLMEditWithInstruction).not.toHaveBeenCalled();
-    });
-
-    it('should NOT call FixLLMEditWithInstruction for .ipynb files even when disableLLMCorrection is false', async () => {
-      const filePath = path.join(rootDir, 'notebook.ipynb');
-      fs.writeFileSync(filePath, '{"cells": []}', 'utf8');
-
-      (mockConfig.getDisableLLMCorrection as Mock).mockReturnValue(false);
-
-      const params: EditToolParams = {
-        file_path: filePath,
-        instruction: 'Replace cell',
-        old_string: 'nonexistent',
-        new_string: 'replacement',
-      };
-
-      const invocation = tool.build(params);
-      await invocation.execute({ abortSignal: new AbortController().signal });
-
-      expect(mockFixLLMEditWithInstruction).not.toHaveBeenCalled();
-    });
-  });
-
   describe('JIT context discovery', () => {
     it('should append JIT context to output when enabled and context is found', async () => {
       const { discoverJitContext, appendJitContext } = await import(
@@ -1388,7 +1141,6 @@ function doIt() {
 
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace old with new',
         old_string: 'old',
         new_string: 'new',
       };
@@ -1419,7 +1171,6 @@ function doIt() {
 
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace old with new',
         old_string: 'old',
         new_string: 'new',
       };
@@ -1456,7 +1207,6 @@ function doIt() {
 
       const params: EditToolParams = {
         file_path: filePath,
-        instruction: 'Replace initial with new',
         old_string: 'initial',
         new_string: 'new',
       };

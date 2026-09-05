@@ -41,7 +41,6 @@ import {
   type ExtensionInstallEvent,
   type ModelSlashCommandEvent,
   type EditStrategyEvent,
-  type EditCorrectionEvent,
   type AgentStartEvent,
   type AgentFinishEvent,
   type RecoveryAttemptEvent,
@@ -602,20 +601,6 @@ export async function logExtensionDisable(
 export function logEditStrategy(
   config: Config,
   event: EditStrategyEvent,
-): void {
-  bufferTelemetryEvent(() => {
-    const logger = logs.getLogger(SERVICE_NAME);
-    const logRecord: LogRecord = {
-      body: event.toLogBody(),
-      attributes: event.toOpenTelemetryAttributes(config),
-    };
-    logger.emit(logRecord);
-  });
-}
-
-export function logEditCorrectionEvent(
-  config: Config,
-  event: EditCorrectionEvent,
 ): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);

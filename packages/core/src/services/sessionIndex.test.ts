@@ -56,7 +56,7 @@ describe('sessionIndex', () => {
         getSessionsIndexPath(tmpDir),
         JSON.stringify({
           version: SESSION_INDEX_VERSION,
-          sessions: { 'session-x.jsonl': { fileName: 42 } },
+          sessions: 'invalid',
         }),
         'utf-8',
       );

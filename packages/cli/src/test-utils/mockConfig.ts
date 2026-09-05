@@ -122,7 +122,6 @@ export const createMockConfig = (overrides: Partial<Config> = {}): Config =>
     getExtensionLoader: vi.fn().mockReturnValue({}),
     getEnabledExtensions: vi.fn().mockReturnValue([]),
     getEnableExtensionReloading: vi.fn().mockReturnValue(false),
-    getDisableLLMCorrection: vi.fn().mockReturnValue(false),
     getNoBrowser: vi.fn().mockReturnValue(false),
     getAgentsSettings: vi.fn().mockReturnValue({}),
     getSummarizeToolOutputConfig: vi.fn().mockReturnValue(undefined),

@@ -578,17 +578,6 @@ their corresponding top-level category object in your `settings.json` file.
           }
         }
       },
-      "edit-corrector": {
-        "extends": "base",
-        "modelConfig": {
-          "model": "flash-lite",
-          "generateContentConfig": {
-            "thinkingConfig": {
-              "thinkingLevel": "LOW"
-            }
-          }
-        }
-      },
       "summarizer-default": {
         "extends": "base",
         "modelConfig": {
@@ -644,10 +633,6 @@ their corresponding top-level category object in your `settings.json` file.
         "modelConfig": {
           "model": "pro"
         }
-      },
-      "llm-edit-fixer": {
-        "extends": "internal-tool-flash",
-        "modelConfig": {}
       },
       "context-snapshotter": {
         "extends": "internal-tool-flash",
@@ -1233,14 +1218,6 @@ their corresponding top-level category object in your `settings.json` file.
   - **Description:** Maximum characters to show when truncating large tool
     outputs. Set to 0 or negative to disable truncation.
   - **Default:** `40000`
-  - **Requires restart:** Yes
-
-- **`tools.disableLLMCorrection`** (boolean):
-
-  - **Description:** Disable LLM-based error correction for edit tools. When
-    enabled, tools will fail immediately if exact string matches are not found,
-    instead of attempting to self-correct.
-  - **Default:** `true`
   - **Requires restart:** Yes
 
 - **`tools.webSearch.thirdPartyProvider`** (enum):

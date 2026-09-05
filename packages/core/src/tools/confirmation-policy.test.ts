@@ -23,7 +23,6 @@ import os from 'node:os';
 // Mock telemetry loggers to avoid failures
 vi.mock('../telemetry/loggers.js', () => ({
   logEditStrategy: vi.fn(),
-  logEditCorrectionEvent: vi.fn(),
   logFileOperation: vi.fn(),
 }));
 
@@ -68,7 +67,6 @@ describe('Tool Confirmation Policy Updates', () => {
       getFileFilteringOptions: () => ({}),
       getGeminiClient: () => ({}),
       getBaseLlmClient: () => ({}),
-      getDisableLLMCorrection: () => true,
       getIdeMode: () => false,
       getActiveModel: () => 'test-model',
       isPlanMode: () => false,
@@ -114,7 +112,6 @@ describe('Tool Confirmation Policy Updates', () => {
       create: (config: Config, bus: MessageBus) => new EditTool(config, bus),
       params: {
         file_path: 'test.txt',
-        instruction: 'change content',
         old_string: 'existing',
         new_string: 'new',
       },

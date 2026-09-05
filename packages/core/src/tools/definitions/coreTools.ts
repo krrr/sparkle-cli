@@ -48,7 +48,6 @@ import {
   GREP_PARAM_AFTER,
   GREP_PARAM_BEFORE,
   GREP_PARAM_NO_IGNORE,
-  EDIT_PARAM_INSTRUCTION,
   EDIT_PARAM_OLD_STRING,
   EDIT_PARAM_NEW_STRING,
   EDIT_PARAM_ALLOW_MULTIPLE,
@@ -127,7 +126,6 @@ export {
   GREP_PARAM_AFTER,
   GREP_PARAM_BEFORE,
   GREP_PARAM_NO_IGNORE,
-  EDIT_PARAM_INSTRUCTION,
   EDIT_PARAM_OLD_STRING,
   EDIT_PARAM_NEW_STRING,
   EDIT_PARAM_ALLOW_MULTIPLE,
@@ -423,10 +421,6 @@ The user has the ability to modify the \`new_string\` content. If modified, this
         description: 'The path to the file to modify.',
         type: 'string',
       },
-      [EDIT_PARAM_INSTRUCTION]: {
-        description: `A clear, semantic instruction for the code change, acting as a high-quality prompt for an expert LLM assistant. It must be self-contained and explain the goal of the change.`,
-        type: 'string',
-      },
       [EDIT_PARAM_OLD_STRING]: {
         description:
           'The exact literal text to replace, unescaped. If this string is not the exact literal text (i.e. you escaped it) or does not match exactly, the tool will fail.',
@@ -443,12 +437,7 @@ The user has the ability to modify the \`new_string\` content. If modified, this
           'If true, the tool will replace all occurrences of `old_string`. If false (default), it will only succeed if exactly one occurrence is found.',
       },
     },
-    required: [
-      PARAM_FILE_PATH,
-      EDIT_PARAM_INSTRUCTION,
-      EDIT_PARAM_OLD_STRING,
-      EDIT_PARAM_NEW_STRING,
-    ],
+    required: [PARAM_FILE_PATH, EDIT_PARAM_OLD_STRING, EDIT_PARAM_NEW_STRING],
   },
 };
 

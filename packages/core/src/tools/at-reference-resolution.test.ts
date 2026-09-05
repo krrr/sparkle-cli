@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ReadFileTool } from './read-file.js';
-import { WriteFileTool, getCorrectedFileContent } from './write-file.js';
+import { WriteFileTool, resolveAndReadFile } from './write-file.js';
 import { EditTool } from './edit.js';
 import { correctPath } from '../utils/pathCorrector.js';
 import path from 'node:path';
@@ -23,7 +23,6 @@ import { isSubpath } from '../utils/paths.js';
 vi.mock('../telemetry/loggers.js', () => ({
   logFileOperation: vi.fn(),
   logEditStrategy: vi.fn(),
-  logEditCorrectionEvent: vi.fn(),
 }));
 
 vi.mock('./jit-context.js', () => ({
@@ -60,7 +59,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
       isPlanMode: () => false,
       getActiveModel: () => undefined,
       getBaseLlmClient: () => undefined,
-      getDisableLLMCorrection: () => true,
       isPathAllowed(this: Config, absolutePath: string): boolean {
         const workspaceContext = this.getWorkspaceContext();
         if (workspaceContext.isPathWithinWorkspace(absolutePath)) {
@@ -363,8 +361,8 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     expect(createdContent).toContain('nested_brand_new_file_alias_win = true');
   });
 
-  it('getCorrectedFileContent blocks path traversal outside the workspace', async () => {
-    const result = await getCorrectedFileContent(
+  it('resolveAndReadFile blocks path traversal outside the workspace', async () => {
+    const result = await resolveAndReadFile(
       mockConfigInstance,
       '../../etc/passwd',
       'malicious content',
@@ -384,7 +382,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     await expect(
       modifyContext.getCurrentContent({
         file_path: '../../etc/passwd',
-        instruction: 'read file',
         old_string: '',
         new_string: '',
       }),
@@ -394,20 +391,19 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     await expect(
       modifyContext.getProposedContent({
         file_path: '../../etc/passwd',
-        instruction: 'read file',
         old_string: '',
         new_string: '',
       }),
     ).rejects.toThrow('Path not in workspace');
   });
 
-  it('getCorrectedFileContent handles symlink loops gracefully', async () => {
+  it('resolveAndReadFile handles symlink loops gracefully', async () => {
     const symlinkPath1 = path.join(tempRootDir, 'symlink1');
     const symlinkPath2 = path.join(tempRootDir, 'symlink2');
     await fsp.symlink(symlinkPath2, symlinkPath1);
     await fsp.symlink(symlinkPath1, symlinkPath2);
 
-    const result = await getCorrectedFileContent(
+    const result = await resolveAndReadFile(
       mockConfigInstance,
       'symlink1',
       'content',
@@ -432,7 +428,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     await expect(
       modifyContext.getCurrentContent({
         file_path: 'symlink1',
-        instruction: 'read file',
         old_string: '',
         new_string: '',
       }),
@@ -442,14 +437,13 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     await expect(
       modifyContext.getProposedContent({
         file_path: 'symlink1',
-        instruction: 'read file',
         old_string: '',
         new_string: '',
       }),
     ).rejects.toThrow('Failed to resolve path');
   });
 
-  it('getCorrectedFileContent successfully resolves paths in Plan Mode', async () => {
+  it('resolveAndReadFile successfully resolves paths in Plan Mode', async () => {
     const plansDir = path.join(tempRootDir, '.plans');
     await fsp.mkdir(plansDir, { recursive: true });
     await fsp.writeFile(
@@ -467,7 +461,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
       },
     }) as unknown as Config;
 
-    const result = await getCorrectedFileContent(
+    const result = await resolveAndReadFile(
       planConfigInstance,
       'plan-file.txt',
       'new plan content',
@@ -482,7 +476,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     const editTool = new EditTool(mockConfigInstance, createMockMessageBus());
     const invocation = editTool.build({
       file_path: '@policies/new-policies.txt',
-      instruction: 'update decision rule',
       old_string: 'decision = "allow"',
       new_string: 'decision = "deny"',
     });
@@ -505,7 +498,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     const editTool = new EditTool(mockConfigInstance, createMockMessageBus());
     const invocation = editTool.build({
       file_path: '@policies/brand-new-edit-file.txt',
-      instruction: 'create new file',
       old_string: '',
       new_string: '[[rule]]\nbrand_new_edit_file = true\n',
     });
@@ -538,7 +530,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     const editTool = new EditTool(mockConfigInstance, createMockMessageBus());
     const invocation = editTool.build({
       file_path: '@new-policies-edit/sub/brand-new-file.txt',
-      instruction: 'create new file in nested subdirectory',
       old_string: '',
       new_string: '[[rule]]\nnested_brand_new_edit_file = true\n',
     });
@@ -576,7 +567,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     const editTool = new EditTool(mockConfigInstance, createMockMessageBus());
     const invocation = editTool.build({
       file_path: '@/new-policies-edit-alias/sub/brand-new-file.txt',
-      instruction: 'create new file in nested subdirectory',
       old_string: '',
       new_string: '[[rule]]\nnested_brand_new_edit_file_alias = true\n',
     });
@@ -616,7 +606,6 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     const editTool = new EditTool(mockConfigInstance, createMockMessageBus());
     const invocation = editTool.build({
       file_path: '@\\new-policies-edit-alias-win\\sub\\brand-new-file.txt',
-      instruction: 'create new file in nested subdirectory',
       old_string: '',
       new_string: '[[rule]]\nnested_brand_new_edit_file_alias_win = true\n',
     });
