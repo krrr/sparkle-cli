@@ -1528,14 +1528,9 @@ their corresponding top-level category object in your `settings.json` file.
   - **Requires restart:** Yes
 
 - **`experimental.contextManagement`** (boolean):
-
   - **Description:** Enable logic for context management.
   - **Default:** `false`
   - **Requires restart:** Yes
-
-- **`experimental.topicUpdateNarration`** (boolean):
-  - **Description:** Deprecated: Use general.topicUpdateNarration instead.
-  - **Default:** `false`
 
 #### `skills`
 

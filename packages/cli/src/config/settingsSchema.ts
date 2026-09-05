@@ -2233,15 +2233,6 @@ const SETTINGS_SCHEMA = {
         description: 'Enable logic for context management.',
         showInDialog: true,
       },
-      topicUpdateNarration: {
-        type: 'boolean',
-        label: 'Topic & Update Narration',
-        category: 'Experimental',
-        requiresRestart: false,
-        default: false,
-        description: 'Deprecated: Use general.topicUpdateNarration instead.',
-        showInDialog: false,
-      },
     },
   },
   extensions: {
