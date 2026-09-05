@@ -320,7 +320,7 @@ describe('PromptProvider', () => {
       );
 
       expect(prompt).not.toContain(
-        `As you work, the user follows along by reading topic updates that you publish with ${UPDATE_TOPIC_TOOL_NAME}.`,
+        `The user follows your progress through chapter headings you publish with ${UPDATE_TOPIC_TOOL_NAME}.`,
       );
     });
 
@@ -337,7 +337,7 @@ describe('PromptProvider', () => {
       );
 
       expect(prompt).toContain(
-        `As you work, the user follows along by reading topic updates that you publish with ${UPDATE_TOPIC_TOOL_NAME}.`,
+        `The user follows your progress through chapter headings you publish with ${UPDATE_TOPIC_TOOL_NAME}.`,
       );
     });
   });

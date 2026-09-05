@@ -263,9 +263,12 @@ describe('Session Cleanup Integration', () => {
       expect(result.skipped).toBe(2); // Should keep recent and current sessions
       expect(result.failed).toBe(0);
 
-      // Verify files on disk
-      const remainingFiles = await fs.readdir(chatsDir);
-      expect(remainingFiles).toHaveLength(2); // Only 2 files should remain
+      // Verify files on disk (filter out the non-session `.sessions-index.json`
+      // sidecar cache that getAllSessionFiles maintains)
+      const remainingFiles = (await fs.readdir(chatsDir)).filter((f) =>
+        f.startsWith(SESSION_FILE_PREFIX),
+      );
+      expect(remainingFiles).toHaveLength(2); // Only 2 session files should remain
       expect(remainingFiles).toContain(
         `${SESSION_FILE_PREFIX}2025-01-15T10-00-00-recent789.jsonl`,
       );
@@ -417,8 +420,11 @@ describe('Session Cleanup Integration', () => {
       expect(result.deleted).toBe(2);
       expect(result.skipped).toBe(1);
 
-      // Verify on-disk file states
-      const chats = await fs.readdir(chatsDir);
+      // Verify on-disk file states (filter out the non-session
+      // `.sessions-index.json` sidecar cache that getAllSessionFiles maintains)
+      const chats = (await fs.readdir(chatsDir)).filter((f) =>
+        f.startsWith(SESSION_FILE_PREFIX),
+      );
       expect(chats).toHaveLength(1);
       expect(chats).toContain(
         `${SESSION_FILE_PREFIX}2025-01-20T10-00-00-${currentShortId}.jsonl`,

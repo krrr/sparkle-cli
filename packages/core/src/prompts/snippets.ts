@@ -11,8 +11,8 @@ import {
   ENTER_PLAN_MODE_TOOL_NAME,
   EXIT_PLAN_MODE_TOOL_NAME,
   UPDATE_TOPIC_TOOL_NAME,
-  TOPIC_PARAM_TITLE,
   TOPIC_PARAM_SUMMARY,
+  TOPIC_PARAM_STRATEGIC_INTENT,
   GLOB_TOOL_NAME,
   GREP_TOOL_NAME,
   READ_FILE_TOOL_NAME,
@@ -630,19 +630,13 @@ function mandateConfirm(interactive: boolean): string {
 function mandateTopicUpdateModel(): string {
   return `
 ## Topic Updates
-As you work, the user follows along by reading topic updates that you publish with ${UPDATE_TOPIC_TOOL_NAME}. Keep them informed by doing the following:
 
-- Usage Exception: NEVER use ${UPDATE_TOPIC_TOOL_NAME} for answering questions, providing explanations, or performing isolated lookup tasks (e.g. reading a single file, running a quick search, or checking a version). It is STRICTLY for orchestrating multi-step codebase modifications or complex investigations involving 3 or more tool calls.
-- Always call ${UPDATE_TOPIC_TOOL_NAME} in your first turn.
-- For tasks taking multiple turns, also call ${UPDATE_TOPIC_TOOL_NAME} in your last turn to recap what was done.
-- Each topic update should give a concise description of what you are doing for the next few turns in the \`${TOPIC_PARAM_SUMMARY}\` parameter.
-- Provide topic updates whenever you change "topics". A topic is typically a discrete subgoal and will be every 3 to 10 turns. Do not use ${UPDATE_TOPIC_TOOL_NAME} on every turn.
-- The typical complex user message should call ${UPDATE_TOPIC_TOOL_NAME} 3 or more times. Each corresponds to a distinct phase of the task, such as "Researching X", "Researching Y", "Implementing Z with X", and "Testing Z".
-- Remember to call ${UPDATE_TOPIC_TOOL_NAME} when you experience an unexpected event (e.g., a test failure, compilation error, environment issue, or unexpected learning) that requires a strategic detour.
-- **Examples:**
-  - \`update_topic(${TOPIC_PARAM_TITLE}="Researching Parser", ${TOPIC_PARAM_SUMMARY}="I am starting an investigation into the parser timeout bug. My goal is to first understand the current test coverage and then attempt to reproduce the failure. This phase will focus on identifying the bottleneck in the main loop before we move to implementation.")\`
-  - \`update_topic(${TOPIC_PARAM_TITLE}="Implementing Buffer Fix", ${TOPIC_PARAM_SUMMARY}="I have completed the research phase and identified a race condition in the tokenizer's buffer management. I am now transitioning to implementation. This new chapter will focus on refactoring the buffer logic to handle async chunks safely, followed by unit testing the fix.")\`
+The user follows your progress through chapter headings you publish with ${UPDATE_TOPIC_TOOL_NAME}. Call it ONLY when you start a new topic (logical phase) or shift strategic intent. Never use it for questions, explanations, or isolated lookups (a single read, search, or version check).
 
+- Each call marks a chapter transition: \`${TOPIC_PARAM_SUMMARY}\` recounts what just finished and what comes next; \`${TOPIC_PARAM_STRATEGIC_INTENT}\` states your immediate goal in one sentence.
+- Do not call on a fixed cadence or in every turn; let actual phase changes drive the calls. Simple tasks and Q&A need none.
+- For complex work, phases typically map to Research → Implementation → Testing — a handful of updates, not one per turn.
+- Also update the topic when an unexpected event (test failure, compilation error, environment issue) forces a strategic detour.
 `;
 }
 

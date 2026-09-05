@@ -231,12 +231,11 @@ export function getUpdateTopicDeclaration(): FunctionDeclaration {
         [TOPIC_PARAM_SUMMARY]: {
           type: 'string',
           description:
-            '(OPTIONAL) A detailed summary (5-10 sentences) covering both the work completed in the previous topic and the strategic intent of the new topic. This is required when transitioning between topics to maintain continuity.',
+            'Summary of the work just completed and the immediate next goal. Provide only when starting a new topic.',
         },
         [TOPIC_PARAM_STRATEGIC_INTENT]: {
           type: 'string',
-          description:
-            'A mandatory one-sentence statement of your immediate intent.',
+          description: 'One sentence stating your immediate goal.',
         },
       },
       required: [TOPIC_PARAM_STRATEGIC_INTENT],

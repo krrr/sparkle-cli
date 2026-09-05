@@ -15,15 +15,14 @@ describe('update_topic_behavior', () => {
 
   /**
    * Verifies the desired behavior of the update_topic tool. update_topic is used by the
-   * agent to share periodic, concise updates about what the agent is working on, independent
-   * of the regular model output and/or thoughts. This tool is expected to be called at least
-   * at the start and end of the session, and typically at least once in the middle, but no
-   * more than 1/4 turns.
+   * agent to mark chapter transitions (logical phases) so the user can follow structured
+   * progress, independent of the regular model output and/or thoughts. It should be called
+   * when the agent changes topic or strategic intent, but not on every turn.
    */
   evalTest('USUALLY_PASSES', {
     suiteName: 'default',
     suiteType: 'behavioral',
-    name: 'update_topic should be used at start, end and middle for complex tasks',
+    name: 'update_topic should mark chapter transitions for complex tasks',
     prompt: `Create a simple users REST API using Express. 
 1. Initialize a new npm project and install express.
 2. Create src/app.ts as the main entry point.
@@ -54,38 +53,22 @@ describe('update_topic_behavior', () => {
         (l) => l.toolRequest.name === UPDATE_TOPIC_TOOL_NAME,
       );
 
-      // 1. Assert that update_topic is called at least 3 times (start, middle, end)
+      // update_topic should be used at least once to mark a chapter transition.
       expect(
         topicCalls.length,
-        `Expected at least 3 update_topic calls, but found ${topicCalls.length}`,
-      ).toBeGreaterThanOrEqual(3);
-
-      // 2. Assert update_topic is called at the very beginning (first tool call)
-      expect(
-        toolLogs[0].toolRequest.name,
-        'First tool call should be update_topic',
-      ).toBe(UPDATE_TOPIC_TOOL_NAME);
-
-      // 3. Assert update_topic is called near the end
-      const lastTopicCallIndex = toolLogs
-        .map((l) => l.toolRequest.name)
-        .lastIndexOf(UPDATE_TOPIC_TOOL_NAME);
-      expect(
-        lastTopicCallIndex,
-        'Expected update_topic to be used near the end of the task',
-      ).toBeGreaterThanOrEqual(toolLogs.length * 0.7);
-
-      // 4. Assert there is at least one update_topic call in the middle (between start and end phases)
-      const middleTopicCalls = topicCalls.slice(1, -1);
-
-      expect(
-        middleTopicCalls.length,
-        'Expected at least one update_topic call in the middle of the task',
+        `Expected at least 1 update_topic call, but found ${topicCalls.length}`,
       ).toBeGreaterThanOrEqual(1);
 
-      // 5. Turn Ratio Assertion: update_topic should be <= 1/2 of total turns.
-      // We only enforce this for tasks that take more than 5 turns, as shorter tasks
-      // naturally have a higher ratio when following the "start, middle, end" rule.
+      // Every update_topic call should carry its strategic intent.
+      for (const call of topicCalls) {
+        expect(
+          JSON.stringify(call.toolRequest.args),
+          'Every update_topic call should include strategic_intent',
+        ).toContain('strategic_intent');
+      }
+
+      // Turn Ratio Assertion: update_topic should not be called on most turns.
+      // We only enforce this for tasks that take more than 5 turns.
       const uniquePromptIds = new Set(
         toolLogs
           .map((l) => l.toolRequest.prompt_id)
@@ -105,15 +88,8 @@ describe('update_topic_behavior', () => {
 
         expect(
           ratio,
-          `update_topic was used in ${topicTurnCount} out of ${totalTurns} turns (${(ratio * 100).toFixed(1)}%). Expected <= 50%.`,
-        ).toBeLessThanOrEqual(0.5);
-
-        // Ideal ratio is closer to 1/5 (20%). We log high usage as a warning.
-        if (ratio > 0.25) {
-          console.warn(
-            `[Efficiency Warning] update_topic usage is high: ${(ratio * 100).toFixed(1)}% (Goal: ~20%)`,
-          );
-        }
+          `update_topic was used in ${topicTurnCount} out of ${totalTurns} turns (${(ratio * 100).toFixed(1)}%). Expected <= 1/3.`,
+        ).toBeLessThanOrEqual(1 / 3);
       }
     },
   });
@@ -216,8 +192,8 @@ export default app;
       );
 
       // This is a multi-step task (read, create new file, edit old file).
-      // It should clear the bar and use update_topic at least at the start and end.
-      expect(topicCalls.length).toBeGreaterThanOrEqual(2);
+      // It should mark at least one chapter transition.
+      expect(topicCalls.length).toBeGreaterThanOrEqual(1);
 
       // Verify it actually did the refactoring to ensure it didn't just fail immediately
       expect(fs.existsSync(path.join(rig.testDir!, 'src/routes.ts'))).toBe(
