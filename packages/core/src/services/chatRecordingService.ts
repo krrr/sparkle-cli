@@ -1060,4 +1060,41 @@ export class ChatRecordingService {
       throw error;
     }
   }
+
+  /**
+   * Overlays display metadata from a source conversation onto matching
+   * messages of this recording (keyed by message id). Only UI decoration is
+   * copied — `content` and per-call `args`/`status` stay owned by the current
+   * recording, which was rebuilt from the freshest agent history. Used by
+   * /fork so the new session keeps the original tool-call details (result
+   * display, display name, description, ...) instead of bare function-call
+   * records.
+   */
+  mergeMetadataFrom(source: ConversationRecord | null | undefined): void {
+    if (!source || !this.conversationFile || !this.cachedConversation) return;
+
+    const sourceById = new Map(source.messages.map((m) => [m.id, m]));
+    const messages = this.cachedConversation.messages.map((message) => {
+      const src = sourceById.get(message.id);
+      if (!src || src.type !== 'gemini' || message.type !== 'gemini') {
+        return message;
+      }
+      // Existing (source) records win on id collisions so the original UI
+      // metadata is restored without dropping calls only the current
+      // recording knows about.
+      const toolCalls = mergeToolCalls(src.toolCalls, message.toolCalls ?? []);
+      return {
+        ...message,
+        ...(toolCalls.length > 0 ? { toolCalls } : {}),
+        thoughts: message.thoughts ?? src.thoughts,
+        tokens: message.tokens ?? src.tokens,
+        model: message.model ?? src.model,
+      };
+    });
+
+    this.updateMetadata({
+      messages,
+      lastUpdated: new Date().toISOString(),
+    });
+  }
 }

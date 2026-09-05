@@ -14,6 +14,7 @@ import {
   type GeminiClient,
   uiTelemetryService,
   type HistoryTurn,
+  type ConversationRecord,
 } from 'sparkle-cli-core';
 
 import * as fsPromises from 'node:fs/promises';
@@ -732,21 +733,23 @@ describe('chatCommand', () => {
       },
     ];
 
-    let mockStartChat: ReturnType<typeof vi.fn>;
+    let mockResetChat: ReturnType<typeof vi.fn>;
     let mockResetNewSessionState: ReturnType<typeof vi.fn>;
     let mockRefreshMemory: ReturnType<typeof vi.fn>;
     let mockSaveSummary: ReturnType<typeof vi.fn>;
     let mockGetConversation: ReturnType<typeof vi.fn>;
+    let mockMergeMetadataFrom: ReturnType<typeof vi.fn>;
     let mockClearInjections: ReturnType<typeof vi.fn>;
     let mockClearTelemetry: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
       forkCommand = getSubCommand('fork');
-      mockStartChat = vi.fn().mockResolvedValue(undefined);
+      mockResetChat = vi.fn().mockResolvedValue(undefined);
       mockResetNewSessionState = vi.fn();
       mockRefreshMemory = vi.fn().mockResolvedValue(undefined);
       mockSaveSummary = vi.fn();
       mockGetConversation = vi.fn().mockReturnValue(null);
+      mockMergeMetadataFrom = vi.fn();
       mockClearInjections = vi.fn();
       mockClearTelemetry = vi.spyOn(uiTelemetryService, 'clear');
       mockGetHistory.mockReturnValue(mockHistory);
@@ -761,9 +764,10 @@ describe('chatCommand', () => {
         },
         geminiClient: {
           getChat: mockGetChat,
-          startChat: mockStartChat,
+          resetChat: mockResetChat,
           getChatRecordingService: () => ({
             getConversation: mockGetConversation,
+            mergeMetadataFrom: mockMergeMetadataFrom,
             saveSummary: mockSaveSummary,
           }),
         } as unknown as GeminiClient,
@@ -792,7 +796,7 @@ describe('chatCommand', () => {
         messageType: 'info',
         content: 'No conversation found to fork.',
       });
-      expect(mockStartChat).not.toHaveBeenCalled();
+      expect(mockResetChat).not.toHaveBeenCalled();
     });
 
     it('should fork the conversation into a new session', async () => {
@@ -801,9 +805,9 @@ describe('chatCommand', () => {
       expect(mockClearInjections).toHaveBeenCalled();
       expect(mockResetNewSessionState).toHaveBeenCalledWith(expect.any(String));
       expect(mockClearTelemetry).toHaveBeenCalledWith(expect.any(String));
-      expect(mockStartChat).toHaveBeenCalledWith(mockHistory);
+      expect(mockResetChat).toHaveBeenCalledWith(mockHistory);
+      expect(mockMergeMetadataFrom).toHaveBeenCalledWith(null);
       expect(mockSaveSummary).toHaveBeenCalledWith('Fork: Hello');
-      expect(mockRefreshMemory).toHaveBeenCalled();
       expect(mockContext.ui.loadHistory).toHaveBeenCalledWith([
         { id: 1, type: 'gemini', text: 'context response' },
         { id: 2, type: 'user', text: 'Hello' },
@@ -816,8 +820,64 @@ describe('chatCommand', () => {
       });
     });
 
-    it('should report an error if starting the new chat fails', async () => {
-      mockStartChat.mockRejectedValue(new Error('boom'));
+    it('should restore the original UI metadata onto the forked session', async () => {
+      const sourceConversation = {
+        sessionId: 'source',
+        projectHash: 'p',
+        startTime: '2026-01-01T00:00:00.000Z',
+        lastUpdated: '2026-01-01T00:00:00.000Z',
+        messages: [],
+        summary: 'Original summary',
+      } as unknown as ConversationRecord;
+      mockGetConversation.mockReturnValue(sourceConversation);
+
+      await forkCommand?.action?.(mockContext, '');
+
+      expect(mockMergeMetadataFrom).toHaveBeenCalledWith(sourceConversation);
+      expect(mockSaveSummary).toHaveBeenCalledWith('Fork: Original summary');
+    });
+
+    it('should render tool groups in the live transcript from the source recording', async () => {
+      const sourceConversation = {
+        sessionId: 'source',
+        projectHash: 'p',
+        startTime: '2026-01-01T00:00:00.000Z',
+        lastUpdated: '2026-01-01T00:00:00.000Z',
+        summary: 'Original summary',
+        messages: [
+          {
+            id: 'm1',
+            timestamp: '2026-01-01T00:00:00.000Z',
+            type: 'gemini',
+            content: 'Hi there!',
+            model: 'test-model',
+            toolCalls: [
+              {
+                id: 'c1',
+                name: 'run_shell_command',
+                args: { command: 'node --version' },
+                status: 'success',
+                timestamp: '2026-01-01T00:00:00.000Z',
+                displayName: 'Shell',
+                description: 'node --version',
+              },
+            ],
+          },
+        ],
+      } as unknown as ConversationRecord;
+      mockGetConversation.mockReturnValue(sourceConversation);
+
+      await forkCommand?.action?.(mockContext, '');
+
+      expect(mockContext.ui.loadHistory).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({ type: 'tool_group' }),
+        ]),
+      );
+    });
+
+    it('should report an error if resetting the new chat fails', async () => {
+      mockResetChat.mockRejectedValue(new Error('boom'));
       const result = await forkCommand?.action?.(mockContext, '');
       expect(result).toEqual({
         type: 'message',
@@ -866,7 +926,7 @@ describe('chatCommand', () => {
 
       await forkCommand?.action?.(mockContext, '');
 
-      expect(mockStartChat).toHaveBeenCalledWith(historyTurns);
+      expect(mockResetChat).toHaveBeenCalledWith(historyTurns);
       expect(mockSaveSummary).toHaveBeenCalledWith('Fork: User prompt');
       expect(mockContext.ui.loadHistory).toHaveBeenCalledWith([
         { id: 1, type: 'user', text: 'User prompt' },

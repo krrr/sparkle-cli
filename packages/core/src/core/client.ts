@@ -313,8 +313,10 @@ export class GeminiClient {
     this.getChat().setTools(tools);
   }
 
-  async resetChat(): Promise<void> {
-    this.chat = await this.startChat();
+  async resetChat(
+    history?: ReadonlyArray<Content | HistoryTurn>,
+  ): Promise<void> {
+    this.chat = await this.startChat(history);
     this.updateTelemetryTokenCount();
     // Reset JIT context loaded paths so subdirectory context can be
     // re-discovered in the new session.

@@ -34,6 +34,7 @@ import type {
 import { MessageType } from '../types.js';
 import { exportHistoryToFile } from '../utils/historyExportUtils.js';
 import { convertToRestPayload } from 'sparkle-cli-core';
+import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
 
 const CHECKPOINT_MENU_GROUP = 'checkpoints';
 
@@ -463,27 +464,34 @@ const forkCommand: SlashCommand = {
       config?.injectionService?.clear();
 
       // Start a new conversation recording with a new session ID. We must
-      // reset the session state BEFORE calling startChat so the new
+      // reset the session state BEFORE calling resetChat so the new
       // ChatRecordingService initialized by GeminiChat picks up the new id.
       const newSessionId = randomUUID();
       config?.resetNewSessionState(newSessionId);
       uiTelemetryService.clear(newSessionId);
 
-      // Creating a new chat with the current history also creates a new
-      // persistent session file under the new session id.
-      await geminiClient.startChat([...history]);
+      // Reset the chat with the copied history. resetChat swaps the client to
+      // the new chat/session, so the writes below land in the forked session
+      // file rather than the original one.
+      await geminiClient.resetChat([...history]);
+
+      // The new recording was rebuilt from the bare model-facing history, so
+      // restore the original UI metadata (tool-call result display, display
+      // names, descriptions, thoughts, tokens, model) from the source
+      // conversation to keep the forked session's details intact.
+      geminiClient.getChatRecordingService()?.mergeMetadataFrom(originalRecord);
 
       // Persist the distinguishing summary. AI summary generation skips
       // sessions that already have a summary, so this is stable.
       geminiClient.getChatRecordingService()?.saveSummary(forkSummary);
 
-      // Reset the JIT context manager so subdirectory context is discovered
-      // for the new session.
-      await config?.getMemoryContextManager()?.refresh();
-
-      // Rebuild the UI history from the copied conversation, mirroring what
-      // resume does so thought/functionCall parts are excluded.
-      const rawUiHistory = convertContentHistoryToUiHistory(history);
+      // Rebuild the UI history from the source recording (mirroring what
+      // resume/rewind do) so tool groups and their UI metadata are shown in
+      // the live transcript, falling back to the model-facing history when
+      // no recording is available.
+      const rawUiHistory = originalRecord
+        ? convertSessionToHistoryFormats(originalRecord.messages).uiHistory
+        : convertContentHistoryToUiHistory(history);
       const uiHistory: HistoryItem[] = rawUiHistory.map((item, index) => ({
         ...item,
         id: index + 1,

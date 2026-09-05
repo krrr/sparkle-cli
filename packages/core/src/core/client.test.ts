@@ -454,6 +454,24 @@ describe('Gemini Client (client.ts)', () => {
 
       await expect(client.resetChat()).resolves.not.toThrow();
     });
+
+    it('should seed the new chat with the provided history', async () => {
+      const extraHistory: Content[] = [
+        { role: 'user', parts: [{ text: 'Old message' }] },
+        { role: 'model', parts: [{ text: 'Old response' }] },
+      ];
+
+      const initialChat = client.getChat();
+      await client.resetChat(extraHistory);
+
+      // The client is swapped to a new chat seeded with the history.
+      expect(client.getChat()).not.toBe(initialChat);
+      const history = client.getHistory();
+      expect(history[0].role).toBe('user');
+      expect(history[0].parts?.[0]?.text).toContain('This is the Sparkle CLI');
+      expect(history[0].parts).toContainEqual({ text: 'Old message' });
+      expect(history[1]).toEqual(extraHistory[1]);
+    });
   });
 
   describe('startChat', () => {

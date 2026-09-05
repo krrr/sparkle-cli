@@ -1204,6 +1204,194 @@ describe('ChatRecordingService', () => {
     });
   });
 
+  describe('mergeMetadataFrom', () => {
+    it('should overlay UI metadata from a source conversation onto matching messages', async () => {
+      await chatRecordingService.initialize();
+
+      // Simulate the /fork path: the recording is rebuilt from the bare
+      // model-facing history, producing tool calls without UI metadata.
+      chatRecordingService.updateMessagesFromHistory([
+        {
+          id: 'model-1',
+          content: {
+            role: 'model',
+            parts: [
+              {
+                functionCall: {
+                  id: 'call-1',
+                  name: 'run_shell_command',
+                  args: { command: 'node --version' },
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 'user-1',
+          content: {
+            role: 'user',
+            parts: [
+              {
+                functionResponse: {
+                  id: 'call-1',
+                  name: 'run_shell_command',
+                  response: { output: 'v22.14.0' },
+                },
+              },
+            ],
+          },
+        },
+      ]);
+
+      const bareMessage = chatRecordingService
+        .getConversation()!
+        .messages.find(
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
+            m.type === 'gemini',
+        )!;
+      expect(bareMessage.toolCalls![0]).toEqual({
+        id: 'call-1',
+        name: 'run_shell_command',
+        args: { command: 'node --version' },
+        status: CoreToolCallStatus.Success,
+        timestamp: expect.any(String),
+      });
+
+      // Source conversation carrying the original UI metadata.
+      const sourceMessage: Extract<MessageRecord, { type: 'gemini' }> = {
+        ...bareMessage,
+        thoughts: [
+          {
+            subject: '',
+            description: 'Checking Node version',
+            timestamp: '2026-01-01T00:00:00.000Z',
+          },
+        ],
+        tokens: {
+          input: 10,
+          output: 5,
+          cached: 0,
+          thoughts: 0,
+          tool: 0,
+          total: 15,
+        },
+        model: 'test-model',
+        toolCalls: [
+          {
+            ...bareMessage.toolCalls![0],
+            resultDisplay: 'v22.14.0',
+            description: 'node --version',
+            displayName: 'Shell',
+            renderOutputAsMarkdown: false,
+          },
+        ],
+      };
+      const source: ConversationRecord = {
+        sessionId: 'source',
+        projectHash: 'p',
+        startTime: '2026-01-01T00:00:00.000Z',
+        lastUpdated: '2026-01-01T00:00:00.000Z',
+        messages: [sourceMessage],
+      };
+
+      chatRecordingService.mergeMetadataFrom(source);
+
+      const mergedMessage = chatRecordingService
+        .getConversation()!
+        .messages.find(
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
+            m.type === 'gemini',
+        )!;
+      expect(mergedMessage.toolCalls![0]).toMatchObject({
+        id: 'call-1',
+        name: 'run_shell_command',
+        args: { command: 'node --version' },
+        resultDisplay: 'v22.14.0',
+        description: 'node --version',
+        displayName: 'Shell',
+        renderOutputAsMarkdown: false,
+      });
+      expect(mergedMessage.thoughts).toEqual(sourceMessage.thoughts);
+      expect(mergedMessage.tokens).toEqual(sourceMessage.tokens);
+      expect(mergedMessage.model).toBe('test-model');
+      // Content stays owned by the current recording.
+      expect(mergedMessage.content).toEqual(bareMessage.content);
+
+      // Metadata is persisted to the session file.
+      const persisted = (await loadConversationRecord(
+        chatRecordingService.getConversationFilePath()!,
+      )) as ConversationRecord;
+      const persistedMessage = persisted.messages.find(
+        (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
+          m.type === 'gemini',
+      )!;
+      expect(persistedMessage.toolCalls![0].resultDisplay).toBe('v22.14.0');
+      expect(persistedMessage.thoughts).toEqual(sourceMessage.thoughts);
+    });
+
+    it('should ignore non-gemini messages and no-op on a null source', async () => {
+      await chatRecordingService.initialize();
+      chatRecordingService.updateMessagesFromHistory([
+        {
+          id: 'model-1',
+          content: {
+            role: 'model',
+            parts: [
+              {
+                functionCall: {
+                  id: 'call-1',
+                  name: 'run_shell_command',
+                  args: { command: 'node --version' },
+                },
+              },
+            ],
+          },
+        },
+      ]);
+      chatRecordingService.recordMessage({
+        type: 'user',
+        content: 'Hello',
+        model: 'm',
+      });
+
+      const geminiMessage = chatRecordingService
+        .getConversation()!
+        .messages.find(
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
+            m.type === 'gemini',
+        )!;
+      const source: ConversationRecord = {
+        sessionId: 'source',
+        projectHash: 'p',
+        startTime: '2026-01-01T00:00:00.000Z',
+        lastUpdated: '2026-01-01T00:00:00.000Z',
+        messages: [
+          {
+            ...geminiMessage,
+            toolCalls: [
+              {
+                ...geminiMessage.toolCalls![0],
+                resultDisplay: 'v22.14.0',
+              },
+            ],
+          },
+        ],
+      };
+
+      chatRecordingService.mergeMetadataFrom(source);
+
+      const messages = chatRecordingService.getConversation()!.messages;
+      // Non-gemini messages are untouched.
+      const userMessage = messages.find((m) => m.type === 'user')!;
+      expect(userMessage.content).toBe('Hello');
+      expect(messages).toHaveLength(2);
+
+      // Null source is a no-op.
+      chatRecordingService.mergeMetadataFrom(null);
+      expect(chatRecordingService.getConversation()!.messages).toHaveLength(2);
+    });
+  });
+
   describe('ENOSPC (disk full) graceful degradation - issue #16266', () => {
     it('should disable recording and not throw when ENOSPC occurs during initialize', async () => {
       const enospcError = new Error('ENOSPC: no space left on device');
