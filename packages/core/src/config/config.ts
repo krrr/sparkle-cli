@@ -1605,6 +1605,8 @@ export class Config implements McpContext, AgentLoopContext {
     this.fallbackOverrides.clear();
     this.modelConfigService.clearRuntimeOverrides();
     this.approvedPlanPath = undefined;
+    // TODO: Persist topicState (title + intent) alongside the session record
+    // and restore it on resume, so the active topic survives session restarts.
     this.topicState.reset();
     this.skillManager.reset();
     this.latestApiRequest = undefined;

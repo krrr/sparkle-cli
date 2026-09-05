@@ -357,25 +357,6 @@ describe('PromptProvider', () => {
       });
     });
 
-    it('should include active topic context when narration is enabled', () => {
-      mockConfig.topicState.setTopic('Active Chapter');
-      const provider = new PromptProvider();
-      const prompt = provider.getCoreSystemPrompt(mockConfig);
-
-      expect(prompt).toContain('[Active Topic: Active Chapter]');
-    });
-
-    it('should NOT include active topic context when narration is disabled', () => {
-      vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(
-        false,
-      );
-      mockConfig.topicState.setTopic('Active Chapter');
-      const provider = new PromptProvider();
-      const prompt = provider.getCoreSystemPrompt(mockConfig);
-
-      expect(prompt).not.toContain('[Active Topic: Active Chapter]');
-    });
-
     it('should filter out update_topic tool when narration is disabled', () => {
       vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
       vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(

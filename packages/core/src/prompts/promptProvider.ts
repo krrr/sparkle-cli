@@ -242,18 +242,7 @@ export class PromptProvider {
     );
 
     // Sanitize erratic newlines from composition
-    let sanitizedPrompt = finalPrompt.replace(/\n{3,}/g, '\n\n');
-
-    // Context Reinjection (Active Topic)
-    if (isTopicUpdateNarrationEnabled) {
-      const activeTopic = context.config.topicState.getTopic();
-      if (activeTopic) {
-        const sanitizedTopic = activeTopic
-          .replace(/\n/g, ' ')
-          .replace(/\]/g, '');
-        sanitizedPrompt += `\n\n[Active Topic: ${sanitizedTopic}]`;
-      }
-    }
+    const sanitizedPrompt = finalPrompt.replace(/\n{3,}/g, '\n\n');
 
     // Write back to file if requested
     this.maybeWriteSystemMd(

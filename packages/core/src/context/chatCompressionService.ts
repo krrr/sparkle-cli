@@ -108,6 +108,35 @@ export function modelStringToModelConfigAlias(model: string): string {
 }
 
 /**
+ * Appends the current active topic to a post-compression summary message.
+ * This keeps the system prompt byte-stable (so prefix caching is preserved)
+ * while guaranteeing the topic survives history compression, where the
+ * original update_topic call may have been summarized away. The topic is
+ * appended AFTER the closing `</state_snapshot>` tag. No-op when topic
+ * narration is disabled
+ * or no topic is set.
+ */
+export function appendActiveTopicToSummary(
+  summary: string,
+  config: Config,
+): string {
+  if (!config.isTopicUpdateNarrationEnabled()) {
+    return summary;
+  }
+  const topic = config.topicState.getTopic();
+  if (!topic) {
+    return summary;
+  }
+  const sanitize = (text: string): string =>
+    text.replace(/\n/g, ' ').replace(/\]/g, '');
+  const intent = config.topicState.getIntent();
+  const topicText = intent
+    ? `[Current Topic: ${sanitize(topic)} — Intent: ${sanitize(intent)}]`
+    : `[Current Topic: ${sanitize(topic)}]`;
+  return `${summary}\n\n${topicText}`;
+}
+
+/**
  * Processes the chat history to ensure function responses don't exceed a specific token budget.
  *
  * This function implements a "Reverse Token Budget" strategy:
@@ -421,7 +450,7 @@ export class ChatCompressionService {
     const extraHistory: Content[] = [
       {
         role: 'user',
-        parts: [{ text: finalSummary }],
+        parts: [{ text: appendActiveTopicToSummary(finalSummary, config) }],
       },
       {
         role: 'model',

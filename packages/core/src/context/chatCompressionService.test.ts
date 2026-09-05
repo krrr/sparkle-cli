@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   ChatCompressionService,
+  appendActiveTopicToSummary,
   findCompressSplitPoint,
   modelStringToModelConfigAlias,
 } from './chatCompressionService.js';
@@ -218,6 +219,11 @@ describe('ChatCompressionService', () => {
         getProjectTempDir: vi.fn().mockReturnValue(testTempDir),
       },
       getApprovedPlanPath: vi.fn().mockReturnValue('/path/to/plan.md'),
+      isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(false),
+      topicState: {
+        getTopic: vi.fn().mockReturnValue(undefined),
+        getIntent: vi.fn().mockReturnValue(undefined),
+      },
     } as unknown as Config;
 
     vi.mocked(getInitialChatHistory).mockImplementation(
@@ -313,6 +319,39 @@ describe('ChatCompressionService', () => {
     expect(result.newHistory![0].parts![0].text).toBe('Verified Summary');
     expect(mockConfig.getBaseLlmClient().generateContent).toHaveBeenCalledTimes(
       2,
+    );
+  });
+
+  it('should append the active topic to the compressed summary message', async () => {
+    vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(true);
+    vi.mocked(mockConfig.topicState.getTopic).mockReturnValue('Chapter One');
+    vi.mocked(mockConfig.topicState.getIntent).mockReturnValue(
+      'Implementing X',
+    );
+
+    const history: Content[] = [
+      { role: 'user', parts: [{ text: 'msg1' }] },
+      { role: 'model', parts: [{ text: 'msg2' }] },
+    ];
+    vi.mocked(mockChat.getHistory).mockReturnValue(history);
+    vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600000);
+
+    const result = await service.compress(
+      mockChat,
+      mockPromptId,
+      false,
+      mockModel,
+      mockConfig,
+      false,
+    );
+
+    expect(result.info.compressionStatus).toBe(CompressionStatus.COMPRESSED);
+    // The topic is appended after the snapshot summary in the same user message.
+    expect(result.newHistory![0].parts![0].text).toBe(
+      'Verified Summary\n\n[Current Topic: Chapter One — Intent: Implementing X]',
+    );
+    expect(result.newHistory![1].parts![0].text).toBe(
+      'Got it. Thanks for the additional context!',
     );
   });
 
@@ -922,5 +961,63 @@ describe('ChatCompressionService', () => {
         'Output too large.',
       );
     });
+  });
+});
+
+describe('appendActiveTopicToSummary', () => {
+  const summary =
+    '<state_snapshot>\n<overall_goal>Goal</overall_goal>\n</state_snapshot>';
+
+  let mockConfig: Config;
+
+  beforeEach(() => {
+    mockConfig = {
+      isTopicUpdateNarrationEnabled: vi.fn().mockReturnValue(true),
+      topicState: {
+        getTopic: vi.fn().mockReturnValue('Chapter One'),
+        getIntent: vi.fn().mockReturnValue('Implementing X'),
+      },
+    } as unknown as Config;
+  });
+
+  it('appends the active topic after the summary when narration is enabled and a topic is set', () => {
+    const result = appendActiveTopicToSummary(summary, mockConfig);
+
+    expect(result).toBe(
+      `${summary}\n\n[Current Topic: Chapter One — Intent: Implementing X]`,
+    );
+  });
+
+  it('omits the intent when none is set', () => {
+    vi.mocked(mockConfig.topicState.getIntent).mockReturnValue(undefined);
+
+    const result = appendActiveTopicToSummary(summary, mockConfig);
+
+    expect(result).toBe(`${summary}\n\n[Current Topic: Chapter One]`);
+  });
+
+  it('is a no-op when narration is disabled', () => {
+    vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(false);
+
+    expect(appendActiveTopicToSummary(summary, mockConfig)).toBe(summary);
+  });
+
+  it('is a no-op when no topic is set', () => {
+    vi.mocked(mockConfig.topicState.getTopic).mockReturnValue(undefined);
+
+    expect(appendActiveTopicToSummary(summary, mockConfig)).toBe(summary);
+  });
+
+  it('sanitizes newlines and closing brackets from the topic', () => {
+    vi.mocked(mockConfig.topicState.getTopic).mockReturnValue(
+      'Chapter ]One\nwith newline',
+    );
+    vi.mocked(mockConfig.topicState.getIntent).mockReturnValue(undefined);
+
+    const result = appendActiveTopicToSummary(summary, mockConfig);
+
+    expect(result).toBe(
+      `${summary}\n\n[Current Topic: Chapter One with newline]`,
+    );
   });
 });

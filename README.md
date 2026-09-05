@@ -13,6 +13,7 @@ from the shape of Gemini's icon.
 - Add multi LLM provider switching
 - Remove Google Cloud and Enterprise features (keep Gemini API)
 - Boost startup speed, optimize UI smoothness
+- Improve prefix cache hit rate, also reduce token usage
 
 ## Installation
 
