@@ -318,7 +318,7 @@ export const getAllSessionFiles = async (
     );
 
     // Persist index only when actually changed.
-    if (isDeepStrictEqual(next, cached)) {
+    if (!isDeepStrictEqual(next, cached)) {
       try {
         await writeSessionsIndex(chatsDir, {
           version: SESSION_INDEX_VERSION,

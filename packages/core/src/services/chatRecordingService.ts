@@ -198,9 +198,7 @@ export function isResumableMessageRecord(message: MessageRecord): boolean {
 
   if (message.type === 'user') {
     return !isIgnoredUserContent(contentString.trim());
-  }
-
-  if (message.type === 'gemini') {
+  } else if (message.type === 'gemini') {
     return (
       contentString.trim().length > 0 ||
       (message.toolCalls?.length ?? 0) > 0 ||
@@ -243,11 +241,6 @@ export async function loadConversationRecord(
 
     let metadata: Partial<ConversationRecord> = {};
     const messagesMap = new Map<string, MessageRecord>();
-    const messageIds: string[] = [];
-    const messageKinds = new Map<
-      string,
-      { isUser: boolean; isResumable: boolean }
-    >();
     let isTrackingMemoryScratchpadFreshness = false;
     let memoryScratchpadIsStale = false;
     let firstUserMessageStr: string | undefined;
@@ -261,31 +254,19 @@ export async function loadConversationRecord(
             memoryScratchpadIsStale = true;
           }
           const rewindId = record.$rewindTo;
-          if (options?.metadataOnly) {
-            const idx = messageIds.indexOf(rewindId);
-            if (idx !== -1) {
-              const removedIds = messageIds.splice(idx);
-              for (const removedId of removedIds) {
-                messageKinds.delete(removedId);
-              }
-            } else {
-              messageIds.length = 0;
-              messageKinds.clear();
+
+          let found = false;
+          const idsToDelete: string[] = [];
+          for (const [id] of messagesMap) {
+            if (id === rewindId) found = true;
+            if (found) idsToDelete.push(id);
+          }
+          if (found) {
+            for (const id of idsToDelete) {
+              messagesMap.delete(id);
             }
           } else {
-            let found = false;
-            const idsToDelete: string[] = [];
-            for (const [id] of messagesMap) {
-              if (id === rewindId) found = true;
-              if (found) idsToDelete.push(id);
-            }
-            if (found) {
-              for (const id of idsToDelete) {
-                messagesMap.delete(id);
-              }
-            } else {
-              messagesMap.clear();
-            }
+            messagesMap.clear();
           }
         } else if (isMessageRecord(record)) {
           if (isTrackingMemoryScratchpadFreshness) {
@@ -294,11 +275,7 @@ export async function loadConversationRecord(
           const id = record.id;
           const isUser = hasProperty(record, 'type') && record.type === 'user';
           const isResumable = isResumableMessageRecord(record);
-          // Track message count and first user message
-          if (options?.metadataOnly) {
-            messageIds.push(id);
-            messageKinds.set(id, { isUser, isResumable });
-          }
+          // Track first user message
           if (
             !firstUserMessageStr &&
             isUser &&
@@ -317,16 +294,7 @@ export async function loadConversationRecord(
             }
           }
 
-          if (!options?.metadataOnly) {
-            messagesMap.set(id, record);
-            if (
-              options?.maxMessages &&
-              messagesMap.size > options.maxMessages
-            ) {
-              const firstKey = messagesMap.keys().next().value;
-              if (typeof firstKey === 'string') messagesMap.delete(firstKey);
-            }
-          }
+          messagesMap.set(id, record);
         } else if (isMetadataUpdateRecord(record)) {
           if (hasProperty(record.$set, 'memoryScratchpad')) {
             isTrackingMemoryScratchpadFreshness = Boolean(
@@ -340,25 +308,13 @@ export async function loadConversationRecord(
           ) {
             // Checkpoint: clear and rebuild from the provided messages array
             messagesMap.clear();
-            if (options?.metadataOnly) {
-              messageIds.length = 0;
-              messageKinds.clear();
-            }
             for (const msg of record.$set.messages) {
               if (isMessageRecord(msg)) {
                 const id = msg.id;
                 const isUser = msg.type === 'user';
                 const isResumable = isResumableMessageRecord(msg);
 
-                if (options?.metadataOnly) {
-                  messageIds.push(id);
-                  messageKinds.set(id, {
-                    isUser,
-                    isResumable,
-                  });
-                } else {
-                  messagesMap.set(id, msg);
-                }
+                messagesMap.set(id, msg);
 
                 if (
                   !firstUserMessageStr &&
@@ -414,12 +370,6 @@ export async function loadConversationRecord(
         fallbackFirstUserMsg = rawContent;
       }
     }
-    const userMessageCount = options?.metadataOnly
-      ? Array.from(messageKinds.values()).filter((m) => m.isUser).length
-      : loadedMessages.filter((m) => m.type === 'user').length;
-    const hasResumableContent = options?.metadataOnly
-      ? Array.from(messageKinds.values()).some((m) => m.isResumable)
-      : hasResumableConversationContent(loadedMessages);
 
     return {
       sessionId: metadata.sessionId,
@@ -431,17 +381,15 @@ export async function loadConversationRecord(
       directories: metadata.directories,
       kind: metadata.kind,
       messages: options?.metadataOnly ? [] : loadedMessages,
-      messageCount: options?.metadataOnly
-        ? loadedMessages.length || messageIds.length
-        : loadedMessages.length,
-      userMessageCount,
+      messageCount: loadedMessages.length,
+      userMessageCount: loadedMessages.filter((m) => m.type === 'user').length,
       memoryScratchpadIsStale: isTrackingMemoryScratchpadFreshness
         ? memoryScratchpadIsStale
         : undefined,
       firstUserMessage: fallbackFirstUserMsg
         ? fallbackFirstUserMsg.slice(0, MAX_FIRST_USER_MESSAGE_LENGTH)
         : fallbackFirstUserMsg,
-      hasResumableContent,
+      hasResumableContent: hasResumableConversationContent(loadedMessages),
     };
   } catch (error) {
     debugLogger.error('Error loading conversation record from JSONL:', error);
@@ -591,13 +539,13 @@ export class ChatRecordingService {
 
   private appendRecord(record: unknown): void {
     if (!this.conversationFile) return;
+    if (this.pendingMetadata !== null) {
+      // Lazy mode: hold the record in memory until the first resumable
+      // message flushes the whole batch to disk (see flushPendingRecords).
+      this.pendingRecords.push(record);
+      return;
+    }
     try {
-      if (this.pendingMetadata !== null) {
-        // Lazy mode: hold the record in memory until the first resumable
-        // message flushes the whole batch to disk (see flushPendingRecords).
-        this.pendingRecords.push(record);
-        return;
-      }
       const line = JSON.stringify(record) + '\n';
       fs.mkdirSync(path.dirname(this.conversationFile), { recursive: true });
       fs.appendFileSync(this.conversationFile, line);

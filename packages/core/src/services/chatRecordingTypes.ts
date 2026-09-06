@@ -10,7 +10,6 @@ import type { ToolResultDisplay } from '../tools/tools.js';
 import { type ThoughtSummary } from '../utils/thoughtUtils.js';
 
 export const SESSION_FILE_PREFIX = 'session-';
-export const MAX_HISTORY_MESSAGES = 50;
 export const MAX_TOOL_OUTPUT_SIZE = 50 * 1024; // 50KB
 
 /**
@@ -115,7 +114,6 @@ export interface ResumedSessionData {
  * Returns null if the file is invalid or cannot be read.
  */
 export interface LoadConversationOptions {
-  maxMessages?: number;
   metadataOnly?: boolean;
 }
 
