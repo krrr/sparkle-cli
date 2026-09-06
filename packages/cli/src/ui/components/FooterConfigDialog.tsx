@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { isDeepStrictEqual } from 'node:util';
 import type React from 'react';
 import { useCallback, useMemo, useReducer, useState } from 'react';
 import { Box, Text } from 'ink';
@@ -137,7 +138,7 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
   const handleSaveAndClose = useCallback(() => {
     const finalItems = orderedIds.filter((id: string) => selectedIds.has(id));
     const currentSetting = settings.merged.ui?.footer?.items;
-    if (JSON.stringify(finalItems) !== JSON.stringify(currentSetting)) {
+    if (!isDeepStrictEqual(finalItems, currentSetting)) {
       setSetting(SettingScope.User, 'ui.footer.items', finalItems);
     }
     onClose?.();

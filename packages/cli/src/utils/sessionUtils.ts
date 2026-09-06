@@ -24,6 +24,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { stripUnsafeCharacters } from '../ui/utils/textUtils.js';
 import { MessageType, type HistoryItemWithoutId } from '../ui/types.js';
+import { isDeepStrictEqual } from 'node:util';
 
 /**
  * Constant for the resume "latest" identifier.
@@ -316,9 +317,8 @@ export const getAllSessionFiles = async (
       },
     );
 
-    // Persist only when the index actually changed. A failed write is
-    // non-fatal: the list stays correct and the next load retries.
-    if (JSON.stringify(next) !== JSON.stringify(cached)) {
+    // Persist index only when actually changed.
+    if (isDeepStrictEqual(next, cached)) {
       try {
         await writeSessionsIndex(chatsDir, {
           version: SESSION_INDEX_VERSION,

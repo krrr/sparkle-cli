@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { isDeepStrictEqual } from 'node:util';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import type React from 'react';
 import { Text } from 'ink';
@@ -75,8 +76,8 @@ const KEY_CTRL_N = new KeyBinding('ctrl+n');
 // restartRequiredSetting -> Map { scopeName -> value }
 function getActiveRestartRequiredSettings(
   settings: SettingsState,
-): Map<string, Map<string, string>> {
-  const snapshot = new Map<string, Map<string, string>>();
+): Map<string, Map<string, unknown>> {
+  const snapshot = new Map<string, Map<string, unknown>>();
   const scopes: Array<[string, Settings]> = [
     ['User', settings.user.settings],
     ['Workspace', settings.workspace.settings],
@@ -84,13 +85,13 @@ function getActiveRestartRequiredSettings(
   ];
 
   for (const key of getDialogRestartRequiredSettings()) {
-    const scopeMap = new Map<string, string>();
+    const scopeMap = new Map<string, unknown>();
     for (const [scopeName, scopeSettings] of scopes) {
       // Raw per-scope value (undefined if not in file)
       const value = isInSettingsScope(key, scopeSettings)
         ? getEffectiveValue(key, scopeSettings)
         : undefined;
-      scopeMap.set(scopeName, JSON.stringify(value));
+      scopeMap.set(scopeName, value);
     }
     snapshot.set(key, scopeMap);
   }
@@ -206,8 +207,8 @@ export function SettingsDialog({
         const currentValue = isInSettingsScope(key, scopeSettings)
           ? getEffectiveValue(key, scopeSettings)
           : undefined;
-        const initialJson = initialScopeMap.get(scopeName);
-        if (JSON.stringify(currentValue) !== initialJson) {
+        const initialValue = initialScopeMap.get(scopeName);
+        if (!isDeepStrictEqual(currentValue, initialValue)) {
           changed.add(key);
           break; // one scope changed is enough
         }

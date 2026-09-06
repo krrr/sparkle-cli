@@ -16,6 +16,7 @@ import {
 } from '../utils/sessionOperations.js';
 import readline from 'node:readline';
 import { randomUUID } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { CoreToolCallStatus } from '../scheduler/types.js';
 import type {
   Part,
@@ -1020,8 +1021,6 @@ export class ChatRecordingService {
     if (!this.conversationFile || !this.cachedConversation) return;
 
     try {
-      let updated = false;
-
       // 1. Sync content and IDs, deduplicating turns that share an id so that
       // records duplicated by polluted checkpoints collapse back to one.
       const newMessages: MessageRecord[] = [];
@@ -1059,14 +1058,6 @@ export class ChatRecordingService {
             existingToolCalls,
             extractToolCallsFromParts(turn.content.parts || []),
           );
-          // If content parts have changed (e.g. masking), update them
-          if (
-            JSON.stringify(existing.content) !== JSON.stringify(syncedParts) ||
-            JSON.stringify(existingToolCalls ?? []) !==
-              JSON.stringify(syncedToolCalls)
-          ) {
-            updated = true;
-          }
           newMessages.push({
             ...existing,
             content: syncedParts,
@@ -1075,9 +1066,8 @@ export class ChatRecordingService {
               : {}),
           });
         } else {
-          // It's a new (possibly synthetic) turn like a summary
-          updated = true;
-          // Preserve tool-call metadata for model turns: `toDurableContentParts`
+          // It's a new (possibly synthetic) turn like a summary. Preserve
+          // tool-call metadata for model turns: `toDurableContentParts`
           // strips functionCall parts from content, so extract them first or
           // the new record would be unusable for resume/rewind pairing.
           const toolCalls = extractToolCallsFromParts(turn.content.parts || []);
@@ -1093,10 +1083,10 @@ export class ChatRecordingService {
         }
       }
 
-      if (
-        updated ||
-        newMessages.length !== this.cachedConversation.messages.length
-      ) {
+      // 2. Skip the checkpoint write entirely when the rebuilt state is
+      // identical to what is already persisted (e.g. a pure resume
+      // round-trip). Ignore key order difference of objects.
+      if (!isDeepStrictEqual(newMessages, this.cachedConversation.messages)) {
         this.cachedConversation.messages = newMessages;
         // Lazy persistence: a sync that carries real conversation content
         // (e.g. the first user turn recorded via setHistory in the context

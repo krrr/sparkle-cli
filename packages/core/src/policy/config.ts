@@ -8,6 +8,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import { Storage } from '../config/storage.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import {
@@ -568,8 +569,7 @@ function findMatchingRule(
     (r) =>
       r.toolName === criteria.toolName &&
       r.mcpName === criteria.mcpName &&
-      JSON.stringify(r.commandPrefix) ===
-        JSON.stringify(criteria.commandPrefix) &&
+      isDeepStrictEqual(r.commandPrefix, criteria.commandPrefix) &&
       r.argsPattern === criteria.argsPattern,
   );
 }
