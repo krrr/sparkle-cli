@@ -1,6 +1,6 @@
 {
-  "name": "sparkle-cli",
-  "version": "0.0.1",
+  "name": "@krrr/sparkle-cli",
+  "version": "0.0.2",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -9,11 +9,11 @@
     "packages/*",
     "third_party/ink"
   ],
-  "private": "true",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/krrr/sparkle-cli.git"
   },
+  "license": "Apache-2.0",
   "config": {
     "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.54.4"
   },
