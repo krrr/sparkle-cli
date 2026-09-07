@@ -107,6 +107,36 @@ describe('Retry Utility Fallback Integration', () => {
     expect(mockApiCall).toHaveBeenCalledTimes(3);
   });
 
+  it('should call onPersistent429 immediately on attempt 1 when classifyGoogleError returns TerminalQuotaError', async () => {
+    const mockApiCall = vi
+      .fn()
+      .mockRejectedValue(
+        new TerminalQuotaError('Capacity exhausted', mockGoogleApiError),
+      );
+
+    const mockPersistent429Callback = vi.fn(
+      async () =>
+        // Return null to stop retrying after fallback attempt
+        null,
+    );
+
+    const promise = retryWithBackoff(mockApiCall, {
+      maxAttempts: 10, // High maxAttempts to prove we don't wait for max attempts
+      initialDelayMs: 1,
+      maxDelayMs: 10,
+      onPersistent429: mockPersistent429Callback,
+      authType: ProviderType.USE_GEMINI,
+    });
+
+    await expect(promise).rejects.toThrow('Capacity exhausted');
+    expect(mockApiCall).toHaveBeenCalledTimes(1); // Only called once because it's terminal and fallback returned null
+    expect(mockPersistent429Callback).toHaveBeenCalledTimes(1);
+    expect(mockPersistent429Callback).toHaveBeenCalledWith(
+      ProviderType.USE_GEMINI,
+      expect.any(TerminalQuotaError),
+    );
+  });
+
   it('should trigger onPersistent429 when HTTP 499 persists through all retry attempts', async () => {
     let fallbackCalled = false;
     const mockError: HttpError = new Error('Simulated 499 error');
