@@ -19,6 +19,8 @@ from the shape of Gemini's icon.
 
 `npm -g install @krrr/sparkle-cli`
 
+`sparkle`
+
 Requires Node.js 20+
 
 ## Configuration
@@ -28,4 +30,4 @@ Set up LLM provider and its models in GUI.
 ## Fork
 
 Initially forked from https://github.com/google-gemini/gemini-cli/commits
-57f9688 in main branch.
+63c5b74 in main branch.
