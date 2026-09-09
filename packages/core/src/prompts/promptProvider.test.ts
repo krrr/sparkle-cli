@@ -394,7 +394,7 @@ describe('PromptProvider', () => {
 
       expect(prompt).toContain('## Topic Updates');
       expect(prompt).toContain(UPDATE_TOPIC_TOOL_NAME);
-      expect(prompt).toContain('No Chitchat');
+      expect(prompt).toContain('Zero Fluff & Narration');
       expect(prompt).toContain('Topic Model');
     });
   });

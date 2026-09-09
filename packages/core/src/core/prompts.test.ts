@@ -244,7 +244,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     const prompt = getCoreSystemPrompt(mockConfig);
     expect(prompt).toContain('You are Sparkle CLI, an interactive CLI agent'); // Check for core content
     expect(prompt).toContain('- **User Hints:**');
-    expect(prompt).toContain('No Chitchat:');
+    expect(prompt).toContain('Zero Fluff & Narration:');
     expect(prompt).toMatchSnapshot();
   });
 
@@ -254,7 +254,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     );
     const prompt = getCoreSystemPrompt(mockConfig);
     expect(prompt).toContain('You are Sparkle CLI, an interactive CLI agent'); // Check for core content
-    expect(prompt).toContain('No Chitchat:');
+    expect(prompt).toContain('Zero Fluff & Narration:');
     expect(prompt).toMatchSnapshot();
   });
 
@@ -283,7 +283,7 @@ describe('Core System Prompt (prompts.ts)', () => {
     const prompt = getCoreSystemPrompt(mockConfig, userMemory);
     expect(prompt).not.toContain('---\n\n'); // Separator should not be present
     expect(prompt).toContain('You are Sparkle CLI, an interactive CLI agent'); // Check for core content
-    expect(prompt).toContain('No Chitchat:');
+    expect(prompt).toContain('Zero Fluff & Narration:');
     expect(prompt).toMatchSnapshot(); // Use snapshot for base prompt structure
   });
 
