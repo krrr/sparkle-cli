@@ -393,6 +393,119 @@ fileDiff Index: Dockerfile
         await waitFor(() => expect(lastFrame()).toContain('RUN npm run build'));
         expect(lastFrame()).toMatchSnapshot();
       });
+
+      it('highlights changed words with a darker background within paired lines', async () => {
+        const wordChangeDiff = `
+diff --git a/test.js b/test.js
+index 123..456 100644
+--- a/test.js
++++ b/test.js
+@@ -1,1 +1,1 @@
+-const oldVar = 1;
++const newVar = 1;
+`;
+        const { lastFrame, lastFrameRaw, waitUntilReady } =
+          await renderWithProviders(
+            <OverflowProvider>
+              <DiffRenderer
+                diffContent={wordChangeDiff}
+                filename="test.js"
+                terminalWidth={80}
+              />
+            </OverflowProvider>,
+            {
+              settings: createMockSettings({ ui: { useAlternateBuffer } }),
+            },
+          );
+        await waitUntilReady();
+        await waitFor(() => expect(lastFrame()).toContain('newVar'));
+
+        const raw = lastFrameRaw();
+        // Dark-theme line backgrounds (DiffAdded #005f00 / DiffRemoved
+        // #5f0000) render as 24-bit SGR background sequences.
+        const lineBackgrounds = raw.match(
+          new RegExp(
+            `${String.fromCharCode(27)}\\[48;2;(\\d+);(\\d+);(\\d+)m`,
+            'g',
+          ),
+        );
+        expect(lineBackgrounds).not.toBeNull();
+        const rgbValues = new Set(
+          lineBackgrounds?.map((seq) => seq.replace(/[^0-9;]/g, '')),
+        );
+        // Both the line background and the contrast-shifted word-level
+        // emphasis background must be present, and they must differ.
+        expect(rgbValues.has('48;2;0;95;0')).toBe(true); // added line bg
+        expect(rgbValues.has('48;2;95;0;0')).toBe(true); // removed line bg
+        expect(rgbValues.size).toBeGreaterThanOrEqual(4);
+      });
+
+      it('does not apply word-level emphasis when disableColor is set', async () => {
+        const wordChangeDiff = `
+diff --git a/test.js b/test.js
+index 123..456 100644
+--- a/test.js
++++ b/test.js
+@@ -1,1 +1,1 @@
+-const oldVar = 1;
++const newVar = 1;
+`;
+        const { lastFrame, lastFrameRaw, waitUntilReady } =
+          await renderWithProviders(
+            <OverflowProvider>
+              <DiffRenderer
+                diffContent={wordChangeDiff}
+                filename="test.js"
+                terminalWidth={80}
+                disableColor
+              />
+            </OverflowProvider>,
+            {
+              settings: createMockSettings({ ui: { useAlternateBuffer } }),
+            },
+          );
+        await waitUntilReady();
+        await waitFor(() => expect(lastFrame()).toContain('newVar'));
+        expect(
+          lastFrameRaw().includes(`${String.fromCharCode(27)}[48;2;`),
+        ).toBe(false);
+      });
+
+      it('does not emphasize unpaired pure insertions or deletions', async () => {
+        const pureInsertDiff = `
+diff --git a/test.js b/test.js
+index 123..456 100644
+--- a/test.js
++++ b/test.js
+@@ -1,2 +1,3 @@
+ const first = 1;
++const second = 2;
+ const third = 3;
+`;
+        const { lastFrame, lastFrameRaw, waitUntilReady } =
+          await renderWithProviders(
+            <OverflowProvider>
+              <DiffRenderer
+                diffContent={pureInsertDiff}
+                filename="test.js"
+                terminalWidth={80}
+              />
+            </OverflowProvider>,
+            {
+              settings: createMockSettings({ ui: { useAlternateBuffer } }),
+            },
+          );
+        await waitUntilReady();
+        await waitFor(() => expect(lastFrame()).toContain('const second'));
+        // The only added-line background is the line background itself
+        // (#005f00); no darker emphasis background is emitted.
+        const backgrounds = lastFrameRaw().match(
+          new RegExp(`${String.fromCharCode(27)}\\[48;2;[0-9;]+m`, 'g'),
+        );
+        expect(backgrounds?.every((seq) => seq.endsWith('48;2;0;95;0m'))).toBe(
+          true,
+        );
+      });
     },
   );
 });

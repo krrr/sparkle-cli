@@ -14,6 +14,7 @@ import {
   getThemeTypeFromBackgroundColor,
   getLuminance,
   getContrastingTextColor,
+  getDiffEmphasisColor,
   parseColor,
   shouldSwitchTheme,
 } from './color-utils.js';
@@ -446,6 +447,27 @@ describe('Color Utils', () => {
           DEFAULT_LIGHT_THEME,
         ),
       ).toBeUndefined();
+    });
+  });
+
+  describe('getDiffEmphasisColor', () => {
+    it('lightens dark (low-luminance) diff backgrounds for emphasis', () => {
+      const original = '#005f00';
+      expect(getLuminance(getDiffEmphasisColor(original))).toBeGreaterThan(
+        getLuminance(original),
+      );
+    });
+
+    it('darkens light (high-luminance) diff backgrounds for emphasis', () => {
+      const original = '#d7ffd7';
+      expect(getLuminance(getDiffEmphasisColor(original))).toBeLessThan(
+        getLuminance(original),
+      );
+    });
+
+    it('returns the input unchanged for unparseable colors', () => {
+      expect(getDiffEmphasisColor('')).toBe('');
+      expect(getDiffEmphasisColor('not-a-color')).toBe('not-a-color');
     });
   });
 });

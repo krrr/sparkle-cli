@@ -17,6 +17,7 @@ import type {
 import stripAnsi from 'strip-ansi';
 import { themeManager } from '../themes/theme-manager.js';
 import type { Theme } from '../themes/theme.js';
+import type { EmphasisRange } from './intraLineDiff.js';
 import {
   MaxSizedBox,
   MINIMUM_MAX_HEIGHT,
@@ -33,14 +34,33 @@ function getLowlight(): ReturnType<typeof createLowlight> {
   return lowlightInstance;
 }
 
+interface RenderHastOptions {
+  theme: Theme;
+  inheritedColor: string | undefined;
+  /**
+   * Character ranges (relative to the highlighted line's full text) that
+   * should render with an emphasis background color. Text node offsets are
+   * tracked across the traversal so ranges align with the final output.
+   */
+  emphasis?: {
+    ranges: EmphasisRange[];
+    backgroundColor: string;
+    offsetRef: { current: number };
+  };
+}
+
 function renderHastNode(
   node: Root | Element | HastText | RootContent,
-  theme: Theme,
-  inheritedColor: string | undefined,
+  options: RenderHastOptions,
 ): React.ReactNode {
+  const { theme, inheritedColor, emphasis } = options;
+
   if (node.type === 'text') {
     // Use the color passed down from parent element, or the theme's default.
     const color = inheritedColor || theme.defaultColor;
+    if (emphasis && emphasis.ranges.length > 0) {
+      return renderTextWithEmphasis(node.value, color, emphasis);
+    }
     return <Text color={color}>{node.value}</Text>;
   }
 
@@ -62,14 +82,17 @@ function renderHastNode(
 
     // Determine the color to pass down: Use this element's specific color
     // if found; otherwise, continue passing down the already inherited color.
-    const colorToPassDown = elementColor || inheritedColor;
+    const childOptions: RenderHastOptions = {
+      ...options,
+      inheritedColor: elementColor || inheritedColor,
+    };
 
     // Recursively render children, passing the determined color down
     // Ensure child type matches expected HAST structure (ElementContent is common)
     const children = node.children?.map(
       (child: ElementContent, index: number) => (
         <React.Fragment key={index}>
-          {renderHastNode(child, theme, colorToPassDown)}
+          {renderHastNode(child, childOptions)}
         </React.Fragment>
       ),
     );
@@ -90,7 +113,7 @@ function renderHastNode(
     // Ensure child type matches expected HAST structure (RootContent is common)
     return node.children?.map((child: RootContent, index: number) => (
       <React.Fragment key={index}>
-        {renderHastNode(child, theme, inheritedColor)}
+        {renderHastNode(child, options)}
       </React.Fragment>
     ));
   }
@@ -99,21 +122,96 @@ function renderHastNode(
   return null;
 }
 
+/**
+ * Splits a HAST text node's value at emphasis range boundaries, rendering the
+ * covered substrings with the emphasis background while preserving syntax
+ * highlighting colors on every fragment.
+ */
+function renderTextWithEmphasis(
+  value: string,
+  color: string,
+  emphasis: NonNullable<RenderHastOptions['emphasis']>,
+): React.ReactNode {
+  const nodeStart = emphasis.offsetRef.current;
+  const nodeEnd = nodeStart + value.length;
+  emphasis.offsetRef.current = nodeEnd;
+
+  // Find ranges overlapping this text node and convert to node-local offsets.
+  const localRanges: EmphasisRange[] = [];
+  for (const range of emphasis.ranges) {
+    const start = Math.max(range.start, nodeStart);
+    const end = Math.min(range.end, nodeEnd);
+    if (start < end) {
+      localRanges.push({ start: start - nodeStart, end: end - nodeStart });
+    }
+  }
+  if (localRanges.length === 0) {
+    return <Text color={color}>{value}</Text>;
+  }
+
+  const fragments: React.ReactNode[] = [];
+  let cursor = 0;
+  for (const range of localRanges) {
+    if (cursor < range.start) {
+      fragments.push(
+        <Text key={`plain-${cursor}`} color={color}>
+          {value.slice(cursor, range.start)}
+        </Text>,
+      );
+    }
+    fragments.push(
+      <Text
+        key={`emphasis-${range.start}`}
+        color={color}
+        backgroundColor={emphasis.backgroundColor}
+      >
+        {value.slice(range.start, range.end)}
+      </Text>,
+    );
+    cursor = range.end;
+  }
+  if (cursor < value.length) {
+    fragments.push(
+      <Text key={`plain-${cursor}`} color={color}>
+        {value.slice(cursor)}
+      </Text>,
+    );
+  }
+  return fragments;
+}
+
 function highlightAndRenderLine(
   line: string,
   language: string | null,
   theme: Theme,
+  emphasis?: {
+    ranges: EmphasisRange[];
+    backgroundColor: string;
+  },
 ): React.ReactNode {
   try {
     const strippedLine = stripAnsi(line);
     const lowlight = getLowlight();
-    const getHighlightedLine = () =>
+    const highlighted =
       !language || !lowlight.registered(language)
         ? lowlight.highlightAuto(strippedLine)
         : lowlight.highlight(language, strippedLine);
 
-    const renderedNode = renderHastNode(getHighlightedLine(), theme, undefined);
-
+    const options: RenderHastOptions = {
+      theme,
+      inheritedColor: undefined,
+      emphasis: undefined,
+    };
+    if (emphasis) {
+      // Emphasis ranges refer to offsets in the stripped line, matching the
+      // text lowlight highlights, so offset tracking starts from zero.
+      options.emphasis = {
+        ranges: emphasis.ranges,
+        backgroundColor: emphasis.backgroundColor,
+        offsetRef: { current: 0 },
+      };
+    }
+    const renderedNode = renderHastNode(highlighted, options);
     return renderedNode !== null ? renderedNode : strippedLine;
   } catch {
     return stripAnsi(line);
@@ -131,6 +229,30 @@ export function colorizeLine(
   }
   const activeTheme = theme || themeManager.getActiveTheme();
   return highlightAndRenderLine(line, language, activeTheme);
+}
+
+/**
+ * Like colorizeLine, but renders the given character ranges with an emphasis
+ * background color (VS Code-style word-level diff highlighting) while
+ * preserving syntax highlighting. Falls back to colorizeLine when there are
+ * no ranges or colors are disabled.
+ */
+export function colorizeLineWithEmphasis(
+  line: string,
+  language: string | null,
+  emphasisRanges: EmphasisRange[],
+  emphasisBackgroundColor: string,
+  theme?: Theme,
+  disableColor = false,
+): React.ReactNode {
+  if (disableColor || emphasisRanges.length === 0) {
+    return colorizeLine(line, language, theme, disableColor);
+  }
+  const activeTheme = theme || themeManager.getActiveTheme();
+  return highlightAndRenderLine(line, language, activeTheme, {
+    ranges: emphasisRanges,
+    backgroundColor: emphasisBackgroundColor,
+  });
 }
 
 export interface ColorizeCodeOptions {

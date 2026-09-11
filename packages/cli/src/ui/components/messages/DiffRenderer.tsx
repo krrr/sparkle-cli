@@ -7,7 +7,15 @@
 import type React from 'react';
 import { useMemo } from 'react';
 import { Box, Text, useIsScreenReaderEnabled } from 'ink';
-import { colorizeCode, colorizeLine } from '../../utils/CodeColorizer.js';
+import stripAnsi from 'strip-ansi';
+import {
+  colorizeCode,
+  colorizeLine,
+  colorizeLineWithEmphasis,
+} from '../../utils/CodeColorizer.js';
+import { computeIntraLineEmphasis } from '../../utils/intraLineDiff.js';
+import type { EmphasisRange } from '../../utils/intraLineDiff.js';
+import { getDiffEmphasisColor } from '../../themes/color-utils.js';
 import { MaxSizedBox } from '../shared/MaxSizedBox.js';
 import { theme as semanticTheme } from '../../semantic-colors.js';
 import type { Theme } from '../../themes/theme.js';
@@ -19,6 +27,11 @@ export interface DiffLine {
   oldLine?: number;
   newLine?: number;
   content: string;
+  /**
+   * Word-level change ranges (VS Code-style intra-line emphasis), computed
+   * for paired delete/add blocks during rendering preparation.
+   */
+  emphasis?: EmphasisRange[];
 }
 
 export function parseDiffWithLineNumbers(diffContent: string): DiffLine[] {
@@ -213,6 +226,47 @@ export const isNewFile = (parsedLines: DiffLine[]): boolean => {
   );
 };
 
+/**
+ * Computes word-level change ranges for paired del/add blocks within a diff
+ * (VS Code-style intra-line highlighting). Mutates the given lines, attaching
+ * `emphasis` ranges to paired lines.
+ *
+ * Within a unified diff, each change block is a run of consecutive del lines
+ * followed by a run of consecutive add lines; del/add pairs are matched by
+ * index within the block. Unpaired lines are whole-line insertions or
+ * deletions, which need no word-level emphasis.
+ */
+const annotateIntraLineEmphasis = (displayLines: DiffLine[]): void => {
+  let i = 0;
+  while (i < displayLines.length) {
+    if (displayLines[i].type !== 'del') {
+      i++;
+      continue;
+    }
+    const delStart = i;
+    while (i < displayLines.length && displayLines[i].type === 'del') {
+      i++;
+    }
+    const addStart = i;
+    while (i < displayLines.length && displayLines[i].type === 'add') {
+      i++;
+    }
+    const dels = displayLines.slice(delStart, addStart);
+    const adds = displayLines.slice(addStart, i);
+    const pairCount = Math.min(dels.length, adds.length);
+    for (let k = 0; k < pairCount; k++) {
+      const emphasis = computeIntraLineEmphasis(
+        dels[k].content,
+        adds[k].content,
+      );
+      if (emphasis) {
+        dels[k].emphasis = emphasis.old;
+        adds[k].emphasis = emphasis.new;
+      }
+    }
+  }
+};
+
 export interface RenderDiffLinesOptions {
   parsedLines: DiffLine[];
   filename?: string;
@@ -273,6 +327,32 @@ export const renderDiffLines = ({
   if (!isFinite(baseIndentation)) {
     baseIndentation = 0;
   }
+
+  // Word-level emphasis ranges must refer to the exact strings rendered, so
+  // common-indent trimming happens up front for all displayable lines (before
+  // computing emphasis) instead of at render time. ANSI escapes are stripped
+  // here too, matching the stripping inside colorizeLine/highlightAndRenderLine
+  // so emphasis offsets align with what is highlighted.
+  if (baseIndentation > 0) {
+    for (const line of displayableLines) {
+      line.content = line.content.substring(baseIndentation);
+    }
+  }
+  if (!disableColor) {
+    for (const line of displayableLines) {
+      if (line.type === 'add' || line.type === 'del') {
+        line.content = stripAnsi(line.content);
+      }
+    }
+    annotateIntraLineEmphasis(displayableLines);
+  }
+
+  const emphasisAddedColor = getDiffEmphasisColor(
+    semanticTheme.background.diff.added,
+  );
+  const emphasisRemovedColor = getDiffEmphasisColor(
+    semanticTheme.background.diff.removed,
+  );
 
   let lastLineNumber: number | null = null;
   const MAX_CONTEXT_LINES_WITHOUT_GAP = 5;
@@ -337,7 +417,7 @@ export const renderDiffLines = ({
           return acc;
       }
 
-      const displayContent = line.content.substring(baseIndentation);
+      const displayContent = line.content;
 
       const backgroundColor = disableColor
         ? undefined
@@ -358,6 +438,13 @@ export const renderDiffLines = ({
           : line.type === 'del'
             ? semanticTheme.status.error
             : undefined;
+
+      const emphasisColor =
+        !disableColor && line.emphasis
+          ? line.type === 'add'
+            ? emphasisAddedColor
+            : emphasisRemovedColor
+          : undefined;
 
       acc.push(
         <Box key={lineKey} flexDirection="row">
@@ -385,7 +472,21 @@ export const renderDiffLines = ({
           ) : (
             <Text backgroundColor={backgroundColor} wrap="wrap">
               <Text color={symbolColor}>{prefixSymbol}</Text>{' '}
-              {colorizeLine(displayContent, language, undefined, disableColor)}
+              {emphasisColor
+                ? colorizeLineWithEmphasis(
+                    displayContent,
+                    language,
+                    line.emphasis!,
+                    emphasisColor,
+                    undefined,
+                    disableColor,
+                  )
+                : colorizeLine(
+                    displayContent,
+                    language,
+                    undefined,
+                    disableColor,
+                  )}
             </Text>
           )}
         </Box>,

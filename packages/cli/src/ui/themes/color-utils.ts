@@ -14,6 +14,7 @@ import {
   getContrastingTextColor,
   CSS_NAME_TO_HEX_MAP,
 } from './theme.js';
+import tinycolor from 'tinycolor2';
 
 export {
   resolveColor,
@@ -25,6 +26,26 @@ export {
   getContrastingTextColor,
   CSS_NAME_TO_HEX_MAP,
 };
+
+/**
+ * Derives a variant of a diff background color with higher contrast, used to
+ * emphasize the changed words within diff lines (VS Code style). The emphasis
+ * color is rendered on top of the diff line background, so the shift direction
+ * is chosen by the diff background's own luminance: light backgrounds get
+ * darkened, dark backgrounds get lightened, guaranteeing the emphasized words
+ * stay distinguishable on both light and dark themes. Return original if
+ * failed parsing, so rendering degrades to the line background.
+ */
+export function getDiffEmphasisColor(color: string): string {
+  const colorObj = tinycolor(color);
+  if (!colorObj.isValid()) {
+    return color;
+  }
+  const saturated = colorObj.saturate(10);
+  return getLuminance(color) > LIGHT_THEME_LUMINANCE_THRESHOLD
+    ? saturated.darken(8).toHexString()
+    : saturated.lighten(8).toHexString();
+}
 
 /**
  * Checks if a color string is valid (hex, Ink-supported color name, or CSS color name).
