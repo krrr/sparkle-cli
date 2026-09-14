@@ -364,7 +364,7 @@ export class LoggingContentGenerator implements ContentGenerator {
           this._logApiResponse(
             contents,
             durationMs,
-            response.modelVersion || req.model,
+            req.model,
             userPromptId,
             role,
             response.responseId,
@@ -514,7 +514,7 @@ export class LoggingContentGenerator implements ContentGenerator {
       this._logApiResponse(
         requestContents,
         durationMs,
-        responses[0]?.modelVersion || req.model,
+        req.model,
         userPromptId,
         role,
         responses[0]?.responseId,
@@ -548,7 +548,7 @@ export class LoggingContentGenerator implements ContentGenerator {
       this._logApiError(
         durationMs,
         error,
-        responses[0]?.modelVersion || req.model,
+        req.model,
         userPromptId,
         requestContents,
         role,
