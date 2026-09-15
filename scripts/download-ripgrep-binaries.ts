@@ -27,7 +27,7 @@ import { execFileSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CORE_VENDOR_DIR = path.join(__dirname, '../packages/core/vendor/ripgrep');
-const VERSION = 'v13.0.0-10';
+const VERSION = 'v14.1.1-1';
 
 interface Target {
   platform: string;
