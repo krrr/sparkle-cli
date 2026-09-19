@@ -12,6 +12,5 @@ export enum LlmRole {
   UTILITY_SUMMARIZER = 'utility_summarizer',
   UTILITY_ROUTER = 'utility_router',
   UTILITY_LOOP_DETECTOR = 'utility_loop_detector',
-  UTILITY_AUTOCOMPLETE = 'utility_autocomplete',
   UTILITY_STATE_SNAPSHOT_PROCESSOR = 'utility_state_snapshot_processor',
 }

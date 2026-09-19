@@ -38,17 +38,6 @@ vi.mock('./useAtCompletion', () => ({
   useAtCompletion: vi.fn(),
 }));
 
-vi.mock('./usePromptCompletion', () => ({
-  usePromptCompletion: vi.fn(() => ({
-    text: '',
-    isLoading: false,
-    isActive: false,
-    accept: vi.fn(),
-    clear: vi.fn(),
-    markSelected: vi.fn(),
-  })),
-}));
-
 vi.mock('./useSlashCompletion', () => ({
   useSlashCompletion: vi.fn(() => ({
     completionStart: 0,
@@ -804,113 +793,6 @@ describe('useCommandCompletion', () => {
 
       // Should STILL be empty because completionStart (3) !== activeStart (0)
       expect(result.current.promptCompletion.text).toBe('');
-    });
-  });
-
-  describe('prompt completion filtering', () => {
-    it('should not trigger prompt completion for line comments', async () => {
-      const mockConfig = {
-        getEnablePromptCompletion: () => true,
-        getGeminiClient: vi.fn(),
-      } as unknown as Config;
-
-      let hookResult: ReturnType<typeof useCommandCompletion> & {
-        textBuffer: ReturnType<typeof useTextBuffer>;
-      };
-
-      function TestComponent() {
-        const textBuffer = useTextBufferForTest('// This is a line comment');
-        const completion = useCommandCompletion({
-          buffer: textBuffer,
-          cwd: testRootDir,
-          slashCommands: [],
-          commandContext: mockCommandContext,
-          reverseSearchActive: false,
-          shellModeActive: false,
-          config: mockConfig,
-          active: true,
-        });
-        hookResult = { ...completion, textBuffer };
-        return null;
-      }
-      await renderWithProviders(<TestComponent />);
-
-      // Should not trigger prompt completion for comments
-      await waitFor(() => {
-        expect(hookResult!.suggestions.length).toBe(0);
-      });
-    });
-
-    it('should not trigger prompt completion for block comments', async () => {
-      const mockConfig = {
-        getEnablePromptCompletion: () => true,
-        getGeminiClient: vi.fn(),
-      } as unknown as Config;
-
-      let hookResult: ReturnType<typeof useCommandCompletion> & {
-        textBuffer: ReturnType<typeof useTextBuffer>;
-      };
-
-      function TestComponent() {
-        const textBuffer = useTextBufferForTest(
-          '/* This is a block comment */',
-        );
-        const completion = useCommandCompletion({
-          buffer: textBuffer,
-          cwd: testRootDir,
-          slashCommands: [],
-          commandContext: mockCommandContext,
-          reverseSearchActive: false,
-          shellModeActive: false,
-          config: mockConfig,
-          active: true,
-        });
-        hookResult = { ...completion, textBuffer };
-        return null;
-      }
-      await renderWithProviders(<TestComponent />);
-
-      // Should not trigger prompt completion for comments
-      await waitFor(() => {
-        expect(hookResult!.suggestions.length).toBe(0);
-      });
-    });
-
-    it('should trigger prompt completion for regular text when enabled', async () => {
-      const mockConfig = {
-        getEnablePromptCompletion: () => true,
-        getGeminiClient: vi.fn(),
-      } as unknown as Config;
-
-      let hookResult: ReturnType<typeof useCommandCompletion> & {
-        textBuffer: ReturnType<typeof useTextBuffer>;
-      };
-
-      function TestComponent() {
-        const textBuffer = useTextBufferForTest(
-          'This is regular text that should trigger completion',
-        );
-        const completion = useCommandCompletion({
-          buffer: textBuffer,
-          cwd: testRootDir,
-          slashCommands: [],
-          commandContext: mockCommandContext,
-          reverseSearchActive: false,
-          shellModeActive: false,
-          config: mockConfig,
-          active: true,
-        });
-        hookResult = { ...completion, textBuffer };
-        return null;
-      }
-      await renderWithProviders(<TestComponent />);
-
-      // This test verifies that comments are filtered out while regular text is not
-      await waitFor(() => {
-        expect(hookResult!.textBuffer.text).toBe(
-          'This is regular text that should trigger completion',
-        );
-      });
     });
   });
 

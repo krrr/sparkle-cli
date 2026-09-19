@@ -15,19 +15,31 @@ import { isSlashCommand } from '../utils/commandUtils.js';
 import { useAtCompletion } from './useAtCompletion.js';
 import { useSlashCompletion } from './useSlashCompletion.js';
 import { useShellCompletion } from './useShellCompletion.js';
-import {
-  usePromptCompletion,
-  PROMPT_COMPLETION_MIN_LENGTH,
-  type PromptCompletion,
-} from './usePromptCompletion.js';
 import type { Config } from 'sparkle-cli-core';
 import { useCompletion } from './useCompletion.js';
+
+export interface PromptCompletion {
+  text: string;
+  isLoading: boolean;
+  isActive: boolean;
+  accept: () => void;
+  clear: () => void;
+  markSelected: (selectedText: string) => void;
+}
+
+const EMPTY_PROMPT_COMPLETION: PromptCompletion = {
+  text: '',
+  isLoading: false,
+  isActive: false,
+  accept: () => {},
+  clear: () => {},
+  markSelected: () => {},
+};
 
 export enum CompletionMode {
   IDLE = 'IDLE',
   AT = 'AT',
   SLASH = 'SLASH',
-  PROMPT = 'PROMPT',
   SHELL = 'SHELL',
 }
 
@@ -184,30 +196,13 @@ export function useCommandCompletion({
       };
     }
 
-    // Check for prompt completion - only if enabled
-    const trimmedText = buffer.text.trim();
-    const isPromptCompletionEnabled = false;
-    if (
-      isPromptCompletionEnabled &&
-      trimmedText.length >= PROMPT_COMPLETION_MIN_LENGTH &&
-      !isSlashCommand(trimmedText) &&
-      !trimmedText.includes('@')
-    ) {
-      return {
-        completionMode: CompletionMode.PROMPT,
-        query: trimmedText,
-        completionStart: 0,
-        completionEnd: trimmedText.length,
-      };
-    }
-
     return {
       completionMode: CompletionMode.IDLE,
       query: null,
       completionStart: -1,
       completionEnd: -1,
     };
-  }, [cursorRow, cursorCol, buffer.lines, buffer.text, shellModeActive]);
+  }, [cursorRow, cursorCol, buffer.lines, shellModeActive]);
 
   useAtCompletion({
     enabled: active && completionMode === CompletionMode.AT,
@@ -243,14 +238,10 @@ export function useCommandCompletion({
       ? shellCompletionRange.query
       : memoQuery;
 
-  const basePromptCompletion = usePromptCompletion({
-    buffer,
-  });
-
   const isShellSuggestionsVisible =
     completionMode !== CompletionMode.SHELL || forceShowShellSuggestions;
 
-  const promptCompletion = useMemo(() => {
+  const promptCompletion: PromptCompletion = useMemo(() => {
     if (
       completionMode === CompletionMode.SHELL &&
       suggestions.length === 1 &&
@@ -299,12 +290,11 @@ export function useCommandCompletion({
         };
       }
     }
-    return basePromptCompletion;
+    return EMPTY_PROMPT_COMPLETION;
   }, [
     completionMode,
     suggestions,
     query,
-    basePromptCompletion,
     buffer,
     cursorRow,
     shellCompletionRange,
