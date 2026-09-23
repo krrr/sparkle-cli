@@ -14,6 +14,7 @@ import {
   resolveToRealPath,
   fileExists,
   ReadManyFilesTool,
+  LSTool,
   REFERENCE_CONTENT_START,
   REFERENCE_CONTENT_END,
   CoreToolCallStatus,
@@ -211,6 +212,7 @@ interface ResolvedFile {
   pathSpec: string;
   displayLabel: string;
   absolutePath?: string;
+  isDirectory?: boolean;
 }
 
 interface IgnoredFile {
@@ -275,16 +277,14 @@ async function resolveFilePaths(
     if (result.status === 'resolved') {
       const { absolutePath, relativePath, stats } = result.resolved;
       if (stats.isDirectory()) {
-        const pathSpec = path.join(relativePath, '**');
         resolvedFiles.push({
           part,
-          pathSpec,
+          pathSpec: relativePath,
           displayLabel: path.isAbsolute(pathName) ? relativePath : pathName,
           absolutePath,
+          isDirectory: true,
         });
-        onDebugMessage(
-          `Path ${pathName} resolved to directory, using glob: ${pathSpec}`,
-        );
+        onDebugMessage(`Path ${pathName} resolved to directory.`);
       } else {
         resolvedFiles.push({
           part,
@@ -509,11 +509,12 @@ async function readLocalFiles(
   userMessageTimestamp: number,
 ): Promise<{
   parts: PartUnion[];
-  display?: IndividualToolCallDisplay;
+  displays: IndividualToolCallDisplay[];
   error?: string;
 }> {
-  if (resolvedFiles.length === 0) {
-    return { parts: [] };
+  const fileResolvedFiles = resolvedFiles.filter((rf) => !rf.isDirectory);
+  if (fileResolvedFiles.length === 0) {
+    return { parts: [], displays: [] };
   }
 
   const readManyFilesTool = new ReadManyFilesTool(
@@ -521,15 +522,10 @@ async function readLocalFiles(
     config.getMessageBus(),
   );
 
-  const pathSpecsToRead = resolvedFiles.map((rf) => {
-    if (rf.absolutePath) {
-      return rf.pathSpec.endsWith('**')
-        ? path.join(rf.absolutePath, '**')
-        : rf.absolutePath;
-    }
-    return rf.pathSpec;
-  });
-  const fileLabelsForDisplay = resolvedFiles.map((rf) => rf.displayLabel);
+  const pathSpecsToRead = fileResolvedFiles.map(
+    (rf) => rf.absolutePath ?? rf.pathSpec,
+  );
+  const fileLabelsForDisplay = fileResolvedFiles.map((rf) => rf.displayLabel);
   const respectFileIgnore = config.getFileFilteringOptions();
 
   const toolArgs = {
@@ -567,7 +563,7 @@ async function readLocalFiles(
             const fileActualContent = match[2].trim();
 
             // Find the display label for this path
-            const resolvedFile = resolvedFiles.find(
+            const resolvedFile = fileResolvedFiles.find(
               (rf) =>
                 rf.absolutePath === filePathSpecInContent ||
                 rf.pathSpec === filePathSpecInContent,
@@ -600,7 +596,7 @@ async function readLocalFiles(
       }
     }
 
-    return { parts, display };
+    return { parts, displays: [display] };
   } catch (error: unknown) {
     const errorDisplay: IndividualToolCallDisplay = {
       callId: `client-read-${userMessageTimestamp}`,
@@ -615,10 +611,103 @@ async function readLocalFiles(
     };
     return {
       parts: [],
-      display: errorDisplay,
+      displays: [errorDisplay],
       error: `Exiting due to an error processing the @ command: ${errorDisplay.resultDisplay}`,
     };
   }
+}
+
+/**
+ * Lists the structure of directories using the LSTool.
+ */
+async function readDirectories(
+  resolvedFiles: ResolvedFile[],
+  config: Config,
+  signal: AbortSignal,
+  userMessageTimestamp: number,
+): Promise<{
+  parts: PartUnion[];
+  displays: IndividualToolCallDisplay[];
+  error?: string;
+}> {
+  const directoryResolvedFiles = resolvedFiles.filter((rf) => rf.isDirectory);
+  if (directoryResolvedFiles.length === 0) {
+    return { parts: [], displays: [] };
+  }
+
+  const lsTool = new LSTool(config, config.getMessageBus());
+  const respectFileIgnore = config.getFileFilteringOptions();
+
+  const results = await Promise.all(
+    directoryResolvedFiles.map(async (rf) => {
+      const toolArgs = {
+        dir_path: rf.absolutePath ?? rf.pathSpec,
+        file_filtering_options: {
+          respect_git_ignore: respectFileIgnore.respectGitIgnore,
+          respect_sparkle_ignore: respectFileIgnore.respectSparkleIgnore,
+        },
+      };
+
+      try {
+        const invocation = lsTool.build(toolArgs);
+        const result = await invocation.execute({ abortSignal: signal });
+        const display: IndividualToolCallDisplay = {
+          callId: `client-ls-${userMessageTimestamp}-${rf.displayLabel}`,
+          name: lsTool.displayName,
+          description: invocation.getDescription(),
+          status: CoreToolCallStatus.Success,
+          isClientInitiated: true,
+          resultDisplay: result.returnDisplay,
+          confirmationDetails: undefined,
+        };
+
+        const llmContent =
+          typeof result.llmContent === 'string'
+            ? result.llmContent
+            : Array.isArray(result.llmContent)
+              ? result.llmContent
+                  .map((part) => (typeof part === 'string' ? part : ''))
+                  .join('')
+              : '';
+
+        return {
+          parts: [
+            { text: `\nContent from @${rf.displayLabel}:\n` },
+            { text: llmContent },
+          ] as PartUnion[],
+          display,
+        };
+      } catch (error: unknown) {
+        const errorDisplay: IndividualToolCallDisplay = {
+          callId: `client-ls-${userMessageTimestamp}-${rf.displayLabel}`,
+          name: lsTool.displayName,
+          description: `Error attempting to list directory ${rf.displayLabel}`,
+          status: CoreToolCallStatus.Error,
+          isClientInitiated: true,
+          resultDisplay: `Error listing directory (${rf.displayLabel}): ${getErrorMessage(error)}`,
+          confirmationDetails: undefined,
+        };
+        return {
+          parts: [] as PartUnion[],
+          display: errorDisplay,
+          error: `Exiting due to an error processing the @ command: ${errorDisplay.resultDisplay}`,
+        };
+      }
+    }),
+  );
+
+  const parts: PartUnion[] = [];
+  const displays: IndividualToolCallDisplay[] = [];
+  let firstError: string | undefined = undefined;
+  for (const result of results) {
+    parts.push(...result.parts);
+    displays.push(result.display);
+    if (!firstError && result.error) {
+      firstError = result.error;
+    }
+  }
+
+  return { parts, displays, error: firstError };
 }
 
 /**
@@ -661,7 +750,8 @@ function reportIgnoredFiles(
 
 /**
  * Processes user input containing one or more '@<path>' commands.
- * - Workspace paths are read via the 'read_many_files' tool.
+ * - Workspace file paths are read via the 'read_many_files' tool.
+ * - Workspace directory paths are listed via the 'list_directory' tool.
  * - MCP resource URIs are read via each server's `resources/read`.
  * The user query is updated with inline content blocks so the LLM receives the
  * referenced context directly.
@@ -718,27 +808,37 @@ export async function handleAtCommand({
     processedQueryParts.push({ text: agentNudge });
   }
 
-  const [mcpResult, fileResult] = await Promise.all([
+  const [mcpResult, fileResult, dirResult] = await Promise.all([
     readMcpResources(resourceParts, config, signal),
     readLocalFiles(resolvedFiles, config, signal, userMessageTimestamp),
+    readDirectories(resolvedFiles, config, signal, userMessageTimestamp),
   ]);
 
-  const hasContent = mcpResult.parts.length > 0 || fileResult.parts.length > 0;
+  const hasContent =
+    mcpResult.parts.length > 0 ||
+    fileResult.parts.length > 0 ||
+    dirResult.parts.length > 0;
   if (hasContent) {
     processedQueryParts.push({ text: REF_CONTENT_HEADER });
     processedQueryParts.push(...mcpResult.parts);
+    // Directory listings must precede fileResult: ReadManyFilesTool appends
+    // REFERENCE_CONTENT_END itself, so anything pushed after fileResult.parts
+    // would fall outside the reference block.
+    processedQueryParts.push(...dirResult.parts);
     processedQueryParts.push(...fileResult.parts);
 
-    // Only add footer if we didn't read local files (because ReadManyFilesTool adds it)
-    // AND we read MCP resources (so we need to close the block).
-    if (fileResult.parts.length === 0 && mcpResult.parts.length > 0) {
+    // ReadManyFilesTool appends REFERENCE_CONTENT_END itself when it produced
+    // content. Only close the block here when it did not (e.g. directory
+    // listings or MCP resources only).
+    if (fileResult.parts.length === 0) {
       processedQueryParts.push({ text: REF_CONTENT_FOOTER });
     }
   }
 
   const allDisplays = [
     ...mcpResult.displays,
-    ...(fileResult.display ? [fileResult.display] : []),
+    ...fileResult.displays,
+    ...dirResult.displays,
   ];
 
   if (allDisplays.length > 0) {
@@ -751,13 +851,10 @@ export async function handleAtCommand({
     );
   }
 
-  if (mcpResult.error) {
-    debugLogger.error(mcpResult.error);
-    return { processedQuery: null, error: mcpResult.error };
-  }
-  if (fileResult.error) {
-    debugLogger.error(fileResult.error);
-    return { processedQuery: null, error: fileResult.error };
+  const error = mcpResult.error ?? fileResult.error ?? dirResult.error;
+  if (error) {
+    debugLogger.error(error);
+    return { processedQuery: null, error };
   }
 
   return { processedQuery: processedQueryParts };

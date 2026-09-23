@@ -19,6 +19,7 @@ import {
   ToolCallEvent,
   debugLogger,
   ReadManyFilesTool,
+  LSTool,
   partListUnionToString,
   type AgentLoopContext,
   updatePolicy,
@@ -33,6 +34,7 @@ import {
   processSingleFileContent,
   isNodeError,
   REFERENCE_CONTENT_START,
+  REFERENCE_CONTENT_END,
   InvalidStreamError,
   MessageBusType,
   PolicyDecision,
@@ -1000,6 +1002,8 @@ export class Session {
       this.context.config.getFileFilteringOptions();
 
     const pathSpecsToRead: string[] = [];
+    const directoryPaths: Array<{ pathName: string; absolutePath: string }> =
+      [];
     const contentLabelsForDisplay: string[] = [];
     const ignoredPaths: string[] = [];
     const directContents: Array<{
@@ -1221,17 +1225,22 @@ export class Session {
               ? resolved.stats
               : await fs.stat(absolutePath);
             if (stats.isDirectory()) {
-              currentPathSpec = pathName.endsWith('/')
-                ? `${pathName}**`
-                : `${pathName}/**`;
-              this.debug(
-                `Path ${pathName} resolved to directory, using glob: ${currentPathSpec}`,
-              );
-            } else {
-              this.debug(
-                `Path ${pathName} resolved to file: ${currentPathSpec}`,
-              );
+              // Directories are listed (not read recursively): collect them
+              // for the LSTool pass.
+              const resolvedDirPath = resolved
+                ? resolved.absolutePath
+                : absolutePath;
+              directoryPaths.push({
+                pathName,
+                absolutePath: resolvedDirPath,
+              });
+              atPathToResolvedSpecMap.set(pathName, pathName);
+              contentLabelsForDisplay.push(pathName);
+              this.debug(`Path ${pathName} resolved to directory.`);
+              resolvedSuccessfully = true;
+              continue;
             }
+            this.debug(`Path ${pathName} resolved to file: ${currentPathSpec}`);
             resolvedSuccessfully = true;
           }
         } else {
@@ -1369,12 +1378,109 @@ export class Session {
 
     if (
       pathSpecsToRead.length === 0 &&
+      directoryPaths.length === 0 &&
       embeddedContext.length === 0 &&
       directContents.length === 0
     ) {
       // Fallback for lone "@" or completely invalid @-commands resulting in empty initialQueryText
       debugLogger.warn('No valid file paths found in @ commands to read.');
       return [{ text: initialQueryText }];
+    }
+
+    // Directory listings are collected by the pass below and assembled right
+    // before the read_many_files output, because that output ends with
+    // REFERENCE_CONTENT_END which must stay last inside the reference block.
+    const directoryListingParts: Part[] = [];
+
+    if (directoryPaths.length > 0) {
+      const lsTool = new LSTool(this.context.config, this.context.messageBus);
+      const fileFilteringOptions: FilterFilesOptions =
+        this.context.config.getFileFilteringOptions();
+
+      for (const dirRef of directoryPaths) {
+        const callId = this.generateCallId(lsTool.name);
+
+        try {
+          const invocation = lsTool.build({
+            dir_path: dirRef.absolutePath,
+            file_filtering_options: {
+              respect_git_ignore: fileFilteringOptions.respectGitIgnore,
+              respect_sparkle_ignore: fileFilteringOptions.respectSparkleIgnore,
+            },
+          });
+
+          await this.sendUpdate({
+            sessionUpdate: 'tool_call',
+            toolCallId: callId,
+            status: 'in_progress',
+            title: invocation.getDescription(),
+            content: [],
+            locations: invocation.toolLocations(),
+            kind: toAcpToolKind(lsTool.kind),
+          });
+
+          const result = await invocation.execute({ abortSignal });
+          const content = toToolCallContent(result) || {
+            type: 'content',
+            content: {
+              type: 'text',
+              text: `Listed directory: ${dirRef.pathName}`,
+            },
+          };
+          await this.sendUpdate({
+            sessionUpdate: 'tool_call_update',
+            toolCallId: callId,
+            status: 'completed',
+            title: invocation.getDescription(),
+            content: content ? [content] : [],
+            locations: invocation.toolLocations(),
+            kind: toAcpToolKind(lsTool.kind),
+          });
+
+          directoryListingParts.push({
+            text: `\nContent from @${dirRef.pathName}:\n`,
+          });
+          if (typeof result.llmContent === 'string') {
+            directoryListingParts.push({ text: result.llmContent });
+          } else if (Array.isArray(result.llmContent)) {
+            for (const part of result.llmContent) {
+              if (typeof part === 'string') {
+                directoryListingParts.push({ text: part });
+              } else {
+                directoryListingParts.push(part);
+              }
+            }
+          }
+        } catch (error: unknown) {
+          await this.sendUpdate({
+            sessionUpdate: 'tool_call_update',
+            toolCallId: callId,
+            status: 'failed',
+            content: [
+              {
+                type: 'content',
+                content: {
+                  type: 'text',
+                  text: `Error listing directory (${dirRef.pathName}): ${getErrorMessage(error)}`,
+                },
+              },
+            ],
+            kind: toAcpToolKind(lsTool.kind),
+          });
+
+          throw error;
+        }
+      }
+    }
+
+    if (directoryListingParts.length > 0) {
+      processedQueryParts.push({ text: `\n${REFERENCE_CONTENT_START}` });
+      processedQueryParts.push(...directoryListingParts);
+      // read_many_files output ends with the block terminator itself; when no
+      // files are read, close the reference block here instead.
+      if (pathSpecsToRead.length === 0) {
+        processedQueryParts.push({ text: `\n${REFERENCE_CONTENT_END}` });
+      }
     }
 
     if (pathSpecsToRead.length > 0) {
@@ -1416,9 +1522,11 @@ export class Session {
         });
         if (Array.isArray(result.llmContent)) {
           const fileContentRegex = /^--- (.*?) ---\n\n([\s\S]*?)\n\n$/;
-          processedQueryParts.push({
-            text: `\n${REFERENCE_CONTENT_START}`,
-          });
+          if (directoryListingParts.length === 0) {
+            processedQueryParts.push({
+              text: `\n${REFERENCE_CONTENT_START}`,
+            });
+          }
           for (const part of result.llmContent) {
             if (typeof part === 'string') {
               const match = fileContentRegex.exec(part);

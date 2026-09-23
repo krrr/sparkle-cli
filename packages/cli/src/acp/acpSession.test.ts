@@ -54,6 +54,7 @@ vi.mock(
       ...actual,
       updatePolicy: vi.fn(),
       ReadManyFilesTool: vi.fn(),
+      LSTool: vi.fn(),
       logToolCall: vi.fn(),
       processSingleFileContent: vi.fn(),
     };
@@ -130,7 +131,10 @@ describe('Session', () => {
       getFileService: vi.fn().mockReturnValue({
         shouldIgnoreFile: vi.fn().mockReturnValue(false),
       }),
-      getFileFilteringOptions: vi.fn().mockReturnValue({}),
+      getFileFilteringOptions: vi.fn().mockReturnValue({
+        respectGitIgnore: true,
+        respectSparkleIgnore: true,
+      }),
       getFileSystemService: vi.fn().mockReturnValue({}),
       getTargetDir: vi.fn().mockReturnValue('/tmp'),
       getEnableRecursiveFileSearch: vi.fn().mockReturnValue(false),
@@ -494,6 +498,190 @@ describe('Session', () => {
       expect.any(AbortSignal),
       expect.any(String),
     );
+  });
+
+  it('should list directory structure for @directory references via LSTool', async () => {
+    (path.resolve as unknown as Mock).mockReturnValue('/tmp/dir');
+    (fs.stat as unknown as Mock).mockResolvedValue({
+      isDirectory: () => true,
+    });
+
+    const lsBuild = vi.fn().mockReturnValue({
+      getDescription: () => 'List dir',
+      toolLocations: () => [],
+      execute: vi.fn().mockResolvedValue({
+        llmContent:
+          'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
+        returnDisplay: {
+          summary: 'Found 2 item(s).',
+          files: ['[DIR] sub', 'inner.txt'],
+        },
+      }),
+    });
+    const { LSTool } = await import('sparkle-cli-core');
+    (LSTool as unknown as Mock).mockImplementation(() => ({
+      name: 'list_directory',
+      kind: 'read',
+      build: lsBuild,
+    }));
+
+    const stream = createMockStream([
+      {
+        type: GeminiEventType.Content,
+        value: '',
+      },
+    ]);
+    mockSendMessageStream.mockReturnValue(stream);
+
+    await session.prompt({
+      sessionId: 'session-1',
+      prompt: [
+        { type: 'text', text: 'Explore' },
+        {
+          type: 'resource_link',
+          uri: 'file://dir',
+          mimeType: 'text/plain',
+          name: 'dir',
+        },
+      ],
+    });
+
+    // LSTool is invoked with the resolved absolute directory path and the
+    // configured git/sparkle ignore filtering.
+    expect(lsBuild).toHaveBeenCalledWith({
+      dir_path: '/tmp/dir',
+      file_filtering_options: {
+        respect_git_ignore: true,
+        respect_sparkle_ignore: true,
+      },
+    });
+
+    // The prompt carries the directory structure, not a recursive glob.
+    const sentParts: Part[] = mockSendMessageStream.mock.calls[0][0];
+    const combined = sentParts
+      .map((p) => (typeof p.text === 'string' ? p.text : ''))
+      .join('\n');
+    expect(combined).toContain('@dir');
+    expect(combined).not.toContain('dir/**');
+    expect(combined).toContain('Content from @dir:');
+    expect(combined).toContain('Directory listing for /tmp/dir');
+    expect(combined).toContain('[DIR] sub');
+
+    // The ACP client sees a completed list_directory tool call.
+    expect(mockConnection.sessionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          sessionUpdate: 'tool_call',
+          toolCallId: expect.stringContaining('list_directory'),
+        }),
+      }),
+    );
+    expect(mockConnection.sessionUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        update: expect.objectContaining({
+          sessionUpdate: 'tool_call_update',
+          status: 'completed',
+        }),
+      }),
+    );
+  });
+
+  it('should keep a mixed directory + file prompt inside one reference block', async () => {
+    // Two resource links: a file (@file.txt) and a directory (@dir).
+    (path.resolve as unknown as Mock).mockImplementation(
+      (_dir: string, p: string) => (p === 'dir' ? '/tmp/dir' : '/tmp/file.txt'),
+    );
+    (fs.stat as unknown as Mock).mockImplementation(async (p: string) => ({
+      isDirectory: () => p === '/tmp/dir',
+      isFile: () => p !== '/tmp/dir',
+    }));
+
+    const lsBuild = vi.fn().mockReturnValue({
+      getDescription: () => 'List dir',
+      toolLocations: () => [],
+      execute: vi.fn().mockResolvedValue({
+        llmContent:
+          'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
+        returnDisplay: {
+          summary: 'Found 2 item(s).',
+          files: ['[DIR] sub', 'inner.txt'],
+        },
+      }),
+    });
+    const { LSTool } = await import('sparkle-cli-core');
+    (LSTool as unknown as Mock).mockImplementation(() => ({
+      name: 'list_directory',
+      kind: 'read',
+      build: lsBuild,
+    }));
+
+    // The real read_many_files appends the reference block terminator to its
+    // llmContent; model that so the block-composition assertions are faithful.
+    (ReadManyFilesTool as unknown as Mock).mockImplementation(() => ({
+      name: 'read_many_files',
+      kind: 'read',
+      build: vi.fn().mockReturnValue({
+        getDescription: () => 'Read files',
+        toolLocations: () => [],
+        execute: vi.fn().mockResolvedValue({
+          llmContent: [
+            '--- file.txt ---\n\nFile content\n\n',
+            '\n--- End of content ---',
+          ],
+        }),
+      }),
+    }));
+    const stream = createMockStream([
+      {
+        type: GeminiEventType.Content,
+        value: '',
+      },
+    ]);
+    mockSendMessageStream.mockReturnValue(stream);
+
+    await session.prompt({
+      sessionId: 'session-1',
+      prompt: [
+        { type: 'text', text: 'Review' },
+        {
+          type: 'resource_link',
+          uri: 'file://file.txt',
+          mimeType: 'text/plain',
+          name: 'file.txt',
+        },
+        {
+          type: 'resource_link',
+          uri: 'file://dir',
+          mimeType: 'text/plain',
+          name: 'dir',
+        },
+      ],
+    });
+
+    const sentParts: Part[] = mockSendMessageStream.mock.calls[0][0];
+    const texts = sentParts.map((p) =>
+      typeof p.text === 'string' ? p.text : '',
+    );
+    const startIdx = texts.findIndex((t) =>
+      t.includes('--- Content from referenced files ---'),
+    );
+    const dirIdx = texts.findIndex((t) => t.includes('Content from @dir:'));
+    const fileIdx = texts.findIndex((t) =>
+      t.includes('Content from @file.txt:'),
+    );
+    const endIdx = texts.findIndex((t) => t.includes('--- End of content ---'));
+
+    // Exactly one reference block: directory listing first, then the file
+    // content, whose last part carries the block terminator appended by
+    // read_many_files.
+    expect(startIdx).toBeGreaterThan(-1);
+    expect(
+      texts.filter((t) => t.includes('--- Content from referenced files ---')),
+    ).toHaveLength(1);
+    expect(dirIdx).toBeGreaterThan(startIdx);
+    expect(fileIdx).toBeGreaterThan(dirIdx);
+    expect(endIdx).toBeGreaterThan(fileIdx);
+    expect(endIdx).toBe(texts.length - 1);
   });
 
   it('should handle rate limit error', async () => {

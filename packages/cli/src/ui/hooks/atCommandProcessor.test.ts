@@ -242,17 +242,20 @@ describe('handleAtCommand', () => {
     );
   });
 
-  it('should process a valid directory path and convert to glob', async () => {
+  it('should process a valid directory path by listing its structure', async () => {
     const fileContent = 'This is the file content.';
     const filePath = await createTestFile(
       path.join(testRootDir, 'path', 'to', 'file.txt'),
       fileContent,
     );
+    const nestedContent = 'Nested file that must NOT be read.';
+    await createTestFile(
+      path.join(testRootDir, 'path', 'to', 'nested', 'deep.txt'),
+      nestedContent,
+    );
     const dirPath = path.dirname(filePath);
     const relativeDirPath = getRelativePath(dirPath);
-    const relativeFilePath = getRelativePath(filePath);
     const query = `@${dirPath}`;
-    const resolvedGlob = path.join(relativeDirPath, '**');
 
     const result = await handleAtCommand({
       query,
@@ -263,18 +266,168 @@ describe('handleAtCommand', () => {
       signal: abortController.signal,
     });
 
+    // The query keeps the original directory path (no ** glob rewrite).
     expect(result).toEqual({
       processedQuery: [
-        { text: `@${resolvedGlob}` },
+        { text: `@${relativeDirPath}` },
         { text: '\n--- Content from referenced files ---' },
-        { text: `\nContent from @${relativeFilePath}:\n` },
-        { text: fileContent },
+        { text: `\nContent from @${relativeDirPath}:\n` },
+        expect.objectContaining({
+          text: expect.stringContaining('Directory listing for'),
+        }),
         { text: '\n--- End of content ---' },
       ],
     });
-    expect(mockOnDebugMessage).toHaveBeenCalledWith(
-      `Path ${dirPath} resolved to directory, using glob: ${resolvedGlob}`,
+
+    // The listing must include the direct child file and subdirectory...
+    const listingPart = (
+      result.processedQuery as Array<{ text?: string }> | null
+    )?.find(
+      (part) =>
+        typeof part === 'object' &&
+        part !== null &&
+        'text' in part &&
+        typeof part.text === 'string' &&
+        part.text.includes('Directory listing for'),
     );
+    expect(listingPart).toBeDefined();
+    expect(listingPart!.text).toContain('[DIR] nested');
+    expect(listingPart!.text).toContain('file.txt');
+
+    // ...but must NOT inline any file content (only the structure is listed).
+    expect(listingPart!.text).not.toContain(fileContent);
+    expect(listingPart!.text).not.toContain(nestedContent);
+
+    expect(mockOnDebugMessage).toHaveBeenCalledWith(
+      `Path ${dirPath} resolved to directory.`,
+    );
+    expect(mockAddItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'tool_group',
+        tools: [
+          expect.objectContaining({
+            name: 'ReadFolder',
+            status: CoreToolCallStatus.Success,
+          }),
+        ],
+      }),
+      126,
+    );
+  });
+
+  it('should handle a mix of file and directory references', async () => {
+    const fileContent = 'Plain file content.';
+    const filePath = await createTestFile(
+      path.join(testRootDir, 'mix', 'a.txt'),
+      fileContent,
+    );
+    const dirPath = path.join(testRootDir, 'mix', 'sub');
+    await createTestFile(
+      path.join(dirPath, 'inner.txt'),
+      'Inner content that must NOT be inlined.',
+    );
+    const query = `@${filePath} and @${dirPath}`;
+
+    const result = await handleAtCommand({
+      query,
+      config: mockConfig,
+      addItem: mockAddItem,
+      onDebugMessage: mockOnDebugMessage,
+      messageId: 710,
+      signal: abortController.signal,
+    });
+
+    expect(result.error).toBeUndefined();
+    const texts = (
+      (result.processedQuery ?? []) as Array<{ text?: string }>
+    ).map((part) =>
+      typeof part === 'object' && part !== null ? part.text : '',
+    );
+    const combined = texts.join('\n');
+
+    // The directory listing must land inside the reference block, before the
+    // closing marker that read_many_files appends to the file contents.
+    const listingIdx = texts.findIndex((t) =>
+      t?.includes('Directory listing for'),
+    );
+    const endIdx = texts.findIndex((t) =>
+      t?.includes('--- End of content ---'),
+    );
+    expect(listingIdx).toBeGreaterThan(-1);
+    expect(endIdx).toBeGreaterThan(listingIdx);
+
+    // File content is inlined via read_many_files...
+    expect(combined).toContain(fileContent);
+    // ...while the directory only contributes its structure (no [DIR] entries
+    // because the test subdirectory has no subdirectories, only a file).
+    expect(combined).toContain('Directory listing for');
+    expect(combined).toContain('inner.txt');
+    expect(combined).not.toContain('Inner content that must NOT be inlined.');
+
+    // Both tool records are reported: ReadManyFiles + ReadFolder.
+    expect(mockAddItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'tool_group',
+        tools: expect.arrayContaining([
+          expect.objectContaining({ name: 'ReadFolder' }),
+        ]),
+      }),
+      710,
+    );
+  });
+
+  it('should return an error if the list_directory tool fails for a directory reference', async () => {
+    const dirPath = path.join(testRootDir, 'err-dir');
+    await fsPromises.mkdir(dirPath, { recursive: true });
+
+    const mockToolInstance = {
+      build: vi.fn(() => {
+        throw new Error('User cancelled operation');
+      }),
+      displayName: 'ReadFolder',
+    };
+    vi.spyOn(core, 'LSTool').mockImplementation(
+      () => mockToolInstance as unknown as core.LSTool,
+    );
+
+    const query = `@${dirPath}`;
+    const result = await handleAtCommand({
+      query,
+      config: mockConfig,
+      addItem: mockAddItem,
+      onDebugMessage: mockOnDebugMessage,
+      messageId: 711,
+      signal: abortController.signal,
+    });
+
+    expect(result.processedQuery).toBeNull();
+    expect(result.error).toBe(
+      'Exiting due to an error processing the @ command: Error listing directory (err-dir): User cancelled operation',
+    );
+    expect(mockAddItem).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'tool_group',
+        tools: [expect.objectContaining({ status: CoreToolCallStatus.Error })],
+      }),
+      711,
+    );
+  });
+
+  it('should keep the original query text for unresolved directory-like references', async () => {
+    const query = 'Check @nonexistent-dir and @ also';
+
+    const result = await handleAtCommand({
+      query,
+      config: mockConfig,
+      addItem: mockAddItem,
+      onDebugMessage: mockOnDebugMessage,
+      messageId: 712,
+      signal: abortController.signal,
+    });
+
+    expect(result).toEqual({
+      processedQuery: [{ text: query }],
+    });
   });
 
   it('should handle query with text before and after @command', async () => {
@@ -1273,15 +1426,31 @@ describe('handleAtCommand', () => {
       expect(result.error).toBeUndefined();
       expect(result.processedQuery).toEqual(
         expect.arrayContaining([
-          { text: `Check @${path.join(subDirPath, '**')} please.` },
+          { text: `Check @${subDirPath} please.` },
           expect.objectContaining({
             text: '\n--- Content from referenced files ---',
           }),
         ]),
       );
 
+      // Directory is listed, not read recursively: only the structure (with
+      // the child file name) is attached, never the child file's content.
+      const listingPart = (
+        result.processedQuery as Array<{ text?: string }> | null
+      )?.find(
+        (part) =>
+          typeof part === 'object' &&
+          part !== null &&
+          'text' in part &&
+          typeof part.text === 'string' &&
+          part.text.includes('Directory listing for'),
+      );
+      expect(listingPart).toBeDefined();
+      expect(listingPart!.text).toContain(fileName);
+      expect(listingPart!.text).not.toContain(fileContent);
+
       expect(mockOnDebugMessage).toHaveBeenCalledWith(
-        expect.stringContaining(`using glob: ${path.join(subDirPath, '**')}`),
+        expect.stringContaining(`resolved to directory`),
       );
     });
   });
