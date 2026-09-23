@@ -59,16 +59,17 @@ describe('ProviderModelsView', () => {
   });
 
   it('handles list shortcuts for back, default, and delete', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
-      <ProviderModelsView
-        profile={mockProfile}
-        onAddModel={onAddModel}
-        onUpdateModel={onUpdateModel}
-        onDeleteModel={onDeleteModel}
-        onSetDefaultModel={onSetDefaultModel}
-        onBack={onBack}
-      />,
-    );
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderWithProviders(
+        <ProviderModelsView
+          profile={mockProfile}
+          onAddModel={onAddModel}
+          onUpdateModel={onUpdateModel}
+          onDeleteModel={onDeleteModel}
+          onSetDefaultModel={onSetDefaultModel}
+          onBack={onBack}
+        />,
+      );
 
     // Press 's' to set default
     await act(async () => {
@@ -77,7 +78,15 @@ describe('ProviderModelsView', () => {
     await waitUntilReady();
     expect(onSetDefaultModel).toHaveBeenCalledWith(DEFAULT_OPENAI_MODEL);
 
-    // Press 'd' to delete
+    // First 'd' press: arm delete confirmation
+    await act(async () => {
+      stdin.write('d');
+    });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('[d] again to confirm');
+    expect(onDeleteModel).not.toHaveBeenCalled();
+
+    // Second 'd' press: confirm delete
     await act(async () => {
       stdin.write('d');
     });
@@ -90,6 +99,79 @@ describe('ProviderModelsView', () => {
     });
     await waitUntilReady();
     expect(onBack).toHaveBeenCalled();
+
+    unmount();
+  });
+
+  it('cancels delete confirmation when pressing escape without closing view', async () => {
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderWithProviders(
+        <ProviderModelsView
+          profile={mockProfile}
+          onAddModel={onAddModel}
+          onUpdateModel={onUpdateModel}
+          onDeleteModel={onDeleteModel}
+          onSetDefaultModel={onSetDefaultModel}
+          onBack={onBack}
+        />,
+      );
+
+    // Arm confirmation
+    await act(async () => {
+      stdin.write('d');
+    });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('[d] again to confirm');
+
+    // Press Escape to cancel confirmation
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+    expect(onDeleteModel).not.toHaveBeenCalled();
+    expect(onBack).not.toHaveBeenCalled();
+    expect(lastFrame()).toContain('[d] Delete');
+    expect(lastFrame()).not.toContain('again to confirm');
+
+    unmount();
+  });
+
+  it('cancels delete confirmation when pressing other keys like navigation', async () => {
+    const profileWithTwoModels: ProviderProfile = {
+      ...mockProfile,
+      models: [
+        { id: DEFAULT_OPENAI_MODEL, tier: 'pro' },
+        { id: 'gpt-4o-mini', tier: 'flash' },
+      ],
+    };
+
+    const { lastFrame, stdin, waitUntilReady, unmount } =
+      await renderWithProviders(
+        <ProviderModelsView
+          profile={profileWithTwoModels}
+          onAddModel={onAddModel}
+          onUpdateModel={onUpdateModel}
+          onDeleteModel={onDeleteModel}
+          onSetDefaultModel={onSetDefaultModel}
+          onBack={onBack}
+        />,
+      );
+
+    // Arm confirmation
+    await act(async () => {
+      stdin.write('d');
+    });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('[d] again to confirm');
+
+    // Press Arrow Down to navigate, cancelling confirmation
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+    expect(onDeleteModel).not.toHaveBeenCalled();
+    expect(lastFrame()).toContain('[d] Delete');
+    expect(lastFrame()).not.toContain('again to confirm');
 
     unmount();
   });

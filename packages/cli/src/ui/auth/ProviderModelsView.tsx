@@ -8,6 +8,8 @@ import type React from 'react';
 import { useState } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
+import { Colors } from '../colors.js';
+import { getContrastingTextColor } from '../themes/color-utils.js';
 import type { ProviderModel, ProviderProfile } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
@@ -47,6 +49,9 @@ export function ProviderModelsView({
   const [editingModelTarget, setEditingModelTarget] = useState<
     ProviderModel | undefined
   >(undefined);
+  const [pendingDeleteModelId, setPendingDeleteModelId] = useState<
+    string | null
+  >(null);
 
   const clampedIndex =
     models.length > 0 ? Math.min(selectedIndex, models.length - 1) : 0;
@@ -86,8 +91,25 @@ export function ProviderModelsView({
         return false;
       }
 
+      // While a delete confirmation is pending, any key other than d/D
+      // (confirm) or escape (cancel) first cancels the confirmation and is
+      // then processed normally below.
+      if (
+        pendingDeleteModelId !== null &&
+        key.name !== 'd' &&
+        key.sequence !== 'd' &&
+        key.sequence !== 'D' &&
+        key.name !== 'escape'
+      ) {
+        setPendingDeleteModelId(null);
+      }
+
       if (keyMatchers[Command.ESCAPE](key)) {
-        onBack();
+        if (pendingDeleteModelId !== null) {
+          setPendingDeleteModelId(null);
+        } else {
+          onBack();
+        }
         return true;
       }
       if (key.name === 'up') {
@@ -115,8 +137,20 @@ export function ProviderModelsView({
         setIsEditingModel(true);
         return true;
       }
-      if (key.name === 'd' && selectedModel) {
-        void onDeleteModel(selectedModel.id);
+      if (key.name === 'd' || key.sequence === 'd' || key.sequence === 'D') {
+        if (selectedModel) {
+          if (
+            pendingDeleteModelId === null ||
+            pendingDeleteModelId !== selectedModel.id
+          ) {
+            // First press: arm delete confirmation
+            setPendingDeleteModelId(selectedModel.id);
+            return true;
+          }
+          // Second press: confirm and delete
+          setPendingDeleteModelId(null);
+          void onDeleteModel(selectedModel.id);
+        }
         return true;
       }
       return false;
@@ -171,6 +205,11 @@ export function ProviderModelsView({
         {models.map((model, idx) => {
           const isSelected = idx === clampedIndex;
           const isDefault = profile.defaultModel === model.id;
+          const isPendingDelete = pendingDeleteModelId === model.id;
+          const pendingDeleteTextColor =
+            isPendingDelete && Colors.AccentRed
+              ? getContrastingTextColor(Colors.AccentRed)
+              : undefined;
           const tierText = model.tier ? `tier: ${model.tier}` : 'no tier';
 
           return (
@@ -178,24 +217,39 @@ export function ProviderModelsView({
               key={model.id}
               flexDirection="column"
               marginBottom={1}
-              backgroundColor={isSelected ? theme.background.focus : undefined}
+              backgroundColor={
+                isPendingDelete
+                  ? Colors.AccentRed
+                  : isSelected
+                    ? theme.background.focus
+                    : undefined
+              }
             >
               <Box flexDirection="row">
                 <Text
                   bold={isSelected}
-                  color={isSelected ? theme.status.success : theme.text.primary}
+                  color={
+                    pendingDeleteTextColor ??
+                    (isSelected ? theme.status.success : theme.text.primary)
+                  }
                 >
                   {isDefault ? '● ' : '  '}
                   {model.id}
                 </Text>
                 {isDefault && (
                   <Box justifyContent="flex-end" flexGrow={1}>
-                    <Text color={theme.status.success}>{'✓ Default'}</Text>
+                    <Text
+                      color={pendingDeleteTextColor ?? theme.status.success}
+                    >
+                      {'✓ Default'}
+                    </Text>
                   </Box>
                 )}
               </Box>
               <Box marginLeft={2}>
-                <Text color={theme.text.secondary}>{tierText}</Text>
+                <Text color={pendingDeleteTextColor ?? theme.text.secondary}>
+                  {tierText}
+                </Text>
               </Box>
             </Box>
           );
@@ -208,15 +262,27 @@ export function ProviderModelsView({
         </Box>
       )}
 
-      <Box marginTop={1}>
-        <Text color={theme.text.secondary}>
-          <Text color={theme.text.accent}>[a]</Text> Add model{'  '}
-          <Text color={theme.text.accent}>[e]</Text> Edit{'  '}
-          <Text color={theme.text.accent}>[s]</Text> Set default{'  '}
-          <Text color={theme.text.accent}>[d]</Text> Delete{'  '}
-          <Text color={theme.text.secondary}>[Esc] Back</Text>
-        </Text>
-      </Box>
+      {pendingDeleteModelId !== null ? (
+        <Box marginTop={1} flexDirection="column">
+          <Text color={Colors.AccentRed}>
+            <Text bold color={Colors.AccentRed}>
+              [d]
+            </Text>{' '}
+            again to confirm{'   '}
+            <Text color={theme.text.secondary}>[Esc] Cancel</Text>
+          </Text>
+        </Box>
+      ) : (
+        <Box marginTop={1}>
+          <Text color={theme.text.secondary}>
+            <Text color={theme.text.accent}>[a]</Text> Add model{'  '}
+            <Text color={theme.text.accent}>[e]</Text> Edit{'  '}
+            <Text color={theme.text.accent}>[s]</Text> Set default{'  '}
+            <Text color={theme.text.accent}>[d]</Text> Delete{'  '}
+            <Text color={theme.text.secondary}>[Esc] Back</Text>
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }
