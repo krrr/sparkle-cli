@@ -81,6 +81,12 @@ const mockConfigPlain = {
   getModelConfigService: () => ({
     getContextWindow: () => 1_048_576,
   }),
+  // `ModelCapabilityContext` expects a `modelConfigService` property (accessed
+  // directly by `getDisplayString`), not just the getter method.
+  modelConfigService: {
+    getContextWindow: () => 1_048_576,
+    getModelDefinition: () => undefined,
+  },
 };
 
 const mockConfig = mockConfigPlain as unknown as Config;

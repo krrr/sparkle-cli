@@ -432,6 +432,77 @@ describe('OpenAiCompatibleGenerator', () => {
     });
   });
 
+  describe('listModels', () => {
+    it('calls GET /models with bearer auth and returns model ids', async () => {
+      fakeServer.on('/v1/models', (_body, headers) => {
+        expect(headers['authorization']).toBe('Bearer test-key');
+        expect(headers['user-agent']).toBe('SparkleCLI');
+        return {
+          status: 200,
+          body: JSON.stringify({
+            object: 'list',
+            data: [
+              { id: 'model-a', object: 'model', owned_by: 'org' },
+              { id: 'model-b', object: 'model', owned_by: 'org' },
+            ],
+          }),
+        };
+      });
+
+      const models = await generator.listModels();
+      expect(models).toEqual(['model-a', 'model-b']);
+    });
+
+    it('skips entries without an id', async () => {
+      fakeServer.on('/v1/models', () => ({
+        status: 200,
+        body: JSON.stringify({
+          object: 'list',
+          data: [
+            { id: 'model-a', object: 'model' },
+            { object: 'model' },
+            { id: '', object: 'model' },
+            {},
+            { id: 'model-c', object: 'model' },
+          ],
+        }),
+      }));
+
+      const models = await generator.listModels();
+      expect(models).toEqual(['model-a', 'model-c']);
+    });
+
+    it('returns an empty list when data is missing', async () => {
+      fakeServer.on('/v1/models', () => ({
+        status: 200,
+        body: JSON.stringify({ object: 'list' }),
+      }));
+
+      const models = await generator.listModels();
+      expect(models).toEqual([]);
+    });
+
+    it('throws OpenAiApiError on error responses', async () => {
+      fakeServer.on('/v1/models', () => ({
+        status: 401,
+        body: JSON.stringify({ error: { message: 'Invalid API key' } }),
+      }));
+      await expect(generator.listModels()).rejects.toMatchObject({
+        name: 'OpenAiApiError',
+        status: 401,
+        message: expect.stringContaining('Invalid API key'),
+      });
+    });
+
+    it('throws OpenAiApiError when the endpoint is missing', async () => {
+      // No handler registered for /v1/models -> the fake server replies 404.
+      await expect(generator.listModels()).rejects.toMatchObject({
+        name: 'OpenAiApiError',
+        status: 404,
+      });
+    });
+  });
+
   describe('embedContent', () => {
     it('calls the embeddings endpoint and maps the response', async () => {
       fakeServer.on('/v1/embeddings', (body) => {

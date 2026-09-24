@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Google LLC
+ * Copyright 2026 krrr
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,11 +10,16 @@ import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import { Colors } from '../colors.js';
 import { getContrastingTextColor } from '../themes/color-utils.js';
-import type { ProviderModel, ProviderProfile } from 'sparkle-cli-core';
+import {
+  ProviderType,
+  type ProviderModel,
+  type ProviderProfile,
+} from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 import { ProviderModelEditorView } from './ProviderModelEditorView.js';
+import { ProviderModelFetchView } from './ProviderModelFetchView.js';
 
 export interface ProviderModelsViewProps {
   profile: ProviderProfile;
@@ -47,6 +52,9 @@ export function ProviderModelsView({
     ProviderModel | undefined
   >(undefined);
   const [pendingDeleteModelId, setPendingDeleteModelId] = useState<string | null>(null);
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
+
+  const canFetchModels = profile.providerType === ProviderType.USE_OPENAI;
 
   const clampedIndex =
     models.length > 0 ? Math.min(selectedIndex, models.length - 1) : 0;
@@ -77,6 +85,10 @@ export function ProviderModelsView({
         if (keyMatchers[Command.RETURN](key) || key.name === 'a') {
           setEditingModelTarget(undefined);
           setIsEditingModel(true);
+          return true;
+        }
+        if (canFetchModels && key.name === 'l') {
+          setIsFetchingModels(true);
           return true;
         }
         if (keyMatchers[Command.ESCAPE](key)) {
@@ -120,6 +132,10 @@ export function ProviderModelsView({
         setIsEditingModel(true);
         return true;
       }
+      if (canFetchModels && key.name === 'l') {
+        setIsFetchingModels(true);
+        return true;
+      }
       if ((key.name === 's' || keyMatchers[Command.RETURN](key)) && selectedModel) {
         void onSetDefaultModel(selectedModel.id);
         return true;
@@ -161,6 +177,18 @@ export function ProviderModelsView({
     );
   }
 
+  if (isFetchingModels) {
+    return (
+      <ProviderModelFetchView
+        profile={profile}
+        existingModelIds={models.map((model) => model.id)}
+        onAddModel={onAddModel}
+        onBack={() => setIsFetchingModels(false)}
+        error={error}
+      />
+    );
+  }
+
   if (models.length === 0) {
     return (
       <Box flexDirection="column" width="100%">
@@ -180,6 +208,11 @@ export function ProviderModelsView({
         <Box marginTop={1}>
           <Text color={theme.text.secondary}>
             <Text color={theme.text.accent}>[a]</Text> Add model{'   '}
+            {canFetchModels && (
+              <>
+                <Text color={theme.text.accent}>[l]</Text> List from API{'   '}
+              </>
+            )}
             <Text color={theme.text.secondary}>[Esc] Back</Text>
           </Text>
         </Box>
@@ -270,6 +303,11 @@ export function ProviderModelsView({
             <Text color={theme.text.accent}>[e]</Text> Edit{'  '}
             <Text color={theme.text.accent}>[s]</Text> Set default{'  '}
             <Text color={theme.text.accent}>[d]</Text> Delete{'  '}
+            {canFetchModels && (
+              <>
+                <Text color={theme.text.accent}>[l]</Text> List from API{'  '}
+              </>
+            )}
             <Text color={theme.text.secondary}>[Esc] Back</Text>
           </Text>
         </Box>

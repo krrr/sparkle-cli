@@ -5,7 +5,7 @@ Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 ## Project Overview
 
 - **Main Technologies:**
-  - **Runtime:** Node.js (>=20.0.0, recommended ~20.19.0 for development)
+  - **Runtime:** Node.js (>=20.19.0)
   - **Language:** TypeScript
   - **UI Framework:** React (using [Ink](https://github.com/vadimdemedes/ink) for CLI
     rendering)
@@ -64,8 +64,8 @@ Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent).
 - **Imports:** Use specific imports and avoid restricted relative imports between
   packages (enforced by ESLint).
 - **License Headers:** For all new source code files (`.ts`, `.tsx`, `.js`), include the
-  Apache-2.0 license header with the current year. (e.g., `Copyright 2026 Google LLC`).
-  This is enforced by ESLint.
+  Apache-2.0 license header with the current year. (e.g., `Copyright 2026 krrr`). This
+  is enforced by ESLint.
 
 ## Testing Conventions
 

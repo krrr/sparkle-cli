@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright 2026 Google LLC
+ * Copyright 2026 krrr
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
 import { act } from 'react';
@@ -14,6 +14,20 @@ import {
   ProviderType,
   type ProviderProfile,
 } from 'sparkle-cli-core';
+
+const mockLoadApiKeyForProfile = vi.fn();
+const mockListModels = vi.fn();
+
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
+  return {
+    ...actual,
+    loadApiKeyForProfile: (id: string) => mockLoadApiKeyForProfile(id),
+    OpenAiCompatibleGenerator: class {
+      listModels = mockListModels;
+    },
+  };
+});
 
 describe('ProviderModelsView', () => {
   const mockProfile: ProviderProfile = {
@@ -36,6 +50,13 @@ describe('ProviderModelsView', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('OPENAI_API_KEY', '');
+    mockLoadApiKeyForProfile.mockResolvedValue('stored-key');
+    mockListModels.mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('renders model list and shortcuts', async () => {
@@ -360,6 +381,82 @@ describe('ProviderModelsView', () => {
     expect(lastFrame()).toContain('gemini-2.5-flash');
     expect(lastFrame()).toContain('✓ Default');
     expect(lastFrame()).toContain('no tier');
+    unmount();
+  });
+
+  it('shows the List from API shortcut only for OpenAI profiles', async () => {
+    const { lastFrame, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
+
+    expect(lastFrame()).toContain('[l] List from API');
+    unmount();
+
+    const geminiProfile: ProviderProfile = {
+      id: 'test-profile-gemini',
+      providerType: ProviderType.USE_GEMINI,
+      models: [{ id: 'gemini-2.5-flash' }],
+    };
+    const {
+      lastFrame: geminiFrame,
+      stdin,
+      waitUntilReady,
+      unmount: unmountGemini,
+    } = await renderWithProviders(
+      <ProviderModelsView
+        profile={geminiProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
+
+    expect(geminiFrame()).not.toContain('[l] List from API');
+
+    // Pressing 'l' on a Gemini profile must not enter the fetch view.
+    await act(async () => {
+      stdin.write('l');
+    });
+    await waitUntilReady();
+    expect(geminiFrame()).toContain('Models for: test-profile-gemini');
+    unmountGemini();
+  });
+
+  it('enters the fetch view on l and returns to the list on escape', async () => {
+    mockListModels.mockResolvedValue(['remote-model-1', 'remote-model-2']);
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
+
+    await act(async () => {
+      stdin.write('l');
+    });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Models from API');
+
+    // Esc returns to the model list view.
+    await act(async () => {
+      stdin.write('\u001b');
+    });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Models for: test-profile');
+    expect(lastFrame()).toContain(DEFAULT_OPENAI_MODEL);
     unmount();
   });
 });

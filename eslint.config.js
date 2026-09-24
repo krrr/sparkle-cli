@@ -319,7 +319,7 @@ export default tseslint.config(
           source: 'string',
           content: [
             '@license',
-            'Copyright (year) Google LLC',
+            'Copyright (year) (holder)',
             'SPDX-License-Identifier: Apache-2.0',
           ].join('\n'),
           patterns: {
@@ -327,6 +327,7 @@ export default tseslint.config(
               pattern: `202[5-${currentYear.toString().slice(-1)}]`,
               defaultValue: currentYear.toString(),
             },
+            holder: { pattern: '[\\w .,&-]+' }
           },
         },
       ],

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Google LLC
+ * Copyright 2026 krrr
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -166,6 +166,20 @@ export interface OpenAiEmbeddingsResponse {
   data?: Array<{ embedding?: number[]; index?: number }>;
   model?: string;
   usage?: { prompt_tokens?: number; total_tokens?: number };
+}
+
+/** A single entry in a `/models` listing response. */
+export interface OpenAiModelSummary {
+  id?: string;
+  object?: string;
+  created?: number;
+  owned_by?: string;
+}
+
+/** The response of the `GET /models` listing endpoint. */
+export interface OpenAiModelsResponse {
+  object?: string;
+  data?: OpenAiModelSummary[];
 }
 
 /** The error envelope returned by OpenAI-compatible APIs. */

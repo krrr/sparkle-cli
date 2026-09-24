@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2026 Google LLC
+ * Copyright 2026 krrr
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -31,6 +31,7 @@ import type {
   OpenAiChatCompletion,
   OpenAiEmbeddingsResponse,
   OpenAiErrorResponse,
+  OpenAiModelsResponse,
   OpenAiRequest,
 } from './openAiTypes.js';
 import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
@@ -96,11 +97,10 @@ export class OpenAiCompatibleGenerator {
     _role: LlmRole,
   ): Promise<GenerateContentResponse> {
     const openAiRequest = this.buildOpenAiRequest(request, false);
-    const response = await this.postJson(
-      '/chat/completions',
-      openAiRequest,
-      this.getAbortSignal(request),
-    );
+    const response = await this.requestJson('/chat/completions', 'POST', {
+      body: openAiRequest,
+      signal: this.getAbortSignal(request),
+    });
     if (!response.ok) {
       throw await this.createApiError(response);
     }
@@ -119,16 +119,35 @@ export class OpenAiCompatibleGenerator {
     _role: LlmRole,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
     const openAiRequest = this.buildOpenAiRequest(request, true);
-    const response = await this.postJson(
-      '/chat/completions',
-      openAiRequest,
-      this.getAbortSignal(request),
-    );
+    const response = await this.requestJson('/chat/completions', 'POST', {
+      body: openAiRequest,
+      signal: this.getAbortSignal(request),
+    });
     if (!response.ok || !response.body) {
       throw await this.createApiError(response);
     }
     const converter = new OpenAiChunkConverter(this.functionNameMapper);
     return this.consumeStream(response.body, converter);
+  }
+
+  /**
+   * Lists the models available from the OpenAI-compatible API via the /models
+   * endpoint.
+   */
+  async listModels(): Promise<string[]> {
+    const response = await this.requestJson('/models', 'GET');
+    if (!response.ok) {
+      throw await this.createApiError(response);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+    const parsed = (await response.json()) as OpenAiModelsResponse;
+    const models: string[] = [];
+    for (const entry of parsed.data ?? []) {
+      if (typeof entry?.id === 'string' && entry.id.length > 0) {
+        models.push(entry.id);
+      }
+    }
+    return models;
   }
 
   /**
@@ -164,11 +183,10 @@ export class OpenAiCompatibleGenerator {
       model: request.model,
       input: text,
     };
-    const response = await this.postJson(
-      '/embeddings',
+    const response = await this.requestJson('/embeddings', 'POST', {
       body,
-      this.getAbortSignal(request),
-    );
+      signal: this.getAbortSignal(request),
+    });
     if (!response.ok) {
       throw await this.createApiError(response);
     }
@@ -257,22 +275,22 @@ export class OpenAiCompatibleGenerator {
     return `${this.config.baseUrl}${path}`;
   }
 
-  private async postJson(
+  private async requestJson(
     path: string,
-    body: unknown,
-    signal?: AbortSignal,
+    method: 'GET' | 'POST',
+    options: { body?: unknown; signal?: AbortSignal } = {},
   ): Promise<Response> {
     const url = this.getEndpointUrl(path);
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${this.config.apiKey}`,
       'User-Agent': 'SparkleCLI',
+      ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
     };
     const init: RequestInit & { dispatcher?: unknown } = {
-      method: 'POST',
+      method,
       headers,
-      body: JSON.stringify(body),
-      signal,
+      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+      ...(options.signal ? { signal: options.signal } : {}),
     };
 
     const proxyUrl = this.config.proxy?.trim();
