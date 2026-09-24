@@ -2,14 +2,14 @@
   "semi": true,
   "trailingComma": "all",
   "singleQuote": true,
-  "printWidth": 80,
+  "printWidth": 88,
   "tabWidth": 2,
   "overrides": [
     {
       "files": ["**/*.md"],
       "options": {
         "tabWidth": 2,
-        "printWidth": 80,
+        "printWidth": 88,
         "proseWrap": "always"
       }
     }
