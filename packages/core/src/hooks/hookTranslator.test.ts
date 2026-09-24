@@ -138,10 +138,7 @@ describe('HookTranslator', () => {
         model: 'gemini-2.5-flash',
       } as unknown as LLMRequest;
 
-      const sdkRequest = translator.fromHookLLMRequest(
-        hookRequest,
-        baseRequest,
-      );
+      const sdkRequest = translator.fromHookLLMRequest(hookRequest, baseRequest);
 
       // Model should be overridden
       expect(sdkRequest.model).toBe('gemini-2.5-flash');
@@ -163,10 +160,7 @@ describe('HookTranslator', () => {
         // messages intentionally omitted
       } as unknown as LLMRequest;
 
-      const sdkRequest = translator.fromHookLLMRequest(
-        hookRequest,
-        baseRequest,
-      );
+      const sdkRequest = translator.fromHookLLMRequest(hookRequest, baseRequest);
 
       expect(sdkRequest.model).toBe('gemini-1.5-pro');
       expect(sdkRequest.contents).toEqual(baseRequest.contents);
@@ -309,9 +303,7 @@ describe('HookTranslator', () => {
 
       const hookRequest: LLMRequest = {
         model: 'gemini-2.0-flash',
-        messages: [
-          { role: 'model', content: 'I will search for you. [BLINDED]' },
-        ],
+        messages: [{ role: 'model', content: 'I will search for you. [BLINDED]' }],
       };
 
       const result = translator.fromHookLLMRequest(hookRequest, baseRequest);
@@ -336,9 +328,7 @@ describe('HookTranslator', () => {
 
       const result = translator.fromHookLLMRequest(hookRequest);
 
-      expect(result.contents).toEqual([
-        { role: 'user', parts: [{ text: 'Hello' }] },
-      ]);
+      expect(result.contents).toEqual([{ role: 'user', parts: [{ text: 'Hello' }] }]);
     });
 
     it('should fall back to text-only when baseRequest has no contents', () => {
@@ -352,9 +342,7 @@ describe('HookTranslator', () => {
 
       const result = translator.fromHookLLMRequest(hookRequest, baseRequest);
 
-      expect(result.contents).toEqual([
-        { role: 'user', parts: [{ text: 'Hello' }] },
-      ]);
+      expect(result.contents).toEqual([{ role: 'user', parts: [{ text: 'Hello' }] }]);
     });
 
     it('should append extra hook messages beyond base contents', () => {

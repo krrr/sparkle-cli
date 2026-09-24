@@ -37,9 +37,7 @@ describe('GlobTool', () => {
 
   beforeEach(async () => {
     // Create a unique root directory for each test run
-    const rawTempRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'glob-tool-root-'),
-    );
+    const rawTempRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'glob-tool-root-'));
     tempRootDir = await fs.realpath(rawTempRootDir);
     await fs.writeFile(path.join(tempRootDir, '.git'), ''); // Fake git repo
 
@@ -92,10 +90,7 @@ describe('GlobTool', () => {
 
     // Deeper subdirectory
     await fs.mkdir(path.join(tempRootDir, 'sub', 'deep'));
-    await fs.writeFile(
-      path.join(tempRootDir, 'sub', 'deep', 'fileE.log'),
-      'contentE',
-    );
+    await fs.writeFile(path.join(tempRootDir, 'sub', 'deep', 'fileE.log'), 'contentE');
 
     // Files for mtime sorting test
     await fs.writeFile(path.join(tempRootDir, 'older.sortme'), 'older_content');
@@ -127,9 +122,7 @@ describe('GlobTool', () => {
       const result = await invocation.execute({ abortSignal });
       expect(result.llmContent).toContain('Found 1 file(s)');
       expect(result.llmContent).toContain(path.join(tempRootDir, 'fileA.txt'));
-      expect(result.llmContent).not.toContain(
-        path.join(tempRootDir, 'FileB.TXT'),
-      );
+      expect(result.llmContent).not.toContain(path.join(tempRootDir, 'FileB.TXT'));
     }, 30000);
 
     it('should find files case-insensitively by default (pattern: *.TXT)', async () => {
@@ -159,12 +152,8 @@ describe('GlobTool', () => {
       const invocation = globTool.build(params);
       const result = await invocation.execute({ abortSignal });
       expect(result.llmContent).toContain('Found 2 file(s)');
-      expect(result.llmContent).toContain(
-        path.join(tempRootDir, 'sub', 'fileC.md'),
-      );
-      expect(result.llmContent).toContain(
-        path.join(tempRootDir, 'sub', 'FileD.MD'),
-      );
+      expect(result.llmContent).toContain(path.join(tempRootDir, 'sub', 'fileC.md'));
+      expect(result.llmContent).toContain(path.join(tempRootDir, 'sub', 'FileD.MD'));
     }, 30000);
 
     it('should find files in a specified relative path (relative to rootDir)', async () => {
@@ -172,12 +161,8 @@ describe('GlobTool', () => {
       const invocation = globTool.build(params);
       const result = await invocation.execute({ abortSignal });
       expect(result.llmContent).toContain('Found 2 file(s)');
-      expect(result.llmContent).toContain(
-        path.join(tempRootDir, 'sub', 'fileC.md'),
-      );
-      expect(result.llmContent).toContain(
-        path.join(tempRootDir, 'sub', 'FileD.MD'),
-      );
+      expect(result.llmContent).toContain(path.join(tempRootDir, 'sub', 'fileC.md'));
+      expect(result.llmContent).toContain(path.join(tempRootDir, 'sub', 'FileD.MD'));
     }, 30000);
 
     it('should find files using a deep globstar pattern (e.g., **/*.log)', async () => {
@@ -206,9 +191,7 @@ describe('GlobTool', () => {
       const invocation = globTool.build(params);
       const result = await invocation.execute({ abortSignal });
       expect(result.llmContent).toContain('Found 1 file(s)');
-      expect(result.llmContent).toContain(
-        path.join(tempRootDir, 'file[1].txt'),
-      );
+      expect(result.llmContent).toContain(path.join(tempRootDir, 'file[1].txt'));
     }, 30000);
 
     it('should find files with special characters like [] and () in the path', async () => {
@@ -341,19 +324,17 @@ describe('GlobTool', () => {
   describe('workspace boundary validation', () => {
     it('should validate search paths are within workspace boundaries', () => {
       expect(globTool.validateToolParams({ pattern: '*' })).toBeNull();
-      expect(
-        globTool.validateToolParams({ pattern: '*', dir_path: '.' }),
-      ).toBeNull();
+      expect(globTool.validateToolParams({ pattern: '*', dir_path: '.' })).toBeNull();
       expect(
         globTool.validateToolParams({ pattern: '*', dir_path: tempRootDir }),
       ).toBeNull();
 
-      expect(
-        globTool.validateToolParams({ pattern: '*', dir_path: '..' }),
-      ).toContain('resolves outside the allowed workspace directories');
-      expect(
-        globTool.validateToolParams({ pattern: '*', dir_path: '/' }),
-      ).toContain('resolves outside the allowed workspace directories');
+      expect(globTool.validateToolParams({ pattern: '*', dir_path: '..' })).toContain(
+        'resolves outside the allowed workspace directories',
+      );
+      expect(globTool.validateToolParams({ pattern: '*', dir_path: '/' })).toContain(
+        'resolves outside the allowed workspace directories',
+      );
     });
 
     it('should provide clear error messages when path is outside workspace', () => {
@@ -361,9 +342,7 @@ describe('GlobTool', () => {
         pattern: '*',
         dir_path: '/tmp/outside',
       });
-      expect(result).toContain(
-        'resolves outside the allowed workspace directories',
-      );
+      expect(result).toContain('resolves outside the allowed workspace directories');
     });
 
     it('should work with paths in workspace subdirectories', async () => {
@@ -377,10 +356,7 @@ describe('GlobTool', () => {
 
   describe('ignore file handling', () => {
     it('should respect .gitignore files by default', async () => {
-      await fs.writeFile(
-        path.join(tempRootDir, '.gitignore'),
-        'ignored_test.txt',
-      );
+      await fs.writeFile(path.join(tempRootDir, '.gitignore'), 'ignored_test.txt');
       await fs.writeFile(path.join(tempRootDir, 'ignored_test.txt'), 'content');
       await fs.writeFile(path.join(tempRootDir, 'visible_test.txt'), 'content');
 
@@ -398,10 +374,7 @@ describe('GlobTool', () => {
         path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
         'sparkle-ignored_test.txt',
       );
-      await fs.writeFile(
-        path.join(tempRootDir, 'sparkle-ignored_test.txt'),
-        'content',
-      );
+      await fs.writeFile(path.join(tempRootDir, 'sparkle-ignored_test.txt'), 'content');
       await fs.writeFile(path.join(tempRootDir, 'visible_test.txt'), 'content');
 
       const params: GlobToolParams = { pattern: 'visible_test.txt' };
@@ -414,10 +387,7 @@ describe('GlobTool', () => {
     }, 30000);
 
     it('should not respect .gitignore when respect_git_ignore is false', async () => {
-      await fs.writeFile(
-        path.join(tempRootDir, '.gitignore'),
-        'ignored_test.txt',
-      );
+      await fs.writeFile(path.join(tempRootDir, '.gitignore'), 'ignored_test.txt');
       await fs.writeFile(path.join(tempRootDir, 'ignored_test.txt'), 'content');
 
       const params: GlobToolParams = {
@@ -436,10 +406,7 @@ describe('GlobTool', () => {
         path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
         'sparkle-ignored_test.txt',
       );
-      await fs.writeFile(
-        path.join(tempRootDir, 'sparkle-ignored_test.txt'),
-        'content',
-      );
+      await fs.writeFile(path.join(tempRootDir, 'sparkle-ignored_test.txt'), 'content');
 
       const params: GlobToolParams = {
         pattern: 'sparkle-ignored_test.txt',

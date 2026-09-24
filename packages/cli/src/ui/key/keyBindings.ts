@@ -269,11 +269,7 @@ export const defaultKeyBindingConfig: KeyBindingConfig = new Map([
   [Command.MOVE_RIGHT, [new KeyBinding('right'), new KeyBinding('ctrl+f')]],
   [
     Command.MOVE_WORD_LEFT,
-    [
-      new KeyBinding('ctrl+left'),
-      new KeyBinding('alt+left'),
-      new KeyBinding('alt+b'),
-    ],
+    [new KeyBinding('ctrl+left'), new KeyBinding('alt+left'), new KeyBinding('alt+b')],
   ],
   [
     Command.MOVE_WORD_RIGHT,
@@ -304,28 +300,16 @@ export const defaultKeyBindingConfig: KeyBindingConfig = new Map([
       new KeyBinding('alt+d'),
     ],
   ],
-  [
-    Command.DELETE_CHAR_LEFT,
-    [new KeyBinding('backspace'), new KeyBinding('ctrl+h')],
-  ],
-  [
-    Command.DELETE_CHAR_RIGHT,
-    [new KeyBinding('delete'), new KeyBinding('ctrl+d')],
-  ],
+  [Command.DELETE_CHAR_LEFT, [new KeyBinding('backspace'), new KeyBinding('ctrl+h')]],
+  [Command.DELETE_CHAR_RIGHT, [new KeyBinding('delete'), new KeyBinding('ctrl+d')]],
   [Command.UNDO, getPlatformUndoBindings(process.platform)],
   [Command.REDO, getPlatformRedoBindings(process.platform)],
 
   // Scrolling
   [Command.SCROLL_UP, [new KeyBinding('shift+up')]],
   [Command.SCROLL_DOWN, [new KeyBinding('shift+down')]],
-  [
-    Command.SCROLL_HOME,
-    [new KeyBinding('ctrl+home'), new KeyBinding('shift+home')],
-  ],
-  [
-    Command.SCROLL_END,
-    [new KeyBinding('ctrl+end'), new KeyBinding('shift+end')],
-  ],
+  [Command.SCROLL_HOME, [new KeyBinding('ctrl+home'), new KeyBinding('shift+home')]],
+  [Command.SCROLL_END, [new KeyBinding('ctrl+end'), new KeyBinding('shift+end')]],
   [Command.PAGE_UP, [new KeyBinding('pageup')]],
   [Command.PAGE_DOWN, [new KeyBinding('pagedown')]],
 
@@ -342,10 +326,7 @@ export const defaultKeyBindingConfig: KeyBindingConfig = new Map([
   // Navigation shortcuts appropriate for dialogs where we do not need to accept
   // text input.
   [Command.DIALOG_NAVIGATION_UP, [new KeyBinding('up'), new KeyBinding('k')]],
-  [
-    Command.DIALOG_NAVIGATION_DOWN,
-    [new KeyBinding('down'), new KeyBinding('j')],
-  ],
+  [Command.DIALOG_NAVIGATION_DOWN, [new KeyBinding('down'), new KeyBinding('j')]],
   [Command.DIALOG_NEXT, [new KeyBinding('tab')]],
   [Command.DIALOG_PREV, [new KeyBinding('shift+tab')]],
 
@@ -377,11 +358,7 @@ export const defaultKeyBindingConfig: KeyBindingConfig = new Map([
   [Command.DEPRECATED_OPEN_EXTERNAL_EDITOR, [new KeyBinding('ctrl+x')]],
   [
     Command.PASTE_CLIPBOARD,
-    [
-      new KeyBinding('ctrl+v'),
-      new KeyBinding('cmd+v'),
-      new KeyBinding('alt+v'),
-    ],
+    [new KeyBinding('ctrl+v'), new KeyBinding('cmd+v'), new KeyBinding('alt+v')],
   ],
 
   // App Controls
@@ -566,8 +543,7 @@ export const commandDescriptions: Readonly<Record<Command, string>> = {
   // Basic Controls
   [Command.RETURN]: 'Confirm the current selection or choice.',
   [Command.ESCAPE]: 'Dismiss dialogs or cancel the current focus.',
-  [Command.QUIT]:
-    'Cancel the current request or quit the CLI when input is empty.',
+  [Command.QUIT]: 'Cancel the current request or quit the CLI when input is empty.',
   [Command.EXIT]: 'Exit the CLI when the input buffer is empty.',
 
   // Cursor Movement
@@ -659,14 +635,11 @@ export const commandDescriptions: Readonly<Record<Command, string>> = {
 
   // Background Shell Controls
   [Command.BACKGROUND_SHELL_ESCAPE]: 'Dismiss background shell list.',
-  [Command.BACKGROUND_SHELL_SELECT]:
-    'Confirm selection in background shell list.',
-  [Command.TOGGLE_BACKGROUND_SHELL]:
-    'Toggle current background shell visibility.',
+  [Command.BACKGROUND_SHELL_SELECT]: 'Confirm selection in background shell list.',
+  [Command.TOGGLE_BACKGROUND_SHELL]: 'Toggle current background shell visibility.',
   [Command.TOGGLE_BACKGROUND_SHELL_LIST]: 'Toggle background shell list.',
   [Command.KILL_BACKGROUND_SHELL]: 'Kill the active background shell.',
-  [Command.UNFOCUS_BACKGROUND_SHELL]:
-    'Move focus from background shell to Sparkle.',
+  [Command.UNFOCUS_BACKGROUND_SHELL]: 'Move focus from background shell to Sparkle.',
   [Command.UNFOCUS_BACKGROUND_SHELL_LIST]:
     'Move focus from background shell list to Sparkle.',
   [Command.SHOW_BACKGROUND_SHELL_UNFOCUS_WARNING]:
@@ -767,18 +740,14 @@ export async function loadCustomKeybindings(): Promise<{
     if (isNodeError(error) && error.code === 'ENOENT') {
       // File doesn't exist, use default bindings
     } else {
-      errors.push(
-        `Error reading keybindings file "${userKeybindingsPath}": ${error}`,
-      );
+      errors.push(`Error reading keybindings file "${userKeybindingsPath}": ${error}`);
     }
   }
 
   return { config, errors };
 }
 
-export function getPlatformUndoBindings(
-  platform: string,
-): readonly KeyBinding[] {
+export function getPlatformUndoBindings(platform: string): readonly KeyBinding[] {
   if (platform === 'win32') {
     return [new KeyBinding('ctrl+z'), new KeyBinding('alt+z')];
   }
@@ -787,16 +756,10 @@ export function getPlatformUndoBindings(
   }
   // Linux / WSL: Promote Alt+Z to avoid Windows interception,
   // but keep Ctrl+Z for smart bubbling.
-  return [
-    new KeyBinding('alt+z'),
-    new KeyBinding('cmd+z'),
-    new KeyBinding('ctrl+z'),
-  ];
+  return [new KeyBinding('alt+z'), new KeyBinding('cmd+z'), new KeyBinding('ctrl+z')];
 }
 
-export function getPlatformRedoBindings(
-  _platform: string,
-): readonly KeyBinding[] {
+export function getPlatformRedoBindings(_platform: string): readonly KeyBinding[] {
   // Use a stable order for all platforms to minimize churn.
   // Ctrl+Shift+Z is the universal primary.
   return [

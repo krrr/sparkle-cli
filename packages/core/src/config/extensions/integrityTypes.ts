@@ -34,9 +34,7 @@ export const IntegrityStoreSchema = z.object({
 /**
  * The integrity data for a single extension.
  */
-export type ExtensionIntegrityData = z.infer<
-  typeof ExtensionIntegrityDataSchema
->;
+export type ExtensionIntegrityData = z.infer<typeof ExtensionIntegrityDataSchema>;
 
 /**
  * A map of extension names to their corresponding integrity data.
@@ -72,8 +70,5 @@ export interface IExtensionIntegrity {
   /**
    * Signs and stores the extension's installation metadata.
    */
-  store(
-    extensionName: string,
-    metadata: ExtensionInstallMetadata,
-  ): Promise<void>;
+  store(extensionName: string, metadata: ExtensionInstallMetadata): Promise<void>;
 }

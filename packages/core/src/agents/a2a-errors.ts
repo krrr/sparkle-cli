@@ -72,11 +72,7 @@ export class AgentAuthConfigMissingError extends A2AAgentError {
   /** Specific fields or config entries that are missing. */
   readonly missingFields: string[];
 
-  constructor(
-    agentName: string,
-    requiredAuth: string,
-    missingFields: string[],
-  ) {
+  constructor(agentName: string, requiredAuth: string, missingFields: string[]) {
     const message = `Agent "${agentName}" requires authentication but none is configured`;
     const userMessage = `Agent requires ${requiredAuth} but no auth is configured. Missing: ${missingFields.join(', ')}`;
     super(agentName, message, userMessage);
@@ -182,9 +178,7 @@ export function classifyAgentError(
   // Check for well-known connection error codes in the cause chain.
   // NOTE: This is checked before the 404 pattern as a defensive measure
   // to prevent DNS errors (ENOTFOUND) from being misclassified as 404s.
-  if (
-    /\b(ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT)\b/i.test(fullErrorText)
-  ) {
+  if (/\b(ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT)\b/i.test(fullErrorText)) {
     return new AgentConnectionError(agentName, agentCardUrl, error);
   }
 

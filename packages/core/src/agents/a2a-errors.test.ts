@@ -27,10 +27,7 @@ describe('A2A Error Types', () => {
 
   describe('AgentCardNotFoundError', () => {
     it('should produce a user-friendly 404 message', () => {
-      const error = new AgentCardNotFoundError(
-        'my-agent',
-        'https://example.com/card',
-      );
+      const error = new AgentCardNotFoundError('my-agent', 'https://example.com/card');
       expect(error.name).toBe('AgentCardNotFoundError');
       expect(error.agentName).toBe('my-agent');
       expect(error.userMessage).toContain('404');
@@ -110,74 +107,46 @@ describe('A2A Error Types', () => {
   describe('classifyAgentError', () => {
     it('should classify a 404 error message', () => {
       const raw = new Error('HTTP 404: Not Found');
-      const result = classifyAgentError(
-        'agent-a',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-a', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentCardNotFoundError);
       expect(result.agentName).toBe('agent-a');
     });
 
     it('should classify a "not found" error message (case-insensitive)', () => {
       const raw = new Error('Agent card not found at the given URL');
-      const result = classifyAgentError(
-        'agent-a',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-a', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentCardNotFoundError);
     });
 
     it('should classify a 401 error message', () => {
       const raw = new Error('Request failed with status 401');
-      const result = classifyAgentError(
-        'agent-b',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-b', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentCardAuthError);
       expect((result as AgentCardAuthError).statusCode).toBe(401);
     });
 
     it('should classify an "unauthorized" error message', () => {
       const raw = new Error('Unauthorized access to agent card');
-      const result = classifyAgentError(
-        'agent-b',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-b', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentCardAuthError);
     });
 
     it('should classify a 403 error message', () => {
       const raw = new Error('HTTP 403 Forbidden');
-      const result = classifyAgentError(
-        'agent-c',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-c', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentCardAuthError);
       expect((result as AgentCardAuthError).statusCode).toBe(403);
     });
 
     it('should fall back to AgentConnectionError for unknown errors', () => {
       const raw = new Error('Something completely unexpected');
-      const result = classifyAgentError(
-        'agent-d',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-d', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentConnectionError);
     });
 
     it('should classify ECONNREFUSED as AgentConnectionError', () => {
       const raw = new Error('ECONNREFUSED 127.0.0.1:8080');
-      const result = classifyAgentError(
-        'agent-d',
-        'https://example.com/card',
-        raw,
-      );
+      const result = classifyAgentError('agent-d', 'https://example.com/card', raw);
       expect(result).toBeInstanceOf(AgentConnectionError);
     });
 

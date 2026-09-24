@@ -4,30 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  vi,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach, type Mock } from 'vitest';
 import { act, useEffect } from 'react';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
-import {
-  useCommandCompletion,
-  CompletionMode,
-} from './useCommandCompletion.js';
+import { useCommandCompletion, CompletionMode } from './useCommandCompletion.js';
 import type { CommandContext, SlashCommand } from '../commands/types.js';
 import type { Config } from 'sparkle-cli-core';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
 import type { Suggestion } from '../components/SuggestionsDisplay.js';
-import {
-  useAtCompletion,
-  type UseAtCompletionProps,
-} from './useAtCompletion.js';
+import { useAtCompletion, type UseAtCompletionProps } from './useAtCompletion.js';
 import {
   useSlashCompletion,
   type UseSlashCompletionProps,
@@ -81,9 +67,7 @@ const setupMocks = ({
   slashCompletionRange?: {
     completionStart: number;
     completionEnd: number;
-    getCommandFromSuggestion: (
-      suggestion: Suggestion,
-    ) => SlashCommand | undefined;
+    getCommandFromSuggestion: (suggestion: Suggestion) => SlashCommand | undefined;
   };
   shellCompletionRange?: {
     completionStart: number;
@@ -94,11 +78,7 @@ const setupMocks = ({
 }) => {
   // Mock for @-completions
   (useAtCompletion as Mock).mockImplementation(
-    ({
-      enabled,
-      setSuggestions,
-      setIsLoadingSuggestions,
-    }: UseAtCompletionProps) => {
+    ({ enabled, setSuggestions, setIsLoadingSuggestions }: UseAtCompletionProps) => {
       useEffect(() => {
         if (enabled) {
           setIsLoadingSuggestions(isLoading);
@@ -254,11 +234,7 @@ describe('useCommandCompletion', () => {
         expect(result.current.showSuggestions).toBe(true);
 
         act(() => {
-          result.current.textBuffer.replaceRangeByOffset(
-            0,
-            5,
-            'just some text',
-          );
+          result.current.textBuffer.replaceRangeByOffset(0, 5, 'just some text');
         });
 
         await waitFor(() => {
@@ -330,11 +306,7 @@ describe('useCommandCompletion', () => {
         },
       ])(
         '$description',
-        async ({
-          shellModeActive,
-          expectedSuggestions,
-          expectedShowSuggestions,
-        }) => {
+        async ({ shellModeActive, expectedSuggestions, expectedShowSuggestions }) => {
           setupMocks({
             slashSuggestions: [{ label: 'clear', value: 'clear' }],
           });
@@ -347,9 +319,7 @@ describe('useCommandCompletion', () => {
 
           await waitFor(() => {
             expect(result.current.suggestions.length).toBe(expectedSuggestions);
-            expect(result.current.showSuggestions).toBe(
-              expectedShowSuggestions,
-            );
+            expect(result.current.showSuggestions).toBe(expectedShowSuggestions);
             if (!shellModeActive) {
               expect(result.current.completionMode).toBe(CompletionMode.SLASH);
             }
@@ -460,9 +430,7 @@ describe('useCommandCompletion', () => {
         const { result } = await renderCommandCompletionHook('/');
 
         await waitFor(() => {
-          expect(result.current.suggestions.length).toBe(
-            mockSuggestions.length,
-          );
+          expect(result.current.suggestions.length).toBe(mockSuggestions.length);
           expect(result.current.activeSuggestionIndex).toBe(0);
         });
       });
@@ -592,9 +560,7 @@ describe('useCommandCompletion', () => {
         result.current.handleAutocomplete(0);
       });
 
-      expect(result.current.textBuffer.text).toBe(
-        '@src/file1.txt is a good file',
-      );
+      expect(result.current.textBuffer.text).toBe('@src/file1.txt is a good file');
     });
 
     it('should complete a directory path ending with / without a trailing space', async () => {
@@ -622,9 +588,7 @@ describe('useCommandCompletion', () => {
 
     it('should complete a directory path ending with \\ without a trailing space', async () => {
       setupMocks({
-        atSuggestions: [
-          { label: 'src\\components\\', value: 'src\\components\\' },
-        ],
+        atSuggestions: [{ label: 'src\\components\\', value: 'src\\components\\' }],
         slashCompletionRange: {
           completionStart: 0,
           completionEnd: 0,

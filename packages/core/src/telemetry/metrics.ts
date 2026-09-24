@@ -37,13 +37,11 @@ const FILE_OPERATION_COUNT = 'gemini_cli.file.operation.count';
 const LINES_CHANGED = 'gemini_cli.lines.changed';
 const INVALID_CHUNK_COUNT = 'gemini_cli.chat.invalid_chunk.count';
 const CONTENT_RETRY_COUNT = 'gemini_cli.chat.content_retry.count';
-const CONTENT_RETRY_FAILURE_COUNT =
-  'gemini_cli.chat.content_retry_failure.count';
+const CONTENT_RETRY_FAILURE_COUNT = 'gemini_cli.chat.content_retry_failure.count';
 const NETWORK_RETRY_COUNT = 'gemini_cli.network_retry.count';
 const MODEL_ROUTING_LATENCY = 'gemini_cli.model_routing.latency';
 const MODEL_ROUTING_FAILURE_COUNT = 'gemini_cli.model_routing.failure.count';
-const MODEL_SLASH_COMMAND_CALL_COUNT =
-  'gemini_cli.slash_command.model.call_count';
+const MODEL_SLASH_COMMAND_CALL_COUNT = 'gemini_cli.slash_command.model.call_count';
 const EVENT_HOOK_CALL_COUNT = 'gemini_cli.hook_call.count';
 const EVENT_HOOK_CALL_LATENCY = 'gemini_cli.hook_call.latency';
 const KEYCHAIN_AVAILABILITY_COUNT = 'gemini_cli.keychain.availability.count';
@@ -57,23 +55,20 @@ const AGENT_RUN_COUNT = 'gemini_cli.agent.run.count';
 const AGENT_DURATION_MS = 'gemini_cli.agent.duration';
 const AGENT_TURNS = 'gemini_cli.agent.turns';
 const AGENT_RECOVERY_ATTEMPT_COUNT = 'gemini_cli.agent.recovery_attempt.count';
-const AGENT_RECOVERY_ATTEMPT_DURATION =
-  'gemini_cli.agent.recovery_attempt.duration';
+const AGENT_RECOVERY_ATTEMPT_DURATION = 'gemini_cli.agent.recovery_attempt.duration';
 
 // Browser Agent Metrics
 const BROWSER_AGENT_CONNECTION_DURATION =
   'gemini_cli.browser_agent.connection.duration';
 const BROWSER_AGENT_CONNECTION_FAILURE_COUNT =
   'gemini_cli.browser_agent.connection.failure.count';
-const BROWSER_AGENT_TOOLS_DISCOVERED =
-  'gemini_cli.browser_agent.tools.discovered';
+const BROWSER_AGENT_TOOLS_DISCOVERED = 'gemini_cli.browser_agent.tools.discovered';
 const BROWSER_AGENT_TOOLS_MISSING_SEMANTIC =
   'gemini_cli.browser_agent.tools.missing_semantic';
 const BROWSER_AGENT_VISION_STATUS = 'gemini_cli.browser_agent.vision.status';
 const BROWSER_AGENT_TASK_OUTCOME = 'gemini_cli.browser_agent.task.outcome';
 const BROWSER_AGENT_TASK_DURATION = 'gemini_cli.browser_agent.task.duration';
-const BROWSER_AGENT_CLEANUP_DURATION =
-  'gemini_cli.browser_agent.cleanup.duration';
+const BROWSER_AGENT_CLEANUP_DURATION = 'gemini_cli.browser_agent.cleanup.duration';
 const BROWSER_AGENT_CLEANUP_FAILURE_COUNT =
   'gemini_cli.browser_agent.cleanup.failure.count';
 
@@ -246,8 +241,7 @@ const COUNTER_DEFINITIONS = {
     },
   },
   [FLICKER_FRAME_COUNT]: {
-    description:
-      'Counts UI frames that flicker (render taller than the terminal).',
+    description: 'Counts UI frames that flicker (render taller than the terminal).',
     valueType: ValueType.INT,
     assign: (c: Counter) => (flickerFrameCounter = c),
     attributes: {} as Record<string, never>,
@@ -305,11 +299,7 @@ const COUNTER_DEFINITIONS = {
     attributes: {} as {
       session_mode: 'persistent' | 'isolated' | 'existing';
       headless: boolean;
-      error_type:
-        | 'profile_locked'
-        | 'timeout'
-        | 'connection_refused'
-        | 'unknown';
+      error_type: 'profile_locked' | 'timeout' | 'connection_refused' | 'unknown';
     },
   },
   [BROWSER_AGENT_TOOLS_MISSING_SEMANTIC]: {
@@ -483,8 +473,7 @@ const HISTOGRAM_DEFINITIONS = {
     },
   },
   [BROWSER_AGENT_CONNECTION_DURATION]: {
-    description:
-      'Duration of browser agent MCP connection setup in milliseconds.',
+    description: 'Duration of browser agent MCP connection setup in milliseconds.',
     unit: 'ms',
     valueType: ValueType.INT,
     assign: (h: Histogram) => (browserAgentConnectionDurationHistogram = h),
@@ -651,8 +640,7 @@ const PERFORMANCE_HISTOGRAM_DEFINITIONS = {
     },
   },
   [REGRESSION_PERCENTAGE_CHANGE]: {
-    description:
-      'Percentage change compared to baseline for detected regressions.',
+    description: 'Percentage change compared to baseline for detected regressions.',
     unit: 'percent',
     valueType: ValueType.DOUBLE,
     assign: (h: Histogram) => (regressionPercentageChangeHistogram = h),
@@ -665,8 +653,7 @@ const PERFORMANCE_HISTOGRAM_DEFINITIONS = {
     },
   },
   [BASELINE_COMPARISON]: {
-    description:
-      'Performance comparison to established baseline (percentage change).',
+    description: 'Performance comparison to established baseline (percentage change).',
     unit: 'percent',
     valueType: ValueType.DOUBLE,
     assign: (h: Histogram) => (baselineComparisonHistogram = h),
@@ -855,8 +842,7 @@ export function recordToolCallMetrics(
   durationMs: number,
   attributes: MetricDefinitions[typeof TOOL_CALL_COUNT]['attributes'],
 ): void {
-  if (!toolCallCounter || !toolCallLatencyHistogram || !isMetricsInitialized)
-    return;
+  if (!toolCallCounter || !toolCallLatencyHistogram || !isMetricsInitialized) return;
 
   const metricAttributes: Attributes = {
     ...baseMetricDefinition.getCommonAttributes(config),
@@ -886,11 +872,7 @@ export function recordCustomApiResponseMetrics(
   durationMs: number,
   attributes: MetricDefinitions[typeof API_REQUEST_COUNT]['attributes'],
 ): void {
-  if (
-    !apiRequestCounter ||
-    !apiRequestLatencyHistogram ||
-    !isMetricsInitialized
-  )
+  if (!apiRequestCounter || !apiRequestLatencyHistogram || !isMetricsInitialized)
     return;
   const metricAttributes: Attributes = {
     ...baseMetricDefinition.getCommonAttributes(config),
@@ -909,11 +891,7 @@ export function recordApiErrorMetrics(
   durationMs: number,
   attributes: MetricDefinitions[typeof API_REQUEST_COUNT]['attributes'],
 ): void {
-  if (
-    !apiRequestCounter ||
-    !apiRequestLatencyHistogram ||
-    !isMetricsInitialized
-  )
+  if (!apiRequestCounter || !apiRequestLatencyHistogram || !isMetricsInitialized)
     return;
   const metricAttributes: Attributes = {
     ...baseMetricDefinition.getCommonAttributes(config),
@@ -961,19 +939,13 @@ export function recordLinesChanged(
  */
 export function recordOnboardingStart(config: Config): void {
   if (!onboardingStartCounter || !isMetricsInitialized) return;
-  onboardingStartCounter.add(
-    1,
-    baseMetricDefinition.getCommonAttributes(config),
-  );
+  onboardingStartCounter.add(1, baseMetricDefinition.getCommonAttributes(config));
 }
 
 /**
  * Records a metric for when the Google auth process ends successfully.
  */
-export function recordOnboardingSuccess(
-  config: Config,
-  durationMs?: number,
-): void {
+export function recordOnboardingSuccess(config: Config, durationMs?: number): void {
   if (!isMetricsInitialized) return;
 
   const attributes: Attributes = {
@@ -1064,10 +1036,7 @@ export function recordContentRetry(config: Config): void {
  */
 export function recordContentRetryFailure(config: Config): void {
   if (!contentRetryFailureCounter || !isMetricsInitialized) return;
-  contentRetryFailureCounter.add(
-    1,
-    baseMetricDefinition.getCommonAttributes(config),
-  );
+  contentRetryFailureCounter.add(1, baseMetricDefinition.getCommonAttributes(config));
 }
 
 export function recordModelSlashCommand(
@@ -1103,16 +1072,14 @@ export function recordModelRoutingMetrics(
   if (event.reasoning) {
     // GCP metric labels have a maximum string size of 1024 characters.
     // Apply strict truncation only in CI workflows to avoid masking data for normal users.
-    const isStrictTelemetry =
-      process.env['GEMINI_STRICT_TELEMETRY_LIMITS'] === 'true';
+    const isStrictTelemetry = process.env['GEMINI_STRICT_TELEMETRY_LIMITS'] === 'true';
     attributes['routing.reasoning'] =
       isStrictTelemetry && event.reasoning.length > 1000
         ? event.reasoning.substring(0, 1000) + '...'
         : event.reasoning;
   }
   if (event.enable_numerical_routing !== undefined) {
-    attributes['routing.enable_numerical_routing'] =
-      event.enable_numerical_routing;
+    attributes['routing.enable_numerical_routing'] = event.enable_numerical_routing;
   }
   if (event.classifier_threshold) {
     attributes['routing.classifier_threshold'] = event.classifier_threshold;
@@ -1121,24 +1088,18 @@ export function recordModelRoutingMetrics(
   modelRoutingLatencyHistogram.record(event.routing_latency_ms, attributes);
 
   if (event.failed) {
-    const isStrictTelemetry =
-      process.env['GEMINI_STRICT_TELEMETRY_LIMITS'] === 'true';
+    const isStrictTelemetry = process.env['GEMINI_STRICT_TELEMETRY_LIMITS'] === 'true';
     modelRoutingFailureCounter.add(1, {
       ...attributes,
       'routing.error_message':
-        isStrictTelemetry &&
-        event.error_message &&
-        event.error_message.length > 1000
+        isStrictTelemetry && event.error_message && event.error_message.length > 1000
           ? event.error_message.substring(0, 1000) + '...'
           : event.error_message,
     });
   }
 }
 
-export function recordAgentRunMetrics(
-  config: Config,
-  event: AgentFinishEvent,
-): void {
+export function recordAgentRunMetrics(config: Config, event: AgentFinishEvent): void {
   if (
     !agentRunCounter ||
     !agentDurationHistogram ||
@@ -1221,16 +1182,10 @@ export function recordGenAiClientOperationDuration(
     ...attributes,
   };
 
-  genAiClientOperationDurationHistogram.record(
-    durationSeconds,
-    metricAttributes,
-  );
+  genAiClientOperationDurationHistogram.record(durationSeconds, metricAttributes);
 }
 
-export function getConventionAttributes(event: {
-  model: string;
-  auth_type?: string;
-}): {
+export function getConventionAttributes(event: { model: string; auth_type?: string }): {
   'gen_ai.operation.name': GenAiOperationName;
   'gen_ai.provider.name': GenAiProviderName;
   'gen_ai.request.model': string;
@@ -1360,8 +1315,7 @@ export function recordToolExecutionBreakdown(
   durationMs: number,
   attributes: MetricDefinitions[typeof TOOL_EXECUTION_BREAKDOWN]['attributes'],
 ): void {
-  if (!toolExecutionBreakdownHistogram || !isPerformanceMonitoringEnabled)
-    return;
+  if (!toolExecutionBreakdownHistogram || !isPerformanceMonitoringEnabled) return;
 
   const metricAttributes: Attributes = {
     ...baseMetricDefinition.getCommonAttributes(config),
@@ -1434,10 +1388,7 @@ export function recordPerformanceRegression(
       ((attributes.current_value - attributes.baseline_value) /
         attributes.baseline_value) *
       100;
-    regressionPercentageChangeHistogram.record(
-      percentageChange,
-      metricAttributes,
-    );
+    regressionPercentageChangeHistogram.record(percentageChange, metricAttributes);
   }
 }
 
@@ -1544,8 +1495,7 @@ export function recordHookCallMetrics(
   durationMs: number,
   success: boolean,
 ): void {
-  if (!hookCallCounter || !hookCallLatencyHistogram || !isMetricsInitialized)
-    return;
+  if (!hookCallCounter || !hookCallLatencyHistogram || !isMetricsInitialized) return;
 
   // Always sanitize hook names in metrics (metrics are aggregated and exposed)
   const sanitizedHookName = sanitizeHookName(hookName);
@@ -1600,11 +1550,7 @@ export function recordBrowserAgentConnection(
     session_mode: 'persistent' | 'isolated' | 'existing';
     headless: boolean;
     success: boolean;
-    error_type?:
-      | 'profile_locked'
-      | 'timeout'
-      | 'connection_refused'
-      | 'unknown';
+    error_type?: 'profile_locked' | 'timeout' | 'connection_refused' | 'unknown';
     tool_count?: number;
   },
 ): void {

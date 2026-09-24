@@ -27,10 +27,7 @@ describe('Topic Tool Policy', () => {
       approvalMode: ApprovalMode.DEFAULT,
     });
 
-    const result = await engine.check(
-      { name: UPDATE_TOPIC_TOOL_NAME },
-      undefined,
-    );
+    const result = await engine.check({ name: UPDATE_TOPIC_TOOL_NAME }, undefined);
     expect(result.decision).toBe(PolicyDecision.ALLOW);
   });
 
@@ -41,10 +38,7 @@ describe('Topic Tool Policy', () => {
       approvalMode: ApprovalMode.PLAN,
     });
 
-    const result = await engine.check(
-      { name: UPDATE_TOPIC_TOOL_NAME },
-      undefined,
-    );
+    const result = await engine.check({ name: UPDATE_TOPIC_TOOL_NAME }, undefined);
     expect(result.decision).toBe(PolicyDecision.ALLOW);
   });
 
@@ -55,10 +49,7 @@ describe('Topic Tool Policy', () => {
       approvalMode: ApprovalMode.YOLO,
     });
 
-    const result = await engine.check(
-      { name: UPDATE_TOPIC_TOOL_NAME },
-      undefined,
-    );
+    const result = await engine.check({ name: UPDATE_TOPIC_TOOL_NAME }, undefined);
     expect(result.decision).toBe(PolicyDecision.ALLOW);
   });
 });

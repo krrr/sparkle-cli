@@ -37,15 +37,13 @@ describe('toolMapping', () => {
       [CoreToolCallStatus.Error, ToolCallStatus.Error],
       [CoreToolCallStatus.Scheduled, ToolCallStatus.Pending],
     ] as const)('maps %s to %s', (coreStatus, expectedDisplayStatus) => {
-      expect(mapCoreStatusToDisplayStatus(coreStatus)).toBe(
-        expectedDisplayStatus,
-      );
+      expect(mapCoreStatusToDisplayStatus(coreStatus)).toBe(expectedDisplayStatus);
     });
 
     it('throws error for unknown status due to checkExhaustive', () => {
-      expect(() =>
-        mapCoreStatusToDisplayStatus('unknown_status' as Status),
-      ).toThrow('unexpected value unknown_status!');
+      expect(() => mapCoreStatusToDisplayStatus('unknown_status' as Status)).toThrow(
+        'unexpected value unknown_status!',
+      );
     });
   });
 

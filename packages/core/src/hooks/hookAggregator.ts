@@ -350,10 +350,7 @@ export class HookAggregator {
   /**
    * Extract additional context from hook-specific outputs
    */
-  private extractAdditionalContext(
-    output: HookOutput,
-    contexts: string[],
-  ): void {
+  private extractAdditionalContext(output: HookOutput, contexts: string[]): void {
     const specific = output.hookSpecificOutput;
     if (!specific) {
       return;

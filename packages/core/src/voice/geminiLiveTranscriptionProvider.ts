@@ -108,10 +108,7 @@ export class GeminiLiveTranscriptionProvider
             }
           }
         } catch (e) {
-          debugLogger.error(
-            '[GeminiLiveTranscription] Error parsing message:',
-            e,
-          );
+          debugLogger.error('[GeminiLiveTranscription] Error parsing message:', e);
         }
       });
 

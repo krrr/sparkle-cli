@@ -27,10 +27,7 @@ import { ToolErrorType } from './tool-error.js';
 import { buildFilePathArgsPattern } from '../policy/utils.js';
 
 import type { PartListUnion } from '@google/genai';
-import {
-  processSingleFileContent,
-  getSpecificMimeType,
-} from '../utils/fileUtils.js';
+import { processSingleFileContent, getSpecificMimeType } from '../utils/fileUtils.js';
 import type { Config } from '../config/config.js';
 import { FileOperation } from '../telemetry/metrics.js';
 import { getProgrammingLanguage } from '../telemetry/telemetry-utils.js';
@@ -87,18 +84,12 @@ class ReadFileToolInvocation extends BaseToolInvocation<
         path.resolve(this.config.getTargetDir(), sanitizedPath),
       );
     } catch {
-      this.resolvedPath = path.resolve(
-        this.config.getTargetDir(),
-        sanitizedPath,
-      );
+      this.resolvedPath = path.resolve(this.config.getTargetDir(), sanitizedPath);
     }
   }
 
   getDescription(): string {
-    const relativePath = makeRelative(
-      this.resolvedPath,
-      this.config.getTargetDir(),
-    );
+    const relativePath = makeRelative(this.resolvedPath, this.config.getTargetDir());
     return shortenPath(relativePath);
   }
 
@@ -120,10 +111,7 @@ class ReadFileToolInvocation extends BaseToolInvocation<
   }
 
   async execute(_options: ExecuteOptions): Promise<ToolResult> {
-    const validationError = this.config.validatePathAccess(
-      this.resolvedPath,
-      'read',
-    );
+    const validationError = this.config.validatePathAccess(this.resolvedPath, 'read');
     if (validationError) {
       return {
         llmContent: validationError,
@@ -222,10 +210,7 @@ ${result.llmContent}`;
 /**
  * Implementation of the ReadFile tool logic
  */
-export class ReadFileTool extends BaseDeclarativeTool<
-  ReadFileToolParams,
-  ToolResult
-> {
+export class ReadFileTool extends BaseDeclarativeTool<ReadFileToolParams, ToolResult> {
   static readonly Name = READ_FILE_TOOL_NAME;
   private readonly fileDiscoveryService: FileDiscoveryService;
 
@@ -270,10 +255,7 @@ export class ReadFileTool extends BaseDeclarativeTool<
       return `Failed to resolve path: ${err instanceof Error ? err.message : String(err)}`;
     }
 
-    const validationError = this.config.validatePathAccess(
-      resolvedPath,
-      'read',
-    );
+    const validationError = this.config.validatePathAccess(resolvedPath, 'read');
     if (validationError) {
       return validationError;
     }
@@ -288,10 +270,7 @@ export class ReadFileTool extends BaseDeclarativeTool<
 
     const fileFilteringOptions = this.config.getFileFilteringOptions();
     if (
-      this.fileDiscoveryService.shouldIgnoreFile(
-        resolvedPath,
-        fileFilteringOptions,
-      )
+      this.fileDiscoveryService.shouldIgnoreFile(resolvedPath, fileFilteringOptions)
     ) {
       return `File path '${resolvedPath}' is ignored by configured ignore patterns.`;
     }

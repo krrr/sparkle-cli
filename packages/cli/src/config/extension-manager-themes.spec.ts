@@ -20,12 +20,7 @@ import {
 import { createExtension } from '../test-utils/createExtension.js';
 import { ExtensionManager } from './extension-manager.js';
 import { themeManager, DEFAULT_THEME } from '../ui/themes/theme-manager.js';
-import {
-  SPARKLE_DIR,
-  type Config,
-  tmpdir,
-  NoopSandboxManager,
-} from 'sparkle-cli-core';
+import { SPARKLE_DIR, type Config, tmpdir, NoopSandboxManager } from 'sparkle-cli-core';
 import { createTestMergedSettings, SettingScope } from './settings.js';
 
 describe('ExtensionManager theme loading', () => {
@@ -34,9 +29,7 @@ describe('ExtensionManager theme loading', () => {
   let tempHomeDir: string;
 
   beforeAll(async () => {
-    tempHomeDir = await fs.promises.mkdtemp(
-      path.join(tmpdir(), 'sparkle-cli-test-'),
-    );
+    tempHomeDir = await fs.promises.mkdtemp(path.join(tmpdir(), 'sparkle-cli-test-'));
   });
 
   afterAll(async () => {

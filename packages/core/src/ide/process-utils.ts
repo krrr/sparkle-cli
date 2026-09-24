@@ -229,8 +229,7 @@ export async function getIdeProcessInfo(): Promise<{
 }> {
   const platform = os.platform();
 
-  const explicitPid =
-    process.env['SPARKLE_CLI_IDE_PID'] || process.env['VSCODE_PID'];
+  const explicitPid = process.env['SPARKLE_CLI_IDE_PID'] || process.env['VSCODE_PID'];
   if (explicitPid) {
     const idePid = parseInt(explicitPid, 10);
     if (!isNaN(idePid) && idePid > 0) {

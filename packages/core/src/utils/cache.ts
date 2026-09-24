@@ -34,9 +34,7 @@ export interface CacheOptions {
  * A generic caching service with TTL support.
  */
 export class CacheService<K extends object | string | undefined, V> {
-  private readonly storage:
-    | Map<K, CacheEntry<V>>
-    | WeakMap<WeakKey, CacheEntry<V>>;
+  private readonly storage: Map<K, CacheEntry<V>> | WeakMap<WeakKey, CacheEntry<V>>;
   private readonly defaultTtl?: number;
   private readonly deleteOnPromiseFailure: boolean;
 

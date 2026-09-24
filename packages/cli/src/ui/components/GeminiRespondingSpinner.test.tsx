@@ -10,10 +10,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStreamingContext } from '../contexts/StreamingContext.js';
 import { Text, useIsScreenReaderEnabled } from 'ink';
 import { StreamingState } from '../types.js';
-import {
-  SCREEN_READER_LOADING,
-  SCREEN_READER_RESPONDING,
-} from '../textConstants.js';
+import { SCREEN_READER_LOADING, SCREEN_READER_RESPONDING } from '../textConstants.js';
 
 vi.mock('../contexts/StreamingContext.js');
 vi.mock('ink', async (importOriginal) => {

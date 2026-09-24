@@ -12,15 +12,11 @@ import { randomUUID } from 'node:crypto';
 import { isRecord } from '../../utils/markdownUtils.js';
 
 function isStringArray(value: unknown): value is string[] {
-  return (
-    Array.isArray(value) && value.every((item) => typeof item === 'string')
-  );
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }
 
 function isNumberArray(value: unknown): value is number[] {
-  return (
-    Array.isArray(value) && value.every((item) => typeof item === 'number')
-  );
+  return Array.isArray(value) && value.every((item) => typeof item === 'number');
 }
 
 function isTaskArray(
@@ -64,10 +60,7 @@ export function isSnapshotState(text: string): boolean {
       Array.isArray(parsed['constraints_and_preferences']) &&
       Array.isArray(parsed['recent_arc']);
     if (!isSnap) {
-      debugLogger.log(
-        '[isSnapshotState] FAILED FOR JSON:',
-        JSON.stringify(parsed),
-      );
+      debugLogger.log('[isSnapshotState] FAILED FOR JSON:', JSON.stringify(parsed));
     }
     return isSnap;
   } catch {
@@ -271,9 +264,7 @@ ${formatNodesForLlm(nodes)}`;
     const newState: SnapshotState = {
       active_tasks: [...previousState.active_tasks],
       discovered_facts: [...previousState.discovered_facts],
-      constraints_and_preferences: [
-        ...previousState.constraints_and_preferences,
-      ],
+      constraints_and_preferences: [...previousState.constraints_and_preferences],
       recent_arc: [...previousState.recent_arc],
     };
 

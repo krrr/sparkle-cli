@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  type Mocked,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mocked, type Mock } from 'vitest';
 import { GeminiAgent } from './acpRpcDispatcher.js';
 import * as acp from '@agentclientprotocol/sdk';
 import {
@@ -36,8 +28,7 @@ vi.mock('../config/config.js', () => ({
 }));
 
 vi.mock('../utils/sessionUtils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/sessionUtils.js')>();
+  const actual = await importOriginal<typeof import('../utils/sessionUtils.js')>();
   return {
     ...actual,
     SessionSelector: vi.fn(),
@@ -82,9 +73,7 @@ describe('GeminiAgent Session Resume', () => {
     mockConfig = {
       refreshAuth: vi.fn().mockResolvedValue(undefined),
       initialize: vi.fn().mockResolvedValue(undefined),
-      getContentGeneratorConfig: vi
-        .fn()
-        .mockReturnValue({ apiKey: 'test-key' }),
+      getContentGeneratorConfig: vi.fn().mockReturnValue({ apiKey: 'test-key' }),
       getProviderProfileService: vi.fn().mockReturnValue({
         getActiveProfile: vi.fn().mockReturnValue({
           id: 'test-profile-1',

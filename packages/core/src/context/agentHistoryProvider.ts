@@ -79,9 +79,7 @@ export class AgentHistoryProvider {
    * - Older messages (already processed) are restricted to the NORMAL limit
    *   once they exit the grace period.
    */
-  private enforceMessageSizeLimits(
-    history: readonly Content[],
-  ): readonly Content[] {
+  private enforceMessageSizeLimits(history: readonly Content[]): readonly Content[] {
     if (history.length === 0) return history;
 
     let hasChanges = false;
@@ -137,15 +135,9 @@ export class AgentHistoryProvider {
           MIN_TARGET_TOKENS,
           Math.floor(partTokens * ratio),
         );
-        const targetChars = estimateCharsFromTokens(
-          part.text,
-          targetPartTokens,
-        );
+        const targetChars = estimateCharsFromTokens(part.text, targetPartTokens);
 
-        if (
-          part.text.length > targetChars &&
-          targetChars > MIN_CHARS_FOR_TRUNCATION
-        ) {
+        if (part.text.length > targetChars && targetChars > MIN_CHARS_FOR_TRUNCATION) {
           const newText = truncateProportionally(
             part.text,
             targetChars,
@@ -200,10 +192,7 @@ export class AgentHistoryProvider {
     }
 
     // Ensure structural integrity of the boundary
-    truncationBoundary = this.adjustBoundaryForIntegrity(
-      history,
-      truncationBoundary,
-    );
+    truncationBoundary = this.adjustBoundaryForIntegrity(history, truncationBoundary);
 
     const messagesToKeep = history.slice(truncationBoundary);
     const messagesToTruncate = history.slice(0, truncationBoundary);
@@ -240,9 +229,7 @@ export class AgentHistoryProvider {
     return currentBoundary;
   }
 
-  private getFallbackSummaryText(
-    messagesToTruncate: readonly Content[],
-  ): string {
+  private getFallbackSummaryText(messagesToTruncate: readonly Content[]): string {
     const userMessages = messagesToTruncate.filter((m) => m.role === 'user');
     const modelMessages = messagesToTruncate.filter((m) => m.role === 'model');
 
@@ -255,9 +242,7 @@ export class AgentHistoryProvider {
     const actionPath = modelMessages
       .flatMap(
         (m) =>
-          m.parts
-            ?.filter((p) => p.functionCall)
-            .map((p) => p.functionCall!.name) || [],
+          m.parts?.filter((p) => p.functionCall).map((p) => p.functionCall!.name) || [],
       )
       .join(' → ');
 
@@ -267,9 +252,7 @@ export class AgentHistoryProvider {
     ];
 
     if (lastUserText) {
-      summaryParts.push(
-        `- **Previous User Intent (Truncated):** "${lastUserText}"`,
-      );
+      summaryParts.push(`- **Previous User Intent (Truncated):** "${lastUserText}"`);
     }
 
     if (actionPath) {
@@ -295,11 +278,7 @@ export class AgentHistoryProvider {
       // to give the summarizer lookahead into the current state.
       const bridge = messagesToKeep.slice(0, 5);
 
-      return await this.generateIntentSummary(
-        messagesToTruncate,
-        bridge,
-        abortSignal,
-      );
+      return await this.generateIntentSummary(messagesToTruncate, bridge, abortSignal);
     } catch (error) {
       debugLogger.log('AgentHistoryProvider: Summarization failed.', error);
       return this.getFallbackSummaryText(messagesToTruncate);
@@ -353,9 +332,7 @@ export class AgentHistoryProvider {
       .filter((m) => m.role === 'model')
       .flatMap(
         (m) =>
-          m.parts
-            ?.filter((p) => p.functionCall)
-            .map((p) => p.functionCall!.name) || [],
+          m.parts?.filter((p) => p.functionCall).map((p) => p.functionCall!.name) || [],
       )
       .join(' → ');
 
@@ -386,20 +363,18 @@ ${JSON.stringify(messagesToTruncate)}
 ACTIVE BRIDGE (LOOKAHEAD):
 ${JSON.stringify(bridge)}`;
 
-    const summaryResponse = await this.config
-      .getBaseLlmClient()
-      .generateContent({
-        modelConfigKey: { model: 'agent-history-provider-summarizer' },
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: prompt }],
-          },
-        ],
-        promptId: 'agent-history-provider',
-        abortSignal: abortSignal ?? new AbortController().signal,
-        role: LlmRole.UTILITY_COMPRESSOR,
-      });
+    const summaryResponse = await this.config.getBaseLlmClient().generateContent({
+      modelConfigKey: { model: 'agent-history-provider-summarizer' },
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }],
+        },
+      ],
+      promptId: 'agent-history-provider',
+      abortSignal: abortSignal ?? new AbortController().signal,
+      role: LlmRole.UTILITY_COMPRESSOR,
+    });
 
     let summary = getResponseText(summaryResponse) ?? '';
     // Clean up if the model included extra tags or markdown

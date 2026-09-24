@@ -6,10 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '../../test-utils/render.js';
-import {
-  useAlternateBuffer,
-  isAlternateBufferEnabled,
-} from './useAlternateBuffer.js';
+import { useAlternateBuffer, isAlternateBufferEnabled } from './useAlternateBuffer.js';
 import type { Config } from 'sparkle-cli-core';
 
 vi.mock('../contexts/ConfigContext.js', () => ({

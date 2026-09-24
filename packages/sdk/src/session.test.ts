@@ -79,9 +79,7 @@ describe('GeminiCliSession constructor', () => {
     const options: GeminiCliAgentOptions = {
       instructions: async () => 'dynamic instructions',
     };
-    expect(
-      () => new GeminiCliSession(options, 'session-2', mockAgent),
-    ).not.toThrow();
+    expect(() => new GeminiCliSession(options, 'session-2', mockAgent)).not.toThrow();
   });
 
   it('throws when instructions is an object (not string or function)', () => {
@@ -114,11 +112,7 @@ describe('GeminiCliSession constructor', () => {
 
 describe('GeminiCliSession id getter', () => {
   it('returns the sessionId passed to the constructor', () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'my-session-id',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'my-session-id', mockAgent);
     expect(session.id).toBe('my-session-id');
   });
 
@@ -131,20 +125,12 @@ describe('GeminiCliSession id getter', () => {
 
 describe('GeminiCliSession initialize()', () => {
   it('initializes successfully with string instructions', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-init-1',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-init-1', mockAgent);
     await expect(session.initialize()).resolves.toBeUndefined();
   });
 
   it('is idempotent — calling initialize() twice does not throw', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-init-2',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-init-2', mockAgent);
     await session.initialize();
     await expect(session.initialize()).resolves.toBeUndefined();
   });
@@ -183,11 +169,7 @@ describe('GeminiCliSession initialize()', () => {
 // TODO(#24999): Mock uses getGeminiClient() method but session.ts expects geminiClient property.
 describe.skip('GeminiCliSession sendStream()', () => {
   it('auto-initializes if not yet initialized', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-stream-1',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-stream-1', mockAgent);
     const events = [];
     for await (const event of session.sendStream('Hello')) {
       events.push(event);
@@ -196,11 +178,7 @@ describe.skip('GeminiCliSession sendStream()', () => {
   });
 
   it('completes cleanly when model returns no tool calls', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-stream-2',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-stream-2', mockAgent);
     await session.initialize();
     const events = [];
     for await (const event of session.sendStream('Hello')) {
@@ -210,11 +188,7 @@ describe.skip('GeminiCliSession sendStream()', () => {
   });
 
   it('accepts an AbortSignal without throwing', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-stream-3',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-stream-3', mockAgent);
     const controller = new AbortController();
     const events = [];
     for await (const event of session.sendStream('Hello', controller.signal)) {
@@ -261,11 +235,7 @@ describe.skip('GeminiCliSession sendStream()', () => {
       },
     ]);
 
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-stream-4',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-stream-4', mockAgent);
     const events = [];
     for await (const event of session.sendStream('Use the tool')) {
       events.push(event);
@@ -283,18 +253,12 @@ describe.skip('GeminiCliSession sendStream()', () => {
   });
 
   it('calls setUserMemory and updateSystemInstruction when instructions is a function', async () => {
-    const dynamicInstructions = vi
-      .fn()
-      .mockResolvedValue('updated instructions');
+    const dynamicInstructions = vi.fn().mockResolvedValue('updated instructions');
     const options: GeminiCliAgentOptions = {
       instructions: dynamicInstructions,
     };
 
-    const session = new GeminiCliSession(
-      options,
-      'session-stream-5',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(options, 'session-stream-5', mockAgent);
     for await (const _event of session.sendStream('Hello')) {
       // consume stream
     }
@@ -308,20 +272,14 @@ describe.skip('GeminiCliSession sendStream()', () => {
     expect(context).toHaveProperty('timestamp');
 
     // Config should have been updated with the new instructions
-    expect(mockConfig.setUserMemory).toHaveBeenCalledWith(
-      'updated instructions',
-    );
+    expect(mockConfig.setUserMemory).toHaveBeenCalledWith('updated instructions');
 
     // Client system instruction should have been refreshed
     expect(mockClient.updateSystemInstruction).toHaveBeenCalledOnce();
   });
 
   it('does not call setUserMemory when instructions is a string', async () => {
-    const session = new GeminiCliSession(
-      baseOptions,
-      'session-stream-6',
-      mockAgent,
-    );
+    const session = new GeminiCliSession(baseOptions, 'session-stream-6', mockAgent);
     for await (const _event of session.sendStream('Hello')) {
       // consume stream
     }

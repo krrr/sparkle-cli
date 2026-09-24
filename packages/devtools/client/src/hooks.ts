@@ -5,10 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import type {
-  NetworkLog,
-  InspectorConsoleLog as ConsoleLog,
-} from '../../src/types.js';
+import type { NetworkLog, InspectorConsoleLog as ConsoleLog } from '../../src/types.js';
 
 export type { NetworkLog };
 export type { InspectorConsoleLog as ConsoleLog } from '../../src/types.js';

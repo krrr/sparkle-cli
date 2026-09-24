@@ -52,10 +52,7 @@ const COMPRESSION_FUNCTION_RESPONSE_TOKEN_BUDGET = 50_000;
  *
  * Exported for testing purposes.
  */
-export function findCompressSplitPoint(
-  contents: Content[],
-  fraction: number,
-): number {
+export function findCompressSplitPoint(contents: Content[], fraction: number): number {
   if (fraction <= 0 || fraction >= 1) {
     throw new Error('Fraction must be between 0 and 1');
   }
@@ -116,10 +113,7 @@ export function modelStringToModelConfigAlias(model: string): string {
  * narration is disabled
  * or no topic is set.
  */
-export function appendActiveTopicToSummary(
-  summary: string,
-  config: Config,
-): string {
+export function appendActiveTopicToSummary(summary: string, config: Config): string {
   if (!config.isTopicUpdateNarrationEnabled()) {
     return summary;
   }
@@ -282,15 +276,12 @@ export class ChatCompressionService {
 
     const originalTokenCount = chat.getLastPromptTokenCount();
 
-    const contextWindow = config
-      .getModelConfigService()
-      .getContextWindow(model);
+    const contextWindow = config.getModelConfigService().getContextWindow(model);
 
     // Don't compress if not forced and we are under the limit.
     if (!force) {
       const threshold =
-        (await config.getCompressionThreshold()) ??
-        DEFAULT_COMPRESSION_TOKEN_THRESHOLD;
+        (await config.getCompressionThreshold()) ?? DEFAULT_COMPRESSION_TOKEN_THRESHOLD;
       if (originalTokenCount < threshold * contextWindow) {
         return {
           newHistory: null,
@@ -305,10 +296,7 @@ export class ChatCompressionService {
 
     // Apply token-based truncation to the entire history before splitting.
     // This ensures that even the "to compress" portion is within safe limits for the summarization model.
-    const truncatedHistory = await truncateHistoryToBudget(
-      curatedHistory,
-      config,
-    );
+    const truncatedHistory = await truncateHistoryToBudget(curatedHistory, config);
 
     // If summarization previously failed (and not forced), we only rely on truncation.
     // We do NOT attempt to invoke the LLM for summarization again to avoid repeated failures/costs.
@@ -400,30 +388,28 @@ export class ChatCompressionService {
 
     // Phase 3: The "Probe" Verification (Self-Correction)
     // We perform a second lightweight turn to ensure no critical information was lost.
-    const verificationResponse = await config
-      .getBaseLlmClient()
-      .generateContent({
-        modelConfigKey: { model: modelStringToModelConfigAlias(model) },
-        contents: [
-          ...historyForSummarizer,
-          {
-            role: 'model',
-            parts: [{ text: summary }],
-          },
-          {
-            role: 'user',
-            parts: [
-              {
-                text: 'Critically evaluate the <state_snapshot> you just generated. Did you omit any specific technical details, file paths, tool results, or user constraints mentioned in the history? If anything is missing or could be more precise, generate a FINAL, improved <state_snapshot>. Otherwise, repeat the exact same <state_snapshot> again.',
-              },
-            ],
-          },
-        ],
-        systemInstruction: { text: getCompressionPrompt(config) },
-        promptId: `${promptId}-verify`,
-        role: LlmRole.UTILITY_COMPRESSOR,
-        abortSignal: abortSignal ?? new AbortController().signal,
-      });
+    const verificationResponse = await config.getBaseLlmClient().generateContent({
+      modelConfigKey: { model: modelStringToModelConfigAlias(model) },
+      contents: [
+        ...historyForSummarizer,
+        {
+          role: 'model',
+          parts: [{ text: summary }],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              text: 'Critically evaluate the <state_snapshot> you just generated. Did you omit any specific technical details, file paths, tool results, or user constraints mentioned in the history? If anything is missing or could be more precise, generate a FINAL, improved <state_snapshot>. Otherwise, repeat the exact same <state_snapshot> again.',
+            },
+          ],
+        },
+      ],
+      systemInstruction: { text: getCompressionPrompt(config) },
+      promptId: `${promptId}-verify`,
+      role: LlmRole.UTILITY_COMPRESSOR,
+      abortSignal: abortSignal ?? new AbortController().signal,
+    });
 
     const finalSummary = (
       getResponseText(verificationResponse)?.trim() || summary
@@ -463,9 +449,7 @@ export class ChatCompressionService {
     const fullNewHistory = await getInitialChatHistory(config, extraHistory);
 
     const newTokenCount = await calculateRequestTokenCount(
-      fullNewHistory.flatMap(
-        (c) => ('content' in c ? c.content.parts : c.parts) || [],
-      ),
+      fullNewHistory.flatMap((c) => ('content' in c ? c.content.parts : c.parts) || []),
       config.getContentGenerator(),
       model,
     );
@@ -484,8 +468,7 @@ export class ChatCompressionService {
         info: {
           originalTokenCount,
           newTokenCount,
-          compressionStatus:
-            CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
         },
       };
     } else {

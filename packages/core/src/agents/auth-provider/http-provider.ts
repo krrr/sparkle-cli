@@ -45,8 +45,7 @@ export class HttpAuthProvider extends BaseA2AAuthProvider {
   override async headers(): Promise<HttpHeaders> {
     const config = this.config;
     if ('token' in config) {
-      if (!this.resolvedToken)
-        throw new Error('HttpAuthProvider not initialized');
+      if (!this.resolvedToken) throw new Error('HttpAuthProvider not initialized');
       return { Authorization: `Bearer ${this.resolvedToken}` };
     }
 
@@ -61,8 +60,7 @@ export class HttpAuthProvider extends BaseA2AAuthProvider {
     }
 
     // Generic raw value for any other IANA-registered scheme
-    if (!this.resolvedValue)
-      throw new Error('HttpAuthProvider not initialized');
+    if (!this.resolvedValue) throw new Error('HttpAuthProvider not initialized');
     return { Authorization: `${config.scheme} ${this.resolvedValue}` };
   }
 
@@ -78,9 +76,7 @@ export class HttpAuthProvider extends BaseA2AAuthProvider {
       if (this.authRetryCount >= BaseA2AAuthProvider.MAX_AUTH_RETRIES) {
         return undefined;
       }
-      debugLogger.debug(
-        '[HttpAuthProvider] Re-resolving values after auth failure',
-      );
+      debugLogger.debug('[HttpAuthProvider] Re-resolving values after auth failure');
       await this.initialize();
     }
     return super.shouldRetryWithHeaders(req, res);

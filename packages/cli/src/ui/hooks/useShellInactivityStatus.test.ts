@@ -39,9 +39,7 @@ describe('useShellInactivityStatus', () => {
   };
 
   it('should show action_required status after 30s when output has been produced', async () => {
-    const { result } = await renderHook(() =>
-      useShellInactivityStatus(defaultProps),
-    );
+    const { result } = await renderHook(() => useShellInactivityStatus(defaultProps));
 
     expect(result.current.inactivityStatus).toBe('none');
 
@@ -73,9 +71,7 @@ describe('useShellInactivityStatus', () => {
       isRedirectionActive: true,
     });
 
-    const { result } = await renderHook(() =>
-      useShellInactivityStatus(defaultProps),
-    );
+    const { result } = await renderHook(() => useShellInactivityStatus(defaultProps));
 
     // Should NOT show action_required even after 60s
     await act(async () => {
@@ -96,9 +92,7 @@ describe('useShellInactivityStatus', () => {
       isRedirectionActive: true,
     });
 
-    const { result } = await renderHook(() =>
-      useShellInactivityStatus(defaultProps),
-    );
+    const { result } = await renderHook(() => useShellInactivityStatus(defaultProps));
 
     // Even after delay, focus hint should be suppressed
     await act(async () => {

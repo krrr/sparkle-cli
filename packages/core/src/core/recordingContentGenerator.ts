@@ -83,9 +83,7 @@ export class RecordingContentGenerator implements ContentGenerator {
     return Promise.resolve(stream(this.filePath));
   }
 
-  async countTokens(
-    request: CountTokensParameters,
-  ): Promise<CountTokensResponse> {
+  async countTokens(request: CountTokensParameters): Promise<CountTokensResponse> {
     const response = await this.realGenerator.countTokens(request);
     const recordedResponse: FakeResponse = {
       method: 'countTokens',
@@ -98,9 +96,7 @@ export class RecordingContentGenerator implements ContentGenerator {
     return response;
   }
 
-  async embedContent(
-    request: EmbedContentParameters,
-  ): Promise<EmbedContentResponse> {
+  async embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse> {
     const response = await this.realGenerator.embedContent(request);
 
     const recordedResponse: FakeResponse = {

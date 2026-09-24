@@ -6,9 +6,7 @@
 
 import type { ContextProcessorRegistry } from './registry.js';
 
-export function getContextManagementConfigSchema(
-  registry: ContextProcessorRegistry,
-) {
+export function getContextManagementConfigSchema(registry: ContextProcessorRegistry) {
   // We use a registry to deeply validate processor overrides.
   // We do this by generating a `oneOf` list that matches the `type` discriminator
   // to the specific processor `options` schema.
@@ -34,8 +32,7 @@ export function getContextManagementConfigSchema(
         properties: {
           retainedTokens: {
             type: 'number',
-            description:
-              'The ideal token count the pipeline tries to shrink down to.',
+            description: 'The ideal token count the pipeline tries to shrink down to.',
           },
           maxTokens: {
             type: 'number',

@@ -263,9 +263,7 @@ describe('KeypressContext', () => {
     it('should stop propagation when a higher priority handler returns true', async () => {
       const higherPriorityHandler = vi.fn(() => true);
       const lowerPriorityHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => {
         result.current.subscribe(higherPriorityHandler, KeypressPriority.High);
@@ -283,9 +281,7 @@ describe('KeypressContext', () => {
     it('should continue propagation when a higher priority handler does not consume the event', async () => {
       const higherPriorityHandler = vi.fn(() => false);
       const lowerPriorityHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => {
         result.current.subscribe(higherPriorityHandler, KeypressPriority.High);
@@ -304,9 +300,7 @@ describe('KeypressContext', () => {
 
     it('should handle double Escape', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
       act(() => result.current.subscribe(keyHandler));
 
       act(() => {
@@ -340,9 +334,7 @@ describe('KeypressContext', () => {
     it('should handle lone Escape key (keycode 27) with timeout when kitty protocol is enabled', async () => {
       // Use real timers for this test to avoid issues with stream/buffer timing
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
       act(() => result.current.subscribe(keyHandler));
 
       // Send just ESC
@@ -465,9 +457,7 @@ describe('KeypressContext', () => {
     ])('should $name', async ({ pastedText, writeSequence }) => {
       const keyHandler = vi.fn();
 
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -487,9 +477,7 @@ describe('KeypressContext', () => {
 
     it('should parse valid OSC 52 response', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -510,9 +498,7 @@ describe('KeypressContext', () => {
 
     it('should handle split OSC 52 response', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -538,9 +524,7 @@ describe('KeypressContext', () => {
 
     it('should handle OSC 52 response terminated by ESC \\', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -561,9 +545,7 @@ describe('KeypressContext', () => {
 
     it('should ignore unknown OSC sequences', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -580,9 +562,7 @@ describe('KeypressContext', () => {
 
     it('should ignore invalid OSC 52 format', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -602,9 +582,7 @@ describe('KeypressContext', () => {
     let debugLoggerSpy: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
-      debugLoggerSpy = vi
-        .spyOn(debugLogger, 'log')
-        .mockImplementation(() => {});
+      debugLoggerSpy = vi.spyOn(debugLogger, 'log').mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -614,14 +592,11 @@ describe('KeypressContext', () => {
     it('should not log keystrokes when debugKeystrokeLogging is false', async () => {
       const keyHandler = vi.fn();
 
-      const { result } = await renderHookWithProviders(
-        () => useKeypressContext(),
-        {
-          settings: createMockSettings({
-            general: { debugKeystrokeLogging: false },
-          }),
-        },
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext(), {
+        settings: createMockSettings({
+          general: { debugKeystrokeLogging: false },
+        }),
+      });
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -639,14 +614,11 @@ describe('KeypressContext', () => {
     it('should log kitty buffer accumulation when debugKeystrokeLogging is true', async () => {
       const keyHandler = vi.fn();
 
-      const { result } = await renderHookWithProviders(
-        () => useKeypressContext(),
-        {
-          settings: createMockSettings({
-            general: { debugKeystrokeLogging: true },
-          }),
-        },
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext(), {
+        settings: createMockSettings({
+          general: { debugKeystrokeLogging: true },
+        }),
+      });
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -661,14 +633,11 @@ describe('KeypressContext', () => {
     it('should show char codes when debugKeystrokeLogging is true even without debug mode', async () => {
       const keyHandler = vi.fn();
 
-      const { result } = await renderHookWithProviders(
-        () => useKeypressContext(),
-        {
-          settings: createMockSettings({
-            general: { debugKeystrokeLogging: true },
-          }),
-        },
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext(), {
+        settings: createMockSettings({
+          general: { debugKeystrokeLogging: true },
+        }),
+      });
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -813,16 +782,12 @@ describe('KeypressContext', () => {
       'should recognize sequence "$sequence" as $expected.name',
       async ({ sequence, expected }) => {
         const keyHandler = vi.fn();
-        const { result } = await renderHookWithProviders(() =>
-          useKeypressContext(),
-        );
+        const { result } = await renderHookWithProviders(() => useKeypressContext());
         act(() => result.current.subscribe(keyHandler));
 
         act(() => stdin.write(sequence));
 
-        expect(keyHandler).toHaveBeenCalledWith(
-          expect.objectContaining(expected),
-        );
+        expect(keyHandler).toHaveBeenCalledWith(expect.objectContaining(expected));
       },
     );
   });
@@ -908,9 +873,7 @@ describe('KeypressContext', () => {
       async ({ sequence, expected }) => {
         const { keyHandler } = await setupKeypressTest();
         act(() => stdin.write(sequence));
-        expect(keyHandler).toHaveBeenCalledWith(
-          expect.objectContaining(expected),
-        );
+        expect(keyHandler).toHaveBeenCalledWith(expect.objectContaining(expected));
       },
     );
   });
@@ -990,82 +953,70 @@ describe('KeypressContext', () => {
 
     it.each(
       terminals.flatMap((terminal) =>
-        Object.entries(keys).map(
-          ([key, [keycode, accentedChar, shiftValue]]) => {
-            if (terminal === 'Ghostty') {
-              // Ghostty uses kitty protocol sequences
-              // Modifier 3 is Alt, 4 is Shift+Alt
-              const modifier = shiftValue ? 4 : 3;
-              return {
-                terminal,
-                key,
-                chunk: `\x1b[${keycode};${modifier}u`,
-                expected: {
-                  name: key.toLowerCase(),
-                  shift: shiftValue,
-                  alt: true,
-                  ctrl: false,
-                  cmd: false,
-                },
-              };
-            } else if (terminal === 'MacTerminal') {
-              // Mac Terminal sends ESC + letter
-              const chunk = shiftValue
-                ? `\x1b${key.toUpperCase()}`
-                : `\x1b${key.toLowerCase()}`;
-              return {
-                terminal,
-                key,
-                kitty: false,
-                chunk,
-                expected: {
-                  sequence: chunk,
-                  name: key.toLowerCase(),
-                  shift: shiftValue,
-                  alt: true,
-                  ctrl: false,
-                  cmd: false,
-                },
-              };
-            } else {
-              // iTerm2 and VSCode send accented characters (å, ø, µ, Ω, ¸)
-              return {
-                terminal,
-                key,
-                chunk: accentedChar,
-                expected: {
-                  name: key.toLowerCase(),
-                  shift: shiftValue,
-                  alt: true, // Always expect alt:true after conversion
-                  ctrl: false,
-                  cmd: false,
-                  sequence: accentedChar,
-                },
-              };
-            }
-          },
-        ),
+        Object.entries(keys).map(([key, [keycode, accentedChar, shiftValue]]) => {
+          if (terminal === 'Ghostty') {
+            // Ghostty uses kitty protocol sequences
+            // Modifier 3 is Alt, 4 is Shift+Alt
+            const modifier = shiftValue ? 4 : 3;
+            return {
+              terminal,
+              key,
+              chunk: `\x1b[${keycode};${modifier}u`,
+              expected: {
+                name: key.toLowerCase(),
+                shift: shiftValue,
+                alt: true,
+                ctrl: false,
+                cmd: false,
+              },
+            };
+          } else if (terminal === 'MacTerminal') {
+            // Mac Terminal sends ESC + letter
+            const chunk = shiftValue
+              ? `\x1b${key.toUpperCase()}`
+              : `\x1b${key.toLowerCase()}`;
+            return {
+              terminal,
+              key,
+              kitty: false,
+              chunk,
+              expected: {
+                sequence: chunk,
+                name: key.toLowerCase(),
+                shift: shiftValue,
+                alt: true,
+                ctrl: false,
+                cmd: false,
+              },
+            };
+          } else {
+            // iTerm2 and VSCode send accented characters (å, ø, µ, Ω, ¸)
+            return {
+              terminal,
+              key,
+              chunk: accentedChar,
+              expected: {
+                name: key.toLowerCase(),
+                shift: shiftValue,
+                alt: true, // Always expect alt:true after conversion
+                ctrl: false,
+                cmd: false,
+                sequence: accentedChar,
+              },
+            };
+          }
+        }),
       ),
     )(
       'should handle Alt+$key in $terminal',
-      async ({
-        chunk,
-        expected,
-      }: {
-        chunk: string;
-        expected: Partial<Key>;
-      }) => {
+      async ({ chunk, expected }: { chunk: string; expected: Partial<Key> }) => {
         const keyHandler = vi.fn();
-        const { result } = await renderHookWithProviders(() =>
-          useKeypressContext(),
-        );
+        const { result } = await renderHookWithProviders(() => useKeypressContext());
         act(() => result.current.subscribe(keyHandler));
 
         act(() => stdin.write(chunk));
 
-        expect(keyHandler).toHaveBeenCalledWith(
-          expect.objectContaining(expected),
-        );
+        expect(keyHandler).toHaveBeenCalledWith(expect.objectContaining(expected));
       },
     );
   });
@@ -1095,9 +1046,7 @@ describe('KeypressContext', () => {
 
   it('should timeout and flush incomplete kitty sequences after 50ms', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1132,9 +1081,7 @@ describe('KeypressContext', () => {
 
   it('should immediately flush non-kitty CSI sequences', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1156,9 +1103,7 @@ describe('KeypressContext', () => {
 
   it('should parse valid kitty sequences immediately when complete', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1176,9 +1121,7 @@ describe('KeypressContext', () => {
 
   it('should handle batched kitty sequences correctly', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1205,9 +1148,7 @@ describe('KeypressContext', () => {
 
   it('should handle mixed valid and invalid sequences', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1235,9 +1176,7 @@ describe('KeypressContext', () => {
     'should handle sequences arriving character by character with %s ms delay',
     async (delay) => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1261,9 +1200,7 @@ describe('KeypressContext', () => {
 
   it('should reset timeout when new input arrives', async () => {
     const keyHandler = vi.fn();
-    const { result } = await renderHookWithProviders(() =>
-      useKeypressContext(),
-    );
+    const { result } = await renderHookWithProviders(() => useKeypressContext());
 
     act(() => result.current.subscribe(keyHandler));
 
@@ -1298,9 +1235,7 @@ describe('KeypressContext', () => {
   describe('SGR Mouse Handling', () => {
     it('should ignore SGR mouse sequences', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1318,9 +1253,7 @@ describe('KeypressContext', () => {
 
     it('should handle mixed SGR mouse and key sequences', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1346,9 +1279,7 @@ describe('KeypressContext', () => {
 
     it('should ignore X11 mouse sequences', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1364,9 +1295,7 @@ describe('KeypressContext', () => {
 
     it('should not flush slow SGR mouse sequences as garbage', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1386,9 +1315,7 @@ describe('KeypressContext', () => {
 
     it('should ignore specific SGR mouse sequence sandwiched between keystrokes', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
 
       act(() => result.current.subscribe(keyHandler));
 
@@ -1419,9 +1346,7 @@ describe('KeypressContext', () => {
       { name: 'another mouse', sequence: '\u001b[<0;29;19m' },
     ])('should ignore $name sequence', async ({ sequence }) => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
       act(() => result.current.subscribe(keyHandler));
 
       for (const char of sequence) {
@@ -1446,9 +1371,7 @@ describe('KeypressContext', () => {
 
     it('should handle F12', async () => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
       act(() => result.current.subscribe(keyHandler));
 
       act(() => {
@@ -1477,9 +1400,7 @@ describe('KeypressContext', () => {
       'A你B好C', // Mixed characters
     ])('should correctly handle string "%s"', async (inputString) => {
       const keyHandler = vi.fn();
-      const { result } = await renderHookWithProviders(() =>
-        useKeypressContext(),
-      );
+      const { result } = await renderHookWithProviders(() => useKeypressContext());
       act(() => result.current.subscribe(keyHandler));
 
       act(() => stdin.write(inputString));

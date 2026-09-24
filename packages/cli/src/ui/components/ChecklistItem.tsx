@@ -21,9 +21,7 @@ export interface ChecklistItemData {
   label: string;
 }
 
-const ChecklistStatusDisplay: React.FC<{ status: ChecklistStatus }> = ({
-  status,
-}) => {
+const ChecklistStatusDisplay: React.FC<{ status: ChecklistStatus }> = ({ status }) => {
   switch (status) {
     case 'completed':
       return (

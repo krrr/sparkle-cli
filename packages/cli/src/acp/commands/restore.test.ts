@@ -40,9 +40,7 @@ describe('RestoreCommand', () => {
         config: {
           getCheckpointingEnabled: vi.fn().mockReturnValue(true),
           storage: {
-            getProjectCheckpointsDir: vi
-              .fn()
-              .mockReturnValue('/tmp/checkpoints'),
+            getProjectCheckpointsDir: vi.fn().mockReturnValue('/tmp/checkpoints'),
           },
         },
       },
@@ -69,9 +67,9 @@ describe('RestoreCommand', () => {
   });
 
   it('returns checkpointing-disabled message when disabled', async () => {
-    (
-      context.agentContext.config.getCheckpointingEnabled as Mock
-    ).mockReturnValue(false);
+    (context.agentContext.config.getCheckpointingEnabled as Mock).mockReturnValue(
+      false,
+    );
 
     const response = await restoreCommand.execute(context, ['checkpoint1']);
 
@@ -118,9 +116,7 @@ describe('RestoreCommand', () => {
   it('formats streamed restore results correctly', async () => {
     vi.mocked(fs.readFile).mockResolvedValue('{"valid": "data"}');
     vi.mocked(getToolCallDataSchema).mockReturnValue({
-      safeParse: vi
-        .fn()
-        .mockReturnValue({ success: true, data: { some: 'data' } }),
+      safeParse: vi.fn().mockReturnValue({ success: true, data: { some: 'data' } }),
     } as unknown as ReturnType<typeof getToolCallDataSchema>);
 
     async function* mockRestoreGenerator() {
@@ -136,9 +132,7 @@ describe('RestoreCommand', () => {
 
     expect(response.data).toContain('[INFO] Restoring...');
     expect(response.data).toContain('Loaded history with 2 messages.');
-    expect(response.data).toContain(
-      'Restored: {"type":"other","some":"other"}',
-    );
+    expect(response.data).toContain('Restored: {"type":"other","some":"other"}');
   });
 
   it('returns generic unexpected error message for non-ENOENT failures', async () => {
@@ -170,9 +164,7 @@ describe('ListCheckpointsCommand', () => {
         config: {
           getCheckpointingEnabled: vi.fn().mockReturnValue(true),
           storage: {
-            getProjectCheckpointsDir: vi
-              .fn()
-              .mockReturnValue('/tmp/checkpoints'),
+            getProjectCheckpointsDir: vi.fn().mockReturnValue('/tmp/checkpoints'),
           },
         },
       },
@@ -180,9 +172,9 @@ describe('ListCheckpointsCommand', () => {
   });
 
   it('returns checkpointing-disabled message when disabled', async () => {
-    (
-      context.agentContext.config.getCheckpointingEnabled as Mock
-    ).mockReturnValue(false);
+    (context.agentContext.config.getCheckpointingEnabled as Mock).mockReturnValue(
+      false,
+    );
 
     const response = await listCommand.execute(context);
 

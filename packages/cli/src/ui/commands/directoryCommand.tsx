@@ -9,11 +9,7 @@ import {
   loadTrustedFolders,
 } from '../../config/trustedFolders.js';
 import { MultiFolderTrustDialog } from '../components/MultiFolderTrustDialog.js';
-import {
-  CommandKind,
-  type SlashCommand,
-  type CommandContext,
-} from './types.js';
+import { CommandKind, type SlashCommand, type CommandContext } from './types.js';
 import { MessageType, type HistoryItem } from '../types.js';
 import { type Config } from 'sparkle-cli-core';
 import {
@@ -26,10 +22,7 @@ import * as fs from 'node:fs';
 
 async function finishAddingDirectories(
   config: Config,
-  addItem: (
-    itemData: Omit<HistoryItem, 'id'>,
-    baseTimestamp?: number,
-  ) => number,
+  addItem: (itemData: Omit<HistoryItem, 'id'>, baseTimestamp?: number) => number,
   added: string[],
   errors: string[],
 ) {
@@ -64,9 +57,7 @@ async function finishAddingDirectories(
       // Persist directories to session file for resume support
       const chatRecordingService = sparkle.getChatRecordingService();
       const workspaceContext = config.getWorkspaceContext();
-      chatRecordingService?.recordDirectories(
-        workspaceContext.getDirectories(),
-      );
+      chatRecordingService?.recordDirectories(workspaceContext.getDirectories());
     }
     addItem({
       type: MessageType.INFO,
@@ -177,10 +168,7 @@ export const directoryCommand: SlashCommand = {
           const trimmedPath = pathToAdd.trim();
           const expandedPath = expandHomeDir(trimmedPath);
           try {
-            const absolutePath = path.resolve(
-              workspaceContext.targetDir,
-              expandedPath,
-            );
+            const absolutePath = path.resolve(workspaceContext.targetDir, expandedPath);
             const resolvedPath = fs.realpathSync(absolutePath);
             if (currentWorkspaceDirs.includes(resolvedPath)) {
               alreadyAdded.push(trimmedPath);
@@ -252,12 +240,7 @@ export const directoryCommand: SlashCommand = {
           errors.push(...result.errors);
         }
 
-        await finishAddingDirectories(
-          agentContext.config,
-          addItem,
-          added,
-          errors,
-        );
+        await finishAddingDirectories(agentContext.config, addItem, added, errors);
         return;
       },
     },

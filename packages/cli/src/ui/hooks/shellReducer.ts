@@ -5,10 +5,7 @@
  */
 
 import type { AnsiOutput, CompletionBehavior } from 'sparkle-cli-core';
-import {
-  MAX_SHELL_OUTPUT_SIZE,
-  SHELL_OUTPUT_TRUNCATION_BUFFER,
-} from '../constants.js';
+import { MAX_SHELL_OUTPUT_SIZE, SHELL_OUTPUT_TRUNCATION_BUFFER } from '../constants.js';
 
 export interface BackgroundTask {
   pid: number;
@@ -52,10 +49,7 @@ export const initialState: ShellState = {
   isBackgroundTaskVisible: false,
 };
 
-export function shellReducer(
-  state: ShellState,
-  action: ShellAction,
-): ShellState {
+export function shellReducer(state: ShellState, action: ShellAction): ShellState {
   switch (action.type) {
     case 'SET_ACTIVE_PTY':
       return { ...state, activeShellPtyId: action.pid };
@@ -104,14 +98,10 @@ export function shellReducer(
       if (typeof action.chunk === 'string') {
         // Check combined length BEFORE concatenation — the + operator itself
         // can throw if the resulting string would exceed ~1 GB.
-        const currentOutput =
-          typeof task.output === 'string' ? task.output : '';
+        const currentOutput = typeof task.output === 'string' ? task.output : '';
         const combinedLength = currentOutput.length + action.chunk.length;
 
-        if (
-          combinedLength >
-          MAX_SHELL_OUTPUT_SIZE + SHELL_OUTPUT_TRUNCATION_BUFFER
-        ) {
+        if (combinedLength > MAX_SHELL_OUTPUT_SIZE + SHELL_OUTPUT_TRUNCATION_BUFFER) {
           if (action.chunk.length >= MAX_SHELL_OUTPUT_SIZE) {
             // Incoming chunk alone exceeds the cap — keep its tail.
             newOutput = action.chunk.slice(-MAX_SHELL_OUTPUT_SIZE);

@@ -13,10 +13,7 @@ import {
   calculateTokensPerSecond,
   computeSessionStats,
 } from './computeStats.js';
-import type {
-  ModelMetrics,
-  SessionMetrics,
-} from '../contexts/SessionContext.js';
+import type { ModelMetrics, SessionMetrics } from '../contexts/SessionContext.js';
 
 describe('calculateErrorRate', () => {
   it('should return 0 if totalRequests is 0', () => {

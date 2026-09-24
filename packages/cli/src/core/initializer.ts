@@ -60,19 +60,13 @@ export async function initializeApp(
 
   const shouldOpenAuthDialog = !activeProfile || !!authError;
 
-  logCliConfiguration(
-    config,
-    new StartSessionEvent(config, config.getToolRegistry()),
-  );
+  logCliConfiguration(config, new StartSessionEvent(config, config.getToolRegistry()));
 
   if (config.getIdeMode()) {
     IdeClient.getInstance()
       .then(async (ideClient) => {
         await ideClient.connect();
-        logIdeConnection(
-          config,
-          new IdeConnectionEvent(IdeConnectionType.START),
-        );
+        logIdeConnection(config, new IdeConnectionEvent(IdeConnectionType.START));
       })
       .catch((e) => {
         // We log locally if IDE connection setup fails in the background.

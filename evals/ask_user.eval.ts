@@ -129,10 +129,7 @@ describe('ask_user', () => {
         'ask_user',
       ]);
 
-      expect(
-        confirmation,
-        'Expected a pending confirmation for a tool',
-      ).toBeDefined();
+      expect(confirmation, 'Expected a pending confirmation for a tool').toBeDefined();
 
       expect(
         confirmation?.toolName,

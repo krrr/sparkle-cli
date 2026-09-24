@@ -6,11 +6,7 @@
 
 import { SettingScope } from '../config/settings.js';
 import type { SkillActionResult } from './skillSettings.js';
-import {
-  Storage,
-  loadSkillsFromDir,
-  type SkillDefinition,
-} from 'sparkle-cli-core';
+import { Storage, loadSkillsFromDir, type SkillDefinition } from 'sparkle-cli-core';
 import { cloneFromGit } from '../config/extensions/github.js';
 import extract from 'extract-zip';
 import * as fs from 'node:fs/promises';
@@ -34,8 +30,7 @@ export function renderSkillActionFeedback(
 
   if (status === 'error') {
     return (
-      error ||
-      `An error occurred while attempting to ${action} skill "${skillName}".`
+      error || `An error occurred while attempting to ${action} skill "${skillName}".`
     );
   }
 
@@ -112,9 +107,7 @@ export async function installSkill(
 
   try {
     if (isGitUrl) {
-      tempDirToClean = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'sparkle-skill-'),
-      );
+      tempDirToClean = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-skill-'));
       sourcePath = tempDirToClean;
 
       onLog(`Cloning skill from ${source}...`);
@@ -127,9 +120,7 @@ export async function installSkill(
         tempDirToClean,
       );
     } else if (isSkillFile) {
-      tempDirToClean = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'sparkle-skill-'),
-      );
+      tempDirToClean = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-skill-'));
       sourcePath = tempDirToClean;
 
       onLog(`Extracting skill from ${source}...`);
@@ -242,9 +233,7 @@ export async function linkSkill(
   const workspaceDir = process.cwd();
   const storage = new Storage(workspaceDir);
   const targetDir =
-    scope === 'workspace'
-      ? storage.getProjectSkillsDir()
-      : Storage.getUserSkillsDir();
+    scope === 'workspace' ? storage.getProjectSkillsDir() : Storage.getUserSkillsDir();
 
   if (!(await requestConsent(skills, targetDir))) {
     throw new Error('Skill linking cancelled by user.');
@@ -267,9 +256,7 @@ export async function linkSkill(
 
     const exists = await fs.lstat(destPath).catch(() => null);
     if (exists) {
-      onLog(
-        `Skill "${skillName}" already exists at destination. Overwriting...`,
-      );
+      onLog(`Skill "${skillName}" already exists at destination. Overwriting...`);
       await fs.rm(destPath, { recursive: true, force: true });
     }
 
@@ -296,9 +283,7 @@ export async function uninstallSkill(
   const workspaceDir = process.cwd();
   const storage = new Storage(workspaceDir);
   const targetDir =
-    scope === 'workspace'
-      ? storage.getProjectSkillsDir()
-      : Storage.getUserSkillsDir();
+    scope === 'workspace' ? storage.getProjectSkillsDir() : Storage.getUserSkillsDir();
 
   const resolvedTarget = path.resolve(targetDir);
 

@@ -13,10 +13,7 @@ import { safeJsonStringify } from '../utils/safeJsonStringify.js';
 import { debugLogger } from '../utils/debugLogger.js';
 
 export class MessageBus extends EventEmitter {
-  private listenerToAbortCleanup = new WeakMap<
-    object,
-    Map<string, () => void>
-  >();
+  private listenerToAbortCleanup = new WeakMap<object, Map<string, () => void>>();
 
   constructor(
     private readonly policyEngine: PolicyEngine,
@@ -96,9 +93,7 @@ export class MessageBus extends EventEmitter {
     }
     try {
       if (!this.isValidMessage(message)) {
-        throw new Error(
-          `Invalid message structure: ${safeJsonStringify(message)}`,
-        );
+        throw new Error(`Invalid message structure: ${safeJsonStringify(message)}`);
       }
 
       if (message.type === MessageBusType.TOOL_CONFIRMATION_REQUEST) {
@@ -111,8 +106,7 @@ export class MessageBus extends EventEmitter {
 
         // Only trust forcedDecision if it comes from a trusted bus
         const decision =
-          (this.isTrusted ? message.forcedDecision : undefined) ??
-          policyDecision;
+          (this.isTrusted ? message.forcedDecision : undefined) ?? policyDecision;
 
         switch (decision) {
           case PolicyDecision.ALLOW:
@@ -139,9 +133,7 @@ export class MessageBus extends EventEmitter {
             // Pass through to UI for user confirmation if any listeners exist.
             // If no listeners are registered (e.g., headless/ACP flows),
             // immediately request user confirmation to avoid long timeouts.
-            if (
-              this.listenerCount(MessageBusType.TOOL_CONFIRMATION_REQUEST) > 0
-            ) {
+            if (this.listenerCount(MessageBusType.TOOL_CONFIRMATION_REQUEST) > 0) {
               this.emitMessage(message);
             } else {
               this.emitMessage({
@@ -243,10 +235,7 @@ export class MessageBus extends EventEmitter {
 
       const responseHandler = (response: TResponse) => {
         // Check if this response matches our request
-        if (
-          'correlationId' in response &&
-          response.correlationId === correlationId
-        ) {
+        if ('correlationId' in response && response.correlationId === correlationId) {
           cleanup();
           resolve(response);
         }

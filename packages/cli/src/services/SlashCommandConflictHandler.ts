@@ -42,8 +42,7 @@ export class SlashCommandConflictHandler {
   private handleConflicts(payload: SlashCommandConflictsPayload) {
     const newConflicts = payload.conflicts.filter((c) => {
       // Use a unique key to prevent duplicate notifications for the same conflict
-      const sourceId =
-        c.loserExtensionName || c.loserMcpServerName || c.loserKind;
+      const sourceId = c.loserExtensionName || c.loserMcpServerName || c.loserKind;
       const key = `${c.name}:${sourceId}:${c.renamedTo}`;
       if (this.notifiedConflicts.has(key)) {
         return false;
@@ -95,10 +94,7 @@ export class SlashCommandConflictHandler {
   /**
    * Emits a grouped notification for multiple conflicts sharing the same name.
    */
-  private emitGroupedFeedback(
-    name: string,
-    conflicts: SlashCommandConflict[],
-  ): void {
+  private emitGroupedFeedback(name: string, conflicts: SlashCommandConflict[]): void {
     const messages = conflicts
       .map((c) => {
         const source = this.getSourceDescription(
@@ -155,9 +151,7 @@ export class SlashCommandConflictHandler {
           ? `extension '${extensionName}' command`
           : 'extension command';
       case CommandKind.SKILL:
-        return extensionName
-          ? `extension '${extensionName}' skill`
-          : 'skill command';
+        return extensionName ? `extension '${extensionName}' skill` : 'skill command';
       case CommandKind.MCP_PROMPT:
         return mcpServerName
           ? `MCP server '${mcpServerName}' command`

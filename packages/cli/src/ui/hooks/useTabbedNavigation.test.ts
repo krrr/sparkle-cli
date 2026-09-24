@@ -115,9 +115,7 @@ describe('useTabbedNavigation', () => {
 
   describe('initialization', () => {
     it('returns initial index of 0 by default', async () => {
-      const { result } = await renderHook(() =>
-        useTabbedNavigation({ tabCount: 3 }),
-      );
+      const { result } = await renderHook(() => useTabbedNavigation({ tabCount: 3 }));
       expect(result.current.currentIndex).toBe(0);
     });
 
@@ -143,9 +141,7 @@ describe('useTabbedNavigation', () => {
 
   describe('goToNextTab', () => {
     it('advances to next tab', async () => {
-      const { result } = await renderHook(() =>
-        useTabbedNavigation({ tabCount: 3 }),
-      );
+      const { result } = await renderHook(() => useTabbedNavigation({ tabCount: 3 }));
 
       act(() => {
         result.current.goToNextTab();
@@ -227,9 +223,7 @@ describe('useTabbedNavigation', () => {
 
   describe('setCurrentIndex', () => {
     it('sets index directly', async () => {
-      const { result } = await renderHook(() =>
-        useTabbedNavigation({ tabCount: 3 }),
-      );
+      const { result } = await renderHook(() => useTabbedNavigation({ tabCount: 3 }));
 
       act(() => {
         result.current.setCurrentIndex(2);

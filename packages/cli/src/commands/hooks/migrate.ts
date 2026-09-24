@@ -231,18 +231,13 @@ export async function handleMigrateFromClaude() {
     return;
   }
 
-  debugLogger.log(
-    `Migrating ${Object.keys(migratedHooks).length} hook event(s)...`,
-  );
+  debugLogger.log(`Migrating ${Object.keys(migratedHooks).length} hook event(s)...`);
 
   // Load current Gemini settings
   const settings = loadSettings(workingDir);
 
   // Merge migrated hooks with existing hooks
-  const existingHooks = (settings.merged?.hooks || {}) as Record<
-    string,
-    unknown
-  >;
+  const existingHooks = (settings.merged?.hooks || {}) as Record<string, unknown>;
   const mergedHooks = { ...existingHooks, ...migratedHooks };
 
   // Update settings (setValue automatically saves)

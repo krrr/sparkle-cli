@@ -23,13 +23,9 @@ describe('NodeTruncationProcessor', () => {
     // env.tokenCalculator uses charsPerToken=1 natively.
     const env = createMockEnvironment();
 
-    const processor = createNodeTruncationProcessor(
-      'NodeTruncationProcessor',
-      env,
-      {
-        maxTokensPerNode: 10, // 10 chars limit
-      },
-    );
+    const processor = createNodeTruncationProcessor('NodeTruncationProcessor', env, {
+      maxTokensPerNode: 10, // 10 chars limit
+    });
 
     const longText = 'A'.repeat(50); // 50 tokens
 
@@ -88,13 +84,9 @@ describe('NodeTruncationProcessor', () => {
   it('should ignore nodes that are below maxTokensPerNode', async () => {
     const env = createMockEnvironment();
 
-    const processor = createNodeTruncationProcessor(
-      'NodeTruncationProcessor',
-      env,
-      {
-        maxTokensPerNode: 100, // 100 chars limit
-      },
-    );
+    const processor = createNodeTruncationProcessor('NodeTruncationProcessor', env, {
+      maxTokensPerNode: 100, // 100 chars limit
+    });
 
     const shortText = 'Short text'; // 10 chars
 

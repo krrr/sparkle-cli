@@ -21,10 +21,7 @@ describe('SlashCommandResolver', () => {
       const cmdA = createMockCommand('a', CommandKind.BUILT_IN);
       const cmdB = createMockCommand('b', CommandKind.USER_FILE);
 
-      const { finalCommands, conflicts } = SlashCommandResolver.resolve([
-        cmdA,
-        cmdB,
-      ]);
+      const { finalCommands, conflicts } = SlashCommandResolver.resolve([cmdA, cmdB]);
 
       expect(finalCommands).toHaveLength(2);
       expect(conflicts).toHaveLength(0);
@@ -49,10 +46,7 @@ describe('SlashCommandResolver', () => {
 
     it('should prefix both user and workspace commands when they conflict', () => {
       const userCmd = createMockCommand('sync', CommandKind.USER_FILE);
-      const workspaceCmd = createMockCommand(
-        'sync',
-        CommandKind.WORKSPACE_FILE,
-      );
+      const workspaceCmd = createMockCommand('sync', CommandKind.WORKSPACE_FILE);
 
       const { finalCommands, conflicts } = SlashCommandResolver.resolve([
         userCmd,
@@ -135,10 +129,7 @@ describe('SlashCommandResolver', () => {
         description: 'second',
       };
 
-      const { finalCommands } = SlashCommandResolver.resolve([
-        builtin1,
-        builtin2,
-      ]);
+      const { finalCommands } = SlashCommandResolver.resolve([builtin1, builtin2]);
 
       expect(finalCommands).toHaveLength(1);
       expect(finalCommands[0].description).toBe('second');
@@ -165,11 +156,7 @@ describe('SlashCommandResolver', () => {
         extensionName: 'gcp',
       };
 
-      const { finalCommands } = SlashCommandResolver.resolve([
-        user1,
-        user2,
-        extension,
-      ]);
+      const { finalCommands } = SlashCommandResolver.resolve([user1, user2, extension]);
 
       expect(finalCommands.find((c) => c.name === 'gcp:deploy1')).toBeDefined();
     });

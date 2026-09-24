@@ -39,9 +39,7 @@ export async function poll(
     attempts++;
     const result = predicate();
     if (env['VERBOSE'] === 'true' && attempts % 5 === 0) {
-      console.log(
-        `Poll attempt ${attempts}: ${result ? 'success' : 'waiting...'}`,
-      );
+      console.log(`Poll attempt ${attempts}: ${result ? 'success' : 'waiting...'}`);
     }
     if (result) {
       return true;
@@ -86,10 +84,7 @@ export function printDebugInfo(
   console.error('Test failed - Debug info:');
   console.error('Result length:', result.length);
   console.error('Result (first 500 chars):', result.substring(0, 500));
-  console.error(
-    'Result (last 500 chars):',
-    result.substring(result.length - 500),
-  );
+  console.error('Result (last 500 chars):', result.substring(result.length - 500));
 
   // Print any additional context provided
   Object.entries(context).forEach(([key, value]) => {
@@ -320,9 +315,7 @@ export class InteractiveRun {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(
         () =>
-          reject(
-            new Error(`Test timed out: process did not exit within a minute.`),
-          ),
+          reject(new Error(`Test timed out: process did not exit within a minute.`)),
         60000,
       );
       this.ptyProcess.onExit(({ exitCode }) => {
@@ -382,8 +375,7 @@ export class TestRig {
     this.testName = testName;
     const sanitizedName = sanitizeTestName(testName);
     const testFileDir =
-      env['INTEGRATION_TEST_FILE_DIR'] ||
-      join(os.tmpdir(), 'sparkle-cli-tests');
+      env['INTEGRATION_TEST_FILE_DIR'] || join(os.tmpdir(), 'sparkle-cli-tests');
     this.testDir = join(testFileDir, sanitizedName);
     this.homeDir = join(testFileDir, sanitizedName + '-home');
 
@@ -420,10 +412,7 @@ export class TestRig {
           return;
         } catch (err) {
           if (i === 9) {
-            console.error(
-              `Failed to clean directory ${dir} after 10 attempts:`,
-              err,
-            );
+            console.error(`Failed to clean directory ${dir} after 10 attempts:`, err);
             throw err;
           }
           const delay = Math.min(Math.pow(2, i) * 1000, 10000); // Max 10s delay
@@ -489,8 +478,7 @@ export class TestRig {
               },
             }
           : {}),
-        sandbox:
-          env['SPARKLE_SANDBOX'] !== 'false' ? env['SPARKLE_SANDBOX'] : false,
+        sandbox: env['SPARKLE_SANDBOX'] !== 'false' ? env['SPARKLE_SANDBOX'] : false,
         // Don't show the IDE connection dialog when running from VsCode
         ide: { enabled: false, hasSeenNudge: true },
       },
@@ -518,10 +506,7 @@ export class TestRig {
       overrideState ?? {},
     );
 
-    writeFileSync(
-      join(userGeminiDir, 'state.json'),
-      JSON.stringify(state, null, 2),
-    );
+    writeFileSync(join(userGeminiDir, 'state.json'), JSON.stringify(state, null, 2));
   }
 
   createFile(fileName: string, content: string) {
@@ -550,8 +535,7 @@ export class TestRig {
     initialArgs: string[];
   } {
     const binaryPath = env['INTEGRATION_TEST_GEMINI_BINARY_PATH'];
-    const isNpmReleaseTest =
-      env['INTEGRATION_TEST_USE_INSTALLED_GEMINI'] === 'true';
+    const isNpmReleaseTest = env['INTEGRATION_TEST_USE_INSTALLED_GEMINI'] === 'true';
     const geminiCommand = os.platform() === 'win32' ? 'sparkle.cmd' : 'sparkle';
     let command = 'node';
     let initialArgs = [BUNDLE_PATH, ...extraInitialArgs];
@@ -576,9 +560,7 @@ export class TestRig {
 
   createScript(fileName: string, content: string) {
     if (!this.testDir) {
-      throw new Error(
-        'TestRig.setup must be called before creating files or scripts',
-      );
+      throw new Error('TestRig.setup must be called before creating files or scripts');
     }
     const scriptPath = join(this.testDir, fileName);
     writeFileSync(scriptPath, content);
@@ -592,9 +574,7 @@ export class TestRig {
    */
   addTestMcpServer(name: string, config: TestMcpConfig | string) {
     if (!this.testDir) {
-      throw new Error(
-        'TestRig.setup must be called before adding test servers',
-      );
+      throw new Error('TestRig.setup must be called before adding test servers');
     }
 
     let testConfig: TestMcpConfig;
@@ -602,9 +582,7 @@ export class TestRig {
       const assetsDir = join(__dirname, '..', 'assets', 'test-servers');
       const configPath = join(assetsDir, `${config}.json`);
       if (!fs.existsSync(configPath)) {
-        throw new Error(
-          `Predefined test server config not found: ${configPath}`,
-        );
+        throw new Error(`Predefined test server config not found: ${configPath}`);
       }
       testConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
       testConfig.name = name; // Override name
@@ -630,13 +608,7 @@ export class TestRig {
     fs.copyFileSync(templatePath, scriptFilePath);
 
     // Calculate path to monorepo node_modules
-    const monorepoNodeModules = join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      'node_modules',
-    );
+    const monorepoNodeModules = join(__dirname, '..', '..', '..', 'node_modules');
 
     // Create symlink to node_modules in testDir for ESM resolution
     const testNodeModules = join(this.testDir, 'node_modules');
@@ -802,14 +774,11 @@ export class TestRig {
           // Check if this is a JSON output test - if so, don't include stderr
           // as it would corrupt the JSON
           const isJsonOutput =
-            commandArgs.includes('--output-format') &&
-            commandArgs.includes('json');
+            commandArgs.includes('--output-format') && commandArgs.includes('json');
 
           // If we have stderr output and it's not a JSON test, include that also
           const finalResult =
-            stderr && !isJsonOutput
-              ? `${result}\n\nStdErr:\n${stderr}`
-              : result;
+            stderr && !isJsonOutput ? `${result}\n\nStdErr:\n${stderr}` : result;
 
           resolve(finalResult);
         } else {
@@ -970,13 +939,10 @@ export class TestRig {
           // Check if this is a JSON output test - if so, don't include stderr
           // as it would corrupt the JSON
           const isJsonOutput =
-            commandArgs.includes('--output-format') &&
-            commandArgs.includes('json');
+            commandArgs.includes('--output-format') && commandArgs.includes('json');
 
           const finalResult =
-            stderr && !isJsonOutput
-              ? `${result}\n\nStdErr:\n${stderr}`
-              : result;
+            stderr && !isJsonOutput ? `${result}\n\nStdErr:\n${stderr}` : result;
           resolve(finalResult);
         } else {
           reject(new Error(`Process exited with code ${code}:\n${stderr}`));
@@ -1028,20 +994,14 @@ export class TestRig {
           child.kill('SIGKILL');
         } catch (error) {
           if (env['VERBOSE'] === 'true') {
-            console.warn(
-              'Failed to kill spawned process during cleanup:',
-              error,
-            );
+            console.warn('Failed to kill spawned process during cleanup:', error);
           }
         }
       }
     }
     this._spawnedProcesses = [];
 
-    if (
-      process.env['REGENERATE_MODEL_GOLDENS'] === 'true' &&
-      this.fakeResponsesPath
-    ) {
+    if (process.env['REGENERATE_MODEL_GOLDENS'] === 'true' && this.fakeResponsesPath) {
       fs.copyFileSync(this.fakeResponsesPath, this.originalFakeResponsesPath!);
     }
     // Clean up test directory and home directory
@@ -1283,11 +1243,7 @@ export class TestRig {
               const obj = JSON.parse(currentObject);
 
               // Check for tool call in different formats
-              if (
-                obj.body &&
-                obj.body.includes('Tool call:') &&
-                obj.attributes
-              ) {
+              if (obj.body && obj.body.includes('Tool call:') && obj.attributes) {
                 const bodyMatch = obj.body.match(/Tool call: (\w+)\./);
                 if (bodyMatch) {
                   logs.push({
@@ -1593,8 +1549,7 @@ export class TestRig {
               for (const dp of metric.dataPoints) {
                 const sessionId =
                   (dp.attributes?.['session.id'] as string) || 'unknown';
-                const component =
-                  (dp.attributes?.['component'] as string) || 'unknown';
+                const component = (dp.attributes?.['component'] as string) || 'unknown';
                 const seconds = dp.startTime?.[0] || 0;
                 const nanos = dp.startTime?.[1] || 0;
                 const timeKey = `${sessionId}-${component}-${seconds}-${nanos}`;
@@ -1613,11 +1568,9 @@ export class TestRig {
                 const value = dp.value?.max ?? dp.value?.sum ?? 0;
 
                 if (type === 'heap_used') snapshots[timeKey].heapUsed = value;
-                else if (type === 'heap_total')
-                  snapshots[timeKey].heapTotal = value;
+                else if (type === 'heap_total') snapshots[timeKey].heapTotal = value;
                 else if (type === 'rss') snapshots[timeKey].rss = value;
-                else if (type === 'external')
-                  snapshots[timeKey].external = value;
+                else if (type === 'external') snapshots[timeKey].external = value;
               }
             }
           }

@@ -45,9 +45,7 @@ describe('ExtensionManager Settings Scope', () => {
       errors: [],
     });
     vi.mocked(loadSkillsFromDir).mockResolvedValue([]);
-    currentTempHome = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-cli-test-home-'),
-    );
+    currentTempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-home-'));
     tempWorkspace = fs.mkdtempSync(
       path.join(os.tmpdir(), 'sparkle-cli-test-workspace-'),
     );
@@ -161,15 +159,11 @@ describe('ExtensionManager Settings Scope', () => {
     expect(setting).toBeDefined();
     expect(setting?.value).toBe('user-value');
     expect(setting?.scope).toBe('user');
-    expect(setting?.source?.endsWith(path.join(extensionName, '.env'))).toBe(
-      true,
-    );
+    expect(setting?.source?.endsWith(path.join(extensionName, '.env'))).toBe(true);
 
     // Verify output string contains (User - <path>)
     const output = extensionManager.toOutputString(extension!);
-    expect(output).toContain(
-      `Test Setting: user-value (User - ${userSettingsPath})`,
-    );
+    expect(output).toContain(`Test Setting: user-value (User - ${userSettingsPath})`);
   });
 
   it('should report unset if neither is present', async () => {

@@ -8,10 +8,7 @@ import type React from 'react';
 import { useMemo, useCallback, useState } from 'react';
 import { Box, Text } from 'ink';
 import type { RegistryExtension } from '../../../config/extensionRegistryClient.js';
-import {
-  SearchableList,
-  type GenericListItem,
-} from '../shared/SearchableList.js';
+import { SearchableList, type GenericListItem } from '../shared/SearchableList.js';
 import { theme } from '../../semantic-colors.js';
 
 import { useExtensionRegistry } from '../../hooks/useExtensionRegistry.js';
@@ -53,15 +50,15 @@ export function ExtensionRegistryView({
     config.getExtensionRegistryURI(),
   );
   const { terminalHeight, staticExtraHeight, historyManager } = useUIState();
-  const [selectedExtension, setSelectedExtension] =
-    useState<RegistryExtension | null>(null);
+  const [selectedExtension, setSelectedExtension] = useState<RegistryExtension | null>(
+    null,
+  );
 
-  const { extensionsUpdateState, dispatchExtensionStateUpdate } =
-    useExtensionUpdates(
-      extensionManager,
-      historyManager.addItem,
-      config.getEnableExtensionReloading(),
-    );
+  const { extensionsUpdateState, dispatchExtensionStateUpdate } = useExtensionUpdates(
+    extensionManager,
+    historyManager.addItem,
+    config.getEnableExtensionReloading(),
+  );
 
   const [installedExtensions, setInstalledExtensions] = useState(() =>
     extensionManager.getExtensions(),
@@ -140,17 +137,13 @@ export function ExtensionRegistryView({
       const isInstalled = installedExtensions.some(
         (e) => e.name === item.extension.extensionName,
       );
-      const updateState = extensionsUpdateState.get(
-        item.extension.extensionName,
-      );
+      const updateState = extensionsUpdateState.get(item.extension.extensionName);
 
       return (
         <Box flexDirection="row" width="100%" justifyContent="space-between">
           <Box flexDirection="row" flexShrink={1} minWidth={0}>
             <Box width={2} flexShrink={0}>
-              <Text
-                color={isActive ? theme.status.success : theme.text.secondary}
-              >
+              <Text color={isActive ? theme.status.success : theme.text.secondary}>
                 {isActive ? '● ' : '  '}
               </Text>
             </Box>
@@ -188,9 +181,7 @@ export function ExtensionRegistryView({
           </Box>
           <Box flexShrink={0} marginLeft={2} width={8} flexDirection="row">
             <Text color={theme.status.warning}>⭐</Text>
-            <Text
-              color={isActive ? theme.status.success : theme.text.secondary}
-            >
+            <Text color={isActive ? theme.status.success : theme.text.secondary}>
               {' '}
               {item.extension.stars || 0}
             </Text>
@@ -211,8 +202,7 @@ export function ExtensionRegistryView({
         </Box>
         <Box flexShrink={0} marginLeft={2}>
           <Text color={theme.text.secondary}>
-            {installedExtensions.length &&
-              `${installedExtensions.length} installed`}
+            {installedExtensions.length && `${installedExtensions.length} installed`}
           </Text>
         </Box>
       </Box>
@@ -309,9 +299,7 @@ export function ExtensionRegistryView({
           isInstalled={installedExtensions.some(
             (e) => e.name === selectedExtension.extensionName,
           )}
-          updateState={extensionsUpdateState.get(
-            selectedExtension.extensionName,
-          )}
+          updateState={extensionsUpdateState.get(selectedExtension.extensionName)}
           onUpdate={async () => {
             await handleUpdate(selectedExtension);
           }}

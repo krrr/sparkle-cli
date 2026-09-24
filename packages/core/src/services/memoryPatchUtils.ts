@@ -21,8 +21,8 @@ import { isSubpath } from '../utils/paths.js';
 export function getAllowedSkillPatchRoots(config: Config): string[] {
   return Array.from(
     new Set(
-      [Storage.getUserSkillsDir(), config.storage.getProjectSkillsDir()].map(
-        (root) => path.resolve(root),
+      [Storage.getUserSkillsDir(), config.storage.getProjectSkillsDir()].map((root) =>
+        path.resolve(root),
       ),
     ),
   );
@@ -57,18 +57,14 @@ async function resolvePathWithExistingAncestors(
   }
 }
 
-async function getCanonicalAllowedSkillPatchRoots(
-  config: Config,
-): Promise<string[]> {
+async function getCanonicalAllowedSkillPatchRoots(config: Config): Promise<string[]> {
   const canonicalRoots = await Promise.all(
     getAllowedSkillPatchRoots(config).map((root) =>
       resolvePathWithExistingAncestors(root),
     ),
   );
   return Array.from(
-    new Set(
-      canonicalRoots.filter((root): root is string => typeof root === 'string'),
-    ),
+    new Set(canonicalRoots.filter((root): root is string => typeof root === 'string')),
   );
 }
 
@@ -76,8 +72,7 @@ export async function resolveAllowedSkillPatchTarget(
   targetPath: string,
   config: Config,
 ): Promise<string | undefined> {
-  const canonicalTargetPath =
-    await resolvePathWithExistingAncestors(targetPath);
+  const canonicalTargetPath = await resolvePathWithExistingAncestors(targetPath);
   if (!canonicalTargetPath) {
     return undefined;
   }
@@ -94,9 +89,7 @@ export async function isAllowedSkillPatchTarget(
   targetPath: string,
   config: Config,
 ): Promise<boolean> {
-  return (
-    (await resolveAllowedSkillPatchTarget(targetPath, config)) !== undefined
-  );
+  return (await resolveAllowedSkillPatchTarget(targetPath, config)) !== undefined;
 }
 
 function isAbsoluteSkillPatchPath(targetPath: string): boolean {
@@ -200,8 +193,7 @@ export async function isProjectSkillPatchTarget(
   targetPath: string,
   config: Config,
 ): Promise<boolean> {
-  const canonicalTargetPath =
-    await resolvePathWithExistingAncestors(targetPath);
+  const canonicalTargetPath = await resolvePathWithExistingAncestors(targetPath);
   if (!canonicalTargetPath) {
     return false;
   }
@@ -218,8 +210,7 @@ export async function isProjectSkillPatchTarget(
 
 export function hasParsedPatchHunks(parsedPatches: StructuredPatch[]): boolean {
   return (
-    parsedPatches.length > 0 &&
-    parsedPatches.every((patch) => patch.hunks.length > 0)
+    parsedPatches.length > 0 && parsedPatches.every((patch) => patch.hunks.length > 0)
   );
 }
 
@@ -309,10 +300,7 @@ function isSamePath(leftPath: string, rightPath: string): boolean {
   return isSubpath(leftPath, rightPath) && isSubpath(rightPath, leftPath);
 }
 
-function includesSamePath(
-  paths: readonly string[],
-  targetPath: string,
-): boolean {
+function includesSamePath(paths: readonly string[], targetPath: string): boolean {
   return paths.some((candidate) => isSamePath(candidate, targetPath));
 }
 
@@ -360,9 +348,7 @@ export async function getMemoryPatchTargetValidationContext(
     };
   }
 
-  const rawPrivateMemoryDir = path.resolve(
-    config.storage.getProjectMemoryDir(),
-  );
+  const rawPrivateMemoryDir = path.resolve(config.storage.getProjectMemoryDir());
   const canonicalPrivateMemoryDirs = await canonicalizeAllowedPatchRoots([
     rawPrivateMemoryDir,
   ]);
@@ -406,10 +392,7 @@ export async function resolveMemoryPatchTargetWithinAllowedSet(
   }
   if (
     context.kind === 'private' &&
-    (!isAllowedPrivateMemoryDocumentPath(
-      targetPath,
-      context.privateMemoryDirs,
-    ) ||
+    (!isAllowedPrivateMemoryDocumentPath(targetPath, context.privateMemoryDirs) ||
       !isAllowedPrivateMemoryDocumentPath(
         resolvedTargetPath,
         context.privateMemoryDirs,
@@ -419,14 +402,8 @@ export async function resolveMemoryPatchTargetWithinAllowedSet(
   }
   if (
     context.kind === 'global' &&
-    (!isAllowedGlobalMemoryDocumentPath(
-      targetPath,
-      context.globalMemoryFiles,
-    ) ||
-      !isAllowedGlobalMemoryDocumentPath(
-        resolvedTargetPath,
-        context.globalMemoryFiles,
-      ))
+    (!isAllowedGlobalMemoryDocumentPath(targetPath, context.globalMemoryFiles) ||
+      !isAllowedGlobalMemoryDocumentPath(resolvedTargetPath, context.globalMemoryFiles))
   ) {
     return undefined;
   }
@@ -443,12 +420,7 @@ export async function findDisallowedMemoryPatchTarget(
   }
 
   for (const header of validated.patches) {
-    if (
-      !(await resolveMemoryPatchTargetWithinAllowedSet(
-        header.targetPath,
-        context,
-      ))
-    ) {
+    if (!(await resolveMemoryPatchTargetWithinAllowedSet(header.targetPath, context))) {
       return header.targetPath;
     }
   }
@@ -487,10 +459,7 @@ export async function listInboxPatchFiles(
   config: Config,
   kind: InboxMemoryPatchKind,
 ): Promise<string[]> {
-  const patchRoot = getMemoryPatchRoot(
-    config.storage.getProjectMemoryDir(),
-    kind,
-  );
+  const patchRoot = getMemoryPatchRoot(config.storage.getProjectMemoryDir(), kind);
   const found: string[] = [];
 
   async function walk(currentDir: string): Promise<void> {
@@ -572,10 +541,7 @@ export async function validateInboxMemoryPatchFile(
     }
   }
 
-  const validationContext = await getMemoryPatchTargetValidationContext(
-    config,
-    kind,
-  );
+  const validationContext = await getMemoryPatchTargetValidationContext(config, kind);
   for (const header of validated.patches) {
     if (
       !(await resolveMemoryPatchTargetWithinAllowedSet(
@@ -611,11 +577,7 @@ export async function listValidInboxPatchFiles(
 
   const valid: string[] = [];
   for (const sourcePath of patchFiles) {
-    const validation = await validateInboxMemoryPatchFile(
-      config,
-      kind,
-      sourcePath,
-    );
+    const validation = await validateInboxMemoryPatchFile(config, kind, sourcePath);
     if (validation.valid) {
       valid.push(sourcePath);
     }
@@ -788,9 +750,7 @@ export async function canonicalizeAllowedPatchRoots(
     roots.map((root) => resolvePathWithExistingAncestors(root)),
   );
   return Array.from(
-    new Set(
-      canonicalRoots.filter((root): root is string => typeof root === 'string'),
-    ),
+    new Set(canonicalRoots.filter((root): root is string => typeof root === 'string')),
   );
 }
 
@@ -809,8 +769,7 @@ export async function resolveTargetWithinAllowedRoots(
   targetPath: string,
   allowedRoots: string[],
 ): Promise<string | undefined> {
-  const canonicalTargetPath =
-    await resolvePathWithExistingAncestors(targetPath);
+  const canonicalTargetPath = await resolvePathWithExistingAncestors(targetPath);
   if (!canonicalTargetPath) {
     return undefined;
   }

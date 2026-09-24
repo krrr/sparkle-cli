@@ -1,9 +1,9 @@
 # Sparkle CLI for the enterprise
 
-This document outlines configuration patterns and best practices for deploying
-and managing Sparkle CLI in an enterprise environment. By leveraging
-system-level settings, administrators can enforce security policies, manage tool
-access, and ensure a consistent experience for all users.
+This document outlines configuration patterns and best practices for deploying and
+managing Sparkle CLI in an enterprise environment. By leveraging system-level settings,
+administrators can enforce security policies, manage tool access, and ensure a
+consistent experience for all users.
 
 <!-- prettier-ignore -->
 > [!WARNING]
@@ -18,22 +18,22 @@ access, and ensure a consistent experience for all users.
 
 ## Centralized configuration: The system settings file
 
-The most powerful tools for enterprise administration are the system-wide
-settings files. These files allow you to define a baseline configuration
-(`system-defaults.json`) and a set of overrides (`settings.json`) that apply to
-all users on a machine. For a complete overview of configuration options, see
-the [Configuration documentation](../reference/configuration.md).
+The most powerful tools for enterprise administration are the system-wide settings
+files. These files allow you to define a baseline configuration (`system-defaults.json`)
+and a set of overrides (`settings.json`) that apply to all users on a machine. For a
+complete overview of configuration options, see the
+[Configuration documentation](../reference/configuration.md).
 
-Settings are merged from four files. The precedence order for single-value
-settings (like `theme`) is:
+Settings are merged from four files. The precedence order for single-value settings
+(like `theme`) is:
 
 1. System Defaults (`system-defaults.json`)
 2. User Settings (`~/.sparkle/settings.json`)
 3. Workspace Settings (`<project>/.sparkle/settings.json`)
 4. System Overrides (`settings.json`)
 
-This means the System Overrides file has the final say. For settings that are
-arrays (`includeDirectories`) or objects (`mcpServers`), the values are merged.
+This means the System Overrides file has the final say. For settings that are arrays
+(`includeDirectories`) or objects (`mcpServers`), the values are merged.
 
 **Example of merging and precedence:**
 
@@ -140,43 +140,42 @@ This results in the following merged configuration:
 
 **Why:**
 
-- **`theme`**: The value from the system overrides (`system-enforced-theme`) is
-  used, as it has the highest precedence.
-- **`mcpServers`**: The objects are merged. The `corp-server` definition from
-  the system overrides takes precedence over the user's definition. The unique
-  `user-tool` and `project-tool` are included.
-- **`includeDirectories`**: The arrays are concatenated in the order of System
-  Defaults, User, Workspace, and then System Overrides.
+- **`theme`**: The value from the system overrides (`system-enforced-theme`) is used, as
+  it has the highest precedence.
+- **`mcpServers`**: The objects are merged. The `corp-server` definition from the system
+  overrides takes precedence over the user's definition. The unique `user-tool` and
+  `project-tool` are included.
+- **`includeDirectories`**: The arrays are concatenated in the order of System Defaults,
+  User, Workspace, and then System Overrides.
 
 - **Location**:
   - **Linux**: `/etc/sparkle-cli/settings.json`
   - **Windows**: `C:\ProgramData\sparkle-cli\settings.json`
   - **macOS**: `/Library/Application Support/GeminiCli/settings.json`
-  - The path can be overridden using the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH`
-    environment variable.
-- **Control**: This file should be managed by system administrators and
-  protected with appropriate file permissions to prevent unauthorized
-  modification by users.
+  - The path can be overridden using the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment
+    variable.
+- **Control**: This file should be managed by system administrators and protected with
+  appropriate file permissions to prevent unauthorized modification by users.
 
-By using the system settings file, you can enforce the security and
-configuration patterns described below.
+By using the system settings file, you can enforce the security and configuration
+patterns described below.
 
 ### Enforcing system settings with a wrapper script
 
-While the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment variable provides
-flexibility, a user could potentially override it to point to a different
-settings file, bypassing the centrally managed configuration. To mitigate this,
-enterprises can deploy a wrapper script or alias that ensures the environment
-variable is always set to the corporate-controlled path.
+While the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment variable provides flexibility,
+a user could potentially override it to point to a different settings file, bypassing
+the centrally managed configuration. To mitigate this, enterprises can deploy a wrapper
+script or alias that ensures the environment variable is always set to the
+corporate-controlled path.
 
-This approach ensures that no matter how the user calls the `sparkle` command,
-the enterprise settings are always loaded with the highest precedence.
+This approach ensures that no matter how the user calls the `sparkle` command, the
+enterprise settings are always loaded with the highest precedence.
 
 **Example wrapper script:**
 
-Administrators can create a script named `sparkle` and place it in a directory
-that appears earlier in the user's `PATH` than the actual Sparkle CLI binary
-(for example, `/usr/local/bin/gemini`).
+Administrators can create a script named `sparkle` and place it in a directory that
+appears earlier in the user's `PATH` than the actual Sparkle CLI binary (for example,
+`/usr/local/bin/gemini`).
 
 ```bash
 #!/bin/bash
@@ -199,11 +198,10 @@ fi
 exec "$REAL_GEMINI_PATH" "$@"
 ```
 
-By deploying this script, the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` is set within
-the script's environment, and the `exec` command replaces the script process
-with the actual Sparkle CLI process, which inherits the environment variable.
-This makes it significantly more difficult for a user to bypass the enforced
-settings.
+By deploying this script, the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` is set within the
+script's environment, and the `exec` command replaces the script process with the actual
+Sparkle CLI process, which inherits the environment variable. This makes it
+significantly more difficult for a user to bypass the enforced settings.
 
 **PowerShell Profile (Windows alternative):**
 
@@ -216,14 +214,12 @@ Add-Content -Path $PROFILE -Value '$env:SPARKLE_CLI_SYSTEM_SETTINGS_PATH="C:\Pro
 
 ## User isolation in shared environments
 
-In shared compute environments (like ML experiment runners or shared build
-servers), you can isolate Sparkle CLI state by overriding the user's home
-directory.
+In shared compute environments (like ML experiment runners or shared build servers), you
+can isolate Sparkle CLI state by overriding the user's home directory.
 
-By default, Sparkle CLI stores configuration and history in `~/.sparkle`. You
-can use the `SPARKLE_CLI_HOME` environment variable to point to a unique
-directory for a specific user or job. The CLI will create a `.sparkle` folder
-inside the specified path.
+By default, Sparkle CLI stores configuration and history in `~/.sparkle`. You can use
+the `SPARKLE_CLI_HOME` environment variable to point to a unique directory for a
+specific user or job. The CLI will create a `.sparkle` folder inside the specified path.
 
 **macOS/Linux**
 
@@ -243,16 +239,16 @@ sparkle
 
 ## Restricting tool access
 
-You can significantly enhance security by controlling which tools the Gemini
-model can use. This is achieved through the `tools.core` setting and the
-[Policy Engine](../reference/policy-engine.md). For a list of available tools,
-see the [Tools reference](../reference/tools.md).
+You can significantly enhance security by controlling which tools the Gemini model can
+use. This is achieved through the `tools.core` setting and the
+[Policy Engine](../reference/policy-engine.md). For a list of available tools, see the
+[Tools reference](../reference/tools.md).
 
 ### Allowlisting with `coreTools`
 
-The most secure approach is to explicitly add the tools and commands that users
-are permitted to execute to an allowlist. This prevents the use of any tool not
-on the approved list.
+The most secure approach is to explicitly add the tools and commands that users are
+permitted to execute to an allowlist. This prevents the use of any tool not on the
+approved list.
 
 **Example:** Allow only safe, read-only file operations and listing files.
 
@@ -266,8 +262,8 @@ on the approved list.
 
 ### Blocklisting with `excludeTools` (Deprecated)
 
-> **Deprecated:** Use the [Policy Engine](../reference/policy-engine.md) for
-> more robust control.
+> **Deprecated:** Use the [Policy Engine](../reference/policy-engine.md) for more robust
+> control.
 
 Alternatively, you can add specific tools that are considered dangerous in your
 environment to a blocklist.
@@ -293,25 +289,22 @@ environment to a blocklist.
 
 If your organization uses custom tools via
 [Model-Context Protocol (MCP) servers](../tools/mcp-server.md), it is crucial to
-understand how server configurations are managed to apply security policies
-effectively.
+understand how server configurations are managed to apply security policies effectively.
 
 ### How MCP server configurations are merged
 
-Sparkle CLI loads `settings.json` files from three levels: System, Workspace,
-and User. When it comes to the `mcpServers` object, these configurations are
-**merged**:
+Sparkle CLI loads `settings.json` files from three levels: System, Workspace, and User.
+When it comes to the `mcpServers` object, these configurations are **merged**:
 
-1.  **Merging:** The lists of servers from all three levels are combined into a
-    single list.
-2.  **Precedence:** If a server with the **same name** is defined at multiple
-    levels (for example, a server named `corp-api` exists in both system and
-    user settings), the definition from the highest-precedence level is used.
-    The order of precedence is: **System > Workspace > User**.
+1.  **Merging:** The lists of servers from all three levels are combined into a single
+    list.
+2.  **Precedence:** If a server with the **same name** is defined at multiple levels
+    (for example, a server named `corp-api` exists in both system and user settings),
+    the definition from the highest-precedence level is used. The order of precedence
+    is: **System > Workspace > User**.
 
-This means a user **cannot** override the definition of a server that is already
-defined in the system-level settings. However, they **can** add new servers with
-unique names.
+This means a user **cannot** override the definition of a server that is already defined
+in the system-level settings. However, they **can** add new servers with unique names.
 
 ### Enforcing a catalog of tools
 
@@ -320,18 +313,16 @@ canonical servers and adding their names to an allowlist.
 
 ### Restricting tools within an MCP server
 
-For even greater security, especially when dealing with third-party MCP servers,
-you can restrict which specific tools from a server are exposed to the model.
-This is done using the `includeTools` and `excludeTools` properties within a
-server's definition. This lets you use a subset of tools from a server without
-allowing potentially dangerous ones.
+For even greater security, especially when dealing with third-party MCP servers, you can
+restrict which specific tools from a server are exposed to the model. This is done using
+the `includeTools` and `excludeTools` properties within a server's definition. This lets
+you use a subset of tools from a server without allowing potentially dangerous ones.
 
 Following the principle of least privilege, it is highly recommended to use
 `includeTools` to create an allowlist of only the necessary tools.
 
 **Example:** Only allow the `code-search` and `get-ticket-details` tools from a
-third-party MCP server, even if the server offers other tools like
-`delete-ticket`.
+third-party MCP server, even if the server offers other tools like `delete-ticket`.
 
 ```json
 {
@@ -352,18 +343,18 @@ third-party MCP server, even if the server offers other tools like
 To create a secure, centrally-managed catalog of tools, the system administrator
 **must** do both of the following in the system-level `settings.json` file:
 
-1.  **Define the full configuration** for every approved server in the
-    `mcpServers` object. This ensures that even if a user defines a server with
-    the same name, the secure system-level definition will take precedence.
-2.  **Add the names** of those servers to an allowlist using the `mcp.allowed`
-    setting. This is a critical security step that prevents users from running
-    any servers that are not on this list. If this setting is omitted, the CLI
-    will merge and allow any server defined by the user.
+1.  **Define the full configuration** for every approved server in the `mcpServers`
+    object. This ensures that even if a user defines a server with the same name, the
+    secure system-level definition will take precedence.
+2.  **Add the names** of those servers to an allowlist using the `mcp.allowed` setting.
+    This is a critical security step that prevents users from running any servers that
+    are not on this list. If this setting is omitted, the CLI will merge and allow any
+    server defined by the user.
 
 **Example system `settings.json`:**
 
-1. Add the _names_ of all approved servers to an allowlist. This will prevent
-   users from adding their own servers.
+1. Add the _names_ of all approved servers to an allowlist. This will prevent users from
+   adding their own servers.
 
 2. Provide the canonical _definition_ for each server on the allowlist.
 
@@ -384,20 +375,19 @@ To create a secure, centrally-managed catalog of tools, the system administrator
 }
 ```
 
-This pattern is more secure because it uses both definition and an allowlist.
-Any server a user defines will either be overridden by the system definition (if
-it has the same name) or blocked because its name is not in the `mcp.allowed`
-list.
+This pattern is more secure because it uses both definition and an allowlist. Any server
+a user defines will either be overridden by the system definition (if it has the same
+name) or blocked because its name is not in the `mcp.allowed` list.
 
 ### Less secure pattern: Omitting the allowlist
 
-If the administrator defines the `mcpServers` object but fails to also specify
-the `mcp.allowed` allowlist, users may add their own servers.
+If the administrator defines the `mcpServers` object but fails to also specify the
+`mcp.allowed` allowlist, users may add their own servers.
 
 **Example system `settings.json`:**
 
-This configuration defines servers but does not enforce the allowlist. The
-administrator has NOT included the "mcp.allowed" setting.
+This configuration defines servers but does not enforce the allowlist. The administrator
+has NOT included the "mcp.allowed" setting.
 
 ```json
 {
@@ -409,15 +399,14 @@ administrator has NOT included the "mcp.allowed" setting.
 }
 ```
 
-In this scenario, a user can add their own server in their local
-`settings.json`. Because there is no `mcp.allowed` list to filter the merged
-results, the user's server will be added to the list of available tools and
-allowed to run.
+In this scenario, a user can add their own server in their local `settings.json`.
+Because there is no `mcp.allowed` list to filter the merged results, the user's server
+will be added to the list of available tools and allowed to run.
 
 ## Enforcing sandboxing for security
 
-To mitigate the risk of potentially harmful operations, you can enforce the use
-of sandboxing for all tool execution. The sandbox isolates tool execution in a
+To mitigate the risk of potentially harmful operations, you can enforce the use of
+sandboxing for all tool execution. The sandbox isolates tool execution in a
 containerized environment.
 
 **Example:** Force all tool execution to happen within a Docker sandbox.
@@ -430,16 +419,16 @@ containerized environment.
 }
 ```
 
-You can also specify a custom, hardened Docker image for the sandbox by building
-a custom `sandbox.Dockerfile` as described in the
+You can also specify a custom, hardened Docker image for the sandbox by building a
+custom `sandbox.Dockerfile` as described in the
 [Sandboxing documentation](./sandbox.md).
 
 ## Controlling network access via proxy
 
-In corporate environments with strict network policies, you can configure
-Sparkle CLI to route all outbound traffic through a corporate proxy. This can be
-set via an environment variable, but it can also be enforced for custom tools
-via the `mcpServers` configuration.
+In corporate environments with strict network policies, you can configure Sparkle CLI to
+route all outbound traffic through a corporate proxy. This can be set via an environment
+variable, but it can also be enforced for custom tools via the `mcpServers`
+configuration.
 
 **Example (for an MCP server):**
 
@@ -460,9 +449,9 @@ via the `mcpServers` configuration.
 
 ## Telemetry and auditing
 
-For auditing and monitoring purposes, you can configure Sparkle CLI to write
-telemetry data to a local file. This lets you track tool usage and other events.
-For more information, see the [telemetry documentation](./telemetry.md).
+For auditing and monitoring purposes, you can configure Sparkle CLI to write telemetry
+data to a local file. This lets you track tool usage and other events. For more
+information, see the [telemetry documentation](./telemetry.md).
 
 **Example:** Enable telemetry and write it to a local file.
 
@@ -484,8 +473,7 @@ For more information, see the [telemetry documentation](./telemetry.md).
 ## Putting it all together: example system `settings.json`
 
 Here is an example of a system `settings.json` file that combines several of the
-patterns discussed above to create a secure, controlled environment for Sparkle
-CLI.
+patterns discussed above to create a secure, controlled environment for Sparkle CLI.
 
 ```json
 {
@@ -527,8 +515,7 @@ CLI.
 This configuration:
 
 - Forces all tool execution into a Docker sandbox.
-- Strictly uses an allowlist for a small set of safe shell commands and file
-  tools.
+- Strictly uses an allowlist for a small set of safe shell commands and file tools.
 - Defines and allows a single corporate MCP server for custom tools.
 - Enables telemetry for auditing, without logging prompt content.
 - Redirects the `/bug` command to an internal ticketing system.

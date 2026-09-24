@@ -67,8 +67,7 @@ const env = {
 };
 
 const keepCiEnv =
-  process.env.SPARKLE_KEEP_CI_ENV === '1' ||
-  process.env.SPARKLE_KEEP_CI_ENV === 'true';
+  process.env.SPARKLE_KEEP_CI_ENV === '1' || process.env.SPARKLE_KEEP_CI_ENV === 'true';
 if (!keepCiEnv) {
   const ciKeys = ['CI', 'CONTINUOUS_INTEGRATION', 'GITHUB_ACTIONS'].filter(
     (k) => k in env,

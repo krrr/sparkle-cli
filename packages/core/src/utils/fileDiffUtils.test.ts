@@ -48,9 +48,7 @@ describe('fileDiffUtils', () => {
         diffStat: validDiffStat,
       };
 
-      const result = getFileDiffFromResultDisplay(
-        resultDisplay as ToolResultDisplay,
-      );
+      const result = getFileDiffFromResultDisplay(resultDisplay as ToolResultDisplay);
       expect(result).toBe(resultDisplay);
     });
   });

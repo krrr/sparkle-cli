@@ -11,11 +11,7 @@ import type {
   BackstopTargetOptions,
 } from '../pipeline.js';
 import type { ContextEnvironment } from '../pipeline/environment.js';
-import {
-  type ConcreteNode,
-  type RollingSummary,
-  NodeType,
-} from '../graph/types.js';
+import { type ConcreteNode, type RollingSummary, NodeType } from '../graph/types.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { LlmRole } from '../../telemetry/llmRole.js';
 import { formatNodesForLlm } from '../utils/formatNodesForLlm.js';
@@ -45,9 +41,7 @@ export function createRollingSummaryProcessor(
   env: ContextEnvironment,
   options: RollingSummaryProcessorOptions,
 ): ContextProcessor {
-  const generateRollingSummary = async (
-    nodes: ConcreteNode[],
-  ): Promise<string> => {
+  const generateRollingSummary = async (nodes: ConcreteNode[]): Promise<string> => {
     const transcript = formatNodesForLlm(nodes);
 
     const systemPrompt =
@@ -125,12 +119,8 @@ export function createRollingSummaryProcessor(
           abstractsIds: consumedIds,
         };
 
-        const returnedNodes = targets.filter(
-          (t) => !consumedIds.includes(t.id),
-        );
-        const firstRemovedIdx = targets.findIndex((t) =>
-          consumedIds.includes(t.id),
-        );
+        const returnedNodes = targets.filter((t) => !consumedIds.includes(t.id));
+        const firstRemovedIdx = targets.findIndex((t) => consumedIds.includes(t.id));
 
         if (firstRemovedIdx !== -1) {
           const idx = Math.max(0, firstRemovedIdx);

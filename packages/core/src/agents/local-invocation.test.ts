@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mocked } from 'vitest';
 import {
   AgentTerminateMode,
   type LocalAgentDefinition,
@@ -155,9 +147,7 @@ describe('LocalSubagentInvocation', () => {
       const description = invocation.getDescription();
       expect(description.length).toBeGreaterThan(300);
       expect(
-        description.startsWith(
-          "Running subagent 'VeryLongAgentNameThatTakesUpSpace'",
-        ),
+        description.startsWith("Running subagent 'VeryLongAgentNameThatTakesUpSpace'"),
       ).toBe(true);
     });
   });
@@ -505,10 +495,7 @@ describe('LocalSubagentInvocation', () => {
       controller.abort();
       await expect(executePromise).rejects.toThrow('Aborted');
 
-      expect(mockExecutorInstance.run).toHaveBeenCalledWith(
-        params,
-        controller.signal,
-      );
+      expect(mockExecutorInstance.run).toHaveBeenCalledWith(params, controller.signal);
     });
 
     it('should throw an error and bubble cancellation when execution returns ABORTED', async () => {

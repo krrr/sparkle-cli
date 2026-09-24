@@ -90,10 +90,7 @@ describe('initializer', () => {
   });
 
   it('should initialize correctly in non-IDE mode', async () => {
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
+    const result = await initializeApp(mockConfig as unknown as Config, mockSettings);
 
     expect(result).toEqual({
       authError: null,
@@ -101,9 +98,7 @@ describe('initializer', () => {
       shouldOpenAuthDialog: false,
       geminiMdFileCount: 5,
     });
-    expect(mockProfileService.activateProfile).toHaveBeenCalledWith(
-      fakeProfile.id,
-    );
+    expect(mockProfileService.activateProfile).toHaveBeenCalledWith(fakeProfile.id);
     expect(validateTheme).toHaveBeenCalledWith(mockSettings);
     expect(logCliConfiguration).toHaveBeenCalled();
     expect(IdeClient.getInstance).not.toHaveBeenCalled();
@@ -111,10 +106,7 @@ describe('initializer', () => {
 
   it('should initialize correctly in IDE mode', async () => {
     mockConfig.getIdeMode.mockReturnValue(true);
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
+    const result = await initializeApp(mockConfig as unknown as Config, mockSettings);
 
     // Wait for the background promise to resolve
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -134,17 +126,10 @@ describe('initializer', () => {
   });
 
   it('should handle auth error', async () => {
-    mockProfileService.activateProfile.mockRejectedValue(
-      new Error('Auth failed'),
-    );
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
+    mockProfileService.activateProfile.mockRejectedValue(new Error('Auth failed'));
+    const result = await initializeApp(mockConfig as unknown as Config, mockSettings);
 
-    expect(result.authError).toBe(
-      'Failed to set LLM provider. Message: Auth failed',
-    );
+    expect(result.authError).toBe('Failed to set LLM provider. Message: Auth failed');
     expect(result.shouldOpenAuthDialog).toBe(true);
   });
 
@@ -152,10 +137,7 @@ describe('initializer', () => {
     mockProfileService.activateProfile.mockRejectedValue(
       new ValidationRequiredError('Validation required'),
     );
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
+    const result = await initializeApp(mockConfig as unknown as Config, mockSettings);
 
     expect(result.authError).toBeNull();
     expect(result.shouldOpenAuthDialog).toBe(false);
@@ -163,10 +145,7 @@ describe('initializer', () => {
 
   it('should handle undefined active profile', async () => {
     mockProfileService.getActiveProfile.mockReturnValue(undefined);
-    const result = await initializeApp(
-      mockConfig as unknown as Config,
-      mockSettings,
-    );
+    const result = await initializeApp(mockConfig as unknown as Config, mockSettings);
 
     expect(result.authError).toBeNull();
     expect(result.shouldOpenAuthDialog).toBe(true);

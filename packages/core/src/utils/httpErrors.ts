@@ -26,8 +26,7 @@ export function getErrorStatus(error: unknown): number | undefined {
     ) {
       const response =
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        (error as { response: { status?: unknown; headers?: unknown } })
-          .response;
+        (error as { response: { status?: unknown; headers?: unknown } }).response;
       if ('status' in response && typeof response.status === 'number') {
         return response.status;
       }

@@ -28,8 +28,7 @@ describe('parseCustomHeaders', () => {
   });
 
   it('should parse multiple headers separated by commas', () => {
-    const input =
-      'Authorization: Bearer abc123, Content-Type: application/json';
+    const input = 'Authorization: Bearer abc123, Content-Type: application/json';
     expect(parseCustomHeaders(input)).toEqual({
       Authorization: 'Bearer abc123',
       'Content-Type': 'application/json',

@@ -27,8 +27,7 @@ export const ContextUsageDisplay = ({
   const percentageUsed = (percentage * 100).toFixed(0);
 
   const threshold =
-    settings.merged.model?.compressionThreshold ??
-    DEFAULT_COMPRESSION_THRESHOLD;
+    settings.merged.model?.compressionThreshold ?? DEFAULT_COMPRESSION_THRESHOLD;
 
   let textColor = theme.text.secondary;
   if (percentage >= 1.0) {
@@ -37,8 +36,7 @@ export const ContextUsageDisplay = ({
     textColor = theme.status.warning;
   }
 
-  const label =
-    terminalWidth < MIN_TERMINAL_WIDTH_FOR_FULL_LABEL ? '%' : '% used';
+  const label = terminalWidth < MIN_TERMINAL_WIDTH_FOR_FULL_LABEL ? '%' : '% used';
 
   return (
     <Text color={textColor}>

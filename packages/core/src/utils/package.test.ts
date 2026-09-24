@@ -53,8 +53,7 @@ describe('getPackageJson', () => {
     },
     {
       description: 'readPackageUp throws',
-      setup: () =>
-        vi.mocked(readPackageUp).mockRejectedValue(new Error('Read error')),
+      setup: () => vi.mocked(readPackageUp).mockRejectedValue(new Error('Read error')),
       expected: undefined,
     },
   ])('should handle $description', async ({ setup, expected }) => {

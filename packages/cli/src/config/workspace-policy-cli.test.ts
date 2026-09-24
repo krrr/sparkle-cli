@@ -150,11 +150,7 @@ describe('Workspace-Level Policy CLI Integration', () => {
 
     await loadCliConfig(settings, 'test-session', argv, { cwd: MOCK_CWD });
 
-    expect(mockAcceptIntegrity).toHaveBeenCalledWith(
-      'workspace',
-      MOCK_CWD,
-      'new-hash',
-    );
+    expect(mockAcceptIntegrity).toHaveBeenCalledWith('workspace', MOCK_CWD, 'new-hash');
     expect(ServerConfig.createPolicyEngineConfig).toHaveBeenCalledWith(
       expect.objectContaining({
         workspacePoliciesDir: expect.stringContaining(
@@ -190,11 +186,7 @@ describe('Workspace-Level Policy CLI Integration', () => {
     });
 
     expect(config.getPolicyUpdateConfirmationRequest()).toBeUndefined();
-    expect(mockAcceptIntegrity).toHaveBeenCalledWith(
-      'workspace',
-      MOCK_CWD,
-      'new-hash',
-    );
+    expect(mockAcceptIntegrity).toHaveBeenCalledWith('workspace', MOCK_CWD, 'new-hash');
     expect(ServerConfig.createPolicyEngineConfig).toHaveBeenCalledWith(
       expect.objectContaining({
         workspacePoliciesDir: expect.stringContaining(
@@ -227,11 +219,7 @@ describe('Workspace-Level Policy CLI Integration', () => {
     });
 
     expect(config.getPolicyUpdateConfirmationRequest()).toBeUndefined();
-    expect(mockAcceptIntegrity).toHaveBeenCalledWith(
-      'workspace',
-      MOCK_CWD,
-      'new-hash',
-    );
+    expect(mockAcceptIntegrity).toHaveBeenCalledWith('workspace', MOCK_CWD, 'new-hash');
 
     expect(ServerConfig.createPolicyEngineConfig).toHaveBeenCalledWith(
       expect.objectContaining({

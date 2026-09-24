@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  JsonStreamEvent,
-  ModelStreamStats,
-  StreamStats,
-} from './types.js';
+import type { JsonStreamEvent, ModelStreamStats, StreamStats } from './types.js';
 import type { SessionMetrics } from '../telemetry/uiTelemetry.js';
 
 /**
@@ -40,10 +36,7 @@ export class StreamJsonFormatter {
    * @param durationMs - The session duration in milliseconds
    * @returns Simplified stats for streaming output
    */
-  convertToStreamStats(
-    metrics: SessionMetrics,
-    durationMs: number,
-  ): StreamStats {
+  convertToStreamStats(metrics: SessionMetrics, durationMs: number): StreamStats {
     const { totalTokens, inputTokens, outputTokens, cached, input, models } =
       Object.entries(metrics.models).reduce(
         (acc, [modelName, modelMetrics]) => {

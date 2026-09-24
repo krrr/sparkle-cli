@@ -10,5 +10,4 @@ export * from './hybrid-token-storage.js';
 export * from './keychain-token-storage.js';
 
 export const DEFAULT_SERVICE_NAME = 'sparkle-cli-oauth';
-export const FORCE_ENCRYPTED_FILE_ENV_VAR =
-  'SPARKLE_FORCE_ENCRYPTED_FILE_STORAGE';
+export const FORCE_ENCRYPTED_FILE_ENV_VAR = 'SPARKLE_FORCE_ENCRYPTED_FILE_STORAGE';

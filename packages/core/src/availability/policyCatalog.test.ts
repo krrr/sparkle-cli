@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  createDefaultPolicy,
-  createSingleModelChain,
-} from './policyCatalog.js';
+import { createDefaultPolicy, createSingleModelChain } from './policyCatalog.js';
 
 describe('policyCatalog', () => {
   it('createSingleModelChain produces a single last-resort policy', () => {

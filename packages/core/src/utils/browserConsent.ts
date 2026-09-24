@@ -78,9 +78,7 @@ export async function getBrowserConsentIfNeeded(): Promise<boolean> {
 /**
  * Persists a sentinel file so consent is not requested again.
  */
-async function markConsentAsAcknowledged(
-  consentFilePath: string,
-): Promise<void> {
+async function markConsentAsAcknowledged(consentFilePath: string): Promise<void> {
   try {
     await fs.mkdir(path.dirname(consentFilePath), { recursive: true });
     await fs.writeFile(

@@ -16,8 +16,7 @@ import { isHeadlessMode } from './headless.js';
  */
 export async function getConsentForOauth(prompt: string): Promise<boolean> {
   const finalPrompt =
-    (prompt ? prompt + ' ' : '') +
-    'Opening authentication page in your browser. ';
+    (prompt ? prompt + ' ' : '') + 'Opening authentication page in your browser. ';
 
   if (isHeadlessMode()) {
     return getOauthConsentNonInteractive(finalPrompt);

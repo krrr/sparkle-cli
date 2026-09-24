@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  vi,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import {
   BaseToolInvocation,
   BaseDeclarativeTool,
@@ -53,9 +45,7 @@ class TestToolInvocation extends BaseToolInvocation<TestParams, TestResult> {
     };
   }
 
-  override async shouldConfirmExecute(
-    abortSignal: AbortSignal,
-  ): Promise<false> {
+  override async shouldConfirmExecute(abortSignal: AbortSignal): Promise<false> {
     const decision = await this.getMessageBusDecision(abortSignal);
     if (decision === 'allow') {
       return false;
@@ -93,12 +83,7 @@ class TestTool extends BaseDeclarativeTool<TestParams, TestResult> {
     _toolName?: string,
     _toolDisplayName?: string,
   ) {
-    return new TestToolInvocation(
-      params,
-      messageBus,
-      _toolName,
-      _toolDisplayName,
-    );
+    return new TestToolInvocation(params, messageBus, _toolName, _toolDisplayName);
   }
 }
 

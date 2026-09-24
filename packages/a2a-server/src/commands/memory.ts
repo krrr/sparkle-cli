@@ -5,11 +5,7 @@
  */
 
 import { listMemoryFiles, refreshMemory, showMemory } from 'sparkle-cli-core';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 
 export class MemoryCommand implements Command {
   readonly name = 'memory';

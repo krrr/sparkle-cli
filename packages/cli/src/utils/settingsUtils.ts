@@ -36,10 +36,7 @@ let _FLATTENED_SCHEMA: FlattenedSchema | undefined;
 
 /** Returns a flattened schema, the first call is memoized for future requests. */
 export function getFlattenedSchema() {
-  return (
-    _FLATTENED_SCHEMA ??
-    (_FLATTENED_SCHEMA = flattenSchema(getSettingsSchema()))
-  );
+  return _FLATTENED_SCHEMA ?? (_FLATTENED_SCHEMA = flattenSchema(getSettingsSchema()));
 }
 
 function clearFlattenedSchema() {
@@ -50,10 +47,7 @@ export function getSettingsByCategory(): Record<
   string,
   Array<SettingDefinition & { key: string }>
 > {
-  const categories: Record<
-    string,
-    Array<SettingDefinition & { key: string }>
-  > = {};
+  const categories: Record<string, Array<SettingDefinition & { key: string }>> = {};
 
   Object.values(getFlattenedSchema()).forEach((definition) => {
     const category = definition.category;
@@ -94,8 +88,7 @@ export function getRestartRequiredSettings(): string[] {
 export function getDialogRestartRequiredSettings(): string[] {
   return Object.values(getFlattenedSchema())
     .filter(
-      (definition) =>
-        definition.requiresRestart && definition.showInDialog !== false,
+      (definition) => definition.requiresRestart && definition.showInDialog !== false,
     )
     .map((definition) => definition.key);
 }
@@ -109,10 +102,7 @@ function isSettingsValue(value: unknown): value is SettingsValue {
   if (value === null) return false;
   const type = typeof value;
   return (
-    type === 'string' ||
-    type === 'number' ||
-    type === 'boolean' ||
-    type === 'object'
+    type === 'string' || type === 'number' || type === 'boolean' || type === 'object'
   );
 }
 
@@ -133,10 +123,7 @@ export function getNestedValue(obj: unknown, path: string[]): unknown {
 /**
  * Get the effective value for a setting falling back to the default value
  */
-export function getEffectiveValue(
-  key: string,
-  settings: Settings,
-): SettingsValue {
+export function getEffectiveValue(key: string, settings: Settings): SettingsValue {
   const definition = getSettingDefinition(key);
   if (!definition) {
     return undefined;
@@ -204,10 +191,7 @@ export function getDialogSettingsByCategory(): Record<
   string,
   Array<SettingDefinition & { key: string }>
 > {
-  const categories: Record<
-    string,
-    Array<SettingDefinition & { key: string }>
-  > = {};
+  const categories: Record<string, Array<SettingDefinition & { key: string }>> = {};
 
   Object.values(getFlattenedSchema())
     .filter((definition) => definition.showInDialog !== false)
@@ -226,15 +210,11 @@ export function getDialogSettingsByType(
   type: SettingsType,
 ): Array<SettingDefinition & { key: string }> {
   return Object.values(getFlattenedSchema()).filter(
-    (definition) =>
-      definition.type === type && definition.showInDialog !== false,
+    (definition) => definition.type === type && definition.showInDialog !== false,
   );
 }
 
-export function isInSettingsScope(
-  key: string,
-  scopeSettings: Settings,
-): boolean {
+export function isInSettingsScope(key: string, scopeSettings: Settings): boolean {
   const path = key.split('.');
   const value = getNestedValue(scopeSettings, path);
   return value !== undefined;
@@ -261,11 +241,7 @@ export function getDisplayValue(
   let valueString = String(value);
 
   // Handle object types by stringifying them
-  if (
-    definition?.type === 'object' &&
-    value !== null &&
-    typeof value === 'object'
-  ) {
+  if (definition?.type === 'object' && value !== null && typeof value === 'object') {
     valueString = JSON.stringify(value);
   } else if (definition?.type === 'enum' && definition.options) {
     const option = definition.options?.find((option) => option.value === value);

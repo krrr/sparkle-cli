@@ -34,10 +34,7 @@ import {
   SettingScope,
   resetSettingsCacheForTesting,
 } from './settings.js';
-import {
-  isWorkspaceTrusted,
-  resetTrustedFoldersForTesting,
-} from './trustedFolders.js';
+import { isWorkspaceTrusted, resetTrustedFoldersForTesting } from './trustedFolders.js';
 import { createExtension } from '../test-utils/createExtension.js';
 import { ExtensionEnablementManager } from './extensions/extensionEnablement.js';
 import { join } from 'node:path';
@@ -66,8 +63,7 @@ const mockGit = {
 const mockDownloadFromGithubRelease = vi.hoisted(() => vi.fn());
 
 vi.mock('./extensions/github.js', async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import('./extensions/github.js')>();
+  const original = await importOriginal<typeof import('./extensions/github.js')>();
   return {
     ...original,
     downloadFromGitHubRelease: mockDownloadFromGithubRelease,
@@ -122,9 +118,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     ExtensionInstallEvent: vi.fn(),
     ExtensionUninstallEvent: vi.fn(),
     ExtensionDisableEvent: vi.fn(),
-    ExtensionIntegrityManager: vi
-      .fn()
-      .mockImplementation(() => mockIntegrityManager),
+    ExtensionIntegrityManager: vi.fn().mockImplementation(() => mockIntegrityManager),
     KeychainTokenStorage: vi.fn().mockImplementation(() => ({
       getSecret: vi.fn(),
       setSecret: vi.fn(),
@@ -175,22 +169,18 @@ describe('extension tests', () => {
       getSecret: vi
         .fn()
         .mockImplementation(async (key: string) => keychainData[key] || null),
-      setSecret: vi
-        .fn()
-        .mockImplementation(async (key: string, value: string) => {
-          keychainData[key] = value;
-        }),
+      setSecret: vi.fn().mockImplementation(async (key: string, value: string) => {
+        keychainData[key] = value;
+      }),
       deleteSecret: vi.fn().mockImplementation(async (key: string) => {
         delete keychainData[key];
       }),
-      listSecrets: vi
-        .fn()
-        .mockImplementation(async () => Object.keys(keychainData)),
+      listSecrets: vi.fn().mockImplementation(async () => Object.keys(keychainData)),
       isAvailable: vi.fn().mockResolvedValue(true),
     };
-    (
-      KeychainTokenStorage as unknown as ReturnType<typeof vi.fn>
-    ).mockImplementation(() => mockKeychainStorage);
+    (KeychainTokenStorage as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      () => mockKeychainStorage,
+    );
     vi.mocked(loadAgentsFromDirectory).mockResolvedValue({
       agents: [],
       errors: [],
@@ -250,9 +240,7 @@ describe('extension tests', () => {
     });
 
     it('should skip the extension if a context file path is outside the extension directory and log an error', async () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'traversal-extension',
@@ -324,10 +312,7 @@ describe('extension tests', () => {
         version: '2.0.0',
       });
       await extensionManager.loadExtensions();
-      await extensionManager.disableExtension(
-        'disabled-extension',
-        SettingScope.User,
-      );
+      await extensionManager.disableExtension('disabled-extension', SettingScope.User);
       const extensions = extensionManager.getExtensions();
       expect(extensions).toHaveLength(2);
       expect(extensions[0].name).toBe('disabled-extension');
@@ -352,11 +337,7 @@ describe('extension tests', () => {
 
       const extensions = await extensionManager.loadExtensions();
       expect(extensions).toHaveLength(1);
-      const expectedCwd = path.join(
-        userExtensionsDir,
-        'test-extension',
-        'server',
-      );
+      const expectedCwd = path.join(userExtensionsDir, 'test-extension', 'server');
       expect(extensions[0].mcpServers?.['test-server'].cwd).toBe(expectedCwd);
     });
 
@@ -389,9 +370,7 @@ describe('extension tests', () => {
         source: sourceExtDir,
         type: 'link',
       });
-      expect(linkedExt.contextFiles).toEqual([
-        path.join(sourceExtDir, 'context.md'),
-      ]);
+      expect(linkedExt.contextFiles).toEqual([path.join(sourceExtDir, 'context.md')]);
     });
 
     it('should load extension policies from the policies directory', async () => {
@@ -415,10 +394,7 @@ toolName = "ask_tool"
 decision = "ask_user"
 priority = 100
 `;
-      fs.writeFileSync(
-        path.join(policiesDir, 'policies.toml'),
-        policiesContent,
-      );
+      fs.writeFileSync(path.join(policiesDir, 'policies.toml'), policiesContent);
 
       const extensions = await extensionManager.loadExtensions();
       expect(extensions).toHaveLength(1);
@@ -426,16 +402,14 @@ priority = 100
 
       expect(extension.rules).toBeDefined();
       expect(extension.rules).toHaveLength(2);
-      expect(
-        extension.rules!.find((r) => r.toolName === 'deny_tool')?.decision,
-      ).toBe('deny');
-      expect(
-        extension.rules!.find((r) => r.toolName === 'ask_tool')?.decision,
-      ).toBe('ask_user');
-      // Verify source is prefixed
-      expect(extension.rules![0].source).toContain(
-        'Extension (policy-extension):',
+      expect(extension.rules!.find((r) => r.toolName === 'deny_tool')?.decision).toBe(
+        'deny',
       );
+      expect(extension.rules!.find((r) => r.toolName === 'ask_tool')?.decision).toBe(
+        'ask_user',
+      );
+      // Verify source is prefixed
+      expect(extension.rules![0].source).toContain('Extension (policy-extension):');
     });
 
     it('should ignore ALLOW rules and YOLO mode from extension policies for security', async () => {
@@ -469,10 +443,7 @@ modes = ["yolo"]
 type = "external"
 name = "yolo-checker"
 `;
-      fs.writeFileSync(
-        path.join(policiesDir, 'policies.toml'),
-        policiesContent,
-      );
+      fs.writeFileSync(path.join(policiesDir, 'policies.toml'), policiesContent);
 
       const extensions = await extensionManager.loadExtensions();
       expect(extensions).toHaveLength(1);
@@ -536,10 +507,7 @@ name = "yolo-checker"
       process.env['TEST_DB_URL'] = 'postgresql://localhost:5432/testdb';
 
       try {
-        const userExtensionsDir = path.join(
-          tempHomeDir,
-          EXTENSIONS_DIRECTORY_NAME,
-        );
+        const userExtensionsDir = path.join(tempHomeDir, EXTENSIONS_DIRECTORY_NAME);
         fs.mkdirSync(userExtensionsDir, { recursive: true });
 
         const extDir = path.join(userExtensionsDir, 'test-extension');
@@ -623,10 +591,7 @@ name = "yolo-checker"
     });
 
     it('should handle missing environment variables gracefully', async () => {
-      const userExtensionsDir = path.join(
-        tempHomeDir,
-        EXTENSIONS_DIRECTORY_NAME,
-      );
+      const userExtensionsDir = path.join(tempHomeDir, EXTENSIONS_DIRECTORY_NAME);
       fs.mkdirSync(userExtensionsDir, { recursive: true });
 
       const extDir = path.join(userExtensionsDir, 'test-extension');
@@ -663,9 +628,7 @@ name = "yolo-checker"
     });
 
     it('should skip an extension with invalid JSON config and log an error', async () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // Good extension
       createExtension({
@@ -694,9 +657,7 @@ name = "yolo-checker"
     });
 
     it('should skip an extension with missing "name" in config and log an error', async () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       // Good extension
       createExtension({
@@ -744,9 +705,7 @@ name = "yolo-checker"
     });
 
     it('should log an error for invalid extension names during loading', async () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       createExtension({
         extensionsDir: userExtensionsDir,
         name: 'bad_name',
@@ -896,8 +855,7 @@ name = "yolo-checker"
           expectedIdSource: 'http://somehost.com/foo/bar',
         },
         {
-          description:
-            'should generate id from owner/repo for github http urls',
+          description: 'should generate id from owner/repo for github http urls',
           installMetadata: {
             type: 'git' as const,
             source: 'http://github.com/foo/bar',
@@ -913,8 +871,7 @@ name = "yolo-checker"
           expectedIdSource: 'https://github.com/foo/bar',
         },
         {
-          description:
-            'should generate id from source for github-release extension',
+          description: 'should generate id from source for github-release extension',
           installMetadata: {
             type: 'github-release' as const,
             source: 'https://github.com/foo/bar',
@@ -1062,10 +1019,7 @@ name = "yolo-checker"
         const requestConsentSpy = vi.fn().mockResolvedValue(true);
         extensionManager.setRequestConsent(requestConsentSpy);
 
-        const sourceExtDir = path.join(
-          tempWorkspaceDir,
-          'hook-extension-source',
-        );
+        const sourceExtDir = path.join(tempWorkspaceDir, 'hook-extension-source');
         fs.mkdirSync(sourceExtDir, { recursive: true });
 
         const hooksDir = path.join(sourceExtDir, 'hooks');
@@ -1192,9 +1146,7 @@ name = "yolo-checker"
           source: sourceExtDir,
           type: 'local',
         }),
-      ).rejects.toThrow(
-        `Invalid configuration in ${configPath}: missing "name"`,
-      );
+      ).rejects.toThrow(`Invalid configuration in ${configPath}: missing "name"`);
     });
 
     it('should install an extension from a git URL', async () => {
@@ -1389,12 +1341,8 @@ name = "yolo-checker"
         type: 'local',
       });
       expect(fs.existsSync(trustedFoldersPath)).toBe(true);
-      const trustedFolders = JSON.parse(
-        fs.readFileSync(trustedFoldersPath, 'utf-8'),
-      );
-      expect(trustedFolders[normalizePath(tempWorkspaceDir)]).toBe(
-        'TRUST_FOLDER',
-      );
+      const trustedFolders = JSON.parse(fs.readFileSync(trustedFoldersPath, 'utf-8'));
+      expect(trustedFolders[normalizePath(tempWorkspaceDir)]).toBe('TRUST_FOLDER');
     });
 
     describe.each([true, false])(
@@ -1684,9 +1632,7 @@ ${INSTALL_WARNING_MESSAGE}`,
         type: 'local',
       });
 
-      const envPath = new ExtensionStorage(
-        'my-local-extension',
-      ).getEnvFilePath();
+      const envPath = new ExtensionStorage('my-local-extension').getEnvFilePath();
       expect(fs.existsSync(envPath)).toBe(true);
       let envContent = fs.readFileSync(envPath, 'utf-8');
       expect(envContent).toContain('MY_API_KEY=old-api-key');
@@ -1711,10 +1657,9 @@ ${INSTALL_WARNING_MESSAGE}`,
         ],
       });
 
-      const previousExtensionConfig =
-        await extensionManager.loadExtensionConfig(
-          path.join(userExtensionsDir, 'my-local-extension'),
-        );
+      const previousExtensionConfig = await extensionManager.loadExtensionConfig(
+        path.join(userExtensionsDir, 'my-local-extension'),
+      );
       mockPromptForSettings.mockResolvedValueOnce('new-setting-value');
 
       // 3. Call installOrUpdateExtension to perform the update.
@@ -1769,10 +1714,9 @@ ${INSTALL_WARNING_MESSAGE}`,
         ],
       });
 
-      const previousExtensionConfig =
-        await extensionManager.loadExtensionConfig(
-          path.join(userExtensionsDir, 'my-auto-update-ext'),
-        );
+      const previousExtensionConfig = await extensionManager.loadExtensionConfig(
+        path.join(userExtensionsDir, 'my-auto-update-ext'),
+      );
 
       // 3. Attempt to update and assert it fails
       const updatedExtension = await extensionManager.installOrUpdateExtension(
@@ -1906,9 +1850,7 @@ ${INSTALL_WARNING_MESSAGE}`,
             source: gitUrl,
             type: 'github-release',
           }),
-        ).rejects.toThrow(
-          `Failed to install extension ${gitUrl}: download failed`,
-        );
+        ).rejects.toThrow(`Failed to install extension ${gitUrl}: download failed`);
 
         expect(mockRequestConsent).toHaveBeenCalledExactlyOnceWith(
           expect.stringContaining(
@@ -1934,9 +1876,7 @@ ${INSTALL_WARNING_MESSAGE}`,
         // We should not see the request to use git clone, this is a repo that
         // has no github releases so it is the only install method.
         expect(mockRequestConsent).toHaveBeenCalledExactlyOnceWith(
-          expect.stringContaining(
-            'Installing extension "sparkle-test-extension"',
-          ),
+          expect.stringContaining('Installing extension "sparkle-test-extension"'),
         );
         expect(mockGit.clone).toHaveBeenCalled();
         const metadataPath = path.join(
@@ -2011,10 +1951,7 @@ ${INSTALL_WARNING_MESSAGE}`,
         name: 'My-Local-Extension',
         version: '1.0.0',
       });
-      const newSourceExtDir = path.join(
-        userExtensionsDir,
-        'my-local-extension',
-      );
+      const newSourceExtDir = path.join(userExtensionsDir, 'my-local-extension');
       fs.renameSync(sourceExtDir, newSourceExtDir);
 
       const otherExtDir = createExtension({
@@ -2052,10 +1989,7 @@ ${INSTALL_WARNING_MESSAGE}`,
         });
 
         await extensionManager.loadExtensions();
-        await extensionManager.uninstallExtension(
-          'my-local-extension',
-          isUpdate,
-        );
+        await extensionManager.uninstallExtension('my-local-extension', isUpdate);
 
         if (isUpdate) {
           expect(mockLogExtensionUninstall).not.toHaveBeenCalled();
@@ -2145,10 +2079,7 @@ ${INSTALL_WARNING_MESSAGE}`,
       });
 
       await extensionManager.loadExtensions();
-      await extensionManager.disableExtension(
-        'my-extension',
-        SettingScope.User,
-      );
+      await extensionManager.disableExtension('my-extension', SettingScope.User);
       expect(
         isEnabled({
           name: 'my-extension',
@@ -2165,10 +2096,7 @@ ${INSTALL_WARNING_MESSAGE}`,
       });
 
       await extensionManager.loadExtensions();
-      await extensionManager.disableExtension(
-        'my-extension',
-        SettingScope.Workspace,
-      );
+      await extensionManager.disableExtension('my-extension', SettingScope.Workspace);
       expect(
         isEnabled({
           name: 'my-extension',
@@ -2191,14 +2119,8 @@ ${INSTALL_WARNING_MESSAGE}`,
       });
 
       await extensionManager.loadExtensions();
-      await extensionManager.disableExtension(
-        'my-extension',
-        SettingScope.User,
-      );
-      await extensionManager.disableExtension(
-        'my-extension',
-        SettingScope.User,
-      );
+      await extensionManager.disableExtension('my-extension', SettingScope.User);
+      await extensionManager.disableExtension('my-extension', SettingScope.User);
       expect(
         isEnabled({
           name: 'my-extension',

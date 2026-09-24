@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mocked } from 'vitest';
 import { IdeClient, IDEConnectionStatus } from './ide-client.js';
 import type * as fs from 'node:fs';
 import { getIdeProcessInfo } from './process-utils.js';
@@ -58,8 +50,7 @@ describe('IdeClient', () => {
 
   beforeEach(async () => {
     // Reset singleton instance for test isolation
-    (IdeClient as unknown as { instance: IdeClient | undefined }).instance =
-      undefined;
+    (IdeClient as unknown as { instance: IdeClient | undefined }).instance = undefined;
 
     // Mock environment variables
     process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'] = '/test/workspace';
@@ -230,9 +221,7 @@ describe('IdeClient', () => {
       expect(ideClient.getConnectionStatus().status).toBe(
         IDEConnectionStatus.Disconnected,
       );
-      expect(ideClient.getConnectionStatus().details).toContain(
-        'Failed to connect',
-      );
+      expect(ideClient.getConnectionStatus().details).toContain('Failed to connect');
     });
   });
 
@@ -423,8 +412,7 @@ describe('IdeClient', () => {
 
     it('should return undefined if client is not connected', async () => {
       const ideClient = await IdeClient.getInstance();
-      (ideClient as unknown as { client: Client | undefined }).client =
-        undefined;
+      (ideClient as unknown as { client: Client | undefined }).client = undefined;
 
       const result = await (
         ideClient as unknown as { closeDiff: (f: string) => Promise<void> }
@@ -465,9 +453,7 @@ describe('IdeClient', () => {
       const ideClient = await IdeClient.getInstance();
       const response = {
         isError: false,
-        content: [
-          { type: 'text', text: JSON.stringify({ content: 'file content' }) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify({ content: 'file content' }) }],
       };
       mockClient.request.mockResolvedValue(response);
 

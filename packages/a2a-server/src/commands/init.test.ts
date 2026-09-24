@@ -6,11 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InitCommand } from './init.js';
-import {
-  performInit,
-  type CommandActionReturn,
-  type Config,
-} from 'sparkle-cli-core';
+import { performInit, type CommandActionReturn, type Config } from 'sparkle-cli-core';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CoderAgentExecutor } from '../agent/executor.js';

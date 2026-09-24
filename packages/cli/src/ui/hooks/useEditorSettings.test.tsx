@@ -16,10 +16,7 @@ import {
 import { act } from 'react';
 import { render } from '../../test-utils/render.js';
 import { useEditorSettings } from './useEditorSettings.js';
-import type {
-  LoadableSettingScope,
-  LoadedSettings,
-} from '../../config/settings.js';
+import type { LoadableSettingScope, LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import { MessageType } from '../types.js';
 import {
@@ -50,11 +47,7 @@ describe('useEditorSettings', () => {
   let result: ReturnType<typeof useEditorSettings>;
 
   function TestComponent() {
-    result = useEditorSettings(
-      mockLoadedSettings,
-      mockSetEditorError,
-      mockAddItem,
-    );
+    result = useEditorSettings(mockLoadedSettings, mockSetEditorError, mockAddItem);
     return null;
   }
 
@@ -195,10 +188,7 @@ describe('useEditorSettings', () => {
     await render(<TestComponent />);
 
     const editorType: EditorType = 'vscode';
-    const scopes: LoadableSettingScope[] = [
-      SettingScope.User,
-      SettingScope.Workspace,
-    ];
+    const scopes: LoadableSettingScope[] = [SettingScope.User, SettingScope.Workspace];
 
     scopes.forEach((scope) => {
       act(() => {
@@ -262,9 +252,7 @@ describe('useEditorSettings', () => {
 
     const errorMessage = 'Failed to save settings';
     (
-      mockLoadedSettings.setValue as MockedFunction<
-        typeof mockLoadedSettings.setValue
-      >
+      mockLoadedSettings.setValue as MockedFunction<typeof mockLoadedSettings.setValue>
     ).mockImplementation(() => {
       throw new Error(errorMessage);
     });

@@ -25,9 +25,7 @@ export const useComposerStatus = () => {
   const hasPendingToolConfirmation = useMemo(
     () =>
       (uiState.pendingHistoryItems ?? [])
-        .filter(
-          (item): item is HistoryItemToolGroup => item.type === 'tool_group',
-        )
+        .filter((item): item is HistoryItemToolGroup => item.type === 'tool_group')
         .some((item) =>
           item.tools.some(
             (tool) => tool.status === CoreToolCallStatus.AwaitingApproval,

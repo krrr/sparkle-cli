@@ -120,10 +120,7 @@ export class Logger {
         await this._backupCorruptedLogFile('invalid_json');
         return [];
       }
-      debugLogger.debug(
-        `Failed to read or parse log file ${this.logFilePath}:`,
-        error,
-      );
+      debugLogger.debug(`Failed to read or parse log file ${this.logFilePath}:`, error);
       throw error;
     }
   }
@@ -174,9 +171,7 @@ export class Logger {
     }
   }
 
-  private async _updateLogFile(
-    entryToAppend: LogEntry,
-  ): Promise<LogEntry | null> {
+  private async _updateLogFile(entryToAppend: LogEntry): Promise<LogEntry | null> {
     if (!this.logFilePath) {
       debugLogger.debug('Log file path not set. Cannot persist log entry.');
       throw new Error('Log file path not set during update attempt.');
@@ -186,10 +181,7 @@ export class Logger {
     try {
       currentLogsOnDisk = await this._readLogFile();
     } catch (readError) {
-      debugLogger.debug(
-        'Critical error reading log file before append:',
-        readError,
-      );
+      debugLogger.debug('Critical error reading log file before append:', readError);
       throw readError;
     }
 
@@ -382,10 +374,7 @@ export class Logger {
         // This is okay, it just means the checkpoint doesn't exist in either format.
         return { history: [] };
       }
-      debugLogger.error(
-        `Failed to read or parse checkpoint file ${path}:`,
-        error,
-      );
+      debugLogger.error(`Failed to read or parse checkpoint file ${path}:`, error);
       return { history: [] };
     }
   }
@@ -409,10 +398,7 @@ export class Logger {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       const nodeError = error as NodeJS.ErrnoException;
       if (nodeError.code !== 'ENOENT') {
-        debugLogger.error(
-          `Failed to delete checkpoint file ${newPath}:`,
-          error,
-        );
+        debugLogger.error(`Failed to delete checkpoint file ${newPath}:`, error);
         throw error; // Rethrow unexpected errors
       }
       // It's okay if it doesn't exist.
@@ -428,10 +414,7 @@ export class Logger {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         const nodeError = error as NodeJS.ErrnoException;
         if (nodeError.code !== 'ENOENT') {
-          debugLogger.error(
-            `Failed to delete checkpoint file ${oldPath}:`,
-            error,
-          );
+          debugLogger.error(`Failed to delete checkpoint file ${oldPath}:`, error);
           throw error; // Rethrow unexpected errors
         }
         // It's okay if it doesn't exist.
@@ -443,9 +426,7 @@ export class Logger {
 
   async checkpointExists(tag: string): Promise<boolean> {
     if (!this.initialized) {
-      throw new Error(
-        'Logger not initialized. Cannot check for checkpoint existence.',
-      );
+      throw new Error('Logger not initialized. Cannot check for checkpoint existence.');
     }
     let filePath: string | undefined;
     try {

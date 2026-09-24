@@ -33,8 +33,7 @@ function areModelMetricsEqual(a: ModelMetrics, b: ModelMetrics): boolean {
     a.api.totalRequests !== b.api.totalRequests ||
     a.api.totalErrors !== b.api.totalErrors ||
     a.api.totalLatencyMs !== b.api.totalLatencyMs ||
-    (a.api.totalTimeToFirstTokenMs ?? 0) !==
-      (b.api.totalTimeToFirstTokenMs ?? 0) ||
+    (a.api.totalTimeToFirstTokenMs ?? 0) !== (b.api.totalTimeToFirstTokenMs ?? 0) ||
     (a.api.totalTimeToFirstTokenRequests ?? 0) !==
       (b.api.totalTimeToFirstTokenRequests ?? 0)
   ) {
@@ -76,12 +75,9 @@ function areToolCallStatsEqual(a: ToolCallStats, b: ToolCallStats): boolean {
     return false;
   }
   if (
-    a.decisions[ToolCallDecision.ACCEPT] !==
-      b.decisions[ToolCallDecision.ACCEPT] ||
-    a.decisions[ToolCallDecision.REJECT] !==
-      b.decisions[ToolCallDecision.REJECT] ||
-    a.decisions[ToolCallDecision.MODIFY] !==
-      b.decisions[ToolCallDecision.MODIFY] ||
+    a.decisions[ToolCallDecision.ACCEPT] !== b.decisions[ToolCallDecision.ACCEPT] ||
+    a.decisions[ToolCallDecision.REJECT] !== b.decisions[ToolCallDecision.REJECT] ||
+    a.decisions[ToolCallDecision.MODIFY] !== b.decisions[ToolCallDecision.MODIFY] ||
     a.decisions[ToolCallDecision.AUTO_ACCEPT] !==
       b.decisions[ToolCallDecision.AUTO_ACCEPT]
   ) {
@@ -261,10 +257,7 @@ export const SessionStatsProvider: React.FC<{
     }));
   }, []);
 
-  const getPromptCount = useCallback(
-    () => stats.promptCount,
-    [stats.promptCount],
-  );
+  const getPromptCount = useCallback(() => stats.promptCount, [stats.promptCount]);
 
   const value = useMemo(
     () => ({
@@ -287,9 +280,7 @@ export const SessionStatsProvider: React.FC<{
 export const useSessionStats = () => {
   const context = useContext(SessionStatsContext);
   if (context === undefined) {
-    throw new Error(
-      'useSessionStats must be used within a SessionStatsProvider',
-    );
+    throw new Error('useSessionStats must be used within a SessionStatsProvider');
   }
   return context;
 };

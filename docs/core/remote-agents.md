@@ -1,20 +1,20 @@
 # Remote Subagents
 
-Sparkle CLI supports connecting to remote subagents using the Agent-to-Agent
-(A2A) protocol. This allows Sparkle CLI to interact with other agents, expanding
-its capabilities by delegating tasks to remote services.
+Sparkle CLI supports connecting to remote subagents using the Agent-to-Agent (A2A)
+protocol. This allows Sparkle CLI to interact with other agents, expanding its
+capabilities by delegating tasks to remote services.
 
-Sparkle CLI can connect to any compliant A2A agent. You can find samples of A2A
-agents in the following repositories:
+Sparkle CLI can connect to any compliant A2A agent. You can find samples of A2A agents
+in the following repositories:
 
 - [ADK Samples (Python)](https://github.com/google/adk-samples/tree/main/python)
 - [ADK Python Contributing Samples](https://github.com/google/adk-python/tree/main/contributing/samples)
 
 ## Proxy support
 
-Sparkle CLI routes traffic to remote agents through an HTTP/HTTPS proxy if one
-is configured. It uses the `general.proxy` setting in your `settings.json` file
-or standard environment variables (`HTTP_PROXY`, `HTTPS_PROXY`).
+Sparkle CLI routes traffic to remote agents through an HTTP/HTTPS proxy if one is
+configured. It uses the `general.proxy` setting in your `settings.json` file or standard
+environment variables (`HTTP_PROXY`, `HTTPS_PROXY`).
 
 ```json
 {
@@ -26,8 +26,8 @@ or standard environment variables (`HTTP_PROXY`, `HTTPS_PROXY`).
 
 ## Defining remote subagents
 
-Remote subagents are defined as Markdown files (`.md`) with YAML frontmatter.
-You can place them in:
+Remote subagents are defined as Markdown files (`.md`) with YAML frontmatter. You can
+place them in:
 
 1.  **Project-level:** `.sparkle/agents/*.md` (Shared with your team)
 2.  **User-level:** `~/.sparkle/agents/*.md` (Personal agents)
@@ -54,8 +54,8 @@ agent_card_url: https://example.com/agent-card
 
 ### Multi-subagent example
 
-The loader explicitly supports multiple remote subagents defined in a single
-Markdown file.
+The loader explicitly supports multiple remote subagents defined in a single Markdown
+file.
 
 ```markdown
 ---
@@ -77,33 +77,33 @@ Markdown file.
 <details>
 <summary>View formatting options for JSON strings</summary>
 
-If you don't have an endpoint serving the agent card, you can provide the A2A
-card directly as a JSON string using `agent_card_json`.
+If you don't have an endpoint serving the agent card, you can provide the A2A card
+directly as a JSON string using `agent_card_json`.
 
-When providing a JSON string in YAML, you must properly format it as a string
-scalar. You can use single quotes, a block scalar, or double quotes (which
-require escaping internal double quotes).
+When providing a JSON string in YAML, you must properly format it as a string scalar.
+You can use single quotes, a block scalar, or double quotes (which require escaping
+internal double quotes).
 
 #### Using single quotes
 
-Single quotes allow you to embed unescaped double quotes inside the JSON string.
-This format is useful for shorter, single-line JSON strings.
+Single quotes allow you to embed unescaped double quotes inside the JSON string. This
+format is useful for shorter, single-line JSON strings.
 
 ```markdown
 ---
 kind: remote
 name: single-quotes-agent
 agent_card_json:
-  '{ "protocolVersion": "0.3.0", "name": "Example Agent", "version": "1.0.0",
-  "url": "dummy-url" }'
+  '{ "protocolVersion": "0.3.0", "name": "Example Agent", "version": "1.0.0", "url":
+  "dummy-url" }'
 ---
 ```
 
 #### Using a block scalar
 
-The literal block scalar (`|`) preserves line breaks and is highly recommended
-for multiline JSON strings as it avoids quote escaping entirely. The following
-is a complete, valid Agent Card configuration using dummy values.
+The literal block scalar (`|`) preserves line breaks and is highly recommended for
+multiline JSON strings as it avoids quote escaping entirely. The following is a
+complete, valid Agent Card configuration using dummy values.
 
 ```markdown
 ---
@@ -146,16 +146,16 @@ agent_card_json: |
 
 #### Using double quotes
 
-Double quotes are also supported, but any internal double quotes in your JSON
-must be escaped with a backslash.
+Double quotes are also supported, but any internal double quotes in your JSON must be
+escaped with a backslash.
 
 ```markdown
 ---
 kind: remote
 name: double-quotes-agent
 agent_card_json:
-  '{ "protocolVersion": "0.3.0", "name": "Example Agent", "version": "1.0.0",
-  "url": "dummy-url" }'
+  '{ "protocolVersion": "0.3.0", "name": "Example Agent", "version": "1.0.0", "url":
+  "dummy-url" }'
 ---
 ```
 
@@ -163,8 +163,8 @@ agent_card_json:
 
 ## Authentication
 
-Many remote agents require authentication. Sparkle CLI supports several
-authentication methods aligned with the
+Many remote agents require authentication. Sparkle CLI supports several authentication
+methods aligned with the
 [A2A security specification](https://a2a-protocol.org/latest/specification/#451-securityscheme).
 Add an `auth` block to your agent's frontmatter to configure credentials.
 
@@ -190,9 +190,8 @@ For `apiKey` and `http` auth types, secret values (`key`, `token`, `username`,
 | literal     | Use the string as-is.                               | `sk-abc123`        |
 | `$$` / `!!` | Escape prefix. `$$FOO` becomes the literal `$FOO`.  | `$$NOT_AN_ENV_VAR` |
 
-> **Security tip:** Prefer `$ENV_VAR` or `!command` over embedding secrets
-> directly in agent files, especially for project-level agents checked into
-> version control.
+> **Security tip:** Prefer `$ENV_VAR` or `!command` over embedding secrets directly in
+> agent files, especially for project-level agents checked into version control.
 
 ### API key (`apiKey`)
 
@@ -217,8 +216,8 @@ auth:
 
 ### HTTP authentication (`http`)
 
-Supports Bearer tokens, Basic auth, and arbitrary IANA-registered HTTP
-authentication schemes.
+Supports Bearer tokens, Basic auth, and arbitrary IANA-registered HTTP authentication
+schemes.
 
 #### Bearer token
 
@@ -258,8 +257,8 @@ auth:
 
 #### Raw scheme
 
-For any other IANA-registered scheme (for example, Digest, HOBA), provide the
-raw authorization value.
+For any other IANA-registered scheme (for example, Digest, HOBA), provide the raw
+authorization value.
 
 | Field    | Type   | Required | Description                                                                   |
 | :------- | :----- | :------- | :---------------------------------------------------------------------------- |
@@ -276,9 +275,9 @@ auth:
 
 ### OAuth 2.0 (`oauth`)
 
-Performs an interactive OAuth 2.0 Authorization Code flow with PKCE. On first
-use, Sparkle CLI opens your browser for sign-in and persists the resulting
-tokens for subsequent requests.
+Performs an interactive OAuth 2.0 Authorization Code flow with PKCE. On first use,
+Sparkle CLI opens your browser for sign-in and persists the resulting tokens for
+subsequent requests.
 
 | Field               | Type     | Required | Description                                                                                                                                        |
 | :------------------ | :------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -300,42 +299,39 @@ auth:
 ---
 ```
 
-If the agent card advertises an `oauth2` security scheme with
-`authorizationCode` flow, the `authorization_url`, `token_url`, and `scopes` are
-automatically discovered. You only need to provide `client_id` (and
-`client_secret` if required).
+If the agent card advertises an `oauth2` security scheme with `authorizationCode` flow,
+the `authorization_url`, `token_url`, and `scopes` are automatically discovered. You
+only need to provide `client_id` (and `client_secret` if required).
 
 Tokens are persisted to disk and refreshed automatically when they expire.
 
 ### Auth validation
 
-When Sparkle CLI loads a remote agent, it validates your auth configuration
-against the agent card's declared `securitySchemes`. If the agent requires
-authentication that you haven't configured, you'll see an error describing
-what's needed.
+When Sparkle CLI loads a remote agent, it validates your auth configuration against the
+agent card's declared `securitySchemes`. If the agent requires authentication that you
+haven't configured, you'll see an error describing what's needed.
 
 ### Auth retry behavior
 
-All auth providers automatically retry on `401` and `403` responses by
-re-fetching credentials (up to 2 retries). This handles cases like expired
-tokens or rotated credentials. For `apiKey` with `!command` values, the command
-is re-executed on retry to fetch a fresh key.
+All auth providers automatically retry on `401` and `403` responses by re-fetching
+credentials (up to 2 retries). This handles cases like expired tokens or rotated
+credentials. For `apiKey` with `!command` values, the command is re-executed on retry to
+fetch a fresh key.
 
 ### Agent card fetching and auth
 
-When connecting to a remote agent, Sparkle CLI first fetches the agent card
-**without** authentication. If the card endpoint returns a `401` or `403`, it
-retries the fetch **with** the configured auth headers. This lets agents have
-publicly accessible cards while protecting their task endpoints, or to protect
-both behind auth.
+When connecting to a remote agent, Sparkle CLI first fetches the agent card **without**
+authentication. If the card endpoint returns a `401` or `403`, it retries the fetch
+**with** the configured auth headers. This lets agents have publicly accessible cards
+while protecting their task endpoints, or to protect both behind auth.
 
 ## Managing Subagents
 
 Users can manage subagents using the following commands within Sparkle CLI:
 
 - `/agents list`: Displays all available local and remote subagents.
-- `/agents reload`: Reloads the agent registry. Use this after adding or
-  modifying agent definition files.
+- `/agents reload`: Reloads the agent registry. Use this after adding or modifying agent
+  definition files.
 - `/agents enable <agent_name>`: Enables a specific subagent.
 - `/agents disable <agent_name>`: Disables a specific subagent.
 
@@ -346,8 +342,8 @@ Users can manage subagents using the following commands within Sparkle CLI:
 
 ## Disabling remote agents
 
-Remote subagents are enabled by default. To disable them, set `enableAgents` to
-`false` in your `settings.json`:
+Remote subagents are enabled by default. To disable them, set `enableAgents` to `false`
+in your `settings.json`:
 
 ```json
 {

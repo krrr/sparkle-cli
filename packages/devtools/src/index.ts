@@ -8,18 +8,10 @@ import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { WebSocketServer, type WebSocket } from 'ws';
-import type {
-  NetworkLog,
-  ConsoleLogPayload,
-  InspectorConsoleLog,
-} from './types.js';
+import type { NetworkLog, ConsoleLogPayload, InspectorConsoleLog } from './types.js';
 import { INDEX_HTML, CLIENT_JS } from './_client-assets.js';
 
-export type {
-  NetworkLog,
-  ConsoleLogPayload,
-  InspectorConsoleLog,
-} from './types.js';
+export type { NetworkLog, ConsoleLogPayload, InspectorConsoleLog } from './types.js';
 
 interface IncomingNetworkPayload extends Partial<NetworkLog> {
   chunk?: {
@@ -355,10 +347,7 @@ export class DevTools extends EventEmitter {
     this.heartbeatTimer.unref();
   }
 
-  private handleWebSocketMessage(
-    sessionId: string,
-    message: Record<string, unknown>,
-  ) {
+  private handleWebSocketMessage(sessionId: string, message: Record<string, unknown>) {
     const session = this.sessions.get(sessionId);
     if (!session) return;
 

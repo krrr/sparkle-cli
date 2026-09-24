@@ -15,10 +15,7 @@ describe('ContextUsageDisplay', () => {
   beforeAll(() => {
     // The fake model ('gemini-9001-super-duper') has no definition, so pin a
     // small context window to keep percentage assertions simple.
-    vi.spyOn(
-      config.getModelConfigService(),
-      'getContextWindow',
-    ).mockReturnValue(10000);
+    vi.spyOn(config.getModelConfigService(), 'getContextWindow').mockReturnValue(10000);
   });
 
   it('renders correct percentage used', async () => {

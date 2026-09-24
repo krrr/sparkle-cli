@@ -6,11 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Config } from '../config/config.js';
-import {
-  initializeTelemetry,
-  shutdownTelemetry,
-  bufferTelemetryEvent,
-} from './sdk.js';
+import { initializeTelemetry, shutdownTelemetry, bufferTelemetryEvent } from './sdk.js';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 
 import * as os from 'node:os';

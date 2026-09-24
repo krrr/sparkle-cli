@@ -46,9 +46,7 @@ export function groupMatchesByFile(
  * Reads the content of a file and splits it into lines.
  * Returns null if the file cannot be read.
  */
-export async function readFileLines(
-  absolutePath: string,
-): Promise<string[] | null> {
+export async function readFileLines(absolutePath: string): Promise<string[] | null> {
   try {
     const content = await fsPromises.readFile(absolutePath, 'utf8');
     return content.split(/\r?\n/);
@@ -116,9 +114,7 @@ export async function enrichWithAutoContext(
               });
               seenLines.add(lineNum);
             } else if (lineNum === match.lineNumber) {
-              const existing = newFileMatches.find(
-                (m) => m.lineNumber === lineNum,
-              );
+              const existing = newFileMatches.find((m) => m.lineNumber === lineNum);
               if (existing) {
                 existing.isContext = false;
               }
@@ -213,8 +209,7 @@ export async function formatGrepResults(
       const graphemes = Array.from(lineContent);
       if (graphemes.length > MAX_LINE_LENGTH_TEXT_FILE) {
         lineContent =
-          graphemes.slice(0, MAX_LINE_LENGTH_TEXT_FILE).join('') +
-          '... [truncated]';
+          graphemes.slice(0, MAX_LINE_LENGTH_TEXT_FILE).join('') + '... [truncated]';
       }
       llmContent += `L${match.lineNumber}${separator} ${lineContent}\n`;
     });

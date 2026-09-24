@@ -70,8 +70,7 @@ const MOCK_CONTEXT_DEFAULT = {
 
 let MOCK_CONTEXT: McpContext = MOCK_CONTEXT_DEFAULT;
 
-const unwrap = (t: any) =>
-  t instanceof McpComplianceTransport ? t.transport : t;
+const unwrap = (t: any) => (t instanceof McpComplianceTransport ? t.transport : t);
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js');
 vi.mock('@modelcontextprotocol/sdk/client/index.js');
@@ -106,9 +105,7 @@ describe('mcp-client', () => {
     };
     // create a tmp dir for this test
     // Create a unique temporary directory for the workspace to avoid conflicts
-    testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-agent-test-'),
-    );
+    testWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-agent-test-'));
     workspaceContext = new WorkspaceContext(testWorkspace);
   });
 
@@ -191,9 +188,7 @@ describe('mcp-client', () => {
     });
 
     it('should not skip tools even if a parameter is missing a type', async () => {
-      const consoleWarnSpy = vi
-        .spyOn(console, 'warn')
-        .mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const mockedClient = {
         connect: vi.fn(),
         discover: vi.fn(),
@@ -1156,9 +1151,7 @@ describe('mcp-client', () => {
         method: 'notifications/prompts/list_changed',
       });
 
-      expect(promptRegistry.removePromptsByServer).toHaveBeenCalledWith(
-        'test-server',
-      );
+      expect(promptRegistry.removePromptsByServer).toHaveBeenCalledWith('test-server');
       expect(promptRegistry.registerPrompt).toHaveBeenLastCalledWith(
         expect.objectContaining({ name: 'two' }),
       );
@@ -1178,9 +1171,7 @@ describe('mcp-client', () => {
         registerCapabilities: vi.fn(),
         setRequestHandler: vi.fn(),
         setNotificationHandler: vi.fn(),
-        getServerCapabilities: vi
-          .fn()
-          .mockReturnValue({ tools: {}, prompts: {} }),
+        getServerCapabilities: vi.fn().mockReturnValue({ tools: {}, prompts: {} }),
         listPrompts: vi.fn().mockResolvedValue({
           prompts: [{ id: 'prompt1', text: 'a prompt' }],
         }),
@@ -1415,10 +1406,9 @@ describe('mcp-client', () => {
         } as unknown as ResourceRegistry,
       });
 
-      const toolUpdateCall =
-        mockedClient.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCall = mockedClient.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       expect(toolUpdateCall).toBeDefined();
     });
 
@@ -1486,10 +1476,9 @@ describe('mcp-client', () => {
       });
 
       // 2. Extract the callback passed to setNotificationHandler for tools
-      const toolUpdateCall =
-        mockedClient.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCall = mockedClient.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const notificationCallback = toolUpdateCall![1];
 
       // 3. Trigger the notification manually
@@ -1563,10 +1552,9 @@ describe('mcp-client', () => {
         resourceRegistry: {} as ResourceRegistry,
       });
 
-      const toolUpdateCall =
-        mockedClient.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCall = mockedClient.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const notificationCallback = toolUpdateCall![1];
 
       // Trigger notification - should fail internally but catch the error
@@ -1659,16 +1647,14 @@ describe('mcp-client', () => {
         resourceRegistry: {} as ResourceRegistry,
       });
 
-      const toolUpdateCallA =
-        mockClientA.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCallA = mockClientA.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const handlerA = toolUpdateCallA![1];
 
-      const toolUpdateCallB =
-        mockClientB.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCallB = mockClientB.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const handlerB = toolUpdateCallB![1];
 
       // Trigger burst updates simultaneously
@@ -1765,10 +1751,9 @@ describe('mcp-client', () => {
         } as unknown as ResourceRegistry,
       });
 
-      const toolUpdateCall =
-        mockedClient.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCall = mockedClient.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const notificationCallback = toolUpdateCall![1];
 
       const refreshPromise = notificationCallback();
@@ -1845,10 +1830,9 @@ describe('mcp-client', () => {
         } as unknown as ResourceRegistry,
       });
 
-      const toolUpdateCall =
-        mockedClient.setNotificationHandler.mock.calls.find(
-          (call) => call[0] === ToolListChangedNotificationSchema,
-        );
+      const toolUpdateCall = mockedClient.setNotificationHandler.mock.calls.find(
+        (call) => call[0] === ToolListChangedNotificationSchema,
+      );
       const notificationCallback = toolUpdateCall![1];
 
       vi.useFakeTimers();
@@ -2174,10 +2158,7 @@ describe('mcp-client', () => {
 
           const wrappedFetch = (
             unwrap(transport) as unknown as {
-              _fetch: (
-                url: URL | string,
-                init?: RequestInit,
-              ) => Promise<Response>;
+              _fetch: (url: URL | string, init?: RequestInit) => Promise<Response>;
             }
           )._fetch;
 
@@ -2605,9 +2586,7 @@ describe('mcp-client', () => {
     it('should return false if the function declaration has no name', () => {
       const namelessFuncDecl = {};
       const mcpServerConfig = {};
-      expect(isEnabled(namelessFuncDecl, serverName, mcpServerConfig)).toBe(
-        false,
-      );
+      expect(isEnabled(namelessFuncDecl, serverName, mcpServerConfig)).toBe(false);
     });
   });
 
@@ -2660,9 +2639,7 @@ describe('connectToMcpServer with OAuth', () => {
     } as unknown as ClientLib.Client;
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
-    testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-agent-test-'),
-    );
+    testWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-agent-test-'));
     workspaceContext = new WorkspaceContext(testWorkspace);
 
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -2695,10 +2672,7 @@ describe('connectToMcpServer with OAuth', () => {
     const wwwAuthHeader = `Bearer realm="test", resource_metadata="http://test-server.com/.well-known/oauth-protected-resource"`;
 
     vi.mocked(mockedClient.connect).mockRejectedValueOnce(
-      new StreamableHTTPError(
-        401,
-        `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`,
-      ),
+      new StreamableHTTPError(401, `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`),
     );
 
     vi.mocked(OAuthUtils.discoverOAuthConfig).mockResolvedValue({
@@ -2709,12 +2683,10 @@ describe('connectToMcpServer with OAuth', () => {
 
     // We need this to be typed to dig into its private state.
     let capturedTransport: TestableTransport | undefined;
-    vi.mocked(mockedClient.connect).mockImplementationOnce(
-      async (transport) => {
-        capturedTransport = unwrap(transport) as unknown as TestableTransport;
-        return Promise.resolve();
-      },
-    );
+    vi.mocked(mockedClient.connect).mockImplementationOnce(async (transport) => {
+      capturedTransport = unwrap(transport) as unknown as TestableTransport;
+      return Promise.resolve();
+    });
 
     const client = await connectToMcpServer(
       '0.0.1',
@@ -2729,8 +2701,8 @@ describe('connectToMcpServer with OAuth', () => {
     expect(mockedClient.connect).toHaveBeenCalledTimes(2);
     expect(mockAuthProvider.authenticate).toHaveBeenCalledOnce();
 
-    const authHeader = (unwrap(capturedTransport) as TestableTransport)
-      ._requestInit?.headers?.['Authorization'];
+    const authHeader = (unwrap(capturedTransport) as TestableTransport)._requestInit
+      ?.headers?.['Authorization'];
     expect(authHeader).toBe('Bearer test-access-token');
   });
 
@@ -2754,12 +2726,10 @@ describe('connectToMcpServer with OAuth', () => {
 
     // We need this to be typed to dig into its private state.
     let capturedTransport: TestableTransport | undefined;
-    vi.mocked(mockedClient.connect).mockImplementationOnce(
-      async (transport) => {
-        capturedTransport = unwrap(transport) as unknown as TestableTransport;
-        return Promise.resolve();
-      },
-    );
+    vi.mocked(mockedClient.connect).mockImplementationOnce(async (transport) => {
+      capturedTransport = unwrap(transport) as unknown as TestableTransport;
+      return Promise.resolve();
+    });
 
     const client = await connectToMcpServer(
       '0.0.1',
@@ -2775,8 +2745,8 @@ describe('connectToMcpServer with OAuth', () => {
     expect(mockAuthProvider.authenticate).toHaveBeenCalledOnce();
     expect(OAuthUtils.discoverOAuthConfig).toHaveBeenCalledWith(serverUrl);
 
-    const authHeader = (unwrap(capturedTransport) as TestableTransport)
-      ._requestInit?.headers?.['Authorization'];
+    const authHeader = (unwrap(capturedTransport) as TestableTransport)._requestInit
+      ?.headers?.['Authorization'];
     expect(authHeader).toBe('Bearer test-access-token-from-discovery');
   });
 
@@ -2787,10 +2757,7 @@ describe('connectToMcpServer with OAuth', () => {
     const wwwAuthHeader = `Bearer realm="test", resource_metadata="http://test-server.com/.well-known/oauth-protected-resource"`;
 
     vi.mocked(mockedClient.connect).mockRejectedValueOnce(
-      new StreamableHTTPError(
-        401,
-        `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`,
-      ),
+      new StreamableHTTPError(401, `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`),
     );
 
     vi.mocked(OAuthUtils.discoverOAuthFromWWWAuthenticate).mockResolvedValue({
@@ -2827,15 +2794,10 @@ describe('connectToMcpServer with OAuth', () => {
     const wwwAuthHeader = `Bearer realm="test"`;
 
     vi.mocked(mockedClient.connect).mockRejectedValueOnce(
-      new StreamableHTTPError(
-        401,
-        `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`,
-      ),
+      new StreamableHTTPError(401, `Unauthorized\nwww-authenticate: ${wwwAuthHeader}`),
     );
 
-    vi.mocked(OAuthUtils.discoverOAuthFromWWWAuthenticate).mockResolvedValue(
-      null,
-    );
+    vi.mocked(OAuthUtils.discoverOAuthFromWWWAuthenticate).mockResolvedValue(null);
     vi.mocked(OAuthUtils.extractBaseUrl).mockReturnValue(baseUrl);
     vi.mocked(OAuthUtils.discoverOAuthConfig).mockResolvedValue({
       authorizationUrl: authUrl,
@@ -2881,9 +2843,7 @@ describe('connectToMcpServer - HTTP→SSE fallback', () => {
     } as unknown as ClientLib.Client;
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
-    testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-agent-test-'),
-    );
+    testWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-agent-test-'));
     workspaceContext = new WorkspaceContext(testWorkspace);
 
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -3016,9 +2976,7 @@ describe('connectToMcpServer - OAuth with transport fallback', () => {
     } as unknown as ClientLib.Client;
     vi.mocked(ClientLib.Client).mockImplementation(() => mockedClient);
 
-    testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-agent-test-'),
-    );
+    testWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-agent-test-'));
     workspaceContext = new WorkspaceContext(testWorkspace);
 
     vi.spyOn(console, 'log').mockImplementation(() => {});

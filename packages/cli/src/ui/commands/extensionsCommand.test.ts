@@ -220,8 +220,7 @@ describe('extensionsCommand', () => {
         expected: ['--all'],
       },
       {
-        description:
-          'should return both extension names and --all when both match',
+        description: 'should return both extension names and --all when both match',
         partialArg: 'all',
         expected: ['--all', 'all-ext'],
       },
@@ -436,8 +435,7 @@ describe('extensionsCommand', () => {
     }
 
     it('should return ExtensionRegistryView custom dialog when experimental.extensionRegistry is true', async () => {
-      mockContext.services.settings.merged.experimental.extensionRegistry =
-        true;
+      mockContext.services.settings.merged.experimental.extensionRegistry = true;
 
       const result = await exploreAction(mockContext, '');
 
@@ -446,23 +444,20 @@ describe('extensionsCommand', () => {
         throw new Error('Expected custom_dialog');
       }
 
-      const component =
-        result.component as ReactElement<ExtensionRegistryViewProps>;
+      const component = result.component as ReactElement<ExtensionRegistryViewProps>;
       expect(component.type).toBe(ExtensionRegistryView);
       expect(component.props.extensionManager).toBe(mockExtensionLoader);
     });
 
     it('should handle onSelect and onClose in ExtensionRegistryView', async () => {
-      mockContext.services.settings.merged.experimental.extensionRegistry =
-        true;
+      mockContext.services.settings.merged.experimental.extensionRegistry = true;
 
       const result = await exploreAction(mockContext, '');
       if (result?.type !== 'custom_dialog') {
         throw new Error('Expected custom_dialog');
       }
 
-      const component =
-        result.component as ReactElement<ExtensionRegistryViewProps>;
+      const component = result.component as ReactElement<ExtensionRegistryViewProps>;
 
       const extension = {
         extensionName: 'test-ext',
@@ -996,9 +991,7 @@ describe('extensionsCommand', () => {
     });
 
     it('handles errors during skill or agent reload', async () => {
-      const mockExtensions = [
-        { name: 'ext1', isActive: true },
-      ] as GeminiCLIExtension[];
+      const mockExtensions = [{ name: 'ext1', isActive: true }] as GeminiCLIExtension[];
       mockGetExtensions.mockReturnValue(mockExtensions);
       mockReloadSkills.mockRejectedValue(new Error('Failed to reload skills'));
 
@@ -1059,9 +1052,7 @@ describe('extensionsCommand', () => {
     });
 
     it('handles errors during extension reload', async () => {
-      const mockExtensions = [
-        { name: 'ext1', isActive: true },
-      ] as GeminiCLIExtension[];
+      const mockExtensions = [{ name: 'ext1', isActive: true }] as GeminiCLIExtension[];
       mockGetExtensions.mockReturnValue(mockExtensions);
       mockRestartExtension.mockRejectedValue(new Error('Failed to restart'));
 
@@ -1077,9 +1068,7 @@ describe('extensionsCommand', () => {
     });
 
     it('shows a warning if an extension is not found', async () => {
-      const mockExtensions = [
-        { name: 'ext1', isActive: true },
-      ] as GeminiCLIExtension[];
+      const mockExtensions = [{ name: 'ext1', isActive: true }] as GeminiCLIExtension[];
       mockGetExtensions.mockReturnValue(mockExtensions);
 
       await restartAction!(mockContext, 'ext1 ext2');
@@ -1095,9 +1084,7 @@ describe('extensionsCommand', () => {
     });
 
     it('does not reload any extensions if none are found', async () => {
-      const mockExtensions = [
-        { name: 'ext1', isActive: true },
-      ] as GeminiCLIExtension[];
+      const mockExtensions = [{ name: 'ext1', isActive: true }] as GeminiCLIExtension[];
       mockGetExtensions.mockReturnValue(mockExtensions);
 
       await restartAction!(mockContext, 'ext2 ext3');

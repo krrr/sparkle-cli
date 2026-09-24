@@ -333,12 +333,8 @@ export class FileCommandLoader implements ICommandLoader {
 
     const processors: IPromptProcessor[] = [];
     const usesArgs = validDef.prompt.includes(SHORTHAND_ARGS_PLACEHOLDER);
-    const usesShellInjection = validDef.prompt.includes(
-      SHELL_INJECTION_TRIGGER,
-    );
-    const usesAtFileInjection = validDef.prompt.includes(
-      AT_FILE_INJECTION_TRIGGER,
-    );
+    const usesShellInjection = validDef.prompt.includes(SHELL_INJECTION_TRIGGER);
+    const usesAtFileInjection = validDef.prompt.includes(AT_FILE_INJECTION_TRIGGER);
 
     // 1. @-File Injection (Security First).
     // This runs first to ensure we're not executing shell commands that
@@ -381,14 +377,9 @@ export class FileCommandLoader implements ICommandLoader {
         }
 
         try {
-          let processedContent: PromptPipelineContent = [
-            { text: validDef.prompt },
-          ];
+          let processedContent: PromptPipelineContent = [{ text: validDef.prompt }];
           for (const processor of processors) {
-            processedContent = await processor.process(
-              processedContent,
-              context,
-            );
+            processedContent = await processor.process(processedContent, context);
           }
 
           return {

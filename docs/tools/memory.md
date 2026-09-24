@@ -1,22 +1,22 @@
 # Memory files
 
-Sparkle CLI persists durable facts, user preferences, and project details by
-editing Markdown memory files directly.
+Sparkle CLI persists durable facts, user preferences, and project details by editing
+Markdown memory files directly.
 
 ## Technical reference
 
-The agent routes memories to the appropriate Markdown file: shared project
-instructions go in repository `AGENTS.md` files, private project notes go in the
-per-project private memory folder, and cross-project personal preferences go in
-the global `~/.sparkle/AGENTS.md` file.
+The agent routes memories to the appropriate Markdown file: shared project instructions
+go in repository `AGENTS.md` files, private project notes go in the per-project private
+memory folder, and cross-project personal preferences go in the global
+`~/.sparkle/AGENTS.md` file.
 
 ## Technical behavior
 
 - **Storage:** Edits Markdown files with `write_file` or `replace`.
-- **Loading:** The stored facts are automatically included in the hierarchical
-  context system for all future sessions.
-- **Format:** Keeps durable instructions concise and avoids duplicating the same
-  fact across multiple memory tiers.
+- **Loading:** The stored facts are automatically included in the hierarchical context
+  system for all future sessions.
+- **Format:** Keeps durable instructions concise and avoids duplicating the same fact
+  across multiple memory tiers.
 
 ## Use cases
 
@@ -26,7 +26,7 @@ the global `~/.sparkle/AGENTS.md` file.
 
 ## Next steps
 
-- Follow the [Memory management guide](../cli/tutorials/memory-management.md)
-  for practical examples.
-- Learn how the [Project context (AGENTS.md)](../cli/gemini-md.md) system loads
-  this information.
+- Follow the [Memory management guide](../cli/tutorials/memory-management.md) for
+  practical examples.
+- Learn how the [Project context (AGENTS.md)](../cli/gemini-md.md) system loads this
+  information.

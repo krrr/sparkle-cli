@@ -128,9 +128,7 @@ export class BaseLlmClient {
     private readonly authType?: ProviderType,
   ) {}
 
-  async generateJson(
-    options: GenerateJsonOptions,
-  ): Promise<Record<string, unknown>> {
+  async generateJson(options: GenerateJsonOptions): Promise<Record<string, unknown>> {
     const {
       schema,
       modelConfigKey,
@@ -142,8 +140,7 @@ export class BaseLlmClient {
       maxAttempts,
     } = options;
 
-    const { model } =
-      this.config.modelConfigService.getResolvedConfig(modelConfigKey);
+    const { model } = this.config.modelConfigService.getResolvedConfig(modelConfigKey);
 
     const shouldRetryOnContent = (response: GenerateContentResponse) => {
       const text = getResponseText(response)?.trim();
@@ -228,32 +225,24 @@ export class BaseLlmClient {
     const prefix = '```json';
     const suffix = '```';
     if (text.startsWith(prefix) && text.endsWith(suffix)) {
-      logMalformedJsonResponse(
-        this.config,
-        new MalformedJsonResponseEvent(model),
-      );
+      logMalformedJsonResponse(this.config, new MalformedJsonResponseEvent(model));
       return text.substring(prefix.length, text.length - suffix.length).trim();
     }
     return text;
   }
 
-  async countTokens(
-    options: CountTokenOptions,
-  ): Promise<{ totalTokens: number }> {
+  async countTokens(options: CountTokenOptions): Promise<{ totalTokens: number }> {
     const activeModel = this.config.getActiveModel();
     const model = options.modelConfigKey
       ? this.config.modelConfigService.resolveModelId(
-          this.config.modelConfigService.getResolvedConfig(
-            options.modelConfigKey,
-          ).model,
+          this.config.modelConfigService.getResolvedConfig(options.modelConfigKey)
+            .model,
         )
       : activeModel;
     const result = await this.contentGenerator.countTokens({
       model,
       contents: options.contents,
-      config: options.abortSignal
-        ? { abortSignal: options.abortSignal }
-        : undefined,
+      config: options.abortSignal ? { abortSignal: options.abortSignal } : undefined,
     });
     return { totalTokens: result.totalTokens || 0 };
   }
@@ -351,24 +340,18 @@ export class BaseLlmClient {
           config: finalConfig,
           contents,
         };
-        return this.contentGenerator.generateContent(
-          requestParams,
-          promptId,
-          role,
-        );
+        return this.contentGenerator.generateContent(requestParams, promptId, role);
       };
 
       return await retryWithBackoff(apiCall, {
         shouldRetryOnContent,
-        maxAttempts:
-          availabilityMaxAttempts ?? maxAttempts ?? DEFAULT_MAX_ATTEMPTS,
+        maxAttempts: availabilityMaxAttempts ?? maxAttempts ?? DEFAULT_MAX_ATTEMPTS,
         getAvailabilityContext,
         onPersistent429: this.config.isInteractive()
           ? (authType, error) =>
               handleFallback(this.config, currentModel, authType, error)
           : undefined,
-        authType:
-          this.authType ?? this.config.getContentGeneratorConfig()?.authType,
+        authType: this.authType ?? this.config.getContentGeneratorConfig()?.authType,
         retryFetchErrors: this.config.getRetryFetchErrors(),
         onRetry: (attempt, error, delayMs) => {
           const actualMaxAttempts =

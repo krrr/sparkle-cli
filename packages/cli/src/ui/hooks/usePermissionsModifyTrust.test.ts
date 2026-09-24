@@ -4,22 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { usePermissionsModifyTrust } from './usePermissionsModifyTrust.js';
-import {
-  TrustLevel,
-  type LoadedTrustedFolders,
-} from '../../config/trustedFolders.js';
+import { TrustLevel, type LoadedTrustedFolders } from '../../config/trustedFolders.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { coreEvents } from 'sparkle-cli-core';
 
@@ -188,10 +177,7 @@ describe('usePermissionsModifyTrust', () => {
       });
 
       expect(result.current.needsRestart).toBe(false);
-      expect(mockSetValue).toHaveBeenCalledWith(
-        '/test/dir',
-        TrustLevel.TRUST_PARENT,
-      );
+      expect(mockSetValue).toHaveBeenCalledWith('/test/dir', TrustLevel.TRUST_PARENT);
       expect(mockOnExit).toHaveBeenCalled();
     });
 
@@ -220,10 +206,7 @@ describe('usePermissionsModifyTrust', () => {
         await result.current.commitTrustLevelChange();
       });
 
-      expect(mockSetValue).toHaveBeenCalledWith(
-        '/test/dir',
-        TrustLevel.TRUST_FOLDER,
-      );
+      expect(mockSetValue).toHaveBeenCalledWith('/test/dir', TrustLevel.TRUST_FOLDER);
     });
 
     it('should add warning when setting DO_NOT_TRUST but still trusted by parent', async () => {

@@ -7,13 +7,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import {
-  mkdirSync,
-  rmSync,
-  readFileSync,
-  existsSync,
-  lstatSync,
-} from 'node:fs';
+import { mkdirSync, rmSync, readFileSync, existsSync, lstatSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -67,9 +61,7 @@ const pythonVenvPythonPath = join(
 
 const isWindows = process.platform === 'win32';
 
-const actionlintCheck = isWindows
-  ? `where actionlint 2>nul`
-  : 'command -v actionlint';
+const actionlintCheck = isWindows ? `where actionlint 2>nul` : 'command -v actionlint';
 
 const actionlintInstaller = isWindows
   ? `powershell -Command "` +
@@ -83,9 +75,7 @@ const actionlintInstaller = isWindows
       tar -xzf "${TEMP_DIR}/.actionlint.tgz" -C "${TEMP_DIR}/actionlint"
     `;
 
-const shellcheckCheck = isWindows
-  ? `where shellcheck 2>nul`
-  : 'command -v shellcheck';
+const shellcheckCheck = isWindows ? `where shellcheck 2>nul` : 'command -v shellcheck';
 
 const shellcheckInstaller = isWindows
   ? `powershell -Command "` +
@@ -194,9 +184,7 @@ export function setupLinters() {
     if (!runCommand(check, 'ignore')) {
       console.log(`Installing ${linter}...`);
       if (!runCommand(installer)) {
-        console.error(
-          `Failed to install ${linter}. Please install it manually.`,
-        );
+        console.error(`Failed to install ${linter}. Please install it manually.`);
         process.exit(1);
       }
     }
@@ -326,9 +314,8 @@ export function runSensitiveKeywordLinter() {
 }
 
 function stripJSONComments(json) {
-  return json.replace(
-    /\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g,
-    (m, g) => (g ? '' : m),
+  return json.replace(/\\"|"(?:\\"|[^"])*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) =>
+    g ? '' : m,
   );
 }
 

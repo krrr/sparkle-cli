@@ -53,9 +53,7 @@ export async function getCommandName(req: SandboxRequest): Promise<string> {
   await initializeShellParsers();
   const fullCmd = [req.command, ...req.args].join(' ');
   const stripped = stripShellWrapper(fullCmd);
-  const roots = getCommandRoots(stripped).filter(
-    (r) => r !== 'shopt' && r !== 'set',
-  );
+  const roots = getCommandRoots(stripped).filter((r) => r !== 'shopt' && r !== 'set');
   if (roots.length > 0) {
     return roots[0];
   }

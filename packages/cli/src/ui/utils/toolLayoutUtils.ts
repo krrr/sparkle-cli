@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  ACTIVE_SHELL_MAX_LINES,
-  COMPLETED_SHELL_MAX_LINES,
-} from '../constants.js';
+import { ACTIVE_SHELL_MAX_LINES, COMPLETED_SHELL_MAX_LINES } from '../constants.js';
 import { CoreToolCallStatus } from 'sparkle-cli-core';
 
 /**

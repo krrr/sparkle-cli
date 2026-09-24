@@ -26,9 +26,7 @@ export const MemoryUsageDisplay: React.FC<{
     const updateMemory = () => {
       const usage = process.memoryUsage().rss;
       setMemoryUsage(formatBytes(usage));
-      setMemoryUsageColor(
-        usage >= 2 * 1024 * 1024 * 1024 ? theme.status.error : color,
-      );
+      setMemoryUsageColor(usage >= 2 * 1024 * 1024 * 1024 ? theme.status.error : color);
     };
 
     const intervalId = setInterval(updateMemory, 2000);

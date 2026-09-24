@@ -29,10 +29,7 @@ import { Environment } from '@google/genai';
 import type { MessageBus } from '../../confirmation-bus/message-bus.js';
 import type { BrowserManager } from './browserManager.js';
 import type { Config } from '../../config/config.js';
-import {
-  getVisualAgentModel,
-  isComputerUseModel,
-} from './modelAvailability.js';
+import { getVisualAgentModel, isComputerUseModel } from './modelAvailability.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { LlmRole } from '../../telemetry/llmRole.js';
 

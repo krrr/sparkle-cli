@@ -50,11 +50,7 @@ export class ApprovalModeStrategy implements RoutingStrategy {
 
     // 1. Planning Phase: If ApprovalMode === PLAN, explicitly route to the Pro model.
     if (approvalMode === ApprovalMode.PLAN) {
-      const proModel = resolveClassifierModel(
-        model,
-        SPARKLE_MODEL_ALIAS_PRO,
-        config,
-      );
+      const proModel = resolveClassifierModel(model, SPARKLE_MODEL_ALIAS_PRO, config);
       return {
         model: proModel,
         metadata: {

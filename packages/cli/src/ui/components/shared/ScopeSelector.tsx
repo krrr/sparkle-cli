@@ -32,9 +32,7 @@ export function ScopeSelector({
     key: item.value,
   }));
 
-  const initialIndex = scopeItems.findIndex(
-    (item) => item.value === initialScope,
-  );
+  const initialIndex = scopeItems.findIndex((item) => item.value === initialScope);
   const safeInitialIndex = initialIndex >= 0 ? initialIndex : 0;
 
   return (

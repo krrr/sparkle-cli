@@ -10,11 +10,7 @@ import { SessionSummaryDisplay } from './SessionSummaryDisplay.js';
 import * as SessionContext from '../contexts/SessionContext.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { type SessionMetrics } from '../contexts/SessionContext.js';
-import {
-  ToolCallDecision,
-  isWindows,
-  type WorktreeSettings,
-} from 'sparkle-cli-core';
+import { ToolCallDecision, isWindows, type WorktreeSettings } from 'sparkle-cli-core';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
@@ -25,8 +21,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 vi.mock('../contexts/SessionContext.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../contexts/SessionContext.js')>();
+  const actual = await importOriginal<typeof import('../contexts/SessionContext.js')>();
   return {
     ...actual,
     useSessionStats: vi.fn(),
@@ -34,8 +29,7 @@ vi.mock('../contexts/SessionContext.js', async (importOriginal) => {
 });
 
 vi.mock('../contexts/ConfigContext.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../contexts/ConfigContext.js')>();
+  const actual = await importOriginal<typeof import('../contexts/ConfigContext.js')>();
   return {
     ...actual,
     useConfig: vi.fn(),
@@ -210,9 +204,7 @@ describe('<SessionSummaryDisplay />', () => {
       const output = lastFrame();
 
       expect(output).toContain('To resume work in this worktree:');
-      expect(output).toContain(
-        'cd /path/to/foo-bar && sparkle --resume test-session',
-      );
+      expect(output).toContain('cd /path/to/foo-bar && sparkle --resume test-session');
       expect(output).toContain(
         'To remove manually: git worktree remove /path/to/foo-bar',
       );

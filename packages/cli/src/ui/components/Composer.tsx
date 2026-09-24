@@ -45,8 +45,7 @@ export const Composer = ({ isFocused = true }: { isFocused?: boolean }) => {
   const isAlternateBuffer = useAlternateBuffer();
   const showUiDetails = uiState.cleanUiDetailsVisible;
   const suggestionsPosition = isAlternateBuffer ? 'above' : 'below';
-  const hideContextSummary =
-    suggestionsVisible && suggestionsPosition === 'above';
+  const hideContextSummary = suggestionsVisible && suggestionsPosition === 'above';
 
   const { hasPendingActionRequired, shouldCollapseDuringApproval } =
     useComposerStatus();
@@ -97,13 +96,9 @@ export const Composer = ({ isFocused = true }: { isFocused?: boolean }) => {
       flexGrow={0}
       flexShrink={0}
     >
-      {uiState.isResuming && (
-        <ConfigInitDisplay message="Resuming session..." />
-      )}
+      {uiState.isResuming && <ConfigInitDisplay message="Resuming session..." />}
 
-      {showUiDetails && (
-        <QueuedMessageDisplay messageQueue={uiState.messageQueue} />
-      )}
+      {showUiDetails && <QueuedMessageDisplay messageQueue={uiState.messageQueue} />}
 
       {showUiDetails && <TodoTray />}
 
@@ -130,9 +125,7 @@ export const Composer = ({ isFocused = true }: { isFocused?: boolean }) => {
         <OverflowProvider>
           <Box flexDirection="column">
             <DetailedMessagesDisplay
-              maxHeight={
-                uiState.constrainHeight ? debugConsoleMaxHeight : undefined
-              }
+              maxHeight={uiState.constrainHeight ? debugConsoleMaxHeight : undefined}
               width={uiState.terminalWidth}
               hasFocus={uiState.showErrorDetails}
             />
@@ -175,9 +168,9 @@ export const Composer = ({ isFocused = true }: { isFocused?: boolean }) => {
         />
       )}
 
-      {showUiDetails &&
-        !settings.merged.ui.hideFooter &&
-        !isScreenReaderEnabled && <Footer />}
+      {showUiDetails && !settings.merged.ui.hideFooter && !isScreenReaderEnabled && (
+        <Footer />
+      )}
     </Box>
   );
 };

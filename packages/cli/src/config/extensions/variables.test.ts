@@ -130,15 +130,11 @@ describe('recursivelyHydrateStrings', () => {
     const result = recursivelyHydrateStrings(payload, context);
 
     expect(result.polluted).toBeUndefined();
-    expect(Object.prototype.hasOwnProperty.call(result, 'polluted')).toBe(
-      false,
-    );
+    expect(Object.prototype.hasOwnProperty.call(result, 'polluted')).toBe(false);
   });
 
   it('should not allow prototype pollution via constructor', () => {
-    const payload = JSON.parse(
-      '{"constructor": {"prototype": {"polluted": "yes"}}}',
-    );
+    const payload = JSON.parse('{"constructor": {"prototype": {"polluted": "yes"}}}');
     const result = recursivelyHydrateStrings(payload, context);
 
     expect(result.polluted).toBeUndefined();

@@ -15,10 +15,7 @@ import { MessageType, type HistoryItem } from '../types.js';
 
 async function finishAddingDirectories(
   config: Config,
-  addItem: (
-    itemData: Omit<HistoryItem, 'id'>,
-    baseTimestamp?: number,
-  ) => number,
+  addItem: (itemData: Omit<HistoryItem, 'id'>, baseTimestamp?: number) => number,
   added: string[],
   errors: string[],
 ) {
@@ -125,10 +122,7 @@ export function useIncludeDirsTrust(
     }
 
     if (undefinedTrustDirs.length > 0) {
-      debugLogger.log(
-        'Creating custom dialog with undecidedDirs:',
-        undefinedTrustDirs,
-      );
+      debugLogger.log('Creating custom dialog with undecidedDirs:', undefinedTrustDirs);
       setCustomDialog(
         <MultiFolderTrustDialog
           folders={undefinedTrustDirs}

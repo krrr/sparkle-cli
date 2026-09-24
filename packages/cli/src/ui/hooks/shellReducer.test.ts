@@ -11,17 +11,12 @@ import {
   type ShellState,
   type ShellAction,
 } from './shellReducer.js';
-import {
-  MAX_SHELL_OUTPUT_SIZE,
-  SHELL_OUTPUT_TRUNCATION_BUFFER,
-} from '../constants.js';
+import { MAX_SHELL_OUTPUT_SIZE, SHELL_OUTPUT_TRUNCATION_BUFFER } from '../constants.js';
 
 describe('shellReducer', () => {
   it('should return the initial state', () => {
     // @ts-expect-error - testing default case
-    expect(shellReducer(initialState, { type: 'UNKNOWN' })).toEqual(
-      initialState,
-    );
+    expect(shellReducer(initialState, { type: 'UNKNOWN' })).toEqual(initialState);
   });
 
   it('should handle SET_ACTIVE_PTY', () => {
@@ -344,8 +339,7 @@ describe('shellReducer', () => {
     const emoji = '\uD83D\uDE00'; // 😀 — 2 UTF-16 code units
     // Fill up to just below the trigger threshold with 'a', then append an emoji
     // whose low surrogate lands exactly on the boundary so the slice splits it.
-    const baseLength =
-      MAX_SHELL_OUTPUT_SIZE + SHELL_OUTPUT_TRUNCATION_BUFFER - 1;
+    const baseLength = MAX_SHELL_OUTPUT_SIZE + SHELL_OUTPUT_TRUNCATION_BUFFER - 1;
     const existingOutput = 'a'.repeat(baseLength);
     // chunk = emoji + padding so combinedLength exceeds the threshold
     const chunk = emoji + 'z';

@@ -13,10 +13,7 @@ import { act } from 'react';
 import { waitFor } from '../../../test-utils/async.js';
 
 vi.mock('../../hooks/useAnimatedScrollbar.js', () => ({
-  useAnimatedScrollbar: (
-    hasFocus: boolean,
-    scrollBy: (delta: number) => void,
-  ) => ({
+  useAnimatedScrollbar: (hasFocus: boolean, scrollBy: (delta: number) => void) => ({
     scrollbarColor: 'white',
     flashScrollbar: vi.fn(),
     scrollByWithAnimation: scrollBy,
@@ -176,12 +173,7 @@ describe('<Scrollable />', () => {
       },
     ])(
       '$name',
-      async ({
-        initialScrollTop,
-        scrollHeight,
-        keySequence,
-        expectedScrollTop,
-      }) => {
+      async ({ initialScrollTop, scrollHeight, keySequence, expectedScrollTop }) => {
         let capturedEntry: ScrollProviderModule.ScrollableEntry | undefined;
         vi.spyOn(ScrollProviderModule, 'useScrollable').mockImplementation(
           async (entry, isActive) => {
@@ -207,18 +199,14 @@ describe('<Scrollable />', () => {
             capturedEntry!.scrollBy(initialScrollTop);
           }
         });
-        expect(capturedEntry!.getScrollState().scrollTop).toBe(
-          initialScrollTop,
-        );
+        expect(capturedEntry!.getScrollState().scrollTop).toBe(initialScrollTop);
 
         await act(async () => {
           stdin.write(keySequence);
         });
         await waitUntilReady();
 
-        expect(capturedEntry!.getScrollState().scrollTop).toBe(
-          expectedScrollTop,
-        );
+        expect(capturedEntry!.getScrollState().scrollTop).toBe(expectedScrollTop);
         unmount();
       },
     );

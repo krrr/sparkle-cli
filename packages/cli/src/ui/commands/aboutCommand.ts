@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CommandKind,
-  type CommandContext,
-  type SlashCommand,
-} from './types.js';
+import { CommandKind, type CommandContext, type SlashCommand } from './types.js';
 import process from 'node:process';
 import { MessageType, type HistoryItemAbout } from '../types.js';
 import { IdeClient, getVersion } from 'sparkle-cli-core';
@@ -26,8 +22,7 @@ export const aboutCommand: SlashCommand = {
     if (process.env['SANDBOX']) {
       sandboxEnv = process.env['SANDBOX'];
     }
-    const modelVersion =
-      context.services.agentContext?.config.getModel() || 'Unknown';
+    const modelVersion = context.services.agentContext?.config.getModel() || 'Unknown';
     const cliVersion = await getVersion();
     const profileService =
       context.services.agentContext?.config.getProviderProfileService();

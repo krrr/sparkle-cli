@@ -23,10 +23,9 @@ export class CheckerRegistry {
 
   private static getBuiltInInProcessCheckers(): Map<string, InProcessChecker> {
     if (!CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS) {
-      CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS = new Map<
-        string,
-        InProcessChecker
-      >([[InProcessCheckerType.ALLOWED_PATH, new AllowedPathChecker()]]);
+      CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS = new Map<string, InProcessChecker>([
+        [InProcessCheckerType.ALLOWED_PATH, new AllowedPathChecker()],
+      ]);
     }
     return CheckerRegistry.BUILT_IN_IN_PROCESS_CHECKERS;
   }

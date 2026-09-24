@@ -12,24 +12,21 @@ export function createMockDebugLogger(options: { stripAnsi?: boolean } = {}) {
   const emitConsoleLog = vi.fn();
   const debugLogger = {
     log: vi.fn((message: unknown, ...args: unknown[]) => {
-      let formatted =
-        typeof message === 'string' ? format(message, ...args) : message;
+      let formatted = typeof message === 'string' ? format(message, ...args) : message;
       if (options.stripAnsi && typeof formatted === 'string') {
         formatted = stripAnsi(formatted);
       }
       emitConsoleLog('log', formatted);
     }),
     error: vi.fn((message: unknown, ...args: unknown[]) => {
-      let formatted =
-        typeof message === 'string' ? format(message, ...args) : message;
+      let formatted = typeof message === 'string' ? format(message, ...args) : message;
       if (options.stripAnsi && typeof formatted === 'string') {
         formatted = stripAnsi(formatted);
       }
       emitConsoleLog('error', formatted);
     }),
     warn: vi.fn((message: unknown, ...args: unknown[]) => {
-      let formatted =
-        typeof message === 'string' ? format(message, ...args) : message;
+      let formatted = typeof message === 'string' ? format(message, ...args) : message;
       if (options.stripAnsi && typeof formatted === 'string') {
         formatted = stripAnsi(formatted);
       }
@@ -66,8 +63,7 @@ export function mockCoreDebugLogger<T extends Record<string, unknown>>(
     ...actual,
     coreEvents: {
       // eslint-disable-next-line no-restricted-syntax
-      ...(typeof actual['coreEvents'] === 'object' &&
-      actual['coreEvents'] !== null
+      ...(typeof actual['coreEvents'] === 'object' && actual['coreEvents'] !== null
         ? actual['coreEvents']
         : {}),
       emitConsoleLog,

@@ -167,10 +167,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
     const subagentMessageBus = parentMessageBus.derive(definition.name);
 
     // Create isolated registries for this agent instance.
-    const agentToolRegistry = new ToolRegistry(
-      context.config,
-      subagentMessageBus,
-    );
+    const agentToolRegistry = new ToolRegistry(context.config, subagentMessageBus);
     const agentPromptRegistry = new PromptRegistry();
     const agentResourceRegistry = new ResourceRegistry();
 
@@ -227,9 +224,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
 
         const parsed = parseMcpToolName(toolName);
         if (parsed.serverName && parsed.toolName === '*') {
-          for (const tool of parentToolRegistry.getToolsByServer(
-            parsed.serverName,
-          )) {
+          for (const tool of parentToolRegistry.getToolsByServer(parsed.serverName)) {
             registerToolInstance(tool);
           }
           return;
@@ -344,8 +339,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
 
     const { functionCalls, modelToUse } = await promptIdContext.run(
       promptId,
-      async () =>
-        this.callModel(chat, currentMessage, combinedSignal, promptId),
+      async () => this.callModel(chat, currentMessage, combinedSignal, promptId),
     );
 
     if (combinedSignal.aborted) {
@@ -636,16 +630,14 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
       // Capture the index of the last hint before starting to avoid re-injecting old hints.
       // NOTE: Hints added AFTER this point will be broadcast to all currently running
       // local agents via the listener below.
-      const startIndex =
-        this.context.config.injectionService.getLatestInjectionIndex();
+      const startIndex = this.context.config.injectionService.getLatestInjectionIndex();
       this.context.config.injectionService.onInjection(injectionListener);
 
       try {
-        const initialHints =
-          this.context.config.injectionService.getInjectionsAfter(
-            startIndex,
-            'user_steering',
-          );
+        const initialHints = this.context.config.injectionService.getInjectionsAfter(
+          startIndex,
+          'user_steering',
+        );
         const formattedInitialHints = formatUserHintsForModel(initialHints);
 
         // Inject loaded memory files. Some background agents opt out of
@@ -816,8 +808,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
       }
 
       return {
-        result:
-          finalResult || 'Agent execution was terminated before completion.',
+        result: finalResult || 'Agent execution was terminated before completion.',
         terminate_reason: terminateReason,
         turn_count: turnCounter,
         duration_ms: Date.now() - startTime,
@@ -965,11 +956,10 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
     const modelConfigAlias = getModelConfigAlias(this.definition);
 
     // Resolve the model config early to get the concrete model string (which may be `auto`).
-    const resolvedConfig =
-      this.context.config.modelConfigService.getResolvedConfig({
-        model: modelConfigAlias,
-        overrideScope: this.definition.name,
-      });
+    const resolvedConfig = this.context.config.modelConfigService.getResolvedConfig({
+      model: modelConfigAlias,
+      overrideScope: this.definition.name,
+    });
     const requestedModel = resolvedConfig.model;
 
     let modelToUse: string | undefined;
@@ -1023,9 +1013,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
         const parts = chunk.candidates?.[0]?.content?.parts;
 
         // Extract and emit any subject "thought" content from the model.
-        const { subject } = parseThought(
-          parts?.find((p) => p.thought)?.text || '',
-        );
+        const { subject } = parseThought(parts?.find((p) => p.thought)?.text || '');
         if (subject) {
           this.emitActivity('THOUGHT_CHUNK', { text: subject });
         }
@@ -1232,8 +1220,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
       chat.recordCompletedToolCalls(model, completedCalls);
 
       for (const call of completedCalls) {
-        const toolName =
-          toolNameMap.get(call.request.callId) || call.request.name;
+        const toolName = toolNameMap.get(call.request.callId) || call.request.name;
         if (call.status === 'success') {
           this.emitActivity('TOOL_CALL_END', {
             name: toolName,
@@ -1243,14 +1230,9 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
           });
 
           // Check if this was a completion tool call
-          const isCompletionTool =
-            call.request.name === COMPLETE_TASK_TOOL_NAME;
+          const isCompletionTool = call.request.name === COMPLETE_TASK_TOOL_NAME;
           const data = call.response.data;
-          if (
-            isCompletionTool &&
-            !taskCompleted &&
-            data?.['taskCompleted'] === true
-          ) {
+          if (isCompletionTool && !taskCompleted && data?.['taskCompleted'] === true) {
             taskCompleted = true;
             const output = data['submittedOutput'];
             if (typeof output === 'string') {
@@ -1266,8 +1248,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
             errorType: SubagentActivityErrorType.GENERIC,
           });
         } else if (call.status === 'cancelled') {
-          const isSoftRejection =
-            call.outcome === ToolConfirmationOutcome.Cancel;
+          const isSoftRejection = call.outcome === ToolConfirmationOutcome.Cancel;
 
           if (isSoftRejection) {
             const error = `${SUBAGENT_REJECTED_ERROR_PREFIX} Please acknowledge this, rethink your strategy, and try a different approach. If you cannot proceed without the rejected operation, summarize the issue and use \`${COMPLETE_TASK_TOOL_NAME}\` to report your findings and the blocker.`;
@@ -1357,9 +1338,7 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
     }
     // Add schemas from tools that were explicitly registered by name, wildcard, or instance.
     toolsList.push(
-      ...this.toolRegistry.getFunctionDeclarations(
-        this.definition.modelConfig.model,
-      ),
+      ...this.toolRegistry.getFunctionDeclarations(this.definition.modelConfig.model),
     );
 
     return toolsList;

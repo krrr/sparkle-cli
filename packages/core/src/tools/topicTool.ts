@@ -29,10 +29,7 @@ interface UpdateTopicParams {
   [TOPIC_PARAM_STRATEGIC_INTENT]?: string;
 }
 
-class UpdateTopicInvocation extends BaseToolInvocation<
-  UpdateTopicParams,
-  ToolResult
-> {
+class UpdateTopicInvocation extends BaseToolInvocation<UpdateTopicParams, ToolResult> {
   constructor(
     params: UpdateTopicParams,
     messageBus: MessageBus,
@@ -57,11 +54,7 @@ class UpdateTopicInvocation extends BaseToolInvocation<
     const strategicIntent = this.params[TOPIC_PARAM_STRATEGIC_INTENT];
 
     const activeTopic = this.config.topicState.getTopic();
-    const isNewTopic = !!(
-      title &&
-      title.trim() !== '' &&
-      title.trim() !== activeTopic
-    );
+    const isNewTopic = !!(title && title.trim() !== '' && title.trim() !== activeTopic);
 
     this.config.topicState.setTopic(title, strategicIntent);
 
@@ -129,11 +122,6 @@ export class UpdateTopicTool extends BaseDeclarativeTool<
     params: UpdateTopicParams,
     messageBus: MessageBus,
   ): UpdateTopicInvocation {
-    return new UpdateTopicInvocation(
-      params,
-      messageBus,
-      this.name,
-      this.config,
-    );
+    return new UpdateTopicInvocation(params, messageBus, this.name, this.config);
   }
 }

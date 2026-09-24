@@ -139,27 +139,9 @@ export class WindowsSandboxManager implements SandboxManager {
               'csc.exe',
             ),
             // Added newer framework paths
-            path.join(
-              systemRoot,
-              'Microsoft.NET',
-              'Framework64',
-              'v4.8',
-              'csc.exe',
-            ),
-            path.join(
-              systemRoot,
-              'Microsoft.NET',
-              'Framework',
-              'v4.8',
-              'csc.exe',
-            ),
-            path.join(
-              systemRoot,
-              'Microsoft.NET',
-              'Framework64',
-              'v3.5',
-              'csc.exe',
-            ),
+            path.join(systemRoot, 'Microsoft.NET', 'Framework64', 'v4.8', 'csc.exe'),
+            path.join(systemRoot, 'Microsoft.NET', 'Framework', 'v4.8', 'csc.exe'),
+            path.join(systemRoot, 'Microsoft.NET', 'Framework64', 'v3.5', 'csc.exe'),
           ];
 
           let compiled = false;
@@ -193,15 +175,10 @@ export class WindowsSandboxManager implements SandboxManager {
           );
         }
       } else {
-        debugLogger.log(
-          `WindowsSandboxManager: Found helper at ${this.helperPath}`,
-        );
+        debugLogger.log(`WindowsSandboxManager: Found helper at ${this.helperPath}`);
       }
     } catch (e) {
-      debugLogger.log(
-        'WindowsSandboxManager: Failed to initialize sandbox helper:',
-        e,
-      );
+      debugLogger.log('WindowsSandboxManager: Failed to initialize sandbox helper:', e);
     }
 
     WindowsSandboxManager.helperCompiled = true;
@@ -270,9 +247,7 @@ export class WindowsSandboxManager implements SandboxManager {
     await initializeShellParsers();
     const fullCmd = [command, ...args].join(' ');
     const stripped = stripShellWrapper(fullCmd);
-    const roots = getCommandRoots(stripped).filter(
-      (r) => r !== 'shopt' && r !== 'set',
-    );
+    const roots = getCommandRoots(stripped).filter((r) => r !== 'shopt' && r !== 'set');
     const isGitCommand = roots.includes('git');
 
     const resolvedPaths = await resolveSandboxPaths(
@@ -351,11 +326,7 @@ export class WindowsSandboxManager implements SandboxManager {
 
     // A. Workspace access
     const isApproved = allowOverrides
-      ? await isStrictlyApproved(
-          command,
-          args,
-          this.options.modeConfig?.approvedTools,
-        )
+      ? await isStrictlyApproved(command, args, this.options.modeConfig?.approvedTools)
       : false;
 
     const workspaceWrite = !isReadonlyMode || isApproved || isYolo;

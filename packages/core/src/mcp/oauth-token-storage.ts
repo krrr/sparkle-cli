@@ -31,10 +31,7 @@ export class MCPOAuthTokenStorage implements TokenStorage {
     process.env[FORCE_ENCRYPTED_FILE_ENV_VAR] === 'true';
   private readonly customTokenFilePath?: string;
 
-  constructor(
-    tokenFilePath?: string,
-    serviceName: string = DEFAULT_SERVICE_NAME,
-  ) {
+  constructor(tokenFilePath?: string, serviceName: string = DEFAULT_SERVICE_NAME) {
     this.customTokenFilePath = tokenFilePath;
     this.hybridTokenStorage = new HybridTokenStorage(serviceName);
   }
@@ -144,8 +141,7 @@ export class MCPOAuthTokenStorage implements TokenStorage {
     await this.ensureConfigDir();
 
     const existing = await this.getCredentials(serverName);
-    const mergedRefreshToken =
-      token.refreshToken || existing?.token.refreshToken;
+    const mergedRefreshToken = token.refreshToken || existing?.token.refreshToken;
 
     const mergedToken = {
       ...token,

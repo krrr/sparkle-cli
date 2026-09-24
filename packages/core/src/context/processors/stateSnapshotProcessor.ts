@@ -60,8 +60,7 @@ export function createStateSnapshotProcessor(
 
       // Determine what mode we are looking for: 'incremental' -> 'point-in-time', 'max' -> 'accumulate'
       const strategy = options.target ?? 'max';
-      const expectedType =
-        strategy === 'incremental' ? 'point-in-time' : 'accumulate';
+      const expectedType = strategy === 'incremental' ? 'point-in-time' : 'accumulate';
 
       // 1. Check Inbox for a completed Snapshot (The Fast Path)
       const proposedSnapshots = inbox.getMessages<{
@@ -78,9 +77,7 @@ export function createStateSnapshotProcessor(
         );
 
         // Sort by newest timestamp first (we want the most accumulated snapshot)
-        const sorted = [...matchingSnapshots].sort(
-          (a, b) => b.timestamp - a.timestamp,
-        );
+        const sorted = [...matchingSnapshots].sort((a, b) => b.timestamp - a.timestamp);
 
         for (const proposed of sorted) {
           const { consumedIds, newText, timestamp } = proposed.payload;
@@ -114,9 +111,7 @@ export function createStateSnapshotProcessor(
             };
 
             // Remove the consumed nodes and insert the snapshot at the earliest index
-            const returnedNodes = targets.filter(
-              (t) => !consumedIds.includes(t.id),
-            );
+            const returnedNodes = targets.filter((t) => !consumedIds.includes(t.id));
             const firstRemovedIdx = targets.findIndex((t) =>
               consumedIds.includes(t.id),
             );
@@ -171,9 +166,7 @@ export function createStateSnapshotProcessor(
       if (baseline) {
         previousStateJson = baseline.text;
         // If the snapshot happens to be inside our summary window, remove it so the LLM doesn't read it as raw transcript
-        const summaryIdx = nodesToSummarize.findIndex(
-          (n) => n.id === baseline.id,
-        );
+        const summaryIdx = nodesToSummarize.findIndex((n) => n.id === baseline.id);
         if (summaryIdx !== -1) {
           baselineIdToConsume = baseline.id;
           nodesToSummarize.splice(summaryIdx, 1);
@@ -214,12 +207,8 @@ export function createStateSnapshotProcessor(
           abstractsIds: [...consumedIds],
         };
 
-        const returnedNodes = targets.filter(
-          (t) => !consumedIds.includes(t.id),
-        );
-        const firstRemovedIdx = targets.findIndex((t) =>
-          consumedIds.includes(t.id),
-        );
+        const returnedNodes = targets.filter((t) => !consumedIds.includes(t.id));
+        const firstRemovedIdx = targets.findIndex((t) => consumedIds.includes(t.id));
 
         if (firstRemovedIdx !== -1) {
           const idx = Math.max(0, firstRemovedIdx);

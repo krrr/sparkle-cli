@@ -47,13 +47,10 @@ vi.mock('node:fs', async () => {
 });
 
 vi.mock('../../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../../utils/shell-utils.js')>();
   return {
     ...actual,
-    spawnAsync: vi.fn(() =>
-      Promise.resolve({ status: 0, stdout: Buffer.from('') }),
-    ),
+    spawnAsync: vi.fn(() => Promise.resolve({ status: 0, stdout: Buffer.from('') })),
     initializeShellParsers: vi.fn(),
     isStrictlyApproved: vi.fn().mockResolvedValue(true),
   };

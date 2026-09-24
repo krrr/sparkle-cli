@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 
 import EventEmitter from 'node:events';
 import type { Readable } from 'node:stream';
@@ -71,8 +63,7 @@ vi.mock('node:fs', async (importOriginal) => {
   };
 });
 vi.mock('../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../utils/shell-utils.js')>();
   return {
     ...actual,
     resolveExecutable: mockResolveExecutable,
@@ -125,9 +116,7 @@ vi.mock('../utils/terminalSerializer.js', () => ({
   convertColorToHex: () => '#000000',
   ColorMode: { DEFAULT: 0, PALETTE: 1, RGB: 2 },
 }));
-const mockProcessKill = vi
-  .spyOn(process, 'kill')
-  .mockImplementation(() => true);
+const mockProcessKill = vi.spyOn(process, 'kill').mockImplementation(() => true);
 
 const shellExecutionConfig: ShellExecutionConfig = {
   sessionId: 'default',
@@ -292,10 +281,7 @@ describe('ShellExecutionService', () => {
 
       expect(mockPtySpawn).toHaveBeenCalledWith(
         'bash',
-        [
-          '-c',
-          'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls -l',
-        ],
+        ['-c', 'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls -l'],
         expect.any(Object),
       );
       expect(result.exitCode).toBe(0);
@@ -383,9 +369,7 @@ describe('ShellExecutionService', () => {
         .join('\n')
         .trim();
       expect(processedOutput).toBe(expectedOutput);
-      expect(result.output.split('\n').length).toBeGreaterThanOrEqual(
-        lineCount,
-      );
+      expect(result.output.split('\n').length).toBeGreaterThanOrEqual(lineCount);
     });
 
     it('should not wrap long lines in the final output', async () => {
@@ -457,9 +441,7 @@ describe('ShellExecutionService', () => {
       expect(outputLines[0]).not.toBe('line 0');
 
       // Check that we have the *last* lines
-      expect(outputLines[outputLines.length - 1]).toBe(
-        `line ${totalLines - 1}`,
-      );
+      expect(outputLines[outputLines.length - 1]).toBe(`line ${totalLines - 1}`);
     });
 
     it('should call onPid with the process id', async () => {
@@ -539,9 +521,7 @@ describe('ShellExecutionService', () => {
     });
 
     it('should ignore errors when resizing an exited pty', async () => {
-      const resizeError = new Error(
-        'Cannot resize a pty that has already exited',
-      );
+      const resizeError = new Error('Cannot resize a pty that has already exited');
       mockPtyProcess.resize.mockImplementation(() => {
         throw resizeError;
       });
@@ -582,9 +562,7 @@ describe('ShellExecutionService', () => {
     });
 
     it('should not throw when resizing a pty that has already exited (Windows)', () => {
-      const resizeError = new Error(
-        'Cannot resize a pty that has already exited',
-      );
+      const resizeError = new Error('Cannot resize a pty that has already exited');
       mockPtyProcess.resize.mockImplementation(() => {
         throw resizeError;
       });
@@ -654,13 +632,10 @@ describe('ShellExecutionService', () => {
 
   describe('Aborting Commands', () => {
     it('should abort a running process and set the aborted flag', async () => {
-      const { result } = await simulateExecution(
-        'sleep 10',
-        (pty, abortController) => {
-          abortController.abort();
-          pty.onExit.mock.calls[0][0]({ exitCode: 1, signal: null });
-        },
-      );
+      const { result } = await simulateExecution('sleep 10', (pty, abortController) => {
+        abortController.abort();
+        pty.onExit.mock.calls[0][0]({ exitCode: 1, signal: null });
+      });
 
       expect(result.aborted).toBe(true);
       // The process kill is mocked, so we just check that the flag is set.
@@ -742,8 +717,7 @@ describe('ShellExecutionService', () => {
       );
       mockHomedir.mockReturnValue('/mock/home');
 
-      mockBgChildProcess = new EventEmitter() as EventEmitter &
-        Partial<ChildProcess>;
+      mockBgChildProcess = new EventEmitter() as EventEmitter & Partial<ChildProcess>;
       mockBgChildProcess.stdout = new EventEmitter() as Readable;
       mockBgChildProcess.stderr = new EventEmitter() as Readable;
       mockBgChildProcess.kill = vi.fn();
@@ -792,11 +766,7 @@ describe('ShellExecutionService', () => {
       ]);
 
       // Background the process
-      ShellExecutionService.background(
-        handle.pid!,
-        'default',
-        'long-running-pty',
-      );
+      ShellExecutionService.background(handle.pid!, 'default', 'long-running-pty');
 
       const result = await handle.result;
       expect(result.backgrounded).toBe(true);
@@ -835,11 +805,7 @@ describe('ShellExecutionService', () => {
       mockBgChildProcess.stdout?.emit('data', Buffer.from('initial cp output'));
       await new Promise((resolve) => process.nextTick(resolve));
 
-      ShellExecutionService.background(
-        handle.pid!,
-        'default',
-        'long-running-child',
-      );
+      ShellExecutionService.background(handle.pid!, 'default', 'long-running-child');
 
       const result = await handle.result;
       expect(result.backgrounded).toBe(true);
@@ -878,11 +844,7 @@ describe('ShellExecutionService', () => {
       });
 
       // Background the process
-      ShellExecutionService.background(
-        handle.pid!,
-        'default',
-        'failing-log-setup',
-      );
+      ShellExecutionService.background(handle.pid!, 'default', 'failing-log-setup');
 
       const result = await handle.result;
       expect(result.backgrounded).toBe(true);
@@ -898,14 +860,9 @@ describe('ShellExecutionService', () => {
       await simulateExecution(
         'history-test-cmd',
         async (pty) => {
-          ShellExecutionService.background(
-            pty.pid,
-            'default',
-            'history-test-cmd',
-          );
+          ShellExecutionService.background(pty.pid, 'default', 'history-test-cmd');
 
-          const history =
-            ShellExecutionService.listBackgroundProcesses('default');
+          const history = ShellExecutionService.listBackgroundProcesses('default');
           expect(history).toHaveLength(1);
           expect(history[0]).toEqual(
             expect.objectContaining({
@@ -943,10 +900,7 @@ describe('ShellExecutionService', () => {
         });
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ShellExecutionService as any).backgroundProcessHistory.set(
-        'default',
-        history,
-      );
+      (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (ShellExecutionService as any).activeChildProcesses.set(101, {
@@ -958,8 +912,7 @@ describe('ShellExecutionService', () => {
 
       ShellExecutionService.background(101, 'default', 'cmd-101');
 
-      const processes =
-        ShellExecutionService.listBackgroundProcesses('default');
+      const processes = ShellExecutionService.listBackgroundProcesses('default');
       expect(processes).toHaveLength(MAX);
       expect(processes.some((p) => p.pid === 1)).toBe(false);
     });
@@ -1074,10 +1027,7 @@ describe('ShellExecutionService', () => {
 
       expect(mockPtySpawn).toHaveBeenCalledWith(
         'bash',
-        [
-          '-c',
-          'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls "foo bar"',
-        ],
+        ['-c', 'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls "foo bar"'],
         expect.objectContaining({
           handleFlowControl: true,
         }),
@@ -1094,9 +1044,7 @@ describe('ShellExecutionService', () => {
         defaultBg: '#000000',
         disableDynamicLineTrimming: true,
       };
-      const mockAnsiOutput = [
-        [{ text: 'hello', fg: '#ffffff', bg: '#000000' }],
-      ];
+      const mockAnsiOutput = [[{ text: 'hello', fg: '#ffffff', bg: '#000000' }]];
       mockSerializeTerminalToObject.mockReturnValue(mockAnsiOutput);
 
       await simulateExecution(
@@ -1147,18 +1095,12 @@ describe('ShellExecutionService', () => {
 
     it('should handle multi-line output correctly when showColor is false', async () => {
       mockSerializeTerminalToObject.mockReturnValue(
-        createMockSerializeTerminalToObjectReturnValue([
-          'line 1',
-          'line 2',
-          'line 3',
-        ]),
+        createMockSerializeTerminalToObjectReturnValue(['line 1', 'line 2', 'line 3']),
       );
       await simulateExecution(
         'ls --color=auto',
         (pty) => {
-          pty.onData.mock.calls[0][0](
-            'line 1\n\u001b[32mline 2\u001b[0m\nline 3',
-          );
+          pty.onData.mock.calls[0][0]('line 1\n\u001b[32mline 2\u001b[0m\nline 3');
           pty.onExit.mock.calls[0][0]({ exitCode: 0, signal: null });
         },
         {
@@ -1283,8 +1225,7 @@ describe('ShellExecutionService child_process fallback', () => {
 
     onOutputEventMock = vi.fn();
 
-    mockChildProcess = new EventEmitter() as EventEmitter &
-      Partial<ChildProcess>;
+    mockChildProcess = new EventEmitter() as EventEmitter & Partial<ChildProcess>;
     mockChildProcess.stdout = new EventEmitter() as Readable;
     mockChildProcess.stderr = new EventEmitter() as Readable;
     mockChildProcess.kill = vi.fn();
@@ -1332,10 +1273,7 @@ describe('ShellExecutionService child_process fallback', () => {
 
       expect(mockCpSpawn).toHaveBeenCalledWith(
         'bash',
-        [
-          '-c',
-          'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls -l',
-        ],
+        ['-c', 'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls -l'],
         expect.objectContaining({ shell: false, detached: true }),
       );
       expect(result.exitCode).toBe(0);
@@ -1429,9 +1367,9 @@ describe('ShellExecutionService child_process fallback', () => {
       expect(outputWithoutMessage.length).toBe(MAX_SIZE);
 
       const expectedStart = (chunk1 + chunk2 + chunk3).slice(-MAX_SIZE);
-      expect(
-        outputWithoutMessage.startsWith(expectedStart.substring(0, 10)),
-      ).toBe(true);
+      expect(outputWithoutMessage.startsWith(expectedStart.substring(0, 10))).toBe(
+        true,
+      );
       expect(outputWithoutMessage.endsWith('c'.repeat(20))).toBe(true);
     }, 120000);
   });
@@ -1567,19 +1505,13 @@ describe('ShellExecutionService child_process fallback', () => {
       await vi.advanceTimersByTimeAsync(0);
 
       // Check the first kill signal
-      expect(mockProcessKill).toHaveBeenCalledWith(
-        -mockChildProcess.pid!,
-        'SIGTERM',
-      );
+      expect(mockProcessKill).toHaveBeenCalledWith(-mockChildProcess.pid!, 'SIGTERM');
 
       // Now, advance time past the timeout
       await vi.advanceTimersByTimeAsync(250);
 
       // Check the second kill signal
-      expect(mockProcessKill).toHaveBeenCalledWith(
-        -mockChildProcess.pid!,
-        'SIGKILL',
-      );
+      expect(mockProcessKill).toHaveBeenCalledWith(-mockChildProcess.pid!, 'SIGKILL');
 
       // Finally, simulate the process exiting and await the result
       mockChildProcess.emit('exit', null, 'SIGKILL');
@@ -1691,10 +1623,7 @@ describe('ShellExecutionService child_process fallback', () => {
 
       expect(mockCpSpawn).toHaveBeenCalledWith(
         'bash',
-        [
-          '-c',
-          'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls "foo bar"',
-        ],
+        ['-c', 'shopt -u promptvars nullglob extglob nocaseglob dotglob; ls "foo bar"'],
         expect.objectContaining({
           shell: false,
           detached: true,
@@ -1745,8 +1674,7 @@ describe('ShellExecutionService execution method selection', () => {
     });
 
     // Mock for child_process
-    mockChildProcess = new EventEmitter() as EventEmitter &
-      Partial<ChildProcess>;
+    mockChildProcess = new EventEmitter() as EventEmitter & Partial<ChildProcess>;
     mockChildProcess.stdout = new EventEmitter() as Readable;
     mockChildProcess.stderr = new EventEmitter() as Readable;
     mockChildProcess.kill = vi.fn();
@@ -1875,8 +1803,7 @@ describe('ShellExecutionService environment variables', () => {
     });
 
     // Mock for child_process
-    mockChildProcess = new EventEmitter() as EventEmitter &
-      Partial<ChildProcess>;
+    mockChildProcess = new EventEmitter() as EventEmitter & Partial<ChildProcess>;
     mockChildProcess.stdout = new EventEmitter() as Readable;
     mockChildProcess.stderr = new EventEmitter() as Readable;
     mockChildProcess.kill = vi.fn();
@@ -1910,9 +1837,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('SPARKLE_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
 
     vi.resetModules();
-    const { ShellExecutionService } = await import(
-      './shellExecutionService.js'
-    );
+    const { ShellExecutionService } = await import('./shellExecutionService.js');
 
     // Test pty path
     await ShellExecutionService.execute(
@@ -1970,9 +1895,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('SPARKLE_CLI_TEST_VAR', 'test-value'); // A test var that should be kept
 
     vi.resetModules();
-    const { ShellExecutionService } = await import(
-      './shellExecutionService.js'
-    );
+    const { ShellExecutionService } = await import('./shellExecutionService.js');
 
     // Test pty path
     await ShellExecutionService.execute(
@@ -2027,9 +1950,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('GITHUB_SHA', '');
     vi.stubEnv('SURFACE', '');
     vi.resetModules();
-    const { ShellExecutionService } = await import(
-      './shellExecutionService.js'
-    );
+    const { ShellExecutionService } = await import('./shellExecutionService.js');
 
     // Test pty path
     await ShellExecutionService.execute(
@@ -2135,9 +2056,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('GIT_CONFIG_KEY_1', 'pull.rebase');
     vi.stubEnv('GIT_CONFIG_VALUE_1', 'true');
 
-    const { ShellExecutionService } = await import(
-      './shellExecutionService.js'
-    );
+    const { ShellExecutionService } = await import('./shellExecutionService.js');
 
     mockGetPty.mockResolvedValue(null); // Force child_process fallback
     await ShellExecutionService.execute(
@@ -2187,9 +2106,7 @@ describe('ShellExecutionService environment variables', () => {
     vi.stubEnv('GCM_INTERACTIVE', undefined);
     vi.stubEnv('GIT_CONFIG_COUNT', undefined);
 
-    const { ShellExecutionService } = await import(
-      './shellExecutionService.js'
-    );
+    const { ShellExecutionService } = await import('./shellExecutionService.js');
 
     mockGetPty.mockResolvedValue(null); // Force child_process fallback
     await ShellExecutionService.execute(
@@ -2250,8 +2167,7 @@ describe('ShellExecutionService environment variables', () => {
       mockGetPty.mockResolvedValue(null);
       onOutputEvent = vi.fn();
 
-      fakeChildProcess = new EventEmitter() as EventEmitter &
-        Partial<ChildProcess>;
+      fakeChildProcess = new EventEmitter() as EventEmitter & Partial<ChildProcess>;
       // The stdio emitters intentionally never emit 'end'/'close': a detached
       // descendant process keeps the inherited pipes open.
       fakeChildProcess.stdout = new EventEmitter() as Readable;

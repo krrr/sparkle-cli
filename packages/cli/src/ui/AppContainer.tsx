@@ -25,10 +25,7 @@ import {
 import { App } from './App.js';
 import { AppContext } from './contexts/AppContext.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
-import {
-  UIActionsContext,
-  type UIActions,
-} from './contexts/UIActionsContext.js';
+import { UIActionsContext, type UIActions } from './contexts/UIActionsContext.js';
 import { ConfigContext } from './contexts/ConfigContext.js';
 import {
   type HistoryItem,
@@ -93,10 +90,7 @@ import { useModelCommand } from './hooks/useModelCommand.js';
 import { useVoiceModelCommand } from './hooks/useVoiceModelCommand.js';
 import { useSlashCommandProcessor } from './hooks/slashCommandProcessor.js';
 import { useVimMode } from './contexts/VimModeContext.js';
-import {
-  useOverflowActions,
-  useOverflowState,
-} from './contexts/OverflowContext.js';
+import { useOverflowActions, useOverflowState } from './contexts/OverflowContext.js';
 import { useErrorCount } from './hooks/useConsoleMessages.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
 import { calculatePromptWidths } from './components/InputPrompt.js';
@@ -125,11 +119,7 @@ import { type IdeIntegrationNudgeResult } from './IdeIntegrationNudge.js';
 import { appEvents, AppEvent, TransientMessageType } from '../utils/events.js';
 import { type UpdateObject } from './utils/updateCheck.js';
 import { setUpdateHandler } from '../utils/handleAutoUpdate.js';
-import {
-  registerCleanup,
-  removeCleanup,
-  runExitCleanup,
-} from '../utils/cleanup.js';
+import { registerCleanup, removeCleanup, runExitCleanup } from '../utils/cleanup.js';
 import { relaunchApp } from '../utils/processUtils.js';
 import type { SessionInfo } from '../utils/sessionUtils.js';
 import { useMessageQueue } from './hooks/useMessageQueue.js';
@@ -226,9 +216,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
   useMemoryMonitor(historyManager);
   const isAlternateBuffer = config.getUseAlternateBuffer();
-  const [mouseMode, setMouseMode] = useState(() =>
-    config.getUseAlternateBuffer(),
-  );
+  const [mouseMode, setMouseMode] = useState(() => config.getUseAlternateBuffer());
 
   useEffect(() => {
     setOptions({
@@ -243,18 +231,14 @@ export const AppContainer = (props: AppContainerProps) => {
 
   const [corgiMode, setCorgiMode] = useState(false);
   const [debugMessage, setDebugMessage] = useState<string>('');
-  const [quittingMessages, setQuittingMessages] = useState<
-    HistoryItem[] | null
-  >(null);
+  const [quittingMessages, setQuittingMessages] = useState<HistoryItem[] | null>(null);
   const [themeError, setThemeError] = useState<string | null>(
     initializationResult.themeError,
   );
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [embeddedShellFocused, setEmbeddedShellFocused] = useState(false);
   const [showDebugProfiler, setShowDebugProfiler] = useState(false);
-  const [customDialog, setCustomDialog] = useState<React.ReactNode | null>(
-    null,
-  );
+  const [customDialog, setCustomDialog] = useState<React.ReactNode | null>(null);
   const [copyModeEnabled, setCopyModeEnabled] = useState(false);
   const [pendingRestorePrompt, setPendingRestorePrompt] = useState(false);
   const toggleBackgroundTasksRef = useRef<() => void>(() => {});
@@ -375,22 +359,17 @@ export const AppContainer = (props: AppContainerProps) => {
   const [permissionsDialogProps, setPermissionsDialogProps] = useState<{
     targetDirectory?: string;
   } | null>(null);
-  const openPermissionsDialog = useCallback(
-    (props?: { targetDirectory?: string }) => {
-      setPermissionsDialogOpen(true);
-      setPermissionsDialogProps(props ?? null);
-    },
-    [],
-  );
+  const openPermissionsDialog = useCallback((props?: { targetDirectory?: string }) => {
+    setPermissionsDialogOpen(true);
+    setPermissionsDialogProps(props ?? null);
+  }, []);
   const closePermissionsDialog = useCallback(() => {
     setPermissionsDialogOpen(false);
     setPermissionsDialogProps(null);
   }, []);
 
   const [isAgentConfigDialogOpen, setIsAgentConfigDialogOpen] = useState(false);
-  const [selectedAgentName, setSelectedAgentName] = useState<
-    string | undefined
-  >();
+  const [selectedAgentName, setSelectedAgentName] = useState<string | undefined>();
   const [selectedAgentDisplayName, setSelectedAgentDisplayName] = useState<
     string | undefined
   >();
@@ -425,8 +404,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const [isConfigInitialized, setConfigInitialized] = useState(false);
 
   const logger = useLogger(config);
-  const { inputHistory, addInput, initializeFromLogger } =
-    useInputHistoryStore();
+  const { inputHistory, addInput, initializeFromLogger } = useInputHistoryStore();
 
   // Terminal and layout hooks
   const { columns: terminalWidth, rows: terminalHeight } = useTerminalSize();
@@ -467,9 +445,7 @@ export const AppContainer = (props: AppContainerProps) => {
         if (additionalContext && geminiClient) {
           await geminiClient.addHistory({
             role: 'user',
-            parts: [
-              { text: `<hook_context>${additionalContext}</hook_context>` },
-            ],
+            parts: [{ text: `<hook_context>${additionalContext}</hook_context>` }],
           });
         }
       }
@@ -509,9 +485,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
     return () => {
       removeCleanup(cleanupFn);
-      cleanupFn().catch((e: unknown) =>
-        debugLogger.error('Error during cleanup:', e),
-      );
+      cleanupFn().catch((e: unknown) => debugLogger.error('Error during cleanup:', e));
     };
   }, [config, resumedSessionData]);
 
@@ -554,8 +528,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const mainAreaWidth = calculateMainAreaWidth(terminalWidth, config);
   // Derive widths for InputPrompt using shared helper
   const { inputWidth, suggestionsWidth } = useMemo(() => {
-    const { inputWidth, suggestionsWidth } =
-      calculatePromptWidths(mainAreaWidth);
+    const { inputWidth, suggestionsWidth } = calculatePromptWidths(mainAreaWidth);
     return { inputWidth, suggestionsWidth };
   }, [mainAreaWidth]);
 
@@ -622,12 +595,8 @@ export const AppContainer = (props: AppContainerProps) => {
   }, [refreshStatic, shouldUseAlternateScreen, app]);
 
   const [editorError, setEditorError] = useState<string | null>(null);
-  const {
-    isEditorDialogOpen,
-    openEditorDialog,
-    handleEditorSelect,
-    exitEditorDialog,
-  } = useEditorSettings(settings, setEditorError, historyManager.addItem);
+  const { isEditorDialogOpen, openEditorDialog, handleEditorSelect, exitEditorDialog } =
+    useEditorSettings(settings, setEditorError, historyManager.addItem);
 
   useEffect(() => {
     coreEvents.on(CoreEvent.ExternalEditorClosed, handleEditorClose);
@@ -713,20 +682,14 @@ export const AppContainer = (props: AppContainerProps) => {
     [handleDeleteSessionSync],
   );
 
-  const { isModelDialogOpen, openModelDialog, closeModelDialog } =
-    useModelCommand();
+  const { isModelDialogOpen, openModelDialog, closeModelDialog } = useModelCommand();
 
-  const {
-    isVoiceModelDialogOpen,
-    openVoiceModelDialog,
-    closeVoiceModelDialog,
-  } = useVoiceModelCommand();
+  const { isVoiceModelDialogOpen, openVoiceModelDialog, closeVoiceModelDialog } =
+    useVoiceModelCommand();
 
   const { toggleVimEnabled } = useVimMode();
 
-  const setIsBackgroundTaskListOpenRef = useRef<(open: boolean) => void>(
-    () => {},
-  );
+  const setIsBackgroundTaskListOpenRef = useRef<(open: boolean) => void>(() => {});
   const [shortcutsHelpVisible, setShortcutsHelpVisible] = useState(false);
 
   const {
@@ -1066,11 +1029,7 @@ export const AppContainer = (props: AppContainerProps) => {
         revealCleanUiDetailsTemporarily(APPROVAL_MODE_REVEAL_DURATION_MS);
       }
     },
-    [
-      handleApprovalModeChange,
-      cleanUiDetailsVisible,
-      revealCleanUiDetailsTemporarily,
-    ],
+    [handleApprovalModeChange, cleanUiDetailsVisible, revealCleanUiDetailsTemporarily],
   );
 
   const { isMcpReady } = useMcpStatus(config);
@@ -1078,8 +1037,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const isCompressing = useMemo(
     () =>
       pendingHistoryItems.some(
-        (item) =>
-          item.type === MessageType.COMPRESSION && item.compression.isPending,
+        (item) => item.type === MessageType.COMPRESSION && item.compression.isPending,
       ),
     [pendingHistoryItems],
   );
@@ -1128,13 +1086,7 @@ export const AppContainer = (props: AppContainerProps) => {
         buffer.setText(textToSet);
       }
     },
-    [
-      buffer,
-      inputHistory,
-      getQueuedMessagesText,
-      clearQueue,
-      pendingHistoryItems,
-    ],
+    [buffer, inputHistory, getQueuedMessagesText, clearQueue, pendingHistoryItems],
   );
 
   const handleHintSubmit = useCallback(
@@ -1263,13 +1215,7 @@ export const AppContainer = (props: AppContainerProps) => {
     historyManager.clearItems();
     clearErrorCount();
     refreshStatic();
-  }, [
-    historyManager,
-    clearErrorCount,
-    refreshStatic,
-    reset,
-    triggerExpandHint,
-  ]);
+  }, [historyManager, clearErrorCount, refreshStatic, reset, triggerExpandHint]);
 
   const { handleInput: vimHandleInput } = useVim(buffer, handleFinalSubmit);
 
@@ -1323,9 +1269,7 @@ export const AppContainer = (props: AppContainerProps) => {
         const entry = entries[0];
         if (entry) {
           const roundedHeight = Math.round(entry.contentRect.height);
-          setControlsHeight((prev) =>
-            roundedHeight !== prev ? roundedHeight : prev,
-          );
+          setControlsHeight((prev) => (roundedHeight !== prev ? roundedHeight : prev));
         }
       });
       observer.observe(node);
@@ -1439,9 +1383,7 @@ export const AppContainer = (props: AppContainerProps) => {
       onRepeat: handleExitRepeat,
     });
 
-  const [ideContextState, setIdeContextState] = useState<
-    IdeContext | undefined
-  >();
+  const [ideContextState, setIdeContextState] = useState<IdeContext | undefined>();
   const [showEscapePrompt, setShowEscapePrompt] = useState(false);
   const [showIdeRestartPrompt, setShowIdeRestartPrompt] = useState(false);
 
@@ -1457,15 +1399,12 @@ export const AppContainer = (props: AppContainerProps) => {
     isRestarting,
   } = useFolderTrust(settings, setIsTrustedFolder, historyManager.addItem);
 
-  const policyUpdateConfirmationRequest =
-    config.getPolicyUpdateConfirmationRequest();
+  const policyUpdateConfirmationRequest = config.getPolicyUpdateConfirmationRequest();
   const [isPolicyUpdateDialogOpen, setIsPolicyUpdateDialogOpen] = useState(
     !!policyUpdateConfirmationRequest,
   );
-  const {
-    needsRestart: ideNeedsRestart,
-    restartReason: ideTrustRestartReason,
-  } = useIdeTrustListener();
+  const { needsRestart: ideNeedsRestart, restartReason: ideTrustRestartReason } =
+    useIdeTrustListener();
   useIncludeDirsTrust(config, isTrustedFolder, historyManager, setCustomDialog);
 
   const tabFocusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -1631,10 +1570,7 @@ export const AppContainer = (props: AppContainerProps) => {
           recordingFilenameRef.current = null;
         }
         return true;
-      } else if (
-        keyMatchers[Command.TOGGLE_COPY_MODE](key) &&
-        !isAlternateBuffer
-      ) {
+      } else if (keyMatchers[Command.TOGGLE_COPY_MODE](key) && !isAlternateBuffer) {
         showTransientMessage({
           text: 'Use Ctrl+O to expand and collapse blocks of content.',
           type: TransientMessageType.Warning,
@@ -1670,9 +1606,7 @@ export const AppContainer = (props: AppContainerProps) => {
       if (keyMatchers[Command.SHOW_ERROR_DETAILS](key)) {
         if (settings.merged.general.devtools) {
           void (async () => {
-            const { toggleDevToolsPanel } = await import(
-              '../utils/devtoolsService.js'
-            );
+            const { toggleDevToolsPanel } = await import('../utils/devtoolsService.js');
             await toggleDevToolsPanel(
               config,
               showErrorDetails,
@@ -1718,8 +1652,7 @@ export const AppContainer = (props: AppContainerProps) => {
       ) {
         if (embeddedShellFocused) {
           const capturedTime = lastOutputTimeRef.current;
-          if (tabFocusTimeoutRef.current)
-            clearTimeout(tabFocusTimeoutRef.current);
+          if (tabFocusTimeoutRef.current) clearTimeout(tabFocusTimeoutRef.current);
           tabFocusTimeoutRef.current = setTimeout(() => {
             if (lastOutputTimeRef.current === capturedTime) {
               setEmbeddedShellFocused(false);
@@ -1736,8 +1669,7 @@ export const AppContainer = (props: AppContainerProps) => {
         const isIdle = Date.now() - lastOutputTimeRef.current >= 100;
 
         if (isIdle && !activePtyId && !isBackgroundTaskVisible) {
-          if (tabFocusTimeoutRef.current)
-            clearTimeout(tabFocusTimeoutRef.current);
+          if (tabFocusTimeoutRef.current) clearTimeout(tabFocusTimeoutRef.current);
           toggleBackgroundTasks();
           setEmbeddedShellFocused(true);
           if (backgroundTasks.size > 1) setIsBackgroundTaskListOpen(true);
@@ -1860,8 +1792,7 @@ export const AppContainer = (props: AppContainerProps) => {
     const paddedTitle = computeTerminalTitle({
       streamingState,
       thoughtSubject: thought?.subject,
-      isConfirming:
-        !!commandConfirmationRequest || shouldShowActionRequiredTitle,
+      isConfirming: !!commandConfirmationRequest || shouldShowActionRequiredTitle,
       isSilentWorking: shouldShowSilentWorkingTitle,
       folderName: basename(config.getTargetDir()),
       showThoughts: !!settings.merged.ui.showStatusInTitle,
@@ -1901,9 +1832,7 @@ export const AppContainer = (props: AppContainerProps) => {
           type = MessageType.INFO;
           break;
         default:
-          throw new Error(
-            `Unexpected severity for user feedback: ${payload.severity}`,
-          );
+          throw new Error(`Unexpected severity for user feedback: ${payload.severity}`);
       }
 
       historyManager.addItem(
@@ -1916,10 +1845,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
       // If there is an attached error object, log it to the debug drawer.
       if (payload.error) {
-        debugLogger.warn(
-          `[Feedback Details for "${payload.message}"]`,
-          payload.error,
-        );
+        debugLogger.warn(`[Feedback Details for "${payload.message}"]`, payload.error);
       }
     };
 
@@ -1977,10 +1903,8 @@ export const AppContainer = (props: AppContainerProps) => {
     [pendingHistoryItems],
   );
 
-  const hasConfirmUpdateExtensionRequests =
-    confirmUpdateExtensionRequests.length > 0;
-  const hasLoopDetectionConfirmationRequest =
-    !!loopDetectionConfirmationRequest;
+  const hasConfirmUpdateExtensionRequests = confirmUpdateExtensionRequests.length > 0;
+  const hasLoopDetectionConfirmationRequest = !!loopDetectionConfirmationRequest;
 
   const hasPendingActionRequired =
     hasPendingToolConfirmation ||
@@ -2001,8 +1925,7 @@ export const AppContainer = (props: AppContainerProps) => {
 
   let estimatedStatusLength = 0;
   if (activeHooks.length > 0 && settings.merged.hooksConfig.notifications) {
-    const hookLabel =
-      activeHooks.length > 1 ? 'Executing Hooks' : 'Executing Hook';
+    const hookLabel = activeHooks.length > 1 ? 'Executing Hooks' : 'Executing Hook';
     const hookNames = activeHooks
       .map(
         (h) =>
@@ -2069,11 +1992,7 @@ export const AppContainer = (props: AppContainerProps) => {
     if (shortcutsHelpVisible && !isPassiveShortcutsHelpState) {
       setShortcutsHelpVisible(false);
     }
-  }, [
-    shortcutsHelpVisible,
-    isPassiveShortcutsHelpState,
-    setShortcutsHelpVisible,
-  ]);
+  }, [shortcutsHelpVisible, isPassiveShortcutsHelpState, setShortcutsHelpVisible]);
 
   useEffect(() => {
     if (
@@ -2271,8 +2190,7 @@ export const AppContainer = (props: AppContainerProps) => {
       isBackgroundTaskListOpen,
       newAgents,
       showIsExpandableHint,
-      hintMode:
-        config.isModelSteeringEnabled() && isToolExecuting(pendingHistoryItems),
+      hintMode: config.isModelSteeringEnabled() && isToolExecuting(pendingHistoryItems),
       hintBuffer: '',
     }),
     [

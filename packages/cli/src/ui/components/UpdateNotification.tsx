@@ -12,12 +12,7 @@ interface UpdateNotificationProps {
 }
 
 export const UpdateNotification = ({ message }: UpdateNotificationProps) => (
-  <Box
-    borderStyle="round"
-    borderColor={theme.status.warning}
-    paddingX={1}
-    marginY={1}
-  >
+  <Box borderStyle="round" borderColor={theme.status.warning} paddingX={1} marginY={1}>
     <Text color={theme.status.warning}>{message}</Text>
   </Box>
 );

@@ -16,10 +16,7 @@ import {
   DEFAULT_OPENAI_MODEL,
 } from '../config/models.js';
 import { ProviderType } from '../config/constants.js';
-import type {
-  ProviderModel,
-  ProviderProfile,
-} from '../config/providerProfile.js';
+import type { ProviderModel, ProviderProfile } from '../config/providerProfile.js';
 
 // The primary key for the ModelConfig is the model string. However, we also
 // support a secondary key to limit the override scope, typically an agent name.
@@ -313,9 +310,7 @@ export class ModelConfigService {
       })
       .map(([id, m]) => {
         const description =
-          id === 'auto'
-            ? getAutoModelDescription()
-            : (m.dialogDescription ?? '');
+          id === 'auto' ? getAutoModelDescription() : (m.dialogDescription ?? '');
 
         return {
           modelId: id,
@@ -378,16 +373,10 @@ export class ModelConfigService {
    */
   getContextWindow(modelId: string): number {
     const resolvedId = this.resolveModelId(modelId);
-    return (
-      this.getModelDefinition(resolvedId)?.contextWindow ??
-      DEFAULT_CONTEXT_WINDOW
-    );
+    return this.getModelDefinition(resolvedId)?.contextWindow ?? DEFAULT_CONTEXT_WINDOW;
   }
 
-  private matches(
-    condition: ResolutionCondition,
-    context: ResolutionContext,
-  ): boolean {
+  private matches(condition: ResolutionCondition, context: ResolutionContext): boolean {
     return Object.entries(condition).every(([key, value]) => {
       if (value === undefined) return true;
 
@@ -405,10 +394,7 @@ export class ModelConfigService {
   }
 
   // Resolves a model ID to a concrete model ID based on the provided context.
-  resolveModelId(
-    requestedName: string,
-    context: ResolutionContext = {},
-  ): string {
+  resolveModelId(requestedName: string, context: ResolutionContext = {}): string {
     const resolution = this.currentConfig.modelIdResolutions?.[requestedName];
     if (!resolution) {
       return requestedName;
@@ -532,16 +518,8 @@ export class ModelConfigService {
     );
 
     const modelToLevel = this.buildModelLevelMap(aliasChain, baseModel);
-    const allOverrides = [
-      ...overrides,
-      ...customOverrides,
-      ...this.runtimeOverrides,
-    ];
-    const matches = this.findMatchingOverrides(
-      allOverrides,
-      context,
-      modelToLevel,
-    );
+    const allOverrides = [...overrides, ...customOverrides, ...this.runtimeOverrides];
+    const matches = this.findMatchingOverrides(allOverrides, context, modelToLevel);
 
     this.sortOverrides(matches);
 
@@ -551,10 +529,7 @@ export class ModelConfigService {
     };
 
     for (const match of matches) {
-      currentConfig = ModelConfigService.merge(
-        currentConfig,
-        match.modelConfig,
-      );
+      currentConfig = ModelConfigService.merge(currentConfig, match.modelConfig);
     }
 
     return {
@@ -602,10 +577,7 @@ export class ModelConfigService {
       let resolvedConfig: ModelConfig = {};
       for (const aliasName of reversedChain) {
         const alias = allAliases[aliasName];
-        resolvedConfig = ModelConfigService.merge(
-          resolvedConfig,
-          alias.modelConfig,
-        );
+        resolvedConfig = ModelConfigService.merge(resolvedConfig, alias.modelConfig);
       }
       return {
         aliasChain: reversedChain,
@@ -617,10 +589,7 @@ export class ModelConfigService {
     if (isChatModel) {
       const fallbackAlias = 'chat-base';
       if (allAliases[fallbackAlias]) {
-        const fallbackResolution = this.resolveAliasChain(
-          fallbackAlias,
-          allAliases,
-        );
+        const fallbackResolution = this.resolveAliasChain(fallbackAlias, allAliases);
         return {
           aliasChain: [...fallbackResolution.aliasChain, requestedModel],
           baseModel: requestedModel,

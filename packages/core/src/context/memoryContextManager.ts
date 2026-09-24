@@ -49,9 +49,7 @@ export class MemoryContextManager {
   private async discoverMemoryPaths() {
     const [global, extension, project, userProjectMemory] = await Promise.all([
       getGlobalMemoryPaths(),
-      Promise.resolve(
-        getExtensionMemoryPaths(this.config.getExtensionLoader()),
-      ),
+      Promise.resolve(getExtensionMemoryPaths(this.config.getExtensionLoader())),
       this.config.isTrustedFolder()
         ? getEnvironmentMemoryPaths(
             [...this.config.getWorkspaceContext().getDirectories()],
@@ -129,19 +127,14 @@ export class MemoryContextManager {
       .filter(Boolean)
       .join('\n\n');
 
-    this.projectMemory = this.config.isTrustedFolder()
-      ? projectMemoryWithMcp
-      : '';
+    this.projectMemory = this.config.isTrustedFolder() ? projectMemoryWithMcp : '';
   }
 
   /**
    * Discovers and loads context for a specific accessed path (Tier 3 - JIT).
    * Traverses upwards from the accessed path to the project root.
    */
-  async discoverContext(
-    accessedPath: string,
-    trustedRoots: string[],
-  ): Promise<string> {
+  async discoverContext(accessedPath: string, trustedRoots: string[]): Promise<string> {
     if (!this.config.isTrustedFolder()) {
       return '';
     }

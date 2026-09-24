@@ -190,9 +190,7 @@ describe('checkpoint utils', () => {
       (mockGitService.createFileSnapshot as Mock).mockRejectedValue(
         new Error('Snapshot failed'),
       );
-      (mockGitService.getCurrentCommitHash as Mock).mockResolvedValue(
-        'fallback-hash',
-      );
+      (mockGitService.getCurrentCommitHash as Mock).mockResolvedValue('fallback-hash');
 
       const { checkpointsToWrite, errors } = await processRestorableToolCalls(
         toolCalls,
@@ -247,9 +245,7 @@ describe('checkpoint utils', () => {
       (mockGitService.createFileSnapshot as Mock).mockRejectedValue(
         new Error('Snapshot failed'),
       );
-      (mockGitService.getCurrentCommitHash as Mock).mockResolvedValue(
-        undefined,
-      );
+      (mockGitService.getCurrentCommitHash as Mock).mockResolvedValue(undefined);
 
       const { checkpointsToWrite, errors } = await processRestorableToolCalls(
         toolCalls,

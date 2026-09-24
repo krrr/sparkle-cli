@@ -38,10 +38,7 @@ export class ExaSearchProvider implements ThirdPartySearchProvider {
 
   constructor(private readonly apiKey: string) {}
 
-  async search(
-    query: string,
-    signal?: AbortSignal,
-  ): Promise<ThirdPartySearchResult[]> {
+  async search(query: string, signal?: AbortSignal): Promise<ThirdPartySearchResult[]> {
     const response = await retryWithBackoff(
       async () => {
         const res = await fetchWithTimeout(

@@ -25,9 +25,7 @@ describe('sessionScratchpadUtils', () => {
     it('handles adversarial unterminated quoted input without exposing arguments', () => {
       const adversarialCommand = `"${'\\"!'.repeat(10_000)}`;
 
-      expect(summarizeShellCommandForScratchpad(adversarialCommand)).toBe(
-        'shell',
-      );
+      expect(summarizeShellCommandForScratchpad(adversarialCommand)).toBe('shell');
     });
   });
 

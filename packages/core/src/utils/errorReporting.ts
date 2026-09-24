@@ -37,11 +37,7 @@ export async function reportError(
   let errorToReport: { message: string; stack?: string };
   if (error instanceof Error) {
     errorToReport = { message: error.message, stack: error.stack };
-  } else if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error
-  ) {
+  } else if (typeof error === 'object' && error !== null && 'message' in error) {
     errorToReport = {
       message: String((error as { message: unknown }).message),
     };
@@ -64,10 +60,7 @@ export async function reportError(
       `${baseMessage} Could not stringify report content (likely due to context):`,
       stringifyError,
     );
-    debugLogger.error(
-      'Original error that triggered report generation:',
-      error,
-    );
+    debugLogger.error('Original error that triggered report generation:', error);
     if (context) {
       debugLogger.error(
         'Original context could not be stringified or included in report.',
@@ -94,20 +87,14 @@ export async function reportError(
 
   try {
     await fs.writeFile(reportPath, stringifiedReportContent);
-    debugLogger.error(
-      `${baseMessage} Full report available at: ${reportPath}`,
-      error,
-    );
+    debugLogger.error(`${baseMessage} Full report available at: ${reportPath}`, error);
   } catch (writeError) {
     debugLogger.error(
       `${baseMessage} Additionally, failed to write detailed error report:`,
       writeError,
     );
     // Log the original error as a fallback if report writing fails
-    debugLogger.error(
-      'Original error that triggered report generation:',
-      error,
-    );
+    debugLogger.error('Original error that triggered report generation:', error);
 
     if (context) {
       // Context was stringifiable, but writing the file failed.
@@ -122,9 +109,7 @@ export async function reportError(
             JSON.stringify(context).substring(0, 1000),
           );
         } catch {
-          debugLogger.error(
-            'Original context could not be logged or stringified.',
-          );
+          debugLogger.error('Original context could not be logged or stringified.');
         }
       }
     }

@@ -68,9 +68,7 @@ export function CompressionMessage({
       </Box>
       <Box>
         <Text
-          color={
-            compression.isPending ? theme.text.accent : theme.status.success
-          }
+          color={compression.isPending ? theme.text.accent : theme.status.success}
           aria-label={SCREEN_READER_MODEL_PREFIX}
         >
           {text}

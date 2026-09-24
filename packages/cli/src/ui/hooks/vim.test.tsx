@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import type React from 'react';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
@@ -464,16 +456,12 @@ describe('useVim hook', async () => {
       exitInsertMode(result);
 
       act(() => {
-        const handled = result.current.handleInput(
-          createKey({ sequence: '3' }),
-        );
+        const handled = result.current.handleInput(createKey({ sequence: '3' }));
         expect(handled).toBe(true);
       });
 
       act(() => {
-        const handled = result.current.handleInput(
-          createKey({ sequence: 'h' }),
-        );
+        const handled = result.current.handleInput(createKey({ sequence: 'h' }));
         expect(handled).toBe(true);
       });
 
@@ -504,10 +492,7 @@ describe('useVim hook', async () => {
     });
 
     it('should support vim mode and basic operations across multiple lines', async () => {
-      const testBuffer = createMockBuffer(
-        'first line word\nsecond line word',
-        [0, 11],
-      );
+      const testBuffer = createMockBuffer('first line word\nsecond line word', [0, 11]);
       const { result } = await renderVimHook(testBuffer);
 
       expect(result.current.vimModeEnabled).toBe(true);
@@ -1256,10 +1241,7 @@ describe('useVim hook', async () => {
       });
 
       it('should change multiple lines with count', async () => {
-        const testBuffer = createMockBuffer(
-          'line1\nline2\nline3\nline4',
-          [1, 0],
-        );
+        const testBuffer = createMockBuffer('line1\nline2\nline3\nline4', [1, 0]);
         const { result } = await renderVimHook(testBuffer);
         exitInsertMode(result);
 
@@ -1465,9 +1447,7 @@ describe('useVim hook', async () => {
         mockVimContext.vimMode = 'NORMAL';
         const { result } = await renderVimHook();
 
-        const handled = result.current.handleInput(
-          createKey({ name: 'escape' }),
-        );
+        const handled = result.current.handleInput(createKey({ name: 'escape' }));
 
         expect(handled).toBe(false);
       });
@@ -1499,9 +1479,7 @@ describe('useVim hook', async () => {
         expect(result.current.mode).toBe('INSERT');
       });
 
-      const handled = result.current.handleInput(
-        createKey({ name: 'r', ctrl: true }),
-      );
+      const handled = result.current.handleInput(createKey({ name: 'r', ctrl: true }));
 
       expect(handled).toBe(false);
     });
@@ -1800,9 +1778,7 @@ describe('useVim hook', async () => {
         });
 
         const action = (
-          count
-            ? { type: actionType, payload: { count } }
-            : { type: actionType }
+          count ? { type: actionType, payload: { count } } : { type: actionType }
         ) as TextBufferAction;
 
         const result = textBufferReducer(initialState, action);
@@ -2088,9 +2064,7 @@ describe('useVim hook', async () => {
         result.current.handleInput(createKey({ sequence: 'r' }));
       });
       act(() => {
-        result.current.handleInput(
-          createKey({ sequence: '\u001b', name: 'escape' }),
-        );
+        result.current.handleInput(createKey({ sequence: '\u001b', name: 'escape' }));
       });
       act(() => {
         result.current.handleInput(createKey({ sequence: 'a' }));
@@ -2177,11 +2151,7 @@ describe('useVim hook', async () => {
       });
 
       expect(mockBuffer.vimFindCharForward).toHaveBeenCalledTimes(2);
-      expect(mockBuffer.vimFindCharForward).toHaveBeenLastCalledWith(
-        'o',
-        1,
-        false,
-      );
+      expect(mockBuffer.vimFindCharForward).toHaveBeenLastCalledWith('o', 1, false);
     });
 
     it(',: should repeat last f find in reverse direction', async () => {
@@ -2200,11 +2170,7 @@ describe('useVim hook', async () => {
         result.current.handleInput(createKey({ sequence: ',' }));
       });
 
-      expect(mockBuffer.vimFindCharBackward).toHaveBeenCalledWith(
-        'o',
-        1,
-        false,
-      );
+      expect(mockBuffer.vimFindCharBackward).toHaveBeenCalledWith('o', 1, false);
     });
 
     it('; and , should do nothing if no prior find', async () => {
@@ -2230,9 +2196,7 @@ describe('useVim hook', async () => {
         result.current.handleInput(createKey({ sequence: 'f' }));
       });
       act(() => {
-        result.current.handleInput(
-          createKey({ sequence: '\u001b', name: 'escape' }),
-        );
+        result.current.handleInput(createKey({ sequence: '\u001b', name: 'escape' }));
       });
       // o should NOT be consumed as find target
       act(() => {
@@ -2347,11 +2311,7 @@ describe('useVim hook', async () => {
         result.current.handleInput(createKey({ sequence: 'x' }));
       });
 
-      expect(mockBuffer.vimDeleteToCharForward).toHaveBeenCalledWith(
-        'x',
-        1,
-        false,
-      );
+      expect(mockBuffer.vimDeleteToCharForward).toHaveBeenCalledWith('x', 1, false);
       expect(mockBuffer.vimFindCharForward).not.toHaveBeenCalled();
 
       // Next key is a fresh normal-mode command — no dangling state
@@ -2462,11 +2422,7 @@ describe('useVim hook', async () => {
       act(() => {
         result.current.handleInput(createKey({ sequence: 'o' }));
       });
-      expect(mockBuffer.vimDeleteToCharForward).toHaveBeenCalledWith(
-        'o',
-        2,
-        false,
-      );
+      expect(mockBuffer.vimDeleteToCharForward).toHaveBeenCalledWith('o', 2, false);
     });
   });
 

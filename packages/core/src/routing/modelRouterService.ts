@@ -54,10 +54,7 @@ export class ModelRouterService {
     // The default strategy is the terminal strategy.
     const terminalStrategy = new DefaultStrategy();
 
-    return new CompositeStrategy(
-      [...strategies, terminalStrategy],
-      'agent-router',
-    );
+    return new CompositeStrategy([...strategies, terminalStrategy], 'agent-router');
   }
 
   /**

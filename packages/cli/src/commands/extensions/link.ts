@@ -47,12 +47,9 @@ export async function handleLink(args: InstallArgs) {
       settings: loadSettings(workspaceDir).merged,
     });
     await extensionManager.loadExtensions();
-    const extension =
-      await extensionManager.installOrUpdateExtension(installMetadata);
+    const extension = await extensionManager.installOrUpdateExtension(installMetadata);
     debugLogger.log(
-      chalk.green(
-        `Extension "${extension.name}" linked successfully and enabled.`,
-      ),
+      chalk.green(`Extension "${extension.name}" linked successfully and enabled.`),
     );
   } catch (error) {
     debugLogger.error(getErrorMessage(error));

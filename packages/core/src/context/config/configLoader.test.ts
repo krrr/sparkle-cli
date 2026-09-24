@@ -74,15 +74,15 @@ describe('SidecarLoader (Real FS)', () => {
       },
     };
     await fs.writeFile(sidecarPath, JSON.stringify(invalidConfig));
-    await expect(
-      loadContextManagementConfig(sidecarPath, registry),
-    ).rejects.toThrow('Validation error');
+    await expect(loadContextManagementConfig(sidecarPath, registry)).rejects.toThrow(
+      'Validation error',
+    );
   });
 
   it('throws validation error if file is empty whitespace', async () => {
     await fs.writeFile(sidecarPath, '   \n  ');
-    await expect(
-      loadContextManagementConfig(sidecarPath, registry),
-    ).rejects.toThrow('Unexpected end of JSON input');
+    await expect(loadContextManagementConfig(sidecarPath, registry)).rejects.toThrow(
+      'Unexpected end of JSON input',
+    );
   });
 });

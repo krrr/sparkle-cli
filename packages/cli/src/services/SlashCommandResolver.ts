@@ -47,8 +47,7 @@ export class SlashCommandResolver {
       const originalName = cmd.name;
       let finalName = originalName;
 
-      const shouldAlwaysPrefix =
-        cmd.kind === CommandKind.SKILL && !!cmd.extensionName;
+      const shouldAlwaysPrefix = cmd.kind === CommandKind.SKILL && !!cmd.extensionName;
 
       if (shouldAlwaysPrefix) {
         finalName = this.getRenamedName(
@@ -152,13 +151,7 @@ export class SlashCommandResolver {
     registry.commandMap.set(renamedName, renamedOwner);
 
     // Record the conflict so the user can be notified of the prefixing.
-    this.trackConflict(
-      registry.conflictsMap,
-      name,
-      reason,
-      currentOwner,
-      renamedName,
-    );
+    this.trackConflict(registry.conflictsMap, name, reason, currentOwner, renamedName);
   }
 
   /**

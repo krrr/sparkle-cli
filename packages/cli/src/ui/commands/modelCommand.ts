@@ -5,17 +5,12 @@
  */
 
 import { ModelSlashCommandEvent, logModelSlashCommand } from 'sparkle-cli-core';
-import {
-  type CommandContext,
-  CommandKind,
-  type SlashCommand,
-} from './types.js';
+import { type CommandContext, CommandKind, type SlashCommand } from './types.js';
 import { MessageType } from '../types.js';
 
 const setModelCommand: SlashCommand = {
   name: 'set',
-  description:
-    'Set the model to use. Usage: /model set <model-name> [--persist]',
+  description: 'Set the model to use. Usage: /model set <model-name> [--persist]',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context: CommandContext, args: string) => {

@@ -86,10 +86,7 @@ describe('permissionsCommand', () => {
     vi.mocked(fs).statSync.mockImplementation(() => {
       throw new Error('ENOENT: no such file or directory');
     });
-    const actionResult = trustCommand?.action?.(
-      mockContext,
-      '/nonexistent/dir',
-    );
+    const actionResult = trustCommand?.action?.(mockContext, '/nonexistent/dir');
     expect(actionResult).toEqual({
       type: 'message',
       messageType: 'error',

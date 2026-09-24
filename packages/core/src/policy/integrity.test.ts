@@ -202,20 +202,12 @@ describe('PolicyIntegrityManager', () => {
       );
 
       // Project A should match
-      const resultA = await integrityManager.checkIntegrity(
-        'workspace',
-        'idA',
-        dirA,
-      );
+      const resultA = await integrityManager.checkIntegrity('workspace', 'idA', dirA);
       expect(resultA.status).toBe(IntegrityStatus.MATCH);
       expect(resultA.hash).toBe(hashA);
 
       // Project B should mismatch
-      const resultB = await integrityManager.checkIntegrity(
-        'workspace',
-        'idB',
-        dirB,
-      );
+      const resultB = await integrityManager.checkIntegrity('workspace', 'idB', dirB);
       expect(resultB.status).toBe(IntegrityStatus.MISMATCH);
       expect(resultB.hash).toBe(hashB);
     });
@@ -225,9 +217,7 @@ describe('PolicyIntegrityManager', () => {
     it('should save the hash to storage', async () => {
       await integrityManager.acceptIntegrity('workspace', 'id', 'hash123');
 
-      const stored = JSON.parse(
-        await fs.readFile(integrityStoragePath, 'utf-8'),
-      );
+      const stored = JSON.parse(await fs.readFile(integrityStoragePath, 'utf-8'));
       expect(stored['workspace:id']).toBe('hash123');
     });
 
@@ -239,9 +229,7 @@ describe('PolicyIntegrityManager', () => {
 
       await integrityManager.acceptIntegrity('workspace', 'id', 'hash123');
 
-      const stored = JSON.parse(
-        await fs.readFile(integrityStoragePath, 'utf-8'),
-      );
+      const stored = JSON.parse(await fs.readFile(integrityStoragePath, 'utf-8'));
       expect(stored['other:id']).toBe('otherhash');
       expect(stored['workspace:id']).toBe('hash123');
     });

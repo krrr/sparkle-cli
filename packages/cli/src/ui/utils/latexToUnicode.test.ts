@@ -46,9 +46,7 @@ describe('convertLatexToUnicode', () => {
     });
 
     it('strips $...$ around single variables', () => {
-      expect(convertLatexToUnicode('let $x$ be a value')).toBe(
-        'let x be a value',
-      );
+      expect(convertLatexToUnicode('let $x$ be a value')).toBe('let x be a value');
     });
 
     it('strips $$...$$ display math', () => {
@@ -70,15 +68,11 @@ describe('convertLatexToUnicode', () => {
     });
 
     it('leaves shell-style $ interpolation alone', () => {
-      expect(convertLatexToUnicode('echo $USER $HOME')).toBe(
-        'echo $USER $HOME',
-      );
+      expect(convertLatexToUnicode('echo $USER $HOME')).toBe('echo $USER $HOME');
     });
 
     it('does not strip dollars across newlines', () => {
-      expect(convertLatexToUnicode('price $5\nfee $3')).toBe(
-        'price $5\nfee $3',
-      );
+      expect(convertLatexToUnicode('price $5\nfee $3')).toBe('price $5\nfee $3');
     });
   });
 
@@ -99,15 +93,11 @@ describe('convertLatexToUnicode', () => {
 
   describe('named commands', () => {
     it('converts arrows', () => {
-      expect(convertLatexToUnicode('\\to \\rightarrow \\Rightarrow')).toBe(
-        '→ → ⇒',
-      );
+      expect(convertLatexToUnicode('\\to \\rightarrow \\Rightarrow')).toBe('→ → ⇒');
     });
 
     it('converts relations', () => {
-      expect(convertLatexToUnicode('\\leq \\geq \\neq \\approx')).toBe(
-        '≤ ≥ ≠ ≈',
-      );
+      expect(convertLatexToUnicode('\\leq \\geq \\neq \\approx')).toBe('≤ ≥ ≠ ≈');
     });
 
     it('converts set theory', () => {
@@ -251,9 +241,7 @@ describe('convertLatexToUnicode', () => {
 
   describe('protection of non-LaTeX content', () => {
     it('leaves Windows paths alone', () => {
-      expect(convertLatexToUnicode('C:\\Users\\foo\\bar')).toBe(
-        'C:\\Users\\foo\\bar',
-      );
+      expect(convertLatexToUnicode('C:\\Users\\foo\\bar')).toBe('C:\\Users\\foo\\bar');
     });
 
     it('leaves Windows UNC paths alone (no line-break rewrite in prose)', () => {
@@ -277,8 +265,7 @@ describe('convertLatexToUnicode', () => {
 
   describe('combined scenarios', () => {
     it('handles complex math in prose', () => {
-      const input =
-        'The complexity is $O(n \\log n)$ for sorting $n$ elements.';
+      const input = 'The complexity is $O(n \\log n)$ for sorting $n$ elements.';
       expect(convertLatexToUnicode(input)).toBe(
         'The complexity is O(n log n) for sorting n elements.',
       );

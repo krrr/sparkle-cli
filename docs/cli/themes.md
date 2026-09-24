@@ -1,13 +1,13 @@
 # Themes
 
-Sparkle CLI supports a variety of themes to customize its color scheme and
-appearance. You can change the theme to suit your preferences via the `/theme`
-command or `"theme":` configuration setting.
+Sparkle CLI supports a variety of themes to customize its color scheme and appearance.
+You can change the theme to suit your preferences via the `/theme` command or `"theme":`
+configuration setting.
 
 ## Available themes
 
-Sparkle CLI comes with a selection of pre-defined themes, which you can list
-using the `/theme` command within Sparkle CLI:
+Sparkle CLI comes with a selection of pre-defined themes, which you can list using the
+`/theme` command within Sparkle CLI:
 
 - **Dark themes:**
   - `ANSI`
@@ -33,8 +33,8 @@ using the `/theme` command within Sparkle CLI:
 
 1.  Enter `/theme` into Sparkle CLI.
 2.  A dialog or selection prompt appears, listing the available themes.
-3.  Using the arrow keys, select a theme. Some interfaces might offer a live
-    preview or highlight as you select.
+3.  Using the arrow keys, select a theme. Some interfaces might offer a live preview or
+    highlight as you select.
 4.  Confirm your selection to apply the theme.
 
 <!-- prettier-ignore -->
@@ -46,22 +46,22 @@ using the `/theme` command within Sparkle CLI:
 ### Theme persistence
 
 Selected themes are saved in Sparkle CLI's
-[configuration](../reference/configuration.md) so your preference is remembered
-across sessions.
+[configuration](../reference/configuration.md) so your preference is remembered across
+sessions.
 
 ---
 
 ## Custom color themes
 
-Sparkle CLI lets you create your own custom color themes by specifying them in
-your `settings.json` file. This gives you full control over the color palette
-used in the CLI.
+Sparkle CLI lets you create your own custom color themes by specifying them in your
+`settings.json` file. This gives you full control over the color palette used in the
+CLI.
 
 ### How to define a custom theme
 
-Add a `customThemes` block to your user, project, or system `settings.json`
-file. Each custom theme is defined as an object with a unique name and a set of
-nested configuration objects. For example:
+Add a `customThemes` block to your user, project, or system `settings.json` file. Each
+custom theme is defined as an object with a unique name and a set of nested
+configuration objects. For example:
 
 ```json
 {
@@ -112,28 +112,26 @@ nested configuration objects. For example:
 - `name` (must match the key in the `customThemes` object and be a string)
 - `type` (must be the string `"custom"`)
 
-While all sub-properties are technically optional, we recommend providing at
-least `background.primary`, `text.primary`, `text.secondary`, and the various
-accent colors via `text.link`, `text.accent`, and `status` to ensure a cohesive
-UI.
+While all sub-properties are technically optional, we recommend providing at least
+`background.primary`, `text.primary`, `text.secondary`, and the various accent colors
+via `text.link`, `text.accent`, and `status` to ensure a cohesive UI.
 
-You can use either hex codes (for example, `#FF0000`) **or** standard CSS color
-names (for example, `coral`, `teal`, `blue`) for any color value. See
+You can use either hex codes (for example, `#FF0000`) **or** standard CSS color names
+(for example, `coral`, `teal`, `blue`) for any color value. See
 [CSS color names](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#color_keywords)
 for a full list of supported names.
 
-You can define multiple custom themes by adding more entries to the
-`customThemes` object.
+You can define multiple custom themes by adding more entries to the `customThemes`
+object.
 
 ### Loading themes from a file
 
-In addition to defining custom themes in `settings.json`, you can also load a
-theme directly from a JSON file by specifying the file path in your
-`settings.json`. This is useful for sharing themes or keeping them separate from
-your main configuration.
+In addition to defining custom themes in `settings.json`, you can also load a theme
+directly from a JSON file by specifying the file path in your `settings.json`. This is
+useful for sharing themes or keeping them separate from your main configuration.
 
-To load a theme from a file, set the `theme` property in your `settings.json` to
-the path of your theme file:
+To load a theme from a file, set the `theme` property in your `settings.json` to the
+path of your theme file:
 
 ```json
 {
@@ -143,8 +141,8 @@ the path of your theme file:
 }
 ```
 
-The theme file must be a valid JSON file that follows the same structure as a
-custom theme defined in `settings.json`.
+The theme file must be a valid JSON file that follows the same structure as a custom
+theme defined in `settings.json`.
 
 **Example `my-theme.json`:**
 
@@ -196,19 +194,18 @@ custom theme defined in `settings.json`.
 
 ### Using your custom theme
 
-- Select your custom theme using the `/theme` command in Sparkle CLI. Your
-  custom theme will appear in the theme selection dialog.
-- Or, set it as the default by adding `"theme": "MyCustomTheme"` to the `ui`
-  object in your `settings.json`.
-- Custom themes can be set at the user, project, or system level, and follow the
-  same [configuration precedence](../reference/configuration.md) as other
-  settings.
+- Select your custom theme using the `/theme` command in Sparkle CLI. Your custom theme
+  will appear in the theme selection dialog.
+- Or, set it as the default by adding `"theme": "MyCustomTheme"` to the `ui` object in
+  your `settings.json`.
+- Custom themes can be set at the user, project, or system level, and follow the same
+  [configuration precedence](../reference/configuration.md) as other settings.
 
 ### Themes from extensions
 
-[Extensions](../extensions/reference.md#themes) can also provide custom themes.
-Once an extension is installed and enabled, its themes are automatically added
-to the selection list in the `/theme` command.
+[Extensions](../extensions/reference.md#themes) can also provide custom themes. Once an
+extension is installed and enabled, its themes are automatically added to the selection
+list in the `/theme` command.
 
 Themes from extensions appear with the extension name in parentheses to help you
 identify their source, for example: `shades-of-green (green-extension)`.

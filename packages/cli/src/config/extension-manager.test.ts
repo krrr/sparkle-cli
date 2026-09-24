@@ -18,11 +18,7 @@ import {
   loadTrustedFolders,
   isWorkspaceTrusted,
 } from './trustedFolders.js';
-import {
-  getRealPath,
-  type CustomTheme,
-  IntegrityDataStatus,
-} from 'sparkle-cli-core';
+import { getRealPath, type CustomTheme, IntegrityDataStatus } from 'sparkle-cli-core';
 
 const mockHomedir = vi.hoisted(() => vi.fn(() => '/tmp/mock-home'));
 const mockIntegrityManager = vi.hoisted(() => ({
@@ -43,9 +39,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...actual,
     homedir: mockHomedir,
-    ExtensionIntegrityManager: vi
-      .fn()
-      .mockImplementation(() => mockIntegrityManager),
+    ExtensionIntegrityManager: vi.fn().mockImplementation(() => mockIntegrityManager),
   };
 });
 
@@ -77,9 +71,7 @@ describe('ExtensionManager', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-cli-test-home-'),
-    );
+    tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-home-'));
     tempWorkspaceDir = fs.mkdtempSync(
       path.join(tempHomeDir, 'sparkle-cli-test-workspace-'),
     );
@@ -123,10 +115,7 @@ describe('ExtensionManager', () => {
       const promise2 = extensionManager.loadExtensions();
 
       // They should resolve to the exact same array
-      const [extensions1, extensions2] = await Promise.all([
-        promise1,
-        promise2,
-      ]);
+      const [extensions1, extensions2] = await Promise.all([promise1, promise2]);
 
       expect(extensions1).toBe(extensions2);
       expect(extensions1).toHaveLength(2);
@@ -197,9 +186,7 @@ describe('ExtensionManager', () => {
 
       // Create a second extension dynamically in a DIFFERENT directory
       // so that loadExtensions (which scans userExtensionsDir) doesn't find it.
-      const externalDir = fs.mkdtempSync(
-        path.join(os.tmpdir(), 'external-ext-'),
-      );
+      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-ext-'));
       fs.writeFileSync(
         path.join(externalDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext2', version: '1.0.0' }),
@@ -371,9 +358,7 @@ describe('ExtensionManager', () => {
       if (absolutePath !== realPath) {
         await expect(
           manager2.installOrUpdateExtension(installMetadata),
-        ).rejects.toThrow(
-          /is not allowed by the "allowedExtensions" security setting/,
-        );
+        ).rejects.toThrow(/is not allowed by the "allowedExtensions" security setting/);
       }
     });
   });
@@ -397,9 +382,7 @@ describe('ExtensionManager', () => {
       await extensionManager.loadExtensions();
 
       // 2. Create a temporary "new" version with a different name
-      const newSourceDir = fs.mkdtempSync(
-        path.join(tempHomeDir, 'new-source-'),
-      );
+      const newSourceDir = fs.mkdtempSync(path.join(tempHomeDir, 'new-source-'));
       fs.writeFileSync(
         path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: newName, version: '1.1.0' }),
@@ -447,9 +430,7 @@ describe('ExtensionManager', () => {
       const extension = extensionManager.getExtensions()[0];
       expect(extension.isActive).toBe(true);
 
-      const newSourceDir = fs.mkdtempSync(
-        path.join(tempHomeDir, 'new-source-'),
-      );
+      const newSourceDir = fs.mkdtempSync(path.join(tempHomeDir, 'new-source-'));
       fs.writeFileSync(
         path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: newName, version: '1.1.0' }),
@@ -497,9 +478,7 @@ describe('ExtensionManager', () => {
       await extensionManager.loadExtensions();
 
       // Try to update ext1 to name 'ext2'
-      const newSourceDir = fs.mkdtempSync(
-        path.join(tempHomeDir, 'new-source-'),
-      );
+      const newSourceDir = fs.mkdtempSync(path.join(tempHomeDir, 'new-source-'));
       fs.writeFileSync(
         path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: 'ext2', version: '1.1.0' }),
@@ -562,16 +541,14 @@ describe('ExtensionManager', () => {
       // Ensure no integrity data exists for this extension
       verifySpy.mockResolvedValueOnce(IntegrityDataStatus.MISSING);
 
-      const initialStatus = await extensionManager.verifyExtensionIntegrity(
-        extName,
-        { type: 'local', source: extDir },
-      );
+      const initialStatus = await extensionManager.verifyExtensionIntegrity(extName, {
+        type: 'local',
+        source: extDir,
+      });
       expect(initialStatus).toBe('missing');
 
       // Create new version of the extension
-      const newSourceDir = fs.mkdtempSync(
-        path.join(tempHomeDir, 'new-source-'),
-      );
+      const newSourceDir = fs.mkdtempSync(path.join(tempHomeDir, 'new-source-'));
       fs.writeFileSync(
         path.join(newSourceDir, 'sparkle-extension.json'),
         JSON.stringify({ name: extName, version: '1.1.0' }),
@@ -603,9 +580,7 @@ describe('ExtensionManager', () => {
 
       await extensionManager.loadExtensions();
 
-      expect(themeManager.getCustomThemeNames()).toContain(
-        'MyTheme (themed-ext)',
-      );
+      expect(themeManager.getCustomThemeNames()).toContain('MyTheme (themed-ext)');
     });
 
     it('should not register themes for inactive extensions', async () => {

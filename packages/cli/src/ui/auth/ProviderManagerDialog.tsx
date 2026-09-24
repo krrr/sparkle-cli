@@ -36,20 +36,18 @@ export function ProviderManagerDialog({
   const profileService = config?.getProviderProfileService();
 
   const [view, setView] = useState<'list' | 'editor' | 'models'>('list');
-  const [editingProfile, setEditingProfile] = useState<
-    ProviderProfile | undefined
-  >(undefined);
-  const [modelsProfileId, setModelsProfileId] = useState<string | undefined>(
+  const [editingProfile, setEditingProfile] = useState<ProviderProfile | undefined>(
     undefined,
   );
+  const [modelsProfileId, setModelsProfileId] = useState<string | undefined>(undefined);
   const [localError, setLocalError] = useState<string | null>(authError);
 
   const [profiles, setProfiles] = useState<ProviderProfile[]>(
     () => profileService?.listProfiles() || [],
   );
-  const [activeProfile, setActiveProfile] = useState<
-    ProviderProfile | undefined
-  >(() => profileService?.getActiveProfile());
+  const [activeProfile, setActiveProfile] = useState<ProviderProfile | undefined>(() =>
+    profileService?.getActiveProfile(),
+  );
 
   const refreshProfiles = useCallback(() => {
     if (!profileService) return;

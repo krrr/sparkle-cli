@@ -139,8 +139,7 @@ export const generateSvgForTerminal = (terminal: Terminal): string => {
             let extraAttrs = '';
             if (currentIsBold) extraAttrs += ' font-weight="bold"';
             if (currentIsItalic) extraAttrs += ' font-style="italic"';
-            if (currentIsUnderline)
-              extraAttrs += ' text-decoration="underline"';
+            if (currentIsUnderline) extraAttrs += ' text-decoration="underline"';
 
             // Use textLength to ensure the block fits exactly into its designated cells
             const textElement = `<text x="${xPos}" y="${yPos + 2}" fill="${fill}" textLength="${textWidth}" lengthAdjust="spacingAndGlyphs"${extraAttrs}>${escapeXml(currentBlockText)}</text>`;

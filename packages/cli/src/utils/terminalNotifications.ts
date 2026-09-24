@@ -112,9 +112,7 @@ function wrapWithPassthrough(sequence: string): string {
 
 function emitOsc9Notification(content: RunEventNotificationContent): void {
   const sanitized = sanitizeNotificationContent(content);
-  const pieces = [sanitized.title, sanitized.subtitle, sanitized.body].filter(
-    Boolean,
-  );
+  const pieces = [sanitized.title, sanitized.subtitle, sanitized.body].filter(Boolean);
   const combined = pieces.join(OSC_TEXT_SEPARATOR);
 
   writeToStdout(wrapWithPassthrough(`${OSC9_PREFIX}${combined}${BEL}`));
@@ -129,9 +127,7 @@ function emitOsc777Notification(content: RunEventNotificationContent): void {
   const safeTitle = sanitized.title.replace(/;/g, ':');
   const safeBody = body.replace(/;/g, ':');
 
-  writeToStdout(
-    wrapWithPassthrough(`${OSC777_PREFIX}${safeTitle};${safeBody}${BEL}`),
-  );
+  writeToStdout(wrapWithPassthrough(`${OSC777_PREFIX}${safeTitle};${safeBody}${BEL}`));
 }
 
 function emitBellNotification(): void {

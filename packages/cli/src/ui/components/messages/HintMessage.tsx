@@ -20,8 +20,7 @@ export const HintMessage: React.FC<HintMessageProps> = ({ text }) => {
   const prefixWidth = prefix.length;
   const config = useConfig();
   const useBackgroundColorSetting = config.getUseBackgroundColor();
-  const useBackgroundColor =
-    useBackgroundColorSetting && !!theme.background.message;
+  const useBackgroundColor = useBackgroundColorSetting && !!theme.background.message;
 
   return (
     <HalfLinePaddedBox
@@ -37,10 +36,7 @@ export const HintMessage: React.FC<HintMessageProps> = ({ text }) => {
         alignSelf="flex-start"
       >
         <Box width={prefixWidth} flexShrink={0}>
-          <Text
-            color={theme.text.accent}
-            aria-label={SCREEN_READER_USER_PREFIX}
-          >
+          <Text color={theme.text.accent} aria-label={SCREEN_READER_USER_PREFIX}>
             {prefix}
           </Text>
         </Box>

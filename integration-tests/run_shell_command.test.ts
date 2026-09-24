@@ -204,9 +204,7 @@ describe('run_shell_command', () => {
 
     const toolCall = rig
       .readToolLogs()
-      .filter(
-        (toolCall) => toolCall.toolRequest.name === 'run_shell_command',
-      )[0];
+      .filter((toolCall) => toolCall.toolRequest.name === 'run_shell_command')[0];
     expect(toolCall.toolRequest.success).toBe(true);
   });
 
@@ -238,9 +236,7 @@ describe('run_shell_command', () => {
 
     const toolCall = rig
       .readToolLogs()
-      .filter(
-        (toolCall) => toolCall.toolRequest.name === 'run_shell_command',
-      )[0];
+      .filter((toolCall) => toolCall.toolRequest.name === 'run_shell_command')[0];
     expect(toolCall.toolRequest.success).toBe(true);
   });
 
@@ -277,9 +273,7 @@ describe('run_shell_command', () => {
 
     const toolCall = rig
       .readToolLogs()
-      .filter(
-        (toolCall) => toolCall.toolRequest.name === 'run_shell_command',
-      )[0];
+      .filter((toolCall) => toolCall.toolRequest.name === 'run_shell_command')[0];
     expect(toolCall.toolRequest.success).toBe(true);
   });
 
@@ -320,9 +314,7 @@ describe('run_shell_command', () => {
 
     const toolCall = rig
       .readToolLogs()
-      .filter(
-        (toolCall) => toolCall.toolRequest.name === 'run_shell_command',
-      )[0];
+      .filter((toolCall) => toolCall.toolRequest.name === 'run_shell_command')[0];
     expect(toolCall.toolRequest.success).toBe(true);
   });
 
@@ -424,9 +416,7 @@ describe('run_shell_command', () => {
       .readToolLogs()
       .filter((toolLog) => toolLog.toolRequest.name === 'run_shell_command');
     const failureLog = toolLogs.find((toolLog) =>
-      toolLog.toolRequest.args
-        .toLowerCase()
-        .includes(disallowed.tool.toLowerCase()),
+      toolLog.toolRequest.args.toLowerCase().includes(disallowed.tool.toLowerCase()),
     );
 
     if (!failureLog || failureLog.toolRequest.success) {
@@ -436,10 +426,7 @@ describe('run_shell_command', () => {
       });
     }
 
-    expect(
-      failureLog,
-      'Expected failing run_shell_command invocation',
-    ).toBeTruthy();
+    expect(failureLog, 'Expected failing run_shell_command invocation').toBeTruthy();
     expect(failureLog!.toolRequest.success).toBe(false);
   });
 
@@ -471,12 +458,9 @@ describe('run_shell_command', () => {
   });
 
   it('should allow all with "ShellTool" and other specific tools', async () => {
-    await rig.setup(
-      'should allow all with "ShellTool" and other specific tools',
-      {
-        settings: { tools: { core: ['run_shell_command'] } },
-      },
-    );
+    await rig.setup('should allow all with "ShellTool" and other specific tools', {
+      settings: { tools: { core: ['run_shell_command'] } },
+    });
 
     const { tool } = getLineCountCommand();
     const prompt = `Please run the command "echo test-allow-all" and show me the output`;
@@ -506,9 +490,7 @@ describe('run_shell_command', () => {
 
     const toolCall = rig
       .readToolLogs()
-      .filter(
-        (toolCall) => toolCall.toolRequest.name === 'run_shell_command',
-      )[0];
+      .filter((toolCall) => toolCall.toolRequest.name === 'run_shell_command')[0];
     expect(toolCall.toolRequest.success).toBe(true);
 
     assertModelHasOutput(result);
@@ -606,8 +588,7 @@ describe('run_shell_command', () => {
     const foundToolCall = await rig.waitForToolCall(
       'run_shell_command',
       15000,
-      (args) =>
-        args.toLowerCase().includes(escapedInvalidCommand.toLowerCase()),
+      (args) => args.toLowerCase().includes(escapedInvalidCommand.toLowerCase()),
     );
 
     if (!foundToolCall) {

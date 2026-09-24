@@ -72,10 +72,9 @@ sleep 100
         (call) => call.toolRequest.name === 'list_background_processes',
       );
 
-      expect(
-        hasListCall,
-        'Expected agent to call list_background_processes',
-      ).toBe(true);
+      expect(hasListCall, 'Expected agent to call list_background_processes').toBe(
+        true,
+      );
     },
   });
 });

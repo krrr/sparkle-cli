@@ -30,8 +30,7 @@ import {
 vi.mock('fs/promises');
 vi.mock('path');
 vi.mock('../../utils/sessionUtils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../utils/sessionUtils.js')>();
+  const actual = await importOriginal<typeof import('../../utils/sessionUtils.js')>();
   return {
     ...actual,
     getSessionFiles: vi.fn(),
@@ -84,9 +83,7 @@ describe('useSessionBrowser', () => {
     vi.mocked(mockConfig.storage.getProjectDataDir).mockReturnValue(
       MOCKED_PROJECT_TEMP_DIR,
     );
-    vi.mocked(mockConfig.getSessionId).mockReturnValue(
-      MOCKED_CURRENT_SESSION_ID,
-    );
+    vi.mocked(mockConfig.getSessionId).mockReturnValue(MOCKED_CURRENT_SESSION_ID);
   });
 
   it('should successfully resume a session', async () => {
@@ -113,9 +110,7 @@ describe('useSessionBrowser', () => {
     expect(loadConversationRecord).toHaveBeenCalledWith(
       `${MOCKED_CHATS_DIR}/${MOCKED_FILENAME}`,
     );
-    expect(mockConfig.setSessionId).toHaveBeenCalledWith(
-      'existing-session-456',
-    );
+    expect(mockConfig.setSessionId).toHaveBeenCalledWith('existing-session-456');
     expect(uiTelemetryService.hydrate).toHaveBeenCalledWith(mockConversation);
     expect(result.current.isSessionBrowserOpen).toBe(false);
     expect(mockOnLoadHistory).toHaveBeenCalled();
@@ -127,9 +122,7 @@ describe('useSessionBrowser', () => {
       id: MOCKED_SESSION_ID,
       fileName: MOCKED_FILENAME,
     } as SessionInfo;
-    vi.mocked(loadConversationRecord).mockRejectedValue(
-      new Error('File not found'),
-    );
+    vi.mocked(loadConversationRecord).mockRejectedValue(new Error('File not found'));
 
     const { result } = await renderHook(() =>
       useSessionBrowser(mockConfig, mockOnLoadHistory),

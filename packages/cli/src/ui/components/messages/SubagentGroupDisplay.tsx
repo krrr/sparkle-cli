@@ -15,10 +15,7 @@ import {
   type SubagentActivityItem,
   SubagentState,
 } from 'sparkle-cli-core';
-import {
-  SubagentProgressDisplay,
-  formatToolArgs,
-} from './SubagentProgressDisplay.js';
+import { SubagentProgressDisplay, formatToolArgs } from './SubagentProgressDisplay.js';
 import { useOverflowActions } from '../../contexts/OverflowContext.js';
 
 export interface SubagentGroupDisplayProps {
@@ -202,10 +199,7 @@ export const SubagentGroupDisplay: React.FC<SubagentGroupDisplayProps> = ({
           let formattedArgs: string | undefined;
 
           if (progress.state === SubagentState.COMPLETED) {
-            if (
-              progress.terminateReason &&
-              progress.terminateReason !== 'GOAL'
-            ) {
+            if (progress.terminateReason && progress.terminateReason !== 'GOAL') {
               content = `Finished Early (${progress.terminateReason})`;
             } else {
               content = 'Completed successfully';

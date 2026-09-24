@@ -69,18 +69,11 @@ import {
   cleanupToolOutputFiles,
   cleanupExpiredSessions,
 } from './utils/sessionCleanup.js';
-import {
-  initializeApp,
-  type InitializationResult,
-} from './core/initializer.js';
+import { initializeApp, type InitializationResult } from './core/initializer.js';
 import { runAcpClient } from './acp/acpStdioTransport.js';
 import { validateNonInteractiveAuth } from './validateNonInterActiveAuth.js';
 import { appEvents, AppEvent } from './utils/events.js';
-import {
-  RESUME_LATEST,
-  SessionError,
-  SessionSelector,
-} from './utils/sessionUtils.js';
+import { RESUME_LATEST, SessionError, SessionSelector } from './utils/sessionUtils.js';
 
 import { relaunchOnExitCode } from './utils/relaunch.js';
 import { loadSandboxConfig } from './config/sandboxConfig.js';
@@ -115,16 +108,12 @@ const DEFAULT_EPT_SIZE = (256 * 1024 * 1024).toString();
 export function getNodeMemoryArgs(isDebugMode: boolean): string[] {
   const totalMemoryMB = os.totalmem() / (1024 * 1024);
   const heapStats = v8.getHeapStatistics();
-  const currentMaxOldSpaceSizeMb = Math.floor(
-    heapStats.heap_size_limit / 1024 / 1024,
-  );
+  const currentMaxOldSpaceSizeMb = Math.floor(heapStats.heap_size_limit / 1024 / 1024);
 
   // Set target to 50% of total memory
   const targetMaxOldSpaceSizeInMB = Math.floor(totalMemoryMB * 0.5);
   if (isDebugMode) {
-    debugLogger.debug(
-      `Current heap size ${currentMaxOldSpaceSizeMb.toFixed(2)} MB`,
-    );
+    debugLogger.debug(`Current heap size ${currentMaxOldSpaceSizeMb.toFixed(2)} MB`);
   }
 
   if (process.env['SPARKLE_CLI_NO_RELAUNCH']) {
@@ -143,9 +132,7 @@ export function getNodeMemoryArgs(isDebugMode: boolean): string[] {
 
   if (
     isV8SandboxEnabled &&
-    !process.execArgv.some((arg) =>
-      arg.startsWith('--max-external-pointer-table-size'),
-    )
+    !process.execArgv.some((arg) => arg.startsWith('--max-external-pointer-table-size'))
   ) {
     args.push(eptFlag);
   }
@@ -260,11 +247,7 @@ export async function resolveSessionId(
       }
 
       await fsPromises.mkdir(chatsDir, { recursive: true });
-      await fsPromises.writeFile(
-        newSessionPath,
-        lines.join('\n') + '\n',
-        'utf-8',
-      );
+      await fsPromises.writeFile(newSessionPath, lines.join('\n') + '\n', 'utf-8');
 
       return {
         sessionId: newSessionId,
@@ -405,10 +388,7 @@ export async function main() {
 
   const trustedFolders = loadTrustedFolders();
   trustedFolders.errors.forEach((error: TrustedFoldersError) => {
-    coreEvents.emitFeedback(
-      'warning',
-      `Error in ${error.path}: ${error.message}`,
-    );
+    coreEvents.emitFeedback('warning', `Error in ${error.path}: ${error.message}`);
   });
 
   const argv = await argvPromise;
@@ -429,10 +409,7 @@ export async function main() {
     );
   }
 
-  if (
-    settings.merged.tools?.exclude &&
-    settings.merged.tools.exclude.length > 0
-  ) {
+  if (settings.merged.tools?.exclude && settings.merged.tools.exclude.length > 0) {
     coreEvents.emitFeedback(
       'warning',
       'Warning: tools.exclude in settings.json is deprecated and will be removed in 1.0. Migrate to Policy Engine: https://geminicli.com/docs/core/policy-engine/',
@@ -524,10 +501,7 @@ export async function main() {
 
       // This function is a copy of the one from sandbox.ts
       // It is moved here to decouple sandbox.ts from the CLI's argument structure.
-      const injectStdinIntoArgs = (
-        args: string[],
-        stdinData?: string,
-      ): string[] => {
+      const injectStdinIntoArgs = (args: string[], stdinData?: string): string[] => {
         const finalArgs = [...args];
         if (stdinData) {
           const promptIndex = finalArgs.findIndex(
@@ -573,9 +547,7 @@ export async function main() {
     await config.storage.initialize();
 
     if (config.isInteractive() && settings.merged.general.devtools) {
-      const { setupInitialActivityLogger } = await import(
-        './utils/devtoolsService.js'
-      );
+      const { setupInitialActivityLogger } = await import('./utils/devtoolsService.js');
       setupInitialActivityLogger(config);
     }
 

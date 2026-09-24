@@ -42,10 +42,7 @@ export function parseThought(rawText: string): ThoughtSummary {
     newlineIndex === -1 ? normalized : normalized.slice(0, newlineIndex)
   ).trim();
 
-  if (
-    !firstLine.startsWith(START_DELIMITER) ||
-    !firstLine.endsWith(END_DELIMITER)
-  ) {
+  if (!firstLine.startsWith(START_DELIMITER) || !firstLine.endsWith(END_DELIMITER)) {
     // The first line is not a fully wrapped subject; keep the whole text as
     // the description rather than guessing at inline bold fragments.
     return { subject: '', description: normalized };

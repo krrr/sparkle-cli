@@ -29,10 +29,7 @@ export interface Command {
   readonly requiresWorkspace?: boolean;
   readonly streaming?: boolean;
 
-  execute(
-    config: CommandContext,
-    args: string[],
-  ): Promise<CommandExecutionResponse>;
+  execute(config: CommandContext, args: string[]): Promise<CommandExecutionResponse>;
 }
 
 export interface CommandExecutionResponse {

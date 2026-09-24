@@ -145,9 +145,7 @@ describe('hooksCommand', () => {
         },
       });
 
-      const panelCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'panel',
-      );
+      const panelCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'panel');
       if (!panelCmd?.action) {
         throw new Error('panel command must have an action');
       }
@@ -164,9 +162,7 @@ describe('hooksCommand', () => {
     it('should return custom_dialog even when hook system is not enabled', async () => {
       mockConfig.getHookSystem.mockReturnValue(null);
 
-      const panelCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'panel',
-      );
+      const panelCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'panel');
       if (!panelCmd?.action) {
         throw new Error('panel command must have an action');
       }
@@ -179,13 +175,10 @@ describe('hooksCommand', () => {
 
     it('should return custom_dialog when no hooks are configured', async () => {
       mockHookSystem.getAllHooks.mockReturnValue([]);
-      (mockContext.services.settings.merged as Record<string, unknown>)[
-        'hooksConfig'
-      ] = { enabled: true };
+      (mockContext.services.settings.merged as Record<string, unknown>)['hooksConfig'] =
+        { enabled: true };
 
-      const panelCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'panel',
-      );
+      const panelCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'panel');
       if (!panelCmd?.action) {
         throw new Error('panel command must have an action');
       }
@@ -203,13 +196,10 @@ describe('hooksCommand', () => {
       ];
 
       mockHookSystem.getAllHooks.mockReturnValue(mockHooks);
-      (mockContext.services.settings.merged as Record<string, unknown>)[
-        'hooksConfig'
-      ] = { enabled: true };
+      (mockContext.services.settings.merged as Record<string, unknown>)['hooksConfig'] =
+        { enabled: true };
 
-      const panelCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'panel',
-      );
+      const panelCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'panel');
       if (!panelCmd?.action) {
         throw new Error('panel command must have an action');
       }
@@ -229,9 +219,7 @@ describe('hooksCommand', () => {
         },
       });
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.action) {
         throw new Error('enable command must have an action');
       }
@@ -248,9 +236,7 @@ describe('hooksCommand', () => {
     it('should return error when hook system is not enabled', async () => {
       mockConfig.getHookSystem.mockReturnValue(null);
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.action) {
         throw new Error('enable command must have an action');
       }
@@ -265,9 +251,7 @@ describe('hooksCommand', () => {
     });
 
     it('should return error when hook name is not provided', async () => {
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.action) {
         throw new Error('enable command must have an action');
       }
@@ -283,15 +267,10 @@ describe('hooksCommand', () => {
 
     it('should enable a hook and update settings', async () => {
       // Update the user settings with disabled hooks
-      mockSettings.user.settings.hooksConfig.disabled = [
-        'test-hook',
-        'other-hook',
-      ];
+      mockSettings.user.settings.hooksConfig.disabled = ['test-hook', 'other-hook'];
       mockSettings.workspace.settings.hooksConfig.disabled = [];
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.action) {
         throw new Error('enable command must have an action');
       }
@@ -303,10 +282,7 @@ describe('hooksCommand', () => {
         'hooksConfig.disabled',
         ['other-hook'],
       );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'test-hook',
-        true,
-      );
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('test-hook', true);
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
@@ -316,9 +292,7 @@ describe('hooksCommand', () => {
     });
 
     it('should complete hook names using friendly names', () => {
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      )!;
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable')!;
 
       const hookEntry = createMockHook(
         './hooks/test.sh',
@@ -414,10 +388,7 @@ describe('hooksCommand', () => {
         'hooksConfig.disabled',
         ['test-hook'],
       );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'test-hook',
-        false,
-      );
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('test-hook', false);
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
@@ -474,9 +445,7 @@ describe('hooksCommand', () => {
         },
       });
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.completion) {
         throw new Error('enable command must have completion');
       }
@@ -488,9 +457,7 @@ describe('hooksCommand', () => {
     it('should return empty array when hook system is not enabled', () => {
       mockConfig.getHookSystem.mockReturnValue(null);
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.completion) {
         throw new Error('enable command must have completion');
       }
@@ -507,9 +474,7 @@ describe('hooksCommand', () => {
 
       mockHookSystem.getAllHooks.mockReturnValue(mockHooks);
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      )!;
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable')!;
       const disableCmd = hooksCommand.subCommands!.find(
         (cmd) => cmd.name === 'disable',
       )!;
@@ -529,9 +494,7 @@ describe('hooksCommand', () => {
 
       mockHookSystem.getAllHooks.mockReturnValue(mockHooks);
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      )!;
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable')!;
       const disableCmd = hooksCommand.subCommands!.find(
         (cmd) => cmd.name === 'disable',
       )!;
@@ -551,9 +514,7 @@ describe('hooksCommand', () => {
 
       mockHookSystem.getAllHooks.mockReturnValue(mockHooks);
 
-      const enableCmd = hooksCommand.subCommands!.find(
-        (cmd) => cmd.name === 'enable',
-      );
+      const enableCmd = hooksCommand.subCommands!.find((cmd) => cmd.name === 'enable');
       if (!enableCmd?.completion) {
         throw new Error('enable command must have completion');
       }
@@ -628,14 +589,8 @@ describe('hooksCommand', () => {
         'hooksConfig.disabled',
         [],
       );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'hook-1',
-        true,
-      );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'hook-2',
-        true,
-      );
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('hook-1', true);
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('hook-2', true);
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
@@ -752,14 +707,8 @@ describe('hooksCommand', () => {
         'hooksConfig.disabled',
         ['hook-1', 'hook-2', 'hook-3'],
       );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'hook-1',
-        false,
-      );
-      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith(
-        'hook-2',
-        false,
-      );
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('hook-1', false);
+      expect(mockHookSystem.setHookEnabled).toHaveBeenCalledWith('hook-2', false);
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',

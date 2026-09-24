@@ -13,11 +13,7 @@ import { ContextTracer } from '../tracer.js';
 import { ContextEnvironmentImpl } from '../pipeline/environmentImpl.js';
 import { ContextEventBus } from '../eventBus.js';
 import { PipelineOrchestrator } from '../pipeline/orchestrator.js';
-import {
-  type ConcreteNode,
-  type ToolExecution,
-  NodeType,
-} from '../graph/types.js';
+import { type ConcreteNode, type ToolExecution, NodeType } from '../graph/types.js';
 import type { ContextEnvironment } from '../pipeline/environment.js';
 import type { Config } from '../../config/config.js';
 import type {
@@ -117,13 +113,10 @@ export function createMockLlmClient(
       // Array-based logic for backwards compatibility, if provided
       if (responses && responses.length > 0) {
         const callCount = generateContentMock.mock.calls.length - 1;
-        const idx =
-          callCount < responses.length ? callCount : responses.length - 1;
+        const idx = callCount < responses.length ? callCount : responses.length - 1;
         const res = responses[idx];
         return Promise.resolve(
-          typeof res === 'string'
-            ? createMockGenerateContentResponse(res)
-            : res,
+          typeof res === 'string' ? createMockGenerateContentResponse(res) : res,
         );
       }
 
@@ -142,8 +135,7 @@ export function createMockLlmClient(
     let mockStr = '';
     if (responses && responses.length > 0) {
       const callCount = generateJsonMock.mock.calls.length - 1;
-      const idx =
-        callCount < responses.length ? callCount : responses.length - 1;
+      const idx = callCount < responses.length ? callCount : responses.length - 1;
       const res = responses[idx];
       if (typeof res === 'string') {
         mockStr = res;

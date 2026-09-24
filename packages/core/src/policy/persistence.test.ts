@@ -7,10 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  createPolicyUpdater,
-  getAlwaysAllowPriorityFraction,
-} from './config.js';
+import { createPolicyUpdater, getAlwaysAllowPriorityFraction } from './config.js';
 import { PolicyEngine } from './policy-engine.js';
 import { MessageBus } from '../confirmation-bus/message-bus.js';
 import { MessageBusType } from '../confirmation-bus/types.js';
@@ -230,10 +227,7 @@ decision = "deny"
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspaceAutoSavedPolicyPath').mockReturnValue(
       policyFile,
     );
@@ -256,10 +250,7 @@ decision = "deny"
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspacePoliciesDir').mockReturnValue(
       workspacePoliciesDir,
     );
@@ -286,10 +277,7 @@ decision = "deny"
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspacePoliciesDir').mockReturnValue(
       workspacePoliciesDir,
     );
@@ -320,10 +308,7 @@ decision = "deny"
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspacePoliciesDir').mockReturnValue(
       workspacePoliciesDir,
     );
@@ -355,10 +340,7 @@ decision = "deny"
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspacePoliciesDir').mockReturnValue(
       workspacePoliciesDir,
     );
@@ -450,10 +432,7 @@ modes = [ "autoEdit", "yolo" ]
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
 
     const workspacePoliciesDir = '/mock/project/.sparkle/policies';
-    const policyFile = path.join(
-      workspacePoliciesDir,
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    const policyFile = path.join(workspacePoliciesDir, AUTO_SAVED_POLICY_FILENAME);
     vi.spyOn(mockStorage, 'getWorkspacePoliciesDir').mockReturnValue(
       workspacePoliciesDir,
     );
@@ -467,9 +446,7 @@ modes = [ "autoEdit", "yolo" ]
       writeFile: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
     };
-    vi.spyOn(fs, 'open').mockResolvedValue(
-      mockFileHandle as unknown as fs.FileHandle,
-    );
+    vi.spyOn(fs, 'open').mockResolvedValue(mockFileHandle as unknown as fs.FileHandle);
     vi.spyOn(fs, 'rename').mockRejectedValue(
       makeNodeError('EBUSY: resource busy or locked', 'EBUSY'),
     );

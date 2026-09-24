@@ -17,9 +17,7 @@ import { debugLogger } from '../utils/debugLogger.js';
 describe('geminiPartsToContentParts', () => {
   it('converts text parts', () => {
     const parts: Part[] = [{ text: 'hello' }];
-    expect(geminiPartsToContentParts(parts)).toEqual([
-      { type: 'text', text: 'hello' },
-    ]);
+    expect(geminiPartsToContentParts(parts)).toEqual([{ type: 'text', text: 'hello' }]);
   });
 
   it('converts thought parts', () => {
@@ -132,9 +130,7 @@ describe('contentPartsToGeminiParts', () => {
   });
 
   it('converts thought ContentParts without signature', () => {
-    const content: ContentPart[] = [
-      { type: 'thought', thought: 'thinking...' },
-    ];
+    const content: ContentPart[] = [{ type: 'thought', thought: 'thinking...' }];
     expect(contentPartsToGeminiParts(content)).toEqual([
       { text: 'thinking...', thought: true },
     ]);

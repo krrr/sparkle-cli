@@ -45,12 +45,7 @@ describe('bfsFileSearch', () => {
   });
 
   it('should find a file in a nested directory', async () => {
-    const targetFilePath = await createTestFile(
-      'content',
-      'a',
-      'b',
-      'target.txt',
-    );
+    const targetFilePath = await createTestFile('content', 'a', 'b', 'target.txt');
     const result = await bfsFileSearch(testRootDir, { fileName: 'target.txt' });
     expect(result).toEqual([targetFilePath]);
   });
@@ -71,11 +66,7 @@ describe('bfsFileSearch', () => {
 
   it('should ignore directories specified in ignoreDirs', async () => {
     await createTestFile('content', 'ignored', 'target.txt');
-    const targetFilePath = await createTestFile(
-      'content',
-      'not-ignored',
-      'target.txt',
-    );
+    const targetFilePath = await createTestFile('content', 'not-ignored', 'target.txt');
     const result = await bfsFileSearch(testRootDir, {
       fileName: 'target.txt',
       ignoreDirs: ['ignored'],
@@ -93,13 +84,7 @@ describe('bfsFileSearch', () => {
   });
 
   it('should respect the maxDirs limit and find the file', async () => {
-    const targetFilePath = await createTestFile(
-      'content',
-      'a',
-      'b',
-      'c',
-      'target.txt',
-    );
+    const targetFilePath = await createTestFile('content', 'a', 'b', 'c', 'target.txt');
     const result = await bfsFileSearch(testRootDir, {
       fileName: 'target.txt',
       maxDirs: 4,
@@ -140,11 +125,7 @@ describe('bfsFileSearch', () => {
     });
 
     it('should ignore sparkleignored files', async () => {
-      await createTestFile(
-        'node_modules/',
-        'project',
-        SPARKLE_IGNORE_FILE_NAME,
-      );
+      await createTestFile('node_modules/', 'project', SPARKLE_IGNORE_FILE_NAME);
       await createTestFile('content', 'project', 'node_modules', 'target.txt');
       const targetFilePath = await createTestFile(
         'content',
@@ -217,9 +198,7 @@ describe('bfsFileSearch', () => {
     const fileCreationPromises: Array<Promise<string>> = [];
     for (let i = 0; i < numTargetDirs; i++) {
       // Add target files in some directories
-      fileCreationPromises.push(
-        createTestFile('content', `dir${i}`, 'AGENTS.md'),
-      );
+      fileCreationPromises.push(createTestFile('content', `dir${i}`, 'AGENTS.md'));
       fileCreationPromises.push(
         createTestFile('content', `dir${i}`, 'subdir1', 'AGENTS.md'),
       );
@@ -272,12 +251,7 @@ describe('bfsFileSearchSync', () => {
   });
 
   it('should find a file in a nested directory synchronously', async () => {
-    const targetFilePath = await createTestFile(
-      'content',
-      'a',
-      'b',
-      'target.txt',
-    );
+    const targetFilePath = await createTestFile('content', 'a', 'b', 'target.txt');
     const result = bfsFileSearchSync(testRootDir, { fileName: 'target.txt' });
     expect(result).toEqual([targetFilePath]);
   });
@@ -293,11 +267,7 @@ describe('bfsFileSearchSync', () => {
 
   it('should ignore directories synchronously', async () => {
     await createTestFile('content', 'ignored', 'target.txt');
-    const targetFilePath = await createTestFile(
-      'content',
-      'not-ignored',
-      'target.txt',
-    );
+    const targetFilePath = await createTestFile('content', 'not-ignored', 'target.txt');
     const result = bfsFileSearchSync(testRootDir, {
       fileName: 'target.txt',
       ignoreDirs: ['ignored'],

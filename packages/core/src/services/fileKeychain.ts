@@ -28,14 +28,9 @@ export class FileKeychain implements Keychain {
 
   private encrypt(text: string): string {
     const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv(
-      'aes-256-gcm',
-      this.encryptionKey,
-      iv,
-      {
-        authTagLength: 16,
-      },
-    );
+    const cipher = crypto.createCipheriv('aes-256-gcm', this.encryptionKey, iv, {
+      authTagLength: 16,
+    });
 
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
@@ -63,12 +58,9 @@ export class FileKeychain implements Keychain {
       throw new Error('Invalid authentication tag length: Must be 16 bytes');
     }
 
-    const decipher = crypto.createDecipheriv(
-      'aes-256-gcm',
-      this.encryptionKey,
-      iv,
-      { authTagLength: 16 },
-    );
+    const decipher = crypto.createDecipheriv('aes-256-gcm', this.encryptionKey, iv, {
+      authTagLength: 16,
+    });
     decipher.setAuthTag(authTag);
 
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
@@ -107,9 +99,7 @@ export class FileKeychain implements Keychain {
     }
   }
 
-  private async saveData(
-    data: Record<string, Record<string, string>>,
-  ): Promise<void> {
+  private async saveData(data: Record<string, Record<string, string>>): Promise<void> {
     await this.ensureDirectoryExists();
     const json = JSON.stringify(data, null, 2);
     const encrypted = this.encrypt(json);
@@ -121,11 +111,7 @@ export class FileKeychain implements Keychain {
     return data[service]?.[account] ?? null;
   }
 
-  async setPassword(
-    service: string,
-    account: string,
-    password: string,
-  ): Promise<void> {
+  async setPassword(service: string, account: string, password: string): Promise<void> {
     const data = await this.loadData();
     if (!data[service]) {
       data[service] = {};

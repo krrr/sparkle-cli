@@ -51,11 +51,7 @@ function footerConfigReducer(
     case 'MOVE_ITEM': {
       const currentIndex = state.orderedIds.indexOf(action.id);
       const newIndex = currentIndex + action.direction;
-      if (
-        currentIndex === -1 ||
-        newIndex < 0 ||
-        newIndex >= state.orderedIds.length
-      ) {
+      if (currentIndex === -1 || newIndex < 0 || newIndex >= state.orderedIds.length) {
         return state;
       }
       const newOrderedIds = [...state.orderedIds];
@@ -81,9 +77,7 @@ function footerConfigReducer(
   }
 }
 
-export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
-  onClose,
-}) => {
+export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({ onClose }) => {
   const keyMatchers = useKeyMatchers();
   const { settings, setSetting } = useSettingsStore();
   const { constrainHeight, terminalHeight, staticExtraHeight } = useUIState();
@@ -211,50 +205,33 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
       );
     }
 
-    const itemsToPreview = orderedIds.filter((id: string) =>
-      selectedIds.has(id),
-    );
+    const itemsToPreview = orderedIds.filter((id: string) => selectedIds.has(id));
     if (itemsToPreview.length === 0) return null;
 
     const itemColor = showLabels ? theme.text.primary : theme.ui.comment;
 
-    const getColor = (id: string, defaultColor?: string) =>
-      defaultColor || itemColor;
+    const getColor = (id: string, defaultColor?: string) => defaultColor || itemColor;
 
     // Mock data for preview (headers come from ALL_ITEMS)
     const mockData: Record<string, React.ReactNode> = {
-      workspace: (
-        <Text color={getColor('workspace', itemColor)}>~/project/path</Text>
-      ),
+      workspace: <Text color={getColor('workspace', itemColor)}>~/project/path</Text>,
       'git-branch': <Text color={getColor('git-branch', itemColor)}>main</Text>,
       sandbox: <Text color={getColor('sandbox', 'green')}>docker</Text>,
       'model-name': (
         <Text color={getColor('model-name', itemColor)}>gemini-2.5-pro</Text>
       ),
-      'context-used': (
-        <Text color={getColor('context-used', itemColor)}>85% used</Text>
-      ),
-      'memory-usage': (
-        <Text color={getColor('memory-usage', itemColor)}>260 MB</Text>
-      ),
-      'session-id': (
-        <Text color={getColor('session-id', itemColor)}>769992f9</Text>
-      ),
-      hostname: (
-        <Text color={getColor('hostname', itemColor)}>dev-machine</Text>
-      ),
+      'context-used': <Text color={getColor('context-used', itemColor)}>85% used</Text>,
+      'memory-usage': <Text color={getColor('memory-usage', itemColor)}>260 MB</Text>,
+      'session-id': <Text color={getColor('session-id', itemColor)}>769992f9</Text>,
+      hostname: <Text color={getColor('hostname', itemColor)}>dev-machine</Text>,
       'code-changes': (
         <Box flexDirection="row">
-          <Text color={getColor('code-changes', theme.status.success)}>
-            +12
-          </Text>
+          <Text color={getColor('code-changes', theme.status.success)}>+12</Text>
           <Text color={getColor('code-changes')}> </Text>
           <Text color={getColor('code-changes', theme.status.error)}>-4</Text>
         </Box>
       ),
-      provider: (
-        <Text color={getColor('provider', itemColor)}>my-provider</Text>
-      ),
+      provider: <Text color={getColor('provider', itemColor)}>my-provider</Text>,
       'token-count': (
         <Text color={getColor('token-count', itemColor)}>1.5k tokens</Text>
       ),
@@ -293,10 +270,7 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
   const effectivePaddingY = includePadding ? 2 : 0;
   const availableListSpace = Math.max(
     0,
-    availableTerminalHeight -
-      BORDER_HEIGHT -
-      effectivePaddingY -
-      STATIC_ELEMENTS,
+    availableTerminalHeight - BORDER_HEIGHT - effectivePaddingY - STATIC_ELEMENTS,
   );
 
   const maxItemsToShow = Math.max(
@@ -342,9 +316,7 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({
                 <Box flexDirection="row">
                   {configItem.type !== 'reset' && (
                     <Text
-                      color={
-                        isChecked ? theme.status.success : theme.text.secondary
-                      }
+                      color={isChecked ? theme.status.success : theme.text.secondary}
                     >
                       [{isChecked ? '✓' : ' '}]
                     </Text>

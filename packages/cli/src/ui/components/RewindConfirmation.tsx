@@ -8,10 +8,7 @@ import { Box, Text, useIsScreenReaderEnabled } from 'ink';
 import type React from 'react';
 import { useMemo } from 'react';
 import { theme } from '../semantic-colors.js';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import type { FileChangeStats } from '../utils/rewindFileOps.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { formatTimeAgo } from '../utils/formatters.js';
@@ -104,8 +101,8 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
             <Text>Lines removed: {stats.removedLines}</Text>
             {timestamp && <Text>({formatTimeAgo(timestamp)})</Text>}
             <Text>
-              Note: Rewinding does not affect files edited manually or by the
-              shell tool.
+              Note: Rewinding does not affect files edited manually or by the shell
+              tool.
             </Text>
           </Box>
         )}
@@ -114,10 +111,7 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
           <Box>
             <Text color={theme.text.secondary}>No code changes to revert.</Text>
             {timestamp && (
-              <Text color={theme.text.secondary}>
-                {' '}
-                ({formatTimeAgo(timestamp)})
-              </Text>
+              <Text color={theme.text.secondary}> ({formatTimeAgo(timestamp)})</Text>
             )}
           </Box>
         )}
@@ -127,11 +121,7 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
           Use arrow keys to navigate, Enter to confirm, Esc to cancel.
         </Text>
 
-        <RadioButtonSelect
-          items={options}
-          onSelect={handleSelect}
-          isFocused={true}
-        />
+        <RadioButtonSelect items={options} onSelect={handleSelect} isFocused={true} />
       </Box>
     );
   }
@@ -162,23 +152,15 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
               : `${stats.fileCount} files affected`}
           </Text>
           <Box flexDirection="row">
-            <Text color={theme.status.success}>
-              Lines added: {stats.addedLines}{' '}
-            </Text>
-            <Text color={theme.status.error}>
-              Lines removed: {stats.removedLines}
-            </Text>
+            <Text color={theme.status.success}>Lines added: {stats.addedLines} </Text>
+            <Text color={theme.status.error}>Lines removed: {stats.removedLines}</Text>
             {timestamp && (
-              <Text color={theme.text.secondary}>
-                {' '}
-                ({formatTimeAgo(timestamp)})
-              </Text>
+              <Text color={theme.text.secondary}> ({formatTimeAgo(timestamp)})</Text>
             )}
           </Box>
           <Box marginTop={1}>
             <Text color={theme.status.warning}>
-              ℹ Rewinding does not affect files edited manually or by the shell
-              tool.
+              ℹ Rewinding does not affect files edited manually or by the shell tool.
             </Text>
           </Box>
         </Box>
@@ -188,10 +170,7 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
         <Box marginBottom={1}>
           <Text color={theme.text.secondary}>No code changes to revert.</Text>
           {timestamp && (
-            <Text color={theme.text.secondary}>
-              {' '}
-              ({formatTimeAgo(timestamp)})
-            </Text>
+            <Text color={theme.text.secondary}> ({formatTimeAgo(timestamp)})</Text>
           )}
         </Box>
       )}
@@ -200,11 +179,7 @@ export const RewindConfirmation: React.FC<RewindConfirmationProps> = ({
         <Text>Select an action:</Text>
       </Box>
 
-      <RadioButtonSelect
-        items={options}
-        onSelect={handleSelect}
-        isFocused={true}
-      />
+      <RadioButtonSelect items={options} onSelect={handleSelect} isFocused={true} />
     </Box>
   );
 };

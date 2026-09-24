@@ -8,11 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { useAuthCommand } from './useAuth.js';
-import {
-  ProviderType,
-  type Config,
-  type ProviderProfile,
-} from 'sparkle-cli-core';
+import { ProviderType, type Config, type ProviderProfile } from 'sparkle-cli-core';
 import { AuthState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 
@@ -29,8 +25,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 vi.mock('../../config/auth.js', () => ({
-  validateProfileAuth: (profile: ProviderProfile) =>
-    mockValidateProfileAuth(profile),
+  validateProfileAuth: (profile: ProviderProfile) => mockValidateProfileAuth(profile),
 }));
 
 describe('useAuth', () => {
@@ -115,9 +110,7 @@ describe('useAuth', () => {
         deferredActivate.resolve();
       });
 
-      expect(mockProfileService.activateProfile).toHaveBeenCalledWith(
-        fakeProfile.id,
-      );
+      expect(mockProfileService.activateProfile).toHaveBeenCalledWith(fakeProfile.id);
       expect(result.current.authState).toBe(AuthState.Authenticated);
       expect(result.current.authError).toBeNull();
     });
@@ -133,9 +126,7 @@ describe('useAuth', () => {
     });
 
     it('should handle activateProfile failure', async () => {
-      mockProfileService.activateProfile.mockRejectedValue(
-        new Error('Auth Failed'),
-      );
+      mockProfileService.activateProfile.mockRejectedValue(new Error('Auth Failed'));
 
       const { result } = await renderHook(() =>
         useAuthCommand(mockSettings, mockConfig),

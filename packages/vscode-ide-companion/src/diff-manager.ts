@@ -50,8 +50,7 @@ interface DiffInfo {
  * Manages the state and lifecycle of diff views within the IDE.
  */
 export class DiffManager {
-  private readonly onDidChangeEmitter =
-    new vscode.EventEmitter<JSONRPCNotification>();
+  private readonly onDidChangeEmitter = new vscode.EventEmitter<JSONRPCNotification>();
   readonly onDidChange = this.onDidChangeEmitter.event;
   private diffDocuments = new Map<string, DiffInfo>();
   private readonly subscriptions: vscode.Disposable[] = [];
@@ -97,11 +96,7 @@ export class DiffManager {
     });
 
     const diffTitle = `${path.basename(filePath)} ↔ Modified`;
-    await vscode.commands.executeCommand(
-      'setContext',
-      'sparkle.diff.isVisible',
-      true,
-    );
+    await vscode.commands.executeCommand('setContext', 'sparkle.diff.isVisible', true);
 
     let leftDocUri;
     try {
@@ -229,11 +224,7 @@ export class DiffManager {
 
   private async closeDiffEditor(rightDocUri: vscode.Uri) {
     const diffInfo = this.diffDocuments.get(rightDocUri.toString());
-    await vscode.commands.executeCommand(
-      'setContext',
-      'sparkle.diff.isVisible',
-      false,
-    );
+    await vscode.commands.executeCommand('setContext', 'sparkle.diff.isVisible', false);
 
     if (diffInfo) {
       this.diffDocuments.delete(rightDocUri.toString());

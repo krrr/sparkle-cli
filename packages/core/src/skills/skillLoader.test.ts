@@ -16,9 +16,7 @@ describe('skillLoader', () => {
   let testRootDir: string;
 
   beforeEach(async () => {
-    testRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'skill-loader-test-'),
-    );
+    testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skill-loader-test-'));
     vi.spyOn(coreEvents, 'emitFeedback');
     vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
   });

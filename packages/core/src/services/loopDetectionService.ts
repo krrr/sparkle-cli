@@ -19,10 +19,7 @@ import {
   LlmLoopCheckEvent,
   LlmRole,
 } from '../telemetry/types.js';
-import {
-  isFunctionCall,
-  isFunctionResponse,
-} from '../utils/messageInspectors.js';
+import { isFunctionCall, isFunctionResponse } from '../utils/messageInspectors.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import type { AgentLoopContext } from '../config/agent-loop-context.js';
 import { resolvePolicyChain } from '../availability/policyHelpers.js';
@@ -183,10 +180,7 @@ export class LoopDetectionService {
    * @returns A LoopDetectionResult
    */
   addAndCheck(event: ServerGeminiStreamEvent): LoopDetectionResult {
-    if (
-      this.disabledForSession ||
-      this.context.config.getDisableLoopDetection()
-    ) {
+    if (this.disabledForSession || this.context.config.getDisableLoopDetection()) {
       return { count: 0 };
     }
     if (this.loopDetected) {
@@ -231,11 +225,7 @@ export class LoopDetectionService {
 
       logLoopDetected(
         this.context.config,
-        new LoopDetectedEvent(
-          this.lastLoopType,
-          this.promptId,
-          this.detectedCount,
-        ),
+        new LoopDetectedEvent(this.lastLoopType, this.promptId, this.detectedCount),
       );
     }
     return isLoop
@@ -258,10 +248,7 @@ export class LoopDetectionService {
    * @returns A promise that resolves to a LoopDetectionResult.
    */
   async turnStarted(signal: AbortSignal): Promise<LoopDetectionResult> {
-    if (
-      this.disabledForSession ||
-      this.context.config.getDisableLoopDetection()
-    ) {
+    if (this.disabledForSession || this.context.config.getDisableLoopDetection()) {
       return { count: 0 };
     }
     if (this.loopDetected) {
@@ -385,8 +372,7 @@ export class LoopDetectionService {
     }
 
     const wasInCodeBlock = this.inCodeBlock;
-    this.inCodeBlock =
-      numFences % 2 === 0 ? this.inCodeBlock : !this.inCodeBlock;
+    this.inCodeBlock = numFences % 2 === 0 ? this.inCodeBlock : !this.inCodeBlock;
     if (wasInCodeBlock || this.inCodeBlock || isDivider) {
       return false;
     }
@@ -407,14 +393,9 @@ export class LoopDetectionService {
     }
 
     // Calculate how much content to remove from the beginning
-    const truncationAmount =
-      this.streamContentHistory.length - MAX_HISTORY_LENGTH;
-    this.streamContentHistory =
-      this.streamContentHistory.slice(truncationAmount);
-    this.lastContentIndex = Math.max(
-      0,
-      this.lastContentIndex - truncationAmount,
-    );
+    const truncationAmount = this.streamContentHistory.length - MAX_HISTORY_LENGTH;
+    this.streamContentHistory = this.streamContentHistory.slice(truncationAmount);
+    this.lastContentIndex = Math.max(0, this.lastContentIndex - truncationAmount);
 
     // Update all stored chunk indices to account for the truncation
     for (const [hash, oldIndices] of this.contentStats.entries()) {
@@ -461,8 +442,7 @@ export class LoopDetectionService {
 
   private hasMoreChunksToProcess(): boolean {
     return (
-      this.lastContentIndex + CONTENT_CHUNK_SIZE <=
-      this.streamContentHistory.length
+      this.lastContentIndex + CONTENT_CHUNK_SIZE <= this.streamContentHistory.length
     );
   }
 
@@ -496,8 +476,7 @@ export class LoopDetectionService {
 
     // Analyze the most recent occurrences to see if they're clustered closely together
     const recentIndices = existingIndices.slice(-CONTENT_LOOP_THRESHOLD);
-    const totalDistance =
-      recentIndices[recentIndices.length - 1] - recentIndices[0];
+    const totalDistance = recentIndices[recentIndices.length - 1] - recentIndices[0];
     const averageDistance = totalDistance / (CONTENT_LOOP_THRESHOLD - 1);
     const maxAllowedDistance = CONTENT_CHUNK_SIZE * 5;
 
@@ -510,10 +489,7 @@ export class LoopDetectionService {
     const periods = new Set<string>();
     for (let i = 0; i < recentIndices.length - 1; i++) {
       periods.add(
-        this.streamContentHistory.substring(
-          recentIndices[i],
-          recentIndices[i + 1],
-        ),
+        this.streamContentHistory.substring(recentIndices[i], recentIndices[i + 1]),
       );
     }
 
@@ -531,10 +507,7 @@ export class LoopDetectionService {
    * Verifies that two chunks with the same hash actually contain identical content.
    * This prevents false positives from hash collisions.
    */
-  private isActualContentMatch(
-    currentChunk: string,
-    originalIndex: number,
-  ): boolean {
+  private isActualContentMatch(currentChunk: string, originalIndex: number): boolean {
     const originalChunk = this.streamContentHistory.substring(
       originalIndex,
       originalIndex + CONTENT_CHUNK_SIZE,
@@ -629,19 +602,12 @@ export class LoopDetectionService {
     // call. The alias may resolve to a bare tier alias (pro/flash/flash-lite);
     // the active provider profile's tier resolution keeps the availability
     // pre-check consistent with the model used for the LLM call.
-    const doubleCheckModelName = this.resolveModelName(
-      DOUBLE_CHECK_MODEL_ALIAS,
-    );
+    const doubleCheckModelName = this.resolveModelName(DOUBLE_CHECK_MODEL_ALIAS);
 
     if (flashConfidence < LLM_CONFIDENCE_THRESHOLD) {
       logLlmLoopCheck(
         this.context.config,
-        new LlmLoopCheckEvent(
-          this.promptId,
-          flashConfidence,
-          doubleCheckModelName,
-          -1,
-        ),
+        new LlmLoopCheckEvent(this.promptId, flashConfidence, doubleCheckModelName, -1),
       );
       this.updateCheckInterval(flashConfidence);
       return { isLoop: false };
@@ -715,15 +681,10 @@ export class LoopDetectionService {
    * is available, whereas this only needs the nominal chain head.
    */
   private resolveModelName(alias: string): string {
-    const aliasModel = this.context.config.modelConfigService.getResolvedConfig(
-      {
-        model: alias,
-      },
-    ).model;
-    return (
-      resolvePolicyChain(this.context.config, aliasModel)[0]?.model ??
-      aliasModel
-    );
+    const aliasModel = this.context.config.modelConfigService.getResolvedConfig({
+      model: alias,
+    }).model;
+    return resolvePolicyChain(this.context.config, aliasModel)[0]?.model ?? aliasModel;
   }
 
   private async queryLoopDetectionModel(

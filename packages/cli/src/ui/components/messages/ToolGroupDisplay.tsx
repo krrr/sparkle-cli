@@ -55,8 +55,7 @@ export const ToolGroupDisplay: React.FC<ToolGroupDisplayProps> = ({
 
   // Standard view behavior: If compact mode is enabled, non-notice tools
   // are typically rendered without an outer box.
-  const shouldShowBox =
-    (hasOtherTools || isClosingSlice) && !isCompactModeEnabled;
+  const shouldShowBox = (hasOtherTools || isClosingSlice) && !isCompactModeEnabled;
 
   const boxBorderTop = borderTop || noticeTools.length > 0;
 
@@ -168,8 +167,7 @@ const ToolDisplayMessage: React.FC<ToolDisplayMessageProps> = ({ tool }) => {
     );
   }
 
-  const isCompact =
-    format === 'compact' || (format === 'auto' && isCompactModeEnabled);
+  const isCompact = format === 'compact' || (format === 'auto' && isCompactModeEnabled);
 
   if (isCompact) {
     return (
@@ -184,10 +182,7 @@ const ToolDisplayMessage: React.FC<ToolDisplayMessageProps> = ({ tool }) => {
         </Text>
         {description && <Text color={theme.text.secondary}>{description}</Text>}
         {resultSummary && (
-          <Text color={theme.text.accent}>
-            {' '}
-            → {resultSummary.replace(/\n/g, ' ')}
-          </Text>
+          <Text color={theme.text.accent}> → {resultSummary.replace(/\n/g, ' ')}</Text>
         )}
       </Box>
     );
@@ -257,9 +252,7 @@ const ToolResultDisplayContent: React.FC<ToolResultDisplayContentProps> = ({
     case 'terminal':
       return <Text color={theme.text.secondary}>[Terminal Output]</Text>;
     case 'agent':
-      return (
-        <Text color={theme.text.secondary}>[Subagent: {content.threadId}]</Text>
-      );
+      return <Text color={theme.text.secondary}>[Subagent: {content.threadId}]</Text>;
     default:
       return null;
   }

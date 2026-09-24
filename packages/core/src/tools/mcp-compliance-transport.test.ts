@@ -64,9 +64,7 @@ describe('McpComplianceTransport', () => {
     const fixedResponse = onMessage.mock.calls[0][0];
     expect(fixedResponse.result.structuredContent).toEqual({ foo: 'bar' });
     // Original content should still be there
-    expect(fixedResponse.result.content[0].text).toBe(
-      JSON.stringify({ foo: 'bar' }),
-    );
+    expect(fixedResponse.result.content[0].text).toBe(JSON.stringify({ foo: 'bar' }));
   });
 
   it('should NOT modify already compliant responses', async () => {

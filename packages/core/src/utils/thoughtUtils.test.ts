@@ -44,8 +44,7 @@ describe('parseThought', () => {
     },
     {
       name: 'a wrapped single-line subject followed by a multi-line description',
-      rawText:
-        '**Assessing the request**\nHere is a description\nspread across lines.',
+      rawText: '**Assessing the request**\nHere is a description\nspread across lines.',
       expected: {
         subject: 'Assessing the request',
         description: 'Here is a description\nspread across lines.',
@@ -82,8 +81,7 @@ describe('parseThought', () => {
     },
     {
       name: 'a subject tag spanning multiple lines',
-      rawText:
-        '**Multi-line\nSubject**\nHere is a description\nspread across lines.',
+      rawText: '**Multi-line\nSubject**\nHere is a description\nspread across lines.',
       expected: {
         subject: '',
         description:

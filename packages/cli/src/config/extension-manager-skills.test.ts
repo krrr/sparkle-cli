@@ -34,15 +34,12 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...actual,
     homedir: mockHomedir,
-    ExtensionIntegrityManager: vi
-      .fn()
-      .mockImplementation(() => mockIntegrityManager),
+    ExtensionIntegrityManager: vi.fn().mockImplementation(() => mockIntegrityManager),
     loadAgentsFromDirectory: vi
       .fn()
       .mockImplementation(async () => ({ agents: [], errors: [] })),
-    loadSkillsFromDir: (
-      await importOriginal<typeof import('sparkle-cli-core')>()
-    ).loadSkillsFromDir,
+    loadSkillsFromDir: (await importOriginal<typeof import('sparkle-cli-core')>())
+      .loadSkillsFromDir,
   };
 });
 

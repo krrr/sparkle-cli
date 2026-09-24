@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  McpServer,
-  type ToolCallback,
-} from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer, type ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
 import { type Server as HTTPServer } from 'node:http';
@@ -16,9 +13,7 @@ import { type ZodRawShape } from 'zod';
 export class TestMcpServer {
   private server: HTTPServer | undefined;
 
-  async start(
-    tools?: Record<string, ToolCallback<ZodRawShape>>,
-  ): Promise<number> {
+  async start(tools?: Record<string, ToolCallback<ZodRawShape>>): Promise<number> {
     const app = express();
     app.use(express.json());
     const mcpServer = new McpServer(

@@ -114,9 +114,7 @@ export class MemoryTestHarness {
   async runScenario(
     rig: TestRig,
     name: string,
-    fn: (
-      recordSnapshot: (label: string) => Promise<MemorySnapshot>,
-    ) => Promise<void>,
+    fn: (recordSnapshot: (label: string) => Promise<MemorySnapshot>) => Promise<void>,
     tolerancePercent?: number,
   ): Promise<MemoryTestResult> {
     const tolerance = tolerancePercent ?? this.defaultTolerancePercent;
@@ -148,9 +146,7 @@ export class MemoryTestHarness {
     // Calculate peak values from ALL snapshots seen during the scenario
     const allSnapshots = rig.readAllMemorySnapshots();
     const scenarioSnapshots = allSnapshots.filter(
-      (s) =>
-        s.timestamp >= beforeSnap.timestamp &&
-        s.timestamp <= afterSnap.timestamp,
+      (s) => s.timestamp >= beforeSnap.timestamp && s.timestamp <= afterSnap.timestamp,
     );
 
     const peakHeapUsed = Math.max(
@@ -175,8 +171,7 @@ export class MemoryTestHarness {
 
     if (baseline) {
       const measuredMB = afterSnap.heapUsed / (1024 * 1024);
-      deltaPercent =
-        ((measuredMB - baseline.heapUsedMB) / baseline.heapUsedMB) * 100;
+      deltaPercent = ((measuredMB - baseline.heapUsedMB) / baseline.heapUsedMB) * 100;
       withinTolerance = deltaPercent <= tolerance;
     }
 
@@ -202,10 +197,7 @@ export class MemoryTestHarness {
    * Assert that a scenario result is within the baseline tolerance.
    * Throws an assertion error with details if it exceeds the threshold.
    */
-  assertWithinBaseline(
-    result: MemoryTestResult,
-    tolerancePercent?: number,
-  ): void {
+  assertWithinBaseline(result: MemoryTestResult, tolerancePercent?: number): void {
     const tolerance = tolerancePercent ?? this.defaultTolerancePercent;
 
     if (!result.baseline) {
@@ -219,8 +211,7 @@ export class MemoryTestHarness {
 
     const measuredMB = result.finalHeapUsed / (1024 * 1024);
     const deltaPercent =
-      ((measuredMB - result.baseline.heapUsedMB) / result.baseline.heapUsedMB) *
-      100;
+      ((measuredMB - result.baseline.heapUsedMB) / result.baseline.heapUsedMB) * 100;
 
     if (deltaPercent > tolerance) {
       throw new Error(
@@ -242,9 +233,7 @@ export class MemoryTestHarness {
     const lastSnapshot = result.snapshots[result.snapshots.length - 1];
     updateBaseline(this.baselinesPath, result.scenarioName, {
       heapUsedMB: Number((result.finalHeapUsed / (1024 * 1024)).toFixed(1)),
-      heapTotalMB: Number(
-        ((lastSnapshot?.heapTotal ?? 0) / (1024 * 1024)).toFixed(1),
-      ),
+      heapTotalMB: Number(((lastSnapshot?.heapTotal ?? 0) / (1024 * 1024)).toFixed(1)),
       rssMB: Number((result.finalRss / (1024 * 1024)).toFixed(1)),
       externalMB: Number((result.finalExternal / (1024 * 1024)).toFixed(1)),
     });
@@ -334,11 +323,7 @@ export class MemoryTestHarness {
       const delta = result.baseline
         ? `${result.deltaPercent >= 0 ? '+' : ''}${result.deltaPercent.toFixed(1)}%`
         : 'N/A';
-      const status = !result.baseline
-        ? 'NEW'
-        : result.withinTolerance
-          ? '✅'
-          : '❌';
+      const status = !result.baseline ? 'NEW' : result.withinTolerance ? '✅' : '❌';
 
       lines.push(
         `${result.scenarioName}: ${measured} (Baseline: ${baseline}, Delta: ${delta}) ${status}`,
@@ -353,17 +338,14 @@ export class MemoryTestHarness {
         default?: { plot?: PlotFn };
         plot?: PlotFn;
       };
-      const plot: PlotFn | undefined =
-        asciichart.default?.plot ?? asciichart.plot;
+      const plot: PlotFn | undefined = asciichart.default?.plot ?? asciichart.plot;
 
       for (const result of resultsToReport) {
         if (result.snapshots.length > 2) {
           lines.push(`📈 Memory trend: ${result.scenarioName}`);
           lines.push('─'.repeat(60));
 
-          const heapDataMB = result.snapshots.map(
-            (s) => s.heapUsed / (1024 * 1024),
-          );
+          const heapDataMB = result.snapshots.map((s) => s.heapUsed / (1024 * 1024));
 
           if (plot) {
             const chart = plot(heapDataMB, {

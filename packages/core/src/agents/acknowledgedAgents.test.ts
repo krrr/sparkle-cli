@@ -52,15 +52,9 @@ describe('AcknowledgedAgentsService', () => {
 
     await service.acknowledge('/project', 'AgentA', 'hash1');
 
-    expect(await service.isAcknowledged('/project', 'AgentA', 'hash1')).toBe(
-      true,
-    );
-    expect(await service.isAcknowledged('/project', 'AgentA', 'hash2')).toBe(
-      false,
-    );
-    expect(await service.isAcknowledged('/project', 'AgentB', 'hash1')).toBe(
-      false,
-    );
+    expect(await service.isAcknowledged('/project', 'AgentA', 'hash1')).toBe(true);
+    expect(await service.isAcknowledged('/project', 'AgentA', 'hash2')).toBe(false);
+    expect(await service.isAcknowledged('/project', 'AgentB', 'hash1')).toBe(false);
   });
 
   it('should load acknowledged agents from disk', async () => {
@@ -77,9 +71,9 @@ describe('AcknowledgedAgentsService', () => {
 
     const service = new AcknowledgedAgentsService();
 
-    expect(
-      await service.isAcknowledged('/project', 'AgentLoaded', 'hashLoaded'),
-    ).toBe(true);
+    expect(await service.isAcknowledged('/project', 'AgentLoaded', 'hashLoaded')).toBe(
+      true,
+    );
   });
 
   it('should handle load errors gracefully', async () => {
@@ -90,8 +84,6 @@ describe('AcknowledgedAgentsService', () => {
     const service = new AcknowledgedAgentsService();
 
     // Should not throw, and treated as empty
-    expect(await service.isAcknowledged('/project', 'Agent', 'hash')).toBe(
-      false,
-    );
+    expect(await service.isAcknowledged('/project', 'Agent', 'hash')).toBe(false);
   });
 });

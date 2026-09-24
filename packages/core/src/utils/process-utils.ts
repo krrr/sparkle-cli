@@ -60,10 +60,7 @@ export async function killProcessGroup(options: KillOptions): Promise<void> {
   const getAllDescendants = async (parentPid: number): Promise<number[]> => {
     let children: number[] = [];
     try {
-      const { stdout } = await spawnAsync('pgrep', [
-        '-P',
-        parentPid.toString(),
-      ]);
+      const { stdout } = await spawnAsync('pgrep', ['-P', parentPid.toString()]);
       const pids = stdout
         .trim()
         .split('\n')

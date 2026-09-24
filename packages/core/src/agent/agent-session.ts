@@ -4,12 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  AgentProtocol,
-  AgentSend,
-  AgentEvent,
-  Unsubscribe,
-} from './types.js';
+import type { AgentProtocol, AgentSend, AgentEvent, Unsubscribe } from './types.js';
 
 /**
  * AgentSession is a wrapper around AgentProtocol that provides a more
@@ -133,18 +128,14 @@ export class AgentSession implements AgentProtocol {
         const resumeEvent = currentEvents[index];
         trackedStreamId = resumeEvent.streamId;
         const firstAgentStartIndex = currentEvents.findIndex(
-          (event) =>
-            event.type === 'agent_start' && event.streamId === trackedStreamId,
+          (event) => event.type === 'agent_start' && event.streamId === trackedStreamId,
         );
 
         if (resumeEvent.type === 'agent_end') {
           replayStartIndex = index + 1;
           agentActivityStarted = true;
           done = true;
-        } else if (
-          firstAgentStartIndex !== -1 &&
-          firstAgentStartIndex <= index
-        ) {
+        } else if (firstAgentStartIndex !== -1 && firstAgentStartIndex <= index) {
           replayStartIndex = index + 1;
           agentActivityStarted = true;
         } else if (firstAgentStartIndex !== -1) {
@@ -171,9 +162,7 @@ export class AgentSession implements AgentProtocol {
           replayStartIndex = index;
         }
       } else {
-        const activeStarts = currentEvents.filter(
-          (e) => e.type === 'agent_start',
-        );
+        const activeStarts = currentEvents.filter((e) => e.type === 'agent_start');
         for (let i = activeStarts.length - 1; i >= 0; i--) {
           const start = activeStarts[i];
           if (
@@ -182,9 +171,7 @@ export class AgentSession implements AgentProtocol {
             )
           ) {
             trackedStreamId = start.streamId;
-            replayStartIndex = currentEvents.findIndex(
-              (e) => e.id === start.id,
-            );
+            replayStartIndex = currentEvents.findIndex((e) => e.id === start.id);
             break;
           }
         }

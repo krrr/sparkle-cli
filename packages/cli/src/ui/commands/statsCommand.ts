@@ -11,19 +11,13 @@ import type {
 } from '../types.js';
 import { MessageType } from '../types.js';
 import { formatDuration } from '../utils/formatters.js';
-import {
-  type CommandContext,
-  type SlashCommand,
-  CommandKind,
-} from './types.js';
+import { type CommandContext, type SlashCommand, CommandKind } from './types.js';
 
 function getSelectedAuthType(context: CommandContext) {
   const profileService =
     context.services.agentContext?.config.getProviderProfileService();
   const activeProfile = profileService?.getActiveProfile();
-  return activeProfile
-    ? `${activeProfile.id} (${activeProfile.providerType})`
-    : '';
+  return activeProfile ? `${activeProfile.id} (${activeProfile.providerType})` : '';
 }
 
 async function defaultSessionView(context: CommandContext) {

@@ -76,9 +76,9 @@ describe('setupTerminalAndTheme', () => {
   });
 
   it('should emit warning when theme is incompatible and autoThemeSwitching is enabled', async () => {
-    vi.mocked(
-      terminalCapabilityManager.getTerminalBackgroundColor,
-    ).mockReturnValue('#ffffff'); // Light
+    vi.mocked(terminalCapabilityManager.getTerminalBackgroundColor).mockReturnValue(
+      '#ffffff',
+    ); // Light
     vi.mocked(themeManager.setActiveTheme).mockReturnValue(true);
     vi.mocked(themeManager.getActiveTheme).mockReturnValue({
       name: 'Dracula',
@@ -98,9 +98,9 @@ describe('setupTerminalAndTheme', () => {
 
   it('should NOT emit warning when theme is incompatible but autoThemeSwitching is DISABLED', async () => {
     mockSettings.merged.ui.autoThemeSwitching = false;
-    vi.mocked(
-      terminalCapabilityManager.getTerminalBackgroundColor,
-    ).mockReturnValue('#ffffff'); // Light
+    vi.mocked(terminalCapabilityManager.getTerminalBackgroundColor).mockReturnValue(
+      '#ffffff',
+    ); // Light
     vi.mocked(themeManager.setActiveTheme).mockReturnValue(true);
     vi.mocked(themeManager.getActiveTheme).mockReturnValue({
       name: 'Dracula',

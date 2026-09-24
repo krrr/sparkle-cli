@@ -64,9 +64,7 @@ interface SandboxIndicatorProps {
   isTrustedFolder: boolean | undefined;
 }
 
-const SandboxIndicator: React.FC<SandboxIndicatorProps> = ({
-  isTrustedFolder,
-}) => {
+const SandboxIndicator: React.FC<SandboxIndicatorProps> = ({ isTrustedFolder }) => {
   const config = useConfig();
   const sandboxEnabled = config.getSandboxEnabled();
   if (isTrustedFolder === false) {
@@ -140,9 +138,7 @@ export const FooterRow: React.FC<{
       >
         {showLabels && (
           <Box height={1}>
-            <Text
-              color={item.isFocused ? theme.text.primary : theme.ui.comment}
-            >
+            <Text color={item.isFocused ? theme.text.primary : theme.ui.comment}>
               {item.header}
             </Text>
           </Box>
@@ -304,12 +300,7 @@ export const Footer: React.FC = () => {
       }
       case 'model-name': {
         const str = getDisplayString(model);
-        addCol(
-          id,
-          header,
-          () => <Text color={itemColor}>{str}</Text>,
-          str.length,
-        );
+        addCol(id, header, () => <Text color={itemColor}>{str}</Text>, str.length);
         break;
       }
       case 'context-used': {
@@ -330,9 +321,7 @@ export const Footer: React.FC = () => {
         addCol(
           id,
           header,
-          () => (
-            <MemoryUsageDisplay color={itemColor} isActive={!copyModeEnabled} />
-          ),
+          () => <MemoryUsageDisplay color={itemColor} isActive={!copyModeEnabled} />,
           10,
         );
         break;
@@ -342,9 +331,7 @@ export const Footer: React.FC = () => {
           id,
           header,
           () => (
-            <Text color={itemColor}>
-              {uiState.sessionStats.sessionId.slice(0, 8)}
-            </Text>
+            <Text color={itemColor}>{uiState.sessionStats.sessionId.slice(0, 8)}</Text>
           ),
           8,
         );
@@ -361,9 +348,7 @@ export const Footer: React.FC = () => {
       }
       case 'provider': {
         if (!settings.merged.ui.showProviderInfo) break;
-        const activeProfile = config
-          .getProviderProfileService()
-          ?.getActiveProfile();
+        const activeProfile = config.getProviderProfileService()?.getActiveProfile();
         const displayStr = activeProfile?.id ?? authType;
         if (!displayStr) break;
         addCol(
@@ -480,8 +465,7 @@ export const Footer: React.FC = () => {
       element: col.element(estimatedWidth),
       flexGrow: 0,
       flexShrink: isWorkspace ? 1 : 0,
-      alignItems:
-        isLast && !droppedAny && index > 0 ? 'flex-end' : 'flex-start',
+      alignItems: isLast && !droppedAny && index > 0 ? 'flex-end' : 'flex-start',
     };
   });
 

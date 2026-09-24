@@ -94,8 +94,7 @@ describe('clearCommand', () => {
     const resetChatOrder = mockResetChat.mock.invocationCallOrder[0];
     const resetTelemetryOrder = (uiTelemetryService.clear as Mock).mock
       .invocationCallOrder[0];
-    const clearOrder = (mockContext.ui.clear as Mock).mock
-      .invocationCallOrder[0];
+    const clearOrder = (mockContext.ui.clear as Mock).mock.invocationCallOrder[0];
 
     expect(setDebugMessageOrder).toBeLessThan(resetChatOrder);
     expect(resetChatOrder).toBeLessThan(resetTelemetryOrder);
@@ -150,10 +149,8 @@ describe('clearCommand', () => {
         },
         expect.any(Number),
       );
-      const clearOrder = (mockContext.ui.clear as Mock).mock
-        .invocationCallOrder[0];
-      const addItemOrder = (mockContext.ui.addItem as Mock).mock
-        .invocationCallOrder[0];
+      const clearOrder = (mockContext.ui.clear as Mock).mock.invocationCallOrder[0];
+      const addItemOrder = (mockContext.ui.addItem as Mock).mock.invocationCallOrder[0];
       expect(clearOrder).toBeLessThan(addItemOrder);
 
       // The rest of the clear flow still runs.

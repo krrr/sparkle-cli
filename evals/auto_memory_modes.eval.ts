@@ -63,10 +63,8 @@ vi.mock('../packages/core/src/utils/debugLogger.js', () => ({
   debugLogger: {
     debug: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
-    log: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
-    warn: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
+    log: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
+    warn: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
     error: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
   },
@@ -76,10 +74,8 @@ vi.mock('../packages/core/src/utils/debugLogger.ts', () => ({
   debugLogger: {
     debug: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
-    log: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
-    warn: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
+    log: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
+    warn: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
     error: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
   },
@@ -89,10 +85,8 @@ vi.mock('../packages/core/src/utils/debugLogger', () => ({
   debugLogger: {
     debug: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
-    log: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
-    warn: (...args: unknown[]) =>
-      evalState.debugLines.push(args.map(String).join(' ')),
+    log: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
+    warn: (...args: unknown[]) => evalState.debugLines.push(args.map(String).join(' ')),
     error: (...args: unknown[]) =>
       evalState.debugLines.push(args.map(String).join(' ')),
   },
@@ -140,73 +134,71 @@ beforeEach(() => {
   evalState.debugLines = [];
   evalState.sessionFilePath = '';
   mocks.localAgentCreate.mockReset();
-  mocks.localAgentCreate.mockImplementation(
-    async (_agent, context, onActivity) => ({
-      run: vi.fn().mockImplementation(async () => {
-        if (evalState.sessionFilePath) {
-          const callId = `read-inbox-routing`;
-          onActivity({
-            isSubagentActivityEvent: true,
-            agentName: 'auto-memory-eval',
-            type: 'TOOL_CALL_START',
-            data: {
-              name: 'read_file',
-              callId,
-              args: { file_path: evalState.sessionFilePath },
-            },
-          });
-          onActivity({
-            isSubagentActivityEvent: true,
-            agentName: 'auto-memory-eval',
-            type: 'TOOL_CALL_END',
-            data: { id: callId, data: { isError: false } },
-          });
-        }
+  mocks.localAgentCreate.mockImplementation(async (_agent, context, onActivity) => ({
+    run: vi.fn().mockImplementation(async () => {
+      if (evalState.sessionFilePath) {
+        const callId = `read-inbox-routing`;
+        onActivity({
+          isSubagentActivityEvent: true,
+          agentName: 'auto-memory-eval',
+          type: 'TOOL_CALL_START',
+          data: {
+            name: 'read_file',
+            callId,
+            args: { file_path: evalState.sessionFilePath },
+          },
+        });
+        onActivity({
+          isSubagentActivityEvent: true,
+          agentName: 'auto-memory-eval',
+          type: 'TOOL_CALL_END',
+          data: { id: callId, data: { isError: false } },
+        });
+      }
 
-        const config = context.config as MockMemoryConfig;
-        const memoryDir = config.storage.getProjectMemoryDir();
-        const inboxDir = path.join(memoryDir, '.inbox');
+      const config = context.config as MockMemoryConfig;
+      const memoryDir = config.storage.getProjectMemoryDir();
+      const inboxDir = path.join(memoryDir, '.inbox');
 
-        const homeDir = process.env['SPARKLE_CLI_HOME'] ?? os.homedir();
-        const globalGeminiDir = path.join(homeDir, '.sparkle');
+      const homeDir = process.env['SPARKLE_CLI_HOME'] ?? os.homedir();
+      const globalGeminiDir = path.join(homeDir, '.sparkle');
 
-        await fs.mkdir(path.join(inboxDir, 'private'), { recursive: true });
-        await fs.mkdir(path.join(inboxDir, 'global'), { recursive: true });
+      await fs.mkdir(path.join(inboxDir, 'private'), { recursive: true });
+      await fs.mkdir(path.join(inboxDir, 'global'), { recursive: true });
 
-        const privateTarget = path.join(memoryDir, 'verify-memory.md');
-        await fs.writeFile(
-          path.join(inboxDir, 'private', 'verify-memory.patch'),
-          [
-            `--- /dev/null`,
-            `+++ ${privateTarget}`,
-            `@@ -0,0 +1,3 @@`,
-            `+# Project Memory Candidate`,
-            `+`,
-            `+Future agents should remember that this project verifies memory changes with \`npm run verify:memory\`.`,
-            ``,
-          ].join('\n'),
-        );
+      const privateTarget = path.join(memoryDir, 'verify-memory.md');
+      await fs.writeFile(
+        path.join(inboxDir, 'private', 'verify-memory.patch'),
+        [
+          `--- /dev/null`,
+          `+++ ${privateTarget}`,
+          `@@ -0,0 +1,3 @@`,
+          `+# Project Memory Candidate`,
+          `+`,
+          `+Future agents should remember that this project verifies memory changes with \`npm run verify:memory\`.`,
+          ``,
+        ].join('\n'),
+      );
 
-        const globalTarget = path.join(globalGeminiDir, 'AGENTS.md');
-        await fs.writeFile(
-          path.join(inboxDir, 'global', 'reply-style.patch'),
-          [
-            `--- /dev/null`,
-            `+++ ${globalTarget}`,
-            `@@ -0,0 +1,1 @@`,
-            `+User prefers concise Chinese architecture plans.`,
-            ``,
-          ].join('\n'),
-        );
+      const globalTarget = path.join(globalGeminiDir, 'AGENTS.md');
+      await fs.writeFile(
+        path.join(inboxDir, 'global', 'reply-style.patch'),
+        [
+          `--- /dev/null`,
+          `+++ ${globalTarget}`,
+          `@@ -0,0 +1,1 @@`,
+          `+User prefers concise Chinese architecture plans.`,
+          ``,
+        ].join('\n'),
+      );
 
-        return {
-          turn_count: 3,
-          duration_ms: 25,
-          terminate_reason: 'GOAL',
-        };
-      }),
+      return {
+        turn_count: 3,
+        duration_ms: 25,
+        terminate_reason: 'GOAL',
+      };
     }),
-  );
+  }));
 });
 
 afterEach(async () => {
@@ -234,9 +226,7 @@ function autoMemoryEval(name: string, fn: () => Promise<void>): void {
 }
 
 async function createFixture(): Promise<Fixture> {
-  const rootDir = await fs.mkdtemp(
-    path.join(os.tmpdir(), 'gemini-auto-memory-eval-'),
-  );
+  const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-auto-memory-eval-'));
   const homeDir = path.join(rootDir, 'home');
   const targetDir = path.join(rootDir, 'workspace');
   const projectTempDir = path.join(rootDir, 'project-temp');
@@ -279,10 +269,7 @@ async function createFixture(): Promise<Fixture> {
   return fixture;
 }
 
-async function seedSession(
-  fixture: Fixture,
-  sessionId: string,
-): Promise<string> {
+async function seedSession(fixture: Fixture, sessionId: string): Promise<string> {
   const sessionFilePath = path.join(
     fixture.projectTempDir,
     'chats',
@@ -388,10 +375,7 @@ describe('Auto Memory inbox routing', () => {
         '../packages/core/src/services/memoryService.js'
       );
       const fixture = await createFixture();
-      evalState.sessionFilePath = await seedSession(
-        fixture,
-        'inbox-routing-session',
-      );
+      evalState.sessionFilePath = await seedSession(fixture, 'inbox-routing-session');
       await expectSeedSessionEligible(fixture, 'inbox-routing-session');
 
       await startMemoryService(fixture.config as never);
@@ -409,10 +393,7 @@ describe('Auto Memory inbox routing', () => {
         'reply-style.patch',
       );
 
-      const activePrivateMemoryPath = path.join(
-        fixture.memoryDir,
-        'verify-memory.md',
-      );
+      const activePrivateMemoryPath = path.join(fixture.memoryDir, 'verify-memory.md');
       const activeGlobalMemoryPath = path.join(
         fixture.homeDir,
         '.sparkle',

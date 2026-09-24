@@ -29,10 +29,7 @@ import { type AgentLoopContext } from '../config/agent-loop-context.js';
 import { getCoreSystemPrompt } from './prompts.js';
 import { reportError } from '../utils/errorReporting.js';
 import { GeminiChat } from './geminiChat.js';
-import {
-  retryWithBackoff,
-  type RetryAvailabilityContext,
-} from '../utils/retry.js';
+import { retryWithBackoff, type RetryAvailabilityContext } from '../utils/retry.js';
 import type { ValidationRequiredError } from '../utils/googleQuotaErrors.js';
 import { getErrorMessage, isAbortError } from '../utils/errors.js';
 import { isFunctionResponse } from '../utils/messageInspectors.js';
@@ -47,10 +44,7 @@ import { AgentHistoryProvider } from '../context/agentHistoryProvider.js';
 import type { ContextManager } from '../context/contextManager.js';
 import type { HistoryTurn } from './agentChatHistory.js';
 import { ideContextStore } from '../ide/ideContext.js';
-import type {
-  DefaultHookOutput,
-  AfterAgentHookOutput,
-} from '../hooks/types.js';
+import type { DefaultHookOutput, AfterAgentHookOutput } from '../hooks/types.js';
 import { LlmRole } from '../telemetry/types.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 import type { IdeContext, File } from '../ide/types.js';
@@ -120,10 +114,7 @@ export class GeminiClient {
 
     coreEvents.on(CoreEvent.ModelChanged, this.handleModelChanged);
     coreEvents.on(CoreEvent.MemoryChanged, this.handleMemoryChanged);
-    coreEvents.on(
-      CoreEvent.ApprovalModeChanged,
-      this.handleApprovalModeChanged,
-    );
+    coreEvents.on(CoreEvent.ApprovalModeChanged, this.handleApprovalModeChanged);
   }
 
   private get config(): Config {
@@ -234,9 +225,7 @@ export class GeminiClient {
     }
 
     const finalResponseText =
-      hookState.cumulativeResponse ||
-      turn?.getResponseText() ||
-      '[no response text]';
+      hookState.cumulativeResponse || turn?.getResponseText() || '[no response text]';
     const finalRequest = hookState.originalRequest || currentRequest;
 
     const hookOutput = await this.config
@@ -252,9 +241,7 @@ export class GeminiClient {
 
   private updateTelemetryTokenCount() {
     if (this.chat) {
-      uiTelemetryService.setLastPromptTokenCount(
-        this.chat.getLastPromptTokenCount(),
-      );
+      uiTelemetryService.setLastPromptTokenCount(this.chat.getLastPromptTokenCount());
     }
   }
 
@@ -313,9 +300,7 @@ export class GeminiClient {
     this.getChat().setTools(tools);
   }
 
-  async resetChat(
-    history?: ReadonlyArray<Content | HistoryTurn>,
-  ): Promise<void> {
+  async resetChat(history?: ReadonlyArray<Content | HistoryTurn>): Promise<void> {
     this.chat = await this.startChat(history);
     this.updateTelemetryTokenCount();
     // Reset JIT context loaded paths so subdirectory context can be
@@ -326,10 +311,7 @@ export class GeminiClient {
   dispose() {
     coreEvents.off(CoreEvent.ModelChanged, this.handleModelChanged);
     coreEvents.off(CoreEvent.MemoryChanged, this.handleMemoryChanged);
-    coreEvents.off(
-      CoreEvent.ApprovalModeChanged,
-      this.handleApprovalModeChanged,
-    );
+    coreEvents.off(CoreEvent.ApprovalModeChanged, this.handleApprovalModeChanged);
   }
 
   async resumeChat(
@@ -399,8 +381,7 @@ export class GeminiClient {
         async (modelId: string) => {
           this.lastUsedModelId = modelId;
           const toolRegistry = this.context.toolRegistry;
-          const toolDeclarations =
-            toolRegistry.getFunctionDeclarations(modelId);
+          const toolDeclarations = toolRegistry.getFunctionDeclarations(modelId);
           return [{ functionDeclarations: toolDeclarations }];
         },
       );
@@ -435,9 +416,7 @@ export class GeminiClient {
       // Send full context as JSON
       const openFiles = currentIdeContext.workspaceState?.openFiles || [];
       const activeFile = openFiles.find((f) => f.isActive);
-      const otherOpenFiles = openFiles
-        .filter((f) => !f.isActive)
-        .map((f) => f.path);
+      const otherOpenFiles = openFiles.filter((f) => !f.isActive).map((f) => f.path);
 
       const contextData: Record<string, unknown> = {};
 
@@ -483,9 +462,10 @@ export class GeminiClient {
       const changes: Record<string, unknown> = {};
 
       const lastFiles = new Map(
-        (this.lastSentIdeContext.workspaceState?.openFiles || []).map(
-          (f: File) => [f.path, f],
-        ),
+        (this.lastSentIdeContext.workspaceState?.openFiles || []).map((f: File) => [
+          f.path,
+          f,
+        ]),
       );
       const currentFiles = new Map(
         (currentIdeContext.workspaceState?.openFiles || []).map((f: File) => [
@@ -641,19 +621,13 @@ export class GeminiClient {
           apiHistory,
           pendingApiHistory,
           baseUnits,
-        } = await this.contextManager.renderHistory(
-          pendingRequest,
-          undefined,
-          signal,
-        );
+        } = await this.contextManager.renderHistory(pendingRequest, undefined, signal);
 
         currentBaseUnits = baseUnits;
 
         // Use the PROCESSED pending content if available (e.g. if cleaned or distilled)
         const finalPendingContent =
-          pendingApiHistory.length > 0
-            ? pendingApiHistory[0]
-            : rawPendingRequest;
+          pendingApiHistory.length > 0 ? pendingApiHistory[0] : rawPendingRequest;
 
         // Late-bind the prompt: Append the active request to the managed history
         // only for the purpose of the upcoming API call.
@@ -710,8 +684,7 @@ export class GeminiClient {
     // in the conversation history . The IDE context is not discarded; it will
     // be included in the next regular message sent to the model.
     const history = this.getHistory();
-    const lastMessage =
-      history.length > 0 ? history[history.length - 1] : undefined;
+    const lastMessage = history.length > 0 ? history[history.length - 1] : undefined;
     const hasPendingToolCall =
       !!lastMessage &&
       lastMessage.role === 'model' &&
@@ -743,10 +716,7 @@ export class GeminiClient {
     // (an assistant message with tool_calls that lacks a matching tool
     // response is rejected, e.g. DeepSeek's invalid_request_error). Commit
     // the response first so the functionCall stays paired.
-    if (
-      loopResult.count > 0 &&
-      isFunctionResponse(createUserContent(request))
-    ) {
+    if (loopResult.count > 0 && isFunctionResponse(createUserContent(request))) {
       this.getChat().addHistory(createUserContent(request));
     }
     if (loopResult.count > 1) {
@@ -789,11 +759,9 @@ export class GeminiClient {
       model: modelToUse,
       isChatModel: true,
     };
-    const { model: finalModel } = applyModelSelection(
-      this.config,
-      modelConfigKey,
-      { consumeAttempt: false },
-    );
+    const { model: finalModel } = applyModelSelection(this.config, modelConfigKey, {
+      consumeAttempt: false,
+    });
     modelToUse = finalModel;
 
     if (!signal.aborted && !this.currentSequenceModel) {
@@ -1060,10 +1028,7 @@ export class GeminiClient {
 
       // Define callback to refresh context based on currentAttemptModel which might be updated by fallback handler
       const getAvailabilityContext: () => RetryAvailabilityContext | undefined =
-        createAvailabilityContextProvider(
-          this.config,
-          () => currentAttemptModel,
-        );
+        createAvailabilityContextProvider(this.config, () => currentAttemptModel);
 
       let initialActiveModel = this.config.getActiveModel();
 
@@ -1098,10 +1063,7 @@ export class GeminiClient {
           role,
         );
       };
-      const onPersistent429Callback = async (
-        authType?: string,
-        error?: unknown,
-      ) =>
+      const onPersistent429Callback = async (authType?: string, error?: unknown) =>
         // Pass the captured model to the centralized handler.
         handleFallback(this.config, currentAttemptModel, authType, error);
 
@@ -1135,8 +1097,7 @@ export class GeminiClient {
         onRetry: (attempt, error, delayMs) => {
           coreEvents.emitRetryAttempt({
             attempt,
-            maxAttempts:
-              availabilityMaxAttempts ?? this.config.getMaxAttempts(),
+            maxAttempts: availabilityMaxAttempts ?? this.config.getMaxAttempts(),
             delayMs,
             error: error instanceof Error ? error.message : String(error),
             model: getDisplayString(currentAttemptModel),
@@ -1189,13 +1150,11 @@ export class GeminiClient {
       info.compressionStatus ===
       CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT
     ) {
-      this.hasFailedCompressionAttempt =
-        this.hasFailedCompressionAttempt || !force;
+      this.hasFailedCompressionAttempt = this.hasFailedCompressionAttempt || !force;
     } else if (info.compressionStatus === CompressionStatus.COMPRESSED) {
       if (newHistory) {
         // capture current session data before resetting
-        const currentRecordingService =
-          this.getChat().getChatRecordingService();
+        const currentRecordingService = this.getChat().getChatRecordingService();
         const conversation = currentRecordingService.getConversation();
         const filePath = currentRecordingService.getConversationFilePath();
 
@@ -1257,9 +1216,7 @@ export class GeminiClient {
     const feedbackText = `System: Potential loop detected. Details: ${loopResult.detail || 'Repetitive patterns identified'}. Please take a step back and confirm you're making forward progress. If not, take a step back, analyze your previous actions and rethink how you're approaching the problem. Avoid repeating the same tool calls or responses without new results.`;
 
     if (this.config.getDebugMode()) {
-      debugLogger.warn(
-        'Iterative Loop Recovery: Injecting feedback message to model.',
-      );
+      debugLogger.warn('Iterative Loop Recovery: Injecting feedback message to model.');
     }
 
     const feedback = [{ text: feedbackText }];

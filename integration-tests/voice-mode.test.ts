@@ -6,10 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TestRig } from './test-helper.js';
-import {
-  WhisperModelManager,
-  WhisperTranscriptionProvider,
-} from 'sparkle-cli-core';
+import { WhisperModelManager, WhisperTranscriptionProvider } from 'sparkle-cli-core';
 import * as fs from 'node:fs';
 import commandExists from 'command-exists';
 
@@ -52,9 +49,7 @@ describe('Voice Mode Integration', () => {
     try {
       await commandExists('whisper-stream');
     } catch {
-      console.log(
-        'Skipping Whisper transcription test: whisper-stream not found',
-      );
+      console.log('Skipping Whisper transcription test: whisper-stream not found');
       return;
     }
 

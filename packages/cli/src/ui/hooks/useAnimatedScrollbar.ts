@@ -41,8 +41,7 @@ export function useAnimatedScrollbar(
     debugState.debugNumAnimatedComponents++;
     isAnimatingRef.current = true;
 
-    const isTest =
-      typeof process !== 'undefined' && process.env['NODE_ENV'] === 'test';
+    const isTest = typeof process !== 'undefined' && process.env['NODE_ENV'] === 'test';
     const fadeInDuration = isTest ? 0 : 200;
     const visibleDuration = isTest ? 0 : 1000;
     const fadeOutDuration = isTest ? 0 : 300;
@@ -85,13 +84,8 @@ export function useAnimatedScrollbar(
             if (!isAnimatingRef.current) return;
 
             const elapsed = Date.now() - start;
-            const progress = Math.max(
-              0,
-              Math.min(elapsed / fadeOutDuration, 1),
-            );
-            setScrollbarColor(
-              interpolateColor(focusedColor, unfocusedColor, progress),
-            );
+            const progress = Math.max(0, Math.min(elapsed / fadeOutDuration, 1));
+            setScrollbarColor(interpolateColor(focusedColor, unfocusedColor, progress));
 
             if (progress === 1) {
               cleanup();

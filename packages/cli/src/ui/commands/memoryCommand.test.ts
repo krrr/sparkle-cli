@@ -176,9 +176,7 @@ describe('memoryCommand', () => {
           include: [],
         }),
         isTrustedFolder: () => false,
-        updateSystemInstructionIfInitialized: vi
-          .fn()
-          .mockResolvedValue(undefined),
+        updateSystemInstructionIfInitialized: vi.fn().mockResolvedValue(undefined),
         getMemoryContextManager: vi.fn().mockReturnValue({
           refresh: mockContextManagerRefresh,
         }),
@@ -230,8 +228,7 @@ describe('memoryCommand', () => {
       const successMessage = {
         type: 'message',
         messageType: MessageType.INFO,
-        content:
-          'Memory reloaded successfully. Loaded 18 characters from 2 file(s).',
+        content: 'Memory reloaded successfully. Loaded 18 characters from 2 file(s).',
       };
       mockRefreshMemory.mockResolvedValue(successMessage);
 

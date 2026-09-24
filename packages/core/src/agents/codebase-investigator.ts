@@ -101,12 +101,7 @@ export const CodebaseInvestigatorAgent = (
 
     toolConfig: {
       // Grant access only to read-only tools.
-      tools: [
-        LS_TOOL_NAME,
-        READ_FILE_TOOL_NAME,
-        GLOB_TOOL_NAME,
-        GREP_TOOL_NAME,
-      ],
+      tools: [LS_TOOL_NAME, READ_FILE_TOOL_NAME, GLOB_TOOL_NAME, GREP_TOOL_NAME],
     },
 
     promptConfig: {

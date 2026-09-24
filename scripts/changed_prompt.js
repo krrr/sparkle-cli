@@ -5,10 +5,7 @@
  */
 import { execSync } from 'node:child_process';
 
-const CORE_STEERING_PATHS = [
-  'packages/core/src/prompts/',
-  'packages/core/src/tools/',
-];
+const CORE_STEERING_PATHS = ['packages/core/src/prompts/', 'packages/core/src/tools/'];
 
 const TEST_PATHS = ['evals/'];
 
@@ -53,10 +50,7 @@ function main() {
         reasons.push(`Matched core steering path: ${file}`);
         if (!verbose) break;
       }
-      if (
-        !steeringOnly &&
-        TEST_PATHS.some((prefix) => file.startsWith(prefix))
-      ) {
+      if (!steeringOnly && TEST_PATHS.some((prefix) => file.startsWith(prefix))) {
         detected = true;
         reasons.push(`Matched test path: ${file}`);
         if (!verbose) break;

@@ -17,10 +17,7 @@ vi.mock('../utils/tokenCalculation.js', () => ({
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
 import type { Config } from '../config/config.js';
 import type { BaseLlmClient } from '../core/baseLlmClient.js';
-import type {
-  AgentHistoryProviderConfig,
-  ContextManagementConfig,
-} from './types.js';
+import type { AgentHistoryProviderConfig, ContextManagementConfig } from './types.js';
 import {
   TEXT_TRUNCATION_PREFIX,
   TOOL_TRUNCATION_PREFIX,
@@ -35,9 +32,7 @@ describe('AgentHistoryProvider', () => {
 
   beforeEach(() => {
     config = {
-      isExperimentalAgentHistoryTruncationEnabled: vi
-        .fn()
-        .mockReturnValue(false),
+      isExperimentalAgentHistoryTruncationEnabled: vi.fn().mockReturnValue(false),
       getContextManagementConfig: vi.fn().mockReturnValue(false),
       getBaseLlmClient: vi.fn(),
     } as unknown as Config;
@@ -152,9 +147,7 @@ describe('AgentHistoryProvider', () => {
     expect(generateContentMock).toHaveBeenCalled();
     expect(result.length).toBe(15);
     // The fallback summary should use clear and unambiguous phrasing
-    expect(result[0].parts![0].text).toContain(
-      'Previous User Intent (Truncated):',
-    );
+    expect(result[0].parts![0].text).toContain('Previous User Intent (Truncated):');
     expect(result[0].parts![0].text).not.toContain('Last User Intent:');
   });
 
@@ -318,12 +311,10 @@ describe('AgentHistoryProvider', () => {
         },
       ];
 
-      vi.mocked(estimateTokenCountSync).mockImplementation(
-        (parts: readonly Part[]) => {
-          if (parts?.[0]?.functionResponse) return 5000;
-          return 10;
-        },
-      );
+      vi.mocked(estimateTokenCountSync).mockImplementation((parts: readonly Part[]) => {
+        if (parts?.[0]?.functionResponse) return 5000;
+        return 10;
+      });
 
       const result = await provider.manageHistory(history);
 
@@ -347,19 +338,13 @@ describe('AgentHistoryProvider', () => {
   describe('truncateProportionally', () => {
     it('returns original string if under target chars', () => {
       const str = 'A'.repeat(50);
-      expect(truncateProportionally(str, 100, TEXT_TRUNCATION_PREFIX)).toBe(
-        str,
-      );
+      expect(truncateProportionally(str, 100, TEXT_TRUNCATION_PREFIX)).toBe(str);
     });
 
     it('truncates proportionally with prefix and ellipsis', () => {
       const str = 'A'.repeat(500) + 'B'.repeat(500); // 1000 chars
       const target = 100;
-      const result = truncateProportionally(
-        str,
-        target,
-        TEXT_TRUNCATION_PREFIX,
-      );
+      const result = truncateProportionally(str, target, TEXT_TRUNCATION_PREFIX);
 
       expect(result.startsWith(TEXT_TRUNCATION_PREFIX)).toBe(true);
       expect(result).toContain('\n...\n');
@@ -409,18 +394,16 @@ describe('AgentHistoryProvider', () => {
         parts: [{ text: part1Text }, { text: part2Text }],
       };
 
-      vi.mocked(estimateTokenCountSync).mockImplementation(
-        (parts: readonly Part[]) => {
-          if (!parts || parts.length === 0) return 0;
-          let tokens = 0;
-          for (const p of parts) {
-            if (p.text?.startsWith('A')) tokens += 2500;
-            else if (p.text?.startsWith('B')) tokens += 7500;
-            else tokens += 10;
-          }
-          return tokens;
-        },
-      );
+      vi.mocked(estimateTokenCountSync).mockImplementation((parts: readonly Part[]) => {
+        if (!parts || parts.length === 0) return 0;
+        let tokens = 0;
+        for (const p of parts) {
+          if (p.text?.startsWith('A')) tokens += 2500;
+          else if (p.text?.startsWith('B')) tokens += 7500;
+          else tokens += 10;
+        }
+        return tokens;
+      });
 
       const result = await provider.manageHistory(history);
 
@@ -453,18 +436,16 @@ describe('AgentHistoryProvider', () => {
         parts: [{ text: smallText }, { text: hugeText }],
       };
 
-      vi.mocked(estimateTokenCountSync).mockImplementation(
-        (parts: readonly Part[]) => {
-          if (!parts || parts.length === 0) return 0;
-          let tokens = 0;
-          for (const p of parts) {
-            if (p.text === smallText) tokens += 10;
-            else if (p.text?.startsWith('B')) tokens += 10000;
-            else tokens += 10;
-          }
-          return tokens;
-        },
-      );
+      vi.mocked(estimateTokenCountSync).mockImplementation((parts: readonly Part[]) => {
+        if (!parts || parts.length === 0) return 0;
+        let tokens = 0;
+        for (const p of parts) {
+          if (p.text === smallText) tokens += 10;
+          else if (p.text?.startsWith('B')) tokens += 10000;
+          else tokens += 10;
+        }
+        return tokens;
+      });
 
       const result = await provider.manageHistory(history);
 

@@ -69,9 +69,7 @@ describe('sandboxUtils', () => {
     });
 
     it('should handle registry path', () => {
-      expect(parseImageName('gcr.io/my-project/my-image:v1')).toBe(
-        'my-image-v1',
-      );
+      expect(parseImageName('gcr.io/my-project/my-image:v1')).toBe('my-image-v1');
     });
   });
 
@@ -186,18 +184,14 @@ describe('sandboxUtils', () => {
       const { debugLogger } = await import('sparkle-cli-core');
       expect(await shouldUseCurrentUserInSandbox()).toBe(false);
       expect(debugLogger.warn).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'Host UID mismatch detected (current UID: 1234)',
-        ),
+        expect.stringContaining('Host UID mismatch detected (current UID: 1234)'),
       );
     });
 
     it('should return true on Pop!_OS (via ID_LIKE)', async () => {
       delete process.env['SANDBOX_SET_UID_GID'];
       vi.mocked(os.platform).mockReturnValue('linux');
-      vi.mocked(readFile).mockResolvedValue(
-        'ID=pop\nID_LIKE="ubuntu debian"\n',
-      );
+      vi.mocked(readFile).mockResolvedValue('ID=pop\nID_LIKE="ubuntu debian"\n');
       expect(await shouldUseCurrentUserInSandbox()).toBe(true);
     });
 

@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { SandboxedFileSystemService } from './sandboxedFileSystemService.js';
 import type {
   SandboxManager,
@@ -135,9 +127,9 @@ describe('SandboxedFileSystemService', () => {
     });
 
     await writePromise;
-    expect(
-      (mockStdin as unknown as { write: Mock }).write,
-    ).toHaveBeenCalledWith('new content');
+    expect((mockStdin as unknown as { write: Mock }).write).toHaveBeenCalledWith(
+      'new content',
+    );
     expect((mockStdin as unknown as { end: Mock }).end).toHaveBeenCalled();
     expect(vi.mocked(sandboxManager.prepareCommand)).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -223,10 +215,7 @@ describe('SandboxedFileSystemService', () => {
     const readPromise = service.readTextFile(testFile);
 
     setImmediate(() => {
-      mockChild.stderr!.emit(
-        'data',
-        Buffer.from('Could not find a part of the path'),
-      );
+      mockChild.stderr!.emit('data', Buffer.from('Could not find a part of the path'));
       mockChild.emit('close', 1);
     });
 

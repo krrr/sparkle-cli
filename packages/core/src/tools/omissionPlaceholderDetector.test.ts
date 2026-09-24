@@ -50,14 +50,12 @@ describe('detectOmissionPlaceholders', () => {
   });
 
   it('does not detect omission phrase when inline in a comment', () => {
-    expect(
-      detectOmissionPlaceholders('return value; // rest of methods ...'),
-    ).toEqual([]);
+    expect(detectOmissionPlaceholders('return value; // rest of methods ...')).toEqual(
+      [],
+    );
   });
 
   it('does not detect unrelated ellipsis text', () => {
-    expect(detectOmissionPlaceholders('const message = "loading...";')).toEqual(
-      [],
-    );
+    expect(detectOmissionPlaceholders('const message = "loading...";')).toEqual([]);
   });
 });

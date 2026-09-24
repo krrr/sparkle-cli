@@ -15,13 +15,10 @@ describe('Context Management Fidelity E2E', () => {
   let rig: TestRig;
 
   function generateRandomString(length: number): string {
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
-      result += characters.charAt(
-        Math.floor(Math.random() * characters.length),
-      );
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
   }
@@ -87,10 +84,7 @@ describe('Context Management Fidelity E2E', () => {
 
       const setupResponses = (fileName: string, mocks: FakeResponse[]) => {
         const filePath = path.join(rig.testDir!, fileName);
-        fs.writeFileSync(
-          filePath,
-          mocks.map((m) => JSON.stringify(m)).join('\n'),
-        );
+        fs.writeFileSync(filePath, mocks.map((m) => JSON.stringify(m)).join('\n'));
         return filePath;
       };
 
@@ -194,8 +188,7 @@ describe('Context Management Fidelity E2E', () => {
         if (!detailsMatch) return null;
 
         const details = JSON.parse(detailsMatch[1]);
-        const assetInfo =
-          details.renderedContextSanitized || details.renderedContext;
+        const assetInfo = details.renderedContextSanitized || details.renderedContext;
         if (assetInfo && assetInfo.$asset) {
           const assetPath = path.join(traceDir, 'assets', assetInfo.$asset);
           return JSON.parse(fs.readFileSync(assetPath, 'utf-8'));
@@ -269,18 +262,14 @@ describe('Context Management Fidelity E2E', () => {
           t.content.parts?.some((p) => p.text?.includes('active_tasks')) ||
           (t.id && t.id.length === 32),
       );
-      expect(syntheticTurnsAfter.length).toBeGreaterThanOrEqual(
-        syntheticTurns.length,
-      );
+      expect(syntheticTurnsAfter.length).toBeGreaterThanOrEqual(syntheticTurns.length);
 
       // Check if the first synthetic turn is identical (with relaxation for environment context)
       expect(syntheticTurnsAfter[0].id).toBe(syntheticTurns[0].id);
       if (isEnvContext(syntheticTurns[0])) {
         expect(isEnvContext(syntheticTurnsAfter[0])).toBe(true);
       } else {
-        expect(syntheticTurnsAfter[0].content).toEqual(
-          syntheticTurns[0].content,
-        );
+        expect(syntheticTurnsAfter[0].content).toEqual(syntheticTurns[0].content);
       }
     },
   );

@@ -19,21 +19,13 @@ describe('AdaptiveTokenCalculator', () => {
 
   it('should initialize with a learned weight of 1.0', () => {
     const eventBus = new ContextEventBus();
-    const calculator = new AdaptiveTokenCalculator(
-      charsPerToken,
-      registry,
-      eventBus,
-    );
+    const calculator = new AdaptiveTokenCalculator(charsPerToken, registry, eventBus);
     expect(calculator.getLearnedWeight()).toBe(1.0);
   });
 
   it('should dynamically update learned weight based on token ground truth events', () => {
     const eventBus = new ContextEventBus();
-    const calculator = new AdaptiveTokenCalculator(
-      charsPerToken,
-      registry,
-      eventBus,
-    );
+    const calculator = new AdaptiveTokenCalculator(charsPerToken, registry, eventBus);
 
     // Initial state: weight = 1.0
 
@@ -60,11 +52,7 @@ describe('AdaptiveTokenCalculator', () => {
 
   it('should clamp the learned weight between 0.5 and 2.0', () => {
     const eventBus = new ContextEventBus();
-    const calculator = new AdaptiveTokenCalculator(
-      charsPerToken,
-      registry,
-      eventBus,
-    );
+    const calculator = new AdaptiveTokenCalculator(charsPerToken, registry, eventBus);
 
     // Push weight up extremely high (API returns 10x tokens)
     for (let i = 0; i < 20; i++) {
@@ -84,11 +72,7 @@ describe('AdaptiveTokenCalculator', () => {
 
   it('should correctly apply the learned weight to node calculations while keeping raw base units stable', () => {
     const eventBus = new ContextEventBus();
-    const calculator = new AdaptiveTokenCalculator(
-      charsPerToken,
-      registry,
-      eventBus,
-    );
+    const calculator = new AdaptiveTokenCalculator(charsPerToken, registry, eventBus);
 
     // Decrease the weight to exactly 0.5
     for (let i = 0; i < 20; i++) {
@@ -109,11 +93,7 @@ describe('AdaptiveTokenCalculator', () => {
 
   it('should ignore ground truth events with 0 promptBaseUnits to prevent division by zero', () => {
     const eventBus = new ContextEventBus();
-    const calculator = new AdaptiveTokenCalculator(
-      charsPerToken,
-      registry,
-      eventBus,
-    );
+    const calculator = new AdaptiveTokenCalculator(charsPerToken, registry, eventBus);
 
     eventBus.emitTokenGroundTruth({
       actualTokens: 100,

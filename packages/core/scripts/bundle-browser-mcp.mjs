@@ -50,10 +50,7 @@ async function bundle() {
     await esbuild.build({
       entryPoints: [entryPoint],
       bundle: true,
-      outfile: path.resolve(
-        __dirname,
-        '../dist/bundled/chrome-devtools-mcp.mjs',
-      ),
+      outfile: path.resolve(__dirname, '../dist/bundled/chrome-devtools-mcp.mjs'),
       format: 'esm',
       platform: 'node',
       plugins: [emptyModulePlugin],
@@ -72,10 +69,7 @@ async function bundle() {
       __dirname,
       '../../../node_modules/chrome-devtools-mcp/build/src/third_party',
     );
-    const destThirdParty = path.resolve(
-      __dirname,
-      '../dist/bundled/third_party',
-    );
+    const destThirdParty = path.resolve(__dirname, '../dist/bundled/third_party');
 
     if (fs.existsSync(srcThirdParty)) {
       if (fs.existsSync(destThirdParty)) {

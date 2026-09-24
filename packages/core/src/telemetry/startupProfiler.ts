@@ -192,10 +192,7 @@ export class StartupProfiler {
           details,
         });
       } else {
-        debugLogger.debug(
-          '[STARTUP] Skipping phase without measure:',
-          phase.name,
-        );
+        debugLogger.debug('[STARTUP] Skipping phase without measure:', phase.name);
       }
     }
 
@@ -214,8 +211,7 @@ export class StartupProfiler {
             (performance.timeOrigin + measure.startTime) * 1000,
           ),
           end_time_usec: Math.round(
-            (performance.timeOrigin + measure.startTime + measure.duration) *
-              1000,
+            (performance.timeOrigin + measure.startTime + measure.duration) * 1000,
           ),
         });
       }

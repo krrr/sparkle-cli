@@ -15,9 +15,7 @@ import { AT_COMMAND_PATH_REGEX_SOURCE } from '../hooks/atCommandProcessor.js';
 // Pre-compiled regex for detecting @<path> patterns consistent with parseAllAtCommands.
 // Uses the same AT_COMMAND_PATH_REGEX_SOURCE so that isAtCommand is true whenever
 // parseAllAtCommands would find at least one atPath part.
-const AT_COMMAND_DETECT_REGEX = new RegExp(
-  `(?<!\\\\)@${AT_COMMAND_PATH_REGEX_SOURCE}`,
-);
+const AT_COMMAND_DETECT_REGEX = new RegExp(`(?<!\\\\)@${AT_COMMAND_PATH_REGEX_SOURCE}`);
 
 /**
  * Checks if a query string potentially represents an '@' command.
@@ -124,31 +122,23 @@ const getStdioTty = (): TtyTarget => {
   // On Windows, prioritize stdout to prevent shell-specific formatting (e.g., PowerShell's
   // red stderr) from corrupting the raw escape sequence payload.
   if (process.platform === 'win32') {
-    if (process.stdout?.isTTY)
-      return { stream: process.stdout, closeAfter: false };
-    if (process.stderr?.isTTY)
-      return { stream: process.stderr, closeAfter: false };
+    if (process.stdout?.isTTY) return { stream: process.stdout, closeAfter: false };
+    if (process.stderr?.isTTY) return { stream: process.stderr, closeAfter: false };
     return null;
   }
 
   // On non-Windows platforms, prioritize stderr to avoid polluting stdout,
   // preserving it for potential redirection or piping.
-  if (process.stderr?.isTTY)
-    return { stream: process.stderr, closeAfter: false };
-  if (process.stdout?.isTTY)
-    return { stream: process.stdout, closeAfter: false };
+  if (process.stderr?.isTTY) return { stream: process.stderr, closeAfter: false };
+  if (process.stdout?.isTTY) return { stream: process.stdout, closeAfter: false };
   return null;
 };
 
 const inTmux = (): boolean =>
-  Boolean(
-    process.env['TMUX'] || (process.env['TERM'] ?? '').startsWith('tmux'),
-  );
+  Boolean(process.env['TMUX'] || (process.env['TERM'] ?? '').startsWith('tmux'));
 
 const inScreen = (): boolean =>
-  Boolean(
-    process.env['STY'] || (process.env['TERM'] ?? '').startsWith('screen'),
-  );
+  Boolean(process.env['STY'] || (process.env['TERM'] ?? '').startsWith('screen'));
 
 const isSSH = (): boolean =>
   Boolean(
@@ -172,10 +162,7 @@ const isDumbTerm = (): boolean => (process.env['TERM'] ?? '') === 'dumb';
 const shouldUseOsc52 = (tty: TtyTarget, settings?: Settings): boolean =>
   Boolean(tty) &&
   !isDumbTerm() &&
-  (settings?.experimental?.useOSC52Copy ||
-    isSSH() ||
-    isWSL() ||
-    isWindowsTerminal());
+  (settings?.experimental?.useOSC52Copy || isSSH() || isWSL() || isWindowsTerminal());
 
 const safeUtf8Truncate = (buf: Buffer, maxBytes: number): Buffer => {
   if (buf.length <= maxBytes) return buf;
@@ -223,10 +210,7 @@ const writeAll = (stream: Writable, data: string): Promise<void> =>
         resolve();
         return;
       } catch (e) {
-        debugLogger.warn(
-          'Direct write to TTY failed, falling back to stream write',
-          e,
-        );
+        debugLogger.warn('Direct write to TTY failed, falling back to stream write', e);
       }
     }
 
@@ -264,11 +248,7 @@ export const copyToClipboard = async (
 
   if (shouldUseOsc52(tty, settings)) {
     const osc = buildOsc52(text);
-    const payload = inTmux()
-      ? wrapForTmux(osc)
-      : inScreen()
-        ? wrapForScreen(osc)
-        : osc;
+    const payload = inTmux() ? wrapForTmux(osc) : inScreen() ? wrapForScreen(osc) : osc;
 
     await writeAll(tty!.stream, payload);
 

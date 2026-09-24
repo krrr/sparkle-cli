@@ -341,10 +341,7 @@ describe('useShellCompletion utilities', () => {
     });
 
     it('should return empty array for non-existent directory', async () => {
-      const results = await resolvePathCompletions(
-        '/nonexistent/path/foo',
-        '/tmp',
-      );
+      const results = await resolvePathCompletions('/nonexistent/path/foo', '/tmp');
       expect(results).toEqual([]);
     });
 

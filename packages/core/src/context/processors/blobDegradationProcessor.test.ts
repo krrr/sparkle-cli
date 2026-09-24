@@ -22,10 +22,7 @@ describe('BlobDegradationProcessor', () => {
     // So we make the blob data 200 chars.
     const fakeData = 'A'.repeat(200);
 
-    const processor = createBlobDegradationProcessor(
-      'BlobDegradationProcessor',
-      env,
-    );
+    const processor = createBlobDegradationProcessor('BlobDegradationProcessor', env);
 
     const node1 = createDummyNode('ep1', NodeType.USER_PROMPT, 10, {
       payload: { text: 'Hello' },
@@ -59,10 +56,7 @@ describe('BlobDegradationProcessor', () => {
   it('should degrade all blobs unconditionally', async () => {
     const env = createMockEnvironment();
 
-    const processor = createBlobDegradationProcessor(
-      'BlobDegradationProcessor',
-      env,
-    );
+    const processor = createBlobDegradationProcessor('BlobDegradationProcessor', env);
 
     const node1 = createDummyNode('ep1', NodeType.USER_PROMPT, 100, {
       payload: {
@@ -89,10 +83,7 @@ describe('BlobDegradationProcessor', () => {
   it('should return exactly the targets array if targets are empty', async () => {
     const env = createMockEnvironment();
 
-    const processor = createBlobDegradationProcessor(
-      'BlobDegradationProcessor',
-      env,
-    );
+    const processor = createBlobDegradationProcessor('BlobDegradationProcessor', env);
     const targets: ConcreteNode[] = [];
 
     const result = await processor.process(createMockProcessArgs(targets));

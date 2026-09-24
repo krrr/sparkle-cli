@@ -40,10 +40,9 @@ describe('interactive_commands', () => {
       );
 
       expect(vitestCall, 'Agent should have called vitest').toBeDefined();
-      expect(
-        vitestCall?.toolRequest.args,
-        'Agent should have passed run arg',
-      ).toMatch(/\b(run|--run)\b/);
+      expect(vitestCall?.toolRequest.args, 'Agent should have passed run arg').toMatch(
+        /\b(run|--run)\b/,
+      );
     },
   });
 

@@ -35,10 +35,7 @@ interface DialogManagerProps {
 }
 
 // Props for DialogManager
-export const DialogManager = ({
-  addItem,
-  terminalWidth,
-}: DialogManagerProps) => {
+export const DialogManager = ({ addItem, terminalWidth }: DialogManagerProps) => {
   const config = useConfig();
   const settings = useSettings();
 

@@ -88,10 +88,7 @@ export function getShellDeclaration(
 ): FunctionDeclaration {
   return {
     name: SHELL_TOOL_NAME,
-    description: getShellToolDescription(
-      enableInteractiveShell,
-      enableEfficiency,
-    ),
+    description: getShellToolDescription(enableInteractiveShell, enableEfficiency),
     parametersJsonSchema: {
       type: 'object',
       properties: {
@@ -182,9 +179,7 @@ export function getExitPlanModeDeclaration(): FunctionDeclaration {
 /**
  * Returns the FunctionDeclaration for activating a skill.
  */
-export function getActivateSkillDeclaration(
-  skillNames: string[],
-): FunctionDeclaration {
+export function getActivateSkillDeclaration(skillNames: string[]): FunctionDeclaration {
   const availableSkillsHint =
     skillNames.length > 0
       ? ` (Available: ${skillNames.map((n) => `'${n}'`).join(', ')})`
@@ -193,9 +188,7 @@ export function getActivateSkillDeclaration(
   let schema: z.ZodTypeAny;
   if (skillNames.length === 0) {
     schema = z.object({
-      [SKILL_PARAM_NAME]: z
-        .string()
-        .describe('No skills are currently available.'),
+      [SKILL_PARAM_NAME]: z.string().describe('No skills are currently available.'),
     });
   } else {
     schema = z.object({

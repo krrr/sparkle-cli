@@ -5,14 +5,9 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import {
-  formatToolLogChain,
-  type ToolLogEntry,
-} from '../utils/tool-log-formatter.js';
+import { formatToolLogChain, type ToolLogEntry } from '../utils/tool-log-formatter.js';
 
-function makeEntry(
-  overrides: Partial<ToolLogEntry['toolRequest']> = {},
-): ToolLogEntry {
+function makeEntry(overrides: Partial<ToolLogEntry['toolRequest']> = {}): ToolLogEntry {
   return {
     toolRequest: {
       name: 'test_tool',

@@ -21,8 +21,7 @@ import type { AgentActionResult } from './agentSettings.js';
 
 describe('agentUtils', () => {
   describe('renderAgentActionFeedback', () => {
-    const mockFormatScope = (label: string, path: string) =>
-      `[${label}:${path}]`;
+    const mockFormatScope = (label: string, path: string) => `[${label}:${path}]`;
 
     it('should return error message if status is error', () => {
       const result: AgentActionResult = {
@@ -82,9 +81,7 @@ describe('agentUtils', () => {
         status: 'success',
         agentName: 'my-agent',
         action: 'enable',
-        modifiedScopes: [
-          { scope: SettingScope.User, path: '/path/to/user/settings' },
-        ],
+        modifiedScopes: [{ scope: SettingScope.User, path: '/path/to/user/settings' }],
         alreadyInStateScopes: [],
       };
       expect(renderAgentActionFeedback(result, mockFormatScope)).toBe(
@@ -97,9 +94,7 @@ describe('agentUtils', () => {
         status: 'success',
         agentName: 'my-agent',
         action: 'enable',
-        modifiedScopes: [
-          { scope: SettingScope.User, path: '/path/to/user/settings' },
-        ],
+        modifiedScopes: [{ scope: SettingScope.User, path: '/path/to/user/settings' }],
         alreadyInStateScopes: [
           {
             scope: SettingScope.Workspace,
@@ -117,9 +112,7 @@ describe('agentUtils', () => {
         status: 'success',
         agentName: 'my-agent',
         action: 'disable',
-        modifiedScopes: [
-          { scope: SettingScope.User, path: '/path/to/user/settings' },
-        ],
+        modifiedScopes: [{ scope: SettingScope.User, path: '/path/to/user/settings' }],
         alreadyInStateScopes: [],
       };
       expect(renderAgentActionFeedback(result, mockFormatScope)).toBe(
@@ -132,9 +125,7 @@ describe('agentUtils', () => {
         status: 'success',
         agentName: 'my-agent',
         action: 'disable',
-        modifiedScopes: [
-          { scope: SettingScope.User, path: '/path/to/user/settings' },
-        ],
+        modifiedScopes: [{ scope: SettingScope.User, path: '/path/to/user/settings' }],
         alreadyInStateScopes: [
           {
             scope: SettingScope.Workspace,

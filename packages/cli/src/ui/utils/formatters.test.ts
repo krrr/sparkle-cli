@@ -101,9 +101,7 @@ describe('formatters', () => {
     });
 
     it('should handle large durations', () => {
-      expect(formatDuration(86400000 + 3600000 + 120000 + 1000)).toBe(
-        '25h 2m 1s',
-      );
+      expect(formatDuration(86400000 + 3600000 + 120000 + 1000)).toBe('25h 2m 1s');
     });
 
     it('should handle negative durations', () => {
@@ -182,14 +180,12 @@ describe('formatters', () => {
     });
 
     it('should handle end marker before start marker gracefully', () => {
-      const text =
-        '--- End of content ---\n--- Content from referenced files ---';
+      const text = '--- End of content ---\n--- Content from referenced files ---';
       expect(stripReferenceContent(text)).toBe(text);
     });
 
     it('should strip even if markers are on the same line (though unlikely)', () => {
-      const text =
-        'A--- Content from referenced files ---B--- End of content ---C';
+      const text = 'A--- Content from referenced files ---B--- End of content ---C';
       expect(stripReferenceContent(text)).toBe('AC');
     });
 

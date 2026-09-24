@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CommandKind,
-  type CommandContext,
-  type SlashCommand,
-} from './types.js';
+import { CommandKind, type CommandContext, type SlashCommand } from './types.js';
 import { RewindViewer } from '../components/RewindViewer.js';
 import { type HistoryItem } from '../types.js';
 import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
@@ -60,9 +56,7 @@ async function rewindConversation(
     client.setHistory(clientHistory);
 
     // Reset context manager as we are rewinding history
-    await context.services.agentContext?.config
-      .getMemoryContextManager()
-      ?.refresh();
+    await context.services.agentContext?.config.getMemoryContextManager()?.refresh();
 
     // Update UI History
     // We generate IDs based on index for the rewind history

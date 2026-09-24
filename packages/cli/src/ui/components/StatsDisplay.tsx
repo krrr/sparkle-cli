@@ -19,10 +19,7 @@ import {
   TOOL_SUCCESS_RATE_HIGH,
   TOOL_SUCCESS_RATE_MEDIUM,
 } from '../utils/displayUtils.js';
-import {
-  computeSessionStats,
-  calculateCacheHitRate,
-} from '../utils/computeStats.js';
+import { computeSessionStats, calculateCacheHitRate } from '../utils/computeStats.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { LlmRole, getDisplayString } from 'sparkle-cli-core';
 
@@ -175,30 +172,22 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
             </Text>
           </Box>
           <Box width={requestsWidth} justifyContent="flex-end">
-            <Text
-              color={row.isSubRow ? theme.text.secondary : theme.text.primary}
-            >
+            <Text color={row.isSubRow ? theme.text.secondary : theme.text.primary}>
               {row.requests}
             </Text>
           </Box>
           <Box width={inputTokensWidth} justifyContent="flex-end">
-            <Text
-              color={row.isSubRow ? theme.text.secondary : theme.text.primary}
-            >
+            <Text color={row.isSubRow ? theme.text.secondary : theme.text.primary}>
               {row.inputTokens}
             </Text>
           </Box>
           <Box width={cacheReadsWidth} justifyContent="flex-end">
-            <Text
-              color={row.isSubRow ? theme.text.secondary : theme.text.primary}
-            >
+            <Text color={row.isSubRow ? theme.text.secondary : theme.text.primary}>
               {row.cachedTokens}
             </Text>
           </Box>
           <Box width={outputTokensWidth} justifyContent="flex-end">
-            <Text
-              color={row.isSubRow ? theme.text.secondary : theme.text.primary}
-            >
+            <Text color={row.isSubRow ? theme.text.secondary : theme.text.primary}>
               {row.outputTokens}
             </Text>
           </Box>
@@ -280,25 +269,17 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
             {tools.totalCalls} (
             <Text color={theme.status.success}>✓ {tools.totalSuccess}</Text>{' '}
             <Text color={theme.status.error}>✗ {tools.totalFail}</Text>){'    '}
-            <Text color={successColor}>
-              {computed.successRate.toFixed(1)}%
-            </Text>{' '}
-            Success
+            <Text color={successColor}>{computed.successRate.toFixed(1)}%</Text> Success
           </Text>
         </StatRow>
-        {files &&
-          (files.totalLinesAdded > 0 || files.totalLinesRemoved > 0) && (
-            <StatRow title="Code Changes:">
-              <Text color={theme.text.primary}>
-                <Text color={theme.status.success}>
-                  +{files.totalLinesAdded}
-                </Text>{' '}
-                <Text color={theme.status.error}>
-                  -{files.totalLinesRemoved}
-                </Text>
-              </Text>
-            </StatRow>
-          )}
+        {files && (files.totalLinesAdded > 0 || files.totalLinesRemoved > 0) && (
+          <StatRow title="Code Changes:">
+            <Text color={theme.text.primary}>
+              <Text color={theme.status.success}>+{files.totalLinesAdded}</Text>{' '}
+              <Text color={theme.status.error}>-{files.totalLinesRemoved}</Text>
+            </Text>
+          </StatRow>
+        )}
       </Section>
 
       <Section title="Performance">

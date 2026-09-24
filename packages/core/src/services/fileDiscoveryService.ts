@@ -4,14 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  GitIgnoreParser,
-  type GitIgnoreFilter,
-} from '../utils/gitIgnoreParser.js';
-import {
-  IgnoreFileParser,
-  type IgnoreFileFilter,
-} from '../utils/ignoreFileParser.js';
+import { GitIgnoreParser, type GitIgnoreFilter } from '../utils/gitIgnoreParser.js';
+import { IgnoreFileParser, type IgnoreFileFilter } from '../utils/ignoreFileParser.js';
 import { isGitRepository } from '../utils/gitUtils.js';
 import { SPARKLE_IGNORE_FILE_NAME } from '../config/constants.js';
 import { isNodeError } from '../utils/errors.js';
@@ -34,8 +28,7 @@ export class FileDiscoveryService {
   private gitIgnoreFilter: GitIgnoreFilter | null = null;
   private sparkleIgnoreFilter: IgnoreFileFilter | null = null;
   private customIgnoreFilter: IgnoreFileFilter | null = null;
-  private combinedIgnoreFilter: GitIgnoreFilter | IgnoreFileFilter | null =
-    null;
+  private combinedIgnoreFilter: GitIgnoreFilter | IgnoreFileFilter | null = null;
   private defaultFilterFileOptions: FilterFilesOptions = {
     respectGitIgnore: true,
     respectSparkleIgnore: true,
@@ -106,9 +99,7 @@ export class FileDiscoveryService {
           (error.code === 'EACCES' || error.code === 'ENOENT')
         ) {
           // Stop if the directory is inaccessible or doesn't exist
-          debugLogger.debug(
-            `Skipping directory ${currentDir} due to ${error.code}`,
-          );
+          debugLogger.debug(`Skipping directory ${currentDir} due to ${error.code}`);
           return;
         }
         throw error;
@@ -146,8 +137,7 @@ export class FileDiscoveryService {
       this.defaultFilterFileOptions.respectGitIgnore = options.respectGitIgnore;
     }
     if (options.respectSparkleIgnore !== undefined) {
-      this.defaultFilterFileOptions.respectSparkleIgnore =
-        options.respectSparkleIgnore;
+      this.defaultFilterFileOptions.respectSparkleIgnore = options.respectSparkleIgnore;
     }
     if (options.customIgnoreFilePaths) {
       this.defaultFilterFileOptions.customIgnoreFilePaths =
@@ -192,20 +182,14 @@ export class FileDiscoveryService {
   /**
    * Checks if a specific file should be ignored based on project ignore rules.
    */
-  shouldIgnoreFile(
-    filePath: string,
-    options: FilterFilesOptions = {},
-  ): boolean {
+  shouldIgnoreFile(filePath: string, options: FilterFilesOptions = {}): boolean {
     return this._shouldIgnore(filePath, false, options);
   }
 
   /**
    * Checks if a specific directory should be ignored based on project ignore rules.
    */
-  shouldIgnoreDirectory(
-    dirPath: string,
-    options: FilterFilesOptions = {},
-  ): boolean {
+  shouldIgnoreDirectory(dirPath: string, options: FilterFilesOptions = {}): boolean {
     return this._shouldIgnore(dirPath, true, options);
   }
 
@@ -230,10 +214,7 @@ export class FileDiscoveryService {
       return true;
     }
 
-    if (
-      respectGitIgnore &&
-      this.gitIgnoreFilter?.isIgnored(filePath, isDirectory)
-    ) {
+    if (respectGitIgnore && this.gitIgnoreFilter?.isIgnored(filePath, isDirectory)) {
       return true;
     }
 
@@ -269,10 +250,7 @@ export class FileDiscoveryService {
    */
   getAllIgnoreFilePaths(): string[] {
     const paths: string[] = [];
-    if (
-      this.gitIgnoreFilter &&
-      this.defaultFilterFileOptions.respectGitIgnore
-    ) {
+    if (this.gitIgnoreFilter && this.defaultFilterFileOptions.respectGitIgnore) {
       const gitIgnorePath = path.join(this.projectRoot, '.gitignore');
       const stat = fs.statSync(gitIgnorePath, { throwIfNoEntry: false });
       if (stat?.isFile()) {

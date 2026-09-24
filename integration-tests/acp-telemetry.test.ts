@@ -108,8 +108,6 @@ describe('ACP telemetry', () => {
 
     // gen_ai.output.messages is the last OTEL log emitted (after prompt response)
     expect(existsSync(telemetryPath)).toBe(true);
-    expect(readFileSync(telemetryPath, 'utf-8')).toContain(
-      'gen_ai.output.messages',
-    );
+    expect(readFileSync(telemetryPath, 'utf-8')).toContain('gen_ai.output.messages');
   });
 });

@@ -41,9 +41,7 @@ export function resolvePolicyChain(
   const normalizedPreferredModel = preferredModel
     ? normalizeModelId(preferredModel)
     : undefined;
-  const activeModel = normalizeModelId(
-    config.getActiveModel?.() ?? config.getModel(),
-  );
+  const activeModel = normalizeModelId(config.getActiveModel?.() ?? config.getModel());
   const modelFromConfig = normalizedPreferredModel ?? activeModel;
   const configuredModel = normalizeModelId(config.getModel());
 
@@ -58,13 +56,9 @@ export function resolvePolicyChain(
     : false;
   const isAutoConfigured = isAutoModel(configuredModel, config);
 
-  const tier =
-    config.modelConfigService.getModelDefinition(resolvedModel)?.tier;
+  const tier = config.modelConfigService.getModelDefinition(resolvedModel)?.tier;
 
-  if (
-    resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL ||
-    tier === 'flash-lite'
-  ) {
+  if (resolvedModel === DEFAULT_GEMINI_FLASH_LITE_MODEL || tier === 'flash-lite') {
     chain = config.modelConfigService.resolveChain('lite');
   } else if (
     isOriginallyGemini3 ||
@@ -75,10 +69,7 @@ export function resolvePolicyChain(
     tier === 'flash'
   ) {
     // 1. Try to find a chain specifically for the current configured alias
-    if (
-      isAutoConfigured &&
-      config.modelConfigService.getModelChain(configuredModel)
-    ) {
+    if (isAutoConfigured && config.modelConfigService.getModelChain(configuredModel)) {
       chain = config.modelConfigService.resolveChain(configuredModel);
     }
     // 2. Fallback to auto-routing
@@ -198,8 +189,7 @@ export function selectModelForAvailability(
 
   if (selection.selectedModel) return selection;
 
-  const backupModel =
-    chain.find((p) => p.isLastResort)?.model ?? DEFAULT_GEMINI_MODEL;
+  const backupModel = chain.find((p) => p.isLastResort)?.model ?? DEFAULT_GEMINI_MODEL;
 
   return { selectedModel: backupModel, skipped: [] };
 }

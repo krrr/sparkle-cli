@@ -168,11 +168,7 @@ describe('handleAtCommand with Agents', () => {
 
     // Check if the query text is preserved
     const firstPart = parts[0];
-    if (
-      typeof firstPart === 'object' &&
-      firstPart !== null &&
-      'text' in firstPart
-    ) {
+    if (typeof firstPart === 'object' && firstPart !== null && 'text' in firstPart) {
       expect((firstPart as { text: string }).text).toContain(
         'Please help me @CodebaseInvestigator',
       );

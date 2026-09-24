@@ -74,9 +74,7 @@ export function formatToolLogChain(logs: ToolLogEntry[]): string {
     if (!t.success && (t.error || t.error_type)) {
       const errorType = t.error_type ? `[${t.error_type}] ` : '';
       const errorMsg = t.error ? truncate(t.error, 120) : 'Unknown error';
-      lines.push(
-        `  ${' '.repeat(padWidth)}   ↳ Error: ${errorType}${errorMsg}`,
-      );
+      lines.push(`  ${' '.repeat(padWidth)}   ↳ Error: ${errorType}${errorMsg}`);
     }
   }
 

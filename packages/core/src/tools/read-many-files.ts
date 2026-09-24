@@ -29,10 +29,7 @@ import {
   type ProcessedFileReadResult,
 } from '../utils/fileUtils.js';
 import type { PartListUnion } from '@google/genai';
-import {
-  type Config,
-  DEFAULT_FILE_FILTERING_OPTIONS,
-} from '../config/config.js';
+import { type Config, DEFAULT_FILE_FILTERING_OPTIONS } from '../config/config.js';
 import { FileOperation } from '../telemetry/metrics.js';
 import { getProgrammingLanguage } from '../telemetry/telemetry-utils.js';
 import { logFileOperation } from '../telemetry/loggers.js';
@@ -145,19 +142,16 @@ ${this.config.getTargetDir()}
     // Determine the final list of exclusion patterns exactly as in execute method
     const paramExcludes = this.params.exclude || [];
     const paramUseDefaultExcludes = this.params.useDefaultExcludes !== false;
-    const finalExclusionPatternsForDescription: string[] =
-      paramUseDefaultExcludes
-        ? [...getDefaultExcludes(this.config), ...paramExcludes]
-        : [...paramExcludes];
+    const finalExclusionPatternsForDescription: string[] = paramUseDefaultExcludes
+      ? [...getDefaultExcludes(this.config), ...paramExcludes]
+      : [...paramExcludes];
 
     const excludeDesc = `Excluding: ${
       finalExclusionPatternsForDescription.length > 0
         ? `patterns like
 ${finalExclusionPatternsForDescription
   .slice(0, 2)
-  .join(
-    '`, `',
-  )}${finalExclusionPatternsForDescription.length > 2 ? '...`' : '`'}`
+  .join('`, `')}${finalExclusionPatternsForDescription.length > 2 ? '...`' : '`'}`
         : 'none specified'
     }`;
 
@@ -231,8 +225,9 @@ ${finalExclusionPatternsForDescription
 
       const fileDiscovery = this.config.getFileService();
 
-      const { filteredPaths, ignoredCount } =
-        fileDiscovery.filterFilesWithReport(relativeEntries, {
+      const { filteredPaths, ignoredCount } = fileDiscovery.filterFilesWithReport(
+        relativeEntries,
+        {
           respectGitIgnore:
             this.params.file_filtering_options?.respect_git_ignore ??
             this.config.getFileFilteringOptions().respectGitIgnore ??
@@ -241,17 +236,15 @@ ${finalExclusionPatternsForDescription
             this.params.file_filtering_options?.respect_sparkle_ignore ??
             this.config.getFileFilteringOptions().respectSparkleIgnore ??
             DEFAULT_FILE_FILTERING_OPTIONS.respectSparkleIgnore,
-        });
+        },
+      );
 
       for (const relativePath of filteredPaths) {
         // Security check: ensure the glob library didn't return something outside the workspace.
 
         const fullPath = path.resolve(this.config.getTargetDir(), relativePath);
 
-        const validationError = this.config.validatePathAccess(
-          fullPath,
-          'read',
-        );
+        const validationError = this.config.validatePathAccess(fullPath, 'read');
         if (validationError) {
           skippedFiles.push({
             path: fullPath,
@@ -292,16 +285,9 @@ ${finalExclusionPatternsForDescription
 
           const fileType = await detectFileType(filePath);
 
-          if (
-            fileType === 'image' ||
-            fileType === 'pdf' ||
-            fileType === 'audio'
-          ) {
+          if (fileType === 'image' || fileType === 'pdf' || fileType === 'audio') {
             const fileExtension = path.extname(filePath).toLowerCase();
-            const fileNameWithoutExtension = path.basename(
-              filePath,
-              fileExtension,
-            );
+            const fileNameWithoutExtension = path.basename(filePath, fileExtension);
             const requestedExplicitly = include.some(
               (pattern: string) =>
                 pattern.toLowerCase().includes(fileExtension) ||
@@ -370,8 +356,7 @@ ${finalExclusionPatternsForDescription
           });
         } else {
           // Handle successfully processed files
-          const { filePath, relativePathForDisplay, fileReadResult } =
-            fileResult;
+          const { filePath, relativePathForDisplay, fileReadResult } = fileResult;
 
           if (typeof fileReadResult.llmContent === 'string') {
             const separator = DEFAULT_OUTPUT_SEPARATOR_FORMAT.replace(
@@ -423,9 +408,7 @@ ${finalExclusionPatternsForDescription
     // Discover JIT subdirectory context for all unique directories of processed files.
     // Run sequentially so each call sees paths marked as loaded by the previous
     // one, preventing shared parent AGENTS.md files from being injected twice.
-    const uniqueDirs = new Set(
-      Array.from(filesToConsider).map((f) => path.dirname(f)),
-    );
+    const uniqueDirs = new Set(Array.from(filesToConsider).map((f) => path.dirname(f)));
     const jitParts: string[] = [];
     for (const dir of uniqueDirs) {
       const ctx = await discoverJitContext(this.config, dir);
@@ -444,9 +427,7 @@ ${finalExclusionPatternsForDescription
       displayMessage += `Successfully read and concatenated content from **${processedFilesRelativePaths.length} file(s)**.\n`;
       if (processedFilesRelativePaths.length <= 10) {
         displayMessage += `\n**Processed Files:**\n`;
-        processedFilesRelativePaths.forEach(
-          (p) => (displayMessage += `- \`${p}\`\n`),
-        );
+        processedFilesRelativePaths.forEach((p) => (displayMessage += `- \`${p}\`\n`));
       } else {
         displayMessage += `\n**Processed Files (first 10 shown):**\n`;
         processedFilesRelativePaths
@@ -467,16 +448,11 @@ ${finalExclusionPatternsForDescription
       }
       skippedFiles
         .slice(0, 5)
-        .forEach(
-          (f) => (displayMessage += `- \`${f.path}\` (Reason: ${f.reason})\n`),
-        );
+        .forEach((f) => (displayMessage += `- \`${f.path}\` (Reason: ${f.reason})\n`));
       if (skippedFiles.length > 5) {
         displayMessage += `- ...and ${skippedFiles.length - 5} more.\n`;
       }
-    } else if (
-      processedFilesRelativePaths.length === 0 &&
-      skippedFiles.length === 0
-    ) {
+    } else if (processedFilesRelativePaths.length === 0 && skippedFiles.length === 0) {
       displayMessage += `No files were read and concatenated based on the criteria.\n`;
     }
 

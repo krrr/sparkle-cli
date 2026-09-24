@@ -34,8 +34,7 @@ export function validatePath(pathStr: string): PathValidationResult {
   if (/[\n\r\0\t]/.test(pathStr)) {
     return {
       isValid: false,
-      error:
-        'Path contains invalid characters (newlines or control characters).',
+      error: 'Path contains invalid characters (newlines or control characters).',
     };
   }
 

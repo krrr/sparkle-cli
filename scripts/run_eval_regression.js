@@ -26,9 +26,7 @@ async function main() {
   let combinedReport = '';
   let hasRegression = false;
 
-  console.log(
-    `🚀 Starting evaluation orchestration for models: ${models.join(', ')}`,
-  );
+  console.log(`🚀 Starting evaluation orchestration for models: ${models.join(', ')}`);
 
   for (const model of models) {
     console.log(`\n--- Processing Model: ${model} ---`);
@@ -36,13 +34,10 @@ async function main() {
     try {
       // 1. Identify Trustworthy Evals
       console.log(`🔍 Identifying trustworthy tests for ${model}...`);
-      const output = execSync(
-        `node scripts/get_trustworthy_evals.js "${model}"`,
-        {
-          encoding: 'utf-8',
-          stdio: ['inherit', 'pipe', 'inherit'], // Capture stdout but pass stdin/stderr
-        },
-      ).trim();
+      const output = execSync(`node scripts/get_trustworthy_evals.js "${model}"`, {
+        encoding: 'utf-8',
+        stdio: ['inherit', 'pipe', 'inherit'], // Capture stdout but pass stdin/stderr
+      }).trim();
 
       if (!output) {
         console.log(`ℹ️ No trustworthy tests found for ${model}. Skipping.`);
@@ -84,9 +79,7 @@ async function main() {
   // Always save the combined report to a file so the workflow can capture it cleanly
   if (combinedReport) {
     fs.writeFileSync('eval_regression_report.md', combinedReport);
-    console.log(
-      '\n📊 Final Markdown report saved to eval_regression_report.md',
-    );
+    console.log('\n📊 Final Markdown report saved to eval_regression_report.md');
   }
 
   // Log status for CI visibility, but don't exit with error

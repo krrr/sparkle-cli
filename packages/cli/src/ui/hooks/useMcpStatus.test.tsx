@@ -83,9 +83,7 @@ describe('useMcpStatus', () => {
 
     expect(result.current.isMcpReady).toBe(false);
 
-    mockMcpClientManager.getDiscoveryState.mockReturnValue(
-      MCPDiscoveryState.COMPLETED,
-    );
+    mockMcpClientManager.getDiscoveryState.mockReturnValue(MCPDiscoveryState.COMPLETED);
 
     act(() => {
       coreEvents.emit(CoreEvent.McpClientUpdate, new Map());

@@ -136,10 +136,7 @@ export * from './services/sandboxedFileSystemService.js';
 export * from './services/modelConfigService.js';
 export * from './sandbox/windows/WindowsSandboxManager.js';
 export * from './services/sessionSummaryUtils.js';
-export {
-  startMemoryService,
-  validatePatches,
-} from './services/memoryService.js';
+export { startMemoryService, validatePatches } from './services/memoryService.js';
 export { isProjectSkillPatchTarget } from './services/memoryPatchUtils.js';
 export * from './context/memoryContextManager.js';
 export * from './services/trackerService.js';
@@ -241,10 +238,7 @@ export * from './tools/ask-user.js';
 
 // MCP OAuth
 export { MCPOAuthProvider } from './mcp/oauth-provider.js';
-export type {
-  OAuthToken,
-  OAuthCredentials,
-} from './mcp/token-storage/types.js';
+export type { OAuthToken, OAuthCredentials } from './mcp/token-storage/types.js';
 export { MCPOAuthTokenStorage } from './mcp/oauth-token-storage.js';
 export type { MCPOAuthConfig } from './mcp/oauth-provider.js';
 export type {
@@ -284,10 +278,7 @@ export { SnapshotGenerator } from './context/utils/snapshotGenerator.js';
 export * from './context/graph/types.js';
 
 export { generalistProfile as legacyGeneralistProfile } from './context/profiles.js';
-export {
-  generalistProfile,
-  stressTestProfile,
-} from './context/config/profiles.js';
+export { generalistProfile, stressTestProfile } from './context/config/profiles.js';
 
 // Export trust utility
 export * from './utils/trust.js';

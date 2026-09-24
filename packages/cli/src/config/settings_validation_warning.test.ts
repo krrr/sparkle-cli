@@ -94,9 +94,7 @@ describe('Settings Validation Warning', () => {
   });
 
   it('should emit a warning and NOT throw when settings are invalid', () => {
-    (fs.existsSync as Mock).mockImplementation(
-      (p: string) => p === USER_SETTINGS_PATH,
-    );
+    (fs.existsSync as Mock).mockImplementation((p: string) => p === USER_SETTINGS_PATH);
 
     const invalidSettingsContent = {
       ui: {
@@ -111,8 +109,7 @@ describe('Settings Validation Warning', () => {
     };
 
     (fs.readFileSync as Mock).mockImplementation((p: string) => {
-      if (p === USER_SETTINGS_PATH)
-        return JSON.stringify(invalidSettingsContent);
+      if (p === USER_SETTINGS_PATH) return JSON.stringify(invalidSettingsContent);
       return '{}';
     });
 
@@ -131,9 +128,7 @@ describe('Settings Validation Warning', () => {
   });
 
   it('should throw a fatal error when settings file is not a valid JSON object', () => {
-    (fs.existsSync as Mock).mockImplementation(
-      (p: string) => p === USER_SETTINGS_PATH,
-    );
+    (fs.existsSync as Mock).mockImplementation((p: string) => p === USER_SETTINGS_PATH);
 
     (fs.readFileSync as Mock).mockImplementation((p: string) => {
       if (p === USER_SETTINGS_PATH) return '[]';
@@ -146,9 +141,7 @@ describe('Settings Validation Warning', () => {
   });
 
   it('should throw a fatal error when settings file contains invalid JSON', () => {
-    (fs.existsSync as Mock).mockImplementation(
-      (p: string) => p === USER_SETTINGS_PATH,
-    );
+    (fs.existsSync as Mock).mockImplementation((p: string) => p === USER_SETTINGS_PATH);
 
     (fs.readFileSync as Mock).mockImplementation((p: string) => {
       if (p === USER_SETTINGS_PATH) return '{ "invalid": "json", }'; // Trailing comma is invalid in standard JSON

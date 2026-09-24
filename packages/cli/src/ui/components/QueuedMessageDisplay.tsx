@@ -12,9 +12,7 @@ export interface QueuedMessageDisplayProps {
   messageQueue: string[];
 }
 
-export const QueuedMessageDisplay = ({
-  messageQueue,
-}: QueuedMessageDisplayProps) => {
+export const QueuedMessageDisplay = ({ messageQueue }: QueuedMessageDisplayProps) => {
   if (messageQueue.length === 0) {
     return null;
   }
@@ -24,19 +22,17 @@ export const QueuedMessageDisplay = ({
       <Box paddingLeft={2}>
         <Text dimColor>Queued (press ↑ to edit):</Text>
       </Box>
-      {messageQueue
-        .slice(0, MAX_DISPLAYED_QUEUED_MESSAGES)
-        .map((message, index) => {
-          const preview = message.replace(/\s+/g, ' ');
+      {messageQueue.slice(0, MAX_DISPLAYED_QUEUED_MESSAGES).map((message, index) => {
+        const preview = message.replace(/\s+/g, ' ');
 
-          return (
-            <Box key={index} paddingLeft={4} width="100%">
-              <Text dimColor wrap="truncate">
-                {preview}
-              </Text>
-            </Box>
-          );
-        })}
+        return (
+          <Box key={index} paddingLeft={4} width="100%">
+            <Text dimColor wrap="truncate">
+              {preview}
+            </Text>
+          </Box>
+        );
+      })}
       {messageQueue.length > MAX_DISPLAYED_QUEUED_MESSAGES && (
         <Box paddingLeft={4}>
           <Text dimColor>

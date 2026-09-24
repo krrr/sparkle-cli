@@ -1,7 +1,7 @@
 # Sparkle CLI VS Code Companion (`sparkle-cli-vscode-ide-companion`)
 
-VS Code extension that pairs with Sparkle CLI, providing direct IDE workspace
-access to the CLI agent.
+VS Code extension that pairs with Sparkle CLI, providing direct IDE workspace access to
+the CLI agent.
 
 ## Architecture
 

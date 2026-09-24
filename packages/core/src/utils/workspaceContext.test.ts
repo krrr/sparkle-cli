@@ -157,9 +157,7 @@ describe('WorkspaceContext with real filesystem', () => {
     it('should handle non-existent paths correctly', () => {
       const workspaceContext = new WorkspaceContext(cwd, [otherDir]);
       const nonExistentPath = path.join(cwd, 'does-not-exist.txt');
-      expect(workspaceContext.isPathWithinWorkspace(nonExistentPath)).toBe(
-        true,
-      );
+      expect(workspaceContext.isPathWithinWorkspace(nonExistentPath)).toBe(true);
     });
 
     describe.skipIf(os.platform() === 'win32')('with symbolic link', () => {
@@ -211,9 +209,7 @@ describe('WorkspaceContext with real filesystem', () => {
         it('should reject dir paths', () => {
           const workspaceContext = new WorkspaceContext(cwd);
 
-          expect(workspaceContext.isPathWithinWorkspace(symlinkDir)).toBe(
-            false,
-          );
+          expect(workspaceContext.isPathWithinWorkspace(symlinkDir)).toBe(false);
         });
 
         it('should reject non-existent paths', () => {
@@ -398,9 +394,7 @@ describe('WorkspaceContext with real filesystem', () => {
       const listener = vi.fn();
       workspaceContext.onDirectoriesChanged(listener);
 
-      const loggerSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       const nonExistent = path.join(tempDir, 'does-not-exist');
       const result = workspaceContext.addDirectories([otherDir, nonExistent]);
@@ -421,9 +415,7 @@ describe('WorkspaceContext with real filesystem', () => {
       const workspaceContext = new WorkspaceContext(cwd);
       const listener = vi.fn();
       workspaceContext.onDirectoriesChanged(listener);
-      const loggerSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const loggerSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       const nonExistent = path.join(tempDir, 'does-not-exist');
       const result = workspaceContext.addDirectories([nonExistent]);
@@ -474,10 +466,7 @@ describe('WorkspaceContext with optional directories', () => {
   });
 
   it('should skip a missing optional directory and log a warning', () => {
-    const workspaceContext = new WorkspaceContext(cwd, [
-      nonExistentDir,
-      existingDir1,
-    ]);
+    const workspaceContext = new WorkspaceContext(cwd, [nonExistentDir, existingDir1]);
     const directories = workspaceContext.getDirectories();
     expect(directories).toEqual([cwd, existingDir1]);
     expect(debugLogger.warn).toHaveBeenCalledTimes(1);

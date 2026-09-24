@@ -113,8 +113,7 @@ export function MouseProvider({
         if (
           lastClick &&
           now - lastClick.time < DOUBLE_CLICK_THRESHOLD_MS &&
-          Math.abs(event.col - lastClick.col) <=
-            DOUBLE_CLICK_DISTANCE_TOLERANCE &&
+          Math.abs(event.col - lastClick.col) <= DOUBLE_CLICK_DISTANCE_TOLERANCE &&
           Math.abs(event.row - lastClick.row) <= DOUBLE_CLICK_DISTANCE_TOLERANCE
         ) {
           const doubleClickEvent: MouseEvent = {
@@ -197,9 +196,5 @@ export function MouseProvider({
     [subscribe, unsubscribe],
   );
 
-  return (
-    <MouseContext.Provider value={contextValue}>
-      {children}
-    </MouseContext.Provider>
-  );
+  return <MouseContext.Provider value={contextValue}>{children}</MouseContext.Provider>;
 }

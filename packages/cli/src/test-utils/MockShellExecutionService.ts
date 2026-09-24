@@ -35,9 +35,7 @@ export class MockShellExecutionService {
   /**
    * Registers the original implementation to allow falling back to real shell execution.
    */
-  static setOriginalImplementation(
-    implementation: ShellExecutionServiceExecute,
-  ) {
+  static setOriginalImplementation(implementation: ShellExecutionServiceExecute) {
     this.originalExecute = implementation;
   }
 

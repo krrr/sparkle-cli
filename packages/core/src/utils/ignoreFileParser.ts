@@ -88,11 +88,7 @@ export class IgnoreFileParser implements IgnoreFileFilter {
       filePath,
       isDirectory,
     );
-    if (
-      normalizedPath === null ||
-      normalizedPath === '' ||
-      normalizedPath === '/'
-    ) {
+    if (normalizedPath === null || normalizedPath === '' || normalizedPath === '/') {
       return false;
     }
 

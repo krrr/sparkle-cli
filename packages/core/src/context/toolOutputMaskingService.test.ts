@@ -12,10 +12,7 @@ import {
   ToolOutputMaskingService,
   MASKING_INDICATOR_TAG,
 } from './toolOutputMaskingService.js';
-import {
-  SHELL_TOOL_NAME,
-  ACTIVATE_SKILL_TOOL_NAME,
-} from '../tools/tool-names.js';
+import { SHELL_TOOL_NAME, ACTIVATE_SKILL_TOOL_NAME } from '../tools/tool-names.js';
 import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
 import type { Config } from '../config/config.js';
 import type { Part } from '@google/genai';
@@ -88,10 +85,7 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       return content.includes(MASKING_INDICATOR_TAG) ? 10 : 200;
     });
@@ -130,9 +124,7 @@ describe('ToolOutputMaskingService', () => {
   });
 
   const getToolResponse = (part: Part | undefined): string => {
-    const resp = part?.functionResponse?.response as
-      | { output: string }
-      | undefined;
+    const resp = part?.functionResponse?.response as { output: string } | undefined;
     return resp?.output ?? (resp as unknown as string) ?? '';
   };
 
@@ -188,10 +180,7 @@ describe('ToolOutputMaskingService', () => {
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
       const toolName = parts[0].functionResponse?.name;
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
 
@@ -302,19 +291,14 @@ describe('ToolOutputMaskingService', () => {
         id: 'turn-3',
         content: {
           role: 'user',
-          parts: [
-            { functionResponse: { name: 'l', response: { output: 'l' } } },
-          ],
+          parts: [{ functionResponse: { name: 'l', response: { output: 'l' } } }],
         },
       },
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
       const name = parts[0].functionResponse?.name;
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
 
@@ -404,10 +388,7 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content =
         (resp?.['output'] as string) ??
         (resp?.['result'] as string) ??
@@ -465,10 +446,7 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
 
@@ -481,13 +459,13 @@ describe('ToolOutputMaskingService', () => {
 
     expect(result.maskedCount).toBe(2); //Both t1 and p are prunable (cumulative 60k each > 50k protection)
     expect(result.newHistory[0].content.parts).toHaveLength(2);
-    expect(
-      result.newHistory[0].content.parts?.[0].functionResponse,
-    ).toBeDefined();
+    expect(result.newHistory[0].content.parts?.[0].functionResponse).toBeDefined();
     expect(
       (
-        result.newHistory[0].content.parts?.[0].functionResponse
-          ?.response as Record<string, unknown>
+        result.newHistory[0].content.parts?.[0].functionResponse?.response as Record<
+          string,
+          unknown
+        >
       )['output'],
     ).toContain(`<${MASKING_INDICATOR_TAG}`);
     expect(result.newHistory[0].content.parts?.[1].inlineData).toEqual({
@@ -534,10 +512,7 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
 
@@ -661,10 +636,7 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
       const content = (resp?.['output'] as string) ?? JSON.stringify(resp);
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
 
@@ -686,8 +658,10 @@ describe('ToolOutputMaskingService', () => {
     );
     expect(
       (
-        result.newHistory[0].content.parts?.[0].functionResponse
-          ?.response as Record<string, unknown>
+        result.newHistory[0].content.parts?.[0].functionResponse?.response as Record<
+          string,
+          unknown
+        >
       )['output'],
     ).toBe('High value instructions for skill');
 
@@ -696,8 +670,10 @@ describe('ToolOutputMaskingService', () => {
     );
     expect(
       (
-        result.newHistory[1].content.parts?.[0].functionResponse
-          ?.response as Record<string, unknown>
+        result.newHistory[1].content.parts?.[0].functionResponse?.response as Record<
+          string,
+          unknown
+        >
       )['output'],
     ).toContain(MASKING_INDICATOR_TAG);
   });
@@ -754,12 +730,8 @@ describe('ToolOutputMaskingService', () => {
     ];
 
     mockedEstimateTokenCountSync.mockImplementation((parts: Part[]) => {
-      const resp = parts[0].functionResponse?.response as Record<
-        string,
-        unknown
-      >;
-      const content =
-        (resp?.['output'] as string) ?? JSON.stringify(resp ?? {});
+      const resp = parts[0].functionResponse?.response as Record<string, unknown>;
+      const content = (resp?.['output'] as string) ?? JSON.stringify(resp ?? {});
       if (content.includes(`<${MASKING_INDICATOR_TAG}`)) return 100;
       return 60000;
     });
@@ -768,19 +740,13 @@ describe('ToolOutputMaskingService', () => {
     expect(result.maskedCount).toBeGreaterThan(0);
 
     // Identity contract: same turns, same ids, same boundaries.
-    expect(result.newHistory.map((t) => t.id)).toEqual(
-      history.map((t) => t.id),
-    );
+    expect(result.newHistory.map((t) => t.id)).toEqual(history.map((t) => t.id));
     expect(result.newHistory[0].id).toBe('env-1');
-    expect(result.newHistory[0].content.parts?.[0].text).toContain(
-      '<session_context>',
-    );
+    expect(result.newHistory[0].content.parts?.[0].text).toContain('<session_context>');
     expect(result.newHistory[1].id).toBe('user-1');
     expect(result.newHistory[1].content.parts?.[0].text).toBe('First message');
     expect(result.newHistory[2].id).toBe('model-1');
-    expect(
-      result.newHistory[2].content.parts?.some((p) => p.functionCall),
-    ).toBe(true);
+    expect(result.newHistory[2].content.parts?.some((p) => p.functionCall)).toBe(true);
     expect(result.newHistory[3].id).toBe('user-2');
     expect(
       (

@@ -24,10 +24,7 @@ describe('A2AAuthProviderFactory', () => {
   describe('validateAuthConfig', () => {
     describe('when no security schemes required', () => {
       it('should return valid when securitySchemes is undefined', () => {
-        const result = A2AAuthProviderFactory.validateAuthConfig(
-          undefined,
-          undefined,
-        );
+        const result = A2AAuthProviderFactory.validateAuthConfig(undefined, undefined);
         expect(result).toEqual({ valid: true });
       });
 
@@ -41,10 +38,7 @@ describe('A2AAuthProviderFactory', () => {
           type: 'apiKey',
           key: 'test-key',
         };
-        const result = A2AAuthProviderFactory.validateAuthConfig(
-          authConfig,
-          {},
-        );
+        const result = A2AAuthProviderFactory.validateAuthConfig(authConfig, {});
         expect(result).toEqual({ valid: true });
       });
     });
@@ -370,8 +364,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('API Key (apiKeyAuth): Send X-API-Key in header');
     });
@@ -384,8 +377,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('HTTP Bearer (bearerAuth)');
     });
@@ -398,8 +390,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('HTTP Basic (basicAuth)');
     });
@@ -412,8 +403,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('OAuth 2.0 (oauth2Auth)');
     });
@@ -422,13 +412,11 @@ describe('A2AAuthProviderFactory', () => {
       const securitySchemes: Record<string, SecurityScheme> = {
         oidcAuth: {
           type: 'openIdConnect',
-          openIdConnectUrl:
-            'https://auth.example.com/.well-known/openid-configuration',
+          openIdConnectUrl: 'https://auth.example.com/.well-known/openid-configuration',
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('OpenID Connect (oidcAuth)');
     });
@@ -440,8 +428,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe('Mutual TLS (mtlsAuth)');
     });
@@ -459,8 +446,7 @@ describe('A2AAuthProviderFactory', () => {
         },
       };
 
-      const result =
-        A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
+      const result = A2AAuthProviderFactory.describeRequiredAuth(securitySchemes);
 
       expect(result).toBe(
         'API Key (apiKeyAuth): Send X-API-Key in header OR HTTP Bearer (bearerAuth)',

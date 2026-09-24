@@ -45,9 +45,7 @@ describe('eval-report utility', () => {
       fs.writeFileSync(path.join(sub2, 'report.json'), '{}');
       fs.writeFileSync(path.join(tmpDir, 'other.txt'), '{}');
 
-      const found = findReportFiles(tmpDir).map((p) =>
-        path.basename(path.dirname(p)),
-      );
+      const found = findReportFiles(tmpDir).map((p) => path.basename(path.dirname(p)));
       expect(found.sort()).toEqual(['sub1', 'sub2']);
     });
 
@@ -77,11 +75,7 @@ describe('eval-report utility', () => {
     });
 
     it('extracts model name from simple eval-logs- directory name without timestamp', () => {
-      const reportPath = path.join(
-        tmpDir,
-        'eval-logs-gemini-2.5-flash',
-        'report.json',
-      );
+      const reportPath = path.join(tmpDir, 'eval-logs-gemini-2.5-flash', 'report.json');
       expect(getModelFromPath(reportPath)).toBe('gemini-2.5-flash');
     });
 
@@ -115,10 +109,7 @@ describe('eval-report utility', () => {
         ],
       };
 
-      fs.writeFileSync(
-        path.join(modelDir, 'report.json'),
-        JSON.stringify(dummyReport),
-      );
+      fs.writeFileSync(path.join(modelDir, 'report.json'), JSON.stringify(dummyReport));
 
       const mockInventory: InventoryResult = {
         totalFiles: 1,
@@ -231,10 +222,7 @@ describe('eval-report utility', () => {
         ],
       };
 
-      fs.writeFileSync(
-        path.join(modelDir, 'report.json'),
-        JSON.stringify(dummyReport),
-      );
+      fs.writeFileSync(path.join(modelDir, 'report.json'), JSON.stringify(dummyReport));
 
       const mockInventory: InventoryResult = {
         totalFiles: 2,
@@ -331,9 +319,7 @@ describe('eval-report utility', () => {
 
       const formatted = formatReportSummary(summary, '/repo');
       expect(formatted).toContain('Model: test-model');
-      expect(formatted).toContain(
-        '✓ [ALWAYS_PASSES] should work — 100.0% (1/1)',
-      );
+      expect(formatted).toContain('✓ [ALWAYS_PASSES] should work — 100.0% (1/1)');
       expect(formatted).toContain('[evals/test.eval.ts]');
     });
   });

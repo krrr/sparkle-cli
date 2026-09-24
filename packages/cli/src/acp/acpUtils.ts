@@ -17,9 +17,7 @@ import type * as acp from '@agentclientprotocol/sdk';
 import { z } from 'zod';
 import type { LoadedSettings } from '../config/settings.js';
 
-export function hasMeta(
-  obj: unknown,
-): obj is { _meta?: Record<string, unknown> } {
+export function hasMeta(obj: unknown): obj is { _meta?: Record<string, unknown> } {
   return typeof obj === 'object' && obj !== null && '_meta' in obj;
 }
 
@@ -33,9 +31,7 @@ export const RequestPermissionResponseSchema = z.object({
   ]),
 });
 
-export function toToolCallContent(
-  toolResult: ToolResult,
-): acp.ToolCallContent | null {
+export function toToolCallContent(toolResult: ToolResult): acp.ToolCallContent | null {
   if (toolResult.error?.message) {
     throw new Error(toolResult.error.message);
   }
@@ -50,9 +46,7 @@ export function toToolCallContent(
       if ('fileName' in toolResult.returnDisplay) {
         return {
           type: 'diff',
-          path:
-            toolResult.returnDisplay.filePath ??
-            toolResult.returnDisplay.fileName,
+          path: toolResult.returnDisplay.filePath ?? toolResult.returnDisplay.fileName,
           oldText: toolResult.returnDisplay.originalContent,
           newText: toolResult.returnDisplay.newContent,
           _meta: {

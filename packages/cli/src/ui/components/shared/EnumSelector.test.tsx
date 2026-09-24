@@ -107,15 +107,14 @@ describe('<EnumSelector />', () => {
   });
 
   it('updates when currentValue changes externally', async () => {
-    const { rerender, lastFrame, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <EnumSelector
-          options={LANGUAGE_OPTIONS}
-          currentValue="en"
-          isActive={true}
-          onValueChange={async () => {}}
-        />,
-      );
+    const { rerender, lastFrame, waitUntilReady, unmount } = await renderWithProviders(
+      <EnumSelector
+        options={LANGUAGE_OPTIONS}
+        currentValue="en"
+        isActive={true}
+        onValueChange={async () => {}}
+      />,
+    );
     expect(lastFrame()).toContain('English');
 
     await act(async () => {

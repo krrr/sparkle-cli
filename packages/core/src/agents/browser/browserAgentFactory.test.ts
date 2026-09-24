@@ -184,11 +184,7 @@ describe('browserAgentFactory', () => {
     it('should not call printOutput for internal setup messages', async () => {
       const printOutput = vi.fn();
 
-      await createBrowserAgentDefinition(
-        mockConfig,
-        mockMessageBus,
-        printOutput,
-      );
+      await createBrowserAgentDefinition(mockConfig, mockMessageBus, printOutput);
 
       expect(printOutput).not.toHaveBeenCalled();
     });
@@ -240,10 +236,10 @@ describe('browserAgentFactory', () => {
       expect(systemPrompt).toContain('analyze_screenshot');
       expect(systemPrompt).toContain('VISUAL IDENTIFICATION');
 
-      expect(recordBrowserAgentVisionStatus).toHaveBeenCalledWith(
-        configWithVision,
-        { enabled: true, disabled_reason: undefined },
-      );
+      expect(recordBrowserAgentVisionStatus).toHaveBeenCalledWith(configWithVision, {
+        enabled: true,
+        disabled_reason: undefined,
+      });
     });
 
     it('should include analyze_screenshot tool when visualModel is configured', async () => {
@@ -270,9 +266,7 @@ describe('browserAgentFactory', () => {
       expect(definition.toolConfig?.tools).toHaveLength(7);
       const toolNames =
         definition.toolConfig?.tools
-          ?.filter(
-            (t): t is { name: string } => typeof t === 'object' && 'name' in t,
-          )
+          ?.filter((t): t is { name: string } => typeof t === 'object' && 'name' in t)
           .map((t) => t.name) ?? [];
       expect(toolNames).toContain('analyze_screenshot');
     });
@@ -317,9 +311,7 @@ describe('browserAgentFactory', () => {
 
       const toolNames =
         definition.toolConfig?.tools
-          ?.filter(
-            (t): t is { name: string } => typeof t === 'object' && 'name' in t,
-          )
+          ?.filter((t): t is { name: string } => typeof t === 'object' && 'name' in t)
           .map((t) => t.name) ?? [];
 
       // All MCP tools must be present
@@ -384,12 +376,9 @@ describe('browserAgentFactory', () => {
       );
       await resetBrowserSession();
       expect(
-        (
-          MockBrowserManager as unknown as Record<
-            string,
-            ReturnType<typeof vi.fn>
-          >
-        )['resetAll'],
+        (MockBrowserManager as unknown as Record<string, ReturnType<typeof vi.fn>>)[
+          'resetAll'
+        ],
       ).toHaveBeenCalled();
     });
   });
@@ -559,9 +548,7 @@ describe('browserAgentFactory', () => {
 
     it('should record failed cleanup metrics when browserManager.close() throws', async () => {
       const mockConfig = makeFakeConfig({});
-      mockBrowserManager.close.mockRejectedValueOnce(
-        new Error('Failed to close'),
-      );
+      mockBrowserManager.close.mockRejectedValueOnce(new Error('Failed to close'));
 
       await cleanupBrowserAgent(
         mockBrowserManager as unknown as BrowserManager,
@@ -609,10 +596,7 @@ describe('buildBrowserSystemPrompt', () => {
   });
 
   it('should include allowed domains restriction when provided', () => {
-    const prompt = buildBrowserSystemPrompt(false, [
-      'github.com',
-      '*.google.com',
-    ]);
+    const prompt = buildBrowserSystemPrompt(false, ['github.com', '*.google.com']);
     expect(prompt).toContain('SECURITY DOMAIN RESTRICTION - CRITICAL:');
     expect(prompt).toContain('- github.com');
     expect(prompt).toContain('- *.google.com');

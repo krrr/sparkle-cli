@@ -46,10 +46,7 @@ export function loadBaselines(path: string): MemoryBaselineFile {
 /**
  * Save baselines to a JSON file.
  */
-export function saveBaselines(
-  path: string,
-  baselines: MemoryBaselineFile,
-): void {
+export function saveBaselines(path: string, baselines: MemoryBaselineFile): void {
   baselines.updatedAt = new Date().toISOString();
   writeFileSync(path, JSON.stringify(baselines, null, 2) + '\n');
 }

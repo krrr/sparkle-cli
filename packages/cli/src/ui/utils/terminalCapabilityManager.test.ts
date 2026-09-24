@@ -7,10 +7,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { TerminalCapabilityManager } from './terminalCapabilityManager.js';
 import { EventEmitter } from 'node:events';
-import {
-  enableKittyKeyboardProtocol,
-  enableModifyOtherKeys,
-} from 'sparkle-cli-core';
+import { enableKittyKeyboardProtocol, enableModifyOtherKeys } from 'sparkle-cli-core';
 import * as fs from 'node:fs';
 
 // Mock fs
@@ -37,10 +34,7 @@ describe('TerminalCapabilityManager', () => {
     isTTY?: boolean;
     isRaw?: boolean;
     setRawMode?: (mode: boolean) => void;
-    removeListener?: (
-      event: string,
-      listener: (...args: unknown[]) => void,
-    ) => void;
+    removeListener?: (event: string, listener: (...args: unknown[]) => void) => void;
   };
   let stdout: { isTTY?: boolean; fd?: number };
   // Save original process properties
@@ -401,13 +395,10 @@ describe('TerminalCapabilityManager', () => {
         env: {},
         expected: false,
       },
-    ])(
-      'should return $expected for $name',
-      ({ terminalName, env, expected }) => {
-        vi.spyOn(manager, 'getTerminalName').mockReturnValue(terminalName);
-        expect(manager.isGhosttyTerminal(env)).toBe(expected);
-      },
-    );
+    ])('should return $expected for $name', ({ terminalName, env, expected }) => {
+      vi.spyOn(manager, 'getTerminalName').mockReturnValue(terminalName);
+      expect(manager.isGhosttyTerminal(env)).toBe(expected);
+    });
   });
 
   describe('isTmux', () => {
@@ -491,16 +482,12 @@ describe('TerminalCapabilityManager', () => {
 
     it('returns true when TERM_PROGRAM is Apple_Terminal', () => {
       vi.spyOn(manager, 'getTerminalName').mockReturnValue(undefined);
-      expect(manager.isAppleTerminal({ TERM_PROGRAM: 'Apple_Terminal' })).toBe(
-        true,
-      );
+      expect(manager.isAppleTerminal({ TERM_PROGRAM: 'Apple_Terminal' })).toBe(true);
     });
 
     it('returns false otherwise', () => {
       vi.spyOn(manager, 'getTerminalName').mockReturnValue('xterm');
-      expect(manager.isAppleTerminal({ TERM_PROGRAM: 'iTerm.app' })).toBe(
-        false,
-      );
+      expect(manager.isAppleTerminal({ TERM_PROGRAM: 'iTerm.app' })).toBe(false);
     });
   });
 
@@ -512,9 +499,7 @@ describe('TerminalCapabilityManager', () => {
     });
 
     it('returns false otherwise', () => {
-      expect(manager.isVSCodeTerminal({ TERM_PROGRAM: 'iTerm.app' })).toBe(
-        false,
-      );
+      expect(manager.isVSCodeTerminal({ TERM_PROGRAM: 'iTerm.app' })).toBe(false);
     });
   });
 

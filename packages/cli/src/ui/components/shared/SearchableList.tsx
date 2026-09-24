@@ -45,11 +45,7 @@ export interface SearchableListProps<T extends GenericListItem> {
   onClose: () => void;
   searchPlaceholder?: string;
   /** Custom item renderer */
-  renderItem?: (
-    item: T,
-    isActive: boolean,
-    labelWidth: number,
-  ) => React.ReactNode;
+  renderItem?: (item: T, isActive: boolean, labelWidth: number) => React.ReactNode;
   /** Optional header content */
   header?: React.ReactNode;
   /** Optional footer content */
@@ -163,16 +159,9 @@ export function SearchableList<T extends GenericListItem>({
     { isActive: isFocused },
   );
 
-  const visibleItems = filteredItems.slice(
-    scrollOffset,
-    scrollOffset + maxItemsToShow,
-  );
+  const visibleItems = filteredItems.slice(scrollOffset, scrollOffset + maxItemsToShow);
 
-  const defaultRenderItem = (
-    item: T,
-    isActive: boolean,
-    labelWidth: number,
-  ) => (
+  const defaultRenderItem = (item: T, isActive: boolean, labelWidth: number) => (
     <Box flexDirection="row" alignItems="flex-start">
       <Box minWidth={2} flexShrink={0}>
         <Text color={isActive ? theme.status.success : theme.text.secondary}>

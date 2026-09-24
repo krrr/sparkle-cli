@@ -20,8 +20,7 @@ import { WorkspaceContext } from '../utils/workspaceContext.js';
  */
 const workspaceContextOverride = new AsyncLocalStorage<WorkspaceContext>();
 const memoryInboxAccessOverride = new AsyncLocalStorage<boolean>();
-const autoMemoryExtractionWriteAccessOverride =
-  new AsyncLocalStorage<boolean>();
+const autoMemoryExtractionWriteAccessOverride = new AsyncLocalStorage<boolean>();
 
 /**
  * Returns the current workspace context override, if any.
@@ -77,9 +76,7 @@ export function hasScopedAutoMemoryExtractionWriteAccess(): boolean {
  * This prevents the background extractor from writing active memory files
  * directly; it may only write extracted skills and canonical inbox patches.
  */
-export function runWithScopedAutoMemoryExtractionWriteAccess<T>(
-  fn: () => T,
-): T {
+export function runWithScopedAutoMemoryExtractionWriteAccess<T>(fn: () => T): T {
   return autoMemoryExtractionWriteAccessOverride.run(true, fn);
 }
 
@@ -110,9 +107,7 @@ export function createScopedWorkspaceContext(
   // accidentally granting access to the entire filesystem.
   for (const dir of additionalDirectories) {
     if (path.resolve(dir) === path.parse(path.resolve(dir)).root) {
-      throw new Error(
-        `Cannot add filesystem root "${dir}" as a workspace directory`,
-      );
+      throw new Error(`Cannot add filesystem root "${dir}" as a workspace directory`);
     }
   }
 

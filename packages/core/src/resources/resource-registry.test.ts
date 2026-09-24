@@ -55,12 +55,8 @@ describe('ResourceRegistry', () => {
       createResource({ uri: 'file:///tmp/bar.txt' }),
     ]);
 
-    expect(
-      registry.findResourceByUri('b:file:///tmp/bar.txt')?.serverName,
-    ).toBe('b');
-    expect(
-      registry.findResourceByUri('a:file:///tmp/foo.txt')?.serverName,
-    ).toBe('a');
+    expect(registry.findResourceByUri('b:file:///tmp/bar.txt')?.serverName).toBe('b');
+    expect(registry.findResourceByUri('a:file:///tmp/foo.txt')?.serverName).toBe('a');
     expect(registry.findResourceByUri('a:file:///tmp/bar.txt')).toBeUndefined();
     expect(registry.findResourceByUri('nonexistent')).toBeUndefined();
   });

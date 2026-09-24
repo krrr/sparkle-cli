@@ -9,10 +9,7 @@ import { Box, Text } from 'ink';
 import chalk from 'chalk';
 import { theme } from '../../semantic-colors.js';
 import type { LoadableSettingScope } from '../../../config/settings.js';
-import type {
-  SettingsType,
-  SettingsValue,
-} from '../../../config/settingsSchema.js';
+import type { SettingsType, SettingsValue } from '../../../config/settingsSchema.js';
 import { getScopeItems } from '../../../utils/dialogScopeUtils.js';
 import { RadioButtonSelect } from './RadioButtonSelect.js';
 import { TextInput } from './TextInput.js';
@@ -93,20 +90,13 @@ export interface BaseSettingsDialogProps {
   /** Called when a boolean/enum item is toggled */
   onItemToggle: (key: string, item: SettingsDialogItem) => void;
   /** Called when edit mode is committed with new value */
-  onEditCommit: (
-    key: string,
-    newValue: string,
-    item: SettingsDialogItem,
-  ) => void;
+  onEditCommit: (key: string, newValue: string, item: SettingsDialogItem) => void;
   /** Called when Ctrl+C is pressed to clear/reset an item */
   onItemClear: (key: string, item: SettingsDialogItem) => void;
   /** Called when dialog should close */
   onClose: () => void;
   /** Optional custom key handler for parent-specific keys. Return true if handled. */
-  onKeyPress?: (
-    key: Key,
-    currentItem: SettingsDialogItem | undefined,
-  ) => boolean;
+  onKeyPress?: (key: Key, currentItem: SettingsDialogItem | undefined) => boolean;
 
   /** Optional override for key matchers used for navigation. */
   keyMatchers?: KeyMatchers;
@@ -202,8 +192,7 @@ export function BaseSettingsDialog({
     );
 
     // Calculate max items without scope selector
-    const availableForItemsWithoutScope =
-      currentAvailableHeight - baseFixedHeight;
+    const availableForItemsWithoutScope = currentAvailableHeight - baseFixedHeight;
     const maxItemsWithoutScope = Math.max(
       1,
       Math.floor(availableForItemsWithoutScope / ITEM_HEIGHT),
@@ -235,11 +224,10 @@ export function BaseSettingsDialog({
   ]);
 
   // Internal state
-  const { activeIndex, windowStart, moveUp, moveDown, moveBy } =
-    useSettingsNavigation({
-      items,
-      maxItemsToShow: effectiveMaxItemsToShow,
-    });
+  const { activeIndex, windowStart, moveUp, moveDown, moveBy } = useSettingsNavigation({
+    items,
+    maxItemsToShow: effectiveMaxItemsToShow,
+  });
 
   const { editState, editDispatch, startEditing, commitEdit, cursorVisible } =
     useInlineEditBuffer({
@@ -251,25 +239,14 @@ export function BaseSettingsDialog({
       },
     });
 
-  const {
-    editingKey,
-    buffer: editBuffer,
-    cursorPos: editCursorPos,
-  } = editState;
+  const { editingKey, buffer: editBuffer, cursorPos: editCursorPos } = editState;
 
-  const [focusSection, setFocusSection] = useState<'settings' | 'scope'>(
-    'settings',
-  );
+  const [focusSection, setFocusSection] = useState<'settings' | 'scope'>('settings');
   const effectiveFocusSection =
-    !finalShowScopeSelector && focusSection === 'scope'
-      ? 'settings'
-      : focusSection;
+    !finalShowScopeSelector && focusSection === 'scope' ? 'settings' : focusSection;
 
   // Calculate visible items based on scroll offset
-  const visibleItems = items.slice(
-    windowStart,
-    windowStart + effectiveMaxItemsToShow,
-  );
+  const visibleItems = items.slice(windowStart, windowStart + effectiveMaxItemsToShow);
 
   // Show scroll indicators if there are more items than can be displayed
   const showScrollUp = items.length > effectiveMaxItemsToShow;
@@ -349,10 +326,7 @@ export function BaseSettingsDialog({
           moveUp();
           return;
         }
-        if (
-          keyMatchers[Command.DIALOG_NAVIGATION_DOWN](key) &&
-          !key.insertable
-        ) {
+        if (keyMatchers[Command.DIALOG_NAVIGATION_DOWN](key) && !key.insertable) {
           commitEdit();
           moveDown();
           return;
@@ -411,8 +385,7 @@ export function BaseSettingsDialog({
             // Start editing for string/number/array/object
             const rawVal = currentItem.rawValue;
             const initialValue =
-              currentItem.editValue ??
-              (rawVal !== undefined ? String(rawVal) : '');
+              currentItem.editValue ?? (rawVal !== undefined ? String(rawVal) : '');
             startEditing(currentItem.key, initialValue);
           }
           return true;
@@ -512,8 +485,7 @@ export function BaseSettingsDialog({
             {visibleItems.map((item, idx) => {
               const globalIndex = idx + windowStart;
               const isActive =
-                effectiveFocusSection === 'settings' &&
-                activeIndex === globalIndex;
+                effectiveFocusSection === 'settings' && activeIndex === globalIndex;
 
               // Compute display value with edit mode cursor
               let displayValue: string;
@@ -528,8 +500,7 @@ export function BaseSettingsDialog({
                     editCursorPos + 1,
                   );
                   const afterCursor = cpSlice(editBuffer, editCursorPos + 1);
-                  displayValue =
-                    beforeCursor + chalk.inverse(atCursor) + afterCursor;
+                  displayValue = beforeCursor + chalk.inverse(atCursor) + afterCursor;
                 } else if (editCursorPos >= cpLen(editBuffer)) {
                   // Cursor is at the end - show inverted space
                   displayValue =
@@ -548,14 +519,10 @@ export function BaseSettingsDialog({
                     marginX={1}
                     flexDirection="row"
                     alignItems="flex-start"
-                    backgroundColor={
-                      isActive ? theme.background.focus : undefined
-                    }
+                    backgroundColor={isActive ? theme.background.focus : undefined}
                   >
                     <Box minWidth={2} flexShrink={0}>
-                      <Text
-                        color={isActive ? theme.ui.focus : theme.text.secondary}
-                      >
+                      <Text color={isActive ? theme.ui.focus : theme.text.secondary}>
                         {isActive ? '●' : ''}
                       </Text>
                     </Box>
@@ -565,14 +532,8 @@ export function BaseSettingsDialog({
                       minWidth={0}
                       alignItems="flex-start"
                     >
-                      <Box
-                        flexDirection="column"
-                        width={maxLabelWidth}
-                        minWidth={0}
-                      >
-                        <Text
-                          color={isActive ? theme.ui.focus : theme.text.primary}
-                        >
+                      <Box flexDirection="column" width={maxLabelWidth} minWidth={0}>
+                        <Text color={isActive ? theme.ui.focus : theme.text.primary}>
                           {item.label}
                           {item.scopeMessage && (
                             <Text color={theme.text.secondary}>
@@ -595,9 +556,7 @@ export function BaseSettingsDialog({
                                 ? theme.text.secondary
                                 : theme.text.primary
                           }
-                          terminalCursorFocus={
-                            editingKey === item.key && cursorVisible
-                          }
+                          terminalCursorFocus={editingKey === item.key && cursorVisible}
                           terminalCursorPosition={cpIndexToOffset(
                             editBuffer,
                             editCursorPos,
@@ -648,8 +607,7 @@ export function BaseSettingsDialog({
         <Box marginX={1}>
           <Text color={theme.text.secondary}>
             (Use Enter to select, {formatCommand(Command.CLEAR_SCREEN)} to reset
-            {finalShowScopeSelector ? ', Tab to change focus' : ''}, Esc to
-            close)
+            {finalShowScopeSelector ? ', Tab to change focus' : ''}, Esc to close)
           </Text>
         </Box>
 

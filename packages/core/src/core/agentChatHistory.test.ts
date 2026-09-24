@@ -90,9 +90,7 @@ describe('AgentChatHistory', () => {
 
   it('should return raw Content array via getContents()', () => {
     const history = new AgentChatHistory(dummyTurns);
-    expect(history.getContents()).toEqual(
-      dummyTurns.map((turn) => turn.content),
-    );
+    expect(history.getContents()).toEqual(dummyTurns.map((turn) => turn.content));
   });
 
   it('should support mapping and flatMapping operations', () => {

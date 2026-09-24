@@ -59,10 +59,7 @@ export function SuggestionsDisplay({
 
   // Calculate the visible slice based on scrollOffset
   const startIndex = scrollOffset;
-  const endIndex = Math.min(
-    scrollOffset + MAX_SUGGESTIONS_TO_SHOW,
-    suggestions.length,
-  );
+  const endIndex = Math.min(scrollOffset + MAX_SUGGESTIONS_TO_SHOW, suggestions.length);
   const visibleSuggestions = suggestions.slice(startIndex, endIndex);
 
   const COMMAND_KIND_SUFFIX: Partial<Record<CommandKind, string>> = {
@@ -73,9 +70,7 @@ export function SuggestionsDisplay({
   const getFullLabel = (s: Suggestion) =>
     s.label + (s.commandKind ? (COMMAND_KIND_SUFFIX[s.commandKind] ?? '') : '');
 
-  const maxLabelLength = Math.max(
-    ...suggestions.map((s) => getFullLabel(s).length),
-  );
+  const maxLabelLength = Math.max(...suggestions.map((s) => getFullLabel(s).length));
   const commandColumnWidth =
     mode === 'slash' ? Math.min(maxLabelLength, Math.floor(width * 0.5)) : 0;
 
@@ -89,8 +84,7 @@ export function SuggestionsDisplay({
         const isExpanded = originalIndex === expandedIndex;
         const textColor = isActive ? theme.ui.focus : theme.text.secondary;
         const isLong = suggestion.value.length >= MAX_WIDTH;
-        const previousSectionTitle =
-          suggestions[originalIndex - 1]?.sectionTitle;
+        const previousSectionTitle = suggestions[originalIndex - 1]?.sectionTitle;
         const shouldRenderSectionHeader =
           mode === 'slash' &&
           !!suggestion.sectionTitle &&
@@ -106,14 +100,9 @@ export function SuggestionsDisplay({
         );
 
         return (
-          <Box
-            key={`${suggestion.value}-${originalIndex}`}
-            flexDirection="column"
-          >
+          <Box key={`${suggestion.value}-${originalIndex}`} flexDirection="column">
             {shouldRenderSectionHeader && (
-              <Text color={theme.text.secondary}>
-                -- {suggestion.sectionTitle} --
-              </Text>
+              <Text color={theme.text.secondary}>-- {suggestion.sectionTitle} --</Text>
             )}
 
             <Box

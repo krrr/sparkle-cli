@@ -13,8 +13,5 @@ import { createHash } from 'node:crypto';
  */
 export function deriveStableId(sourceIds: string[]): string {
   const sortedIds = [...sourceIds].sort();
-  return createHash('sha256')
-    .update(sortedIds.join('|'))
-    .digest('hex')
-    .slice(0, 32);
+  return createHash('sha256').update(sortedIds.join('|')).digest('hex').slice(0, 32);
 }

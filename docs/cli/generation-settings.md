@@ -1,9 +1,8 @@
 # Advanced Model Configuration
 
-This guide details the Model Configuration system within Sparkle CLI. Designed
-for researchers, AI quality engineers, and advanced users, this system provides
-a rigorous framework for managing generative model hyperparameters and
-behaviors.
+This guide details the Model Configuration system within Sparkle CLI. Designed for
+researchers, AI quality engineers, and advanced users, this system provides a rigorous
+framework for managing generative model hyperparameters and behaviors.
 
 <!-- prettier-ignore -->
 > [!WARNING]
@@ -14,35 +13,33 @@ behaviors.
 
 ## 1. System Overview
 
-The Model Configuration system (`ModelConfigService`) enables deterministic
-control over model generation. It decouples the requested model identifier (for
-example, a CLI flag or agent request) from the underlying API configuration.
-This allows for:
+The Model Configuration system (`ModelConfigService`) enables deterministic control over
+model generation. It decouples the requested model identifier (for example, a CLI flag
+or agent request) from the underlying API configuration. This allows for:
 
 - **Precise Hyperparameter Tuning**: Direct control over `temperature`, `topP`,
   `thinkingBudget`, and other SDK-level parameters.
-- **Environment-Specific Behavior**: Distinct configurations for different
-  operating contexts (for example, testing vs. production).
-- **Agent-Scoped Customization**: Applying specific settings only when a
-  particular agent is active.
+- **Environment-Specific Behavior**: Distinct configurations for different operating
+  contexts (for example, testing vs. production).
+- **Agent-Scoped Customization**: Applying specific settings only when a particular
+  agent is active.
 
 The system operates on two core primitives: **Aliases** and **Overrides**.
 
 ## 2. Configuration Primitives
 
-These settings are located under the `modelConfigs` key in your configuration
-file.
+These settings are located under the `modelConfigs` key in your configuration file.
 
 ### Aliases (`customAliases`)
 
-Aliases are named, reusable configuration presets. Users should define their own
-aliases (or override system defaults) in the `customAliases` map.
+Aliases are named, reusable configuration presets. Users should define their own aliases
+(or override system defaults) in the `customAliases` map.
 
-- **Inheritance**: An alias can `extends` another alias (including system
-  defaults like `chat-base`), inheriting its `modelConfig`. Child aliases can
-  overwrite or augment inherited settings.
-- **Abstract Aliases**: An alias is not required to specify a concrete `model`
-  if it serves purely as a base for other aliases.
+- **Inheritance**: An alias can `extends` another alias (including system defaults like
+  `chat-base`), inheriting its `modelConfig`. Child aliases can overwrite or augment
+  inherited settings.
+- **Abstract Aliases**: An alias is not required to specify a concrete `model` if it
+  serves purely as a base for other aliases.
 
 **Example Hierarchy**:
 
@@ -66,14 +63,14 @@ aliases (or override system defaults) in the `customAliases` map.
 
 ### Overrides (`overrides`)
 
-Overrides are conditional rules that inject configuration based on the runtime
-context. They are evaluated dynamically for each model request.
+Overrides are conditional rules that inject configuration based on the runtime context.
+They are evaluated dynamically for each model request.
 
-- **Match Criteria**: Overrides apply when the request context matches the
-  specified `match` properties.
+- **Match Criteria**: Overrides apply when the request context matches the specified
+  `match` properties.
   - `model`: Matches the requested model name or alias.
-  - `overrideScope`: Matches the distinct scope of the request (typically the
-    agent name, for example, `codebaseInvestigator`).
+  - `overrideScope`: Matches the distinct scope of the request (typically the agent
+    name, for example, `codebaseInvestigator`).
 
 **Example Override**:
 
@@ -94,13 +91,12 @@ context. They are evaluated dynamically for each model request.
 
 ## 3. Resolution Strategy
 
-The `ModelConfigService` resolves the final configuration through a two-step
-process:
+The `ModelConfigService` resolves the final configuration through a two-step process:
 
 ### Step 1: Alias Resolution
 
-The requested model string is looked up in the merged map of system `aliases`
-and user `customAliases`.
+The requested model string is looked up in the merged map of system `aliases` and user
+`customAliases`.
 
 1.  If found, the system recursively resolves the `extends` chain.
 2.  Settings are merged from parent to child (child wins).
@@ -109,18 +105,18 @@ and user `customAliases`.
 
 ### Step 2: Override Application
 
-The system evaluates the `overrides` list against the request context (`model`
-and `overrideScope`).
+The system evaluates the `overrides` list against the request context (`model` and
+`overrideScope`).
 
 1.  **Filtering**: All matching overrides are identified.
-2.  **Sorting**: Matches are prioritized by **specificity** (the number of
-    matched keys in the `match` object).
-    - Specific matches (for example, `model` + `overrideScope`) override broad
-      matches (for example, `model` only).
-    - Tie-breaking: If specificity is equal, the order of definition in the
-      `overrides` array is preserved (last one wins).
-3.  **Merging**: The configurations from the sorted overrides are merged
-    sequentially onto the base configuration.
+2.  **Sorting**: Matches are prioritized by **specificity** (the number of matched keys
+    in the `match` object).
+    - Specific matches (for example, `model` + `overrideScope`) override broad matches
+      (for example, `model` only).
+    - Tie-breaking: If specificity is equal, the order of definition in the `overrides`
+      array is preserved (last one wins).
+3.  **Merging**: The configurations from the sorted overrides are merged sequentially
+    onto the base configuration.
 
 ## 4. Configuration Reference
 
@@ -139,12 +135,12 @@ Defines the actual parameters for the model.
 
 Directly maps to the SDK's `GenerateContentConfig`. Common parameters include:
 
-- **`temperature`**: (`number`) Controls output randomness. Lower values (0.0)
-  are deterministic; higher values (>0.7) are creative.
+- **`temperature`**: (`number`) Controls output randomness. Lower values (0.0) are
+  deterministic; higher values (>0.7) are creative.
 - **`topP`**: (`number`) Nucleus sampling probability.
 - **`maxOutputTokens`**: (`number`) Limit on generated response length.
-- **`thinkingConfig`**: (`object`) Configuration for models with reasoning
-  capabilities (for example, `thinkingBudget`, `includeThoughts`).
+- **`thinkingConfig`**: (`object`) Configuration for models with reasoning capabilities
+  (for example, `thinkingBudget`, `includeThoughts`).
 
 ## 5. Practical Examples
 
@@ -171,8 +167,8 @@ configuration but enforcing zero temperature.
 
 ### Agent-Specific Parameter Injection
 
-Enforce extended thinking budgets for a specific agent without altering the
-global default, for example for the `codebaseInvestigator`.
+Enforce extended thinking budgets for a specific agent without altering the global
+default, for example for the `codebaseInvestigator`.
 
 ```json
 "modelConfigs": {
@@ -193,8 +189,8 @@ global default, for example for the `codebaseInvestigator`.
 
 ### Experimental Model Evaluation
 
-Route traffic for a specific alias to a preview model for A/B testing, without
-changing client code.
+Route traffic for a specific alias to a preview model for A/B testing, without changing
+client code.
 
 ```json
 "modelConfigs": {

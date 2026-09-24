@@ -12,10 +12,7 @@ import {
   type MultiFolderTrustDialogProps,
 } from './MultiFolderTrustDialog.js';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import {
-  TrustLevel,
-  type LoadedTrustedFolders,
-} from '../../config/trustedFolders.js';
+import { TrustLevel, type LoadedTrustedFolders } from '../../config/trustedFolders.js';
 import * as trustedFolders from '../../config/trustedFolders.js';
 import * as directoryUtils from '../utils/directoryUtils.js';
 import type { Config } from 'sparkle-cli-core';
@@ -62,9 +59,7 @@ const defaultProps: MultiFolderTrustDialogProps = {
 describe('MultiFolderTrustDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(trustedFolders.loadTrustedFolders).mockReturnValue(
-      mockTrustedFolders,
-    );
+    vi.mocked(trustedFolders.loadTrustedFolders).mockReturnValue(mockTrustedFolders);
     vi.mocked(directoryUtils.expandHomeDir).mockImplementation((p) => p);
     mockedRadioButtonSelect.mockImplementation((props) => (
       <div data-testid="RadioButtonSelect" {...props} />
@@ -159,12 +154,8 @@ describe('MultiFolderTrustDialog', () => {
     });
     await waitUntilReady();
 
-    expect(mockAddDirectory).toHaveBeenCalledWith(
-      path.resolve('/path/to/folder1'),
-    );
-    expect(mockAddDirectory).toHaveBeenCalledWith(
-      path.resolve('/path/to/folder2'),
-    );
+    expect(mockAddDirectory).toHaveBeenCalledWith(path.resolve('/path/to/folder1'));
+    expect(mockAddDirectory).toHaveBeenCalledWith(path.resolve('/path/to/folder2'));
     expect(mockSetValue).not.toHaveBeenCalled();
     expect(mockFinishAddingDirectories).toHaveBeenCalledWith(
       mockConfig,
@@ -188,9 +179,7 @@ describe('MultiFolderTrustDialog', () => {
     });
     await waitUntilReady();
 
-    expect(mockAddDirectory).toHaveBeenCalledWith(
-      path.resolve('/path/to/folder1'),
-    );
+    expect(mockAddDirectory).toHaveBeenCalledWith(path.resolve('/path/to/folder1'));
     expect(mockSetValue).toHaveBeenCalledWith(
       path.resolve('/path/to/folder1'),
       TrustLevel.TRUST_FOLDER,
@@ -270,12 +259,8 @@ describe('MultiFolderTrustDialog', () => {
     });
     await waitUntilReady();
 
-    expect(mockAddDirectory).toHaveBeenCalledWith(
-      path.resolve('/path/to/good'),
-    );
-    expect(mockAddDirectory).not.toHaveBeenCalledWith(
-      path.resolve('/path/to/error'),
-    );
+    expect(mockAddDirectory).toHaveBeenCalledWith(path.resolve('/path/to/good'));
+    expect(mockAddDirectory).not.toHaveBeenCalledWith(path.resolve('/path/to/error'));
     expect(mockFinishAddingDirectories).toHaveBeenCalledWith(
       mockConfig,
       mockAddItem,

@@ -7,11 +7,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  SPARKLE_DIR,
-  TestRig,
-  checkModelOutputContent,
-} from './test-helper.js';
+import { SPARKLE_DIR, TestRig, checkModelOutputContent } from './test-helper.js';
 
 describe('Plan Mode', () => {
   let rig: TestRig;
@@ -23,24 +19,16 @@ describe('Plan Mode', () => {
   afterEach(async () => await rig.cleanup());
 
   it('should allow read-only tools but deny write tools in plan mode', async () => {
-    await rig.setup(
-      'should allow read-only tools but deny write tools in plan mode',
-      {
-        settings: {
-          general: {
-            plan: { enabled: true },
-          },
-          tools: {
-            core: [
-              'run_shell_command',
-              'list_directory',
-              'write_file',
-              'read_file',
-            ],
-          },
+    await rig.setup('should allow read-only tools but deny write tools in plan mode', {
+      settings: {
+        general: {
+          plan: { enabled: true },
+        },
+        tools: {
+          core: ['run_shell_command', 'list_directory', 'write_file', 'read_file'],
         },
       },
-    );
+    });
 
     const result = await rig.run({
       approvalMode: 'plan',
@@ -49,9 +37,7 @@ describe('Plan Mode', () => {
 
     const toolLogs = rig.readToolLogs();
     const lsLog = toolLogs.find((l) => l.toolRequest.name === 'list_directory');
-    const shellLog = toolLogs.find(
-      (l) => l.toolRequest.name === 'run_shell_command',
-    );
+    const shellLog = toolLogs.find((l) => l.toolRequest.name === 'run_shell_command');
 
     expect(lsLog, 'Expected list_directory to be called').toBeDefined();
     expect(lsLog?.toolRequest.success).toBe(true);
@@ -68,8 +54,7 @@ describe('Plan Mode', () => {
 
   it('should allow write_file to the plans directory in plan mode', async () => {
     const plansDir = '.sparkle/tmp/foo/123/plans';
-    const testName =
-      'should allow write_file to the plans directory in plan mode';
+    const testName = 'should allow write_file to the plans directory in plan mode';
 
     await rig.setup(testName, {
       settings: {
@@ -109,10 +94,7 @@ describe('Plan Mode', () => {
       );
     }
 
-    expect(
-      planWrite,
-      'Expected write_file to be called for plan.md',
-    ).toBeDefined();
+    expect(planWrite, 'Expected write_file to be called for plan.md').toBeDefined();
     expect(
       planWrite?.toolRequest.success,
       `Expected write_file to succeed, but it failed with error: ${'error' in (planWrite?.toolRequest || {}) ? (planWrite?.toolRequest as unknown as Record<string, string>)['error'] : 'unknown'}`,
@@ -121,8 +103,7 @@ describe('Plan Mode', () => {
 
   it('should deny write_file to non-plans directory in plan mode', async () => {
     const plansDir = '.sparkle/tmp/foo/123/plans';
-    const testName =
-      'should deny write_file to non-plans directory in plan mode';
+    const testName = 'should deny write_file to non-plans directory in plan mode';
 
     await rig.setup(testName, {
       settings: {
@@ -144,8 +125,7 @@ describe('Plan Mode', () => {
     const toolLogs = rig.readToolLogs();
     const writeLog = toolLogs.find(
       (l) =>
-        l.toolRequest.name === 'write_file' &&
-        l.toolRequest.args.includes('hello.txt'),
+        l.toolRequest.name === 'write_file' && l.toolRequest.args.includes('hello.txt'),
     );
 
     if (writeLog) {
@@ -175,9 +155,7 @@ describe('Plan Mode', () => {
     });
 
     const toolLogs = rig.readToolLogs();
-    const enterLog = toolLogs.find(
-      (l) => l.toolRequest.name === 'enter_plan_mode',
-    );
+    const enterLog = toolLogs.find((l) => l.toolRequest.name === 'enter_plan_mode');
     expect(enterLog, 'Expected enter_plan_mode to be called').toBeDefined();
     expect(enterLog?.toolRequest.success).toBe(true);
   });
@@ -277,9 +255,7 @@ describe('Plan Mode', () => {
     expect(exitCallFound, 'Expected exit_plan_mode to be called').toBe(true);
 
     const shellCallFound = await rig.waitForToolCall('run_shell_command');
-    expect(shellCallFound, 'Expected run_shell_command to be called').toBe(
-      true,
-    );
+    expect(shellCallFound, 'Expected run_shell_command to be called').toBe(true);
 
     const apiRequests = rig.readAllApiRequest();
     const modelNames = apiRequests.map(

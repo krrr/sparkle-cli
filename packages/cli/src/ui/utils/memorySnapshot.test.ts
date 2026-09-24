@@ -44,9 +44,7 @@ describe('captureHeapSnapshot', () => {
     mkdirMock.mockClear();
     pipelineMock.mockClear();
     getHeapSnapshotMock.mockClear().mockReturnValue(Readable.from([]));
-    createWriteStreamMock
-      .mockClear()
-      .mockReturnValue({ write: vi.fn(), end: vi.fn() });
+    createWriteStreamMock.mockClear().mockReturnValue({ write: vi.fn(), end: vi.fn() });
   });
 
   afterEach(() => {

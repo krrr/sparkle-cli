@@ -1,8 +1,8 @@
 # Manage context and memory
 
-Control what Sparkle CLI knows about you and your projects. In this guide,
-you'll learn how to define project-wide rules with `AGENTS.md`, teach the agent
-persistent facts, and inspect the active context.
+Control what Sparkle CLI knows about you and your projects. In this guide, you'll learn
+how to define project-wide rules with `AGENTS.md`, teach the agent persistent facts, and
+inspect the active context.
 
 ## Prerequisites
 
@@ -11,25 +11,23 @@ persistent facts, and inspect the active context.
 
 ## Why manage context?
 
-Sparkle CLI is powerful but general. It doesn't know your preferred testing
-framework, your indentation style, or your preference against `any` in
-TypeScript. Context management solves this by giving the agent persistent
-memory.
+Sparkle CLI is powerful but general. It doesn't know your preferred testing framework,
+your indentation style, or your preference against `any` in TypeScript. Context
+management solves this by giving the agent persistent memory.
 
 You'll use these features when you want to:
 
-- **Enforce standards:** Ensure every generated file matches your team's style
-  guide.
+- **Enforce standards:** Ensure every generated file matches your team's style guide.
 - **Set a persona:** Tell the agent to act as a "Senior Rust Engineer" or "QA
   Specialist."
-- **Remember facts:** Save details like "My database port is 5432" so you don't
-  have to repeat them.
+- **Remember facts:** Save details like "My database port is 5432" so you don't have to
+  repeat them.
 
 ## How to define project-wide rules (AGENTS.md)
 
-The most powerful way to control the agent's behavior is through `AGENTS.md`
-files. These are Markdown files containing instructions that are automatically
-loaded into every conversation.
+The most powerful way to control the agent's behavior is through `AGENTS.md` files.
+These are Markdown files containing instructions that are automatically loaded into
+every conversation.
 
 ### Scenario: Create a project context file
 
@@ -50,15 +48,15 @@ loaded into every conversation.
 
 ### Scenario: Using the hierarchy
 
-Context is loaded hierarchically. This lets you have general rules for
-everything and specific rules for sub-projects.
+Context is loaded hierarchically. This lets you have general rules for everything and
+specific rules for sub-projects.
 
 1.  **Global:** `~/.sparkle/AGENTS.md` (Rules for _every_ project you work on).
 2.  **Project Root:** `./AGENTS.md` (Rules for the current repository).
 3.  **Subdirectory:** `./src/AGENTS.md` (Rules specific to the `src` folder).
 
-**Example:** You might set "Always use strict typing" in your global config, but
-"Use Python 3.11" only in your backend repository.
+**Example:** You might set "Always use strict typing" in your global config, but "Use
+Python 3.11" only in your backend repository.
 
 ## How to teach the agent facts (Memory)
 
@@ -71,15 +69,14 @@ Just tell the agent to remember something.
 
 **Prompt:** `Remember that I prefer using 'const' over 'let' wherever possible.`
 
-The agent will edit the appropriate memory Markdown file, so the fact is loaded
-in future sessions.
+The agent will edit the appropriate memory Markdown file, so the fact is loaded in
+future sessions.
 
 **Prompt:** `Save the fact that the staging server IP is 10.0.0.5.`
 
 ### Scenario: Using memory in conversation
 
-Once a fact is saved, you don't need to invoke it explicitly. The agent "knows"
-it.
+Once a fact is saved, you don't need to invoke it explicitly. The agent "knows" it.
 
 **Next Prompt:** `Write a script to deploy to staging.`
 
@@ -87,18 +84,18 @@ it.
 
 ## How to manage and inspect context
 
-As your project grows, you might want to see exactly what instructions the agent
-is following.
+As your project grows, you might want to see exactly what instructions the agent is
+following.
 
 ### Scenario: View active context
 
-To see the full, concatenated set of instructions currently loaded (from all
-`AGENTS.md` files and saved memories), use the `/memory show` command.
+To see the full, concatenated set of instructions currently loaded (from all `AGENTS.md`
+files and saved memories), use the `/memory show` command.
 
 **Command:** `/memory show`
 
-This prints the raw text the model receives at the start of the session. It's
-excellent for debugging why the agent might be ignoring a rule.
+This prints the raw text the model receives at the start of the session. It's excellent
+for debugging why the agent might be ignoring a rule.
 
 ### Scenario: Refresh context
 
@@ -109,20 +106,19 @@ immediately. Force a reload with:
 
 ## Best practices
 
-- **Keep it focused:** Avoid adding excessive content to `AGENTS.md`. Keep
-  instructions actionable and relevant to code generation.
-- **Use negative constraints:** Explicitly telling the agent what _not_ to do
-  (for example, "Do not use class components") is often more effective than
-  vague positive instructions.
-- **Review often:** Periodically check your `AGENTS.md` files to remove outdated
-  rules.
+- **Keep it focused:** Avoid adding excessive content to `AGENTS.md`. Keep instructions
+  actionable and relevant to code generation.
+- **Use negative constraints:** Explicitly telling the agent what _not_ to do (for
+  example, "Do not use class components") is often more effective than vague positive
+  instructions.
+- **Review often:** Periodically check your `AGENTS.md` files to remove outdated rules.
 
 ## Next steps
 
-- Learn about [Session management](session-management.md) to see how short-term
-  history works.
-- Explore the [Command reference](../../reference/commands.md) for more
-  `/memory` options.
+- Learn about [Session management](session-management.md) to see how short-term history
+  works.
+- Explore the [Command reference](../../reference/commands.md) for more `/memory`
+  options.
 - Read the technical spec for [Project context](../../cli/gemini-md.md).
-- Try the experimental [Auto Memory](../auto-memory.md) feature to extract
-  memory updates and reusable skills from your past sessions automatically.
+- Try the experimental [Auto Memory](../auto-memory.md) feature to extract memory
+  updates and reusable skills from your past sessions automatically.

@@ -8,11 +8,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CoderAgentEvent, type AgentSettings } from '../types.js';
 import { performInit } from 'sparkle-cli-core';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 import type { CoderAgentExecutor } from '../agent/executor.js';
 import type {
   ExecutionEventBus,

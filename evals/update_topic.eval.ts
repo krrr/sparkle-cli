@@ -70,9 +70,7 @@ describe('update_topic_behavior', () => {
       // Turn Ratio Assertion: update_topic should not be called on most turns.
       // We only enforce this for tasks that take more than 5 turns.
       const uniquePromptIds = new Set(
-        toolLogs
-          .map((l) => l.toolRequest.prompt_id)
-          .filter((id) => id !== undefined),
+        toolLogs.map((l) => l.toolRequest.prompt_id).filter((id) => id !== undefined),
       );
       const totalTurns = uniquePromptIds.size;
 
@@ -126,8 +124,7 @@ describe('update_topic_behavior', () => {
     suiteType: 'behavioral',
     name: 'update_topic should NOT be used for surgical symbol searches (Grey Area)',
     approvalMode: 'default',
-    prompt:
-      "Find the file where the 'UPDATE_TOPIC_TOOL_NAME' constant is defined.",
+    prompt: "Find the file where the 'UPDATE_TOPIC_TOOL_NAME' constant is defined.",
     files: {
       'packages/core/src/tools/tool-names.ts':
         "export const UPDATE_TOPIC_TOOL_NAME = 'update_topic';",
@@ -196,9 +193,7 @@ export default app;
       expect(topicCalls.length).toBeGreaterThanOrEqual(1);
 
       // Verify it actually did the refactoring to ensure it didn't just fail immediately
-      expect(fs.existsSync(path.join(rig.testDir!, 'src/routes.ts'))).toBe(
-        true,
-      );
+      expect(fs.existsSync(path.join(rig.testDir!, 'src/routes.ts'))).toBe(true);
     },
   });
 

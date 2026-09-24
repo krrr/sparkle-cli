@@ -16,17 +16,13 @@ vi.mock('../../utils/skillUtils.js', () => ({
 }));
 
 const { debugLogger } = await vi.hoisted(async () => {
-  const { createMockDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { createMockDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   return createMockDebugLogger({ stripAnsi: false });
 });
 
 vi.mock('sparkle-cli-core', () => ({
   debugLogger,
-  getErrorMessage: vi.fn((e: unknown) =>
-    e instanceof Error ? e.message : String(e),
-  ),
+  getErrorMessage: vi.fn((e: unknown) => (e instanceof Error ? e.message : String(e))),
 }));
 
 vi.mock('../../config/extensions/consent.js', () => ({
@@ -49,9 +45,7 @@ describe('skills link command', () => {
 
   it('should call linkSkill with correct arguments', async () => {
     const sourcePath = '/source/path';
-    mockLinkSkill.mockResolvedValue([
-      { name: 'test-skill', location: '/dest/path' },
-    ]);
+    mockLinkSkill.mockResolvedValue([{ name: 'test-skill', location: '/dest/path' }]);
 
     await handleLink({ path: sourcePath, scope: 'user' });
 

@@ -5,12 +5,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import {
-  promises as fs,
-  type PathLike,
-  type Dirent,
-  type Stats,
-} from 'node:fs';
+import { promises as fs, type PathLike, type Dirent, type Stats } from 'node:fs';
 import * as path from 'node:path';
 import { cleanupBackgroundLogs } from './logCleanup.js';
 

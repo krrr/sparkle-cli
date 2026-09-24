@@ -75,9 +75,7 @@ describe('relaunchOnExitCode', () => {
   it('should exit with non-RELAUNCH_EXIT_CODE', async () => {
     const runner = vi.fn().mockResolvedValue(0);
 
-    await expect(relaunchOnExitCode(runner)).rejects.toThrow(
-      'PROCESS_EXIT_CALLED',
-    );
+    await expect(relaunchOnExitCode(runner)).rejects.toThrow('PROCESS_EXIT_CALLED');
 
     expect(runner).toHaveBeenCalledTimes(1);
     expect(processExitSpy).toHaveBeenCalledWith(0);
@@ -92,9 +90,7 @@ describe('relaunchOnExitCode', () => {
       return 0; // Exit on third call
     });
 
-    await expect(relaunchOnExitCode(runner)).rejects.toThrow(
-      'PROCESS_EXIT_CALLED',
-    );
+    await expect(relaunchOnExitCode(runner)).rejects.toThrow('PROCESS_EXIT_CALLED');
 
     expect(runner).toHaveBeenCalledTimes(3);
     expect(processExitSpy).toHaveBeenCalledWith(0);
@@ -104,9 +100,7 @@ describe('relaunchOnExitCode', () => {
     setPlatform('android');
     const runner = vi.fn().mockResolvedValue(RELAUNCH_EXIT_CODE);
 
-    await expect(relaunchOnExitCode(runner)).rejects.toThrow(
-      'PROCESS_EXIT_CALLED',
-    );
+    await expect(relaunchOnExitCode(runner)).rejects.toThrow('PROCESS_EXIT_CALLED');
 
     expect(runner).toHaveBeenCalledTimes(1);
     expect(processExitSpy).toHaveBeenCalledWith(RELAUNCH_EXIT_CODE);
@@ -116,15 +110,11 @@ describe('relaunchOnExitCode', () => {
     const error = new Error('Runner failed');
     const runner = vi.fn().mockRejectedValue(error);
 
-    await expect(relaunchOnExitCode(runner)).rejects.toThrow(
-      'PROCESS_EXIT_CALLED',
-    );
+    await expect(relaunchOnExitCode(runner)).rejects.toThrow('PROCESS_EXIT_CALLED');
 
     expect(runner).toHaveBeenCalledTimes(1);
     expect(mocks.writeToStderr).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Fatal error: Failed to relaunch the CLI process.',
-      ),
+      expect.stringContaining('Fatal error: Failed to relaunch the CLI process.'),
     );
     expect(stdinResumeSpy).toHaveBeenCalled();
     expect(processExitSpy).toHaveBeenCalledWith(1);
@@ -249,12 +239,7 @@ describe('relaunchAppInChildProcess', () => {
       vi.stubEnv('IS_BINARY', 'true');
       // execArgv should be inherited, not duplicated in NODE_OPTIONS
       process.execArgv = ['--inspect=9229'];
-      process.argv = [
-        '/usr/bin/gemini',
-        '/usr/bin/gemini',
-        'command',
-        '--verbose',
-      ];
+      process.argv = ['/usr/bin/gemini', '/usr/bin/gemini', 'command', '--verbose'];
 
       const additionalNodeArgs = ['--max-old-space-size=8192'];
       const additionalScriptArgs: string[] = [];

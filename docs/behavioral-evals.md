@@ -1,26 +1,23 @@
 # Behavioral Evaluations & EDK Guide
 
-This guide introduces the **Eval Development Kit (EDK)** and details how to
-write, validate, run, and report on **behavioral evaluations** in the Gemini CLI
-codebase.
+This guide introduces the **Eval Development Kit (EDK)** and details how to write,
+validate, run, and report on **behavioral evaluations** in the Gemini CLI codebase.
 
 ---
 
 ## Overview
 
-Behavioral evaluations are automated tests designed to assert on the
-**behavior** of the Gemini CLI agent (e.g., verifying which tools are called,
-checking call ordering, or avoiding destructive commands) rather than checking
-the final prose output.
+Behavioral evaluations are automated tests designed to assert on the **behavior** of the
+Gemini CLI agent (e.g., verifying which tools are called, checking call ordering, or
+avoiding destructive commands) rather than checking the final prose output.
 
 Evaluating agent behavior is critical because:
 
-1. Model responses are non-deterministic, making exact prose matching highly
-   fragile.
-2. We must ensure the model utilizes the most efficient tools (e.g., batching
-   files via `read_many_files` instead of sequential `read_file` calls).
-3. We must enforce safety boundaries (e.g., preventing execution of raw shell
-   commands when safe alternatives exist).
+1. Model responses are non-deterministic, making exact prose matching highly fragile.
+2. We must ensure the model utilizes the most efficient tools (e.g., batching files via
+   `read_many_files` instead of sequential `read_file` calls).
+3. We must enforce safety boundaries (e.g., preventing execution of raw shell commands
+   when safe alternatives exist).
 
 All behavioral evaluations are stored under the `evals/` directory.
 
@@ -28,20 +25,20 @@ All behavioral evaluations are stored under the `evals/` directory.
 
 ## EDK Developer Commands
 
-The EDK provides CLI tools under `scripts/` to help contributors audit, check,
-and monitor evals.
+The EDK provides CLI tools under `scripts/` to help contributors audit, check, and
+monitor evals.
 
 ### 1. `npm run eval:inventory`
 
-Scans all eval files under `evals/`, statically parses them, and provides a
-structured overview of what exists in the repository.
+Scans all eval files under `evals/`, statically parses them, and provides a structured
+overview of what exists in the repository.
 
 - **Usage:**
   ```bash
   npm run eval:inventory
   ```
-- **JSON Output:** For CI integration or inventory indexing, generate a
-  machine-readable JSON report:
+- **JSON Output:** For CI integration or inventory indexing, generate a machine-readable
+  JSON report:
   ```bash
   npm run eval:inventory -- --json
   ```
@@ -80,16 +77,16 @@ guidelines and best practices.
 | `workspace-setup`    | **Error**   | Workspace behaviors (like file-system edits/reads) must set up a `files` object.                                       |
 | `new-evals-policy`   | **Warning** | New evals must not use `ALWAYS_PASSES` policy initially (they should be promoted after nightly data proves stability). |
 
-Warnings (`new-evals-policy`) will be logged with `⚠` and will **not** cause
-the CLI process to exit with status `1`. Errors (`✗`) will block CI builds and
-return exit status `1`.
+Warnings (`new-evals-policy`) will be logged with `⚠` and will **not** cause the CLI
+process to exit with status `1`. Errors (`✗`) will block CI builds and return exit
+status `1`.
 
 ---
 
 ### 3. `npm run eval:report`
 
-Aggregates local vitest `report.json` artifacts, maps them against inventory
-policies, and summarizes the pass rates per model.
+Aggregates local vitest `report.json` artifacts, maps them against inventory policies,
+and summarizes the pass rates per model.
 
 - **Usage:**
   ```bash
@@ -114,23 +111,22 @@ high-quality, non-flaky test runs.
 
 ### Step-by-Step Guide
 
-1. **Identify the Target Behavior**: Determine which tool calls need
-   verification (e.g., `web_fetch` must be called).
-2. **Author the Eval File**: Create your file under `evals/<name>.eval.ts`
-   naming it properly.
-3. **Configure Workspace Files**: If the eval reads or edits files, define them
-   inside the `files` metadata field.
-4. **Assert Behavior, Not Prose**: Ensure the `assert` block checks tool
-   interactions using `rig.waitForToolCall` or similar. Do not check final
-   prose.
+1. **Identify the Target Behavior**: Determine which tool calls need verification (e.g.,
+   `web_fetch` must be called).
+2. **Author the Eval File**: Create your file under `evals/<name>.eval.ts` naming it
+   properly.
+3. **Configure Workspace Files**: If the eval reads or edits files, define them inside
+   the `files` metadata field.
+4. **Assert Behavior, Not Prose**: Ensure the `assert` block checks tool interactions
+   using `rig.waitForToolCall` or similar. Do not check final prose.
 5. **Run Locally**:
    ```bash
    RUN_EVALS=true npx vitest run evals/my-test.eval.ts
    ```
-6. **Deflake**: Run your eval at least 3 times locally to verify it does not
-   fail due to model variance.
-7. **Run Validation**: Run `npm run eval:validate` to ensure no linting errors
-   are present.
+6. **Deflake**: Run your eval at least 3 times locally to verify it does not fail due to
+   model variance.
+7. **Run Validation**: Run `npm run eval:validate` to ensure no linting errors are
+   present.
 
 ### Acceptance Criteria Checklist
 
@@ -138,31 +134,29 @@ high-quality, non-flaky test runs.
 - [ ] **Policy**: New evals start as `USUALLY_PASSES`.
 - [ ] **Metadata**: Static `suiteName` and `suiteType` (e.g. `'behavioral'`) are
       specified.
-- [ ] **Assertions**: Uses `rig.waitForToolCall` or asserts tool arguments
-      explicitly.
+- [ ] **Assertions**: Uses `rig.waitForToolCall` or asserts tool arguments explicitly.
 - [ ] **Clean workspace**: Does not write to files outside `rig.testDir`.
 
 ### Common Anti-Patterns to Avoid
 
-- **Restricting core tools**: Never override `settings.tools.core` to limit
-  tools. Evals must run against the default toolset.
-- **Checking model prose**: Avoid `expect(result).toContain('something')` since
-  model wording is non-deterministic.
-- **Integration-only testing**: Evals that only write files without checking
-  realistic model prompts are integration tests and belong under
-  `integration-tests/`.
+- **Restricting core tools**: Never override `settings.tools.core` to limit tools. Evals
+  must run against the default toolset.
+- **Checking model prose**: Avoid `expect(result).toContain('something')` since model
+  wording is non-deterministic.
+- **Integration-only testing**: Evals that only write files without checking realistic
+  model prompts are integration tests and belong under `integration-tests/`.
 
 ---
 
 ## CI & Dashboard Integration
 
-You can easily automate behavioral evaluations or compile dashboard data using
-EDK's JSON reporters.
+You can easily automate behavioral evaluations or compile dashboard data using EDK's
+JSON reporters.
 
 ### CI Validation Block
 
-Add a step in your PR checks or GitHub workflows to automatically lint new evals
-and block pull requests containing validation errors:
+Add a step in your PR checks or GitHub workflows to automatically lint new evals and
+block pull requests containing validation errors:
 
 ```yaml
 - name: Run Eval Validator
@@ -181,5 +175,5 @@ To record nightly performance metrics across multiple models:
    ```bash
    npm run eval:report -- evals/logs --json > aggregated_report.json
    ```
-3. Upload `aggregated_report.json` to your dashboard storage backend to
-   visualize pass rates over time.
+3. Upload `aggregated_report.json` to your dashboard storage backend to visualize pass
+   rates over time.

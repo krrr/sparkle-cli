@@ -36,9 +36,7 @@ describe('MemoryUsageDisplay', () => {
   });
 
   it('updates memory usage over time', async () => {
-    const { lastFrame, waitUntilReady, unmount } = await render(
-      <MemoryUsageDisplay />,
-    );
+    const { lastFrame, waitUntilReady, unmount } = await render(<MemoryUsageDisplay />);
     expect(lastFrame()).toContain('50.0 MB');
 
     vi.mocked(process.memoryUsage).mockReturnValue({

@@ -97,10 +97,7 @@ export function convertToFunctionResponse(
 
   for (const part of inlineDataParts) {
     const mimeType = part.inlineData?.mimeType;
-    if (
-      mimeType &&
-      (mimeType.startsWith('audio/') || mimeType.startsWith('video/'))
-    ) {
+    if (mimeType && (mimeType.startsWith('audio/') || mimeType.startsWith('video/'))) {
       unsupportedInlineDataParts.push(part);
     } else {
       filteredInlineDataParts.push(part);
@@ -109,13 +106,10 @@ export function convertToFunctionResponse(
 
   if (unsupportedInlineDataParts.length > 0) {
     const uniqueMimes = Array.from(
-      new Set(
-        unsupportedInlineDataParts.map((p) => p.inlineData?.mimeType ?? ''),
-      ),
+      new Set(unsupportedInlineDataParts.map((p) => p.inlineData?.mimeType ?? '')),
     ).join(', ');
 
-    const isReadFileTool =
-      toolName === 'read_file' || toolName === 'read_many_files';
+    const isReadFileTool = toolName === 'read_file' || toolName === 'read_many_files';
 
     if (isReadFileTool) {
       textParts.unshift(
@@ -137,8 +131,7 @@ export function convertToFunctionResponse(
     },
   };
 
-  const isReadFileTool =
-    toolName === 'read_file' || toolName === 'read_many_files';
+  const isReadFileTool = toolName === 'read_file' || toolName === 'read_many_files';
 
   if (unsupportedInlineDataParts.length > 0 && isReadFileTool) {
     if (part.functionResponse) {
@@ -148,10 +141,7 @@ export function convertToFunctionResponse(
     }
   }
 
-  const isMultimodalFRSupported = supportsMultimodalFunctionResponse(
-    model,
-    config,
-  );
+  const isMultimodalFRSupported = supportsMultimodalFunctionResponse(model, config);
   const siblingParts: Part[] = [...fileDataParts];
 
   if (filteredInlineDataParts.length > 0) {
@@ -169,8 +159,7 @@ export function convertToFunctionResponse(
     textParts.length === 0 &&
     (filteredInlineDataParts.length > 0 || fileDataParts.length > 0)
   ) {
-    const totalBinaryItems =
-      filteredInlineDataParts.length + fileDataParts.length;
+    const totalBinaryItems = filteredInlineDataParts.length + fileDataParts.length;
     part.functionResponse!.response = {
       output: `Binary content provided (${totalBinaryItems} item(s)).`,
     };
@@ -211,9 +200,7 @@ export function getFunctionCalls(
   return functionCallParts.length > 0 ? functionCallParts : undefined;
 }
 
-export function getFunctionCallsFromParts(
-  parts: Part[],
-): FunctionCall[] | undefined {
+export function getFunctionCallsFromParts(parts: Part[]): FunctionCall[] | undefined {
   if (!parts) {
     return undefined;
   }
@@ -234,9 +221,7 @@ export function getFunctionCallsAsJson(
   return JSON.stringify(functionCalls, null, 2);
 }
 
-export function getFunctionCallsFromPartsAsJson(
-  parts: Part[],
-): string | undefined {
+export function getFunctionCallsFromPartsAsJson(parts: Part[]): string | undefined {
   const functionCalls = getFunctionCallsFromParts(parts);
   if (!functionCalls) {
     return undefined;
@@ -262,9 +247,7 @@ export function getStructuredResponse(
   return undefined;
 }
 
-export function getStructuredResponseFromParts(
-  parts: Part[],
-): string | undefined {
+export function getStructuredResponseFromParts(parts: Part[]): string | undefined {
   const textContent = getResponseTextFromParts(parts);
   const functionCallsJson = getFunctionCallsFromPartsAsJson(parts);
 

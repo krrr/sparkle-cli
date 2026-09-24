@@ -24,9 +24,7 @@ export interface UseInputHistoryStoreReturn {
 export function useInputHistoryStore(): UseInputHistoryStoreReturn {
   const [inputHistory, setInputHistory] = useState<string[]>([]);
   const [_pastSessionMessages, setPastSessionMessages] = useState<string[]>([]);
-  const [_currentSessionMessages, setCurrentSessionMessages] = useState<
-    string[]
-  >([]);
+  const [_currentSessionMessages, setCurrentSessionMessages] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
 
   /**
@@ -70,10 +68,7 @@ export function useInputHistoryStore(): UseInputHistoryStoreReturn {
         setIsInitialized(true);
       } catch (error) {
         // Start with empty history even if logger initialization fails
-        debugLogger.warn(
-          'Failed to initialize input history from logger:',
-          error,
-        );
+        debugLogger.warn('Failed to initialize input history from logger:', error);
         setPastSessionMessages([]);
         recalculateHistory([], []);
         setIsInitialized(true);

@@ -21,9 +21,7 @@ export function geminiPartsToContentParts(parts: Part[]): ContentPart[] {
         result.push({
           type: 'thought',
           thought: part.text,
-          ...(part.thoughtSignature
-            ? { thoughtSignature: part.thoughtSignature }
-            : {}),
+          ...(part.thoughtSignature ? { thoughtSignature: part.thoughtSignature } : {}),
         });
       } else {
         result.push({ type: 'text', text: part.text });
@@ -70,9 +68,7 @@ export function contentPartsToGeminiParts(content: ContentPart[]): Part[] {
         result.push({
           text: part.thought,
           thought: true,
-          ...(part.thoughtSignature
-            ? { thoughtSignature: part.thoughtSignature }
-            : {}),
+          ...(part.thoughtSignature ? { thoughtSignature: part.thoughtSignature } : {}),
         });
         break;
       case 'media':

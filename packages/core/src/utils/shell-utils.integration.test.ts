@@ -23,10 +23,7 @@ describe('execStreaming (Integration)', () => {
 
   it('should throw error on non-zero exit code', async () => {
     // exit 2 via node
-    const generator = execStreaming(process.execPath, [
-      '-e',
-      'process.exit(2)',
-    ]);
+    const generator = execStreaming(process.execPath, ['-e', 'process.exit(2)']);
 
     await expect(async () => {
       for await (const _ of generator) {

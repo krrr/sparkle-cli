@@ -88,11 +88,9 @@ describe('useIdeTrustListener', () => {
     vi.mocked(mockIdeClient.addTrustChangeListener).mockImplementation((cb) => {
       trustChangeCallback = cb;
     });
-    vi.mocked(mockIdeClient.addStatusChangeListener).mockImplementation(
-      (cb) => {
-        statusChangeCallback = cb;
-      },
-    );
+    vi.mocked(mockIdeClient.addStatusChangeListener).mockImplementation((cb) => {
+      statusChangeCallback = cb;
+    });
   });
 
   const renderTrustListenerHook = async () => {

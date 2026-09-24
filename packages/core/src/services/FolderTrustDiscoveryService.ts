@@ -178,14 +178,10 @@ export class FolderTrustDiscoveryService {
     }
   }
 
-  private static collectSecurityWarnings(
-    settings: Record<string, unknown>,
-  ): string[] {
+  private static collectSecurityWarnings(settings: Record<string, unknown>): string[] {
     const warnings: string[] = [];
 
-    const tools = this.isRecord(settings['tools'])
-      ? settings['tools']
-      : undefined;
+    const tools = this.isRecord(settings['tools']) ? settings['tools'] : undefined;
 
     const security = this.isRecord(settings['security'])
       ? settings['security']

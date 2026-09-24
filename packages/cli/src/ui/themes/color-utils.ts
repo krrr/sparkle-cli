@@ -82,9 +82,7 @@ export function isValidColor(color: string): boolean {
  * Returns undefined if no safe background color is available for the given
  * terminal background.
  */
-export function getSafeLowColorBackground(
-  terminalBg: string,
-): string | undefined {
+export function getSafeLowColorBackground(terminalBg: string): string | undefined {
   const resolvedTerminalBg = resolveColor(terminalBg) || terminalBg;
   if (
     resolvedTerminalBg === 'black' ||
@@ -130,10 +128,7 @@ export function shouldSwitchTheme(
 
   if (luminance > LIGHT_THEME_LUMINANCE_THRESHOLD && isDefaultTheme) {
     return defaultLightThemeName;
-  } else if (
-    luminance < DARK_THEME_LUMINANCE_THRESHOLD &&
-    isDefaultLightTheme
-  ) {
+  } else if (luminance < DARK_THEME_LUMINANCE_THRESHOLD && isDefaultLightTheme) {
     return defaultThemeName;
   }
 

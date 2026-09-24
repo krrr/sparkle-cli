@@ -30,10 +30,9 @@ const chromeAvailable = (() => {
         },
       );
     } else if (process.platform === 'linux') {
-      execSync(
-        'which google-chrome || which chromium-browser || which chromium',
-        { stdio: 'ignore' },
-      );
+      execSync('which google-chrome || which chromium-browser || which chromium', {
+        stdio: 'ignore',
+      });
     } else if (process.platform === 'win32') {
       const chromePaths = [
         'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -94,10 +93,7 @@ describe.skipIf(!chromeAvailable)('browser-policy', () => {
       const trustedFolders = {
         [rig.testDir!]: 'TRUST_FOLDER',
       };
-      writeFileSync(
-        trustedFoldersPath,
-        JSON.stringify(trustedFolders, null, 2),
-      );
+      writeFileSync(trustedFoldersPath, JSON.stringify(trustedFolders, null, 2));
 
       // Force confirmation for browser agent.
       // NOTE: We don't force confirm browser tools here because "Allow all server tools"
@@ -140,9 +136,7 @@ priority = 200
         },
       });
 
-      await run.sendKeys(
-        'Open https://example.com and check if there is a heading\r',
-      );
+      await run.sendKeys('Open https://example.com and check if there is a heading\r');
       await run.sendKeys('\r');
 
       // Handle confirmations.
@@ -200,8 +194,7 @@ priority = 200
       // tool confirmations — the browser agent may still fail due to
       // Chrome/MCP issues in CI, which is acceptable for this policy test.
       expect(
-        output.includes('completed successfully') ||
-          output.includes('agent error'),
+        output.includes('completed successfully') || output.includes('agent error'),
       ).toBe(true);
     },
   );

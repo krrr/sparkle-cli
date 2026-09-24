@@ -48,10 +48,7 @@ describe('mcpToolWrapper Confirmation', () => {
   });
 
   it('getConfirmationDetails returns specific MCP details', async () => {
-    const tools = await createMcpDeclarativeTools(
-      mockBrowserManager,
-      mockMessageBus,
-    );
+    const tools = await createMcpDeclarativeTools(mockBrowserManager, mockMessageBus);
     const invocation = tools[0].build({}) as unknown as TestableConfirmation;
 
     const details = await invocation.getConfirmationDetails(
@@ -83,10 +80,7 @@ describe('mcpToolWrapper Confirmation', () => {
   });
 
   it('getPolicyUpdateOptions returns correct options', async () => {
-    const tools = await createMcpDeclarativeTools(
-      mockBrowserManager,
-      mockMessageBus,
-    );
+    const tools = await createMcpDeclarativeTools(mockBrowserManager, mockMessageBus);
     const invocation = tools[0].build({}) as unknown as TestableConfirmation;
 
     const options = invocation.getPolicyUpdateOptions(

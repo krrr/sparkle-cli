@@ -59,10 +59,7 @@ const renderWithMockedStats = async (
     },
   } as unknown as LoadedSettings);
 
-  const result = await render(
-    <ModelStatsDisplay currentModel={currentModel} />,
-    width,
-  );
+  const result = await render(<ModelStatsDisplay currentModel={currentModel} />, width);
   return result;
 };
 
@@ -102,9 +99,7 @@ describe('<ModelStatsDisplay />', () => {
       },
     });
 
-    expect(lastFrame()).toContain(
-      'No API calls have been made in this session.',
-    );
+    expect(lastFrame()).toContain('No API calls have been made in this session.');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });

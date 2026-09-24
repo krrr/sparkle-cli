@@ -42,10 +42,7 @@ export class CommandHandler {
    * Parses and executes a command string if it matches a registered command.
    * Returns true if a command was handled, false otherwise.
    */
-  async handleCommand(
-    commandText: string,
-    context: CommandContext,
-  ): Promise<boolean> {
+  async handleCommand(commandText: string, context: CommandContext): Promise<boolean> {
     const { commandToExecute, args } = this.parseSlashCommand(commandText);
 
     if (commandToExecute) {
@@ -76,17 +73,14 @@ export class CommandHandler {
         'content' in result.data
       ) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-explicit-any
-        messageContent = (result.data as Record<string, any>)[
-          'content'
-        ] as string;
+        messageContent = (result.data as Record<string, any>)['content'] as string;
       } else {
         messageContent = JSON.stringify(result.data, null, 2);
       }
 
       await context.sendMessage(messageContent);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       await context.sendMessage(`Error: ${errorMessage}`);
     }
   }

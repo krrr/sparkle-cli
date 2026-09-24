@@ -1,7 +1,7 @@
 # Sparkle CLI Core (`sparkle-cli-core`)
 
-Backend logic for Sparkle CLI: API orchestration, prompt construction, tool
-execution, and agent management.
+Backend logic for Sparkle CLI: API orchestration, prompt construction, tool execution,
+and agent management.
 
 ## Architecture
 
@@ -31,11 +31,10 @@ execution, and agent management.
 
 ## Coding Conventions
 
-- **Style:** Follow existing backend logic patterns. This package has no UI
-  dependencies — keep it framework-agnostic.
+- **Style:** Follow existing backend logic patterns. This package has no UI dependencies
+  — keep it framework-agnostic.
 
 ## Testing
 
 - Run tests: `npm test -w sparkle-cli-core`
-- Run a specific test:
-  `npm test -w sparkle-cli-core -- src/path/to/file.test.ts`
+- Run a specific test: `npm test -w sparkle-cli-core -- src/path/to/file.test.ts`

@@ -43,9 +43,7 @@ describe('AgentSession', () => {
     await session.send({ update: { title: 't' } });
     await session.abort();
     expect(
-      session.events.some(
-        (e) => e.type === 'agent_end' && e.reason === 'aborted',
-      ),
+      session.events.some((e) => e.type === 'agent_end' && e.reason === 'aborted'),
     ).toBe(true);
   });
 
@@ -216,9 +214,7 @@ describe('AgentSession', () => {
       const iterator = session
         .stream({ eventId: 'missing-event' })
         [Symbol.asyncIterator]();
-      await expect(iterator.next()).rejects.toThrow(
-        'Unknown eventId: missing-event',
-      );
+      await expect(iterator.next()).rejects.toThrow('Unknown eventId: missing-event');
     });
 
     it('should throw when resuming from an event before agent_start on a stream with no agent activity', async () => {
@@ -290,9 +286,7 @@ describe('AgentSession', () => {
       ]);
       const session = new AgentSession(protocol);
 
-      const iterator = session
-        .stream({ eventId: 'e-1' })
-        [Symbol.asyncIterator]();
+      const iterator = session.stream({ eventId: 'e-1' })[Symbol.asyncIterator]();
       await expect(iterator.next()).rejects.toThrow(
         'Cannot resume from eventId e-1 before agent_start for stream stream-1',
       );
@@ -346,9 +340,7 @@ describe('AgentSession', () => {
         streamedEvents.push(event);
       }
 
-      expect(
-        streamedEvents.every((event) => event.streamId === streamId1),
-      ).toBe(true);
+      expect(streamedEvents.every((event) => event.streamId === streamId1)).toBe(true);
       expect(streamedEvents.map((event) => event.type)).toEqual([
         'message',
         'agent_end',
@@ -419,9 +411,7 @@ describe('AgentSession', () => {
       const { streamId } = await session.send({ update: { title: 't1' } });
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const iterator = session
-        .stream({ streamId: streamId! })
-        [Symbol.asyncIterator]();
+      const iterator = session.stream({ streamId: streamId! })[Symbol.asyncIterator]();
 
       const first = await iterator.next();
       expect(first.value?.type).toBe('agent_start');

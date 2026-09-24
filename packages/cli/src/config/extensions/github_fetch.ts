@@ -10,10 +10,7 @@ export function getGitHubToken(): string | undefined {
   return process.env['GITHUB_TOKEN'];
 }
 
-export async function fetchJson<T>(
-  url: string,
-  redirectCount: number = 0,
-): Promise<T> {
+export async function fetchJson<T>(url: string, redirectCount: number = 0): Promise<T> {
   const headers: { 'User-Agent': string; Authorization?: string } = {
     'User-Agent': 'sparkle-cli',
   };
@@ -32,18 +29,13 @@ export async function fetchJson<T>(
             return reject(new Error('No location header in redirect response'));
           }
           res.resume();
-          fetchJson<T>(
-            new URL(res.headers.location, url).toString(),
-            redirectCount + 1,
-          )
+          fetchJson<T>(new URL(res.headers.location, url).toString(), redirectCount + 1)
             .then(resolve)
             .catch(reject);
           return;
         }
         if (res.statusCode !== 200) {
-          return reject(
-            new Error(`Request failed with status code ${res.statusCode}`),
-          );
+          return reject(new Error(`Request failed with status code ${res.statusCode}`));
         }
         const chunks: Buffer[] = [];
         res.on('data', (chunk) => chunks.push(chunk));

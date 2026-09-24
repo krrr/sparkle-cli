@@ -89,9 +89,7 @@ class LocalSubagentProtocol implements AgentProtocol {
     private readonly context: AgentLoopContext,
     // Required for API parity across protocol constructors (local, remote, legacy)
     _messageBus: MessageBus,
-    private readonly _rawActivityCallback?: (
-      activity: SubagentActivityEvent,
-    ) => void,
+    private readonly _rawActivityCallback?: (activity: SubagentActivityEvent) => void,
   ) {}
 
   // ---------------------------------------------------------------------------
@@ -232,10 +230,7 @@ class LocalSubagentProtocol implements AgentProtocol {
 
     const output = await executor.run(params, signal);
 
-    if (
-      output.terminate_reason === AgentTerminateMode.ABORTED ||
-      signal.aborted
-    ) {
+    if (output.terminate_reason === AgentTerminateMode.ABORTED || signal.aborted) {
       this._finishStream('aborted');
     } else {
       this._finishStream(mapTerminateMode(output.terminate_reason));
@@ -267,9 +262,7 @@ class LocalSubagentProtocol implements AgentProtocol {
         const name = String(rawName ?? 'unknown');
         const rawArgs = activity.data['args'];
         const args: Record<string, unknown> =
-          rawArgs !== null &&
-          typeof rawArgs === 'object' &&
-          !Array.isArray(rawArgs)
+          rawArgs !== null && typeof rawArgs === 'object' && !Array.isArray(rawArgs)
             ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
               (rawArgs as Record<string, unknown>)
             : {};

@@ -132,10 +132,7 @@ describe('eval-validate', () => {
 
     it('returns correct file summaries for clean inventory', () => {
       const inventory = makeInventory([
-        makeFile([
-          makeCase({ name: 'case one' }),
-          makeCase({ name: 'case two' }),
-        ]),
+        makeFile([makeCase({ name: 'case one' }), makeCase({ name: 'case two' })]),
       ]);
       const result = validateInventory(inventory, registry);
 
@@ -159,9 +156,7 @@ describe('eval-validate', () => {
       });
       const result = validateInventory(makeInventory([f]), registry);
 
-      const violations = result.violations.filter(
-        (v) => v.ruleId === 'file-naming',
-      );
+      const violations = result.violations.filter((v) => v.ruleId === 'file-naming');
       expect(violations).toHaveLength(1);
       expect(violations[0].message).toContain('bad-name.ts');
     });
@@ -176,9 +171,7 @@ describe('eval-validate', () => {
         relativePath: 'evals/bad-name.ts',
       });
       const result = validateInventory(makeInventory([f]), registry);
-      const violations = result.violations.filter(
-        (v) => v.ruleId === 'file-naming',
-      );
+      const violations = result.violations.filter((v) => v.ruleId === 'file-naming');
       expect(violations).toHaveLength(1);
     });
 
@@ -192,9 +185,9 @@ describe('eval-validate', () => {
         relativePath: 'evals/component.eval.tsx',
       });
       const result = validateInventory(makeInventory([f]), registry);
-      expect(
-        result.violations.filter((v) => v.ruleId === 'file-naming'),
-      ).toHaveLength(0);
+      expect(result.violations.filter((v) => v.ruleId === 'file-naming')).toHaveLength(
+        0,
+      );
     });
 
     it('flags valid-policy violation for unknown policy', () => {
@@ -202,9 +195,7 @@ describe('eval-validate', () => {
         makeInventory([makeFile([makeCase({ policy: 'unknown' })])]),
         registry,
       );
-      const violations = result.violations.filter(
-        (v) => v.ruleId === 'valid-policy',
-      );
+      const violations = result.violations.filter((v) => v.ruleId === 'valid-policy');
       expect(violations).toHaveLength(1);
       expect(violations[0].message).toContain('"unknown"');
     });
@@ -230,9 +221,7 @@ describe('eval-validate', () => {
         makeInventory([makeFile([makeCase({ suiteName: undefined })])]),
         registry,
       );
-      const violations = result.violations.filter(
-        (v) => v.ruleId === 'suite-metadata',
-      );
+      const violations = result.violations.filter((v) => v.ruleId === 'suite-metadata');
       expect(violations).toHaveLength(1);
       expect(violations[0].message).toContain('suiteName');
     });
@@ -242,9 +231,7 @@ describe('eval-validate', () => {
         makeInventory([makeFile([makeCase({ suiteType: undefined })])]),
         registry,
       );
-      const violations = result.violations.filter(
-        (v) => v.ruleId === 'suite-metadata',
-      );
+      const violations = result.violations.filter((v) => v.ruleId === 'suite-metadata');
       expect(violations).toHaveLength(1);
       expect(violations[0].message).toContain('suiteType');
     });
@@ -458,10 +445,7 @@ describe('eval-validate', () => {
 
     it('flags positive-assertion when standard test has no tool references', () => {
       const c = makeCase({ toolReferences: [] });
-      const result = validateInventory(
-        makeInventory([makeFile([c])]),
-        registry,
-      );
+      const result = validateInventory(makeInventory([makeFile([c])]), registry);
       const violations = result.violations.filter(
         (v) => v.ruleId === 'positive-assertion',
       );
@@ -480,10 +464,7 @@ describe('eval-validate', () => {
         suiteType: 'component-level',
         toolReferences: [],
       });
-      const result = validateInventory(
-        makeInventory([makeFile([c1, c2])]),
-        registry,
-      );
+      const result = validateInventory(makeInventory([makeFile([c1, c2])]), registry);
       const violations = result.violations.filter(
         (v) => v.ruleId === 'positive-assertion',
       );
@@ -497,10 +478,7 @@ describe('eval-validate', () => {
         hasFiles: false,
         hasSetup: false,
       });
-      const result = validateInventory(
-        makeInventory([makeFile([c])]),
-        registry,
-      );
+      const result = validateInventory(makeInventory([makeFile([c])]), registry);
       const violations = result.violations.filter(
         (v) => v.ruleId === 'workspace-setup',
       );
@@ -519,10 +497,7 @@ describe('eval-validate', () => {
         hasFiles: false,
         hasSetup: true,
       });
-      const result = validateInventory(
-        makeInventory([makeFile([c1, c2])]),
-        registry,
-      );
+      const result = validateInventory(makeInventory([makeFile([c1, c2])]), registry);
       const violations = result.violations.filter(
         (v) => v.ruleId === 'workspace-setup',
       );
@@ -537,25 +512,18 @@ describe('eval-validate', () => {
       });
 
       // First call: git status --porcelain (working-tree additions)
-      vi.mocked(execSync).mockReturnValueOnce(
-        '?? evals/untracked-test.eval.ts\n',
-      );
+      vi.mocked(execSync).mockReturnValueOnce('?? evals/untracked-test.eval.ts\n');
       // Subsequent calls for git merge-base can throw — addFromOutput won't add anything
       vi.mocked(execSync).mockImplementationOnce(() => {
         throw new Error('no merge base');
       });
 
-      const result = validateInventory(
-        makeInventory([makeFile([c])]),
-        registry,
-      );
+      const result = validateInventory(makeInventory([makeFile([c])]), registry);
       const violations = result.violations.filter(
         (v) => v.ruleId === 'new-evals-policy',
       );
       expect(violations).toHaveLength(1);
-      expect(violations[0].message).toContain(
-        'not use ALWAYS_PASSES policy initially',
-      );
+      expect(violations[0].message).toContain('not use ALWAYS_PASSES policy initially');
     });
 
     it('validates the real evals directory without any rule violations', async () => {

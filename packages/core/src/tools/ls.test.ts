@@ -35,9 +35,7 @@ describe('LSTool', () => {
   beforeEach(async () => {
     const realTmp = await fs.realpath(os.tmpdir());
     tempRootDir = await fs.mkdtemp(path.join(realTmp, 'ls-tool-root-'));
-    tempSecondaryDir = await fs.mkdtemp(
-      path.join(realTmp, 'ls-tool-secondary-'),
-    );
+    tempSecondaryDir = await fs.mkdtemp(path.join(realTmp, 'ls-tool-secondary-'));
 
     const mockStorage = {
       getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
@@ -45,8 +43,7 @@ describe('LSTool', () => {
 
     mockConfig = {
       getTargetDir: () => tempRootDir,
-      getWorkspaceContext: () =>
-        new WorkspaceContext(tempRootDir, [tempSecondaryDir]),
+      getWorkspaceContext: () => new WorkspaceContext(tempRootDir, [tempSecondaryDir]),
       getFileService: () => new FileDiscoveryService(tempRootDir),
       getFileFilteringOptions: () => ({
         respectGitIgnore: true,
@@ -202,10 +199,7 @@ describe('LSTool', () => {
     it('should respect sparkleignore patterns', async () => {
       await fs.writeFile(path.join(tempRootDir, 'file1.txt'), 'content1');
       await fs.writeFile(path.join(tempRootDir, 'file2.log'), 'content1');
-      await fs.writeFile(
-        path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME),
-        '*.log',
-      );
+      await fs.writeFile(path.join(tempRootDir, SPARKLE_IGNORE_FILE_NAME), '*.log');
       const invocation = lsTool.build({ dir_path: tempRootDir });
       const result = await invocation.execute({ abortSignal });
 
@@ -247,9 +241,7 @@ describe('LSTool', () => {
       const invocation = lsTool.build({ dir_path: tempRootDir });
       const result = await invocation.execute({ abortSignal });
 
-      const lines = (
-        typeof result.llmContent === 'string' ? result.llmContent : ''
-      )
+      const lines = (typeof result.llmContent === 'string' ? result.llmContent : '')
         .split('\n')
         .filter(Boolean);
       const entries = lines.slice(1); // Skip header
@@ -389,17 +381,12 @@ describe('LSTool', () => {
       const { discoverJitContext } = await import('./jit-context.js');
       vi.mocked(discoverJitContext).mockResolvedValue('');
 
-      await fs.writeFile(
-        path.join(tempRootDir, 'jit-disabled-file.txt'),
-        'content',
-      );
+      await fs.writeFile(path.join(tempRootDir, 'jit-disabled-file.txt'), 'content');
 
       const invocation = lsTool.build({ dir_path: tempRootDir });
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).not.toContain(
-        'Newly Discovered Project Context',
-      );
+      expect(result.llmContent).not.toContain('Newly Discovered Project Context');
     });
   });
 });

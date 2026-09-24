@@ -72,18 +72,12 @@ export class AcpSessionManager {
     const activeProfile = profileService.getActiveProfile();
     const authType = activeProfile?.providerType || ProviderType.USE_GEMINI;
     const baseUrl = authDetails.baseUrl || activeProfile?.baseUrl;
-    const customHeaders =
-      authDetails.customHeaders || activeProfile?.customHeaders;
+    const customHeaders = authDetails.customHeaders || activeProfile?.customHeaders;
 
     let isAuthenticated = false;
     let authErrorMessage = '';
     try {
-      await config.refreshAuth(
-        authType,
-        authDetails.apiKey,
-        baseUrl,
-        customHeaders,
-      );
+      await config.refreshAuth(authType, authDetails.apiKey, baseUrl, customHeaders);
       isAuthenticated = true;
 
       // Extra validation for Gemini API key. A custom endpoint (a baseUrl
@@ -103,9 +97,7 @@ export class AcpSessionManager {
     } catch (e) {
       isAuthenticated = false;
       authErrorMessage = getAcpErrorMessage(e);
-      debugLogger.error(
-        `Authentication failed: ${e instanceof Error ? e.stack : e}`,
-      );
+      debugLogger.error(`Authentication failed: ${e instanceof Error ? e.stack : e}`);
     }
 
     if (!isAuthenticated) {
@@ -301,10 +293,7 @@ export class AcpSessionManager {
     const mergedMcpServers = { ...currentSettings.merged.mcpServers };
 
     for (const server of mcpServers) {
-      if (
-        'type' in server &&
-        (server.type === 'sse' || server.type === 'http')
-      ) {
+      if ('type' in server && (server.type === 'sse' || server.type === 'http')) {
         // HTTP or SSE MCP server
         const headers = Object.fromEntries(
           server.headers.map(({ name, value }) => [name, value]),
@@ -340,11 +329,7 @@ export class AcpSessionManager {
 
     const config = await loadCliConfig(settings, sessionId, this.argv, { cwd });
 
-    createPolicyUpdater(
-      config.getPolicyEngine(),
-      config.messageBus,
-      config.storage,
-    );
+    createPolicyUpdater(config.getPolicyEngine(), config.messageBus, config.storage);
 
     return config;
   }

@@ -94,10 +94,7 @@ export class GeminiCliAgent {
     const filesToCheck = candidates.length > 0 ? candidates : sessions;
 
     for (const sessionFile of filesToCheck) {
-      const absolutePath = path.join(
-        storage.getProjectDataDir(),
-        sessionFile.filePath,
-      );
+      const absolutePath = path.join(storage.getProjectDataDir(), sessionFile.filePath);
       const loaded = await loadConversationRecord(absolutePath);
       if (loaded && loaded.sessionId === sessionId) {
         conversation = loaded;

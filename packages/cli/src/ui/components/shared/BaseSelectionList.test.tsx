@@ -79,9 +79,7 @@ describe('BaseSelectionList', () => {
       ...props,
     };
 
-    const result = await renderWithProviders(
-      <BaseSelectionList {...defaultProps} />,
-    );
+    const result = await renderWithProviders(<BaseSelectionList {...defaultProps} />);
     return result;
   };
 
@@ -342,8 +340,7 @@ describe('BaseSelectionList', () => {
     });
 
     it('should scroll down when activeIndex moves beyond the visible window', async () => {
-      const { updateActiveIndex, lastFrame, unmount } =
-        await renderScrollableList(0);
+      const { updateActiveIndex, lastFrame, unmount } = await renderScrollableList(0);
 
       // Move to index 3 (Item 4). Should trigger scroll.
       // New visible window should be Items 2, 3, 4 (scroll offset 1).
@@ -358,8 +355,7 @@ describe('BaseSelectionList', () => {
     });
 
     it('should scroll up when activeIndex moves before the visible window', async () => {
-      const { updateActiveIndex, lastFrame, unmount } =
-        await renderScrollableList(0);
+      const { updateActiveIndex, lastFrame, unmount } = await renderScrollableList(0);
 
       await updateActiveIndex(4);
 
@@ -393,8 +389,7 @@ describe('BaseSelectionList', () => {
     });
 
     it('should handle dynamic scrolling through multiple activeIndex changes', async () => {
-      const { updateActiveIndex, lastFrame, unmount } =
-        await renderScrollableList(0);
+      const { updateActiveIndex, lastFrame, unmount } = await renderScrollableList(0);
 
       expect(lastFrame()).toContain('Item 1');
       expect(lastFrame()).toContain('Item 3');
@@ -457,9 +452,7 @@ describe('BaseSelectionList', () => {
       // List length 10, max items 3, activeIndex 9 (last item).
       const { unmount } = await renderScrollableList(9);
 
-      const renderedItemValues = mockRenderItem.mock.calls.map(
-        (call) => call[0].value,
-      );
+      const renderedItemValues = mockRenderItem.mock.calls.map((call) => call[0].value);
 
       // Item 1 (index 0) should not be rendered if the scroll offset is correctly
       // synchronized with the activeIndex from the start.

@@ -36,9 +36,7 @@ export class ContextWorkingBufferImpl implements ContextWorkingBuffer {
    * Initializes a brand new ContextWorkingBuffer from a pristine graph.
    * Every node's provenance points to itself.
    */
-  static initialize(
-    pristineNodes: readonly ConcreteNode[],
-  ): ContextWorkingBufferImpl {
+  static initialize(pristineNodes: readonly ConcreteNode[]): ContextWorkingBufferImpl {
     const pristineMap = new Map<string, ConcreteNode>();
     const initialProvenance = new Map<string, ReadonlySet<string>>();
 
@@ -169,12 +167,10 @@ export class ContextWorkingBufferImpl implements ContextWorkingBuffer {
     }
     finalPristineMap = prunedPristineMap;
 
-    return new ContextWorkingBufferImpl(
-      newGraph,
-      finalPristineMap,
-      newProvenanceMap,
-      [...this.history, mutation],
-    );
+    return new ContextWorkingBufferImpl(newGraph, finalPristineMap, newProvenanceMap, [
+      ...this.history,
+      mutation,
+    ]);
   }
 
   /**
@@ -187,9 +183,7 @@ export class ContextWorkingBufferImpl implements ContextWorkingBuffer {
     const newPristineMap = new Map<string, ConcreteNode>(this.pristineNodesMap);
     const newProvenanceMap = new Map(this.provenanceMap);
 
-    const authoritativeIds = new Set(
-      authoritativePristineNodes.map((n) => n.id),
-    );
+    const authoritativeIds = new Set(authoritativePristineNodes.map((n) => n.id));
 
     // 1. Register any newly discovered pristine nodes
     for (const node of authoritativePristineNodes) {
@@ -327,20 +321,15 @@ export class ContextWorkingBufferImpl implements ContextWorkingBuffer {
       if (node) prunedPristineMap.set(id, node);
     }
 
-    return new ContextWorkingBufferImpl(
-      newGraph,
-      prunedPristineMap,
-      newProvenanceMap,
-      [...this.history],
-    );
+    return new ContextWorkingBufferImpl(newGraph, prunedPristineMap, newProvenanceMap, [
+      ...this.history,
+    ]);
   }
 
   getPristineNodes(id: string): readonly ConcreteNode[] {
     const pristineIds = this.provenanceMap.get(id);
     if (!pristineIds) return [];
-    return Array.from(pristineIds).map(
-      (pid) => this.pristineNodesMap.get(pid)!,
-    );
+    return Array.from(pristineIds).map((pid) => this.pristineNodesMap.get(pid)!);
   }
 
   getAuditLog(): readonly GraphMutation[] {

@@ -256,10 +256,7 @@ class RecursiveFileSearch implements FileSearch {
     }
   }
 
-  async search(
-    pattern: string,
-    options: SearchOptions = {},
-  ): Promise<string[]> {
+  async search(pattern: string, options: SearchOptions = {}): Promise<string[]> {
     if (
       !this.resultCache ||
       (!this.fzf && this.options.enableFuzzySearch) ||
@@ -271,8 +268,7 @@ class RecursiveFileSearch implements FileSearch {
     pattern = unescapePath(pattern) || '*';
 
     let filteredCandidates: string[];
-    const { files: candidates, isExactMatch } =
-      await this.resultCache.get(pattern);
+    const { files: candidates, isExactMatch } = await this.resultCache.get(pattern);
 
     if (isExactMatch) {
       // Use the cached result.
@@ -286,11 +282,7 @@ class RecursiveFileSearch implements FileSearch {
           const fzfResult: unknown = await this.fzf.find(pattern);
           if (Array.isArray(fzfResult)) {
             filteredCandidates = fzfResult.map((entry: unknown) => {
-              if (
-                typeof entry === 'object' &&
-                entry !== null &&
-                'item' in entry
-              ) {
+              if (typeof entry === 'object' && entry !== null && 'item' in entry) {
                 return String((entry as { item: unknown }).item);
               }
               return String(entry);
@@ -370,10 +362,7 @@ class DirectoryFileSearch implements FileSearch {
     );
   }
 
-  async search(
-    pattern: string,
-    options: SearchOptions = {},
-  ): Promise<string[]> {
+  async search(pattern: string, options: SearchOptions = {}): Promise<string[]> {
     if (!this.ignore) {
       throw new Error('Engine not initialized. Call initialize() first.');
     }

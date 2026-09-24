@@ -41,9 +41,7 @@ const TestComponent = ({
     customPhrases,
   );
   // For tests, we'll combine them to verify existence
-  return (
-    <Text>{[currentTip, currentWittyPhrase].filter(Boolean).join(' | ')}</Text>
-  );
+  return <Text>{[currentTip, currentWittyPhrase].filter(Boolean).join(' | ')}</Text>;
 };
 
 describe('usePhraseCycler', () => {
@@ -89,11 +87,7 @@ describe('usePhraseCycler', () => {
 
     await act(async () => {
       rerender(
-        <TestComponent
-          isActive={true}
-          isWaiting={false}
-          shouldShowFocusHint={true}
-        />,
+        <TestComponent isActive={true} isWaiting={false} shouldShowFocusHint={true} />,
       );
     });
     await waitUntilReady();
@@ -111,11 +105,7 @@ describe('usePhraseCycler', () => {
 
     await act(async () => {
       rerender(
-        <TestComponent
-          isActive={true}
-          isWaiting={true}
-          shouldShowFocusHint={true}
-        />,
+        <TestComponent isActive={true} isWaiting={true} shouldShowFocusHint={true} />,
       );
     });
     await waitUntilReady();
@@ -288,9 +278,7 @@ describe('usePhraseCycler', () => {
       );
     };
 
-    const { lastFrame, unmount, waitUntilReady } = await render(
-      <StatefulWrapper />,
-    );
+    const { lastFrame, unmount, waitUntilReady } = await render(<StatefulWrapper />);
     await waitUntilReady();
 
     // After first interval, it should use custom phrases

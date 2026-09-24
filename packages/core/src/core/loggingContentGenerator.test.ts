@@ -134,10 +134,7 @@ describe('LoggingContentGenerator', () => {
         userPromptId,
         LlmRole.MAIN,
       );
-      expect(logApiRequest).toHaveBeenCalledWith(
-        config,
-        expect.any(ApiRequestEvent),
-      );
+      expect(logApiRequest).toHaveBeenCalledWith(config, expect.any(ApiRequestEvent));
       const responseEvent = vi.mocked(logApiResponse).mock.calls[0][1];
       expect(responseEvent.duration_ms).toBe(1000);
       // Non-streaming responses have no distinct first-token measurement.
@@ -149,9 +146,7 @@ describe('LoggingContentGenerator', () => {
           attributes: expect.objectContaining({
             [GEN_AI_REQUEST_MODEL]: 'gemini-pro',
             [GEN_AI_PROMPT_NAME]: userPromptId,
-            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(
-              req.config.systemInstruction,
-            ),
+            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(req.config.systemInstruction),
             [GEN_AI_TOOL_DEFINITIONS]: JSON.stringify(req.config.tools),
           }),
         }),
@@ -200,10 +195,7 @@ describe('LoggingContentGenerator', () => {
 
       await expect(promise).rejects.toThrow(error);
 
-      expect(logApiRequest).toHaveBeenCalledWith(
-        config,
-        expect.any(ApiRequestEvent),
-      );
+      expect(logApiRequest).toHaveBeenCalledWith(config, expect.any(ApiRequestEvent));
       const errorEvent = vi.mocked(logApiError).mock.calls[0][1];
       expect(errorEvent.duration_ms).toBe(1000);
 
@@ -213,9 +205,7 @@ describe('LoggingContentGenerator', () => {
           attributes: expect.objectContaining({
             [GEN_AI_REQUEST_MODEL]: 'gemini-pro',
             [GEN_AI_PROMPT_NAME]: userPromptId,
-            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(
-              req.config.systemInstruction,
-            ),
+            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(req.config.systemInstruction),
             [GEN_AI_TOOL_DEFINITIONS]: JSON.stringify(req.config.tools),
           }),
         }),
@@ -260,11 +250,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe('Hello');
@@ -283,11 +269,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe(normalData);
@@ -306,11 +288,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe(invalidAscii);
@@ -328,11 +306,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe('Hello');
@@ -352,11 +326,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe('Héllo');
@@ -368,8 +338,7 @@ describe('LoggingContentGenerator', () => {
         const req = { contents: [], model: 'gemini-pro' };
 
         // "こんにちは" in UTF-8 bytes (3 bytes per character)
-        const utf8Data =
-          '227,129,147,227,130,147,227,129,171,227,129,161,227,129,175';
+        const utf8Data = '227,129,147,227,130,147,227,129,171,227,129,161,227,129,175';
         const gaxiosError = Object.assign(new Error('Gaxios Error'), {
           response: { data: utf8Data },
         });
@@ -377,11 +346,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe('こんにちは');
@@ -400,11 +365,7 @@ describe('LoggingContentGenerator', () => {
         vi.mocked(wrapped.generateContent).mockRejectedValue(gaxiosError);
 
         await expect(
-          loggingContentGenerator.generateContent(
-            req,
-            'prompt-123',
-            LlmRole.MAIN,
-          ),
+          loggingContentGenerator.generateContent(req, 'prompt-123', LlmRole.MAIN),
         ).rejects.toSatisfy((error: unknown) => {
           const gError = error as { response: { data: unknown } };
           expect(gError.response.data).toBe(outOfRange);
@@ -424,11 +385,7 @@ describe('LoggingContentGenerator', () => {
       vi.mocked(wrapped.generateContent).mockRejectedValue(abortError);
 
       await expect(
-        loggingContentGenerator.generateContent(
-          req,
-          userPromptId,
-          LlmRole.MAIN,
-        ),
+        loggingContentGenerator.generateContent(req, userPromptId, LlmRole.MAIN),
       ).rejects.toThrow(abortError);
 
       expect(logApiError).not.toHaveBeenCalled();
@@ -494,10 +451,7 @@ describe('LoggingContentGenerator', () => {
         userPromptId,
         LlmRole.MAIN,
       );
-      expect(logApiRequest).toHaveBeenCalledWith(
-        config,
-        expect.any(ApiRequestEvent),
-      );
+      expect(logApiRequest).toHaveBeenCalledWith(config, expect.any(ApiRequestEvent));
       const responseEvent = vi.mocked(logApiResponse).mock.calls[0][1];
       expect(responseEvent.duration_ms).toBe(1000);
       expect(responseEvent.time_to_first_token_ms).toBe(1000);
@@ -509,9 +463,7 @@ describe('LoggingContentGenerator', () => {
           attributes: expect.objectContaining({
             [GEN_AI_REQUEST_MODEL]: 'gemini-pro',
             [GEN_AI_PROMPT_NAME]: userPromptId,
-            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(
-              req.config.systemInstruction,
-            ),
+            [GEN_AI_SYSTEM_INSTRUCTIONS]: JSON.stringify(req.config.systemInstruction),
             [GEN_AI_TOOL_DEFINITIONS]: JSON.stringify(req.config.tools),
           }),
         }),
@@ -573,10 +525,7 @@ describe('LoggingContentGenerator', () => {
         }
       }).rejects.toThrow(error);
 
-      expect(logApiRequest).toHaveBeenCalledWith(
-        config,
-        expect.any(ApiRequestEvent),
-      );
+      expect(logApiRequest).toHaveBeenCalledWith(config, expect.any(ApiRequestEvent));
       const errorEvent = vi.mocked(logApiError).mock.calls[0][1];
       expect(errorEvent.duration_ms).toBe(1000);
     });
@@ -592,11 +541,7 @@ describe('LoggingContentGenerator', () => {
       vi.mocked(wrapped.generateContentStream).mockRejectedValue(abortError);
 
       await expect(
-        loggingContentGenerator.generateContentStream(
-          req,
-          userPromptId,
-          LlmRole.MAIN,
-        ),
+        loggingContentGenerator.generateContentStream(req, userPromptId, LlmRole.MAIN),
       ).rejects.toThrow(abortError);
 
       expect(logApiError).not.toHaveBeenCalled();

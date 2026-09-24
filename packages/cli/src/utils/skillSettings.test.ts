@@ -88,9 +88,7 @@ describe('skillSettings', () => {
         expect(result.modifiedScopes).toHaveLength(1);
         expect(result.modifiedScopes[0].scope).toBe(SettingScope.User);
         expect(result.alreadyInStateScopes).toHaveLength(1);
-        expect(result.alreadyInStateScopes[0].scope).toBe(
-          SettingScope.Workspace,
-        );
+        expect(result.alreadyInStateScopes[0].scope).toBe(SettingScope.Workspace);
         expect(settings.setValue).toHaveBeenCalledTimes(1);
       });
 
@@ -179,11 +177,7 @@ describe('skillSettings', () => {
           workspaceSettings: { skills: { disabled: [] } },
         });
 
-        const result = disableSkill(
-          settings,
-          'my-skill',
-          SettingScope.Workspace,
-        );
+        const result = disableSkill(settings, 'my-skill', SettingScope.Workspace);
 
         expect(result.status).toBe('success');
         expect(result.modifiedScopes).toHaveLength(1);

@@ -22,9 +22,7 @@ export function captureHeapSnapshot(): string | null {
     const filename = `sparkle-heap-${timestamp}.heapsnapshot`;
 
     // Use mkdtempSync for a secure, uniquely named directory (mitigates symlink attacks)
-    const snapshotsDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-heap-'),
-    );
+    const snapshotsDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-heap-'));
     const filePath = path.join(snapshotsDir, filename);
 
     // Note: v8.writeHeapSnapshot is a synchronous, blocking operation.

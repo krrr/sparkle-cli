@@ -276,10 +276,7 @@ function createWorkflowComparisonSessions(withScratchpad: boolean): {
 
   return {
     sessions,
-    relevantSessionIds: [
-      'hidden-settings-workflow-a',
-      'hidden-settings-workflow-b',
-    ],
+    relevantSessionIds: ['hidden-settings-workflow-a', 'hidden-settings-workflow-b'],
     distractorSessionIds: [
       'distractor-release-notes',
       'distractor-ci-snapshots',
@@ -289,10 +286,7 @@ function createWorkflowComparisonSessions(withScratchpad: boolean): {
   };
 }
 
-async function seedSessions(
-  config: Config,
-  sessions: SeedSession[],
-): Promise<void> {
+async function seedSessions(config: Config, sessions: SeedSession[]): Promise<void> {
   const chatsDir = path.join(config.storage.getProjectTempDir(), 'chats');
   await fsp.mkdir(chatsDir, { recursive: true });
 
@@ -302,10 +296,7 @@ async function seedSessions(
     const sessionTimestamp = new Date(
       Date.now() - session.timestampOffsetMinutes * 60 * 1000,
     );
-    const timestamp = sessionTimestamp
-      .toISOString()
-      .slice(0, 16)
-      .replace(/:/g, '-');
+    const timestamp = sessionTimestamp.toISOString().slice(0, 16).replace(/:/g, '-');
     const filename = `${SESSION_FILE_PREFIX}${timestamp}-${session.sessionId.slice(0, 8)}.jsonl`;
     const conversation = {
       sessionId: session.sessionId,
@@ -328,9 +319,7 @@ async function seedSessions(
   }
 }
 
-async function runExtractionAndReadState(
-  config: Config,
-): Promise<ExtractionOutcome> {
+async function runExtractionAndReadState(config: Config): Promise<ExtractionOutcome> {
   await startMemoryService(config);
 
   const memoryDir = config.storage.getProjectMemoryDir();
@@ -357,23 +346,17 @@ async function runExtractionAndReadState(
     state: {
       runs: state.runs.map((run) => ({
         sessionIds: Array.isArray(run.sessionIds) ? run.sessionIds : [],
-        skillsCreated: Array.isArray(run.skillsCreated)
-          ? run.skillsCreated
-          : [],
+        skillsCreated: Array.isArray(run.skillsCreated) ? run.skillsCreated : [],
         candidateSessions: Array.isArray(run.candidateSessions)
           ? run.candidateSessions
           : [],
         processedSessions: Array.isArray(run.processedSessions)
           ? run.processedSessions
           : [],
-        turnCount:
-          typeof run.turnCount === 'number' ? run.turnCount : undefined,
-        durationMs:
-          typeof run.durationMs === 'number' ? run.durationMs : undefined,
+        turnCount: typeof run.turnCount === 'number' ? run.turnCount : undefined,
+        durationMs: typeof run.durationMs === 'number' ? run.durationMs : undefined,
         terminateReason:
-          typeof run.terminateReason === 'string'
-            ? run.terminateReason
-            : undefined,
+          typeof run.terminateReason === 'string' ? run.terminateReason : undefined,
       })),
     },
     skillsDir,
@@ -415,29 +398,21 @@ async function summarizeScratchpadRun(
     signalScore: relevantReads - distractorReads,
     skillQualityScore: quality.score,
     skillQualityMax: quality.maxScore,
-    skillQualityRatio:
-      quality.maxScore === 0 ? 0 : quality.score / quality.maxScore,
+    skillQualityRatio: quality.maxScore === 0 ? 0 : quality.score / quality.maxScore,
     missingQualitySignals: quality.missing,
   };
 }
 
-function averageScratchpadRuns(
-  runs: ScratchpadRunMetrics[],
-): ScratchpadStatsAggregate {
+function averageScratchpadRuns(runs: ScratchpadRunMetrics[]): ScratchpadStatsAggregate {
   return {
     turnCountAvg: roundStat(averageNullable(runs.map((run) => run.turnCount))),
-    durationMsAvg: roundStat(
-      averageNullable(runs.map((run) => run.durationMs)),
-    ),
+    durationMsAvg: roundStat(averageNullable(runs.map((run) => run.durationMs))),
     recallAvg: roundStat(average(runs.map((run) => run.recall))) ?? 0,
     precisionAvg: roundStat(average(runs.map((run) => run.precision))) ?? 0,
     signalScoreAvg: roundStat(average(runs.map((run) => run.signalScore))) ?? 0,
-    relevantReadsAvg:
-      roundStat(average(runs.map((run) => run.relevantReads))) ?? 0,
-    distractorReadsAvg:
-      roundStat(average(runs.map((run) => run.distractorReads))) ?? 0,
-    skillsCreatedAvg:
-      roundStat(average(runs.map((run) => run.skillsCreated))) ?? 0,
+    relevantReadsAvg: roundStat(average(runs.map((run) => run.relevantReads))) ?? 0,
+    distractorReadsAvg: roundStat(average(runs.map((run) => run.distractorReads))) ?? 0,
+    skillsCreatedAvg: roundStat(average(runs.map((run) => run.skillsCreated))) ?? 0,
     skillQualityScoreAvg:
       roundStat(average(runs.map((run) => run.skillQualityScore))) ?? 0,
     skillQualityRatioAvg:
@@ -460,8 +435,7 @@ function diffScratchpadAggregates(
         : roundStat(enhanced.durationMsAvg - baseline.durationMsAvg),
     recallAvg: roundStat(enhanced.recallAvg - baseline.recallAvg) ?? 0,
     precisionAvg: roundStat(enhanced.precisionAvg - baseline.precisionAvg) ?? 0,
-    signalScoreAvg:
-      roundStat(enhanced.signalScoreAvg - baseline.signalScoreAvg) ?? 0,
+    signalScoreAvg: roundStat(enhanced.signalScoreAvg - baseline.signalScoreAvg) ?? 0,
     relevantReadsAvg:
       roundStat(enhanced.relevantReadsAvg - baseline.relevantReadsAvg) ?? 0,
     distractorReadsAvg:
@@ -469,13 +443,9 @@ function diffScratchpadAggregates(
     skillsCreatedAvg:
       roundStat(enhanced.skillsCreatedAvg - baseline.skillsCreatedAvg) ?? 0,
     skillQualityScoreAvg:
-      roundStat(
-        enhanced.skillQualityScoreAvg - baseline.skillQualityScoreAvg,
-      ) ?? 0,
+      roundStat(enhanced.skillQualityScoreAvg - baseline.skillQualityScoreAvg) ?? 0,
     skillQualityRatioAvg:
-      roundStat(
-        enhanced.skillQualityRatioAvg - baseline.skillQualityRatioAvg,
-      ) ?? 0,
+      roundStat(enhanced.skillQualityRatioAvg - baseline.skillQualityRatioAvg) ?? 0,
   };
 }
 
@@ -495,18 +465,12 @@ async function runScenarioWithFreshRig(
   }
 }
 
-async function runScratchpadStatsTrial(
-  trial: number,
-): Promise<ScratchpadStatsTrial> {
+async function runScratchpadStatsTrial(trial: number): Promise<ScratchpadStatsTrial> {
   const baselineScenario = createWorkflowComparisonSessions(false);
   const enhancedScenario = createWorkflowComparisonSessions(true);
 
-  const baselineOutcome = await runScenarioWithFreshRig(
-    baselineScenario.sessions,
-  );
-  const enhancedOutcome = await runScenarioWithFreshRig(
-    enhancedScenario.sessions,
-  );
+  const baselineOutcome = await runScenarioWithFreshRig(baselineScenario.sessions);
+  const enhancedOutcome = await runScenarioWithFreshRig(enhancedScenario.sessions);
 
   const baselineRun = baselineOutcome.state.runs.at(-1);
   const enhancedRun = enhancedOutcome.state.runs.at(-1);
@@ -541,12 +505,8 @@ async function runScratchpadStatsReport(
     results.push(await runScratchpadStatsTrial(trial));
   }
 
-  const baseline = averageScratchpadRuns(
-    results.map((result) => result.baseline),
-  );
-  const enhanced = averageScratchpadRuns(
-    results.map((result) => result.enhanced),
-  );
+  const baseline = averageScratchpadRuns(results.map((result) => result.baseline));
+  const enhanced = averageScratchpadRuns(results.map((result) => result.enhanced));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -584,10 +544,7 @@ async function readSkillBodies(skillsDir: string): Promise<string[]> {
 
       try {
         bodies.push(
-          await fsp.readFile(
-            path.join(skillsDir, entry.name, 'SKILL.md'),
-            'utf-8',
-          ),
+          await fsp.readFile(path.join(skillsDir, entry.name, 'SKILL.md'), 'utf-8'),
         );
       } catch {
         // Ignore incomplete skill directories so one bad artifact does not hide
@@ -630,8 +587,7 @@ const SETTINGS_SKILL_QUALITY_SIGNALS: SkillQualitySignal[] = [
   { label: 'verification guidance', pattern: /verif(?:y|ication)/i },
   {
     label: 'generated docs warning or ordering constraint',
-    pattern:
-      /do not hand-edit|manual edits|exact command order|preserve.*order/i,
+    pattern: /do not hand-edit|manual edits|exact command order|preserve.*order/i,
   },
 ];
 
@@ -658,10 +614,7 @@ const EXTRACTION_CONFIG_OVERRIDES = {
 };
 
 function parseScratchpadStatsTrials(): number {
-  const configured = Number.parseInt(
-    process.env['SCRATCHPAD_STATS_TRIALS'] ?? '8',
-    10,
-  );
+  const configured = Number.parseInt(process.env['SCRATCHPAD_STATS_TRIALS'] ?? '8', 10);
   return Number.isFinite(configured) && configured > 0 ? configured : 8;
 }
 
@@ -773,10 +726,7 @@ describe('Skill Extraction', () => {
       const { state, skillsDir } = await runExtractionAndReadState(config);
       const skillBodies = await readSkillBodies(skillsDir);
       const combinedSkills = skillBodies.join('\n\n');
-      const quality = scoreSkillQuality(
-        skillBodies,
-        SETTINGS_SKILL_QUALITY_SIGNALS,
-      );
+      const quality = scoreSkillQuality(skillBodies, SETTINGS_SKILL_QUALITY_SIGNALS);
 
       expect(state.runs).toHaveLength(1);
       expect(state.runs[0].sessionIds).toHaveLength(2);
@@ -793,9 +743,7 @@ describe('Skill Extraction', () => {
       ).toBeGreaterThanOrEqual(4);
 
       // Verify the extraction agent activated skill-creator for design guidance.
-      expect(config.getSkillManager().isSkillActive('skill-creator')).toBe(
-        true,
-      );
+      expect(config.getSkillManager().isSkillActive('skill-creator')).toBe(true);
     },
   });
 
@@ -810,12 +758,8 @@ describe('Skill Extraction', () => {
       const baselineScenario = createWorkflowComparisonSessions(false);
       const enhancedScenario = createWorkflowComparisonSessions(true);
 
-      const baselineOutcome = await runScenarioWithFreshRig(
-        baselineScenario.sessions,
-      );
-      const enhancedOutcome = await runScenarioWithFreshRig(
-        enhancedScenario.sessions,
-      );
+      const baselineOutcome = await runScenarioWithFreshRig(baselineScenario.sessions);
+      const enhancedOutcome = await runScenarioWithFreshRig(enhancedScenario.sessions);
 
       const baselineRun = baselineOutcome.state.runs.at(-1);
       const enhancedRun = enhancedOutcome.state.runs.at(-1);
@@ -842,21 +786,15 @@ describe('Skill Extraction', () => {
         enhancedRun.processedSessions,
         enhancedScenario.distractorSessionIds,
       );
-      const baselineSignalScore =
-        baselineRelevantReads - baselineDistractorReads;
-      const enhancedSignalScore =
-        enhancedRelevantReads - enhancedDistractorReads;
+      const baselineSignalScore = baselineRelevantReads - baselineDistractorReads;
+      const enhancedSignalScore = enhancedRelevantReads - enhancedDistractorReads;
 
       expect(enhancedRun.candidateSessions).toHaveLength(
         enhancedScenario.sessions.length,
       );
       expect(enhancedRelevantReads).toBeGreaterThanOrEqual(2);
-      expect(enhancedRelevantReads).toBeGreaterThanOrEqual(
-        baselineRelevantReads,
-      );
-      expect(enhancedDistractorReads).toBeLessThanOrEqual(
-        baselineDistractorReads,
-      );
+      expect(enhancedRelevantReads).toBeGreaterThanOrEqual(baselineRelevantReads);
+      expect(enhancedDistractorReads).toBeLessThanOrEqual(baselineDistractorReads);
       expect(enhancedSignalScore).toBeGreaterThan(baselineSignalScore);
     },
   });
@@ -958,9 +896,7 @@ describe('Skill Extraction', () => {
       ).toBeGreaterThanOrEqual(4);
 
       // Verify the extraction agent activated skill-creator for design guidance.
-      expect(config.getSkillManager().isSkillActive('skill-creator')).toBe(
-        true,
-      );
+      expect(config.getSkillManager().isSkillActive('skill-creator')).toBe(true);
     },
   });
 });

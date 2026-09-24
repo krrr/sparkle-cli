@@ -10,16 +10,12 @@ import type { Transformation } from '../components/shared/text-buffer.js';
 
 describe('parseInputForHighlighting', () => {
   it('should handle an empty string', () => {
-    expect(parseInputForHighlighting('', 0)).toEqual([
-      { text: '', type: 'default' },
-    ]);
+    expect(parseInputForHighlighting('', 0)).toEqual([{ text: '', type: 'default' }]);
   });
 
   it('should handle text with no commands or files', () => {
     const text = 'this is a normal sentence';
-    expect(parseInputForHighlighting(text, 0)).toEqual([
-      { text, type: 'default' },
-    ]);
+    expect(parseInputForHighlighting(text, 0)).toEqual([{ text, type: 'default' }]);
   });
 
   it('should highlight a single command at the beginning when index is 0', () => {

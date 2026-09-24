@@ -74,14 +74,12 @@ describe('Configuration Integration Tests', () => {
         expected: DEFAULT_FILE_FILTERING_OPTIONS.respectGitIgnore,
       },
       {
-        description:
-          'should load custom file filtering settings from configuration',
+        description: 'should load custom file filtering settings from configuration',
         fileFiltering: { respectGitIgnore: false },
         expected: false,
       },
       {
-        description:
-          'should respect file filtering settings from configuration',
+        description: 'should respect file filtering settings from configuration',
         fileFiltering: { respectGitIgnore: true },
         expected: true,
       },
@@ -170,14 +168,7 @@ describe('Configuration Integration Tests', () => {
     it.each([
       {
         description: 'should parse --approval-mode=auto_edit correctly',
-        argv: [
-          'node',
-          'script.js',
-          '--approval-mode',
-          'auto_edit',
-          '-p',
-          'test',
-        ],
+        argv: ['node', 'script.js', '--approval-mode', 'auto_edit', '-p', 'test'],
         expected: { approvalMode: 'auto_edit', prompt: 'test', yolo: false },
       },
       {
@@ -219,17 +210,14 @@ describe('Configuration Integration Tests', () => {
         argv: ['node', 'script.js', '--approval-mode', 'invalid_mode'],
       },
       {
-        description:
-          'should reject conflicting --yolo and --approval-mode flags',
+        description: 'should reject conflicting --yolo and --approval-mode flags',
         argv: ['node', 'script.js', '--yolo', '--approval-mode', 'default'],
       },
     ])('$description', async ({ argv }) => {
       const originalArgv = process.argv;
       try {
         process.argv = argv;
-        await expect(
-          parseArguments(createTestMergedSettings()),
-        ).rejects.toThrow();
+        await expect(parseArguments(createTestMergedSettings())).rejects.toThrow();
       } finally {
         process.argv = originalArgv;
       }

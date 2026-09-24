@@ -175,8 +175,7 @@ export const READ_FILE_DECLARATION: FunctionDeclaration = {
         minimum: 1,
       },
       [READ_FILE_PARAM_END_LINE]: {
-        description:
-          'Optional: The 1-based line number to end reading at (inclusive).',
+        description: 'Optional: The 1-based line number to end reading at (inclusive).',
         type: 'integer',
         minimum: 1,
       },
@@ -628,13 +627,7 @@ The agent did not use the todo list because this task could be completed by a ti
             [TODOS_ITEM_PARAM_STATUS]: {
               type: 'string',
               description: 'The current status of the task.',
-              enum: [
-                'pending',
-                'in_progress',
-                'completed',
-                'cancelled',
-                'blocked',
-              ],
+              enum: ['pending', 'in_progress', 'completed', 'cancelled', 'blocked'],
             },
           },
           required: [TODOS_ITEM_PARAM_DESCRIPTION, TODOS_ITEM_PARAM_STATUS],
@@ -774,14 +767,12 @@ export const READ_MCP_RESOURCE_DECLARATION: FunctionDeclaration = {
 
 export const LIST_MCP_RESOURCES_DECLARATION: FunctionDeclaration = {
   name: LIST_MCP_RESOURCES_TOOL_NAME,
-  description:
-    'Lists all available resources exposed by connected MCP servers.',
+  description: 'Lists all available resources exposed by connected MCP servers.',
   parametersJsonSchema: {
     type: 'object',
     properties: {
       serverName: {
-        description:
-          'Optional filter to list resources from a specific server.',
+        description: 'Optional filter to list resources from a specific server.',
         type: 'string',
       },
     },

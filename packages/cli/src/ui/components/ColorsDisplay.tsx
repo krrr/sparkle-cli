@@ -37,8 +37,7 @@ const COLOR_DESCRIPTIONS: Record<string, string> = {
   'text.secondary': 'Secondary/dimmed text color',
   'text.link': 'Hyperlink and highlighting color',
   'text.accent': 'Accent color for emphasis',
-  'text.response':
-    'Color for model response text (uses terminal default if blank)',
+  'text.response': 'Color for model response text (uses terminal default if blank)',
   'background.primary': 'Main terminal background color',
   'background.message': 'Subtle background for message blocks',
   'background.input': 'Background for the input prompt',
@@ -50,8 +49,7 @@ const COLOR_DESCRIPTIONS: Record<string, string> = {
   'ui.symbol': 'Color for technical symbols and UI icons',
   'ui.active': 'Border color for active or running elements',
   'ui.dark': 'Deeply dimmed color for subtle UI elements',
-  'ui.focus':
-    'Color for focused elements (e.g. selected menu items, focused borders)',
+  'ui.focus': 'Color for focused elements (e.g. selected menu items, focused borders)',
   'status.error': 'Color for error messages and critical status',
   'status.success': 'Color for success messages and positive status',
   'status.warning': 'Color for warnings and cautionary status',
@@ -77,9 +75,7 @@ function getContrastingTextColor(hex: string): string {
   return yiq >= 128 ? '#000000' : '#FFFFFF';
 }
 
-export const ColorsDisplay: React.FC<ColorsDisplayProps> = ({
-  activeTheme,
-}) => {
+export const ColorsDisplay: React.FC<ColorsDisplayProps> = ({ activeTheme }) => {
   const semanticColors = activeTheme.semanticColors;
 
   const backgroundRows: BackgroundColorRow[] = [];
@@ -162,13 +158,12 @@ export const ColorsDisplay: React.FC<ColorsDisplayProps> = ({
               foreground/background.
             </Text>
             <Text color={theme.text.primary}>
-              • <Text bold>Compatibility:</Text> On older terminals, hex is
-              approximated to the nearest ANSI color.
+              • <Text bold>Compatibility:</Text> On older terminals, hex is approximated
+              to the nearest ANSI color.
             </Text>
             <Text color={theme.text.primary}>
-              • <Text bold>ANSI Names:</Text> &apos;red&apos;,
-              &apos;green&apos;, etc. are mapped to your terminal app&apos;s
-              palette.
+              • <Text bold>ANSI Names:</Text> &apos;red&apos;, &apos;green&apos;, etc.
+              are mapped to your terminal app&apos;s palette.
             </Text>
           </Box>
         </Box>

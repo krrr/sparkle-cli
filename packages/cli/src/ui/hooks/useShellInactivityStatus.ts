@@ -61,9 +61,7 @@ export const useShellInactivityStatus = ({
   const shouldShowFocusHint = useInactivityTimer(
     isAwaitingFocus && !isRedirectionActive,
     lastOutputTime,
-    hasProducedOutput
-      ? SHELL_FOCUS_HINT_DELAY_MS
-      : SHELL_FOCUS_HINT_DELAY_MS * 4,
+    hasProducedOutput ? SHELL_FOCUS_HINT_DELAY_MS : SHELL_FOCUS_HINT_DELAY_MS * 4,
   );
 
   // 2. Action Required Status (The ✋ icon in the terminal window title)

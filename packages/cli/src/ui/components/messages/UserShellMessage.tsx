@@ -15,14 +15,10 @@ interface UserShellMessageProps {
   width: number;
 }
 
-export const UserShellMessage: React.FC<UserShellMessageProps> = ({
-  text,
-  width,
-}) => {
+export const UserShellMessage: React.FC<UserShellMessageProps> = ({ text, width }) => {
   const config = useConfig();
   const useBackgroundColorSetting = config.getUseBackgroundColor();
-  const useBackgroundColor =
-    useBackgroundColorSetting && !!theme.background.message;
+  const useBackgroundColor = useBackgroundColorSetting && !!theme.background.message;
 
   // Remove leading '!' if present, as App.tsx adds it for the processor.
   const commandToDisplay = text.startsWith('!') ? text.substring(1) : text;

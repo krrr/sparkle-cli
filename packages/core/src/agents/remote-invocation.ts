@@ -22,10 +22,7 @@ import {
 } from './types.js';
 import { type AgentLoopContext } from '../config/agent-loop-context.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
-import type {
-  A2AClientManager,
-  SendMessageResult,
-} from './a2a-client-manager.js';
+import type { A2AClientManager, SendMessageResult } from './a2a-client-manager.js';
 import { extractIdsFromResponse, A2AResultReassembler } from './a2aUtils.js';
 import type { AuthenticationHandler } from '@a2a-js/sdk/client';
 import { debugLogger } from '../utils/debugLogger.js';
@@ -148,9 +145,7 @@ export class RemoteAgentInvocation extends BaseToolInvocation<
         });
       }
 
-      const priorState = RemoteAgentInvocation.sessionState.get(
-        this.definition.name,
-      );
+      const priorState = RemoteAgentInvocation.sessionState.get(this.definition.name);
       if (priorState) {
         this.contextId = priorState.contextId;
         this.taskId = priorState.taskId;

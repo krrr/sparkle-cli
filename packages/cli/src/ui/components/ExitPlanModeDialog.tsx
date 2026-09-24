@@ -25,11 +25,7 @@ import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { formatCommand } from '../key/keybindingUtils.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
-import {
-  appEvents,
-  AppEvent,
-  TransientMessageType,
-} from '../../utils/events.js';
+import { appEvents, AppEvent, TransientMessageType } from '../../utils/events.js';
 
 export interface ExitPlanModeDialogProps {
   planPath: string;
@@ -222,9 +218,7 @@ export const ExitPlanModeDialog: React.FC<ExitPlanModeDialogProps> = ({
   if (planState.status === PlanStatus.Error) {
     return (
       <StatusMessage>
-        <Text color={theme.status.error}>
-          Error reading plan: {planState.error}
-        </Text>
+        <Text color={theme.status.error}>Error reading plan: {planState.error}</Text>
       </StatusMessage>
     );
   }
@@ -251,13 +245,11 @@ export const ExitPlanModeDialog: React.FC<ExitPlanModeDialogProps> = ({
             options: [
               {
                 label: ApprovalOption.Auto,
-                description:
-                  'Approves plan and allows tools to run automatically',
+                description: 'Approves plan and allows tools to run automatically',
               },
               {
                 label: ApprovalOption.Manual,
-                description:
-                  'Approves plan but requires confirmation for each tool',
+                description: 'Approves plan but requires confirmation for each tool',
               },
             ],
             placeholder: 'Type your feedback...',

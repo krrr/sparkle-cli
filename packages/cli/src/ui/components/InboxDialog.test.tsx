@@ -377,9 +377,7 @@ describe('InboxDialog', () => {
     const config = {
       isTrustedFolder: vi.fn().mockReturnValue(true),
     } as unknown as Config;
-    const onReloadSkills = vi
-      .fn()
-      .mockRejectedValue(new Error('reload hook failed'));
+    const onReloadSkills = vi.fn().mockRejectedValue(new Error('reload hook failed'));
     const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
       renderWithProviders(
         <InboxDialog
@@ -540,15 +538,14 @@ describe('InboxDialog', () => {
           getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+        ),
       );
 
       await waitFor(() => {
@@ -609,10 +606,7 @@ describe('InboxDialog', () => {
       });
 
       await waitFor(() => {
-        expect(mockApplyInboxPatch).toHaveBeenCalledWith(
-          config,
-          'update-docs.patch',
-        );
+        expect(mockApplyInboxPatch).toHaveBeenCalledWith(config, 'update-docs.patch');
       });
       expect(onReloadSkills).toHaveBeenCalled();
 
@@ -629,15 +623,14 @@ describe('InboxDialog', () => {
           getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+        ),
       );
 
       await waitFor(() => {
@@ -674,15 +667,14 @@ describe('InboxDialog', () => {
             .mockReturnValue('/symlinked/workspace/.sparkle/skills'),
         },
       } as unknown as Config;
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+        ),
       );
 
       await waitFor(() => {
@@ -751,10 +743,7 @@ describe('InboxDialog', () => {
       });
 
       await waitFor(() => {
-        expect(mockDismissInboxPatch).toHaveBeenCalledWith(
-          config,
-          'update-docs.patch',
-        );
+        expect(mockDismissInboxPatch).toHaveBeenCalledWith(config, 'update-docs.patch');
       });
       expect(onReloadSkills).not.toHaveBeenCalled();
 
@@ -769,9 +758,7 @@ describe('InboxDialog', () => {
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
         storage: {
-          getProjectSkillsDir: vi
-            .fn()
-            .mockReturnValue('C:\\repo\\.sparkle\\skills'),
+          getProjectSkillsDir: vi.fn().mockReturnValue('C:\\repo\\.sparkle\\skills'),
         },
       } as unknown as Config;
       const { lastFrame, unmount } = await act(async () =>
@@ -798,9 +785,7 @@ describe('InboxDialog', () => {
       mockListInboxSkills.mockResolvedValue([]);
       mockListInboxPatches.mockResolvedValue([multiSectionPatch]);
 
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const config = {
         isTrustedFolder: vi.fn().mockReturnValue(true),
@@ -808,15 +793,14 @@ describe('InboxDialog', () => {
           getProjectSkillsDir: vi.fn().mockReturnValue('/repo/.sparkle/skills'),
         },
       } as unknown as Config;
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+        ),
       );
 
       await waitFor(() => {
@@ -879,19 +863,18 @@ describe('InboxDialog', () => {
         },
       } as unknown as Config;
 
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-            {
-              settings: altBufferSettings,
-              uiState: { terminalHeight: 18 },
-            },
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+          {
+            settings: altBufferSettings,
+            uiState: { terminalHeight: 18 },
+          },
+        ),
       );
 
       await waitFor(() => {
@@ -925,16 +908,15 @@ describe('InboxDialog', () => {
         },
       } as unknown as Config;
 
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-            { settings: altBufferSettings },
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+          { settings: altBufferSettings },
+        ),
       );
 
       await waitFor(() => {
@@ -970,16 +952,15 @@ describe('InboxDialog', () => {
         },
       } as unknown as Config;
 
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-            { uiState: { terminalHeight: 18, constrainHeight: true } },
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+          { uiState: { terminalHeight: 18, constrainHeight: true } },
+        ),
       );
 
       await waitFor(() => {
@@ -1014,16 +995,15 @@ describe('InboxDialog', () => {
         },
       } as unknown as Config;
 
-      const { lastFrame, stdin, unmount, waitUntilReady } = await act(
-        async () =>
-          renderWithProviders(
-            <InboxDialog
-              config={config}
-              onClose={vi.fn()}
-              onReloadSkills={vi.fn().mockResolvedValue(undefined)}
-            />,
-            { uiState: { terminalHeight: 18, constrainHeight: true } },
-          ),
+      const { lastFrame, stdin, unmount, waitUntilReady } = await act(async () =>
+        renderWithProviders(
+          <InboxDialog
+            config={config}
+            onClose={vi.fn()}
+            onReloadSkills={vi.fn().mockResolvedValue(undefined)}
+          />,
+          { uiState: { terminalHeight: 18, constrainHeight: true } },
+        ),
       );
 
       await waitFor(() => {

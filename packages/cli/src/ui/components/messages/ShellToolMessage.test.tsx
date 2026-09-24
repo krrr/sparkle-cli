@@ -5,16 +5,9 @@
  */
 
 import React, { act } from 'react';
-import {
-  ShellToolMessage,
-  type ShellToolMessageProps,
-} from './ShellToolMessage.js';
+import { ShellToolMessage, type ShellToolMessageProps } from './ShellToolMessage.js';
 import { StreamingState } from '../../types.js';
-import {
-  type Config,
-  SHELL_TOOL_NAME,
-  CoreToolCallStatus,
-} from 'sparkle-cli-core';
+import { type Config, SHELL_TOOL_NAME, CoreToolCallStatus } from 'sparkle-cli-core';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { createMockSettings } from '../../../test-utils/settings.js';
 import { makeFakeConfig } from 'sparkle-cli-core';
@@ -45,10 +38,7 @@ describe('<ShellToolMessage />', () => {
     } as unknown as Config,
   };
 
-  const LONG_OUTPUT = Array.from(
-    { length: 100 },
-    (_, i) => `Line ${i + 1}`,
-  ).join('\n');
+  const LONG_OUTPUT = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`).join('\n');
 
   const mockSetEmbeddedShellFocused = vi.fn();
   const uiActions = {
@@ -70,10 +60,10 @@ describe('<ShellToolMessage />', () => {
       ['SHELL_TOOL_NAME', SHELL_TOOL_NAME],
     ])('clicks inside the shell area sets focus for %s', async (_, name) => {
       const { lastFrame, simulateClick, unmount, waitUntilReady } =
-        await renderWithProviders(
-          <ShellToolMessage {...baseProps} name={name} />,
-          { uiActions, mouseEventsEnabled: true },
-        );
+        await renderWithProviders(<ShellToolMessage {...baseProps} name={name} />, {
+          uiActions,
+          mouseEventsEnabled: true,
+        });
 
       await waitUntilReady();
       expect(lastFrame()).toContain('A shell command');
@@ -90,9 +80,7 @@ describe('<ShellToolMessage />', () => {
       let updateStatus: (s: CoreToolCallStatus) => void = () => {};
 
       const Wrapper = () => {
-        const [status, setStatus] = React.useState(
-          CoreToolCallStatus.Executing,
-        );
+        const [status, setStatus] = React.useState(CoreToolCallStatus.Executing);
         updateStatus = setStatus;
         return <ShellToolMessage {...baseProps} status={status} ptyId={1} />;
       };
@@ -236,30 +224,29 @@ describe('<ShellToolMessage />', () => {
         constrainHeight,
         isExpandable,
       ) => {
-        const { lastFrame, waitUntilReady, unmount } =
-          await renderWithProviders(
-            <ShellToolMessage
-              {...baseProps}
-              resultDisplay={LONG_OUTPUT}
-              renderOutputAsMarkdown={false}
-              availableTerminalHeight={availableTerminalHeight}
-              ptyId={1}
-              status={CoreToolCallStatus.Executing}
-              isExpandable={isExpandable}
-            />,
-            {
-              uiActions,
-              config: makeFakeConfig({ useAlternateBuffer: true }),
-              settings: createMockSettings({
-                ui: { useAlternateBuffer: true },
-              }),
-              uiState: {
-                activePtyId: focused ? 1 : 2,
-                embeddedShellFocused: focused,
-                constrainHeight,
-              },
+        const { lastFrame, waitUntilReady, unmount } = await renderWithProviders(
+          <ShellToolMessage
+            {...baseProps}
+            resultDisplay={LONG_OUTPUT}
+            renderOutputAsMarkdown={false}
+            availableTerminalHeight={availableTerminalHeight}
+            ptyId={1}
+            status={CoreToolCallStatus.Executing}
+            isExpandable={isExpandable}
+          />,
+          {
+            uiActions,
+            config: makeFakeConfig({ useAlternateBuffer: true }),
+            settings: createMockSettings({
+              ui: { useAlternateBuffer: true },
+            }),
+            uiState: {
+              activePtyId: focused ? 1 : 2,
+              embeddedShellFocused: focused,
+              constrainHeight,
             },
-          );
+          },
+        );
 
         await waitUntilReady();
 

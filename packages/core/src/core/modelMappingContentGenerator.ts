@@ -46,11 +46,7 @@ export class ModelMappingContentGenerator implements ContentGenerator {
     userPromptId: string,
     role: LlmRole,
   ): Promise<GenerateContentResponse> {
-    return this.wrapped.generateContent(
-      this.mapModel(request),
-      userPromptId,
-      role,
-    );
+    return this.wrapped.generateContent(this.mapModel(request), userPromptId, role);
   }
 
   generateContentStream(

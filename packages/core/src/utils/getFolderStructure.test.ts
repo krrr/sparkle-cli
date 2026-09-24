@@ -333,10 +333,7 @@ ${testRootDir}${path.sep}
     });
 
     it('should not ignore files if respectGitIgnore is false', async () => {
-      await fsPromises.writeFile(
-        path.join(testRootDir, '.gitignore'),
-        'ignored.txt',
-      );
+      await fsPromises.writeFile(path.join(testRootDir, '.gitignore'), 'ignored.txt');
       await createTestFile('file1.txt');
       await createTestFile('ignored.txt');
 

@@ -98,9 +98,7 @@ export function createStateSnapshotAsyncProcessor(
         // If the snapshot happens to be inside our summary window, remove it so the LLM doesn't read it as raw transcript
         if (previousStateJson) {
           const summaryIdx = nodesToSummarize.findIndex(
-            (n) =>
-              n.type === NodeType.SNAPSHOT &&
-              n.payload.text === previousStateJson,
+            (n) => n.type === NodeType.SNAPSHOT && n.payload.text === previousStateJson,
           );
           if (summaryIdx !== -1) {
             nodesToSummarize.splice(summaryIdx, 1);
@@ -118,18 +116,11 @@ export function createStateSnapshotAsyncProcessor(
           },
         );
 
-        env.tracer.logEvent(
-          'StateSnapshotAsyncProcessor',
-          'Snapshot Synthesized',
-          {
-            snapshotText,
-          },
-        );
+        env.tracer.logEvent('StateSnapshotAsyncProcessor', 'Snapshot Synthesized', {
+          snapshotText,
+        });
 
-        const newConsumedIds = [
-          ...previousConsumedIds,
-          ...targets.map((t) => t.id),
-        ];
+        const newConsumedIds = [...previousConsumedIds, ...targets.map((t) => t.id)];
 
         // In V2, async pipelines communicate their work to the inbox, and the processor picks it up.
         env.inbox.publish('PROPOSED_SNAPSHOT', {
@@ -139,10 +130,7 @@ export function createStateSnapshotAsyncProcessor(
           timestamp: targets[targets.length - 1].timestamp,
         });
       } catch (e) {
-        debugLogger.error(
-          'StateSnapshotAsyncProcessor failed to generate snapshot',
-          e,
-        );
+        debugLogger.error('StateSnapshotAsyncProcessor failed to generate snapshot', e);
       }
     },
   };

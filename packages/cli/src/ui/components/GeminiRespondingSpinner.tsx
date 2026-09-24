@@ -9,10 +9,7 @@ import { Text, useIsScreenReaderEnabled } from 'ink';
 import type { SpinnerName } from 'cli-spinners';
 import { useStreamingContext } from '../contexts/StreamingContext.js';
 import { StreamingState } from '../types.js';
-import {
-  SCREEN_READER_LOADING,
-  SCREEN_READER_RESPONDING,
-} from '../textConstants.js';
+import { SCREEN_READER_LOADING, SCREEN_READER_RESPONDING } from '../textConstants.js';
 import { theme } from '../semantic-colors.js';
 import { GeminiSpinner } from './GeminiSpinner.js';
 
@@ -31,9 +28,7 @@ interface GeminiRespondingSpinnerProps {
   color?: string;
 }
 
-export const GeminiRespondingSpinner: React.FC<
-  GeminiRespondingSpinnerProps
-> = ({
+export const GeminiRespondingSpinner: React.FC<GeminiRespondingSpinnerProps> = ({
   nonRespondingDisplay,
   spinnerType = 'dots',
   isHookActive = false,
@@ -46,10 +41,7 @@ export const GeminiRespondingSpinner: React.FC<
   // to be consistent, instead of the rainbow spinner which means "Gemini is talking".
   if (streamingState === StreamingState.Responding && !isHookActive) {
     return (
-      <GeminiSpinner
-        spinnerType={spinnerType}
-        altText={SCREEN_READER_RESPONDING}
-      />
+      <GeminiSpinner spinnerType={spinnerType} altText={SCREEN_READER_RESPONDING} />
     );
   }
 

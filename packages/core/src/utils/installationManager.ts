@@ -18,9 +18,7 @@ export class InstallationManager {
   private readInstallationIdFromFile(): string | null {
     const installationIdFile = this.getInstallationIdPath();
     if (fs.existsSync(installationIdFile)) {
-      const installationid = fs
-        .readFileSync(installationIdFile, 'utf-8')
-        .trim();
+      const installationid = fs.readFileSync(installationIdFile, 'utf-8').trim();
       return installationid || null;
     }
     return null;

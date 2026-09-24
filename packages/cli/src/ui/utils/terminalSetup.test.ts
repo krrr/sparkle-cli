@@ -202,18 +202,16 @@ describe('terminalSetup', () => {
 
   describe('shouldPromptForTerminalSetup', () => {
     it('should return false when kitty protocol is already enabled', async () => {
-      vi.mocked(
-        terminalCapabilityManager.isKittyProtocolEnabled,
-      ).mockReturnValue(true);
+      vi.mocked(terminalCapabilityManager.isKittyProtocolEnabled).mockReturnValue(true);
 
       const result = await shouldPromptForTerminalSetup();
       expect(result).toBe(false);
     });
 
     it('should return false when both Shift+Enter and Ctrl+Enter bindings already exist', async () => {
-      vi.mocked(
-        terminalCapabilityManager.isKittyProtocolEnabled,
-      ).mockReturnValue(false);
+      vi.mocked(terminalCapabilityManager.isKittyProtocolEnabled).mockReturnValue(
+        false,
+      );
       process.env['TERM_PROGRAM'] = 'vscode';
 
       const existingBindings = [
@@ -235,9 +233,9 @@ describe('terminalSetup', () => {
     });
 
     it('should return true when keybindings file does not exist', async () => {
-      vi.mocked(
-        terminalCapabilityManager.isKittyProtocolEnabled,
-      ).mockReturnValue(false);
+      vi.mocked(terminalCapabilityManager.isKittyProtocolEnabled).mockReturnValue(
+        false,
+      );
       process.env['TERM_PROGRAM'] = 'vscode';
 
       mocks.readFile.mockRejectedValue(new Error('ENOENT'));

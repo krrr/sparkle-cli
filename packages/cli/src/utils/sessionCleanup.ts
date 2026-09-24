@@ -118,10 +118,7 @@ export async function cleanupExpiredSessions(
     const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 
     // Validate retention configuration
-    const validationErrorMessage = validateRetentionConfig(
-      config,
-      retentionConfig,
-    );
+    const validationErrorMessage = validateRetentionConfig(config, retentionConfig);
     if (validationErrorMessage) {
       // Log validation errors to console for visibility
       debugLogger.warn(`Session cleanup disabled: ${validationErrorMessage}`);
@@ -136,10 +133,7 @@ export async function cleanupExpiredSessions(
     }
 
     // Determine which sessions to delete (corrupted and expired)
-    const sessionsToDelete = await identifySessionsToDelete(
-      allFiles,
-      retentionConfig,
-    );
+    const sessionsToDelete = await identifySessionsToDelete(allFiles, retentionConfig);
 
     const processedShortIds = new Set<string>();
 
@@ -158,8 +152,7 @@ export async function cleanupExpiredSessions(
             .map((f) => f.fileName)
             .filter(
               (f) =>
-                f.startsWith(SESSION_FILE_PREFIX) &&
-                f.endsWith(`-${shortId}.jsonl`),
+                f.startsWith(SESSION_FILE_PREFIX) && f.endsWith(`-${shortId}.jsonl`),
             );
 
           for (const file of matchingFiles) {
@@ -239,19 +232,13 @@ export async function cleanupExpiredSessions(
           }
 
           if (config.getDebugMode()) {
-            debugLogger.debug(
-              `Deleted fallback session: ${sessionToDelete.fileName}`,
-            );
+            debugLogger.debug(`Deleted fallback session: ${sessionToDelete.fileName}`);
           }
           result.deleted++;
         }
       } catch (error) {
         // Ignore ENOENT (file already deleted)
-        if (
-          error instanceof Error &&
-          'code' in error &&
-          error.code === 'ENOENT'
-        ) {
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
           // File already deleted
         } else {
           const sessionId =
@@ -275,8 +262,7 @@ export async function cleanupExpiredSessions(
     }
   } catch (error) {
     // Global error handler - don't let cleanup failures break startup
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     debugLogger.warn(`Session cleanup failed: ${errorMessage}`);
     result.failed++;
   }
@@ -294,9 +280,7 @@ export async function identifySessionsToDelete(
   const sessionsToDelete: SessionFileEntry[] = [];
 
   // All corrupted files should be deleted
-  sessionsToDelete.push(
-    ...allFiles.filter((entry) => entry.sessionInfo === null),
-  );
+  sessionsToDelete.push(...allFiles.filter((entry) => entry.sessionInfo === null));
 
   // Now handle valid sessions based on retention policy
   const validSessions = allFiles.filter((entry) => entry.sessionInfo !== null);
@@ -557,9 +541,7 @@ export async function cleanupToolOutputFiles(
     // This ensures we keep at most maxCount files, preferring newer ones.
     if (retentionConfig.maxCount !== undefined) {
       // Filter out files already marked for deletion by age-based cleanup
-      const remainingFiles = fileStats.filter(
-        (f) => !filesToDelete.includes(f.name),
-      );
+      const remainingFiles = fileStats.filter((f) => !filesToDelete.includes(f.name));
       if (remainingFiles.length > retentionConfig.maxCount) {
         // Calculate how many excess files need to be deleted
         const excessCount = remainingFiles.length - retentionConfig.maxCount;
@@ -580,9 +562,7 @@ export async function cleanupToolOutputFiles(
         // Security: Validate that the subdirectory name is a safe filename part
         // and doesn't attempt path traversal.
         if (subdir.name !== sanitizeFilenamePart(subdir.name)) {
-          debugLogger.debug(
-            `Skipping unsafe tool-output subdirectory: ${subdir.name}`,
-          );
+          debugLogger.debug(`Skipping unsafe tool-output subdirectory: ${subdir.name}`);
           continue;
         }
 
@@ -628,8 +608,7 @@ export async function cleanupToolOutputFiles(
     }
   } catch (error) {
     // Global error handler - don't let cleanup failures break startup
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     debugLogger.warn(`Tool output cleanup failed: ${errorMessage}`);
     result.failed++;
   }

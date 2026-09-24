@@ -86,9 +86,7 @@ describe('useVim passthrough', () => {
     'should ignore unmapped printable key %s in NORMAL mode',
     async (sequence) => {
       mockVimContext.vimMode = 'NORMAL';
-      const { result } = await renderHook(() =>
-        useVim(mockBuffer as TextBuffer),
-      );
+      const { result } = await renderHook(() => useVim(mockBuffer as TextBuffer));
 
       let handled = false;
       act(() => {

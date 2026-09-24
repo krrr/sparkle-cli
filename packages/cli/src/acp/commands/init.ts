@@ -7,11 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { performInit } from 'sparkle-cli-core';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 
 export class InitCommand implements Command {
   name = 'init';

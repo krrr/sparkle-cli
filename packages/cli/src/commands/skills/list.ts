@@ -48,15 +48,11 @@ export async function handleList(args: { all?: boolean }) {
   process.stdout.write(chalk.bold('Discovered Agent Skills:') + '\n\n');
 
   for (const skill of skills) {
-    const status = skill.disabled
-      ? chalk.red('[Disabled]')
-      : chalk.green('[Enabled]');
+    const status = skill.disabled ? chalk.red('[Disabled]') : chalk.green('[Enabled]');
 
     const builtinSuffix = skill.isBuiltin ? chalk.gray(' [Built-in]') : '';
 
-    process.stdout.write(
-      `${chalk.bold(skill.name)} ${status}${builtinSuffix}\n`,
-    );
+    process.stdout.write(`${chalk.bold(skill.name)} ${status}${builtinSuffix}\n`);
     process.stdout.write(`  Description: ${skill.description}\n`);
     process.stdout.write(`  Location:    ${skill.location}\n\n`);
   }

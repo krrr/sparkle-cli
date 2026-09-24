@@ -20,9 +20,7 @@ describe('CopyModeWarning', () => {
     vi.mocked(useInputState).mockReturnValue({
       copyModeEnabled: false,
     } as unknown as ReturnType<typeof useInputState>);
-    const { lastFrame, unmount } = await renderWithProviders(
-      <CopyModeWarning />,
-    );
+    const { lastFrame, unmount } = await renderWithProviders(<CopyModeWarning />);
     expect(lastFrame({ allowEmpty: true })).toBe('');
     unmount();
   });
@@ -31,9 +29,7 @@ describe('CopyModeWarning', () => {
     vi.mocked(useInputState).mockReturnValue({
       copyModeEnabled: true,
     } as unknown as ReturnType<typeof useInputState>);
-    const { lastFrame, unmount } = await renderWithProviders(
-      <CopyModeWarning />,
-    );
+    const { lastFrame, unmount } = await renderWithProviders(<CopyModeWarning />);
     expect(lastFrame()).toContain('In Copy Mode');
     expect(lastFrame()).toContain('Use Page Up/Down to scroll');
     expect(lastFrame()).toContain('Press Ctrl+S or any other key to exit');

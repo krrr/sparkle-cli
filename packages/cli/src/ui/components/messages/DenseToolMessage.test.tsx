@@ -38,8 +38,7 @@ describe('DenseToolMessage', () => {
     const fileDiff: FileDiff = {
       fileName: 'test-file.ts',
       filePath: '/test-file.ts',
-      fileDiff:
-        '--- a/test-file.ts\n+++ b/test-file.ts\n@@ -1 +1 @@\n-old\n+new',
+      fileDiff: '--- a/test-file.ts\n+++ b/test-file.ts\n@@ -1 +1 @@\n-old\n+new',
       originalContent: 'old',
       newContent: 'new',
     };
@@ -126,9 +125,7 @@ describe('DenseToolMessage', () => {
       },
     );
     await waitFor(() => expect(lastFrame()).toContain('test-tool'));
-    await waitFor(() =>
-      expect(lastFrame()).toContain('test.ts → Accepted (+15, -6)'),
-    );
+    await waitFor(() => expect(lastFrame()).toContain('test.ts → Accepted (+15, -6)'));
     const output = lastFrame();
     expect(output).toMatchSnapshot();
   });
@@ -139,8 +136,7 @@ describe('DenseToolMessage', () => {
       title: 'Confirm Edit',
       fileName: 'styles.scss',
       filePath: '/path/to/styles.scss',
-      fileDiff:
-        '@@ -1,1 +1,1 @@\n-body { color: blue; }\n+body { color: red; }',
+      fileDiff: '@@ -1,1 +1,1 @@\n-body { color: blue; }\n+body { color: red; }',
       originalContent: 'body { color: blue; }',
       newContent: 'body { color: red; }',
     };
@@ -150,9 +146,7 @@ describe('DenseToolMessage', () => {
         name="Edit"
         status={CoreToolCallStatus.AwaitingApproval}
         resultDisplay={undefined}
-        confirmationDetails={
-          confirmationDetails as SerializableConfirmationDetails
-        }
+        confirmationDetails={confirmationDetails as SerializableConfirmationDetails}
       />,
       {},
     );
@@ -204,8 +198,7 @@ describe('DenseToolMessage', () => {
       title: 'Confirm Edit',
       fileName: 'styles.scss',
       filePath: '/path/to/styles.scss',
-      fileDiff:
-        '@@ -1,1 +1,1 @@\n-body { color: blue; }\n+body { color: red; }',
+      fileDiff: '@@ -1,1 +1,1 @@\n-body { color: blue; }\n+body { color: red; }',
       originalContent: 'body { color: blue; }',
       newContent: 'body { color: red; }',
       diffStat: {

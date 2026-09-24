@@ -59,9 +59,7 @@ You are the doc expert. Document the provided implementation clearly.`,
     },
     assert: async (rig, _result) => {
       // Verify tracker tasks were created
-      const wasCreateCalled = await rig.waitForToolCall(
-        TRACKER_CREATE_TASK_TOOL_NAME,
-      );
+      const wasCreateCalled = await rig.waitForToolCall(TRACKER_CREATE_TASK_TOOL_NAME);
       expect(wasCreateCalled).toBe(true);
 
       const toolLogs = rig.readToolLogs();
@@ -70,11 +68,7 @@ You are the doc expert. Document the provided implementation clearly.`,
       );
       expect(createCalls.length).toBeGreaterThanOrEqual(3);
 
-      await rig.expectToolCallSuccess([
-        'researcher',
-        'developer',
-        'doc-expert',
-      ]);
+      await rig.expectToolCallSuccess(['researcher', 'developer', 'doc-expert']);
 
       const logicFile = rig.readFile('src/logic.ts');
       const docFile = rig.readFile('docs/logic.md');
@@ -110,9 +104,7 @@ You are the doc expert. Document the provided implementation clearly.`,
     },
     assert: async (rig, _result) => {
       // Verify tracker tasks were created
-      const wasCreateCalled = await rig.waitForToolCall(
-        TRACKER_CREATE_TASK_TOOL_NAME,
-      );
+      const wasCreateCalled = await rig.waitForToolCall(TRACKER_CREATE_TASK_TOOL_NAME);
       expect(wasCreateCalled).toBe(true);
 
       const toolLogs = rig.readToolLogs();

@@ -616,10 +616,7 @@ export function useVim(buffer: TextBuffer, onSubmit?: (value: string) => void) {
    * @returns boolean indicating if command was handled
    */
   const handleOperatorMotion = useCallback(
-    (
-      operator: 'd' | 'c',
-      motion: 'w' | 'b' | 'e' | 'W' | 'B' | 'E',
-    ): boolean => {
+    (operator: 'd' | 'c', motion: 'w' | 'b' | 'e' | 'W' | 'B' | 'E'): boolean => {
       const count = getCurrentCount();
 
       const commandMap = {

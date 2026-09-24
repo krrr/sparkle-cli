@@ -9,11 +9,7 @@ import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 import { ToolConfirmationMessage } from './messages/ToolConfirmationMessage.js';
-import {
-  isShellTool,
-  ToolStatusIndicator,
-  ToolInfo,
-} from './messages/ToolShared.js';
+import { isShellTool, ToolStatusIndicator, ToolInfo } from './messages/ToolShared.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import type { ConfirmingToolState } from '../hooks/useConfirmingTool.js';
 import { StickyHeader } from './StickyHeader.js';
@@ -23,9 +19,7 @@ import { useUIActions } from '../contexts/UIActionsContext.js';
 function getConfirmationHeader(
   details: SerializableConfirmationDetails | undefined,
 ): string {
-  const headers: Partial<
-    Record<SerializableConfirmationDetails['type'], string>
-  > = {
+  const headers: Partial<Record<SerializableConfirmationDetails['type'], string>> = {
     ask_user: 'Answer Questions',
     exit_plan_mode: 'Ready to start implementation?',
   };
@@ -153,10 +147,7 @@ export const ToolConfirmationQueue: React.FC<ToolConfirmationQueueProps> = ({
       >
         <Box flexDirection="column" width={mainAreaWidth - 4}>
           {/* Header */}
-          <Box
-            marginBottom={hideToolIdentity ? 0 : 1}
-            justifyContent="space-between"
-          >
+          <Box marginBottom={hideToolIdentity ? 0 : 1} justifyContent="space-between">
             <Text color={borderColor} bold>
               {getConfirmationHeader(tool.confirmationDetails)}
             </Text>

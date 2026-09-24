@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  Config,
-  GeminiCLIExtension,
-  MCPServerConfig,
-} from '../config/config.js';
+import type { Config, GeminiCLIExtension, MCPServerConfig } from '../config/config.js';
 import type { ToolRegistry } from './tool-registry.js';
 import {
   McpClient,
@@ -24,10 +20,7 @@ import { debugLogger } from '../utils/debugLogger.js';
 import { createHash } from 'node:crypto';
 import { stableStringify } from '../policy/stable-stringify.js';
 import type { PromptRegistry } from '../prompts/prompt-registry.js';
-import type {
-  ResourceRegistry,
-  MCPResource,
-} from '../resources/resource-registry.js';
+import type { ResourceRegistry, MCPResource } from '../resources/resource-registry.js';
 
 /**
  * Manages the lifecycle of multiple MCP clients, including local child processes.
@@ -76,11 +69,7 @@ export class McpClientManager {
    */
   private lastErrors: Map<string, string> = new Map();
 
-  constructor(
-    clientVersion: string,
-    cliConfig: Config,
-    eventEmitter?: EventEmitter,
-  ) {
+  constructor(clientVersion: string, cliConfig: Config, eventEmitter?: EventEmitter) {
     this.clientVersion = clientVersion;
     this.cliConfig = cliConfig;
     this.eventEmitter = eventEmitter;
@@ -128,9 +117,7 @@ export class McpClientManager {
     // If user has interacted, show verbosely unless already shown verbosely
     if (this.userInteractedWithMcp) {
       if (previousStatus === 'verbose') {
-        debugLogger.debug(
-          `Deduplicated verbose MCP diagnostic: ${diagnosticKey}`,
-        );
+        debugLogger.debug(`Deduplicated verbose MCP diagnostic: ${diagnosticKey}`);
         return;
       }
       this.shownDiagnostics.set(diagnosticKey, 'verbose');
@@ -182,9 +169,7 @@ export class McpClientManager {
     }
 
     // Try direct URI match
-    return this.mainResourceRegistry
-      .getAllResources()
-      .find((r) => r.uri === uri);
+    return this.mainResourceRegistry.getAllResources().find((r) => r.uri === uri);
   }
 
   getAllResources(): MCPResource[] {
@@ -259,19 +244,11 @@ export class McpClientManager {
    */
   private isBlockedBySettings(name: string): boolean {
     const allowedNames = this.cliConfig.getAllowedMcpServers();
-    if (
-      allowedNames &&
-      allowedNames.length > 0 &&
-      !allowedNames.includes(name)
-    ) {
+    if (allowedNames && allowedNames.length > 0 && !allowedNames.includes(name)) {
       return true;
     }
     const blockedNames = this.cliConfig.getBlockedMcpServers();
-    if (
-      blockedNames &&
-      blockedNames.length > 0 &&
-      blockedNames.includes(name)
-    ) {
+    if (blockedNames && blockedNames.length > 0 && blockedNames.includes(name)) {
       return true;
     }
     return false;
@@ -352,10 +329,7 @@ export class McpClientManager {
     // For blocklists (excludeTools), use union so if ANY party blocks it,
     // it stays blocked.
     const excludeTools = [
-      ...new Set([
-        ...(base.excludeTools ?? []),
-        ...(override.excludeTools ?? []),
-      ]),
+      ...new Set([...(base.excludeTools ?? []), ...(override.excludeTools ?? [])]),
     ];
 
     const env = { ...(base.env ?? {}), ...(override.env ?? {}) };
@@ -478,9 +452,7 @@ export class McpClientManager {
               this.cliConfig.getDebugMode(),
               this.clientVersion,
               async () => {
-                debugLogger.log(
-                  `🔔 Refreshing context for server '${name}'...`,
-                );
+                debugLogger.log(`🔔 Refreshing context for server '${name}'...`);
                 await this.scheduleMcpContextRefresh();
               },
             );
@@ -626,17 +598,15 @@ export class McpClientManager {
     await Promise.all(disconnectionPromises);
 
     await Promise.all(
-      Array.from(this.allServerConfigs.entries()).map(
-        async ([name, config]) => {
-          try {
-            await this.maybeDiscoverMcpServer(name, config);
-          } catch (error) {
-            debugLogger.error(
-              `Error restarting client '${name}': ${getErrorMessage(error)}`,
-            );
-          }
-        },
-      ),
+      Array.from(this.allServerConfigs.entries()).map(async ([name, config]) => {
+        try {
+          await this.maybeDiscoverMcpServer(name, config);
+        } catch (error) {
+          debugLogger.error(
+            `Error restarting client '${name}': ${getErrorMessage(error)}`,
+          );
+        }
+      }),
     );
     await this.scheduleMcpContextRefresh();
   }
@@ -665,11 +635,7 @@ export class McpClientManager {
         try {
           await client.disconnect();
         } catch (error) {
-          this.emitDiagnostic(
-            'error',
-            `Error stopping client '${name}':`,
-            error,
-          );
+          this.emitDiagnostic('error', `Error stopping client '${name}':`, error);
         }
       },
     );
@@ -740,16 +706,12 @@ export class McpClientManager {
           // If more refresh requests came in during the execution, wait a bit
           // to coalesce them before the next iteration.
           if (this.pendingMcpContextRefresh) {
-            debugLogger.log(
-              'Coalescing burst refresh requests (300ms delay)...',
-            );
+            debugLogger.log('Coalescing burst refresh requests (300ms delay)...');
             await new Promise((resolve) => setTimeout(resolve, 300));
           }
         } while (this.pendingMcpContextRefresh);
       } catch (error) {
-        debugLogger.error(
-          `Error refreshing MCP context: ${getErrorMessage(error)}`,
-        );
+        debugLogger.error(`Error refreshing MCP context: ${getErrorMessage(error)}`);
       } finally {
         this.isRefreshingMcpContext = false;
         this.pendingRefreshPromise = null;

@@ -27,10 +27,7 @@ describe('hardenHistory', () => {
     ];
     const hardened = hardenHistory(history);
     expect(hardened.length).toBe(1);
-    expect(hardened[0].content.parts).toEqual([
-      { text: 'hello' },
-      { text: 'world' },
-    ]);
+    expect(hardened[0].content.parts).toEqual([{ text: 'hello' }, { text: 'world' }]);
     expect(hardened[0].id).toBe('1'); // Inherits ID of the first turn in the sequence
   });
 
@@ -62,10 +59,7 @@ describe('hardenHistory', () => {
 
     const hardened = hardenHistory(history);
     const modelPart = hardened[1].content.parts![0];
-    expect(modelPart).toHaveProperty(
-      'thoughtSignature',
-      SYNTHETIC_THOUGHT_SIGNATURE,
-    );
+    expect(modelPart).toHaveProperty('thoughtSignature', SYNTHETIC_THOUGHT_SIGNATURE);
   });
 
   it('should inject a sentinel user turn if history ends with a model turn', () => {
@@ -198,20 +192,16 @@ describe('hardenHistory', () => {
     expect(userResponseTurn.content.parts).toHaveLength(2);
 
     // Verify no sentinels were injected and original responses were preserved
-    expect(userResponseTurn.content.parts![0].functionResponse?.id).toBe(
-      'call_1',
-    );
-    expect(userResponseTurn.content.parts![1].functionResponse?.id).toBe(
-      'call_2',
-    );
+    expect(userResponseTurn.content.parts![0].functionResponse?.id).toBe('call_1');
+    expect(userResponseTurn.content.parts![1].functionResponse?.id).toBe('call_2');
 
     // Ensure no error properties exist
-    expect(
-      userResponseTurn.content.parts![0].functionResponse?.response,
-    ).toEqual({ ok: true });
-    expect(
-      userResponseTurn.content.parts![1].functionResponse?.response,
-    ).toEqual({ ok: true });
+    expect(userResponseTurn.content.parts![0].functionResponse?.response).toEqual({
+      ok: true,
+    });
+    expect(userResponseTurn.content.parts![1].functionResponse?.response).toEqual({
+      ok: true,
+    });
   });
 
   it('should synthesize a functionCall for a singleton orphaned functionResponse', () => {
@@ -292,9 +282,9 @@ describe('hardenHistory', () => {
     // Only the FIRST function call should get the synthetic signature
     const callA = modelTurn.content.parts![1];
     expect(callA.functionCall?.id).toBe('orphan_A');
-    expect(
-      (callA as unknown as { thoughtSignature?: string }).thoughtSignature,
-    ).toBe(SYNTHETIC_THOUGHT_SIGNATURE);
+    expect((callA as unknown as { thoughtSignature?: string }).thoughtSignature).toBe(
+      SYNTHETIC_THOUGHT_SIGNATURE,
+    );
 
     const callB = modelTurn.content.parts![2];
     expect(callB.functionCall?.id).toBe('orphan_B');
@@ -573,9 +563,6 @@ describe('scrubHistory', () => {
 
     const scrubbed = scrubHistory(history);
     expect(scrubbed.length).toBe(1); // Since user turns are coalesced (Turn 1 + Turn 3) and Turn 2 is removed because it has 0 parts
-    expect(scrubbed[0].content.parts).toEqual([
-      { text: 'Hello' },
-      { text: 'World' },
-    ]);
+    expect(scrubbed[0].content.parts).toEqual([{ text: 'Hello' }, { text: 'World' }]);
   });
 });

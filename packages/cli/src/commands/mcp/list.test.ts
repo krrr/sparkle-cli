@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { listMcpServers } from './list.js';
 import { loadSettings } from '../../config/settings.js';
 import { createTransport, debugLogger } from 'sparkle-cli-core';
@@ -23,8 +15,7 @@ import { McpServerEnablementManager } from '../../config/mcp/index.js';
 import { createMockSettings } from '../../test-utils/settings.js';
 
 vi.mock('../../config/settings.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../config/settings.js')>();
+  const actual = await importOriginal<typeof import('../../config/settings.js')>();
   return {
     ...actual,
     loadSettings: vi.fn(),
@@ -61,8 +52,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
       },
     ),
     SPARKLE_DIR: '.sparkle',
-    getErrorMessage: (e: unknown) =>
-      e instanceof Error ? e.message : String(e),
+    getErrorMessage: (e: unknown) => (e instanceof Error ? e.message : String(e)),
   };
 });
 vi.mock('@modelcontextprotocol/sdk/client/index.js');
@@ -71,8 +61,7 @@ vi.mock('../utils.js', () => ({
   exitCli: vi.fn(),
 }));
 
-const mockedGetUserExtensionsDir =
-  ExtensionStorage.getUserExtensionsDir as Mock;
+const mockedGetUserExtensionsDir = ExtensionStorage.getUserExtensionsDir as Mock;
 const mockedLoadSettings = loadSettings as Mock;
 const mockedCreateTransport = createTransport as Mock;
 const MockedClient = Client as Mock;
@@ -102,10 +91,9 @@ describe('mcp list command', () => {
     vi.spyOn(debugLogger, 'log').mockImplementation(() => {});
     McpServerEnablementManager.resetInstance();
     // Use a mock for isFileEnabled to avoid reading real files
-    vi.spyOn(
-      McpServerEnablementManager.prototype,
-      'isFileEnabled',
-    ).mockResolvedValue(true);
+    vi.spyOn(McpServerEnablementManager.prototype, 'isFileEnabled').mockResolvedValue(
+      true,
+    );
 
     mockTransport = { close: vi.fn() };
     mockClient = {
@@ -160,14 +148,10 @@ describe('mcp list command', () => {
 
     expect(debugLogger.log).toHaveBeenCalledWith('Configured MCP servers:\n');
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'stdio-server: /path/to/server arg1 (stdio) - Connected',
-      ),
+      expect.stringContaining('stdio-server: /path/to/server arg1 (stdio) - Connected'),
     );
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'sse-server: https://example.com/sse (sse) - Connected',
-      ),
+      expect.stringContaining('sse-server: https://example.com/sse (sse) - Connected'),
     );
     expect(debugLogger.log).toHaveBeenCalledWith(
       expect.stringContaining(
@@ -201,9 +185,7 @@ describe('mcp list command', () => {
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'test-server: /test/server  (stdio) - Disconnected',
-      ),
+      expect.stringContaining('test-server: /test/server  (stdio) - Disconnected'),
     );
   });
 
@@ -296,9 +278,7 @@ describe('mcp list command', () => {
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'config-server: /config/server  (stdio) - Connected',
-      ),
+      expect.stringContaining('config-server: /config/server  (stdio) - Connected'),
     );
     expect(debugLogger.log).toHaveBeenCalledWith(
       expect.stringContaining(
@@ -345,9 +325,7 @@ describe('mcp list command', () => {
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'blocked-server: /test/server  (stdio) - Blocked',
-      ),
+      expect.stringContaining('blocked-server: /test/server  (stdio) - Blocked'),
     );
     expect(mockedCreateTransport).not.toHaveBeenCalled();
   });
@@ -362,17 +340,14 @@ describe('mcp list command', () => {
       }),
     );
 
-    vi.spyOn(
-      McpServerEnablementManager.prototype,
-      'isFileEnabled',
-    ).mockResolvedValue(false);
+    vi.spyOn(McpServerEnablementManager.prototype, 'isFileEnabled').mockResolvedValue(
+      false,
+    );
 
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'disabled-server: /test/server  (stdio) - Disabled',
-      ),
+      expect.stringContaining('disabled-server: /test/server  (stdio) - Disabled'),
     );
     expect(mockedCreateTransport).not.toHaveBeenCalled();
   });
@@ -468,9 +443,7 @@ describe('mcp list command', () => {
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'blocked-server: /test/server  (stdio) - Blocked',
-      ),
+      expect.stringContaining('blocked-server: /test/server  (stdio) - Blocked'),
     );
     expect(mockedCreateTransport).not.toHaveBeenCalled();
   });
@@ -506,9 +479,7 @@ describe('mcp list command', () => {
     await listMcpServers();
 
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'blocked-server: /test/server  (stdio) - Blocked',
-      ),
+      expect.stringContaining('blocked-server: /test/server  (stdio) - Blocked'),
     );
     expect(mockedCreateTransport).not.toHaveBeenCalled();
   });
@@ -567,20 +538,14 @@ describe('mcp list command', () => {
 
     // allowed-server-1 is in the intersection, so it should connect
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'allowed-server-1: /allowed/1  (stdio) - Connected',
-      ),
+      expect.stringContaining('allowed-server-1: /allowed/1  (stdio) - Connected'),
     );
     // allowed-server-2 and malicious-server are not in the intersection, so they should be Blocked
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'allowed-server-2: /allowed/2  (stdio) - Blocked',
-      ),
+      expect.stringContaining('allowed-server-2: /allowed/2  (stdio) - Blocked'),
     );
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'malicious-server: /malicious  (stdio) - Blocked',
-      ),
+      expect.stringContaining('malicious-server: /malicious  (stdio) - Blocked'),
     );
 
     expect(mockedCreateTransport).toHaveBeenCalledTimes(1);
@@ -642,9 +607,7 @@ describe('mcp list command', () => {
 
     // Since the intersection is empty ([]), both servers should be Blocked!
     expect(debugLogger.log).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'user-allowed-server: /allowed/user  (stdio) - Blocked',
-      ),
+      expect.stringContaining('user-allowed-server: /allowed/user  (stdio) - Blocked'),
     );
     expect(debugLogger.log).toHaveBeenCalledWith(
       expect.stringContaining(

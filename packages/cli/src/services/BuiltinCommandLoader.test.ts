@@ -279,8 +279,7 @@ describe('BuiltinCommandLoader', () => {
         (c) => c.name === 'checkpoints',
       );
       const chatCheckpointHasDebug =
-        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ??
-        false;
+        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
       expect(chatCheckpointHasDebug).toBe(false);
     });
 
@@ -299,8 +298,7 @@ describe('BuiltinCommandLoader', () => {
         (c) => c.name === 'checkpoints',
       );
       const chatCheckpointHasDebug =
-        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ??
-        false;
+        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
       expect(chatCheckpointHasDebug).toBe(true);
     });
   });

@@ -63,9 +63,7 @@ export function isNetworkReliantCommand(
       return true;
     }
 
-    return (
-      !!subCommand && NETWORK_HEAVY_SUBCOMMANDS.has(subCommand.toLowerCase())
-    );
+    return !!subCommand && NETWORK_HEAVY_SUBCOMMANDS.has(subCommand.toLowerCase());
   }
 
   // Other tools (ssh, git, curl, etc.) are always network-reliant

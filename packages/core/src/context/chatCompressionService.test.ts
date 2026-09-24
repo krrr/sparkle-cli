@@ -164,9 +164,7 @@ describe('ChatCompressionService', () => {
   const mockPromptId = 'test-prompt-id';
 
   beforeEach(() => {
-    testTempDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'chat-compression-test-'),
-    );
+    testTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chat-compression-test-'));
     service = new ChatCompressionService();
     mockChat = {
       getHistory: vi.fn(),
@@ -317,17 +315,13 @@ describe('ChatCompressionService', () => {
     expect(result.newHistory).not.toBeNull();
     // It should contain the final verified summary
     expect(result.newHistory![0].parts![0].text).toBe('Verified Summary');
-    expect(mockConfig.getBaseLlmClient().generateContent).toHaveBeenCalledTimes(
-      2,
-    );
+    expect(mockConfig.getBaseLlmClient().generateContent).toHaveBeenCalledTimes(2);
   });
 
   it('should append the active topic to the compressed summary message', async () => {
     vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(true);
     vi.mocked(mockConfig.topicState.getTopic).mockReturnValue('Chapter One');
-    vi.mocked(mockConfig.topicState.getIntent).mockReturnValue(
-      'Implementing X',
-    );
+    vi.mocked(mockConfig.topicState.getIntent).mockReturnValue('Implementing X');
 
     const history: Content[] = [
       { role: 'user', parts: [{ text: 'msg1' }] },
@@ -404,17 +398,10 @@ describe('ChatCompressionService', () => {
     vi.mocked(mockChat.getHistory).mockReturnValue(history);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(800);
 
-    await service.compress(
-      mockChat,
-      mockPromptId,
-      false,
-      mockModel,
-      mockConfig,
-      false,
-    );
+    await service.compress(mockChat, mockPromptId, false, mockModel, mockConfig, false);
 
-    const firstCall = vi.mocked(mockConfig.getBaseLlmClient().generateContent)
-      .mock.calls[0][0];
+    const firstCall = vi.mocked(mockConfig.getBaseLlmClient().generateContent).mock
+      .calls[0][0];
     const lastContent = firstCall.contents?.[firstCall.contents.length - 1];
     expect(lastContent?.parts?.[0].text).toContain(
       'A previous <state_snapshot> exists',
@@ -424,9 +411,7 @@ describe('ChatCompressionService', () => {
   it('should include the approved plan path in the system instruction', async () => {
     const planPath = '/custom/plan/path.md';
     vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(planPath);
-    vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-      'gemini-3.1-pro-preview',
-    );
+    vi.mocked(mockConfig.getActiveModel).mockReturnValue('gemini-3.1-pro-preview');
 
     const history: Content[] = [
       { role: 'user', parts: [{ text: 'msg1' }] },
@@ -435,14 +420,7 @@ describe('ChatCompressionService', () => {
     vi.mocked(mockChat.getHistory).mockReturnValue(history);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600000);
 
-    await service.compress(
-      mockChat,
-      mockPromptId,
-      false,
-      mockModel,
-      mockConfig,
-      false,
-    );
+    await service.compress(mockChat, mockPromptId, false, mockModel, mockConfig, false);
 
     const firstCallText = (
       vi.mocked(mockConfig.getBaseLlmClient().generateContent).mock.calls[0][0]
@@ -462,14 +440,7 @@ describe('ChatCompressionService', () => {
     vi.mocked(mockChat.getHistory).mockReturnValue(history);
     vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600000);
 
-    await service.compress(
-      mockChat,
-      mockPromptId,
-      false,
-      mockModel,
-      mockConfig,
-      false,
-    );
+    await service.compress(mockChat, mockPromptId, false, mockModel, mockConfig, false);
 
     const firstCallText = (
       vi.mocked(mockConfig.getBaseLlmClient().generateContent).mock.calls[0][0]
@@ -521,9 +492,7 @@ describe('ChatCompressionService', () => {
     } as unknown as GenerateContentResponse);
 
     // Inflate the token count by spying on calculateRequestTokenCount
-    vi.spyOn(tokenCalculation, 'calculateRequestTokenCount').mockResolvedValue(
-      10000,
-    );
+    vi.spyOn(tokenCalculation, 'calculateRequestTokenCount').mockResolvedValue(10000);
 
     const result = await service.compress(
       mockChat,
@@ -634,9 +603,7 @@ describe('ChatCompressionService', () => {
       // Verify the new history contains the truncated message
       const keptHistory = result.newHistory!.slice(2); // After summary and 'Got it'
       const truncatedPart = keptHistory[1].parts![0].functionResponse;
-      expect(truncatedPart?.response?.['output']).toContain(
-        'Output too large.',
-      );
+      expect(truncatedPart?.response?.['output']).toContain('Output too large.');
 
       // Verify a file was actually created in the tool_output subdirectory
       const toolOutputDir = path.join(testTempDir, TOOL_OUTPUTS_DIR);
@@ -702,16 +669,14 @@ describe('ChatCompressionService', () => {
       const shellResponse = keptHistory.find(
         (h) =>
           h.parts?.some((p) => p.functionResponse?.name === 'shell') &&
-          (h.parts?.[0].functionResponse?.response?.['output'] as string)
-            ?.length < 100000,
+          (h.parts?.[0].functionResponse?.response?.['output'] as string)?.length <
+            100000,
       );
       const truncatedPart = shellResponse!.parts![0].functionResponse;
       const content = truncatedPart?.response?.['output'] as string;
 
       // DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD = 40000 -> head=8000 (20%), tail=32000 (80%)
-      expect(content).toContain(
-        'Showing first 8,000 and last 32,000 characters',
-      );
+      expect(content).toContain('Showing first 8,000 and last 32,000 characters');
     });
 
     it('should use character-based truncation for massive single-line raw strings', async () => {
@@ -766,16 +731,14 @@ describe('ChatCompressionService', () => {
       const rawResponse = keptHistory.find(
         (h) =>
           h.parts?.some((p) => p.functionResponse?.name === 'raw_tool') &&
-          (h.parts?.[0].functionResponse?.response?.['output'] as string)
-            ?.length < 100000,
+          (h.parts?.[0].functionResponse?.response?.['output'] as string)?.length <
+            100000,
       );
       const truncatedPart = rawResponse!.parts![0].functionResponse;
       const content = truncatedPart?.response?.['output'] as string;
 
       // DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD = 40000 -> head=8000 (20%), tail=32000 (80%)
-      expect(content).toContain(
-        'Showing first 8,000 and last 32,000 characters',
-      );
+      expect(content).toContain('Showing first 8,000 and last 32,000 characters');
     });
 
     it('should fallback to original content and still update budget if truncation fails', async () => {
@@ -874,9 +837,9 @@ describe('ChatCompressionService', () => {
 
       vi.mocked(mockChat.getHistory).mockReturnValue(history);
       vi.mocked(mockChat.getLastPromptTokenCount).mockReturnValue(600000);
-      vi.mocked(
-        mockConfig.getModelConfigService().getContextWindow,
-      ).mockReturnValue(1_000_000);
+      vi.mocked(mockConfig.getModelConfigService().getContextWindow).mockReturnValue(
+        1_000_000,
+      );
 
       const result = await service.compress(
         mockChat,
@@ -908,9 +871,7 @@ describe('ChatCompressionService', () => {
         h.parts?.some((p) => p.functionResponse?.name === 'massive_preserved'),
       );
       const preservedPart = preservedToolTurn!.parts![0].functionResponse;
-      expect(preservedPart?.response?.['output']).toContain(
-        'Output too large.',
-      );
+      expect(preservedPart?.response?.['output']).toContain('Output too large.');
     });
 
     it('should fall back to truncated history for summarization when original is massive (>1M tokens)', async () => {
@@ -933,9 +894,9 @@ describe('ChatCompressionService', () => {
       ];
 
       vi.mocked(mockChat.getHistory).mockReturnValue(history);
-      vi.mocked(
-        mockConfig.getModelConfigService().getContextWindow,
-      ).mockReturnValue(1_000_000);
+      vi.mocked(mockConfig.getModelConfigService().getContextWindow).mockReturnValue(
+        1_000_000,
+      );
 
       const result = await service.compress(
         mockChat,
@@ -1016,8 +977,6 @@ describe('appendActiveTopicToSummary', () => {
 
     const result = appendActiveTopicToSummary(summary, mockConfig);
 
-    expect(result).toBe(
-      `${summary}\n\n[Current Topic: Chapter One with newline]`,
-    );
+    expect(result).toBe(`${summary}\n\n[Current Topic: Chapter One with newline]`);
   });
 });

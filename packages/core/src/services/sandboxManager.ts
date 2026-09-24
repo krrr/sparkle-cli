@@ -205,10 +205,7 @@ export const GOVERNANCE_FILES = [
  * Files that contain sensitive secrets or credentials and should be
  * completely hidden (deny read/write) in any sandbox.
  */
-export const SECRET_FILES = [
-  { pattern: '.env' },
-  { pattern: '.env.*' },
-] as const;
+export const SECRET_FILES = [{ pattern: '.env' }, { pattern: '.env.*' }] as const;
 
 /**
  * Checks if a given file name matches any of the secret file patterns.
@@ -411,10 +408,9 @@ export async function resolveSandboxPaths(
 
   if (worktreeGitDir) {
     const gitIdentities = new Set(
-      [
-        path.join(options.workspace, '.git'),
-        path.join(resolvedWorkspace, '.git'),
-      ].map(toPathKey),
+      [path.join(options.workspace, '.git'), path.join(resolvedWorkspace, '.git')].map(
+        toPathKey,
+      ),
     );
     if (policyRead.some((p) => gitIdentities.has(toPathKey(p)))) {
       policyRead.push(worktreeGitDir);
@@ -432,9 +428,7 @@ export async function resolveSandboxPaths(
   const filter = (paths: string[]) =>
     paths.filter((p) => {
       const identity = toPathKey(p);
-      return (
-        !workspaceIdentities.has(identity) && !forbiddenIdentities.has(identity)
-      );
+      return !workspaceIdentities.has(identity) && !forbiddenIdentities.has(identity);
     });
 
   return {

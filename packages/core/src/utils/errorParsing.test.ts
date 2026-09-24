@@ -38,23 +38,17 @@ describe('parseAndFormatApiError', () => {
 
   it('should return the original message if it is not a JSON error', () => {
     const errorMessage = 'This is a plain old error message';
-    expect(parseAndFormatApiError(errorMessage)).toBe(
-      `[API Error: ${errorMessage}]`,
-    );
+    expect(parseAndFormatApiError(errorMessage)).toBe(`[API Error: ${errorMessage}]`);
   });
 
   it('should return the original message for malformed JSON', () => {
     const errorMessage = '[Stream Error: {"error": "malformed}';
-    expect(parseAndFormatApiError(errorMessage)).toBe(
-      `[API Error: ${errorMessage}]`,
-    );
+    expect(parseAndFormatApiError(errorMessage)).toBe(`[API Error: ${errorMessage}]`);
   });
 
   it('should handle JSON that does not match the ApiError structure', () => {
     const errorMessage = '[Stream Error: {"not_an_error": "some other json"}]';
-    expect(parseAndFormatApiError(errorMessage)).toBe(
-      `[API Error: ${errorMessage}]`,
-    );
+    expect(parseAndFormatApiError(errorMessage)).toBe(`[API Error: ${errorMessage}]`);
   });
 
   it('should format a nested API error', () => {
@@ -75,10 +69,7 @@ describe('parseAndFormatApiError', () => {
       },
     });
 
-    const result = parseAndFormatApiError(
-      errorMessage,
-      ProviderType.USE_GEMINI,
-    );
+    const result = parseAndFormatApiError(errorMessage, ProviderType.USE_GEMINI);
     expect(result).toContain('Gemini 2.5 Pro Preview');
     expect(result).toContain(geminiMessage);
   });
@@ -97,8 +88,7 @@ describe('parseAndFormatApiError', () => {
       message: 'Rate limit exceeded (simulated 429 error, limit: 0)',
       status: undefined,
     };
-    const expected =
-      '[API Error: Rate limit exceeded (simulated 429 error, limit: 0)]';
+    const expected = '[API Error: Rate limit exceeded (simulated 429 error, limit: 0)]';
     expect(parseAndFormatApiError(error)).toBe(expected);
   });
 

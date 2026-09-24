@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import {
   hasValidEditorCommand,
   hasValidEditorCommandAsync,
@@ -113,9 +105,7 @@ describe('editor utils', () => {
         // Non-windows tests
         it(`should return true if first command "${commands[0]}" exists on non-windows`, () => {
           Object.defineProperty(process, 'platform', { value: 'linux' });
-          (execSync as Mock).mockReturnValue(
-            Buffer.from(`/usr/bin/${commands[0]}`),
-          );
+          (execSync as Mock).mockReturnValue(Buffer.from(`/usr/bin/${commands[0]}`));
           expect(hasValidEditorCommand(editor)).toBe(true);
           expect(execSync).toHaveBeenCalledWith(`command -v ${commands[0]}`, {
             stdio: 'ignore',
@@ -151,12 +141,9 @@ describe('editor utils', () => {
             Buffer.from(`C:\\Program Files\\...\\${win32Commands[0]}`),
           );
           expect(hasValidEditorCommand(editor)).toBe(true);
-          expect(execSync).toHaveBeenCalledWith(
-            `where.exe ${win32Commands[0]}`,
-            {
-              stdio: 'ignore',
-            },
-          );
+          expect(execSync).toHaveBeenCalledWith(`where.exe ${win32Commands[0]}`, {
+            stdio: 'ignore',
+          });
         });
 
         if (win32Commands.length > 1) {
@@ -217,9 +204,7 @@ describe('editor utils', () => {
       // Non-windows tests
       it(`should use first command "${commands[0]}" when it exists on non-windows`, () => {
         Object.defineProperty(process, 'platform', { value: 'linux' });
-        (execSync as Mock).mockReturnValue(
-          Buffer.from(`/usr/bin/${commands[0]}`),
-        );
+        (execSync as Mock).mockReturnValue(Buffer.from(`/usr/bin/${commands[0]}`));
         const diffCommand = getDiffCommand('old.txt', 'new.txt', editor);
         expect(diffCommand).toEqual({
           command: commands[0],
@@ -431,14 +416,10 @@ describe('editor utils', () => {
 
         await openDiff('old.txt', 'new.txt', editor);
         const diffCommand = getDiffCommand('old.txt', 'new.txt', editor)!;
-        expect(spawn).toHaveBeenCalledWith(
-          diffCommand.command,
-          diffCommand.args,
-          {
-            stdio: 'inherit',
-            shell: process.platform === 'win32',
-          },
-        );
+        expect(spawn).toHaveBeenCalledWith(diffCommand.command, diffCommand.args, {
+          stdio: 'inherit',
+          shell: process.platform === 'win32',
+        });
         expect(mockSpawnOn).toHaveBeenCalledWith('close', expect.any(Function));
         expect(mockSpawnOn).toHaveBeenCalledWith('error', expect.any(Function));
       });
@@ -458,9 +439,7 @@ describe('editor utils', () => {
       });
 
       it(`should resolve and log warning if ${editor} exits with non-zero code`, async () => {
-        const warnSpy = vi
-          .spyOn(debugLogger, 'warn')
-          .mockImplementation(() => {});
+        const warnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
         const mockSpawnOn = vi.fn((event, cb) => {
           if (event === 'close') {
             cb(1);
@@ -518,11 +497,9 @@ describe('editor utils', () => {
       it(`should only emit ExternalEditorClosed once when ${editor} fires both error and close`, async () => {
         const emitSpy = vi.spyOn(coreEvents, 'emit');
         const callbacks: Record<string, (arg: unknown) => void> = {};
-        const mockSpawnOn = vi.fn(
-          (event: string, cb: (arg: unknown) => void) => {
-            callbacks[event] = cb;
-          },
-        );
+        const mockSpawnOn = vi.fn((event: string, cb: (arg: unknown) => void) => {
+          callbacks[event] = cb;
+        });
         (spawn as Mock).mockReturnValue({ on: mockSpawnOn });
 
         const promise = openDiff('old.txt', 'new.txt', editor);
@@ -551,13 +528,9 @@ describe('editor utils', () => {
       it(`should call spawnSync for ${editor}`, async () => {
         await openDiff('old.txt', 'new.txt', editor);
         const diffCommand = getDiffCommand('old.txt', 'new.txt', editor)!;
-        expect(spawnSync).toHaveBeenCalledWith(
-          diffCommand.command,
-          diffCommand.args,
-          {
-            stdio: 'inherit',
-          },
-        );
+        expect(spawnSync).toHaveBeenCalledWith(diffCommand.command, diffCommand.args, {
+          stdio: 'inherit',
+        });
       });
     }
 
@@ -797,10 +770,7 @@ describe('editor utils', () => {
       mockExecAsync((cmd) => cmd.includes('code'));
       vi.stubEnv('SANDBOX', 'sandbox');
       const resolvePromise = resolveEditorAsync('vscode');
-      setTimeout(
-        () => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }),
-        0,
-      );
+      setTimeout(() => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }), 0);
       const result = await resolvePromise;
       expect(result).toBe('vim');
     });
@@ -812,10 +782,7 @@ describe('editor utils', () => {
       const resolvePromise = resolveEditorAsync(undefined);
 
       // Simulate UI selection
-      setTimeout(
-        () => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }),
-        0,
-      );
+      setTimeout(() => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }), 0);
 
       const result = await resolvePromise;
       expect(result).toBe('vim');
@@ -852,10 +819,7 @@ describe('editor utils', () => {
       const resolvePromise = resolveEditorAsync(undefined);
 
       // Simulate UI selection
-      setTimeout(
-        () => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }),
-        0,
-      );
+      setTimeout(() => coreEvents.emit(CoreEvent.EditorSelected, { editor: 'vim' }), 0);
 
       const result = await resolvePromise;
       expect(result).toBe('vim');
@@ -932,24 +896,14 @@ describe('editor utils', () => {
     });
 
     it('should return [] for VS Code-family editors by default', () => {
-      const vscodeEditors: EditorType[] = [
-        'vscode',
-        'vscodium',
-        'cursor',
-        'windsurf',
-      ];
+      const vscodeEditors: EditorType[] = ['vscode', 'vscodium', 'cursor', 'windsurf'];
       for (const editor of vscodeEditors) {
         expect(getEditorExtraArgs(editor)).toEqual([]);
       }
     });
 
     it('should return [--new-window] for VS Code-family editors when newWindow is true', () => {
-      const vscodeEditors: EditorType[] = [
-        'vscode',
-        'vscodium',
-        'cursor',
-        'windsurf',
-      ];
+      const vscodeEditors: EditorType[] = ['vscode', 'vscodium', 'cursor', 'windsurf'];
       for (const editor of vscodeEditors) {
         expect(getEditorExtraArgs(editor, { newWindow: true })).toEqual([
           '--new-window',
@@ -958,12 +912,7 @@ describe('editor utils', () => {
     });
 
     it('should return [] for VS Code-family editors when newWindow is false', () => {
-      const vscodeEditors: EditorType[] = [
-        'vscode',
-        'vscodium',
-        'cursor',
-        'windsurf',
-      ];
+      const vscodeEditors: EditorType[] = ['vscode', 'vscodium', 'cursor', 'windsurf'];
       for (const editor of vscodeEditors) {
         expect(getEditorExtraArgs(editor, { newWindow: false })).toEqual([]);
       }

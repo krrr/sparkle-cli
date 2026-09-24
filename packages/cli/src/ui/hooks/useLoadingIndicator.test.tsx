@@ -123,16 +123,12 @@ describe('useLoadingIndicator', () => {
       });
     });
 
-    expect(result.current.currentLoadingPhrase).toBe(
-      INTERACTIVE_SHELL_WAITING_PHRASE,
-    );
+    expect(result.current.currentLoadingPhrase).toBe(INTERACTIVE_SHELL_WAITING_PHRASE);
   });
 
   it('should reflect values when Responding', async () => {
     vi.spyOn(Math, 'random').mockImplementation(() => 0.5); // Always witty for subsequent phrases
-    const { result } = await renderLoadingIndicatorHook(
-      StreamingState.Responding,
-    );
+    const { result } = await renderLoadingIndicatorHook(StreamingState.Responding);
 
     expect(result.current.elapsedTime).toBe(0);
 

@@ -159,9 +159,7 @@ describe('BrowserManager', () => {
         expect.objectContaining({
           command: 'node',
           args: expect.arrayContaining([
-            expect.stringMatching(
-              /(dist[\\/])?bundled[\\/]chrome-devtools-mcp\.mjs$/,
-            ),
+            expect.stringMatching(/(dist[\\/])?bundled[\\/]chrome-devtools-mcp\.mjs$/),
           ]),
         }),
       );
@@ -176,9 +174,7 @@ describe('BrowserManager', () => {
         expect.objectContaining({
           command: 'node',
           args: expect.arrayContaining([
-            expect.stringMatching(
-              /(dist[\\/])?bundled[\\/]chrome-devtools-mcp\.mjs$/,
-            ),
+            expect.stringMatching(/(dist[\\/])?bundled[\\/]chrome-devtools-mcp\.mjs$/),
           ]),
         }),
       );
@@ -393,8 +389,7 @@ describe('BrowserManager', () => {
         }),
       );
       // Persistent mode should NOT include --isolated or --autoConnect
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).not.toContain('--isolated');
       expect(args).not.toContain('--autoConnect');
       expect(args).not.toContain('-y');
@@ -416,8 +411,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(restrictedConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).toContain(
         '--chromeArg="--host-rules=MAP * ~NOTFOUND, EXCLUDE google.com, EXCLUDE *.openai.com"',
       );
@@ -505,8 +499,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(isolatedConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).toContain('--isolated');
       expect(args).not.toContain('--autoConnect');
     });
@@ -528,8 +521,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(existingConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).toContain('--autoConnect');
       expect(args).not.toContain('--isolated');
 
@@ -666,9 +658,7 @@ describe('BrowserManager', () => {
       vi.mocked(Client).mockImplementation(
         () =>
           ({
-            connect: vi
-              .fn()
-              .mockRejectedValue(new Error('Some unexpected error')),
+            connect: vi.fn().mockRejectedValue(new Error('Some unexpected error')),
             close: vi.fn().mockResolvedValue(undefined),
             listTools: vi.fn(),
             callTool: vi.fn(),
@@ -697,9 +687,7 @@ describe('BrowserManager', () => {
       vi.mocked(Client).mockImplementation(
         () =>
           ({
-            connect: vi
-              .fn()
-              .mockRejectedValue(new Error('Some unexpected error')),
+            connect: vi.fn().mockRejectedValue(new Error('Some unexpected error')),
             close: vi.fn().mockResolvedValue(undefined),
             listTools: vi.fn(),
             callTool: vi.fn(),
@@ -755,8 +743,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(privacyDisabledConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).toContain('--no-usage-statistics');
       expect(args).toContain('--no-performance-crux');
     });
@@ -766,8 +753,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(mockConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).not.toContain('--no-usage-statistics');
       expect(args).not.toContain('--no-performance-crux');
     });
@@ -789,10 +775,7 @@ describe('BrowserManager', () => {
 
     it('should not use McpClientManager from config', async () => {
       // Spy on config method to verify isolation
-      const getMcpClientManagerSpy = vi.spyOn(
-        mockConfig,
-        'getMcpClientManager',
-      );
+      const getMcpClientManagerSpy = vi.spyOn(mockConfig, 'getMcpClientManager');
 
       const manager = new BrowserManager(mockConfig);
       await manager.ensureConnection();
@@ -816,8 +799,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(mockConfig);
       await manager.ensureConnection();
 
-      const transportInstance =
-        vi.mocked(StdioClientTransport).mock.results[0]?.value;
+      const transportInstance = vi.mocked(StdioClientTransport).mock.results[0]?.value;
 
       // Trigger onclose during close()
       vi.spyOn(transportInstance, 'close').mockImplementation(async () => {
@@ -1028,8 +1010,7 @@ describe('BrowserManager', () => {
       const instance = BrowserManager.getInstance(mockConfig);
       await instance.ensureConnection();
 
-      const transportInstance =
-        vi.mocked(StdioClientTransport).mock.results[0]?.value;
+      const transportInstance = vi.mocked(StdioClientTransport).mock.results[0]?.value;
 
       // Trigger onclose during close() which is called by resetAll()
       vi.spyOn(transportInstance, 'close').mockImplementation(async () => {
@@ -1070,8 +1051,7 @@ describe('BrowserManager', () => {
       await manager.ensureConnection();
 
       // Simulate transport closing unexpectedly via the onclose callback
-      const transportInstance =
-        vi.mocked(StdioClientTransport).mock.results[0]?.value;
+      const transportInstance = vi.mocked(StdioClientTransport).mock.results[0]?.value;
       if (transportInstance?.onclose) {
         transportInstance.onclose();
       }
@@ -1164,12 +1144,7 @@ describe('BrowserManager', () => {
       });
 
       const manager = new BrowserManager(mockConfig);
-      for (const tool of [
-        'click_at',
-        'new_page',
-        'press_key',
-        'handle_dialog',
-      ]) {
+      for (const tool of ['click_at', 'new_page', 'press_key', 'handle_dialog']) {
         vi.mocked(injectAutomationOverlay).mockClear();
         vi.mocked(injectInputBlocker).mockClear();
         await manager.callTool(tool, {});
@@ -1323,8 +1298,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(existingConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       expect(args).toContain('--browser-url');
       expect(args).toContain('http://192.168.127.254:9222');
       expect(args).not.toContain('--autoConnect');
@@ -1339,8 +1313,7 @@ describe('BrowserManager', () => {
       const manager = new BrowserManager(mockConfig);
       await manager.ensureConnection();
 
-      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]
-        ?.args as string[];
+      const args = vi.mocked(StdioClientTransport).mock.calls[0]?.[0]?.args as string[];
       // Default persistent mode: no --isolated, no --autoConnect
       expect(args).not.toContain('--isolated');
       expect(args).not.toContain('--autoConnect');

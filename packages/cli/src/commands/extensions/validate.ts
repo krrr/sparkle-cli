@@ -51,10 +51,7 @@ async function validateExtension(args: ValidateArgs) {
 
     const missingContextFiles: string[] = [];
     for (const contextFilePath of contextFileNames) {
-      const contextFileAbsolutePath = path.resolve(
-        absoluteInputPath,
-        contextFilePath,
-      );
+      const contextFileAbsolutePath = path.resolve(absoluteInputPath, contextFilePath);
       if (!fs.existsSync(contextFileAbsolutePath)) {
         missingContextFiles.push(contextFilePath);
       }

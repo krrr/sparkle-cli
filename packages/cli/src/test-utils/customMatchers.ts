@@ -58,8 +58,7 @@ export async function toMatchSvgSnapshot(
   callCountByTest.set(testId, count);
 
   const snapshotName =
-    options?.name ??
-    (count > 1 ? `${currentTestName}-${count}` : currentTestName);
+    options?.name ?? (count > 1 ? `${currentTestName}-${count}` : currentTestName);
 
   const svgFileName =
     sanitize(path.basename(testPath).replace(/\.test\.tsx?$/, '')) +

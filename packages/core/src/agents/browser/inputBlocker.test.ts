@@ -64,9 +64,7 @@ describe('inputBlocker', () => {
 
       const call = vi.mocked(mockBrowserManager.callTool).mock.calls[0];
       const args = call[1] as { function: string };
-      expect(args.function).toContain(
-        'Sparkle CLI is controlling this browser',
-      );
+      expect(args.function).toContain('Sparkle CLI is controlling this browser');
     });
 
     it('should set aria-hidden to prevent accessibility tree pollution', async () => {
@@ -82,9 +80,7 @@ describe('inputBlocker', () => {
         .fn()
         .mockRejectedValue(new Error('Script failed'));
 
-      await expect(
-        injectInputBlocker(mockBrowserManager),
-      ).resolves.toBeUndefined();
+      await expect(injectInputBlocker(mockBrowserManager)).resolves.toBeUndefined();
     });
 
     it('should be safe to call multiple times (idempotent injection)', async () => {
@@ -141,9 +137,7 @@ describe('inputBlocker', () => {
         .fn()
         .mockRejectedValue(new Error('Removal failed'));
 
-      await expect(
-        removeInputBlocker(mockBrowserManager),
-      ).resolves.toBeUndefined();
+      await expect(removeInputBlocker(mockBrowserManager)).resolves.toBeUndefined();
     });
   });
 
@@ -154,12 +148,8 @@ describe('inputBlocker', () => {
         content: [{ type: 'text', text: 'Script ran on page and returned:' }],
       });
 
-      await expect(
-        suspendInputBlocker(mockBrowserManager),
-      ).resolves.toBeUndefined();
-      await expect(
-        resumeInputBlocker(mockBrowserManager),
-      ).resolves.toBeUndefined();
+      await expect(suspendInputBlocker(mockBrowserManager)).resolves.toBeUndefined();
+      await expect(resumeInputBlocker(mockBrowserManager)).resolves.toBeUndefined();
 
       expect(mockBrowserManager.callTool).toHaveBeenCalledTimes(2);
       expect(mockBrowserManager.callTool).toHaveBeenNthCalledWith(

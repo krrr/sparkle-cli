@@ -126,10 +126,7 @@ describe('ToolActionsContext', () => {
       wrapper: WrapperReactComp,
     });
 
-    await result.current.confirm(
-      'modern-call',
-      ToolConfirmationOutcome.ProceedOnce,
-    );
+    await result.current.confirm('modern-call', ToolConfirmationOutcome.ProceedOnce);
 
     expect(mockMessageBus.publish).toHaveBeenCalledWith({
       type: MessageBusType.TOOL_CONFIRMATION_RESPONSE,
@@ -181,15 +178,9 @@ describe('ToolActionsContext', () => {
       deferredIdeClient.resolve(mockIdeClient);
     });
 
-    await result.current.confirm(
-      'edit-call',
-      ToolConfirmationOutcome.ProceedOnce,
-    );
+    await result.current.confirm('edit-call', ToolConfirmationOutcome.ProceedOnce);
 
-    expect(mockIdeClient.resolveDiffFromCli).toHaveBeenCalledWith(
-      '/f.txt',
-      'accepted',
-    );
+    expect(mockIdeClient.resolveDiffFromCli).toHaveBeenCalledWith('/f.txt', 'accepted');
     expect(mockMessageBus.publish).toHaveBeenCalledWith(
       expect.objectContaining({
         correlationId: 'corr-edit',
@@ -277,10 +268,7 @@ describe('ToolActionsContext', () => {
     });
 
     await act(async () => {
-      await result.current.confirm(
-        'legacy-call',
-        ToolConfirmationOutcome.ProceedOnce,
-      );
+      await result.current.confirm('legacy-call', ToolConfirmationOutcome.ProceedOnce);
     });
 
     expect(mockOnConfirm).toHaveBeenCalledWith(

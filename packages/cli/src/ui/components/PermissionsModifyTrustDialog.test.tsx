@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
 import { PermissionsModifyTrustDialog } from './PermissionsModifyTrustDialog.js';
@@ -144,10 +136,9 @@ describe('PermissionsModifyTrustDialog', () => {
 
   it('should call onExit when escape is pressed', async () => {
     const onExit = vi.fn();
-    const { stdin, lastFrame, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
-      );
+    const { stdin, lastFrame, waitUntilReady, unmount } = await renderWithProviders(
+      <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
+    );
 
     await waitFor(() => expect(lastFrame()).not.toContain('Loading...'));
 
@@ -182,10 +173,9 @@ describe('PermissionsModifyTrustDialog', () => {
     });
 
     const onExit = vi.fn();
-    const { stdin, lastFrame, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
-      );
+    const { stdin, lastFrame, waitUntilReady, unmount } = await renderWithProviders(
+      <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
+    );
 
     await waitFor(() => expect(lastFrame()).not.toContain('Loading...'));
 
@@ -216,10 +206,9 @@ describe('PermissionsModifyTrustDialog', () => {
     });
 
     const onExit = vi.fn();
-    const { stdin, lastFrame, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
-      );
+    const { stdin, lastFrame, waitUntilReady, unmount } = await renderWithProviders(
+      <PermissionsModifyTrustDialog onExit={onExit} addItem={vi.fn()} />,
+    );
 
     await waitFor(() => expect(lastFrame()).not.toContain('Loading...'));
 

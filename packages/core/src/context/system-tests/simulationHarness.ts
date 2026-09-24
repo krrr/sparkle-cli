@@ -123,8 +123,7 @@ export class SimulationHarness {
     // 4. Measure tokens after background processors (requires another render or sync check)
     // In the new model, we'd need to re-render to see the effect of async processors
     // that might have finished.
-    const { processedNodes: nodesAfter } =
-      await this.contextManager.renderHistory();
+    const { processedNodes: nodesAfter } = await this.contextManager.renderHistory();
 
     const tokensAfter =
       this.env.tokenCalculator.calculateConcreteListTokens(nodesAfter);

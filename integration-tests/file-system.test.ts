@@ -43,10 +43,7 @@ describe('file-system', () => {
       });
     }
 
-    expect(
-      foundToolCall,
-      'Expected to find a read_file tool call',
-    ).toBeTruthy();
+    expect(foundToolCall, 'Expected to find a read_file tool call').toBeTruthy();
 
     assertModelHasOutput(result);
     checkModelOutputContent(result, {
@@ -128,10 +125,7 @@ describe('file-system', () => {
     if (!foundToolCall) {
       printDebugInfo(rig, result);
     }
-    expect(
-      foundToolCall,
-      'Expected to find a write_file tool call',
-    ).toBeTruthy();
+    expect(foundToolCall, 'Expected to find a write_file tool call').toBeTruthy();
 
     const newFileContent = rig.readFile(fileName);
     // Trim to tolerate models that idiomatically append a trailing newline.
@@ -152,13 +146,10 @@ describe('file-system', () => {
     await rig.waitForTelemetryReady();
     const toolLogs = rig.readToolLogs();
 
-    const readCall = toolLogs.find(
-      (log) => log.toolRequest.name === 'read_file',
-    );
+    const readCall = toolLogs.find((log) => log.toolRequest.name === 'read_file');
     const writeCall = toolLogs.find(
       (log) =>
-        log.toolRequest.name === 'write_file' ||
-        log.toolRequest.name === 'replace',
+        log.toolRequest.name === 'write_file' || log.toolRequest.name === 'replace',
     );
 
     if (!readCall || !writeCall) {
@@ -201,8 +192,7 @@ describe('file-system', () => {
 
     const toolLogs = rig.readToolLogs();
     const successfulEdit = toolLogs.some(
-      (log) =>
-        validTools.includes(log.toolRequest.name) && log.toolRequest.success,
+      (log) => validTools.includes(log.toolRequest.name) && log.toolRequest.success,
     );
     if (!successfulEdit) {
       console.error(
@@ -227,10 +217,9 @@ describe('file-system', () => {
   });
 
   it('should fail safely when trying to edit a non-existent file', async () => {
-    await rig.setup(
-      'should fail safely when trying to edit a non-existent file',
-      { settings: { tools: { core: ['read_file', 'replace'] } } },
-    );
+    await rig.setup('should fail safely when trying to edit a non-existent file', {
+      settings: { tools: { core: ['read_file', 'replace'] } },
+    });
     const fileName = 'non_existent.txt';
 
     const result = await rig.run({
@@ -240,12 +229,8 @@ describe('file-system', () => {
     await rig.waitForTelemetryReady();
     const toolLogs = rig.readToolLogs();
 
-    const readAttempt = toolLogs.find(
-      (log) => log.toolRequest.name === 'read_file',
-    );
-    const writeAttempt = toolLogs.find(
-      (log) => log.toolRequest.name === 'write_file',
-    );
+    const readAttempt = toolLogs.find((log) => log.toolRequest.name === 'read_file');
+    const writeAttempt = toolLogs.find((log) => log.toolRequest.name === 'write_file');
     const successfulReplace = toolLogs.find(
       (log) => log.toolRequest.name === 'replace' && log.toolRequest.success,
     );
@@ -268,15 +253,10 @@ describe('file-system', () => {
     // CRITICAL: Verify that no matter what the model did, it never successfully
     // wrote or replaced anything.
     if (writeAttempt) {
-      console.error(
-        'A write_file attempt was made when no file should be written.',
-      );
+      console.error('A write_file attempt was made when no file should be written.');
       printDebugInfo(rig, result);
     }
-    expect(
-      writeAttempt,
-      'write_file should not have been called',
-    ).toBeUndefined();
+    expect(writeAttempt, 'write_file should not have been called').toBeUndefined();
 
     if (successfulReplace) {
       console.error('A successful replace occurred when it should not have.');
@@ -290,8 +270,6 @@ describe('file-system', () => {
     // Final verification: ensure the file was not created.
     const filePath = path.join(rig.testDir!, fileName);
     const fileExists = existsSync(filePath);
-    expect(fileExists, 'The non-existent file should not be created').toBe(
-      false,
-    );
+    expect(fileExists, 'The non-existent file should not be created').toBe(false);
   });
 });

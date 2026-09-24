@@ -75,10 +75,7 @@ async function downloadBinary() {
 
     // Node 18+ global fetch response.body is a ReadableStream (web stream)
     // pipeline(Readable.fromWeb(response.body), fileStream) works in Node 18+
-    await pipeline(
-      Readable.fromWeb(response.body as ReadableStream),
-      fileStream,
-    );
+    await pipeline(Readable.fromWeb(response.body as ReadableStream), fileStream);
 
     console.log(`[Extract] Extracting ${archivePath}...`);
     // Extract using shell commands for simplicity
@@ -91,11 +88,7 @@ async function downloadBinary() {
       } else {
         // Fallback for sub-directory if it happens
         const extractedDirName = `ripgrep-${VERSION}-${target.file.replace('.tar.gz', '')}`;
-        const fallbackSourceBin = path.join(
-          CORE_VENDOR_DIR,
-          extractedDirName,
-          'rg',
-        );
+        const fallbackSourceBin = path.join(CORE_VENDOR_DIR, extractedDirName, 'rg');
         if (fs.existsSync(fallbackSourceBin)) {
           await fsPromises.rename(fallbackSourceBin, finalBinPath);
           await fsPromises.rm(path.join(CORE_VENDOR_DIR, extractedDirName), {

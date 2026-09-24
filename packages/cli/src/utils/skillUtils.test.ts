@@ -135,11 +135,7 @@ describe('skillUtils', () => {
     expect(skills[0].name).toBe('weather-skill');
 
     // Verify it was copied to the workspace skills dir
-    const installedPath = path.join(
-      tempDir,
-      '.sparkle/skills',
-      'weather-skill',
-    );
+    const installedPath = path.join(tempDir, '.sparkle/skills', 'weather-skill');
     const installedExists = await fs.stat(installedPath).catch(() => null);
     expect(installedExists?.isDirectory()).toBe(true);
 

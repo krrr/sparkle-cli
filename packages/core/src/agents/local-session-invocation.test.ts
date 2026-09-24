@@ -27,9 +27,7 @@ vi.mock('./local-subagent-protocol.js');
 
 const MockLocalSubagentSession = vi.mocked(LocalSubagentSession);
 
-let capturedActivityCallback:
-  | ((activity: SubagentActivityEvent) => void)
-  | undefined;
+let capturedActivityCallback: ((activity: SubagentActivityEvent) => void) | undefined;
 
 const testDefinition: LocalAgentDefinition = {
   kind: 'local',
@@ -97,9 +95,9 @@ describe('LocalSessionInvocation', () => {
       params,
       mockMessageBus,
     );
-    expect(
-      (invocation as unknown as { messageBus: MessageBus }).messageBus,
-    ).toBe(mockMessageBus);
+    expect((invocation as unknown as { messageBus: MessageBus }).messageBus).toBe(
+      mockMessageBus,
+    );
   });
 
   describe('getDescription', () => {
@@ -286,9 +284,7 @@ describe('LocalSessionInvocation', () => {
       const runningCalls = progressCalls.filter((p) => p.state === 'running');
       // The first running call with a tool_call should show 'running'
       const firstToolCall = runningCalls.find((p) =>
-        p.recentActivity?.some(
-          (a) => a.type === 'tool_call' && a.content === 'ls',
-        ),
+        p.recentActivity?.some((a) => a.type === 'tool_call' && a.content === 'ls'),
       );
       expect(firstToolCall).toBeDefined();
 
@@ -296,9 +292,7 @@ describe('LocalSessionInvocation', () => {
       const hasCompleted = progressCalls.some((p) =>
         p.recentActivity?.some(
           (a) =>
-            a.type === 'tool_call' &&
-            a.content === 'ls' &&
-            a.status === 'completed',
+            a.type === 'tool_call' && a.content === 'ls' && a.status === 'completed',
         ),
       );
       expect(hasCompleted).toBe(true);
@@ -381,9 +375,7 @@ describe('LocalSessionInvocation', () => {
         (c) => c[0] as SubagentProgress,
       );
       const hasCancelled = progressCalls.some((p) =>
-        p.recentActivity?.some(
-          (a) => a.type === 'thought' && a.status === 'cancelled',
-        ),
+        p.recentActivity?.some((a) => a.type === 'thought' && a.status === 'cancelled'),
       );
       expect(hasCancelled).toBe(true);
     });
@@ -501,13 +493,9 @@ describe('LocalSessionInvocation', () => {
       const lastRunning = afterFourthActivity[afterFourthActivity.length - 1];
       expect(lastRunning.recentActivity.length).toBeLessThanOrEqual(3);
       // Should contain tool4 (the latest)
-      expect(
-        lastRunning.recentActivity.some((a) => a.content === 'tool4'),
-      ).toBe(true);
+      expect(lastRunning.recentActivity.some((a) => a.content === 'tool4')).toBe(true);
       // Should NOT contain tool1 (trimmed away)
-      expect(
-        lastRunning.recentActivity.some((a) => a.content === 'tool1'),
-      ).toBe(false);
+      expect(lastRunning.recentActivity.some((a) => a.content === 'tool1')).toBe(false);
     });
 
     it('should handle executor errors', async () => {
@@ -567,9 +555,7 @@ describe('LocalSessionInvocation', () => {
       const progressCalls = updateOutput.mock.calls.map(
         (c) => c[0] as SubagentProgress,
       );
-      const hasCancelledState = progressCalls.some(
-        (p) => p.state === 'cancelled',
-      );
+      const hasCancelledState = progressCalls.some((p) => p.state === 'cancelled');
       expect(hasCancelledState).toBe(true);
     });
 
@@ -674,10 +660,7 @@ describe('LocalSessionInvocation', () => {
       setupMockSession({});
       const params = { query: 'cleanup' };
       const controller = new AbortController();
-      const removeEventListenerSpy = vi.spyOn(
-        controller.signal,
-        'removeEventListener',
-      );
+      const removeEventListenerSpy = vi.spyOn(controller.signal, 'removeEventListener');
       const updateOutput = vi.fn();
       const invocation = new LocalSessionInvocation(
         testDefinition,

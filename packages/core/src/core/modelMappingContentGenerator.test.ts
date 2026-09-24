@@ -21,10 +21,7 @@ describe('ModelMappingContentGenerator', () => {
       generateContent: vi.fn().mockResolvedValue({}),
     } as unknown as ContentGenerator;
 
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
+    const generator = new ModelMappingContentGenerator(mockWrapped, mockMappings);
     const req = { model: 'gemini-3.5-flash', contents: [] };
 
     await generator.generateContent(req, 'prompt-id', LlmRole.MAIN);
@@ -41,10 +38,7 @@ describe('ModelMappingContentGenerator', () => {
       generateContent: vi.fn().mockResolvedValue({}),
     } as unknown as ContentGenerator;
 
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
+    const generator = new ModelMappingContentGenerator(mockWrapped, mockMappings);
     const req = { model: 'models/gemini-3.5-flash', contents: [] };
 
     await generator.generateContent(req, 'prompt-id', LlmRole.MAIN);
@@ -61,10 +55,7 @@ describe('ModelMappingContentGenerator', () => {
       generateContent: vi.fn().mockResolvedValue({}),
     } as unknown as ContentGenerator;
 
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
+    const generator = new ModelMappingContentGenerator(mockWrapped, mockMappings);
     const req = { model: 'unknown-model', contents: [] };
 
     await generator.generateContent(req, 'prompt-id', LlmRole.MAIN);
@@ -81,10 +72,7 @@ describe('ModelMappingContentGenerator', () => {
       generateContent: vi.fn().mockResolvedValue({}),
     } as unknown as ContentGenerator;
 
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
+    const generator = new ModelMappingContentGenerator(mockWrapped, mockMappings);
     const req = { model: 'models/unknown-model', contents: [] };
 
     await generator.generateContent(req, 'prompt-id', LlmRole.MAIN);
@@ -101,10 +89,7 @@ describe('ModelMappingContentGenerator', () => {
       generateContent: vi.fn().mockResolvedValue({}),
     } as unknown as ContentGenerator;
 
-    const generator = new ModelMappingContentGenerator(
-      mockWrapped,
-      mockMappings,
-    );
+    const generator = new ModelMappingContentGenerator(mockWrapped, mockMappings);
     const req = { contents: [] } as unknown as GenerateContentParameters;
 
     await generator.generateContent(req, 'prompt-id', LlmRole.MAIN);

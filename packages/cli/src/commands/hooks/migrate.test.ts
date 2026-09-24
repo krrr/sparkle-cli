@@ -45,12 +45,8 @@ describe('migrate command', () => {
     vi.resetAllMocks();
 
     mockSetValue = vi.fn();
-    debugLoggerLogSpy = vi
-      .spyOn(debugLogger, 'log')
-      .mockImplementation(() => {});
-    debugLoggerErrorSpy = vi
-      .spyOn(debugLogger, 'error')
-      .mockImplementation(() => {});
+    debugLoggerLogSpy = vi.spyOn(debugLogger, 'log').mockImplementation(() => {});
+    debugLoggerErrorSpy = vi.spyOn(debugLogger, 'error').mockImplementation(() => {});
 
     // Mock process.cwd()
     originalCwd = process.cwd;

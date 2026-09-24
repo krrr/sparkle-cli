@@ -116,9 +116,7 @@ describe('SkillCommandLoader', () => {
   });
 
   it('should propagate extensionName to the generated slash command', async () => {
-    const mockSkills = [
-      { name: 'skill1', description: 'desc', extensionName: 'ext1' },
-    ];
+    const mockSkills = [{ name: 'skill1', description: 'desc', extensionName: 'ext1' }];
     mockSkillManager.getDisplayableSkills.mockReturnValue(mockSkills);
 
     const loader = new SkillCommandLoader(mockConfig);

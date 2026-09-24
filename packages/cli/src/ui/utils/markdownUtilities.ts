@@ -41,10 +41,7 @@ This function aims to find an *intelligent* or "safe" index within the provided 
  * @param indexToTest The character index to test.
  * @returns True if the index is inside a code block's content, false otherwise.
  */
-const isIndexInsideCodeBlock = (
-  content: string,
-  indexToTest: number,
-): boolean => {
+const isIndexInsideCodeBlock = (content: string, indexToTest: number): boolean => {
   let fenceCount = 0;
   let searchPos = 0;
   while (searchPos < content.length) {
@@ -65,10 +62,7 @@ const isIndexInsideCodeBlock = (
  * @param index The index to check.
  * @returns Start index of the enclosing code block or -1.
  */
-const findEnclosingCodeBlockStart = (
-  content: string,
-  index: number,
-): number => {
+const findEnclosingCodeBlockStart = (content: string, index: number): number => {
   if (!isIndexInsideCodeBlock(content, index)) {
     return -1;
   }
@@ -91,10 +85,7 @@ const findEnclosingCodeBlockStart = (
 };
 
 export const findLastSafeSplitPoint = (content: string) => {
-  const enclosingBlockStart = findEnclosingCodeBlockStart(
-    content,
-    content.length,
-  );
+  const enclosingBlockStart = findEnclosingCodeBlockStart(content, content.length);
   if (enclosingBlockStart !== -1) {
     // The end of the content is contained in a code block. Split right before.
     return enclosingBlockStart;

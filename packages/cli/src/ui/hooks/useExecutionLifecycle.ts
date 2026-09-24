@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  HistoryItemWithoutId,
-  IndividualToolCallDisplay,
-} from '../types.js';
+import type { HistoryItemWithoutId, IndividualToolCallDisplay } from '../types.js';
 import { useCallback, useReducer, useRef, useEffect } from 'react';
 import type {
   AnsiOutput,
@@ -30,11 +27,7 @@ import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
 import { themeManager } from '../../ui/themes/theme-manager.js';
-import {
-  shellReducer,
-  initialState,
-  type BackgroundTask,
-} from './shellReducer.js';
+import { shellReducer, initialState, type BackgroundTask } from './shellReducer.js';
 export { type BackgroundTask };
 
 export const OUTPUT_UPDATE_INTERVAL_MS = 1000;
@@ -196,8 +189,7 @@ export const useExecutionLifecycle = (
   ]);
 
   const backgroundCurrentExecution = useCallback(() => {
-    const pidToBackground =
-      state.activeShellPtyId ?? activeBackgroundExecutionId;
+    const pidToBackground = state.activeShellPtyId ?? activeBackgroundExecutionId;
     if (pidToBackground) {
       // TRACK THE PID BEFORE TRIGGERING THE BACKGROUND ACTION
       // This prevents the onBackground listener from double-registering.
@@ -356,10 +348,7 @@ export const useExecutionLifecycle = (
 
       const userMessageTimestamp = Date.now();
       const callId = `shell-${userMessageTimestamp}`;
-      addItemToHistory(
-        { type: 'user_shell', text: rawQuery },
-        userMessageTimestamp,
-      );
+      addItemToHistory({ type: 'user_shell', text: rawQuery }, userMessageTimestamp);
 
       const isWindows = os.platform() === 'win32';
       const targetDir = config.getTargetDir();
@@ -389,9 +378,7 @@ export const useExecutionLifecycle = (
         let executionPid: number | undefined;
 
         const abortHandler = () => {
-          onDebugMessage(
-            `Aborting shell command (PID: ${executionPid ?? 'unknown'})`,
-          );
+          onDebugMessage(`Aborting shell command (PID: ${executionPid ?? 'unknown'})`);
         };
         abortSignal.addEventListener('abort', abortHandler, { once: true });
 
@@ -402,9 +389,7 @@ export const useExecutionLifecycle = (
             if (command.endsWith('\\')) {
               command += ' ';
             }
-            const tmpDir = fs.mkdtempSync(
-              path.join(os.tmpdir(), 'sparkle-shell-'),
-            );
+            const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-shell-'));
             pwdFilePath = path.join(tmpDir, 'pwd.tmp');
             const escapedPwdFilePath = escapeShellArg(pwdFilePath, 'bash');
             commandToExecute = `{\n${command}\n}\n__code=$?; pwd > ${escapedPwdFilePath}; exit $__code`;
@@ -422,83 +407,82 @@ export const useExecutionLifecycle = (
             defaultBg: activeTheme.colors.Background,
           };
 
-          const { pid, result: resultPromise } =
-            await ShellExecutionService.execute(
-              commandToExecute,
-              targetDir,
-              (event) => {
-                let shouldUpdate = false;
+          const { pid, result: resultPromise } = await ShellExecutionService.execute(
+            commandToExecute,
+            targetDir,
+            (event) => {
+              let shouldUpdate = false;
 
-                switch (event.type) {
-                  case 'data':
-                    if (isBinaryStream) break;
-                    if (typeof event.chunk === 'string') {
-                      if (typeof cumulativeStdout === 'string') {
-                        cumulativeStdout += event.chunk;
-                      } else {
-                        cumulativeStdout = event.chunk;
-                      }
+              switch (event.type) {
+                case 'data':
+                  if (isBinaryStream) break;
+                  if (typeof event.chunk === 'string') {
+                    if (typeof cumulativeStdout === 'string') {
+                      cumulativeStdout += event.chunk;
                     } else {
-                      // AnsiOutput (PTY) is always the full state
                       cumulativeStdout = event.chunk;
                     }
-                    shouldUpdate = true;
-                    break;
-                  case 'binary_detected':
-                    isBinaryStream = true;
-                    shouldUpdate = true;
-                    break;
-                  case 'binary_progress':
-                    isBinaryStream = true;
-                    binaryBytesReceived = event.bytesReceived;
-                    shouldUpdate = true;
-                    break;
-                  case 'exit':
-                    // No action needed for exit event during streaming
-                    break;
-                  default:
-                    throw new Error('An unhandled ShellOutputEvent was found.');
-                }
+                  } else {
+                    // AnsiOutput (PTY) is always the full state
+                    cumulativeStdout = event.chunk;
+                  }
+                  shouldUpdate = true;
+                  break;
+                case 'binary_detected':
+                  isBinaryStream = true;
+                  shouldUpdate = true;
+                  break;
+                case 'binary_progress':
+                  isBinaryStream = true;
+                  binaryBytesReceived = event.bytesReceived;
+                  shouldUpdate = true;
+                  break;
+                case 'exit':
+                  // No action needed for exit event during streaming
+                  break;
+                default:
+                  throw new Error('An unhandled ShellOutputEvent was found.');
+              }
 
-                if (executionPid && m.backgroundedPids.has(executionPid)) {
-                  // Already backgrounded: the ExecutionLifecycleService
-                  // subscription from registerBackgroundTask is the single
-                  // writer for this task's card output — appending here as
-                  // well would duplicate every string chunk.
-                  return;
-                }
+              if (executionPid && m.backgroundedPids.has(executionPid)) {
+                // Already backgrounded: the ExecutionLifecycleService
+                // subscription from registerBackgroundTask is the single
+                // writer for this task's card output — appending here as
+                // well would duplicate every string chunk.
+                return;
+              }
 
-                let currentDisplayOutput: string | AnsiOutput;
-                if (isBinaryStream) {
-                  currentDisplayOutput =
-                    binaryBytesReceived > 0
-                      ? `[Receiving binary output... ${formatBytes(binaryBytesReceived)} received]`
-                      : '[Binary output detected. Halting stream...]';
-                } else {
-                  currentDisplayOutput = cumulativeStdout;
-                }
+              let currentDisplayOutput: string | AnsiOutput;
+              if (isBinaryStream) {
+                currentDisplayOutput =
+                  binaryBytesReceived > 0
+                    ? `[Receiving binary output... ${formatBytes(binaryBytesReceived)} received]`
+                    : '[Binary output detected. Halting stream...]';
+              } else {
+                currentDisplayOutput = cumulativeStdout;
+              }
 
-                if (shouldUpdate) {
-                  dispatch({ type: 'SET_OUTPUT_TIME', time: Date.now() });
-                  setPendingHistoryItem((prevItem) => {
-                    if (prevItem?.type === 'tool_group') {
-                      return {
-                        ...prevItem,
-                        tools: prevItem.tools.map((tool) =>
-                          tool.callId === callId
-                            ? { ...tool, resultDisplay: currentDisplayOutput }
-                            : tool,
-                        ),
-                      };
-                    }
-                    return prevItem;
-                  });
-                }
-              },
-              abortSignal,
-              config.getEnableInteractiveShell(),
-              shellExecutionConfig,
-            );
+              if (shouldUpdate) {
+                dispatch({ type: 'SET_OUTPUT_TIME', time: Date.now() });
+                setPendingHistoryItem((prevItem) => {
+                  if (prevItem?.type === 'tool_group') {
+                    return {
+                      ...prevItem,
+                      tools: prevItem.tools.map((tool) =>
+                        tool.callId === callId
+                          ? { ...tool, resultDisplay: currentDisplayOutput }
+                          : tool,
+                      ),
+                    };
+                  }
+                  return prevItem;
+                });
+              }
+            },
+            abortSignal,
+            config.getEnableInteractiveShell(),
+            shellExecutionConfig,
+          );
 
           executionPid = pid;
           if (pid) {
@@ -520,22 +504,15 @@ export const useExecutionLifecycle = (
           setPendingHistoryItem(null);
 
           if (result.backgrounded && result.pid) {
-            registerBackgroundTask(
-              result.pid,
-              rawQuery,
-              cumulativeStdout,
-              'notify',
-            );
+            registerBackgroundTask(result.pid, rawQuery, cumulativeStdout, 'notify');
             dispatch({ type: 'SET_ACTIVE_PTY', pid: null });
           }
 
           let mainContent: string;
           if (isBinaryStream || isBinary(result.rawOutput)) {
-            mainContent =
-              '[Command produced binary output, which is not shown.]';
+            mainContent = '[Command produced binary output, which is not shown.]';
           } else {
-            mainContent =
-              result.output.trim() || '(Command produced no output)';
+            mainContent = result.output.trim() || '(Command produced no output)';
           }
 
           let finalOutput: string | AnsiOutput =

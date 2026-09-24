@@ -33,8 +33,6 @@ export function getPlanModeExitMessage(
   isManual: boolean = false,
 ): string {
   const description = getApprovalModeDescription(newMode);
-  const prefix = isManual
-    ? 'User has manually exited Plan Mode.'
-    : 'Plan approved.';
+  const prefix = isManual ? 'User has manually exited Plan Mode.' : 'Plan approved.';
   return `${prefix} Switching to ${description}.`;
 }

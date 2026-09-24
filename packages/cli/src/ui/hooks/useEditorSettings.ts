@@ -5,10 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import type {
-  LoadableSettingScope,
-  LoadedSettings,
-} from '../../config/settings.js';
+import type { LoadableSettingScope, LoadedSettings } from '../../config/settings.js';
 import { MessageType } from '../types.js';
 import type { EditorType } from 'sparkle-cli-core';
 import {
@@ -47,8 +44,7 @@ export const useEditorSettings = (
     (editorType: EditorType | undefined, scope: LoadableSettingScope) => {
       if (
         editorType &&
-        (!hasValidEditorCommand(editorType) ||
-          !allowEditorTypeInSandbox(editorType))
+        (!hasValidEditorCommand(editorType) || !allowEditorTypeInSandbox(editorType))
       ) {
         return;
       }

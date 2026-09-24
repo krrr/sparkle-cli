@@ -52,8 +52,7 @@ vi.mock('./AnsiOutput.js', () => ({
 }));
 
 // Mock useKeypress
-let keypressHandlers: Array<{ handler: KeypressHandler; isActive: boolean }> =
-  [];
+let keypressHandlers: Array<{ handler: KeypressHandler; isActive: boolean }> = [];
 vi.mock('../hooks/useKeypress.js', () => ({
   useKeypress: vi.fn((handler, { isActive }) => {
     keypressHandlers.push({ handler, isActive });
@@ -86,10 +85,7 @@ vi.mock('./shared/ScrollableList.js', () => ({
       renderItem,
     }: {
       data: BackgroundTask[];
-      renderItem: (props: {
-        item: BackgroundTask;
-        index: number;
-      }) => React.ReactNode;
+      renderItem: (props: { item: BackgroundTask; index: number }) => React.ReactNode;
     }) => (
       <Box flexDirection="column">
         {data.map((item: BackgroundTask, index: number) => (
@@ -218,11 +214,7 @@ describe('<BackgroundTaskDisplay />', () => {
       width,
     );
 
-    expect(ShellExecutionService.resizePty).toHaveBeenCalledWith(
-      shell1.pid,
-      76,
-      20,
-    );
+    expect(ShellExecutionService.resizePty).toHaveBeenCalledWith(shell1.pid, 76, 20);
 
     rerender(
       <ScrollProvider>
@@ -237,11 +229,7 @@ describe('<BackgroundTaskDisplay />', () => {
       </ScrollProvider>,
     );
 
-    expect(ShellExecutionService.resizePty).toHaveBeenCalledWith(
-      shell1.pid,
-      96,
-      26,
-    );
+    expect(ShellExecutionService.resizePty).toHaveBeenCalledWith(shell1.pid, 96, 26);
     unmount();
   });
 

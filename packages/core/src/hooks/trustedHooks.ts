@@ -24,10 +24,7 @@ export class TrustedHooksManager {
   private trustedHooks: TrustedHooksConfig = {};
 
   constructor() {
-    this.configPath = path.join(
-      Storage.getGlobalGeminiDir(),
-      'trusted_hooks.json',
-    );
+    this.configPath = path.join(Storage.getGlobalGeminiDir(), 'trusted_hooks.json');
     this.load();
   }
 
@@ -50,10 +47,7 @@ export class TrustedHooksManager {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(
-        this.configPath,
-        JSON.stringify(this.trustedHooks, null, 2),
-      );
+      fs.writeFileSync(this.configPath, JSON.stringify(this.trustedHooks, null, 2));
     } catch (error) {
       debugLogger.warn('Failed to save trusted hooks config', error);
     }

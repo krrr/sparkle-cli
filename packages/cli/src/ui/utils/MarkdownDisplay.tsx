@@ -131,10 +131,7 @@ const MarkdownDisplayInternal: React.FC<MarkdownDisplayProps> = ({
       codeBlockLang = codeFenceMatch[2] || null;
     } else if (tableRowMatch && !inTable) {
       // Potential table start - check if next line is separator
-      if (
-        index + 1 < lines.length &&
-        lines[index + 1].match(tableSeparatorRegex)
-      ) {
+      if (index + 1 < lines.length && lines[index + 1].match(tableSeparatorRegex)) {
         inTable = true;
         tableHeaders = tableRowMatch[1].split('|').map((cell) => cell.trim());
         tableRows = [];
@@ -222,10 +219,7 @@ const MarkdownDisplayInternal: React.FC<MarkdownDisplayProps> = ({
         case 4:
           headerNode = (
             <Text italic color={theme.text.secondary}>
-              <RenderInline
-                text={headerText}
-                defaultColor={theme.text.secondary}
-              />
+              <RenderInline text={headerText} defaultColor={theme.text.secondary} />
             </Text>
           );
           break;
@@ -338,11 +332,7 @@ const RenderCodeBlockInternal: React.FC<RenderCodeBlockProps> = ({
 
   // When not in alternate buffer mode we need to be careful that we don't
   // trigger flicker when the pending code is too long to fit in the terminal
-  if (
-    !isAlternateBuffer &&
-    isPending &&
-    availableTerminalHeight !== undefined
-  ) {
+  if (!isAlternateBuffer && isPending && availableTerminalHeight !== undefined) {
     const MAX_CODE_LINES_WHEN_PENDING = Math.max(
       0,
       availableTerminalHeight - RESERVED_LINES,
@@ -353,9 +343,7 @@ const RenderCodeBlockInternal: React.FC<RenderCodeBlockProps> = ({
         // Not enough space to even show the message meaningfully
         return (
           <Box paddingLeft={CODE_BLOCK_PREFIX_PADDING}>
-            <Text color={theme.text.secondary}>
-              ... code is being written ...
-            </Text>
+            <Text color={theme.text.secondary}>... code is being written ...</Text>
           </Box>
         );
       }
@@ -419,10 +407,7 @@ const RenderListItemInternal: React.FC<RenderListItemProps> = ({
   const listResponseColor = theme.text.response ?? theme.text.primary;
 
   return (
-    <Box
-      paddingLeft={indentation + LIST_ITEM_PREFIX_PADDING}
-      flexDirection="row"
-    >
+    <Box paddingLeft={indentation + LIST_ITEM_PREFIX_PADDING} flexDirection="row">
       <Box width={prefixWidth} flexShrink={0}>
         <Text color={listResponseColor}>{prefix}</Text>
       </Box>
@@ -447,9 +432,7 @@ const RenderTableInternal: React.FC<RenderTableProps> = ({
   headers,
   rows,
   terminalWidth,
-}) => (
-  <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />
-);
+}) => <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />;
 
 const RenderTable = React.memo(RenderTableInternal);
 

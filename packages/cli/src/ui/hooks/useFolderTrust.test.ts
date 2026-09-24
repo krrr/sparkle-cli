@@ -20,10 +20,7 @@ import { waitFor } from '../../test-utils/async.js';
 import { useFolderTrust } from './useFolderTrust.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { FolderTrustChoice } from '../components/FolderTrustDialog.js';
-import {
-  TrustLevel,
-  type LoadedTrustedFolders,
-} from '../../config/trustedFolders.js';
+import { TrustLevel, type LoadedTrustedFolders } from '../../config/trustedFolders.js';
 import * as trustedFolders from '../../config/trustedFolders.js';
 import { coreEvents, ExitCodes, isHeadlessMode } from 'sparkle-cli-core';
 import { MessageType } from '../types.js';
@@ -33,9 +30,7 @@ const mockedExit = vi.hoisted(() => vi.fn());
 
 vi.mock('sparkle-cli-core', async () => {
   const actual =
-    await vi.importActual<typeof import('sparkle-cli-core')>(
-      'sparkle-cli-core',
-    );
+    await vi.importActual<typeof import('sparkle-cli-core')>('sparkle-cli-core');
   return {
     ...actual,
     isHeadlessMode: vi.fn().mockReturnValue(false),
@@ -46,8 +41,7 @@ vi.mock('sparkle-cli-core', async () => {
 });
 
 vi.mock('node:process', async () => {
-  const actual =
-    await vi.importActual<typeof import('node:process')>('node:process');
+  const actual = await vi.importActual<typeof import('node:process')>('node:process');
   return {
     ...actual,
     cwd: mockedCwd,
@@ -96,9 +90,7 @@ describe('useFolderTrust', () => {
       setValue: vi.fn(),
     } as unknown as LoadedTrustedFolders;
 
-    vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(
-      mockTrustedFolders,
-    );
+    vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(mockTrustedFolders);
     isWorkspaceTrustedSpy = vi.spyOn(trustedFolders, 'isWorkspaceTrusted');
     mockedCwd.mockReturnValue('/test/path');
     onTrustChange = vi.fn();
@@ -154,9 +146,7 @@ describe('useFolderTrust', () => {
 
   it('should send a message if the folder is untrusted', async () => {
     isWorkspaceTrustedSpy.mockReturnValue({ isTrusted: false, source: 'file' });
-    await renderHook(() =>
-      useFolderTrust(mockSettings, onTrustChange, addItem),
-    );
+    await renderHook(() => useFolderTrust(mockSettings, onTrustChange, addItem));
     expect(addItem).toHaveBeenCalledWith(
       {
         text: 'This folder is untrusted, project settings, hooks, MCPs, and AGENTS.md files will not be applied for this folder.\nUse the `/permissions` command to change the trust level.',
@@ -168,9 +158,7 @@ describe('useFolderTrust', () => {
 
   it('should not send a message if the folder is trusted', async () => {
     isWorkspaceTrustedSpy.mockReturnValue({ isTrusted: true, source: 'file' });
-    await renderHook(() =>
-      useFolderTrust(mockSettings, onTrustChange, addItem),
-    );
+    await renderHook(() => useFolderTrust(mockSettings, onTrustChange, addItem));
     expect(addItem).not.toHaveBeenCalled();
   });
 
@@ -196,9 +184,7 @@ describe('useFolderTrust', () => {
     });
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.TRUST_FOLDER,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.TRUST_FOLDER);
     });
 
     await waitFor(() => {
@@ -222,9 +208,7 @@ describe('useFolderTrust', () => {
     );
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.TRUST_PARENT,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.TRUST_PARENT);
     });
 
     await waitFor(() => {
@@ -248,9 +232,7 @@ describe('useFolderTrust', () => {
     );
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.DO_NOT_TRUST,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.DO_NOT_TRUST);
     });
 
     await waitFor(() => {
@@ -306,9 +288,7 @@ describe('useFolderTrust', () => {
     });
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.TRUST_FOLDER,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.TRUST_FOLDER);
     });
 
     await waitFor(() => {
@@ -327,9 +307,7 @@ describe('useFolderTrust', () => {
     );
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.TRUST_FOLDER,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.TRUST_FOLDER);
     });
 
     await waitFor(() => {
@@ -352,9 +330,7 @@ describe('useFolderTrust', () => {
     );
 
     await act(async () => {
-      await result.current.handleFolderTrustSelect(
-        FolderTrustChoice.TRUST_FOLDER,
-      );
+      await result.current.handleFolderTrustSelect(FolderTrustChoice.TRUST_FOLDER);
     });
 
     await vi.runAllTimersAsync();

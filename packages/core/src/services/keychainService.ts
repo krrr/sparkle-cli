@@ -77,9 +77,7 @@ export class KeychainService {
    * Lists all account/secret pairs stored under this service.
    * @throws Error if the keychain is unavailable.
    */
-  async findCredentials(): Promise<
-    Array<{ account: string; password: string }>
-  > {
+  async findCredentials(): Promise<Array<{ account: string; password: string }>> {
     const keychain = await this.getKeychainOrThrow();
     return keychain.findCredentials(this.serviceName);
   }
@@ -101,9 +99,7 @@ export class KeychainService {
     const forceFileStorage = process.env[FORCE_FILE_STORAGE_ENV_VAR] === 'true';
 
     // Try to get the native OS keychain unless file storage is requested.
-    const nativeKeychain = forceFileStorage
-      ? null
-      : await this.getNativeKeychain();
+    const nativeKeychain = forceFileStorage ? null : await this.getNativeKeychain();
 
     coreEvents.emitTelemetryKeychainAvailability(
       new KeychainAvailabilityEvent(nativeKeychain !== null),
@@ -145,10 +141,7 @@ export class KeychainService {
     } catch (error) {
       // Avoid logging full error objects to prevent PII exposure.
       const message = error instanceof Error ? error.message : String(error);
-      debugLogger.debug(
-        'Keychain initialization encountered an error:',
-        message,
-      );
+      debugLogger.debug('Keychain initialization encountered an error:', message);
       return null;
     }
   }
@@ -182,22 +175,14 @@ export class KeychainService {
 
     const probe = async (): Promise<boolean> => {
       await keychain.setPassword(this.serviceName, testAccount, testPassword);
-      const retrieved = await keychain.getPassword(
-        this.serviceName,
-        testAccount,
-      );
-      const deleted = await keychain.deletePassword(
-        this.serviceName,
-        testAccount,
-      );
+      const retrieved = await keychain.getPassword(this.serviceName, testAccount);
+      const deleted = await keychain.deletePassword(this.serviceName, testAccount);
       return deleted && retrieved === testPassword;
     };
 
     return Promise.race([
       probe(),
-      new Promise<false>((resolve) =>
-        setTimeout(() => resolve(false), 2000).unref(),
-      ),
+      new Promise<false>((resolve) => setTimeout(() => resolve(false), 2000).unref()),
     ]);
   }
 

@@ -40,8 +40,7 @@ class FakeOpenAiServer {
       let raw = '';
       req.on('data', (chunk) => (raw += chunk.toString()));
       req.on('end', () => {
-        const body = JSON.parse(raw || '{}') as OpenAiRequest &
-          Record<string, unknown>;
+        const body = JSON.parse(raw || '{}') as OpenAiRequest & Record<string, unknown>;
         const headers: Record<string, string> = {};
         for (const [key, value] of Object.entries(req.headers)) {
           headers[key] = String(value);
@@ -55,8 +54,7 @@ class FakeOpenAiServer {
         }
         const result = handler.handler(body, headers);
         res.writeHead(result.status, {
-          'Content-Type':
-            result.contentType ?? 'application/json; charset=utf-8',
+          'Content-Type': result.contentType ?? 'application/json; charset=utf-8',
         });
         res.end(result.body);
       });
@@ -74,9 +72,7 @@ class FakeOpenAiServer {
   }
 
   async listen(): Promise<string> {
-    await new Promise<void>((resolve) =>
-      this.server.listen(0, '127.0.0.1', resolve),
-    );
+    await new Promise<void>((resolve) => this.server.listen(0, '127.0.0.1', resolve));
     const { port } = this.server.address() as AddressInfo;
     return `http://127.0.0.1:${port}/v1`;
   }
@@ -143,14 +139,10 @@ describe('OpenAiCompatibleGenerator', () => {
         'prompt-1',
         LlmRole.MAIN,
       );
-      expect(response.candidates![0].content!.parts).toEqual([
-        { text: 'Hello world' },
-      ]);
+      expect(response.candidates![0].content!.parts).toEqual([{ text: 'Hello world' }]);
       expect(response.candidates![0].finishReason).toBe(FinishReason.STOP);
       expect(response.usageMetadata!.totalTokenCount).toBe(8);
-      expect(fakeServer.lastRequest!.headers['authorization']).toBe(
-        'Bearer test-key',
-      );
+      expect(fakeServer.lastRequest!.headers['authorization']).toBe('Bearer test-key');
     });
 
     it('maps tool calls and reasoning content', async () => {
@@ -411,12 +403,8 @@ describe('OpenAiCompatibleGenerator', () => {
         (m) => m.role === 'assistant' && m.tool_calls,
       );
       expect(assistantMessage).toBeDefined();
-      expect(assistantMessage!.reasoning_content).toBe(
-        'thinking about the weather',
-      );
-      expect(assistantMessage!.tool_calls![0].function.name).toBe(
-        'get_weather',
-      );
+      expect(assistantMessage!.reasoning_content).toBe('thinking about the weather');
+      expect(assistantMessage!.tool_calls![0].function.name).toBe('get_weather');
     });
 
     it('throws OpenAiApiError on error responses', async () => {

@@ -215,9 +215,7 @@ export function AgentConfigDialog({
   useEffect(() => {
     const scopeSettings = settings.forScope(selectedScope).settings;
     const existingOverride = scopeSettings.agents?.overrides?.[agentName];
-    setPendingOverride(
-      existingOverride ? structuredClone(existingOverride) : {},
-    );
+    setPendingOverride(existingOverride ? structuredClone(existingOverride) : {});
     setModifiedFields(new Set());
   }, [selectedScope, settings, agentName]);
 
@@ -232,9 +230,7 @@ export function AgentConfigDialog({
       }
       // Build the full settings path for agent override
       // e.g., agents.overrides.<agentName>.modelConfig.generateContentConfig.temperature
-      const settingsPath = ['agents', 'overrides', agentName, ...path].join(
-        '.',
-      );
+      const settingsPath = ['agents', 'overrides', agentName, ...path].join('.');
       settings.setValue(selectedScope, settingsPath, value);
       onSave?.();
     },
@@ -258,8 +254,7 @@ export function AgentConfigDialog({
       AGENT_CONFIG_FIELDS.map((field) => {
         const currentValue = getNestedValue(pendingOverride, field.path);
         const defaultValue = getFieldDefaultFromDefinition(field, definition);
-        const effectiveValue =
-          currentValue !== undefined ? currentValue : defaultValue;
+        const effectiveValue = currentValue !== undefined ? currentValue : defaultValue;
 
         let displayValue: string;
         if (field.type === 'boolean') {
@@ -271,15 +266,13 @@ export function AgentConfigDialog({
         }
 
         // Add * if modified
-        const isModified =
-          modifiedFields.has(field.key) || currentValue !== undefined;
+        const isModified = modifiedFields.has(field.key) || currentValue !== undefined;
         if (isModified && currentValue !== undefined) {
           displayValue += '*';
         }
 
         // Get raw value for edit mode
-        const rawValue =
-          currentValue !== undefined ? currentValue : effectiveValue;
+        const rawValue = currentValue !== undefined ? currentValue : effectiveValue;
 
         return {
           key: field.key,
@@ -311,8 +304,7 @@ export function AgentConfigDialog({
 
       const currentValue = getNestedValue(pendingOverride, field.path);
       const defaultValue = getFieldDefaultFromDefinition(field, definition);
-      const effectiveValue =
-        currentValue !== undefined ? currentValue : defaultValue;
+      const effectiveValue = currentValue !== undefined ? currentValue : defaultValue;
       const newValue = !effectiveValue;
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -417,9 +409,7 @@ export function AgentConfigDialog({
         modifiedFields.size > 0
           ? {
               content: (
-                <Text color={theme.text.secondary}>
-                  Changes saved automatically.
-                </Text>
+                <Text color={theme.text.secondary}>Changes saved automatically.</Text>
               ),
               height: 1,
             }

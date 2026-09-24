@@ -1,18 +1,17 @@
 # `Sparkle CLI SDK`
 
-> **Implementation Status:** Core agent loop, tool execution, and session
-> context are implemented. Advanced features like hooks, skills, subagents, and
-> ACP are currently missing.
+> **Implementation Status:** Core agent loop, tool execution, and session context are
+> implemented. Advanced features like hooks, skills, subagents, and ACP are currently
+> missing.
 
 # `Examples`
 
 ## `Simple Example`
 
-> **Status:** Implemented. `GeminiCliAgent` supports `session()` and
-> `resumeSession()`.
+> **Status:** Implemented. `GeminiCliAgent` supports `session()` and `resumeSession()`.
 
-Equivalent to `sparkle -p "what does this project do?"`. Loads all workspace and
-user settings.
+Equivalent to `sparkle -p "what does this project do?"`. Loads all workspace and user
+settings.
 
 ```ts
 import { GeminiCliAgent } from 'sparkle-cli-sdk';
@@ -41,8 +40,7 @@ Validation:
 > **Status:** Implemented. Both static string instructions and dynamic functions
 > (receiving `SessionContext`) are supported.
 
-System instructions can be provided by a static string OR dynamically via a
-function:
+System instructions can be provided by a static string OR dynamically via a function:
 
 ```ts
 import { GeminiCliAgent } from "sparkle-cli-sdk";
@@ -55,14 +53,14 @@ const agent = new GeminiCliAgent({
 
 Validation:
 
-- Static string instructions show up where AGENTS.md content normally would in
-  model call
+- Static string instructions show up where AGENTS.md content normally would in model
+  call
 - Dynamic instructions show up and contain dynamic content.
 
 ## `Custom Tools`
 
-> **Status:** Implemented. `tool()` helper and `GeminiCliAgent` support custom
-> tool definitions and execution.
+> **Status:** Implemented. `tool()` helper and `GeminiCliAgent` support custom tool
+> definitions and execution.
 
 ```ts
 import { GeminiCliAgent, tool, z } from "sparkle-cli-sdk";
@@ -125,8 +123,8 @@ const myHook = hook(
 );
 ```
 
-SDK Hooks can also run as standalone scripts to implement userland "command"
-style hooks:
+SDK Hooks can also run as standalone scripts to implement userland "command" style
+hooks:
 
 ```ts
 import { hook } from "sparkle-cli-sdk";
@@ -146,8 +144,8 @@ Validation (these are probably hardest to validate):
 
 ## `Custom Skills`
 
-> **Status:** Implemented. `skillDir` helper and `GeminiCliAgent` support
-> loading skills from filesystem.
+> **Status:** Implemented. `skillDir` helper and `GeminiCliAgent` support loading skills
+> from filesystem.
 
 Custom skills can be referenced by individual directories or by "skill roots"
 (directories containing many skills).
@@ -207,8 +205,8 @@ const agent = new GeminiCliAgent({
 
 > **Status:** Not Implemented.
 
-Potentially the most important feature of the Sparkle CLI SDK is support for
-extensions, which modularly encapsulate all of the primitives listed above:
+Potentially the most important feature of the Sparkle CLI SDK is support for extensions,
+which modularly encapsulate all of the primitives listed above:
 
 ```ts
 import { GeminiCliAgent, extension } from "sparkle-cli-sdk";
@@ -229,8 +227,8 @@ INSTRUCTIONS",
 
 > **Status:** Not Implemented.
 
-The SDK will include a wrapper utility to interact with the agent via ACP
-instead of the SDK's natural API.
+The SDK will include a wrapper utility to interact with the agent via ACP instead of the
+SDK's natural API.
 
 ```ts
 import { GeminiCliAgent } from "sparkle-cli-sdk";
@@ -255,12 +253,11 @@ TODO
 
 ## `Session Context`
 
-> **Status:** Implemented. `SessionContext` interface exists and is passed to
-> tools.
+> **Status:** Implemented. `SessionContext` interface exists and is passed to tools.
 
-Whenever executing a tool, hook, command, or skill, a SessionContext object
-should be passed as an additional argument after the arguments/payload. The
-interface should look something like:
+Whenever executing a tool, hook, command, or skill, a SessionContext object should be
+passed as an additional argument after the arguments/payload. The interface should look
+something like:
 
 ```ts
 export interface SessionContext {
@@ -311,15 +308,14 @@ export interface AgentShellProcess {
 
 # `Notes`
 
-- To validate the SDK, it would be useful to have a robust way to mock the
-  underlying model API so that the tests could be closer to end-to-end but still
-  deterministic.
-- Need to work in both Gemini-CLI-triggered approvals and optional
-  developer-initiated user prompts / HITL stuff.
-- Need to think about how subagents inherit message context \- e.g. do they have
-  the same session id?
-- Presumably the transcript is kept updated in memory and also persisted to disk
-  by default?
+- To validate the SDK, it would be useful to have a robust way to mock the underlying
+  model API so that the tests could be closer to end-to-end but still deterministic.
+- Need to work in both Gemini-CLI-triggered approvals and optional developer-initiated
+  user prompts / HITL stuff.
+- Need to think about how subagents inherit message context \- e.g. do they have the
+  same session id?
+- Presumably the transcript is kept updated in memory and also persisted to disk by
+  default?
 
 # `Next Steps`
 
@@ -327,8 +323,8 @@ Based on the current implementation status, we can proceed with:
 
 ## Feature 3: Custom Hooks Support
 
-Implement support for loading and registering custom hooks. This involves adding
-a `hooks` option to `GeminiCliAgentOptions`.
+Implement support for loading and registering custom hooks. This involves adding a
+`hooks` option to `GeminiCliAgentOptions`.
 
 **Tasks:**
 
@@ -336,5 +332,5 @@ a `hooks` option to `GeminiCliAgentOptions`.
 2.  Add `hooks` option to `GeminiCliAgentOptions`.
 3.  Implement hook registration logic in `GeminiCliAgent`.
 
-IMPORTANT: Hook signatures should be strongly typed all the way through. You'll
-need to create a mapping of the string event name to the request/response types.
+IMPORTANT: Hook signatures should be strongly typed all the way through. You'll need to
+create a mapping of the string event name to the request/response types.

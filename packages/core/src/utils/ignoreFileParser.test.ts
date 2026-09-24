@@ -31,14 +31,8 @@ describe('IgnoreFileParser', () => {
 
   describe('Basic File Loading', () => {
     it('should identify paths ignored by a single ignore file', async () => {
-      await createTestFile(
-        SPARKLE_IGNORE_FILE_NAME,
-        'ignored.txt\n/ignored_dir/',
-      );
-      const parser = new IgnoreFileParser(
-        projectRoot,
-        SPARKLE_IGNORE_FILE_NAME,
-      );
+      await createTestFile(SPARKLE_IGNORE_FILE_NAME, 'ignored.txt\n/ignored_dir/');
+      const parser = new IgnoreFileParser(projectRoot, SPARKLE_IGNORE_FILE_NAME);
 
       expect(parser.isIgnored('ignored.txt', false)).toBe(true);
       expect(parser.isIgnored('ignored_dir/file.txt', false)).toBe(true);
@@ -82,11 +76,7 @@ describe('IgnoreFileParser', () => {
 
   describe('Direct Pattern Input (isPatterns = true)', () => {
     it('should use raw patterns passed directly in the constructor', () => {
-      const parser = new IgnoreFileParser(
-        projectRoot,
-        ['*.tmp', '!safe.tmp'],
-        true,
-      );
+      const parser = new IgnoreFileParser(projectRoot, ['*.tmp', '!safe.tmp'], true);
 
       expect(parser.isIgnored('temp.tmp', false)).toBe(true);
       expect(parser.isIgnored('safe.tmp', false)).toBe(false);

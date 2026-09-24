@@ -23,10 +23,7 @@ describe('AllowedPathChecker', () => {
     testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'safety-test-'));
     mockCwd = path.join(testRootDir, 'home', 'user', 'project');
     await fs.mkdir(mockCwd, { recursive: true });
-    mockWorkspaces = [
-      mockCwd,
-      path.join(testRootDir, 'home', 'user', 'other-project'),
-    ];
+    mockWorkspaces = [mockCwd, path.join(testRootDir, 'home', 'user', 'other-project')];
     await fs.mkdir(mockWorkspaces[1], { recursive: true });
   });
 
@@ -128,9 +125,7 @@ describe('AllowedPathChecker', () => {
     const input = createInput({ path: symlinkPath });
     const result = await checker.check(input);
     expect(result.decision).toBe(SafetyCheckDecision.DENY);
-    expect(result.reason).toContain(
-      'outside of the allowed workspace directories',
-    );
+    expect(result.reason).toContain('outside of the allowed workspace directories');
   });
 
   it('should allow access if path contains a symlink pointing INSIDE allowed directories', async () => {
@@ -164,10 +159,7 @@ describe('AllowedPathChecker', () => {
     await fs.mkdir(path.dirname(outsidePath), { recursive: true });
     await fs.writeFile(outsidePath, 'secret');
     // Normally 'path' would be checked, but we exclude it
-    const input = createInput(
-      { path: outsidePath },
-      { excluded_args: ['path'] },
-    );
+    const input = createInput({ path: outsidePath }, { excluded_args: ['path'] });
     const result = await checker.check(input);
     expect(result.decision).toBe(SafetyCheckDecision.ALLOW);
   });

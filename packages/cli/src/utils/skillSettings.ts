@@ -20,8 +20,7 @@ export type SkillActionStatus = 'success' | 'no-op' | 'error';
 /**
  * Metadata representing the result of a skill settings operation.
  */
-export interface SkillActionResult
-  extends Omit<FeatureActionResult, 'featureName'> {
+export interface SkillActionResult extends Omit<FeatureActionResult, 'featureName'> {
   skillName: string;
 }
 
@@ -33,9 +32,7 @@ const skillStrategy: FeatureToggleStrategy = {
   enable: (settings, scope, skillName) => {
     const currentScopeDisabled =
       settings.forScope(scope).settings.skills?.disabled ?? [];
-    const newDisabled = currentScopeDisabled.filter(
-      (name) => name !== skillName,
-    );
+    const newDisabled = currentScopeDisabled.filter((name) => name !== skillName);
     settings.setValue(scope, 'skills.disabled', newDisabled);
   },
   isExplicitlyDisabled: (settings, scope, skillName) => {
@@ -63,11 +60,7 @@ export function enableSkill(
   settings: LoadedSettings,
   skillName: string,
 ): SkillActionResult {
-  const { featureName, ...rest } = enableFeature(
-    settings,
-    skillName,
-    skillStrategy,
-  );
+  const { featureName, ...rest } = enableFeature(settings, skillName, skillStrategy);
   return {
     ...rest,
     skillName: featureName,

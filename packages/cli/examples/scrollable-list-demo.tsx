@@ -13,10 +13,7 @@ import {
 import { ScrollProvider } from '../src/ui/contexts/ScrollProvider.js';
 import { MouseProvider } from '../src/ui/contexts/MouseContext.js';
 import { KeypressProvider } from '../src/ui/contexts/KeypressContext.js';
-import {
-  enableMouseEvents,
-  disableMouseEvents,
-} from '../src/ui/utils/mouse.js';
+import { enableMouseEvents, disableMouseEvents } from '../src/ui/utils/mouse.js';
 
 interface Item {
   id: string;
@@ -96,9 +93,9 @@ const Demo = () => {
             padding={1}
           >
             <Text>
-              Press &apos;A&apos; to add an item. Press &apos;E&apos; to edit
-              last item. Press &apos;Ctrl+E&apos; to scroll to end. Press
-              &apos;Esc&apos; to exit. Mouse wheel or Shift+Up/Down to scroll.
+              Press &apos;A&apos; to add an item. Press &apos;E&apos; to edit last item.
+              Press &apos;Ctrl+E&apos; to scroll to end. Press &apos;Esc&apos; to exit.
+              Mouse wheel or Shift+Up/Down to scroll.
             </Text>
             <Box flexGrow={1} borderStyle="round" borderColor="cyan">
               <ScrollableList
@@ -112,11 +109,7 @@ const Demo = () => {
                       width={size.columns - 2}
                       opaque
                       stickyChildren={
-                        <Box
-                          flexDirection="column"
-                          width={size.columns - 2}
-                          opaque
-                        >
+                        <Box flexDirection="column" width={size.columns - 2} opaque>
                           <Text>{item.title}</Text>
                           <Box
                             borderStyle="single"

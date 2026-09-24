@@ -43,8 +43,7 @@ export function enableHook(
   for (const scope of writableScopes) {
     if (isLoadableSettingScope(scope)) {
       const scopePath = settings.forScope(scope).path;
-      const scopeDisabled =
-        settings.forScope(scope).settings.hooksConfig?.disabled;
+      const scopeDisabled = settings.forScope(scope).settings.hooksConfig?.disabled;
       if (scopeDisabled?.includes(hookName)) {
         foundInDisabledScopes.push({ scope, path: scopePath });
       } else {
@@ -69,9 +68,7 @@ export function enableHook(
       if (isLoadableSettingScope(scope)) {
         const currentScopeDisabled =
           settings.forScope(scope).settings.hooksConfig?.disabled ?? [];
-        const newDisabled = currentScopeDisabled.filter(
-          (name) => name !== hookName,
-        );
+        const newDisabled = currentScopeDisabled.filter((name) => name !== hookName);
         settings.setValue(scope, 'hooksConfig.disabled', newDisabled);
         modifiedScopes.push({ scope, path });
       }
@@ -131,9 +128,7 @@ export function disableHook(
 
   // Check if it's already disabled in the other writable scope
   const otherScope =
-    scope === SettingScope.Workspace
-      ? SettingScope.User
-      : SettingScope.Workspace;
+    scope === SettingScope.Workspace ? SettingScope.User : SettingScope.Workspace;
   const alreadyDisabledInOther: ModifiedScope[] = [];
 
   if (isLoadableSettingScope(otherScope)) {

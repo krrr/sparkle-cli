@@ -71,12 +71,7 @@ export class BrowserAgentInvocation extends BaseToolInvocation<
   ) {
     const resolvedName = _toolName ?? 'browser_agent';
     // Note: BrowserAgentDefinition is a factory function, so we use hardcoded names
-    super(
-      params,
-      messageBus,
-      resolvedName,
-      _toolDisplayName ?? 'Browser Agent',
-    );
+    super(params, messageBus, resolvedName, _toolDisplayName ?? 'Browser Agent');
     this.agentName = resolvedName;
   }
 
@@ -90,8 +85,7 @@ export class BrowserAgentInvocation extends BaseToolInvocation<
   getDescription(): string {
     const inputSummary = Object.entries(this.params)
       .map(
-        ([key, value]) =>
-          `${key}: ${String(value).slice(0, INPUT_PREVIEW_MAX_LENGTH)}`,
+        ([key, value]) => `${key}: ${String(value).slice(0, INPUT_PREVIEW_MAX_LENGTH)}`,
       )
       .join(', ');
 
@@ -198,9 +192,7 @@ export class BrowserAgentInvocation extends BaseToolInvocation<
             const description = activity.data['description']
               ? sanitizeErrorMessage(String(activity.data['description']))
               : undefined;
-            const args = JSON.stringify(
-              sanitizeToolArgs(activity.data['args']),
-            );
+            const args = JSON.stringify(sanitizeToolArgs(activity.data['args']));
             const callId = activity.data['callId']
               ? String(activity.data['callId'])
               : randomUUID();
@@ -280,9 +272,7 @@ export class BrowserAgentInvocation extends BaseToolInvocation<
             recentActivity.push({
               id: randomUUID(),
               type: 'thought',
-              content: isCancellation
-                ? sanitizedError
-                : `Error: ${sanitizedError}`,
+              content: isCancellation ? sanitizedError : `Error: ${sanitizedError}`,
               status: newStatus,
             });
             updated = true;
@@ -323,10 +313,7 @@ export class BrowserAgentInvocation extends BaseToolInvocation<
         taskSuccess = parsed?.success === true;
       } catch (parseError) {
         // non-JSON result -> treat as unknown, default false
-        debugLogger.log(
-          'Failed to parse browser agent output as JSON:',
-          parseError,
-        );
+        debugLogger.log('Failed to parse browser agent output as JSON:', parseError);
       }
 
       const resultContent = `Browser agent finished.
@@ -365,8 +352,7 @@ ${output.result}`;
         returnDisplay: progress,
       };
     } catch (error) {
-      const rawErrorMessage =
-        error instanceof Error ? error.message : String(error);
+      const rawErrorMessage = error instanceof Error ? error.message : String(error);
       const isAbort =
         (error instanceof Error && error.name === 'AbortError') ||
         rawErrorMessage.includes('Aborted');

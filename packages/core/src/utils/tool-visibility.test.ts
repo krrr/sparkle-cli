@@ -33,9 +33,9 @@ describe('ToolVisibility Rules', () => {
 
   describe('isRenderedInHistory', () => {
     it('hides tools with parents', () => {
-      expect(
-        isRenderedInHistory(createCtx({ parentCallId: 'parent-123' })),
-      ).toBe(false);
+      expect(isRenderedInHistory(createCtx({ parentCallId: 'parent-123' }))).toBe(
+        false,
+      );
     });
 
     it('hides AskUser errors without results', () => {
@@ -100,9 +100,7 @@ describe('ToolVisibility Rules', () => {
     });
 
     it('returns true for standard tools', () => {
-      expect(
-        belongsInConfirmationQueue(createCtx({ name: 'write_file' })),
-      ).toBe(true);
+      expect(belongsInConfirmationQueue(createCtx({ name: 'write_file' }))).toBe(true);
     });
   });
 

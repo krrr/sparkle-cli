@@ -70,11 +70,7 @@ async function verifyToolExecution(
   expectAllowed: boolean,
   expectedDenialString?: string,
 ) {
-  const log = await waitForToolCallLog(
-    rig,
-    promptCommand.tool,
-    promptCommand.command,
-  );
+  const log = await waitForToolCallLog(rig, promptCommand.tool, promptCommand.command);
 
   if (expectAllowed) {
     expect(log!.toolRequest.success).toBe(true);
@@ -83,9 +79,7 @@ async function verifyToolExecution(
     expect(result).toContain(promptCommand.expectedSuccessResult);
   } else {
     expect(log!.toolRequest.success).toBe(false);
-    expect(result).toContain(
-      expectedDenialString || 'Tool execution denied by policy',
-    );
+    expect(result).toContain(expectedDenialString || 'Tool execution denied by policy');
     expect(result).toContain(promptCommand.expectedFailureResult);
   }
 }

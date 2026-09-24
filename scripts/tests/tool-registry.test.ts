@@ -62,15 +62,11 @@ describe('tool-registry', () => {
   describe('resolveToolName', () => {
     it('resolves canonical names to themselves', () => {
       expect(resolveToolName(registry, 'grep_search')).toBe('grep_search');
-      expect(resolveToolName(registry, 'run_shell_command')).toBe(
-        'run_shell_command',
-      );
+      expect(resolveToolName(registry, 'run_shell_command')).toBe('run_shell_command');
     });
 
     it('resolves legacy alias to canonical name', () => {
-      expect(resolveToolName(registry, 'search_file_content')).toBe(
-        'grep_search',
-      );
+      expect(resolveToolName(registry, 'search_file_content')).toBe('grep_search');
     });
 
     it('returns undefined for unknown tool names', () => {
@@ -114,9 +110,7 @@ describe('tool-registry', () => {
     });
 
     it('returns empty array for unknown category', () => {
-      expect(
-        getToolsByCategory(registry, 'nonexistent' as ToolCategory),
-      ).toEqual([]);
+      expect(getToolsByCategory(registry, 'nonexistent' as ToolCategory)).toEqual([]);
     });
 
     it('every defined category has at least one tool', () => {

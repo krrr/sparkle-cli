@@ -31,10 +31,7 @@ export async function validateWorkspacePath(
 
   try {
     const canonicalAllowedRoot = resolveToRealPath(allowedRoot);
-    const resolvedWorkspacePath = path.resolve(
-      canonicalAllowedRoot,
-      trimmedPath,
-    );
+    const resolvedWorkspacePath = path.resolve(canonicalAllowedRoot, trimmedPath);
     const canonicalWorkspacePath = resolveToRealPath(resolvedWorkspacePath);
 
     // Check if the resolved path is within the allowed root directory

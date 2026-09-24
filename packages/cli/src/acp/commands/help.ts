@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 import type { CommandRegistry } from './commandRegistry.js';
 
 export class HelpCommand implements Command {

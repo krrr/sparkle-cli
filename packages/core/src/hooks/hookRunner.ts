@@ -62,10 +62,7 @@ export class HookRunner {
     const startTime = Date.now();
 
     // Secondary security check: Ensure project hooks are not executed in untrusted folders
-    if (
-      hookConfig.source === ConfigSource.Project &&
-      !this.config.isTrustedFolder()
-    ) {
+    if (hookConfig.source === ConfigSource.Project && !this.config.isTrustedFolder()) {
       const errorMessage =
         'Security: Blocked execution of project hook in untrusted folder';
       debugLogger.warn(errorMessage);
@@ -80,20 +77,10 @@ export class HookRunner {
 
     try {
       if (hookConfig.type === HookType.Runtime) {
-        return await this.executeRuntimeHook(
-          hookConfig,
-          eventName,
-          input,
-          startTime,
-        );
+        return await this.executeRuntimeHook(hookConfig, eventName, input, startTime);
       }
 
-      return await this.executeCommandHook(
-        hookConfig,
-        eventName,
-        input,
-        startTime,
-      );
+      return await this.executeCommandHook(hookConfig, eventName, input, startTime);
     } catch (error) {
       const duration = Date.now() - startTime;
       const hookId =
@@ -185,13 +172,9 @@ export class HookRunner {
             // For BeforeAgent, we could modify the prompt with additional context
             const additionalContext =
               hookOutput.hookSpecificOutput['additionalContext'];
-            if (
-              typeof additionalContext === 'string' &&
-              'prompt' in modifiedInput
-            ) {
+            if (typeof additionalContext === 'string' && 'prompt' in modifiedInput) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-              (modifiedInput as BeforeAgentInput).prompt +=
-                '\n\n' + additionalContext;
+              (modifiedInput as BeforeAgentInput).prompt += '\n\n' + additionalContext;
             }
           }
           break;
@@ -207,8 +190,7 @@ export class HookRunner {
             ) {
               // Merge the partial request with the existing request
               // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-              const currentRequest = (modifiedInput as BeforeModelInput)
-                .llm_request;
+              const currentRequest = (modifiedInput as BeforeModelInput).llm_request;
               const partialRequest =
                 hookBeforeModelOutput.hookSpecificOutput.llm_request;
               // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
@@ -223,9 +205,10 @@ export class HookRunner {
         case HookEventName.BeforeTool:
           if ('tool_input' in hookOutput.hookSpecificOutput) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            const newToolInput = hookOutput.hookSpecificOutput[
-              'tool_input'
-            ] as Record<string, unknown>;
+            const newToolInput = hookOutput.hookSpecificOutput['tool_input'] as Record<
+              string,
+              unknown
+            >;
             if (newToolInput && 'tool_input' in modifiedInput) {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
               (modifiedInput as BeforeToolInput).tool_input = {
@@ -274,8 +257,7 @@ export class HookRunner {
         timeoutPromise,
       ]);
 
-      const output =
-        result === null || result === undefined ? undefined : result;
+      const output = result === null || result === undefined ? undefined : result;
 
       return {
         hookConfig,
@@ -315,9 +297,7 @@ export class HookRunner {
     return new Promise((resolve) => {
       if (!hookConfig.command) {
         const errorMessage = 'Command hook missing command';
-        debugLogger.warn(
-          `Hook configuration error (non-fatal): ${errorMessage}`,
-        );
+        debugLogger.warn(`Hook configuration error (non-fatal): ${errorMessage}`);
         resolve({
           hookConfig,
           eventName,
@@ -333,11 +313,7 @@ export class HookRunner {
       let timedOut = false;
 
       const shellConfig = getShellConfiguration();
-      let command = this.expandCommand(
-        hookConfig.command,
-        input,
-        shellConfig.shell,
-      );
+      let command = this.expandCommand(hookConfig.command, input, shellConfig.shell);
 
       if (shellConfig.shell === 'powershell') {
         // Append exit code check to ensure the exit code of the command is propagated
@@ -534,10 +510,7 @@ export class HookRunner {
   /**
    * Convert plain text output to structured HookOutput
    */
-  private convertPlainTextToHookOutput(
-    text: string,
-    exitCode: number,
-  ): HookOutput {
+  private convertPlainTextToHookOutput(text: string, exitCode: number): HookOutput {
     if (exitCode === EXIT_CODE_SUCCESS) {
       // Success
       return {

@@ -11,11 +11,7 @@ import {
   type SlashCommandActionReturn,
   CommandKind,
 } from './types.js';
-import {
-  MessageType,
-  type HistoryItemError,
-  type HistoryItemInfo,
-} from '../types.js';
+import { MessageType, type HistoryItemError, type HistoryItemInfo } from '../types.js';
 
 /**
  * Action for the default `/commands` invocation.
@@ -124,8 +120,7 @@ export const commandsCommand: SlashCommand = {
   subCommands: [
     {
       name: 'list',
-      description:
-        'List available custom command .toml files. Usage: /commands list',
+      description: 'List available custom command .toml files. Usage: /commands list',
       kind: CommandKind.BUILT_IN,
       autoExecute: true,
       action: listSubcommandAction,

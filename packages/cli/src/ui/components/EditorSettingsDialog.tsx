@@ -27,10 +27,7 @@ import {
 import { useKeypress } from '../hooks/useKeypress.js';
 
 interface EditorDialogProps {
-  onSelect: (
-    editorType: EditorType | undefined,
-    scope: LoadableSettingScope,
-  ) => void;
+  onSelect: (editorType: EditorType | undefined, scope: LoadableSettingScope) => void;
   settings: LoadedSettings;
   onExit: () => void;
 }
@@ -43,9 +40,7 @@ export function EditorSettingsDialog({
   const [selectedScope, setSelectedScope] = useState<LoadableSettingScope>(
     SettingScope.User,
   );
-  const [focusedSection, setFocusedSection] = useState<'editor' | 'scope'>(
-    'editor',
-  );
+  const [focusedSection, setFocusedSection] = useState<'editor' | 'scope'>('editor');
   useKeypress(
     (key) => {
       if (key.name === 'tab') {
@@ -67,9 +62,7 @@ export function EditorSettingsDialog({
   const currentPreference =
     settings.forScope(selectedScope).settings.general?.preferredEditor;
   let editorIndex = currentPreference
-    ? editorItems.findIndex(
-        (item: EditorDisplay) => item.type === currentPreference,
-      )
+    ? editorItems.findIndex((item: EditorDisplay) => item.type === currentPreference)
     : 0;
   const isUnsupportedEditor = editorIndex === -1;
   if (isUnsupportedEditor) {
@@ -78,10 +71,7 @@ export function EditorSettingsDialog({
 
   useEffect(() => {
     if (isUnsupportedEditor && currentPreference) {
-      coreEvents.emitFeedback(
-        'error',
-        `Editor is not supported: ${currentPreference}`,
-      );
+      coreEvents.emitFeedback('error', `Editor is not supported: ${currentPreference}`);
     }
   }, [isUnsupportedEditor, currentPreference]);
 
@@ -117,16 +107,10 @@ export function EditorSettingsDialog({
 
   let otherScopeModifiedMessage = '';
   const otherScope =
-    selectedScope === SettingScope.User
-      ? SettingScope.Workspace
-      : SettingScope.User;
-  if (
-    settings.forScope(otherScope).settings.general?.preferredEditor !==
-    undefined
-  ) {
+    selectedScope === SettingScope.User ? SettingScope.Workspace : SettingScope.User;
+  if (settings.forScope(otherScope).settings.general?.preferredEditor !== undefined) {
     otherScopeModifiedMessage =
-      settings.forScope(selectedScope).settings.general?.preferredEditor !==
-      undefined
+      settings.forScope(selectedScope).settings.general?.preferredEditor !== undefined
         ? `(Also modified in ${otherScope})`
         : `(Modified in ${otherScope})`;
   }
@@ -136,8 +120,7 @@ export function EditorSettingsDialog({
     settings.merged.general.preferredEditor &&
     isEditorAvailable(settings.merged.general.preferredEditor)
   ) {
-    mergedEditorName =
-      EDITOR_DISPLAY_NAMES[settings.merged.general.preferredEditor];
+    mergedEditorName = EDITOR_DISPLAY_NAMES[settings.merged.general.preferredEditor];
   }
 
   return (
@@ -192,17 +175,13 @@ export function EditorSettingsDialog({
         </Text>
         <Box flexDirection="column" gap={1} marginTop={1}>
           <Text color={theme.text.secondary}>
-            These editors are currently supported. Please note that some editors
-            cannot be used in sandbox mode.
+            These editors are currently supported. Please note that some editors cannot
+            be used in sandbox mode.
           </Text>
           <Text color={theme.text.secondary}>
             Your preferred editor is:{' '}
             <Text
-              color={
-                mergedEditorName === 'None'
-                  ? theme.status.error
-                  : theme.text.link
-              }
+              color={mergedEditorName === 'None' ? theme.status.error : theme.text.link}
               bold
             >
               {mergedEditorName}

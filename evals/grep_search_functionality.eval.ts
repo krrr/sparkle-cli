@@ -6,10 +6,7 @@
 
 import { describe, expect } from 'vitest';
 import { evalTest, TestRig } from './test-helper.js';
-import {
-  assertModelHasOutput,
-  checkModelOutputContent,
-} from './test-helper.js';
+import { assertModelHasOutput, checkModelOutputContent } from './test-helper.js';
 
 describe('grep_search_functionality', () => {
   const TEST_PREFIX = 'Grep Search Functionality: ';

@@ -126,11 +126,8 @@ describe('ContextCompressionService', () => {
 
       // Because src/app.ts was re-read recently (index 6 is >= 4), the OLD response at index 1 is PROTECTED.
       // It should NOT be compressed.
-      const compressedOutput =
-        res[1].parts![0].functionResponse!.response!['output'];
-      expect(compressedOutput).toBe(
-        '--- src/app.ts ---\nLine 1\nLine 2\nLine 3',
-      );
+      const compressedOutput = res[1].parts![0].functionResponse!.response!['output'];
+      expect(compressedOutput).toBe('--- src/app.ts ---\nLine 1\nLine 2\nLine 3');
       // Verify generateContentMock wasn't called because it bypassed the LLM routing
       expect(generateContentMock).not.toHaveBeenCalled();
     });
@@ -182,8 +179,7 @@ describe('ContextCompressionService', () => {
       });
 
       const res = await service.compressHistory(history, 'test prompt');
-      const compressedOutput =
-        res[1].parts![0].functionResponse!.response!['output'];
+      const compressedOutput = res[1].parts![0].functionResponse!.response!['output'];
 
       expect(compressedOutput).toContain('[Showing lines 2–3 of 4 in old.ts.');
       expect(compressedOutput).toContain('2 | Line 2');
@@ -230,9 +226,7 @@ describe('ContextCompressionService', () => {
       });
       // 2nd request: the actual summarization call
       generateContentMock.mockResolvedValueOnce({
-        candidates: [
-          { content: { parts: [{ text: 'This is a cached summary.' }] } },
-        ],
+        candidates: [{ content: { parts: [{ text: 'This is a cached summary.' }] } }],
       });
 
       await service.compressHistory(history1, 'test query');
@@ -257,8 +251,7 @@ describe('ContextCompressionService', () => {
       expect(generateJsonMock).toHaveBeenCalledTimes(1);
       expect(generateContentMock).toHaveBeenCalledTimes(1);
 
-      const compressedOutput =
-        res[1].parts![0].functionResponse!.response!['output'];
+      const compressedOutput = res[1].parts![0].functionResponse!.response!['output'];
       expect(compressedOutput).toContain('This is a cached summary.');
     });
     it('returns unmodified history if structural validation fails', async () => {

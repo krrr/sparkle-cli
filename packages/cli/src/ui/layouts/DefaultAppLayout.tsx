@@ -48,9 +48,7 @@ export const DefaultAppLayout: React.FC = () => {
               activePid={uiState.activeBackgroundTaskPid}
               width={uiState.terminalWidth}
               height={uiState.backgroundTaskHeight}
-              isFocused={
-                uiState.embeddedShellFocused && !uiState.dialogsVisible
-              }
+              isFocused={uiState.embeddedShellFocused && !uiState.dialogsVisible}
               isListOpenProp={uiState.isBackgroundTaskListOpen}
             />
           </Box>

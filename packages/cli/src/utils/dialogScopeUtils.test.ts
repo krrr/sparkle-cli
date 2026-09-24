@@ -6,10 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SettingScope, type LoadedSettings } from '../config/settings.js';
-import {
-  getScopeItems,
-  getScopeMessageForSetting,
-} from './dialogScopeUtils.js';
+import { getScopeItems, getScopeMessageForSetting } from './dialogScopeUtils.js';
 import { isInSettingsScope } from './settingsUtils.js';
 
 vi.mock('../config/settings', () => ({
@@ -80,21 +77,18 @@ describe('dialogScopeUtils', () => {
       const userSettings = { scope: 'user' };
 
       mockSettings.forScope.mockImplementation((scope: string) => {
-        if (scope === SettingScope.Workspace)
-          return { settings: workspaceSettings };
+        if (scope === SettingScope.Workspace) return { settings: workspaceSettings };
         if (scope === SettingScope.System) return { settings: systemSettings };
         if (scope === SettingScope.User) return { settings: userSettings };
         return { settings: {} };
       });
 
-      vi.mocked(isInSettingsScope).mockImplementation(
-        (_key, settings: unknown) => {
-          if (settings === workspaceSettings) return true;
-          if (settings === systemSettings) return false;
-          if (settings === userSettings) return false;
-          return false;
-        },
-      );
+      vi.mocked(isInSettingsScope).mockImplementation((_key, settings: unknown) => {
+        if (settings === workspaceSettings) return true;
+        if (settings === systemSettings) return false;
+        if (settings === userSettings) return false;
+        return false;
+      });
 
       const message = getScopeMessageForSetting(
         'key',

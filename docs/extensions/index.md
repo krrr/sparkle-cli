@@ -1,10 +1,9 @@
 # Sparkle CLI extensions
 
-Sparkle CLI extensions package prompts, MCP servers, custom commands, themes,
-hooks, sub-agents, and agent skills into a familiar and user-friendly format.
-With extensions, you can expand the capabilities of Sparkle CLI and share those
-capabilities with others. They are designed to be easily installable and
-shareable.
+Sparkle CLI extensions package prompts, MCP servers, custom commands, themes, hooks,
+sub-agents, and agent skills into a familiar and user-friendly format. With extensions,
+you can expand the capabilities of Sparkle CLI and share those capabilities with others.
+They are designed to be easily installable and shareable.
 
 To see what's possible, browse the
 [Sparkle CLI extension gallery](https://geminicli.com/extensions/browse/).
@@ -15,35 +14,35 @@ Choose the guide that best fits your needs.
 
 ### I want to use extensions
 
-Learn how to discover, install, and manage extensions to enhance your Sparkle
-CLI experience.
+Learn how to discover, install, and manage extensions to enhance your Sparkle CLI
+experience.
 
 - **[Manage extensions](#manage-extensions):** List and verify your installed
   extensions.
-- **[Install extensions](#installation):** Add new capabilities from GitHub or
-  local paths.
+- **[Install extensions](#installation):** Add new capabilities from GitHub or local
+  paths.
 
 ### I want to build extensions
 
 Learn how to create, test, and share your own extensions with the community.
 
-- **[Build extensions](writing-extensions.md):** Create your first extension
-  from a template.
-- **[Best practices](best-practices.md):** Learn how to build secure and
-  reliable extensions.
+- **[Build extensions](writing-extensions.md):** Create your first extension from a
+  template.
+- **[Best practices](best-practices.md):** Learn how to build secure and reliable
+  extensions.
 - **[Publish to the gallery](releasing.md):** Share your work with the world.
 
 ## Manage extensions
 
-Use the interactive `/extensions` command to verify your installed extensions
-and their status:
+Use the interactive `/extensions` command to verify your installed extensions and their
+status:
 
 ```bash
 /extensions list
 ```
 
-You can also manage extensions from your terminal using the `sparkle extensions`
-command group:
+You can also manage extensions from your terminal using the `sparkle extensions` command
+group:
 
 ```bash
 sparkle extensions list

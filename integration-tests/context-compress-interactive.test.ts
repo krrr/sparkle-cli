@@ -49,13 +49,8 @@ describe.skipIf(skipOnDarwin)('Interactive Mode', () => {
     await run.type('/compress');
     await run.type('\r');
 
-    const foundEvent = await rig.waitForTelemetryEvent(
-      'chat_compression',
-      25000,
-    );
-    expect(foundEvent, 'chat_compression telemetry event was not found').toBe(
-      true,
-    );
+    const foundEvent = await rig.waitForTelemetryEvent('chat_compression', 25000);
+    expect(foundEvent, 'chat_compression telemetry event was not found').toBe(true);
 
     await run.expectText('Chat history compressed', 5000);
   });
@@ -83,10 +78,7 @@ describe.skipIf(skipOnDarwin)('Interactive Mode', () => {
     await run.expectText('compression was not beneficial', 25000);
 
     // Verify no telemetry event is logged for NOOP
-    const foundEvent = await rig.waitForTelemetryEvent(
-      'chat_compression',
-      5000,
-    );
+    const foundEvent = await rig.waitForTelemetryEvent('chat_compression', 5000);
     expect(
       foundEvent,
       'chat_compression telemetry event should be found for failures',

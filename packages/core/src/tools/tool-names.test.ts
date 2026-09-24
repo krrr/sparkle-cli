@@ -25,8 +25,7 @@ vi.mock('./tool-names.js', async (importOriginal) => {
     ...actual,
     TOOL_LEGACY_ALIASES: mockedAliases,
     isValidToolName: vi.fn().mockImplementation((name: string, options) => {
-      if (Object.prototype.hasOwnProperty.call(mockedAliases, name))
-        return true;
+      if (Object.prototype.hasOwnProperty.call(mockedAliases, name)) return true;
       return actual.isValidToolName(name, options);
     }),
     getToolAliases: vi.fn().mockImplementation((name: string) => {
@@ -86,15 +85,11 @@ describe('tool-names', () => {
       // Explicitly allowed
       expect(isValidToolName('*', { allowWildcards: true })).toBe(true);
       expect(isValidToolName('mcp_*', { allowWildcards: true })).toBe(true);
-      expect(isValidToolName('mcp_server_*', { allowWildcards: true })).toBe(
-        true,
-      );
+      expect(isValidToolName('mcp_server_*', { allowWildcards: true })).toBe(true);
 
       // Invalid wildcards
       expect(isValidToolName('mcp__*', { allowWildcards: true })).toBe(false);
-      expect(
-        isValidToolName('mcp_server_tool*', { allowWildcards: true }),
-      ).toBe(false);
+      expect(isValidToolName('mcp_server_tool*', { allowWildcards: true })).toBe(false);
     });
   });
 

@@ -126,9 +126,7 @@ describe('toolsCommand', () => {
     expect(message.showDescriptions).toBe(true);
     expect(message.tools).toHaveLength(2);
     expect(message.tools[0].displayName).toBe('File Reader');
-    expect(message.tools[0].description).toBe(
-      'Reads files from the local system.',
-    );
+    expect(message.tools[0].description).toBe('Reads files from the local system.');
     expect(message.tools[1].displayName).toBe('Code Editor');
     expect(message.tools[1].description).toBe('Edits code files.');
   });
@@ -180,17 +178,13 @@ describe('toolsCommand', () => {
     expect(message.showDescriptions).toBe(true);
     expect(message.tools).toHaveLength(2);
     expect(message.tools[0].displayName).toBe('File Reader');
-    expect(message.tools[0].description).toBe(
-      'Reads files from the local system.',
-    );
+    expect(message.tools[0].description).toBe('Reads files from the local system.');
     expect(message.tools[1].displayName).toBe('Code Editor');
     expect(message.tools[1].description).toBe('Edits code files.');
   });
 
   it('should expose a desc subcommand for TUI discoverability', async () => {
-    const descSubCommand = toolsCommand.subCommands?.find(
-      (cmd) => cmd.name === 'desc',
-    );
+    const descSubCommand = toolsCommand.subCommands?.find((cmd) => cmd.name === 'desc');
     expect(descSubCommand).toBeDefined();
     expect(descSubCommand?.description).toContain('descriptions');
 

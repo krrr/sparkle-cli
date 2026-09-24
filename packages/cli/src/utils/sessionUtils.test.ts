@@ -57,10 +57,7 @@ describe('SessionSelector', () => {
       const chatsDir = path.join(tmpDir, 'chats');
       await fs.mkdir(chatsDir, { recursive: true });
       await fs.writeFile(
-        path.join(
-          chatsDir,
-          `session-20240101T000000-${sessionId.slice(0, 8)}.jsonl`,
-        ),
+        path.join(chatsDir, `session-20240101T000000-${sessionId.slice(0, 8)}.jsonl`),
         JSON.stringify({ sessionId, projectHash: 'test-hash' }),
       );
 
@@ -459,13 +456,11 @@ describe('SessionSelector', () => {
 
     const sessionSelector = new SessionSelector(storage);
 
-    await expect(
-      sessionSelector.resolveSession('invalid-uuid'),
-    ).rejects.toThrow(SessionError);
-
-    await expect(sessionSelector.resolveSession('999')).rejects.toThrow(
+    await expect(sessionSelector.resolveSession('invalid-uuid')).rejects.toThrow(
       SessionError,
     );
+
+    await expect(sessionSelector.resolveSession('999')).rejects.toThrow(SessionError);
   });
 
   it('should throw SessionError with NO_SESSIONS_FOUND when resolving latest with no sessions', async () => {
@@ -548,10 +543,8 @@ describe('SessionSelector', () => {
       ].join('\n') + '\n',
     );
 
-    const {
-      messages: sessionSystemOnlyMessages,
-      ...sessionSystemOnlyMetadata
-    } = sessionSystemOnly;
+    const { messages: sessionSystemOnlyMessages, ...sessionSystemOnlyMetadata } =
+      sessionSystemOnly;
     await fs.writeFile(
       path.join(
         chatsDir,
@@ -668,10 +661,8 @@ describe('SessionSelector', () => {
       ],
     };
 
-    const {
-      messages: sessionGeminiOnlyMessages,
-      ...sessionGeminiOnlyMetadata
-    } = sessionGeminiOnly;
+    const { messages: sessionGeminiOnlyMessages, ...sessionGeminiOnlyMetadata } =
+      sessionGeminiOnly;
     await fs.writeFile(
       path.join(
         chatsDir,
@@ -733,8 +724,7 @@ describe('SessionSelector', () => {
       kind: 'subagent',
     };
 
-    const { messages: mainSessionMessages, ...mainSessionMetadata } =
-      mainSession;
+    const { messages: mainSessionMessages, ...mainSessionMetadata } = mainSession;
     await fs.writeFile(
       path.join(
         chatsDir,
@@ -1060,9 +1050,7 @@ describe('formatRelativeTime', () => {
 
     // 5 minutes ago
     const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-    expect(formatRelativeTime(fiveMinutesAgo.toISOString())).toBe(
-      '5 minutes ago',
-    );
+    expect(formatRelativeTime(fiveMinutesAgo.toISOString())).toBe('5 minutes ago');
 
     // 1 minute ago
     const oneMinuteAgo = new Date(now.getTime() - 1 * 60 * 1000);
@@ -1249,8 +1237,7 @@ describe('convertSessionToHistoryFormats', () => {
         id: '1',
         timestamp: new Date().toISOString(),
         type: 'user',
-        content:
-          '<session_context>\nThis is the Sparkle CLI\n</session_context>',
+        content: '<session_context>\nThis is the Sparkle CLI\n</session_context>',
       },
       {
         id: '2',

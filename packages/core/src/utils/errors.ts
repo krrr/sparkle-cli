@@ -192,11 +192,7 @@ function isResponseData(data: unknown): data is ResponseData {
   }
 
   // Optional properties check
-  if (
-    'code' in error &&
-    typeof error.code !== 'number' &&
-    error.code !== undefined
-  ) {
+  if ('code' in error && typeof error.code !== 'number' && error.code !== undefined) {
     return false;
   }
   if (
@@ -221,10 +217,7 @@ export function toFriendlyError(error: unknown): unknown {
         d.reason === 'TOS_VIOLATION',
     );
     if (tosDetail) {
-      return new AccountSuspendedError(
-        googleApiError.message,
-        tosDetail.metadata,
-      );
+      return new AccountSuspendedError(googleApiError.message, tosDetail.metadata);
     }
   }
 
@@ -246,9 +239,7 @@ export function toFriendlyError(error: unknown): unknown {
   return error;
 }
 
-export function isAccountSuspendedError(
-  error: unknown,
-): AccountSuspendedError | null {
+export function isAccountSuspendedError(error: unknown): AccountSuspendedError | null {
   const friendly = toFriendlyError(error);
   return friendly instanceof AccountSuspendedError ? friendly : null;
 }

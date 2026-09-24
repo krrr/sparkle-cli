@@ -36,9 +36,7 @@ export class Override {
     const isDisable = fileRule.startsWith('!');
     let baseRule = isDisable ? fileRule.substring(1) : fileRule;
     const includeSubdirs = baseRule.endsWith('*');
-    baseRule = includeSubdirs
-      ? baseRule.substring(0, baseRule.length - 1)
-      : baseRule;
+    baseRule = includeSubdirs ? baseRule.substring(0, baseRule.length - 1) : baseRule;
     return new Override(baseRule, isDisable, includeSubdirs);
   }
 
@@ -116,10 +114,7 @@ export class ExtensionEnablementManager {
 
   constructor(enabledExtensionNames?: string[]) {
     this.configDir = ExtensionStorage.getUserExtensionsDir();
-    this.configFilePath = path.join(
-      this.configDir,
-      'extension-enablement.json',
-    );
+    this.configFilePath = path.join(this.configDir, 'extension-enablement.json');
     this.enabledExtensionNamesOverride =
       enabledExtensionNames?.map((name) => name.toLowerCase()) ?? [];
   }
@@ -127,9 +122,7 @@ export class ExtensionEnablementManager {
   validateExtensionOverrides(extensions: GeminiCLIExtension[]) {
     for (const name of this.enabledExtensionNamesOverride) {
       if (name === 'none') continue;
-      if (
-        !extensions.some((ext) => ext.name.toLowerCase() === name.toLowerCase())
-      ) {
+      if (!extensions.some((ext) => ext.name.toLowerCase() === name.toLowerCase())) {
         coreEvents.emitFeedback('error', `Extension not found: ${name}`);
       }
     }
@@ -181,17 +174,10 @@ export class ExtensionEnablementManager {
     try {
       const content = fs.readFileSync(this.configFilePath, 'utf-8');
       const parsed: unknown = JSON.parse(content);
-      const schema = z.record(
-        z.string(),
-        z.object({ overrides: z.array(z.string()) }),
-      );
+      const schema = z.record(z.string(), z.object({ overrides: z.array(z.string()) }));
       return schema.parse(parsed);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        'code' in error &&
-        error.code === 'ENOENT'
-      ) {
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
         return {};
       }
       coreEvents.emitFeedback(
@@ -208,11 +194,7 @@ export class ExtensionEnablementManager {
     fs.writeFileSync(this.configFilePath, JSON.stringify(config, null, 2));
   }
 
-  enable(
-    extensionName: string,
-    includeSubdirs: boolean,
-    scopePath: string,
-  ): void {
+  enable(extensionName: string, includeSubdirs: boolean, scopePath: string): void {
     const config = this.readConfig();
     if (!config[extensionName]) {
       config[extensionName] = { overrides: [] };
@@ -220,10 +202,7 @@ export class ExtensionEnablementManager {
     const override = Override.fromInput(scopePath, includeSubdirs);
     const overrides = config[extensionName].overrides.filter((rule) => {
       const fileOverride = Override.fromFileRule(rule);
-      if (
-        fileOverride.conflictsWith(override) ||
-        fileOverride.isEqualTo(override)
-      ) {
+      if (fileOverride.conflictsWith(override) || fileOverride.isEqualTo(override)) {
         return false; // Remove conflicts and equivalent values.
       }
       return !fileOverride.isChildOf(override);
@@ -233,11 +212,7 @@ export class ExtensionEnablementManager {
     this.writeConfig(config);
   }
 
-  disable(
-    extensionName: string,
-    includeSubdirs: boolean,
-    scopePath: string,
-  ): void {
+  disable(extensionName: string, includeSubdirs: boolean, scopePath: string): void {
     this.enable(extensionName, includeSubdirs, `!${scopePath}`);
   }
 

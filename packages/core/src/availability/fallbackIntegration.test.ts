@@ -55,9 +55,7 @@ describe('Fallback Integration', () => {
     expect(result.model).toBe(DEFAULT_GEMINI_FLASH_MODEL);
 
     // 5. Expect active model to be updated
-    expect(config.setActiveModel).toHaveBeenCalledWith(
-      DEFAULT_GEMINI_FLASH_MODEL,
-    );
+    expect(config.setActiveModel).toHaveBeenCalledWith(DEFAULT_GEMINI_FLASH_MODEL);
   });
 
   it('should fallback even when config is NOT in AUTO mode (all Gemini models get the Gemini 3 chain)', () => {

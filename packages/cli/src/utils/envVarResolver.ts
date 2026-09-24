@@ -141,11 +141,7 @@ function resolveEnvVarsInObjectInternal<T>(
     const newObj = { ...obj } as T;
     for (const key in newObj) {
       if (Object.prototype.hasOwnProperty.call(newObj, key)) {
-        newObj[key] = resolveEnvVarsInObjectInternal(
-          newObj[key],
-          visited,
-          customEnv,
-        );
+        newObj[key] = resolveEnvVarsInObjectInternal(newObj[key], visited, customEnv);
       }
     }
     visited.delete(obj as object);

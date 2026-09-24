@@ -19,9 +19,7 @@ export const useAuthCommand = (
   const activeProfile = profileService.getActiveProfile();
 
   const [authState, setAuthState] = useState<AuthState>(
-    initialAuthError || !activeProfile
-      ? AuthState.Updating
-      : AuthState.Unauthenticated,
+    initialAuthError || !activeProfile ? AuthState.Updating : AuthState.Unauthenticated,
   );
 
   const [authError, setAuthError] = useState<string | null>(initialAuthError);
@@ -49,8 +47,8 @@ export const useAuthCommand = (
         return;
       }
 
-      const error = await validateProfileAuth(currentProfile).catch(
-        (e: unknown) => getErrorMessage(e),
+      const error = await validateProfileAuth(currentProfile).catch((e: unknown) =>
+        getErrorMessage(e),
       );
 
       if (error) {

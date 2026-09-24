@@ -78,9 +78,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 vi.mock('../../config/extension-manager.js', async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import('../../config/extension-manager.js')
-  >()),
+  ...(await importOriginal<typeof import('../../config/extension-manager.js')>()),
   ExtensionManager: mockExtensionManager,
   inferInstallMetadata: mockInferInstallMetadata,
 }));
@@ -115,15 +113,9 @@ describe('handleInstall', () => {
   let processSpy: MockInstance;
 
   beforeEach(() => {
-    debugLogSpy = vi
-      .spyOn(core.debugLogger, 'log')
-      .mockImplementation(() => {});
-    debugErrorSpy = vi
-      .spyOn(core.debugLogger, 'error')
-      .mockImplementation(() => {});
-    processSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation(() => undefined as never);
+    debugLogSpy = vi.spyOn(core.debugLogger, 'log').mockImplementation(() => {});
+    debugErrorSpy = vi.spyOn(core.debugLogger, 'error').mockImplementation(() => {});
+    processSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
 
     mockLoadExtensions.mockResolvedValue([]);
     mockInstallOrUpdateExtension.mockReset();
@@ -226,9 +218,7 @@ describe('handleInstall', () => {
   });
 
   it('throws an error from an unknown source', async () => {
-    mockInferInstallMetadata.mockRejectedValue(
-      new Error('Install source not found.'),
-    );
+    mockInferInstallMetadata.mockRejectedValue(new Error('Install source not found.'));
     await handleInstall({
       source: 'test://google.com',
     });

@@ -29,10 +29,7 @@ export async function discoverJitContext(
   const trustedRoots = [...config.getWorkspaceContext().getDirectories()];
 
   try {
-    return await memoryContextManager.discoverContext(
-      accessedPath,
-      trustedRoots,
-    );
+    return await memoryContextManager.discoverContext(accessedPath, trustedRoots);
   } catch {
     // JIT context is supplementary — never fail the tool's primary operation.
     return '';
@@ -42,8 +39,7 @@ export async function discoverJitContext(
 /**
  * Format string to delimit JIT context in tool output.
  */
-export const JIT_CONTEXT_PREFIX =
-  '\n\n--- Newly Discovered Project Context ---\n';
+export const JIT_CONTEXT_PREFIX = '\n\n--- Newly Discovered Project Context ---\n';
 export const JIT_CONTEXT_SUFFIX = '\n--- End Project Context ---';
 
 /**
@@ -54,10 +50,7 @@ export const JIT_CONTEXT_SUFFIX = '\n--- End Project Context ---';
  * @param jitContext - The discovered JIT context string.
  * @returns The content with JIT context appended, or unchanged if empty.
  */
-export function appendJitContext(
-  llmContent: string,
-  jitContext: string,
-): string {
+export function appendJitContext(llmContent: string, jitContext: string): string {
   if (!jitContext) {
     return llmContent;
   }

@@ -2,8 +2,8 @@
 
 ## 🛠️ Prerequisites
 
-Behavioral evals run against the compiled binary. You **must** build and bundle
-the project first after making changes:
+Behavioral evals run against the compiled binary. You **must** build and bundle the
+project first after making changes:
 
 ```bash
 npm run build && npm run bundle
@@ -15,8 +15,8 @@ npm run build && npm run bundle
 
 ### 1. Configure Environment Variables
 
-Evals require a standard API key. If your `.env` file has multiple keys or
-comments, use this precise extraction setup:
+Evals require a standard API key. If your `.env` file has multiple keys or comments, use
+this precise extraction setup:
 
 ```bash
 export GEMINI_API_KEY=$(grep '^GEMINI_API_KEY=' .env | cut -d '=' -f2) && RUN_EVALS=1 npx vitest run --config evals/vitest.config.ts <file_name>
@@ -44,8 +44,7 @@ RUN_EVALS=1 npx vitest run --config evals/vitest.config.ts my_feature.eval.ts
 If a test fails, verify:
 
 - **Tool Trajectory Logs**:序列 of calls in `evals/logs/<test_name>.log`.
-- **Verbose Reasoning**: Capture raw buffer traces by setting
-  `SPARKLE_DEBUG_LOG_FILE`:
+- **Verbose Reasoning**: Capture raw buffer traces by setting `SPARKLE_DEBUG_LOG_FILE`:
   ```bash
   export SPARKLE_DEBUG_LOG_FILE="debug.log"
   ```
@@ -54,10 +53,10 @@ If a test fails, verify:
 
 ### 🎯 Verify Model Targeting
 
-- **Tip:** Standard evals benchmark against model variations. If a test passes
-  on Flash but fails on Pro (or vice versa), the issue is usually in the **tool
-  description**, not the prompt definition. Flash is sensitive to "instruction
-  bloat," while Pro is sensitive to "ambiguous intent."
+- **Tip:** Standard evals benchmark against model variations. If a test passes on Flash
+  but fails on Pro (or vice versa), the issue is usually in the **tool description**,
+  not the prompt definition. Flash is sensitive to "instruction bloat," while Pro is
+  sensitive to "ambiguous intent."
 
 ---
 
@@ -91,5 +90,5 @@ Once a test scores 100% consistency over multiple nightly cycles:
 sparkle /promote-behavioral-eval
 ```
 
-_Do not promote manually._ The command verifies trajectory logs before updating
-the file policy.
+_Do not promote manually._ The command verifies trajectory logs before updating the file
+policy.

@@ -14,12 +14,13 @@ import { FatalSandboxError, type SandboxConfig } from 'sparkle-cli-core';
 import { createMockSandboxConfig } from 'sparkle-cli-test-utils';
 import { EventEmitter } from 'node:events';
 
-const { mockedHomedir, mockedGetContainerPath, mockedExecCommands } =
-  vi.hoisted(() => ({
+const { mockedHomedir, mockedGetContainerPath, mockedExecCommands } = vi.hoisted(
+  () => ({
     mockedHomedir: vi.fn().mockReturnValue('/home/user'),
     mockedGetContainerPath: vi.fn().mockImplementation((p: string) => p),
     mockedExecCommands: [] as string[],
-  }));
+  }),
+);
 
 vi.mock('./sandboxUtils.js', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./sandboxUtils.js')>();
@@ -182,14 +183,7 @@ describe('sandbox', () => {
       await expect(promise).resolves.toBe(0);
       expect(spawn).toHaveBeenCalledWith(
         'docker',
-        expect.arrayContaining([
-          'run',
-          '-i',
-          '--rm',
-          '--init',
-          '--entrypoint',
-          '',
-        ]),
+        expect.arrayContaining(['run', '-i', '--rm', '--init', '--entrypoint', '']),
         expect.objectContaining({ stdio: 'inherit' }),
       );
 
@@ -244,9 +238,7 @@ describe('sandbox', () => {
       });
       vi.mocked(spawn).mockImplementationOnce(() => mockSpawnProcess);
 
-      await expect(
-        start_sandbox(config, [], undefined, ['arg1']),
-      ).resolves.toBe(0);
+      await expect(start_sandbox(config, [], undefined, ['arg1'])).resolves.toBe(0);
 
       const containerName = 'sparkle-cli-integration-test-a1b2c3d4e5f6';
       expect(randomBytes).toHaveBeenCalledWith(6);
@@ -275,8 +267,7 @@ describe('sandbox', () => {
       interface MockProcessWithStdout extends EventEmitter {
         stdout: EventEmitter;
       }
-      const mockImageCheckProcess1 =
-        new EventEmitter() as MockProcessWithStdout;
+      const mockImageCheckProcess1 = new EventEmitter() as MockProcessWithStdout;
       mockImageCheckProcess1.stdout = new EventEmitter();
       vi.mocked(spawn).mockImplementationOnce(() => {
         setTimeout(() => {
@@ -301,8 +292,7 @@ describe('sandbox', () => {
       });
 
       // 3. Image check succeeds
-      const mockImageCheckProcess2 =
-        new EventEmitter() as MockProcessWithStdout;
+      const mockImageCheckProcess2 = new EventEmitter() as MockProcessWithStdout;
       mockImageCheckProcess2.stdout = new EventEmitter();
       vi.mocked(spawn).mockImplementationOnce(() => {
         setTimeout(() => {
@@ -344,8 +334,7 @@ describe('sandbox', () => {
       interface MockProcessWithStdout extends EventEmitter {
         stdout: EventEmitter;
       }
-      const mockImageCheckProcess1 =
-        new EventEmitter() as MockProcessWithStdout;
+      const mockImageCheckProcess1 = new EventEmitter() as MockProcessWithStdout;
       mockImageCheckProcess1.stdout = new EventEmitter();
       vi.mocked(spawn).mockImplementationOnce(() => {
         setTimeout(() => {
@@ -506,9 +495,7 @@ describe('sandbox', () => {
       await start_sandbox(config);
 
       expect(execSync).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'network create --internal sparkle-cli-sandbox',
-        ),
+        expect.stringContaining('network create --internal sparkle-cli-sandbox'),
         expect.any(Object),
       );
       expect(spawn).toHaveBeenCalledWith(
@@ -690,8 +677,7 @@ describe('sandbox', () => {
       vi.mocked(spawn).mockImplementation((cmd, args) => {
         const a = args as string[];
         if (cmd === 'docker' && a && a[0] === 'images') {
-          const mockImageCheckProcess =
-            new EventEmitter() as MockProcessWithStdout;
+          const mockImageCheckProcess = new EventEmitter() as MockProcessWithStdout;
           mockImageCheckProcess.stdout = new EventEmitter();
           setTimeout(() => {
             mockImageCheckProcess.stdout.emit('data', Buffer.from('image-id'));

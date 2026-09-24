@@ -5,11 +5,7 @@
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import type {
-  OAuthFlowConfig,
-  OAuthRefreshConfig,
-  PKCEParams,
-} from './oauth-flow.js';
+import type { OAuthFlowConfig, OAuthRefreshConfig, PKCEParams } from './oauth-flow.js';
 import {
   generatePKCEParams,
   getPortFromUrl,
@@ -186,9 +182,7 @@ describe('oauth-flow', () => {
       };
       const url = buildAuthorizationUrl(config, basePkceParams, 3000);
       const parsed = new URL(url);
-      expect(parsed.searchParams.get('audience')).toBe(
-        'https://api.example.com',
-      );
+      expect(parsed.searchParams.get('audience')).toBe('https://api.example.com');
     });
 
     it('should include resource parameter when provided', () => {
@@ -199,9 +193,7 @@ describe('oauth-flow', () => {
         'https://mcp.example.com',
       );
       const parsed = new URL(url);
-      expect(parsed.searchParams.get('resource')).toBe(
-        'https://mcp.example.com',
-      );
+      expect(parsed.searchParams.get('resource')).toBe('https://mcp.example.com');
     });
 
     it('should not include resource parameter when not provided', () => {
@@ -371,9 +363,7 @@ describe('oauth-flow', () => {
       expect(body.get('code')).toBe('my-code');
       expect(body.get('code_verifier')).toBe('my-verifier');
       expect(body.get('client_id')).toBe('test-client-id');
-      expect(body.get('redirect_uri')).toBe(
-        `http://localhost:4000${REDIRECT_PATH}`,
-      );
+      expect(body.get('redirect_uri')).toBe(`http://localhost:4000${REDIRECT_PATH}`);
     });
 
     it('should include client_secret when provided', async () => {
@@ -424,12 +414,7 @@ describe('oauth-flow', () => {
         ),
       );
 
-      const result = await exchangeCodeForToken(
-        baseConfig,
-        'code',
-        'verifier',
-        3000,
-      );
+      const result = await exchangeCodeForToken(baseConfig, 'code', 'verifier', 3000);
 
       expect(result.access_token).toBe('form-token');
       expect(result.token_type).toBe('Bearer');
@@ -448,13 +433,10 @@ describe('oauth-flow', () => {
 
     it('should throw on non-ok response with form-urlencoded error', async () => {
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(
-          'error=invalid_grant&error_description=Code+expired',
-          {
-            status: 400,
-            contentType: 'application/x-www-form-urlencoded',
-          },
-        ),
+        createMockResponse('error=invalid_grant&error_description=Code+expired', {
+          status: 400,
+          contentType: 'application/x-www-form-urlencoded',
+        }),
       );
 
       await expect(
@@ -498,12 +480,7 @@ describe('oauth-flow', () => {
         createMockResponse(JSON.stringify({ access_token: 'tok' })),
       );
 
-      const result = await exchangeCodeForToken(
-        baseConfig,
-        'code',
-        'verifier',
-        3000,
-      );
+      const result = await exchangeCodeForToken(baseConfig, 'code', 'verifier', 3000);
       expect(result.token_type).toBe('Bearer');
     });
   });

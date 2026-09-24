@@ -26,12 +26,7 @@ async function getDependencyLicense(depName, depVersion) {
       depName,
       'package.json',
     );
-    const rootDepPath = path.join(
-      projectRoot,
-      'node_modules',
-      depName,
-      'package.json',
-    );
+    const rootDepPath = path.join(projectRoot, 'node_modules', depName, 'package.json');
 
     if (await fs.stat(localDepPath).catch(() => false)) {
       depPackageJsonPath = localDepPath;
@@ -41,10 +36,7 @@ async function getDependencyLicense(depName, depVersion) {
       throw new Error(`Package ${depName} not found in node_modules`);
     }
 
-    const depPackageJsonContent = await fs.readFile(
-      depPackageJsonPath,
-      'utf-8',
-    );
+    const depPackageJsonContent = await fs.readFile(depPackageJsonPath, 'utf-8');
     const depPackageJson = JSON.parse(depPackageJsonContent);
 
     repositoryUrl = depPackageJson.repository?.url || repositoryUrl;
@@ -82,9 +74,7 @@ async function getDependencyLicense(depName, depVersion) {
       console.warn(`Warning: Could not find license file for ${depName}`);
     }
   } catch (e) {
-    console.warn(
-      `Warning: Could not find package.json for ${depName}: ${e.message}`,
-    );
+    console.warn(`Warning: Could not find package.json for ${depName}: ${e.message}`);
   }
 
   return {
@@ -106,9 +96,7 @@ function collectDependencies(
   }
 
   let packageInfo =
-    packageLock.packages[
-      `${workspaceRelativePath}/node_modules/${packageName}`
-    ];
+    packageLock.packages[`${workspaceRelativePath}/node_modules/${packageName}`];
   if (!packageInfo) {
     packageInfo = packageLock.packages[`node_modules/${packageName}`];
   }
@@ -124,12 +112,7 @@ function collectDependencies(
 
   if (packageInfo.dependencies) {
     for (const depName of Object.keys(packageInfo.dependencies)) {
-      collectDependencies(
-        depName,
-        packageLock,
-        dependenciesMap,
-        workspaceRelativePath,
-      );
+      collectDependencies(depName, packageLock, dependenciesMap, workspaceRelativePath);
     }
   }
 }
@@ -141,10 +124,7 @@ async function main() {
     const packageJson = JSON.parse(packageJsonContent);
 
     const packageLockJsonPath = path.join(projectRoot, 'package-lock.json');
-    const packageLockJsonContent = await fs.readFile(
-      packageLockJsonPath,
-      'utf-8',
-    );
+    const packageLockJsonContent = await fs.readFile(packageLockJsonPath, 'utf-8');
     const packageLockJson = JSON.parse(packageLockJsonContent);
 
     // package-lock.json keys always use forward slashes, but path.relative()
@@ -178,8 +158,7 @@ async function main() {
       'This file contains third-party software notices and license terms.\n\n';
 
     for (const dep of dependencyLicenses) {
-      noticeText +=
-        '============================================================\n';
+      noticeText += '============================================================\n';
       noticeText += `${dep.name}@${dep.version}\n`;
       noticeText += `(${dep.repository})\n\n`;
       noticeText += `${dep.license}\n\n`;

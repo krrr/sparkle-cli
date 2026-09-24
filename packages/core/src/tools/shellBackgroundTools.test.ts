@@ -70,9 +70,7 @@ describe('Background Tools', () => {
       abortSignal: new AbortController().signal,
     });
 
-    expect(result.llmContent).toContain(
-      `[PID ${pid}] RUNNING: \`unknown command\``,
-    );
+    expect(result.llmContent).toContain(`[PID ${pid}] RUNNING: \`unknown command\``);
   });
 
   it('list_background_processes should show exited status with code or signal', async () => {
@@ -85,10 +83,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     const invocation = listTool.build({});
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,10 +106,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     // The log directory is shared with real CLI usage and may contain stale
     // files from previous runs. Remove any leftover log for this pid so the
@@ -146,10 +138,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     // Ensure dir exists
     fs.mkdirSync(logDir, { recursive: true });
@@ -208,10 +197,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     fs.mkdirSync(logDir, { recursive: true });
     fs.writeFileSync(logPath, '');
@@ -240,18 +226,13 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     fs.mkdirSync(logDir, { recursive: true });
     fs.writeFileSync(logPath, 'dummy content');
 
     // Mock open to throw to hit catch block
-    vi.spyOn(fs.promises, 'open').mockRejectedValue(
-      new Error('Simulated read error'),
-    );
+    vi.spyOn(fs.promises, 'open').mockRejectedValue(new Error('Simulated read error'));
 
     const invocation = readTool.build({ pid });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -278,10 +259,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     fs.mkdirSync(logDir, { recursive: true });
     fs.writeFileSync(logPath, 'dummy content');
@@ -316,10 +294,7 @@ describe('Background Tools', () => {
       startTime: Date.now(),
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (ShellExecutionService as any).backgroundProcessHistory.set(
-      'default',
-      history,
-    );
+    (ShellExecutionService as any).backgroundProcessHistory.set('default', history);
 
     fs.mkdirSync(logDir, { recursive: true });
     // Write 5 lines

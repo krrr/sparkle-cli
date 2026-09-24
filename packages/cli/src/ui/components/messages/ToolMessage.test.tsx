@@ -237,10 +237,7 @@ describe('<ToolMessage />', () => {
 
     it('shows ? for Confirming status', async () => {
       const { lastFrame, unmount } = await renderWithContext(
-        <ToolMessage
-          {...baseProps}
-          status={CoreToolCallStatus.AwaitingApproval}
-        />,
+        <ToolMessage {...baseProps} status={CoreToolCallStatus.AwaitingApproval} />,
         StreamingState.Idle,
       );
       expect(lastFrame()).toMatchSnapshot();
@@ -406,11 +403,7 @@ describe('<ToolMessage />', () => {
 
   it('renders indeterminate progress when total is missing', async () => {
     const { lastFrame, unmount } = await renderWithContext(
-      <ToolMessage
-        {...baseProps}
-        status={CoreToolCallStatus.Executing}
-        progress={7}
-      />,
+      <ToolMessage {...baseProps} status={CoreToolCallStatus.Executing} progress={7} />,
       StreamingState.Responding,
     );
     const output = lastFrame();

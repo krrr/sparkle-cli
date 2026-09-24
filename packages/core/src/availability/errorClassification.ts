@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  TerminalQuotaError,
-  RetryableQuotaError,
-} from '../utils/googleQuotaErrors.js';
+import { TerminalQuotaError, RetryableQuotaError } from '../utils/googleQuotaErrors.js';
 import { ModelNotFoundError } from '../utils/httpErrors.js';
 import type { FailureKind } from './modelPolicy.js';
 

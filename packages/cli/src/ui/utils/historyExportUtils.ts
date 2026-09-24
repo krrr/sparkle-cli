@@ -11,9 +11,7 @@ import type { Content } from '@google/genai';
 /**
  * Serializes chat history to a Markdown string.
  */
-export function serializeHistoryToMarkdown(
-  history: readonly Content[],
-): string {
+export function serializeHistoryToMarkdown(history: readonly Content[]): string {
   return history
     .map((item) => {
       const text =
@@ -70,9 +68,7 @@ export async function exportHistoryToFile(
   } else if (extension === '.md') {
     content = serializeHistoryToMarkdown(history);
   } else {
-    throw new Error(
-      `Unsupported file extension: ${extension}. Use .json or .md.`,
-    );
+    throw new Error(`Unsupported file extension: ${extension}. Use .json or .md.`);
   }
 
   const dir = path.dirname(filePath);

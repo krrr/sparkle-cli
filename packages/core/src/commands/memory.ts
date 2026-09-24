@@ -54,9 +54,7 @@ export function showMemory(config: Config): MessageActionReturn {
   };
 }
 
-export async function refreshMemory(
-  config: Config,
-): Promise<MessageActionReturn> {
+export async function refreshMemory(config: Config): Promise<MessageActionReturn> {
   await config.getMemoryContextManager()?.refresh();
   const memoryContent = flattenMemory(config.getUserMemory());
   const fileCount = config.getGeminiMdFileCount();
@@ -258,8 +256,7 @@ export async function moveInboxSkill(
   // Remove from inbox after successful copy
   await fs.rm(sourcePath, { recursive: true, force: true });
 
-  const label =
-    destination === 'global' ? '~/.sparkle/skills' : '.sparkle/skills';
+  const label = destination === 'global' ? '~/.sparkle/skills' : '.sparkle/skills';
   return {
     success: true,
     message: `Moved "${dirName}" to ${label}.`,
@@ -405,10 +402,7 @@ async function getFileMtimeIso(filePath: string): Promise<string | undefined> {
   }
 }
 
-async function patchTargetsProjectSkills(
-  targetPaths: string[],
-  config: Config,
-) {
+async function patchTargetsProjectSkills(targetPaths: string[], config: Config) {
   for (const targetPath of targetPaths) {
     if (await isProjectSkillPatchTarget(targetPath, config)) {
       return true;
@@ -417,9 +411,7 @@ async function patchTargetsProjectSkills(
   return false;
 }
 
-async function getPatchExtractedAt(
-  patchPath: string,
-): Promise<string | undefined> {
+async function getPatchExtractedAt(patchPath: string): Promise<string | undefined> {
   try {
     const stats = await fs.stat(patchPath);
     return stats.mtime.toISOString();
@@ -453,10 +445,7 @@ export async function listInboxMemoryPatches(
   const aggregated: InboxMemoryPatch[] = [];
 
   for (const kind of kinds) {
-    const validationContext = await getMemoryPatchTargetValidationContext(
-      config,
-      kind,
-    );
+    const validationContext = await getMemoryPatchTargetValidationContext(config, kind);
     const patchFiles = await listInboxPatchFiles(config, kind);
 
     const aggregatedEntries: InboxMemoryPatchEntry[] = [];
@@ -569,11 +558,7 @@ export async function applyInboxMemoryPatch(
     return { success: false, message: 'Invalid memory patch path.' };
   }
 
-  const sourcePath = await getInboxMemoryPatchSourcePath(
-    config,
-    kind,
-    normalizedPath,
-  );
+  const sourcePath = await getInboxMemoryPatchSourcePath(config, kind, normalizedPath);
   if (!sourcePath) {
     return { success: false, message: 'Invalid memory patch path.' };
   }
@@ -602,12 +587,7 @@ async function applyAllInboxPatchesForKind(
 
   for (const sourcePath of patchFiles) {
     const basename = path.basename(sourcePath);
-    const result = await applyMemoryPatchFile(
-      config,
-      kind,
-      sourcePath,
-      basename,
-    );
+    const result = await applyMemoryPatchFile(config, kind, sourcePath, basename);
     if (result.success) {
       successes.push(basename);
       // Surface auto-added MEMORY.md pointer info if present.
@@ -639,9 +619,7 @@ async function applyAllInboxPatchesForKind(
     };
   }
 
-  const failureSummary = failures
-    .map((f) => `"${f.name}" — ${f.reason}`)
-    .join('; ');
+  const failureSummary = failures.map((f) => `"${f.name}" — ${f.reason}`).join('; ');
   // Any failure → success=false so the dialog keeps the inbox entry visible
   // (the user needs to see and retry/dismiss the remaining sub-patches).
   // The successful sub-patches have already been removed from disk by
@@ -811,10 +789,7 @@ async function applyMemoryPatchFile(
     };
   }
 
-  const validationContext = await getMemoryPatchTargetValidationContext(
-    config,
-    kind,
-  );
+  const validationContext = await getMemoryPatchTargetValidationContext(config, kind);
   const disallowedTargetPath = await findDisallowedMemoryPatchTarget(
     parsed,
     validationContext,
@@ -831,10 +806,7 @@ async function applyMemoryPatchFile(
     validationContext.allowedRoots,
     {
       isResolvedTargetAllowed: (resolvedTargetPath) =>
-        isResolvedMemoryPatchTargetAllowed(
-          resolvedTargetPath,
-          validationContext,
-        ),
+        isResolvedMemoryPatchTargetAllowed(resolvedTargetPath, validationContext),
     },
   );
   if (!applied.success) {
@@ -983,11 +955,7 @@ export async function dismissInboxMemoryPatch(
     return { success: false, message: 'Invalid memory patch path.' };
   }
 
-  const sourcePath = await getInboxMemoryPatchSourcePath(
-    config,
-    kind,
-    normalizedPath,
-  );
+  const sourcePath = await getInboxMemoryPatchSourcePath(config, kind, normalizedPath);
   if (!sourcePath) {
     return { success: false, message: 'Invalid memory patch path.' };
   }
@@ -1009,9 +977,7 @@ export async function dismissInboxMemoryPatch(
   };
 }
 
-async function findNearestExistingDirectory(
-  startPath: string,
-): Promise<string> {
+async function findNearestExistingDirectory(startPath: string): Promise<string> {
   let currentPath = path.resolve(startPath);
 
   while (true) {
@@ -1083,11 +1049,7 @@ async function restoreCommittedInboxPatchTarget(
     `.${path.basename(stagedTarget.targetPath)}.${randomUUID()}.rollback`,
   );
 
-  await writeExclusiveFile(
-    restorePath,
-    stagedTarget.original,
-    stagedTarget.mode,
-  );
+  await writeExclusiveFile(restorePath, stagedTarget.original, stagedTarget.mode);
   await fs.rename(restorePath, stagedTarget.targetPath);
 }
 
@@ -1246,8 +1208,7 @@ export async function applyInboxPatch(
   ) {
     return {
       success: false,
-      message:
-        'Project skill patches are unavailable until this workspace is trusted.',
+      message: 'Project skill patches are unavailable until this workspace is trusted.',
     };
   }
 

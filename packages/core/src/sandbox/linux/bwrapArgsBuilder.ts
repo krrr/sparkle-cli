@@ -30,9 +30,7 @@ export interface BwrapArgsOptions {
 /**
  * Builds the list of bubblewrap arguments based on the provided options.
  */
-export async function buildBwrapArgs(
-  options: BwrapArgsOptions,
-): Promise<string[]> {
+export async function buildBwrapArgs(options: BwrapArgsOptions): Promise<string[]> {
   const {
     resolvedPaths,
     workspaceWrite,

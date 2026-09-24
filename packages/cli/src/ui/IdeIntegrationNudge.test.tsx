@@ -164,10 +164,9 @@ describe('IdeIntegrationNudge', () => {
     vi.stubEnv('SPARKLE_CLI_IDE_WORKSPACE_PATH', '/tmp');
 
     const onComplete = vi.fn();
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <IdeIntegrationNudge {...defaultProps} onComplete={onComplete} />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <IdeIntegrationNudge {...defaultProps} onComplete={onComplete} />,
+    );
 
     const frame = lastFrame();
 

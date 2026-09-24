@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  afterAll,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
 import {
   Logger,
   MessageSenderType,
@@ -42,10 +34,7 @@ const TEST_SPARKLE_DIR = path.join(
 );
 
 const TEST_LOG_FILE_PATH = path.join(TEST_SPARKLE_DIR, LOG_FILE_NAME);
-const TEST_CHECKPOINT_FILE_PATH = path.join(
-  TEST_SPARKLE_DIR,
-  CHECKPOINT_FILE_NAME,
-);
+const TEST_CHECKPOINT_FILE_PATH = path.join(TEST_SPARKLE_DIR, CHECKPOINT_FILE_NAME);
 
 async function cleanupLogAndCheckpointFiles() {
   try {
@@ -146,14 +135,8 @@ describe('Logger', () => {
           message: 'Msg2',
         },
       ];
-      await fs.writeFile(
-        TEST_LOG_FILE_PATH,
-        JSON.stringify(existingLogs, null, 2),
-      );
-      const newLogger = new Logger(
-        currentSessionId,
-        new Storage(process.cwd()),
-      );
+      await fs.writeFile(TEST_LOG_FILE_PATH, JSON.stringify(existingLogs, null, 2));
+      const newLogger = new Logger(currentSessionId, new Storage(process.cwd()));
       await newLogger.initialize();
       expect(newLogger['messageId']).toBe(2);
       expect(newLogger['logs']).toEqual(existingLogs);
@@ -170,10 +153,7 @@ describe('Logger', () => {
           message: 'OldMsg',
         },
       ];
-      await fs.writeFile(
-        TEST_LOG_FILE_PATH,
-        JSON.stringify(existingLogs, null, 2),
-      );
+      await fs.writeFile(TEST_LOG_FILE_PATH, JSON.stringify(existingLogs, null, 2));
       const newLogger = new Logger('a-new-session', new Storage(process.cwd()));
       await newLogger.initialize();
       expect(newLogger['messageId']).toBe(0);
@@ -211,18 +191,14 @@ describe('Logger', () => {
       const dirContents = await fs.readdir(TEST_SPARKLE_DIR);
       expect(
         dirContents.some(
-          (f) =>
-            f.startsWith(LOG_FILE_NAME + '.invalid_json') && f.endsWith('.bak'),
+          (f) => f.startsWith(LOG_FILE_NAME + '.invalid_json') && f.endsWith('.bak'),
         ),
       ).toBe(true);
       newLogger.close();
     });
 
     it('should handle non-array JSON in log file by backing it up and starting fresh', async () => {
-      await fs.writeFile(
-        TEST_LOG_FILE_PATH,
-        JSON.stringify({ not: 'an array' }),
-      );
+      await fs.writeFile(TEST_LOG_FILE_PATH, JSON.stringify({ not: 'an array' }));
       const consoleDebugSpy = vi
         .spyOn(debugLogger, 'debug')
         .mockImplementation(() => {});
@@ -238,9 +214,7 @@ describe('Logger', () => {
       const dirContents = await fs.readdir(TEST_SPARKLE_DIR);
       expect(
         dirContents.some(
-          (f) =>
-            f.startsWith(LOG_FILE_NAME + '.malformed_array') &&
-            f.endsWith('.bak'),
+          (f) => f.startsWith(LOG_FILE_NAME + '.malformed_array') && f.endsWith('.bak'),
         ),
       ).toBe(true);
       newLogger.close();
@@ -277,10 +251,7 @@ describe('Logger', () => {
     });
 
     it('should handle logger not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close(); // Ensure it's treated as uninitialized
       const consoleDebugSpy = vi
         .spyOn(debugLogger, 'debug')
@@ -295,16 +266,10 @@ describe('Logger', () => {
 
     it('should simulate concurrent writes from different logger instances to the same file', async () => {
       const concurrentSessionId = 'concurrent-session';
-      const logger1 = new Logger(
-        concurrentSessionId,
-        new Storage(process.cwd()),
-      );
+      const logger1 = new Logger(concurrentSessionId, new Storage(process.cwd()));
       await logger1.initialize();
 
-      const logger2 = new Logger(
-        concurrentSessionId,
-        new Storage(process.cwd()),
-      );
+      const logger2 = new Logger(concurrentSessionId, new Storage(process.cwd()));
       await logger2.initialize();
       expect(logger2['sessionId']).toEqual(logger1['sessionId']);
 
@@ -368,19 +333,13 @@ describe('Logger', () => {
       await loggerSort2.initialize();
       await loggerSort2.logMessage(MessageSenderType.USER, 'S2M0_ts102000');
       vi.advanceTimersByTime(1000);
-      await loggerSort2.logMessage(
-        'model' as MessageSenderType,
-        'S2_Model_ts103000',
-      );
+      await loggerSort2.logMessage('model' as MessageSenderType, 'S2_Model_ts103000');
       vi.advanceTimersByTime(1000);
       await loggerSort2.logMessage(MessageSenderType.USER, 'S2M1_ts104000');
       loggerSort.close();
       loggerSort2.close();
 
-      const finalLogger = new Logger(
-        'final-session',
-        new Storage(process.cwd()),
-      );
+      const finalLogger = new Logger('final-session', new Storage(process.cwd()));
       await finalLogger.initialize();
 
       const messages = await finalLogger.getPreviousUserMessages();
@@ -400,10 +359,7 @@ describe('Logger', () => {
     });
 
     it('should return empty array if logger not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close();
       const messages = await uninitializedLogger.getPreviousUserMessages();
       expect(messages).toEqual([]);
@@ -452,10 +408,7 @@ describe('Logger', () => {
     });
 
     it('should not throw if logger is not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close();
       const consoleErrorSpy = vi
         .spyOn(debugLogger, 'error')
@@ -503,20 +456,14 @@ describe('Logger', () => {
       },
     ])('should load from a checkpoint', async ({ tag, encodedTag }) => {
       const taggedConversation = {
-        history: [
-          ...conversation,
-          { role: 'user', parts: [{ text: 'hello' }] },
-        ],
+        history: [...conversation, { role: 'user', parts: [{ text: 'hello' }] }],
         authType: ProviderType.USE_GEMINI,
       };
       const taggedFilePath = path.join(
         TEST_SPARKLE_DIR,
         `checkpoint-${encodedTag}.json`,
       );
-      await fs.writeFile(
-        taggedFilePath,
-        JSON.stringify(taggedConversation, null, 2),
-      );
+      await fs.writeFile(taggedFilePath, JSON.stringify(taggedConversation, null, 2));
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded).toEqual(taggedConversation);
@@ -568,10 +515,7 @@ describe('Logger', () => {
     });
 
     it('should return an empty history if logger is not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close();
       const consoleErrorSpy = vi
         .spyOn(debugLogger, 'error')
@@ -593,10 +537,7 @@ describe('Logger', () => {
     let taggedFilePath: string;
 
     beforeEach(async () => {
-      taggedFilePath = path.join(
-        TEST_SPARKLE_DIR,
-        `checkpoint-${encodedTag}.json`,
-      );
+      taggedFilePath = path.join(TEST_SPARKLE_DIR, `checkpoint-${encodedTag}.json`);
       // Create a file to be deleted
       await fs.writeFile(taggedFilePath, JSON.stringify(conversation));
     });
@@ -611,10 +552,7 @@ describe('Logger', () => {
 
     it('should delete both new and old checkpoint files if they exist', async () => {
       const oldTag = 'delete-me(old)';
-      const oldStylePath = path.join(
-        TEST_SPARKLE_DIR,
-        `checkpoint-${oldTag}.json`,
-      );
+      const oldStylePath = path.join(TEST_SPARKLE_DIR, `checkpoint-${oldTag}.json`);
       const newStylePath = logger['_checkpointPath'](oldTag);
 
       // Create both files
@@ -659,10 +597,7 @@ describe('Logger', () => {
     });
 
     it('should return false if logger is not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close();
       const consoleErrorSpy = vi
         .spyOn(debugLogger, 'error')
@@ -682,10 +617,7 @@ describe('Logger', () => {
     let taggedFilePath: string;
 
     beforeEach(() => {
-      taggedFilePath = path.join(
-        TEST_SPARKLE_DIR,
-        `checkpoint-${encodedTag}.json`,
-      );
+      taggedFilePath = path.join(TEST_SPARKLE_DIR, `checkpoint-${encodedTag}.json`);
     });
 
     it('should return true if the checkpoint file exists', async () => {
@@ -700,10 +632,7 @@ describe('Logger', () => {
     });
 
     it('should throw an error if logger is not initialized', async () => {
-      const uninitializedLogger = new Logger(
-        testSessionId,
-        new Storage(process.cwd()),
-      );
+      const uninitializedLogger = new Logger(testSessionId, new Storage(process.cwd()));
       uninitializedLogger.close();
 
       await expect(uninitializedLogger.checkpointExists(tag)).rejects.toThrow(
@@ -742,14 +671,8 @@ describe('Logger', () => {
         { role: 'user', parts: [{ text: 'hello' }] },
       ];
       const tag = 'special(char)';
-      const taggedFilePath = path.join(
-        TEST_SPARKLE_DIR,
-        `checkpoint-${tag}.json`,
-      );
-      await fs.writeFile(
-        taggedFilePath,
-        JSON.stringify(taggedConversation, null, 2),
-      );
+      const taggedFilePath = path.join(TEST_SPARKLE_DIR, `checkpoint-${tag}.json`);
+      await fs.writeFile(taggedFilePath, JSON.stringify(taggedConversation, null, 2));
 
       const loaded = await logger.loadCheckpoint(tag);
       expect(loaded.history).toEqual(taggedConversation);

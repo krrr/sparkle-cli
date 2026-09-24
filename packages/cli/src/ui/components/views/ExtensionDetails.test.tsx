@@ -199,10 +199,7 @@ describe('ExtensionDetails', () => {
   });
 
   it('should show [Updating...] and hide "Already Installed" when update is in progress', async () => {
-    const { lastFrame } = await renderDetails(
-      true,
-      ExtensionUpdateState.UPDATING,
-    );
+    const { lastFrame } = await renderDetails(true, ExtensionUpdateState.UPDATING);
     await waitFor(() => {
       expect(lastFrame()).toContain('[Updating...]');
       expect(lastFrame()).not.toContain('Already Installed');

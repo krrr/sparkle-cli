@@ -44,9 +44,7 @@ describe('AtFileProcessor', () => {
 
     // Default mock success behavior: return content wrapped in a text part.
     mockReadPathFromWorkspace.mockImplementation(
-      async (path: string): Promise<PartUnion[]> => [
-        { text: `content of ${path}` },
-      ],
+      async (path: string): Promise<PartUnion[]> => [{ text: `content of ${path}` }],
     );
   });
 
@@ -74,9 +72,7 @@ describe('AtFileProcessor', () => {
   describe('Parsing Logic', () => {
     it('should replace a single valid @{path/to/file.txt} placeholder', async () => {
       const processor = new AtFileProcessor();
-      const prompt: PartUnion[] = [
-        { text: 'Analyze this file: @{path/to/file.txt}' },
-      ];
+      const prompt: PartUnion[] = [{ text: 'Analyze this file: @{path/to/file.txt}' }];
       const result = await processor.process(prompt, context);
       expect(mockReadPathFromWorkspace).toHaveBeenCalledWith(
         'path/to/file.txt',
@@ -90,19 +86,11 @@ describe('AtFileProcessor', () => {
 
     it('should replace multiple different @{...} placeholders', async () => {
       const processor = new AtFileProcessor();
-      const prompt: PartUnion[] = [
-        { text: 'Compare @{file1.js} with @{file2.js}' },
-      ];
+      const prompt: PartUnion[] = [{ text: 'Compare @{file1.js} with @{file2.js}' }];
       const result = await processor.process(prompt, context);
       expect(mockReadPathFromWorkspace).toHaveBeenCalledTimes(2);
-      expect(mockReadPathFromWorkspace).toHaveBeenCalledWith(
-        'file1.js',
-        mockConfig,
-      );
-      expect(mockReadPathFromWorkspace).toHaveBeenCalledWith(
-        'file2.js',
-        mockConfig,
-      );
+      expect(mockReadPathFromWorkspace).toHaveBeenCalledWith('file1.js', mockConfig);
+      expect(mockReadPathFromWorkspace).toHaveBeenCalledWith('file2.js', mockConfig);
       expect(result).toEqual([
         { text: 'Compare ' },
         { text: 'content of file1.js' },
@@ -128,9 +116,7 @@ describe('AtFileProcessor', () => {
 
     it('should correctly parse paths that contain balanced braces', async () => {
       const processor = new AtFileProcessor();
-      const prompt: PartUnion[] = [
-        { text: 'Analyze @{path/with/{braces}/file.txt}' },
-      ];
+      const prompt: PartUnion[] = [{ text: 'Analyze @{path/with/{braces}/file.txt}' }];
       const result = await processor.process(prompt, context);
       expect(mockReadPathFromWorkspace).toHaveBeenCalledWith(
         'path/with/{braces}/file.txt',

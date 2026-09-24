@@ -44,10 +44,7 @@ import * as os from 'node:os';
  * };
  */
 export type FileSystemStructure = {
-  [name: string]:
-    | string
-    | FileSystemStructure
-    | Array<string | FileSystemStructure>;
+  [name: string]: string | FileSystemStructure | Array<string | FileSystemStructure>;
 };
 
 /**
@@ -81,9 +78,7 @@ async function create(dir: string, structure: FileSystemStructure) {
  * @param structure The `FileSystemStructure` to create within the temporary directory.
  * @returns A promise that resolves to the absolute path of the created temporary directory.
  */
-export async function createTmpDir(
-  structure: FileSystemStructure,
-): Promise<string> {
+export async function createTmpDir(structure: FileSystemStructure): Promise<string> {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-cli-test-'));
   await create(tmpDir, structure);
   return tmpDir;

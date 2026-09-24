@@ -147,9 +147,7 @@ describe('readStdin', () => {
     const charCount = Math.floor(MAX_STDIN_SIZE / 3) + 1;
     const multiByteChunk = '한'.repeat(charCount);
 
-    mockStdin.read
-      .mockReturnValueOnce(multiByteChunk)
-      .mockReturnValueOnce(null);
+    mockStdin.read.mockReturnValueOnce(multiByteChunk).mockReturnValueOnce(null);
 
     const promise = readStdin();
     onReadableHandler();
@@ -169,17 +167,13 @@ describe('readStdin', () => {
     const charCount = MAX_STDIN_SIZE; // 8M characters = 24MB
     const multiByteChunk = '한'.repeat(charCount);
 
-    mockStdin.read
-      .mockReturnValueOnce(multiByteChunk)
-      .mockReturnValueOnce(null);
+    mockStdin.read.mockReturnValueOnce(multiByteChunk).mockReturnValueOnce(null);
 
     const promise = readStdin();
     onReadableHandler();
 
     const result = await promise;
-    expect(Buffer.byteLength(result, 'utf8')).toBeLessThanOrEqual(
-      MAX_STDIN_SIZE,
-    );
+    expect(Buffer.byteLength(result, 'utf8')).toBeLessThanOrEqual(MAX_STDIN_SIZE);
     expect(result.length).toBeLessThan(charCount);
   });
 

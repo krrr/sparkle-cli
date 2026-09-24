@@ -90,10 +90,7 @@ export async function summarizeReports(
   const reportPaths = findReportFiles(reportsDir);
   const modelSummariesMap = new Map<
     string,
-    Map<
-      string,
-      { name: string; passed: number; total: number; filePath: string }
-    >
+    Map<string, { name: string; passed: number; total: number; filePath: string }>
   >();
 
   for (const reportPath of reportPaths) {
@@ -148,9 +145,7 @@ export async function summarizeReports(
   const policyMap = new Map<string, string>();
   if (inventory) {
     for (const caseRec of inventory.cases) {
-      const normalizedCasePath = path
-        .resolve(caseRec.filePath)
-        .replace(/\\/g, '/');
+      const normalizedCasePath = path.resolve(caseRec.filePath).replace(/\\/g, '/');
       const key = `${normalizedCasePath}::${caseRec.name}`;
       policyMap.set(key, caseRec.policy);
     }
@@ -236,12 +231,11 @@ export function formatReportSummary(
         repoRoot && path.isAbsolute(c.filePath)
           ? path.relative(repoRoot, c.filePath).replace(/\\/g, '/')
           : c.filePath;
-      const indicator =
-        c.passRate === 1.0 ? '✓' : c.passRate === 0 ? '✗' : '⚠';
+      const indicator = c.passRate === 1.0 ? '✓' : c.passRate === 0 ? '✗' : '⚠';
       lines.push(
-        `    ${indicator} [${c.policy}] ${c.name} — ${(
-          c.passRate * 100
-        ).toFixed(1)}% (${c.passed}/${c.total}) [${relPath}]`,
+        `    ${indicator} [${c.policy}] ${c.name} — ${(c.passRate * 100).toFixed(
+          1,
+        )}% (${c.passed}/${c.total}) [${relPath}]`,
       );
     }
     lines.push('');

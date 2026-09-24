@@ -10,11 +10,7 @@ import {
   ShellTool,
   type Config as CoreConfig,
 } from 'sparkle-cli-core';
-import type {
-  AgentShell,
-  AgentShellResult,
-  AgentShellOptions,
-} from './types.js';
+import type { AgentShell, AgentShellResult, AgentShellOptions } from './types.js';
 
 /**
  * SDK implementation of {@link AgentShell} that executes commands via the
@@ -31,10 +27,7 @@ import type {
 export class SdkAgentShell implements AgentShell {
   constructor(private readonly config: CoreConfig) {}
 
-  async exec(
-    command: string,
-    options?: AgentShellOptions,
-  ): Promise<AgentShellResult> {
+  async exec(command: string, options?: AgentShellOptions): Promise<AgentShellResult> {
     const cwd = options?.cwd || this.config.getWorkingDir();
     const abortController = new AbortController();
 

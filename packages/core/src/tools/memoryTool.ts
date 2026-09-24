@@ -92,8 +92,5 @@ export function getGlobalMemoryFilePath(): string {
 }
 
 export function getProjectMemoryIndexFilePath(storage: Storage): string {
-  return path.join(
-    storage.getProjectMemoryDir(),
-    PROJECT_MEMORY_INDEX_FILENAME,
-  );
+  return path.join(storage.getProjectMemoryDir(), PROJECT_MEMORY_INDEX_FILENAME);
 }

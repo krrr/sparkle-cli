@@ -128,11 +128,7 @@ export function resolveColor(colorValue: string): string | undefined {
   return undefined;
 }
 
-export function interpolateColor(
-  color1: string,
-  color2: string,
-  factor: number,
-) {
+export function interpolateColor(color1: string, color2: string, factor: number) {
   if (factor <= 0 && color1) {
     return color1;
   }
@@ -342,8 +338,7 @@ export class Theme {
     // Determine the default foreground color
     const rawDefaultColor = rawMappings['hljs']?.color;
     this.defaultColor =
-      (rawDefaultColor ? Theme._resolveColor(rawDefaultColor) : undefined) ??
-      ''; // Default to empty string if not found or resolvable
+      (rawDefaultColor ? Theme._resolveColor(rawDefaultColor) : undefined) ?? ''; // Default to empty string if not found or resolvable
   }
 
   /**
@@ -414,10 +409,8 @@ export function createCustomTheme(customTheme: CustomTheme): Theme {
     AccentGreen: customTheme.status?.success ?? customTheme.AccentGreen ?? '',
     AccentYellow: customTheme.status?.warning ?? customTheme.AccentYellow ?? '',
     AccentRed: customTheme.status?.error ?? customTheme.AccentRed ?? '',
-    DiffAdded:
-      customTheme.background?.diff?.added ?? customTheme.DiffAdded ?? '',
-    DiffRemoved:
-      customTheme.background?.diff?.removed ?? customTheme.DiffRemoved ?? '',
+    DiffAdded: customTheme.background?.diff?.added ?? customTheme.DiffAdded ?? '',
+    DiffRemoved: customTheme.background?.diff?.removed ?? customTheme.DiffRemoved ?? '',
     Comment: customTheme.ui?.comment ?? customTheme.Comment ?? '',
     Gray: customTheme.text?.secondary ?? customTheme.Gray ?? '',
     DarkGray:
@@ -591,9 +584,7 @@ export function createCustomTheme(customTheme: CustomTheme): Theme {
       link: customTheme.text?.link ?? colors.AccentBlue,
       accent: customTheme.text?.accent ?? colors.AccentPurple,
       response:
-        customTheme.text?.response ??
-        customTheme.text?.primary ??
-        colors.Foreground,
+        customTheme.text?.response ?? customTheme.text?.primary ?? colors.Foreground,
     },
     background: {
       primary: customTheme.background?.primary ?? colors.Background,
@@ -623,13 +614,7 @@ export function createCustomTheme(customTheme: CustomTheme): Theme {
     },
   };
 
-  return new Theme(
-    customTheme.name,
-    'custom',
-    rawMappings,
-    colors,
-    semanticColors,
-  );
+  return new Theme(customTheme.name, 'custom', rawMappings, colors, semanticColors);
 }
 
 /**

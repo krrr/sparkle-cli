@@ -65,9 +65,7 @@ describe.skip('stdin context', () => {
     // Add debugging information
     if (!result.toLowerCase().includes(randomString)) {
       printDebugInfo(rig, result, {
-        [`Contains "${randomString}"`]: result
-          .toLowerCase()
-          .includes(randomString),
+        [`Contains "${randomString}"`]: result.toLowerCase().includes(randomString),
       });
     }
 

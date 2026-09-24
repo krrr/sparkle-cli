@@ -4,14 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  type MockedFunction,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 import { renderHook } from '../../test-utils/render.js';
 import { useBanner, _clearSessionBannersForTest } from './useBanner.js';
 import { persistentState } from '../../utils/persistentState.js';
@@ -72,10 +65,8 @@ describe('useBanner', () => {
 
   it('should hide banner if show count exceeds max limit (Legacy format)', async () => {
     mockedPersistentStateGet.mockReturnValue({
-      [crypto
-        .createHash('sha256')
-        .update(defaultBannerData.defaultText)
-        .digest('hex')]: 5,
+      [crypto.createHash('sha256').update(defaultBannerData.defaultText).digest('hex')]:
+        5,
     });
   });
 
@@ -90,12 +81,9 @@ describe('useBanner', () => {
     await renderHook(() => useBanner(data));
 
     // Expect set to be called with incremented count
-    expect(mockedPersistentStateSet).toHaveBeenCalledWith(
-      'defaultBannerShownCount',
-      {
-        [crypto.createHash('sha256').update(data.defaultText).digest('hex')]: 2,
-      },
-    );
+    expect(mockedPersistentStateSet).toHaveBeenCalledWith('defaultBannerShownCount', {
+      [crypto.createHash('sha256').update(data.defaultText).digest('hex')]: 2,
+    });
   });
 
   it('should increment count if warning text is shown instead', async () => {
@@ -104,12 +92,9 @@ describe('useBanner', () => {
     await renderHook(() => useBanner(data));
 
     // Warning text now also gets counted
-    expect(mockedPersistentStateSet).toHaveBeenCalledWith(
-      'defaultBannerShownCount',
-      {
-        [crypto.createHash('sha256').update(data.warningText).digest('hex')]: 1,
-      },
-    );
+    expect(mockedPersistentStateSet).toHaveBeenCalledWith('defaultBannerShownCount', {
+      [crypto.createHash('sha256').update(data.warningText).digest('hex')]: 1,
+    });
   });
 
   it('should handle newline replacements', async () => {

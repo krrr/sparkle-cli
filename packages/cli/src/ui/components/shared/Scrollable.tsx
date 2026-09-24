@@ -79,13 +79,7 @@ export const Scrollable: React.FC<ScrollableProps> = ({
     } else {
       overflowActions?.removeOverflowingId?.(id);
     }
-  }, [
-    reportOverflow,
-    size.scrollHeight,
-    size.innerHeight,
-    id,
-    overflowActions,
-  ]);
+  }, [reportOverflow, size.scrollHeight, size.innerHeight, id, overflowActions]);
 
   useEffect(
     () => () => {
@@ -148,10 +142,7 @@ export const Scrollable: React.FC<ScrollableProps> = ({
                 prev.scrollHeight > innerHeight &&
                 scrollTopRef.current >= prev.scrollHeight - innerHeight - 1;
 
-              if (
-                isAtBottom ||
-                (scrollToBottom && scrollHeight > prev.scrollHeight)
-              ) {
+              if (isAtBottom || (scrollToBottom && scrollHeight > prev.scrollHeight)) {
                 setScrollTop(Number.MAX_SAFE_INTEGER);
               }
               return { ...prev, scrollHeight };

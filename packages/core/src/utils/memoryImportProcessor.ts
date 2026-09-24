@@ -12,14 +12,11 @@ import { debugLogger } from './debugLogger.js';
 // Simple console logger for import processing
 const logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  debug: (...args: any[]) =>
-    debugLogger.debug('[DEBUG] [ImportProcessor]', ...args),
+  debug: (...args: any[]) => debugLogger.debug('[DEBUG] [ImportProcessor]', ...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  warn: (...args: any[]) =>
-    debugLogger.warn('[WARN] [ImportProcessor]', ...args),
+  warn: (...args: any[]) => debugLogger.warn('[WARN] [ImportProcessor]', ...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: (...args: any[]) =>
-    debugLogger.error('[ERROR] [ImportProcessor]', ...args),
+  error: (...args: any[]) => debugLogger.error('[ERROR] [ImportProcessor]', ...args),
 };
 
 /**
@@ -135,9 +132,7 @@ function findImports(
     // Basic validation (starts with ./ or / or letter)
     if (
       importPath.length > 0 &&
-      (importPath[0] === '.' ||
-        importPath[0] === '/' ||
-        isLetter(importPath[0]))
+      (importPath[0] === '.' || importPath[0] === '/' || isLetter(importPath[0]))
     ) {
       imports.push({
         start: i,
@@ -253,17 +248,14 @@ export async function processImports(
         // Skip if inside a code region
         if (
           codeRegions.some(
-            ([regionStart, regionEnd]) =>
-              start >= regionStart && start < regionEnd,
+            ([regionStart, regionEnd]) => start >= regionStart && start < regionEnd,
           )
         ) {
           continue;
         }
 
         // Validate import path
-        if (
-          !validateImportPath(importPath, fileBasePath, [projectRoot || ''])
-        ) {
+        if (!validateImportPath(importPath, fileBasePath, [projectRoot || ''])) {
           continue;
         }
 
@@ -296,9 +288,7 @@ export async function processImports(
     }
 
     // Start with the root file (current file)
-    const rootPath = path.normalize(
-      importState.currentFile || path.resolve(basePath),
-    );
+    const rootPath = path.normalize(importState.currentFile || path.resolve(basePath));
     await processFlat(content, basePath, rootPath, 0);
 
     // Concatenate all unique files in order, Claude-style

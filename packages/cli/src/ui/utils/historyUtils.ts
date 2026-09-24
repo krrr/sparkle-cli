@@ -67,14 +67,10 @@ export function getLastTurnToolCallIds(
   return targetToolCallIds;
 }
 
-export function isToolExecuting(
-  pendingHistoryItems: HistoryItemWithoutId[],
-): boolean {
+export function isToolExecuting(pendingHistoryItems: HistoryItemWithoutId[]): boolean {
   return pendingHistoryItems.some((item) => {
     if (item && item.type === 'tool_group') {
-      return item.tools.some(
-        (tool) => CoreToolCallStatus.Executing === tool.status,
-      );
+      return item.tools.some((tool) => CoreToolCallStatus.Executing === tool.status);
     }
     return false;
   });
@@ -86,9 +82,7 @@ export function isToolAwaitingConfirmation(
   return pendingHistoryItems
     .filter((item): item is HistoryItemToolGroup => item.type === 'tool_group')
     .some((item) =>
-      item.tools.some(
-        (tool) => CoreToolCallStatus.AwaitingApproval === tool.status,
-      ),
+      item.tools.some((tool) => CoreToolCallStatus.AwaitingApproval === tool.status),
     );
 }
 

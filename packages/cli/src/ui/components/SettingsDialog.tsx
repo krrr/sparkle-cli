@@ -30,10 +30,7 @@ import {
   getEditValue,
   parseEditedValue,
 } from '../../utils/settingsUtils.js';
-import {
-  useSettingsStore,
-  type SettingsState,
-} from '../contexts/SettingsContext.js';
+import { useSettingsStore, type SettingsState } from '../contexts/SettingsContext.js';
 import { getCachedStringWidth } from '../utils/textUtils.js';
 import {
   type SettingsType,
@@ -115,8 +112,7 @@ export function SettingsDialog({
         const settingsFile = settings.forScope(item.value);
         return (
           settingsFile.readOnly !== true &&
-          (item.value !== SettingScope.Workspace ||
-            settingsFile.path !== undefined)
+          (item.value !== SettingScope.Workspace || settingsFile.path !== undefined)
         );
       }),
     [settings],
@@ -235,9 +231,7 @@ export function SettingsDialog({
       const label = def.label || key;
       const labelFull = label + (scopeMessage ? ` ${scopeMessage}` : '');
       const lWidth = getCachedStringWidth(labelFull);
-      const dWidth = def.description
-        ? getCachedStringWidth(def.description)
-        : 0;
+      const dWidth = def.description ? getCachedStringWidth(def.description) : 0;
 
       max = Math.max(max, lWidth, dWidth);
     }
@@ -322,9 +316,7 @@ export function SettingsDialog({
         if (options.length === 0) {
           return;
         }
-        const currentIndex = options?.findIndex(
-          (opt) => opt.value === currentValue,
-        );
+        const currentIndex = options?.findIndex((opt) => opt.value === currentValue);
         if (currentIndex !== -1 && currentIndex < options.length - 1) {
           newValue = options[currentIndex + 1].value;
         } else {
@@ -432,8 +424,8 @@ export function SettingsDialog({
           ? {
               content: (
                 <Text color={theme.status.warning}>
-                  Changes that require a restart have been modified. Press r to
-                  exit and apply changes now.
+                  Changes that require a restart have been modified. Press r to exit and
+                  apply changes now.
                 </Text>
               ),
               height: 1,

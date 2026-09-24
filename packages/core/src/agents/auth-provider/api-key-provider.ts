@@ -45,9 +45,7 @@ export class ApiKeyAuthProvider extends BaseA2AAuthProvider {
 
   async headers(): Promise<HttpHeaders> {
     if (!this.resolvedKey) {
-      throw new Error(
-        'ApiKeyAuthProvider not initialized. Call initialize() first.',
-      );
+      throw new Error('ApiKeyAuthProvider not initialized. Call initialize() first.');
     }
     return { [this.headerName]: this.resolvedKey };
   }
@@ -75,9 +73,7 @@ export class ApiKeyAuthProvider extends BaseA2AAuthProvider {
     }
     this.authRetryCount++;
 
-    debugLogger.debug(
-      '[ApiKeyAuthProvider] Re-resolving API key after auth failure',
-    );
+    debugLogger.debug('[ApiKeyAuthProvider] Re-resolving API key after auth failure');
     this.resolvedKey = await resolveAuthValue(this.config.key);
 
     return this.headers();

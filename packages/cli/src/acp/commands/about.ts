@@ -5,11 +5,7 @@
  */
 
 import { IdeClient, getVersion } from 'sparkle-cli-core';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 import process from 'node:process';
 
 export class AboutCommand implements Command {
@@ -27,8 +23,7 @@ export class AboutCommand implements Command {
     }
     const modelVersion = context.agentContext.config.getModel() || 'Unknown';
     const cliVersion = await getVersion();
-    const profileService =
-      context.agentContext.config.getProviderProfileService();
+    const profileService = context.agentContext.config.getProviderProfileService();
     const activeProfile = profileService.getActiveProfile();
     const selectedAuthType = activeProfile
       ? `${activeProfile.id} (${activeProfile.providerType})`

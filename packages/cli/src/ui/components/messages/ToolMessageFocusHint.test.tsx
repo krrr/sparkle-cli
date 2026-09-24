@@ -10,10 +10,7 @@ import { ShellToolMessage } from './ShellToolMessage.js';
 import { StreamingState } from '../../types.js';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  SHELL_COMMAND_NAME,
-  SHELL_FOCUS_HINT_DELAY_MS,
-} from '../../constants.js';
+import { SHELL_COMMAND_NAME, SHELL_FOCUS_HINT_DELAY_MS } from '../../constants.js';
 import {
   type Config,
   type ToolResultDisplay,

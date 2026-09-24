@@ -16,8 +16,7 @@ export async function pushTaskStateFailed(
   taskId: string,
   contextId: string,
 ) {
-  const errorMessage =
-    error instanceof Error ? error.message : 'Agent execution error';
+  const errorMessage = error instanceof Error ? error.message : 'Agent execution error';
   const stateChange: StateChange = {
     kind: CoderAgentEvent.StateChangeEvent,
   };

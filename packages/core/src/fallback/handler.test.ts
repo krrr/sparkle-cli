@@ -29,10 +29,7 @@ import type { FallbackModelHandler } from './types.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import * as policyHelpers from '../availability/policyHelpers.js';
 import { createDefaultPolicy } from '../availability/policyCatalog.js';
-import {
-  RetryableQuotaError,
-  TerminalQuotaError,
-} from '../utils/googleQuotaErrors.js';
+import { RetryableQuotaError, TerminalQuotaError } from '../utils/googleQuotaErrors.js';
 
 // Mock the telemetry logger and event class
 vi.mock('../telemetry/index.js', () => ({
@@ -163,19 +160,13 @@ describe('handleFallback', () => {
       policyConfig = createMockConfig();
 
       // Ensure we test the availability path
-      vi.mocked(policyConfig.getModelAvailabilityService).mockReturnValue(
-        availability,
-      );
-      vi.mocked(policyConfig.getFallbackModelHandler).mockReturnValue(
-        policyHandler,
-      );
+      vi.mocked(policyConfig.getModelAvailabilityService).mockReturnValue(availability);
+      vi.mocked(policyConfig.getFallbackModelHandler).mockReturnValue(policyHandler);
     });
 
     it('uses availability selection with correct candidates when enabled', async () => {
       // Direct mock manipulation since it's already a vi.fn()
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
       await handleFallback(policyConfig, DEFAULT_GEMINI_MODEL, AUTH_OAUTH);
 
@@ -185,9 +176,7 @@ describe('handleFallback', () => {
     });
 
     it('falls back to last resort when availability returns null', async () => {
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
       availability.selectFirstAvailable = vi
         .fn()
         .mockReturnValue({ selectedModel: null, skipped: [] });
@@ -223,11 +212,7 @@ describe('handleFallback', () => {
           skipped: [],
         });
 
-        const result = await handleFallback(
-          policyConfig,
-          MOCK_PRO_MODEL,
-          AUTH_OAUTH,
-        );
+        const result = await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH);
 
         expect(result).toBe(true);
         expect(policyConfig.getFallbackModelHandler).not.toHaveBeenCalled();
@@ -242,9 +227,7 @@ describe('handleFallback', () => {
 
     it('does not wrap around to upgrade candidates if the current model was selected at the end (e.g. by router)', async () => {
       // Last-resort failure (Flash) in [Preview, Pro, Flash] checks Preview then Pro (all upstream).
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
       availability.selectFirstAvailable = vi.fn().mockReturnValue({
         selectedModel: MOCK_PRO_MODEL,
@@ -255,11 +238,7 @@ describe('handleFallback', () => {
 
       policyHandler.mockResolvedValue('retry_once');
 
-      await handleFallback(
-        policyConfig,
-        DEFAULT_GEMINI_FLASH_MODEL,
-        AUTH_OAUTH,
-      );
+      await handleFallback(policyConfig, DEFAULT_GEMINI_FLASH_MODEL, AUTH_OAUTH);
 
       expect(availability.selectFirstAvailable).not.toHaveBeenCalled();
       expect(policyHandler).toHaveBeenCalledWith(
@@ -275,12 +254,8 @@ describe('handleFallback', () => {
         skipped: [],
       });
       policyHandler.mockResolvedValue('retry_once');
-      vi.mocked(policyConfig.getActiveModel).mockReturnValue(
-        DEFAULT_GEMINI_MODEL,
-      );
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getActiveModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
       const result = await handleFallback(
         policyConfig,
@@ -298,11 +273,7 @@ describe('handleFallback', () => {
       const handlerError = new Error('UI interaction failed');
       policyHandler.mockRejectedValue(handlerError);
 
-      const result = await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-      );
+      const result = await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH);
 
       expect(result).toBeNull();
       expect(debugLogger.error).toHaveBeenCalledWith(
@@ -323,16 +294,9 @@ describe('handleFallback', () => {
         5,
       );
       policyHandler.mockResolvedValue('retry_always');
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
-      await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-        terminalError,
-      );
+      await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH, terminalError);
 
       expect(policyHandler).toHaveBeenCalledWith(
         MOCK_PRO_MODEL,
@@ -353,16 +317,9 @@ describe('handleFallback', () => {
         1000,
       );
       policyHandler.mockResolvedValue('retry_once');
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
-      await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-        retryableError,
-      );
+      await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH, retryableError);
 
       expect(policyHandler).toHaveBeenCalledWith(
         MOCK_PRO_MODEL,
@@ -376,9 +333,7 @@ describe('handleFallback', () => {
       availability.selectFirstAvailable = vi
         .fn()
         .mockReturnValue({ selectedModel: null, skipped: [] });
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
       // Mock activeModel to be unavailable so the utility bypass heuristic is skipped
       vi.mocked(availability.snapshot).mockReturnValue({ available: false });
 
@@ -400,15 +355,9 @@ describe('handleFallback', () => {
 
     it('calls activateFallbackMode when handler returns "retry_always"', async () => {
       policyHandler.mockResolvedValue('retry_always');
-      vi.mocked(policyConfig.getModel).mockReturnValue(
-        SPARKLE_MODEL_ALIAS_AUTO,
-      );
+      vi.mocked(policyConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
 
-      const result = await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-      );
+      const result = await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH);
 
       expect(result).toBe(true);
       expect(policyConfig.activateFallbackMode).toHaveBeenCalledWith(
@@ -421,11 +370,7 @@ describe('handleFallback', () => {
     it('does NOT call activateFallbackMode when handler returns "stop"', async () => {
       policyHandler.mockResolvedValue('stop');
 
-      const result = await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-      );
+      const result = await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH);
 
       expect(result).toBe(false);
       expect(policyConfig.activateFallbackMode).not.toHaveBeenCalled();
@@ -435,11 +380,7 @@ describe('handleFallback', () => {
     it('does NOT call activateFallbackMode when handler returns "retry_once"', async () => {
       policyHandler.mockResolvedValue('retry_once');
 
-      const result = await handleFallback(
-        policyConfig,
-        MOCK_PRO_MODEL,
-        AUTH_OAUTH,
-      );
+      const result = await handleFallback(policyConfig, MOCK_PRO_MODEL, AUTH_OAUTH);
 
       expect(result).toBe(true);
       expect(policyConfig.activateFallbackMode).not.toHaveBeenCalled();

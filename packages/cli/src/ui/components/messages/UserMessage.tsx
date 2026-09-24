@@ -28,8 +28,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({ text, width }) => {
   const isSlashCommand = checkIsSlashCommand(text);
   const config = useConfig();
   const useBackgroundColorSetting = config.getUseBackgroundColor();
-  const useBackgroundColor =
-    useBackgroundColorSetting && !!theme.background.message;
+  const useBackgroundColor = useBackgroundColorSetting && !!theme.background.message;
 
   const textColor = isSlashCommand ? theme.text.accent : theme.text.primary;
 
@@ -66,10 +65,7 @@ export const UserMessage: React.FC<UserMessageProps> = ({ text, width }) => {
         width={width}
       >
         <Box width={prefixWidth} flexShrink={0}>
-          <Text
-            color={theme.text.accent}
-            aria-label={SCREEN_READER_USER_PREFIX}
-          >
+          <Text color={theme.text.accent} aria-label={SCREEN_READER_USER_PREFIX}>
             {prefix}
           </Text>
         </Box>

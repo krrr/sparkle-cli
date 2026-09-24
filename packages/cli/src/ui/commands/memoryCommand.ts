@@ -107,9 +107,7 @@ const inboxSubCommand: SlashCommand = {
     'Review skills extracted from past sessions and move them to global or project skills',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: (
-    context,
-  ): OpenCustomDialogActionReturn | SlashCommandActionReturn | void => {
+  action: (context): OpenCustomDialogActionReturn | SlashCommandActionReturn | void => {
     const config = context.services.agentContext?.config;
     if (!config) {
       return {

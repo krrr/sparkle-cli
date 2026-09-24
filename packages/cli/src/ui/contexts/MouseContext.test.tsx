@@ -91,12 +91,9 @@ describe('MouseContext', () => {
 
   it('should not call handler if not active', async () => {
     const handler = vi.fn();
-    await renderHookWithProviders(
-      () => useMouse(handler, { isActive: false }),
-      {
-        mouseEventsEnabled: true,
-      },
-    );
+    await renderHookWithProviders(() => useMouse(handler, { isActive: false }), {
+      mouseEventsEnabled: true,
+    });
 
     act(() => {
       stdin.write('\x1b[<0;10;20M');
@@ -222,12 +219,9 @@ describe('MouseContext', () => {
       'should recognize sequence "$sequence" as $expected.name',
       async ({ sequence, expected }) => {
         const mouseHandler = vi.fn();
-        const { result } = await renderHookWithProviders(
-          () => useMouseContext(),
-          {
-            mouseEventsEnabled: true,
-          },
-        );
+        const { result } = await renderHookWithProviders(() => useMouseContext(), {
+          mouseEventsEnabled: true,
+        });
         act(() => result.current.subscribe(mouseHandler));
 
         act(() => stdin.write(sequence));

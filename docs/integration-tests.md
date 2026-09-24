@@ -1,33 +1,33 @@
 # Integration tests
 
-This document provides information about the integration testing framework used
-in this project.
+This document provides information about the integration testing framework used in this
+project.
 
 ## Overview
 
-The integration tests are designed to validate the end-to-end functionality of
-Sparkle CLI. They execute the built binary in a controlled environment and
-verify that it behaves as expected when interacting with the file system.
+The integration tests are designed to validate the end-to-end functionality of Sparkle
+CLI. They execute the built binary in a controlled environment and verify that it
+behaves as expected when interacting with the file system.
 
-These tests are located in the `integration-tests` directory and are run using a
-custom test runner.
+These tests are located in the `integration-tests` directory and are run using a custom
+test runner.
 
 ## Building the tests
 
-Prior to running any integration tests, you need to create a release bundle that
-you want to actually test:
+Prior to running any integration tests, you need to create a release bundle that you
+want to actually test:
 
 ```bash
 npm run bundle
 ```
 
-You must re-run this command after making any changes to the CLI source code,
-but not after making changes to tests.
+You must re-run this command after making any changes to the CLI source code, but not
+after making changes to tests.
 
 ## Running the tests
 
-The integration tests are not run as part of the default `npm run test` command.
-They must be run explicitly using the `npm run test:integration:all` script.
+The integration tests are not run as part of the default `npm run test` command. They
+must be run explicitly using the `npm run test:integration:all` script.
 
 The integration tests can also be run using the following shortcut:
 
@@ -38,11 +38,10 @@ npm run test:e2e
 ## Running a specific set of tests
 
 To run a subset of test files, you can use
-`npm run <integration test command> <file_name1> ....` where &lt;integration
-test command&gt; is either `test:e2e` or `test:integration*` and `<file_name>`
-is any of the `.test.js` files in the `integration-tests/` directory. For
-example, the following command runs `list_directory.test.js` and
-`write_file.test.js`:
+`npm run <integration test command> <file_name1> ....` where &lt;integration test
+command&gt; is either `test:e2e` or `test:integration*` and `<file_name>` is any of the
+`.test.js` files in the `integration-tests/` directory. For example, the following
+command runs `list_directory.test.js` and `write_file.test.js`:
 
 ```bash
 npm run test:e2e list_directory write_file
@@ -58,27 +57,27 @@ npm run test:e2e -- --test-name-pattern "reads a file"
 
 ### Regenerating model responses
 
-Some integration tests use faked out model responses, which may need to be
-regenerated from time to time as the implementations change.
+Some integration tests use faked out model responses, which may need to be regenerated
+from time to time as the implementations change.
 
-To regenerate these golden files, set the REGENERATE_MODEL_GOLDENS environment
-variable to "true" when running the tests, for example:
+To regenerate these golden files, set the REGENERATE_MODEL_GOLDENS environment variable
+to "true" when running the tests, for example:
 
-**WARNING**: If running locally you should review these updated responses for
-any information about yourself or your system that sparkle may have included in
-these responses.
+**WARNING**: If running locally you should review these updated responses for any
+information about yourself or your system that sparkle may have included in these
+responses.
 
 ```bash
 REGENERATE_MODEL_GOLDENS="true" npm run test:e2e
 ```
 
-**WARNING**: Make sure you run **await rig.cleanup()** at the end of your test,
-else the golden files will not be updated.
+**WARNING**: Make sure you run **await rig.cleanup()** at the end of your test, else the
+golden files will not be updated.
 
 ### Deflaking a test
 
-Before adding a **new** integration test, you should test it at least 5 times
-with the deflake script or workflow to make sure that it is not flaky.
+Before adding a **new** integration test, you should test it at least 5 times with the
+deflake script or workflow to make sure that it is not flaky.
 
 ### Deflake script
 
@@ -102,8 +101,8 @@ npm run test:integration:all
 
 ### Sandbox matrix
 
-The `all` command will run tests for `no sandboxing`, `docker` and `podman`.
-Each individual type can be run using the following commands:
+The `all` command will run tests for `no sandboxing`, `docker` and `podman`. Each
+individual type can be run using the following commands:
 
 ```bash
 npm run test:integration:sandbox:none
@@ -119,16 +118,16 @@ npm run test:integration:sandbox:podman
 
 ## Memory regression tests
 
-Memory regression tests are designed to detect heap growth and leaks across key
-CLI scenarios. They are located in the `memory-tests` directory.
+Memory regression tests are designed to detect heap growth and leaks across key CLI
+scenarios. They are located in the `memory-tests` directory.
 
-These tests are distinct from standard integration tests because they measure
-memory usage and compare it against committed baselines.
+These tests are distinct from standard integration tests because they measure memory
+usage and compare it against committed baselines.
 
 ### Running memory tests
 
-Memory tests are not run as part of the default `npm run test` or
-`npm run test:e2e` commands. They are run nightly in CI but can be run manually:
+Memory tests are not run as part of the default `npm run test` or `npm run test:e2e`
+commands. They are run nightly in CI but can be run manually:
 
 ```bash
 npm run test:memory
@@ -136,17 +135,16 @@ npm run test:memory
 
 ### Updating baselines
 
-If you intentionally change behavior that affects memory usage, you may need to
-update the baselines. Set the `UPDATE_MEMORY_BASELINES` environment variable to
-`true`:
+If you intentionally change behavior that affects memory usage, you may need to update
+the baselines. Set the `UPDATE_MEMORY_BASELINES` environment variable to `true`:
 
 ```bash
 UPDATE_MEMORY_BASELINES=true npm run test:memory
 ```
 
 This will run the tests, take median snapshots, and overwrite
-`memory-tests/baselines.json`. You should review the changes and commit the
-updated baseline file.
+`memory-tests/baselines.json`. You should review the changes and commit the updated
+baseline file.
 
 ### How it works
 
@@ -159,9 +157,9 @@ The harness (`MemoryTestHarness` in `packages/test-utils`):
 
 ## Performance regression tests
 
-Performance regression tests are designed to detect wall-clock time, CPU usage,
-and event loop delay regressions across key CLI scenarios. They are located in
-the `perf-tests` directory.
+Performance regression tests are designed to detect wall-clock time, CPU usage, and
+event loop delay regressions across key CLI scenarios. They are located in the
+`perf-tests` directory.
 
 These tests are distinct from standard integration tests because they measure
 performance metrics and compare it against committed baselines.
@@ -177,17 +175,16 @@ npm run test:perf
 
 ### Updating baselines
 
-If you intentionally change behavior that affects performance, you may need to
-update the baselines. Set the `UPDATE_PERF_BASELINES` environment variable to
-`true`:
+If you intentionally change behavior that affects performance, you may need to update
+the baselines. Set the `UPDATE_PERF_BASELINES` environment variable to `true`:
 
 ```bash
 UPDATE_PERF_BASELINES=true npm run test:perf
 ```
 
-This will run the tests multiple times (with warmup), apply IQR outlier
-filtering, and overwrite `perf-tests/baselines.json`. You should review the
-changes and commit the updated baseline file.
+This will run the tests multiple times (with warmup), apply IQR outlier filtering, and
+overwrite `perf-tests/baselines.json`. You should review the changes and commit the
+updated baseline file.
 
 ### How it works
 
@@ -201,13 +198,13 @@ The harness (`PerfTestHarness` in `packages/test-utils`):
 
 ## Diagnostics
 
-The integration test runner provides several options for diagnostics to help
-track down test failures.
+The integration test runner provides several options for diagnostics to help track down
+test failures.
 
 ### Keeping test output
 
-You can preserve the temporary files created during a test run for inspection.
-This is useful for debugging issues with file system operations.
+You can preserve the temporary files created during a test run for inspection. This is
+useful for debugging issues with file system operations.
 
 To keep the test output set the `KEEP_OUTPUT` environment variable to `true`.
 
@@ -215,8 +212,8 @@ To keep the test output set the `KEEP_OUTPUT` environment variable to `true`.
 KEEP_OUTPUT=true npm run test:integration:sandbox:none
 ```
 
-When output is kept, the test runner will print the path to the unique directory
-for the test run.
+When output is kept, the test runner will print the path to the unique directory for the
+test run.
 
 ### Verbose output
 
@@ -226,9 +223,9 @@ For more detailed debugging, set the `VERBOSE` environment variable to `true`.
 VERBOSE=true npm run test:integration:sandbox:none
 ```
 
-When using `VERBOSE=true` and `KEEP_OUTPUT=true` in the same command, the output
-is streamed to the console and also saved to a log file within the test's
-temporary directory.
+When using `VERBOSE=true` and `KEEP_OUTPUT=true` in the same command, the output is
+streamed to the console and also saved to a log file within the test's temporary
+directory.
 
 The verbose output is formatted to clearly identify the source of the logs:
 
@@ -240,9 +237,8 @@ The verbose output is formatted to clearly identify the source of the logs:
 
 ## Linting and formatting
 
-To ensure code quality and consistency, the integration test files are linted as
-part of the main build process. You can also manually run the linter and
-auto-fixer.
+To ensure code quality and consistency, the integration test files are linted as part of
+the main build process. You can also manually run the linter and auto-fixer.
 
 ### Running the linter
 
@@ -252,8 +248,8 @@ To check for linting errors, run the following command:
 npm run lint
 ```
 
-You can include the `:fix` flag in the command to automatically fix any fixable
-linting errors:
+You can include the `:fix` flag in the command to automatically fix any fixable linting
+errors:
 
 ```bash
 npm run lint:fix
@@ -262,12 +258,12 @@ npm run lint:fix
 ## Directory structure
 
 The integration tests create a unique directory for each test run inside the
-`.integration-tests` directory. Within this directory, a subdirectory is created
-for each test file, and within that, a subdirectory is created for each
-individual test case.
+`.integration-tests` directory. Within this directory, a subdirectory is created for
+each test file, and within that, a subdirectory is created for each individual test
+case.
 
-This structure makes it easy to locate the artifacts for a specific test run,
-file, or case.
+This structure makes it easy to locate the artifacts for a specific test run, file, or
+case.
 
 ```
 .integration-tests/
@@ -280,13 +276,13 @@ file, or case.
 
 ## Continuous integration
 
-To ensure the integration tests are always run, a GitHub Actions workflow is
-defined in `.github/workflows/chained_e2e.yml`. This workflow automatically runs
-the integrations tests for pull requests against the `main` branch, or when a
-pull request is added to a merge queue.
+To ensure the integration tests are always run, a GitHub Actions workflow is defined in
+`.github/workflows/chained_e2e.yml`. This workflow automatically runs the integrations
+tests for pull requests against the `main` branch, or when a pull request is added to a
+merge queue.
 
-The workflow runs the tests in different sandboxing environments to ensure
-Sparkle CLI is tested across each:
+The workflow runs the tests in different sandboxing environments to ensure Sparkle CLI
+is tested across each:
 
 - `sandbox:none`: Runs the tests without any sandboxing.
 - `sandbox:docker`: Runs the tests in a Docker container.

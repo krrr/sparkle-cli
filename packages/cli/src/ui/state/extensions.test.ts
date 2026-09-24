@@ -24,10 +24,7 @@ describe('extensionUpdatesReducer', () => {
         payload: { name: 'ext1', state },
       };
 
-      const newState = extensionUpdatesReducer(
-        initialExtensionUpdatesState,
-        action,
-      );
+      const newState = extensionUpdatesReducer(initialExtensionUpdatesState, action);
 
       expect(newState.extensionStatuses.get('ext1')).toEqual({
         status: state,
@@ -121,10 +118,7 @@ describe('extensionUpdatesReducer', () => {
         payload: { name: 'non-existent', notified: true },
       };
 
-      const newState = extensionUpdatesReducer(
-        initialExtensionUpdatesState,
-        action,
-      );
+      const newState = extensionUpdatesReducer(initialExtensionUpdatesState, action);
 
       expect(newState).toBe(initialExtensionUpdatesState);
     });
@@ -133,10 +127,7 @@ describe('extensionUpdatesReducer', () => {
   describe('Batch Checks', () => {
     it('should handle BATCH_CHECK_START action', () => {
       const action = { type: 'BATCH_CHECK_START' as const };
-      const newState = extensionUpdatesReducer(
-        initialExtensionUpdatesState,
-        action,
-      );
+      const newState = extensionUpdatesReducer(initialExtensionUpdatesState, action);
       expect(newState.batchChecksInProgress).toBe(1);
     });
 
@@ -163,10 +154,7 @@ describe('extensionUpdatesReducer', () => {
         },
       };
 
-      const newState = extensionUpdatesReducer(
-        initialExtensionUpdatesState,
-        action,
-      );
+      const newState = extensionUpdatesReducer(initialExtensionUpdatesState, action);
 
       expect(newState.scheduledUpdate).toEqual({
         names: ['ext1'],

@@ -134,11 +134,7 @@ async function findChildren(repo, number, depth = 0) {
       allDescendants.push({ ...childDetails, repo: child.repo });
 
       // Recurse
-      const grandChildren = await findChildren(
-        child.repo,
-        child.number,
-        depth + 1,
-      );
+      const grandChildren = await findChildren(child.repo, child.number, depth + 1);
       allDescendants.push(...grandChildren);
     }
   }
@@ -209,9 +205,7 @@ Total Open Gemini Issues: ${issues.length}`);
 
   if (toAdd.length > 0) {
     console.log('\n--- EXAMPLES TO ADD ---');
-    toAdd
-      .slice(0, 5)
-      .forEach((i) => console.log(`[+] #${i.number} ${i.title}`));
+    toAdd.slice(0, 5).forEach((i) => console.log(`[+] #${i.number} ${i.title}`));
   }
 
   if (toRemove.length > 0) {

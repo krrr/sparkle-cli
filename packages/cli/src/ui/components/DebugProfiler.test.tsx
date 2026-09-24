@@ -65,9 +65,7 @@ describe('DebugProfiler', () => {
       // To ensure we don't trigger the debounce
       profiler.lastFrameStartTime = 0;
     }
-    expect(profiler.possiblyIdleFrameTimestamps.size).toBe(
-      FRAME_TIMESTAMP_CAPACITY,
-    );
+    expect(profiler.possiblyIdleFrameTimestamps.size).toBe(FRAME_TIMESTAMP_CAPACITY);
   });
 
   it('should drop oldest action timestamps when capacity is reached', () => {
@@ -88,9 +86,7 @@ describe('DebugProfiler', () => {
     profiler.lastFrameStartTime = 0;
     profiler.reportFrameRendered();
 
-    expect(profiler.possiblyIdleFrameTimestamps.size).toBe(
-      FRAME_TIMESTAMP_CAPACITY,
-    );
+    expect(profiler.possiblyIdleFrameTimestamps.size).toBe(FRAME_TIMESTAMP_CAPACITY);
     expect(profiler.possiblyIdleFrameTimestamps.peekFirst()).toBe(1);
   });
 

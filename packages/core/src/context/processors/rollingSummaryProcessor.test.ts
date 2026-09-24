@@ -15,13 +15,9 @@ import { NodeType } from '../graph/types.js';
 describe('RollingSummaryProcessor', () => {
   it('should initialize with correct default options', () => {
     const env = createMockEnvironment();
-    const processor = createRollingSummaryProcessor(
-      'RollingSummaryProcessor',
-      env,
-      {
-        target: 'incremental',
-      },
-    );
+    const processor = createRollingSummaryProcessor('RollingSummaryProcessor', env, {
+      target: 'incremental',
+    });
     expect(processor.id).toBe('RollingSummaryProcessor');
   });
 
@@ -31,14 +27,10 @@ describe('RollingSummaryProcessor', () => {
 
     // We want to free exactly 100 tokens.
     // We will supply nodes that cost 50 tokens each.
-    const processor = createRollingSummaryProcessor(
-      'RollingSummaryProcessor',
-      env,
-      {
-        target: 'freeNTokens',
-        freeTokensTarget: 100,
-      },
-    );
+    const processor = createRollingSummaryProcessor('RollingSummaryProcessor', env, {
+      target: 'freeNTokens',
+      freeTokensTarget: 100,
+    });
 
     const text50 = 'A'.repeat(50);
     const targets = [
@@ -80,14 +72,10 @@ describe('RollingSummaryProcessor', () => {
     const env = createMockEnvironment();
 
     // We want to free 100 tokens, but our nodes will only cost 10 tokens each.
-    const processor = createRollingSummaryProcessor(
-      'RollingSummaryProcessor',
-      env,
-      {
-        target: 'freeNTokens',
-        freeTokensTarget: 100,
-      },
-    );
+    const processor = createRollingSummaryProcessor('RollingSummaryProcessor', env, {
+      target: 'freeNTokens',
+      freeTokensTarget: 100,
+    });
 
     const text10 = 'A'.repeat(10);
     const targets = [

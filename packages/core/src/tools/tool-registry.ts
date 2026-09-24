@@ -40,10 +40,7 @@ import {
 
 type ToolParams = Record<string, unknown>;
 
-class DiscoveredToolInvocation extends BaseToolInvocation<
-  ToolParams,
-  ToolResult
-> {
+class DiscoveredToolInvocation extends BaseToolInvocation<ToolParams, ToolResult> {
   constructor(
     private readonly config: Config,
     private readonly originalToolName: string,
@@ -110,10 +107,7 @@ class DiscoveredToolInvocation extends BaseToolInvocation<
           error = err;
         };
 
-        const onClose = (
-          _code: number | null,
-          _signal: NodeJS.Signals | null,
-        ) => {
+        const onClose = (_code: number | null, _signal: NodeJS.Signals | null) => {
           code = _code;
           signal = _signal;
           cleanup();
@@ -165,10 +159,7 @@ class DiscoveredToolInvocation extends BaseToolInvocation<
   }
 }
 
-export class DiscoveredTool extends BaseDeclarativeTool<
-  ToolParams,
-  ToolResult
-> {
+export class DiscoveredTool extends BaseDeclarativeTool<ToolParams, ToolResult> {
   private readonly originalName: string;
 
   constructor(
@@ -237,11 +228,7 @@ export class ToolRegistry {
   readonly messageBus: MessageBus;
   private isMainRegistry: boolean;
 
-  constructor(
-    config: Config,
-    messageBus: MessageBus,
-    isMainRegistry: boolean = false,
-  ) {
+  constructor(config: Config, messageBus: MessageBus, isMainRegistry: boolean = false) {
     this.config = config;
     this.messageBus = messageBus;
     this.isMainRegistry = isMainRegistry;
@@ -366,16 +353,12 @@ export class ToolRegistry {
     try {
       const cmdParts = parse(discoveryCmd);
       if (cmdParts.length === 0) {
-        throw new Error(
-          'Tool discovery command is empty or contains only whitespace.',
-        );
+        throw new Error('Tool discovery command is empty or contains only whitespace.');
       }
 
       const firstPart = cmdParts[0];
       if (typeof firstPart !== 'string') {
-        throw new Error(
-          'Tool discovery command must start with a program name.',
-        );
+        throw new Error('Tool discovery command must start with a program name.');
       }
 
       let finalCommand: string = firstPart;
@@ -459,9 +442,7 @@ export class ToolRegistry {
                 stderr,
               );
               return reject(
-                new Error(
-                  `Tool discovery command failed with exit code ${code}`,
-                ),
+                new Error(`Tool discovery command failed with exit code ${code}`),
               );
             }
             resolve();
@@ -586,10 +567,7 @@ export class ToolRegistry {
    * @param excludeTools (optional, helps performance for repeated calls)
    * @returns Whether or not the `tool` is not excluded.
    */
-  private isActiveTool(
-    tool: AnyDeclarativeTool,
-    excludeTools?: Set<string>,
-  ): boolean {
+  private isActiveTool(tool: AnyDeclarativeTool, excludeTools?: Set<string>): boolean {
     excludeTools ??=
       this.expandExcludeToolsWithAliases(
         this.config.getExcludeTools(
@@ -627,9 +605,7 @@ export class ToolRegistry {
     if (tool instanceof DiscoveredMCPTool) {
       // Check both the unqualified and qualified name for MCP tools.
       if (tool.name.startsWith(tool.getFullyQualifiedPrefix())) {
-        possibleNames.push(
-          tool.name.substring(tool.getFullyQualifiedPrefix().length),
-        );
+        possibleNames.push(tool.name.substring(tool.getFullyQualifiedPrefix().length));
       } else {
         possibleNames.push(`${tool.getFullyQualifiedPrefix()}${tool.name}`);
       }
@@ -656,9 +632,7 @@ export class ToolRegistry {
 
     this.getActiveTools().forEach((tool) => {
       const toolName =
-        tool instanceof DiscoveredMCPTool
-          ? tool.getFullyQualifiedName()
-          : tool.name;
+        tool instanceof DiscoveredMCPTool ? tool.getFullyQualifiedName() : tool.name;
 
       if (seenNames.has(toolName)) {
         return;
@@ -758,9 +732,7 @@ export class ToolRegistry {
       a.displayName.localeCompare(b.displayName),
     )) {
       const name =
-        tool instanceof DiscoveredMCPTool
-          ? tool.getFullyQualifiedName()
-          : tool.name;
+        tool instanceof DiscoveredMCPTool ? tool.getFullyQualifiedName() : tool.name;
       if (!seen.has(name)) {
         seen.add(name);
         tools.push(tool);

@@ -8,10 +8,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
-import {
-  RipGrepTool,
-  resolveRipgrepPath,
-} from '../packages/core/src/tools/ripGrep.js';
+import { RipGrepTool, resolveRipgrepPath } from '../packages/core/src/tools/ripGrep.js';
 import { Config } from '../packages/core/src/config/config.js';
 import { WorkspaceContext } from '../packages/core/src/utils/workspaceContext.js';
 import { createMockMessageBus } from '../packages/core/src/test-utils/mock-message-bus.js';
@@ -67,10 +64,7 @@ describe('ripgrep-real-direct', () => {
     // Create test files
     await fs.writeFile(path.join(tempDir, 'file1.txt'), 'hello world\n');
     await fs.mkdir(path.join(tempDir, 'subdir'));
-    await fs.writeFile(
-      path.join(tempDir, 'subdir', 'file2.txt'),
-      'hello universe\n',
-    );
+    await fs.writeFile(path.join(tempDir, 'subdir', 'file2.txt'), 'hello universe\n');
     await fs.writeFile(path.join(tempDir, 'file3.txt'), 'goodbye moon\n');
 
     const config = new MockConfig(tempDir) as unknown as Config;
@@ -108,10 +102,7 @@ describe('ripgrep-real-direct', () => {
 
   it('should respect include filters', async () => {
     // Create a .js file
-    await fs.writeFile(
-      path.join(tempDir, 'script.js'),
-      'console.log("hello");\n',
-    );
+    await fs.writeFile(path.join(tempDir, 'script.js'), 'console.log("hello");\n');
 
     const invocation = tool.build({
       pattern: 'hello',

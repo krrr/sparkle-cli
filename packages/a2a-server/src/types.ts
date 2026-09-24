@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  MCPServerStatus,
-  ToolConfirmationOutcome,
-} from 'sparkle-cli-core';
+import type { MCPServerStatus, ToolConfirmationOutcome } from 'sparkle-cli-core';
 import type { TaskState } from '@a2a-js/sdk';
 
 // Interfaces and enums for the CoderAgent protocol.
@@ -134,9 +131,7 @@ function isAgentSettings(value: unknown): value is AgentSettings {
   );
 }
 
-function isPersistedStateMetadata(
-  value: unknown,
-): value is PersistedStateMetadata {
+function isPersistedStateMetadata(value: unknown): value is PersistedStateMetadata {
   return (
     typeof value === 'object' &&
     value !== null &&

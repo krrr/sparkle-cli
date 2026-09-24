@@ -5,11 +5,7 @@
  */
 
 import { describe, it, beforeAll, afterAll } from 'vitest';
-import {
-  TestRig,
-  PerfTestHarness,
-  type PerfSnapshot,
-} from 'sparkle-cli-test-utils';
+import { TestRig, PerfTestHarness, type PerfSnapshot } from 'sparkle-cli-test-utils';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -109,27 +105,24 @@ describe('CPU Performance Tests', () => {
   });
 
   it('asian-language-conv: verify perf is acceptable ', async () => {
-    const result = await harness.runScenario(
-      'asian-language-conv',
-      async () => {
-        const rig = new TestRig();
-        try {
-          rig.setup('perf-asian-language', {
-            fakeResponsesPath: join(__dirname, 'perf.asian-language.responses'),
-          });
+    const result = await harness.runScenario('asian-language-conv', async () => {
+      const rig = new TestRig();
+      try {
+        rig.setup('perf-asian-language', {
+          fakeResponsesPath: join(__dirname, 'perf.asian-language.responses'),
+        });
 
-          return await harness.measure('asian-language', async () => {
-            await rig.run({
-              args: ['嗨'],
-              timeout: 120000,
-              env: { GEMINI_API_KEY: 'fake-perf-test-key' },
-            });
+        return await harness.measure('asian-language', async () => {
+          await rig.run({
+            args: ['嗨'],
+            timeout: 120000,
+            env: { GEMINI_API_KEY: 'fake-perf-test-key' },
           });
-        } finally {
-          await rig.cleanup();
-        }
-      },
-    );
+        });
+      } finally {
+        await rig.cleanup();
+      }
+    });
 
     if (UPDATE_BASELINES) {
       harness.updateScenarioBaseline(result);
@@ -193,109 +186,103 @@ describe('CPU Performance Tests', () => {
   });
 
   it('high-volume-shell-output: handles large output efficiently', async () => {
-    const result = await harness.runScenario(
-      'high-volume-shell-output',
-      async () => {
-        const rig = new TestRig();
+    const result = await harness.runScenario('high-volume-shell-output', async () => {
+      const rig = new TestRig();
+      try {
+        rig.setup('perf-high-volume-output', {
+          fakeResponsesPath: join(__dirname, 'perf.high-volume.responses'),
+        });
+
+        const snapshot = await harness.measureWithEventLoop(
+          'high-volume-output',
+          async () => {
+            await rig.run({
+              args: ['Generate 1M lines of output'],
+              timeout: 120000,
+              env: {
+                GEMINI_API_KEY: 'fake-perf-test-key',
+                GEMINI_TELEMETRY_ENABLED: 'true',
+                GEMINI_MEMORY_MONITOR_INTERVAL: '500',
+                GEMINI_EVENT_LOOP_MONITOR_ENABLED: 'true',
+                DEBUG: 'true',
+              },
+            });
+          },
+        );
+
+        // Query CLI's own performance metrics from telemetry logs
+        await rig.waitForTelemetryReady();
+
+        // Debug: Read and log the telemetry file content
         try {
-          rig.setup('perf-high-volume-output', {
-            fakeResponsesPath: join(__dirname, 'perf.high-volume.responses'),
-          });
+          const logFilePath = join(rig.homeDir!, 'telemetry.log');
+          if (existsSync(logFilePath)) {
+            const content = readFileSync(logFilePath, 'utf-8');
+            console.log(`  Telemetry Log Content:\n`, content);
+          } else {
+            console.log(`  Telemetry log file not found at: ${logFilePath}`);
+          }
+        } catch (e) {
+          console.error(`  Failed to read telemetry log:`, e);
+        }
 
-          const snapshot = await harness.measureWithEventLoop(
-            'high-volume-output',
-            async () => {
-              await rig.run({
-                args: ['Generate 1M lines of output'],
-                timeout: 120000,
-                env: {
-                  GEMINI_API_KEY: 'fake-perf-test-key',
-                  GEMINI_TELEMETRY_ENABLED: 'true',
-                  GEMINI_MEMORY_MONITOR_INTERVAL: '500',
-                  GEMINI_EVENT_LOOP_MONITOR_ENABLED: 'true',
-                  DEBUG: 'true',
-                },
-              });
-            },
+        const memoryMetric = rig.readMetric('memory.usage');
+        const cpuMetric = rig.readMetric('cpu.usage');
+        const toolLatencyMetric = rig.readMetric('tool.call.latency');
+        const eventLoopMetric = rig.readMetric('event_loop.delay');
+
+        if (memoryMetric) {
+          console.log(`  CLI Memory Metric found:`, JSON.stringify(memoryMetric));
+        }
+        if (cpuMetric) {
+          console.log(`  CLI CPU Metric found:`, JSON.stringify(cpuMetric));
+        }
+        if (toolLatencyMetric) {
+          console.log(
+            `  CLI Tool Latency Metric found:`,
+            JSON.stringify(toolLatencyMetric),
           );
-
-          // Query CLI's own performance metrics from telemetry logs
-          await rig.waitForTelemetryReady();
-
-          // Debug: Read and log the telemetry file content
-          try {
-            const logFilePath = join(rig.homeDir!, 'telemetry.log');
-            if (existsSync(logFilePath)) {
-              const content = readFileSync(logFilePath, 'utf-8');
-              console.log(`  Telemetry Log Content:\n`, content);
-            } else {
-              console.log(`  Telemetry log file not found at: ${logFilePath}`);
-            }
-          } catch (e) {
-            console.error(`  Failed to read telemetry log:`, e);
-          }
-
-          const memoryMetric = rig.readMetric('memory.usage');
-          const cpuMetric = rig.readMetric('cpu.usage');
-          const toolLatencyMetric = rig.readMetric('tool.call.latency');
-          const eventLoopMetric = rig.readMetric('event_loop.delay');
-
-          if (memoryMetric) {
-            console.log(
-              `  CLI Memory Metric found:`,
-              JSON.stringify(memoryMetric),
-            );
-          }
-          if (cpuMetric) {
-            console.log(`  CLI CPU Metric found:`, JSON.stringify(cpuMetric));
-          }
-          if (toolLatencyMetric) {
-            console.log(
-              `  CLI Tool Latency Metric found:`,
-              JSON.stringify(toolLatencyMetric),
-            );
-          }
-          const logs = rig.readTelemetryLogs();
-          console.log(`  Total telemetry log entries: ${logs.length}`);
-          for (const logData of logs) {
-            if (logData.scopeMetrics) {
-              for (const scopeMetric of logData.scopeMetrics) {
-                for (const metric of scopeMetric.metrics) {
-                  if (metric.descriptor.name.includes('event_loop')) {
-                    console.log(
-                      `  Found event_loop metric in log:`,
-                      metric.descriptor.name,
-                    );
-                  }
+        }
+        const logs = rig.readTelemetryLogs();
+        console.log(`  Total telemetry log entries: ${logs.length}`);
+        for (const logData of logs) {
+          if (logData.scopeMetrics) {
+            for (const scopeMetric of logData.scopeMetrics) {
+              for (const metric of scopeMetric.metrics) {
+                if (metric.descriptor.name.includes('event_loop')) {
+                  console.log(
+                    `  Found event_loop metric in log:`,
+                    metric.descriptor.name,
+                  );
                 }
               }
             }
           }
-
-          if (eventLoopMetric) {
-            console.log(
-              `  CLI Event Loop Metric found:`,
-              JSON.stringify(eventLoopMetric),
-            );
-
-            const findValue = (percentile: string) => {
-              const dp = eventLoopMetric.dataPoints.find(
-                (p) => p.attributes?.['percentile'] === percentile,
-              );
-              return dp?.value?.min;
-            };
-
-            snapshot.childEventLoopDelayP50Ms = findValue('p50');
-            snapshot.childEventLoopDelayP95Ms = findValue('p95');
-            snapshot.childEventLoopDelayMaxMs = findValue('max');
-          }
-
-          return snapshot;
-        } finally {
-          await rig.cleanup();
         }
-      },
-    );
+
+        if (eventLoopMetric) {
+          console.log(
+            `  CLI Event Loop Metric found:`,
+            JSON.stringify(eventLoopMetric),
+          );
+
+          const findValue = (percentile: string) => {
+            const dp = eventLoopMetric.dataPoints.find(
+              (p) => p.attributes?.['percentile'] === percentile,
+            );
+            return dp?.value?.min;
+          };
+
+          snapshot.childEventLoopDelayP50Ms = findValue('p50');
+          snapshot.childEventLoopDelayP95Ms = findValue('p95');
+          snapshot.childEventLoopDelayMaxMs = findValue('max');
+        }
+
+        return snapshot;
+      } finally {
+        await rig.cleanup();
+      }
+    });
 
     if (UPDATE_BASELINES) {
       harness.updateScenarioBaseline(result);
@@ -318,9 +305,7 @@ describe('CPU Performance Tests', () => {
 
     beforeAll(async () => {
       if (!existsSync(LARGE_CHAT_SOURCE)) {
-        throw new Error(
-          `Performance test fixture missing: ${LARGE_CHAT_SOURCE}.`,
-        );
+        throw new Error(`Performance test fixture missing: ${LARGE_CHAT_SOURCE}.`);
       }
 
       rig = new TestRig();
@@ -351,40 +336,8 @@ describe('CPU Performance Tests', () => {
     });
 
     it('session-load: resume a 60MB chat history', async () => {
-      const result = await harness.runScenario(
-        'long-conversation-resume',
-        async () => {
-          const snapshot = await harness.measureWithEventLoop(
-            'resume',
-            async () => {
-              const run = await rig.runInteractive({
-                args: ['--resume', 'latest'],
-                env: {
-                  GEMINI_API_KEY: 'fake-perf-test-key',
-                  GEMINI_TELEMETRY_ENABLED: 'true',
-                  GEMINI_MEMORY_MONITOR_INTERVAL: '500',
-                  GEMINI_EVENT_LOOP_MONITOR_ENABLED: 'true',
-                  DEBUG: 'true',
-                },
-              });
-              await run.kill();
-            },
-          );
-          return snapshot;
-        },
-      );
-
-      if (UPDATE_BASELINES) {
-        harness.updateScenarioBaseline(result);
-      } else {
-        harness.assertWithinBaseline(result);
-      }
-    });
-
-    it('typing: latency when typing into a large session', async () => {
-      const result = await harness.runScenario(
-        'long-conversation-typing',
-        async () => {
+      const result = await harness.runScenario('long-conversation-resume', async () => {
+        const snapshot = await harness.measureWithEventLoop('resume', async () => {
           const run = await rig.runInteractive({
             args: ['--resume', 'latest'],
             env: {
@@ -395,21 +348,41 @@ describe('CPU Performance Tests', () => {
               DEBUG: 'true',
             },
           });
-
-          const snapshot = await harness.measureWithEventLoop(
-            'typing',
-            async () => {
-              // On average, the expected latency per key is under 30ms.
-              for (const char of 'Hello') {
-                await run.type(char);
-              }
-            },
-          );
-
           await run.kill();
-          return snapshot;
-        },
-      );
+        });
+        return snapshot;
+      });
+
+      if (UPDATE_BASELINES) {
+        harness.updateScenarioBaseline(result);
+      } else {
+        harness.assertWithinBaseline(result);
+      }
+    });
+
+    it('typing: latency when typing into a large session', async () => {
+      const result = await harness.runScenario('long-conversation-typing', async () => {
+        const run = await rig.runInteractive({
+          args: ['--resume', 'latest'],
+          env: {
+            GEMINI_API_KEY: 'fake-perf-test-key',
+            GEMINI_TELEMETRY_ENABLED: 'true',
+            GEMINI_MEMORY_MONITOR_INTERVAL: '500',
+            GEMINI_EVENT_LOOP_MONITOR_ENABLED: 'true',
+            DEBUG: 'true',
+          },
+        });
+
+        const snapshot = await harness.measureWithEventLoop('typing', async () => {
+          // On average, the expected latency per key is under 30ms.
+          for (const char of 'Hello') {
+            await run.type(char);
+          }
+        });
+
+        await run.kill();
+        return snapshot;
+      });
 
       if (UPDATE_BASELINES) {
         harness.updateScenarioBaseline(result);
@@ -435,13 +408,10 @@ describe('CPU Performance Tests', () => {
 
           await run.expectText('Type your message');
 
-          const snapshot = await harness.measureWithEventLoop(
-            'execution',
-            async () => {
-              await run.sendKeys('!echo hi\r');
-              await run.expectText('hi');
-            },
-          );
+          const snapshot = await harness.measureWithEventLoop('execution', async () => {
+            await run.sendKeys('!echo hi\r');
+            await run.expectText('hi');
+          });
 
           await run.kill();
           return snapshot;

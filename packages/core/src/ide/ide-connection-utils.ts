@@ -15,11 +15,9 @@ import { type IdeInfo } from './detect-ide.js';
 
 const logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  debug: (...args: any[]) =>
-    debugLogger.debug('[DEBUG] [IDEConnectionUtils]', ...args),
+  debug: (...args: any[]) => debugLogger.debug('[DEBUG] [IDEConnectionUtils]', ...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: (...args: any[]) =>
-    debugLogger.error('[ERROR] [IDEConnectionUtils]', ...args),
+  error: (...args: any[]) => debugLogger.error('[ERROR] [IDEConnectionUtils]', ...args),
 };
 
 export type StdioConfig = {
@@ -95,9 +93,7 @@ export function getStdioConfigFromEnv(): StdioConfig | undefined {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         args = parsedArgs;
       } else {
-        logger.error(
-          'SPARKLE_CLI_IDE_SERVER_STDIO_ARGS must be a JSON array string.',
-        );
+        logger.error('SPARKLE_CLI_IDE_SERVER_STDIO_ARGS must be a JSON array string.');
       }
     } catch (e) {
       logger.error('Failed to parse SPARKLE_CLI_IDE_SERVER_STDIO_ARGS:', e);
@@ -109,9 +105,7 @@ export function getStdioConfigFromEnv(): StdioConfig | undefined {
 
 const IDE_SERVER_FILE_REGEX = /^sparkle-ide-server-(\d+)-\d+\.json$/;
 
-async function verifyAndReadFile(
-  filePath: string,
-): Promise<string | undefined> {
+async function verifyAndReadFile(filePath: string): Promise<string | undefined> {
   let handle: fs.promises.FileHandle | undefined;
   try {
     handle = await fs.promises.open(filePath, 'r');
@@ -177,9 +171,7 @@ export async function getConnectionConfigFromFile(
     return undefined;
   }
 
-  const matchingFiles = portFiles.filter((file) =>
-    IDE_SERVER_FILE_REGEX.test(file),
-  );
+  const matchingFiles = portFiles.filter((file) => IDE_SERVER_FILE_REGEX.test(file));
 
   if (matchingFiles.length === 0) {
     return undefined;
@@ -188,9 +180,7 @@ export async function getConnectionConfigFromFile(
   sortConnectionFiles(matchingFiles, pid);
 
   const fileContents = await Promise.all(
-    matchingFiles.map((file) =>
-      verifyAndReadFile(path.join(portFileDir, file)),
-    ),
+    matchingFiles.map((file) => verifyAndReadFile(path.join(portFileDir, file))),
   );
 
   const parsedContents = fileContents.map(
@@ -231,10 +221,7 @@ export async function getConnectionConfigFromFile(
       if (!content) {
         return false;
       }
-      const { isValid } = validateWorkspacePath(
-        content.workspacePath,
-        process.cwd(),
-      );
+      const { isValid } = validateWorkspacePath(content.workspacePath, process.cwd());
       return isValid;
     },
   );
@@ -280,8 +267,7 @@ export async function getConnectionConfigFromFile(
   const portFromEnv = getPortFromEnv();
   if (portFromEnv) {
     const matchingPortIndex = validWorkspaces.findIndex(
-      (content) =>
-        content.port !== undefined && String(content.port) === portFromEnv,
+      (content) => content.port !== undefined && String(content.port) === portFromEnv,
     );
     if (matchingPortIndex !== -1) {
       const selected = validWorkspaces[matchingPortIndex];
@@ -405,7 +391,6 @@ function isSshConnected() {
 
 function isDevContainer() {
   return !!(
-    process.env['VSCODE_REMOTE_CONTAINERS_SESSION'] ||
-    process.env['REMOTE_CONTAINERS']
+    process.env['VSCODE_REMOTE_CONTAINERS_SESSION'] || process.env['REMOTE_CONTAINERS']
   );
 }

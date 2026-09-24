@@ -163,10 +163,7 @@ describe('useInputHistory', () => {
       act(() => {
         result.current.navigateDown(); // historyIndex becomes -1
       });
-      expect(mockOnChange).toHaveBeenCalledWith(
-        currentQuery,
-        currentCursorOffset,
-      );
+      expect(mockOnChange).toHaveBeenCalledWith(currentQuery, currentCursorOffset);
     });
 
     it('should navigate through history messages on subsequent navigateUp calls', async () => {
@@ -208,12 +205,9 @@ describe('useInputHistory', () => {
         currentCursorOffset: 0,
         onChange: mockOnChange,
       };
-      const { result, rerender } = await renderHook(
-        (props) => useInputHistory(props),
-        {
-          initialProps,
-        },
-      );
+      const { result, rerender } = await renderHook((props) => useInputHistory(props), {
+        initialProps,
+      });
 
       // First navigate up to have something in history
       act(() => {
@@ -272,27 +266,21 @@ describe('useInputHistory', () => {
         result.current.navigateDown();
       });
       // Should restore middle offset
-      expect(mockOnChange).toHaveBeenCalledWith(
-        originalQuery,
-        originalCursorOffset,
-      );
+      expect(mockOnChange).toHaveBeenCalledWith(originalQuery, originalCursorOffset);
     });
 
     it('should NOT restore cursor offset if it was at start or end of compose prompt', async () => {
       const originalQuery = 'my original input';
-      const { result, rerender } = await renderHook(
-        (props) => useInputHistory(props),
-        {
-          initialProps: {
-            userMessages,
-            onSubmit: mockOnSubmit,
-            isActive: true,
-            currentQuery: originalQuery,
-            currentCursorOffset: 0, // Start
-            onChange: mockOnChange,
-          },
+      const { result, rerender } = await renderHook((props) => useInputHistory(props), {
+        initialProps: {
+          userMessages,
+          onSubmit: mockOnSubmit,
+          isActive: true,
+          currentQuery: originalQuery,
+          currentCursorOffset: 0, // Start
+          onChange: mockOnChange,
         },
-      );
+      });
 
       // Case 1: Start
       act(() => {
@@ -328,19 +316,16 @@ describe('useInputHistory', () => {
     it('should remember text edits but use default cursor when navigating between history items', async () => {
       const originalQuery = 'my original input';
       const originalCursorOffset = 5;
-      const { result, rerender } = await renderHook(
-        (props) => useInputHistory(props),
-        {
-          initialProps: {
-            userMessages,
-            onSubmit: mockOnSubmit,
-            isActive: true,
-            currentQuery: originalQuery,
-            currentCursorOffset: originalCursorOffset,
-            onChange: mockOnChange,
-          },
+      const { result, rerender } = await renderHook((props) => useInputHistory(props), {
+        initialProps: {
+          userMessages,
+          onSubmit: mockOnSubmit,
+          isActive: true,
+          currentQuery: originalQuery,
+          currentCursorOffset: originalCursorOffset,
+          onChange: mockOnChange,
         },
-      );
+      });
 
       // 1. Navigate UP from compose prompt (-1 -> 0)
       act(() => {
@@ -373,10 +358,7 @@ describe('useInputHistory', () => {
         result.current.navigateDown();
       });
       // Should restore edited text AND the offset because we just came from History[0]
-      expect(mockOnChange).toHaveBeenCalledWith(
-        editedHistoryText,
-        editedHistoryOffset,
-      );
+      expect(mockOnChange).toHaveBeenCalledWith(editedHistoryText, editedHistoryOffset);
       mockOnChange.mockClear();
 
       // Simulate being at History[0] (restored) and navigating DOWN to compose prompt (0 -> -1)
@@ -394,10 +376,7 @@ describe('useInputHistory', () => {
         result.current.navigateDown();
       });
       // Level -1 should ALWAYS restore its offset if it was in the middle
-      expect(mockOnChange).toHaveBeenCalledWith(
-        originalQuery,
-        originalCursorOffset,
-      );
+      expect(mockOnChange).toHaveBeenCalledWith(originalQuery, originalCursorOffset);
     });
 
     it('should restore offset for history items ONLY if returning from them immediately', async () => {
@@ -411,12 +390,9 @@ describe('useInputHistory', () => {
         onChange: mockOnChange,
       };
 
-      const { result, rerender } = await renderHook(
-        (props) => useInputHistory(props),
-        {
-          initialProps,
-        },
-      );
+      const { result, rerender } = await renderHook((props) => useInputHistory(props), {
+        initialProps,
+      });
 
       // -1 -> 0 ('message 3')
       act(() => {

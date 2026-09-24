@@ -140,10 +140,9 @@ describe('loggers', () => {
     vi.spyOn(uiTelemetry.uiTelemetryService, 'addEvent').mockImplementation(
       mockUiEvent.addEvent,
     );
-    vi.spyOn(
-      InstallationManager.prototype,
-      'getInstallationId',
-    ).mockReturnValue('test-installation-id');
+    vi.spyOn(InstallationManager.prototype, 'getInstallationId').mockReturnValue(
+      'test-installation-id',
+    );
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'));
   });
@@ -164,10 +163,10 @@ describe('loggers', () => {
         }),
       );
 
-      expect(metrics.recordChatCompressionMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        { tokens_before: 9001, tokens_after: 9000 },
-      );
+      expect(metrics.recordChatCompressionMetrics).toHaveBeenCalledWith(mockConfig, {
+        tokens_before: 9001,
+        tokens_after: 9000,
+      });
     });
   });
 
@@ -489,35 +488,27 @@ describe('loggers', () => {
       );
 
       // Verify token usage calls for all token types
-      expect(mockMetrics.recordTokenUsageMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        17,
-        {
-          model: 'test-model',
-          type: 'input',
-          genAiAttributes: {
-            'gen_ai.operation.name': 'generate_content',
-            'gen_ai.provider.name': 'gcp.gen_ai',
-            'gen_ai.request.model': 'test-model',
-            'gen_ai.response.model': 'test-model',
-          },
+      expect(mockMetrics.recordTokenUsageMetrics).toHaveBeenCalledWith(mockConfig, 17, {
+        model: 'test-model',
+        type: 'input',
+        genAiAttributes: {
+          'gen_ai.operation.name': 'generate_content',
+          'gen_ai.provider.name': 'gcp.gen_ai',
+          'gen_ai.request.model': 'test-model',
+          'gen_ai.response.model': 'test-model',
         },
-      );
+      });
 
-      expect(mockMetrics.recordTokenUsageMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        50,
-        {
-          model: 'test-model',
-          type: 'output',
-          genAiAttributes: {
-            'gen_ai.operation.name': 'generate_content',
-            'gen_ai.provider.name': 'gcp.gen_ai',
-            'gen_ai.request.model': 'test-model',
-            'gen_ai.response.model': 'test-model',
-          },
+      expect(mockMetrics.recordTokenUsageMetrics).toHaveBeenCalledWith(mockConfig, 50, {
+        model: 'test-model',
+        type: 'output',
+        genAiAttributes: {
+          'gen_ai.operation.name': 'generate_content',
+          'gen_ai.provider.name': 'gcp.gen_ai',
+          'gen_ai.request.model': 'test-model',
+          'gen_ai.response.model': 'test-model',
         },
-      );
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -568,12 +559,8 @@ describe('loggers', () => {
           call[0].attributes['event.name'] ===
             'gen_ai.client.inference.operation.details',
       );
-      expect(
-        detailsCall![0].attributes['gen_ai.input.messages'],
-      ).toBeUndefined();
-      expect(
-        detailsCall![0].attributes['gen_ai.output.messages'],
-      ).toBeUndefined();
+      expect(detailsCall![0].attributes['gen_ai.input.messages']).toBeUndefined();
+      expect(detailsCall![0].attributes['gen_ai.output.messages']).toBeUndefined();
     });
 
     it('should log an API response with a role', () => {
@@ -771,15 +758,11 @@ describe('loggers', () => {
         }),
       });
 
-      expect(mockMetrics.recordApiErrorMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          model: 'test-model',
-          status_code: 503,
-          error_type: 'ApiError',
-        },
-      );
+      expect(mockMetrics.recordApiErrorMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        model: 'test-model',
+        status_code: 503,
+        error_type: 'ApiError',
+      });
 
       expect(mockMetrics.recordApiResponseMetrics).toHaveBeenCalledWith(
         mockConfig,
@@ -844,9 +827,7 @@ describe('loggers', () => {
           call[0].attributes['event.name'] ===
             'gen_ai.client.inference.operation.details',
       );
-      expect(
-        detailsCall![0].attributes['gen_ai.input.messages'],
-      ).toBeUndefined();
+      expect(detailsCall![0].attributes['gen_ai.input.messages']).toBeUndefined();
     });
 
     it('should log an API error with a role', () => {
@@ -1256,8 +1237,7 @@ describe('loggers', () => {
         },
       }),
       getQuestion: () => 'test-question',
-      getToolRegistry: () =>
-        new ToolRegistry(cfg1, {} as unknown as MessageBus),
+      getToolRegistry: () => new ToolRegistry(cfg1, {} as unknown as MessageBus),
       getUserMemory: () => 'user-memory',
       isExperimentalAgentHistoryTruncationEnabled: () => false,
       getExperimentalAgentHistoryTruncationThreshold: () => 30,
@@ -1388,16 +1368,12 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          function_name: 'test-function',
-          success: true,
-          decision: ToolCallDecision.ACCEPT,
-          tool_type: 'native',
-        },
-      );
+      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        function_name: 'test-function',
+        success: true,
+        decision: ToolCallDecision.ACCEPT,
+        tool_type: 'native',
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -1529,16 +1505,12 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          function_name: 'test-function',
-          success: false,
-          decision: ToolCallDecision.REJECT,
-          tool_type: 'native',
-        },
-      );
+      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        function_name: 'test-function',
+        success: false,
+        decision: ToolCallDecision.REJECT,
+        tool_type: 'native',
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -1609,16 +1581,12 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          function_name: 'test-function',
-          success: true,
-          decision: ToolCallDecision.MODIFY,
-          tool_type: 'native',
-        },
-      );
+      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        function_name: 'test-function',
+        success: true,
+        decision: ToolCallDecision.MODIFY,
+        tool_type: 'native',
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -1688,16 +1656,12 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          function_name: 'test-function',
-          success: true,
-          decision: undefined,
-          tool_type: 'native',
-        },
-      );
+      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        function_name: 'test-function',
+        success: true,
+        decision: undefined,
+        tool_type: 'native',
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -1768,16 +1732,12 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-        {
-          function_name: 'test-function',
-          success: false,
-          decision: undefined,
-          tool_type: 'native',
-        },
-      );
+      expect(mockMetrics.recordToolCallMetrics).toHaveBeenCalledWith(mockConfig, 100, {
+        function_name: 'test-function',
+        success: false,
+        decision: undefined,
+        tool_type: 'native',
+      });
 
       expect(mockUiEvent.addEvent).toHaveBeenCalledWith({
         // eslint-disable-next-line @typescript-eslint/no-misused-spread
@@ -2055,16 +2015,13 @@ describe('loggers', () => {
         },
       });
 
-      expect(mockMetrics.recordFileOperationMetric).toHaveBeenCalledWith(
-        mockConfig,
-        {
-          operation: 'read',
-          lines: 10,
-          mimetype: 'text/plain',
-          extension: '.txt',
-          programming_language: 'typescript',
-        },
-      );
+      expect(mockMetrics.recordFileOperationMetric).toHaveBeenCalledWith(mockConfig, {
+        operation: 'read',
+        lines: 10,
+        mimetype: 'text/plain',
+        extension: '.txt',
+        programming_language: 'typescript',
+      });
     });
   });
 
@@ -2142,10 +2099,7 @@ describe('loggers', () => {
         },
       });
 
-      expect(metrics.recordModelRoutingMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        event,
-      );
+      expect(metrics.recordModelRoutingMetrics).toHaveBeenCalledWith(mockConfig, event);
     });
 
     it('should log the event with numerical routing fields', () => {
@@ -2457,10 +2411,7 @@ describe('loggers', () => {
         },
       });
 
-      expect(metrics.recordAgentRunMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        event,
-      );
+      expect(metrics.recordAgentRunMetrics).toHaveBeenCalledWith(mockConfig, event);
     });
   });
 
@@ -2580,13 +2531,10 @@ describe('loggers', () => {
         },
       });
 
-      expect(metrics.recordRetryAttemptMetrics).toHaveBeenCalledWith(
-        mockConfig,
-        {
-          model: 'test-model',
-          attempt: 2,
-        },
-      );
+      expect(metrics.recordRetryAttemptMetrics).toHaveBeenCalledWith(mockConfig, {
+        model: 'test-model',
+        attempt: 2,
+      });
     });
   });
 
@@ -2641,10 +2589,7 @@ describe('loggers', () => {
         },
       });
 
-      expect(metrics.recordOnboardingSuccess).toHaveBeenCalledWith(
-        mockConfig,
-        100,
-      );
+      expect(metrics.recordOnboardingSuccess).toHaveBeenCalledWith(mockConfig, 100);
     });
   });
 

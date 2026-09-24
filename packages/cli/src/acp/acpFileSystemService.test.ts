@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mocked } from 'vitest';
 import { AcpFileSystemService } from './acpFileSystemService.js';
 import type { AgentSideConnection } from '@agentclientprotocol/sdk';
 import type { FileSystemService } from 'sparkle-cli-core';
@@ -72,9 +64,7 @@ describe('AcpFileSystemService', () => {
           mockFallback.readTextFile.mockResolvedValue('content');
         },
         verify: () => {
-          expect(mockFallback.readTextFile).toHaveBeenCalledWith(
-            '/path/to/file',
-          );
+          expect(mockFallback.readTextFile).toHaveBeenCalledWith('/path/to/file');
           expect(mockConnection.readTextFile).not.toHaveBeenCalled();
         },
       },
@@ -86,9 +76,7 @@ describe('AcpFileSystemService', () => {
           mockFallback.readTextFile.mockResolvedValue('content');
         },
         verify: () => {
-          expect(mockFallback.readTextFile).toHaveBeenCalledWith(
-            '/outside/file',
-          );
+          expect(mockFallback.readTextFile).toHaveBeenCalledWith('/outside/file');
           expect(mockConnection.readTextFile).not.toHaveBeenCalled();
         },
       },
@@ -107,24 +95,21 @@ describe('AcpFileSystemService', () => {
           expect(mockConnection.readTextFile).not.toHaveBeenCalled();
         },
       },
-    ])(
-      'should use $desc',
-      async ({ capability, path, root, setup, verify }) => {
-        service = new AcpFileSystemService(
-          mockConnection,
-          'session-1',
-          { readTextFile: capability, writeTextFile: true },
-          mockFallback,
-          root || '/path/to',
-        );
-        setup();
+    ])('should use $desc', async ({ capability, path, root, setup, verify }) => {
+      service = new AcpFileSystemService(
+        mockConnection,
+        'session-1',
+        { readTextFile: capability, writeTextFile: true },
+        mockFallback,
+        root || '/path/to',
+      );
+      setup();
 
-        const result = await service.readTextFile(path);
+      const result = await service.readTextFile(path);
 
-        expect(result).toBe('content');
-        verify();
-      },
-    );
+      expect(result).toBe('content');
+      verify();
+    });
 
     it('should throw normalized ENOENT error when readTextFile encounters "Resource not found"', async () => {
       service = new AcpFileSystemService(
@@ -138,9 +123,7 @@ describe('AcpFileSystemService', () => {
         new Error('Resource not found for document'),
       );
 
-      await expect(
-        service.readTextFile('/path/to/missing'),
-      ).rejects.toMatchObject({
+      await expect(service.readTextFile('/path/to/missing')).rejects.toMatchObject({
         code: 'ENOENT',
         message: 'Resource not found for document',
       });

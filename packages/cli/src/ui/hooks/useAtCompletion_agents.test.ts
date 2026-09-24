@@ -112,8 +112,6 @@ describe('useAtCompletion with Agents', () => {
     expect(result.current.suggestions.map((s) => s.value)).toContain(
       'CodebaseInvestigator',
     );
-    expect(result.current.suggestions.map((s) => s.value)).not.toContain(
-      'OtherAgent',
-    );
+    expect(result.current.suggestions.map((s) => s.value)).not.toContain('OtherAgent');
   });
 });

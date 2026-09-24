@@ -6,11 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ToolExecutor } from './tool-executor.js';
-import {
-  type Config,
-  type ToolResult,
-  type AnyToolInvocation,
-} from '../index.js';
+import { type Config, type ToolResult, type AnyToolInvocation } from '../index.js';
 import { makeFakeConfig } from '../test-utils/config.js';
 import { MockTool } from '../test-utils/mock-tool.js';
 import { CoreToolCallStatus, type ScheduledToolCall } from './types.js';
@@ -220,9 +216,7 @@ describe('ToolExecutor', () => {
 
     const abortErr = new Error('The user aborted a request.');
     abortErr.name = 'AbortError';
-    vi.mocked(coreToolHookTriggers.executeToolWithHooks).mockRejectedValue(
-      abortErr,
-    );
+    vi.mocked(coreToolHookTriggers.executeToolWithHooks).mockRejectedValue(abortErr);
 
     const scheduledCall: ScheduledToolCall = {
       status: CoreToolCallStatus.Scheduled,
@@ -260,9 +254,7 @@ describe('ToolExecutor', () => {
     const invocation = mockTool.build({});
 
     const cancelErr = new Error('Operation cancelled by user');
-    vi.mocked(coreToolHookTriggers.executeToolWithHooks).mockRejectedValue(
-      cancelErr,
-    );
+    vi.mocked(coreToolHookTriggers.executeToolWithHooks).mockRejectedValue(cancelErr);
 
     const scheduledCall: ScheduledToolCall = {
       status: CoreToolCallStatus.Scheduled,
@@ -751,9 +743,7 @@ describe('ToolExecutor', () => {
         error: '[Operation Cancelled] User cancelled tool execution.',
         output: partialOutput,
       });
-      expect(result.response.resultDisplay).toBe(
-        `[Cancelled] ${partialOutput}`,
-      );
+      expect(result.response.resultDisplay).toBe(`[Cancelled] ${partialOutput}`);
     }
   });
 

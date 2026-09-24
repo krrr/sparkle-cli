@@ -49,10 +49,8 @@ function confirmationRequestsReducer(
 }
 
 export const useConfirmUpdateRequests = () => {
-  const [
-    confirmUpdateExtensionRequests,
-    dispatchConfirmUpdateExtensionRequests,
-  ] = useReducer(confirmationRequestsReducer, []);
+  const [confirmUpdateExtensionRequests, dispatchConfirmUpdateExtensionRequests] =
+    useReducer(confirmationRequestsReducer, []);
   const addConfirmUpdateExtensionRequest = useCallback(
     (original: ConfirmationRequest) => {
       const wrappedRequest = {
@@ -93,9 +91,7 @@ export const useExtensionUpdates = (
 
   useEffect(() => {
     const extensionsToCheck = extensions.filter((extension) => {
-      const currentStatus = extensionsUpdateState.extensionStatuses.get(
-        extension.name,
-      );
+      const currentStatus = extensionsUpdateState.extensionStatuses.get(extension.name);
       if (!currentStatus) return true;
       const currentState = currentStatus.status;
       return !currentState || currentState === ExtensionUpdateState.UNKNOWN;
@@ -142,9 +138,7 @@ export const useExtensionUpdates = (
     const pendingUpdates = [];
     const updatePromises: Array<Promise<ExtensionUpdateInfo | undefined>> = [];
     for (const extension of extensions) {
-      const currentState = extensionsUpdateState.extensionStatuses.get(
-        extension.name,
-      );
+      const currentState = extensionsUpdateState.extensionStatuses.get(extension.name);
       if (
         !currentState ||
         currentState.status !== ExtensionUpdateState.UPDATE_AVAILABLE
@@ -231,10 +225,7 @@ export const useExtensionUpdates = (
 
   const extensionsUpdateStateComputed = useMemo(() => {
     const result = new Map<string, ExtensionUpdateState>();
-    for (const [
-      key,
-      value,
-    ] of extensionsUpdateState.extensionStatuses.entries()) {
+    for (const [key, value] of extensionsUpdateState.extensionStatuses.entries()) {
       result.set(key, value.status);
     }
     return result;

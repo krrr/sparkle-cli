@@ -25,8 +25,7 @@ const createMockConfig = (
     respectSparkleIgnore?: boolean;
   } = {},
 ): Config => {
-  const { respectGitIgnore = true, respectSparkleIgnore = true } =
-    fileFiltering;
+  const { respectGitIgnore = true, respectSparkleIgnore = true } = fileFiltering;
   const workspace = new WorkspaceContext(cwd, otherDirs);
   const fileSystemService = new StandardFileSystemService();
   return {
@@ -100,9 +99,7 @@ describe('readPathFromWorkspace', () => {
 
   it('should read an image file and return it as inlineData (Part object)', async () => {
     // Use a real PNG header for robustness
-    const imageData = Buffer.from([
-      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-    ]);
+    const imageData = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
     mock({
       [CWD]: {
         'image.png': imageData,
@@ -184,16 +181,12 @@ describe('readPathFromWorkspace', () => {
         })
         .join('');
 
-      expect(resultText).toContain(
-        '--- Start of content for directory: my-dir ---',
-      );
+      expect(resultText).toContain('--- Start of content for directory: my-dir ---');
       expect(resultText).toContain('--- file1.txt ---');
       expect(resultText).toContain('content of file 1');
       expect(resultText).toContain('--- file2.md ---');
       expect(resultText).toContain('content of file 2');
-      expect(resultText).toContain(
-        '--- End of content for directory: my-dir ---',
-      );
+      expect(resultText).toContain('--- End of content for directory: my-dir ---');
     });
 
     it('should recursively expand a directory and read all nested files', async () => {
@@ -223,15 +216,11 @@ describe('readPathFromWorkspace', () => {
 
       expect(resultText).toContain('content of file 1');
       expect(resultText).toContain('nested content');
-      expect(resultText).toContain(
-        `--- ${path.join('sub-dir', 'nested.txt')} ---`,
-      );
+      expect(resultText).toContain(`--- ${path.join('sub-dir', 'nested.txt')} ---`);
     });
 
     it('should handle mixed content and include files from subdirectories', async () => {
-      const imageData = Buffer.from([
-        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-      ]);
+      const imageData = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
       mock({
         [CWD]: {
           'mixed-dir': {
@@ -262,9 +251,7 @@ describe('readPathFromWorkspace', () => {
       expect(textContent).toContain('this should be included');
 
       // Check for the image part
-      const imagePart = result.find(
-        (p) => typeof p === 'object' && 'inlineData' in p,
-      );
+      const imagePart = result.find((p) => typeof p === 'object' && 'inlineData' in p);
       expect(imagePart).toEqual({
         inlineData: {
           mimeType: 'image/png',
@@ -304,13 +291,10 @@ describe('readPathFromWorkspace', () => {
       const config = createMockConfig(CWD, [], mockFileService);
       const result = await readPathFromWorkspace('ignored.txt', config);
       expect(result).toEqual([]);
-      expect(mockFileService.filterFiles).toHaveBeenCalledWith(
-        ['ignored.txt'],
-        {
-          respectGitIgnore: true,
-          respectSparkleIgnore: true,
-        },
-      );
+      expect(mockFileService.filterFiles).toHaveBeenCalledWith(['ignored.txt'], {
+        respectGitIgnore: true,
+        respectSparkleIgnore: true,
+      });
     });
 
     it('should not read ignored files when expanding a directory', async () => {
@@ -409,9 +393,9 @@ describe('readPathFromWorkspace', () => {
       [OTHER_DIR]: {},
     });
     const config = createMockConfig(CWD, [OTHER_DIR]);
-    await expect(
-      readPathFromWorkspace('not-found.txt', config),
-    ).rejects.toThrow('Path not found in workspace: not-found.txt');
+    await expect(readPathFromWorkspace('not-found.txt', config)).rejects.toThrow(
+      'Path not found in workspace: not-found.txt',
+    );
   });
 
   it('should prevent path traversal outside the workspace via relative paths', async () => {
@@ -424,9 +408,9 @@ describe('readPathFromWorkspace', () => {
     const config = createMockConfig(CWD);
     // Attempt to traverse out of CWD to OUTSIDE_DIR
     const relativeTraversal = path.join('..', 'outside', 'secret.txt');
-    await expect(
-      readPathFromWorkspace(relativeTraversal, config),
-    ).rejects.toThrow(`Path not found in workspace: ${relativeTraversal}`);
+    await expect(readPathFromWorkspace(relativeTraversal, config)).rejects.toThrow(
+      `Path not found in workspace: ${relativeTraversal}`,
+    );
   });
 
   it('should prevent symlink escape outside the workspace', async () => {
@@ -442,9 +426,9 @@ describe('readPathFromWorkspace', () => {
     });
     const config = createMockConfig(CWD);
     // Even if the link is in the workspace, its target is not.
-    await expect(
-      readPathFromWorkspace('malicious-link', config),
-    ).rejects.toThrow('Path not found in workspace: malicious-link');
+    await expect(readPathFromWorkspace('malicious-link', config)).rejects.toThrow(
+      'Path not found in workspace: malicious-link',
+    );
   });
 
   it('should block symlink escape inside a directory expansion (defense-in-depth)', async () => {

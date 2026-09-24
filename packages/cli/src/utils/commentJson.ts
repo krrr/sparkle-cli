@@ -77,9 +77,7 @@ function preserveCommentsOnPropertyDeletion(
   function appendToSymbol(destSym: symbol, comments: unknown[]) {
     if (!comments || comments.length === 0) return;
     const existing = target[destSym];
-    target[destSym] = Array.isArray(existing)
-      ? existing.concat(comments)
-      : comments;
+    target[destSym] = Array.isArray(existing) ? existing.concat(comments) : comments;
   }
 
   if (beforeComments && beforeComments.length > 0) {
@@ -128,13 +126,9 @@ function applyKeyDiff(
     const baseVal = base[nextKey];
 
     const isObj =
-      typeof nextVal === 'object' &&
-      nextVal !== null &&
-      !Array.isArray(nextVal);
+      typeof nextVal === 'object' && nextVal !== null && !Array.isArray(nextVal);
     const isBaseObj =
-      typeof baseVal === 'object' &&
-      baseVal !== null &&
-      !Array.isArray(baseVal);
+      typeof baseVal === 'object' && baseVal !== null && !Array.isArray(baseVal);
     const isArr = Array.isArray(nextVal);
     const isBaseArr = Array.isArray(baseVal);
 

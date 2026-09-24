@@ -14,9 +14,7 @@ import { stressTestProfile } from '../config/profiles.js';
 expect.addSnapshotSerializer({
   test: (val) =>
     typeof val === 'string' &&
-    (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(
-      val,
-    ) ||
+    (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(val) ||
       /\b[0-9a-f]{32}\b/i.test(val) ||
       /\bsynth_[a-zA-Z0-9_]+_[0-9a-f]{32}\b/.test(val) ||
       /[\\/]tmp[\\/]sim/.test(val)),
@@ -66,10 +64,7 @@ describe('System Lifecycle Golden Tests', () => {
       },
     };
 
-    const harness = await SimulationHarness.create(
-      customProfile,
-      mockLlmClient,
-    );
+    const harness = await SimulationHarness.create(customProfile, mockLlmClient);
 
     // Turn 0: System Prompt
     await harness.simulateTurn([
@@ -157,10 +152,7 @@ describe('System Lifecycle Golden Tests', () => {
       buildAsyncPipelines: () => [],
     };
 
-    const harness = await SimulationHarness.create(
-      generousConfig,
-      mockLlmClient,
-    );
+    const harness = await SimulationHarness.create(generousConfig, mockLlmClient);
 
     // Turn 0: System Prompt
     await harness.simulateTurn([
@@ -202,10 +194,7 @@ describe('System Lifecycle Golden Tests', () => {
       buildAsyncPipelines: () => [],
     };
 
-    const harness = await SimulationHarness.create(
-      customProfile,
-      mockLlmClient,
-    );
+    const harness = await SimulationHarness.create(customProfile, mockLlmClient);
 
     // Turn 0
     await harness.simulateTurn([
@@ -244,10 +233,7 @@ describe('System Lifecycle Golden Tests', () => {
       },
     };
 
-    const harness = await SimulationHarness.create(
-      customProfile,
-      mockLlmClient,
-    );
+    const harness = await SimulationHarness.create(customProfile, mockLlmClient);
 
     const createMessage = (index: number) =>
       `Msg ${index} `.repeat(25).padEnd(200, '.');

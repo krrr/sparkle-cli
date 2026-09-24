@@ -84,8 +84,7 @@ describe('classifyGoogleError', () => {
   it('should return TerminalQuotaError for MODEL_CAPACITY_EXHAUSTED even with RetryInfo headers', () => {
     const apiError: GoogleApiError = {
       code: 503,
-      message:
-        'No capacity available for model gemini-3.1-pro-preview on the server',
+      message: 'No capacity available for model gemini-3.1-pro-preview on the server',
       details: [
         {
           '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
@@ -109,8 +108,7 @@ describe('classifyGoogleError', () => {
   it('should return TerminalQuotaError for MODEL_CAPACITY_EXHAUSTED when no retry delay is specified', () => {
     const apiError: GoogleApiError = {
       code: 429,
-      message:
-        'No capacity available for model gemini-3.1-pro-preview on the server',
+      message: 'No capacity available for model gemini-3.1-pro-preview on the server',
       details: [
         {
           '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
@@ -132,9 +130,7 @@ describe('classifyGoogleError', () => {
       details: [
         {
           '@type': 'type.googleapis.com/google.rpc.Help',
-          links: [
-            { description: 'Learn more', url: 'https://support.google.com' },
-          ],
+          links: [{ description: 'Learn more', url: 'https://support.google.com' }],
         },
       ],
     };
@@ -146,8 +142,7 @@ describe('classifyGoogleError', () => {
   it('should return TerminalQuotaError for MODEL_CAPACITY_EXHAUSTED even when the domain is not a Cloud Code domain (domain-agnostic)', () => {
     const apiError: GoogleApiError = {
       code: 429,
-      message:
-        'No capacity available for model gemini-3.1-pro-preview on the server',
+      message: 'No capacity available for model gemini-3.1-pro-preview on the server',
       details: [
         {
           '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
@@ -165,8 +160,7 @@ describe('classifyGoogleError', () => {
   it('should return TerminalQuotaError for MODEL_CAPACITY_EXCEEDED when no retry delay is specified', () => {
     const apiError: GoogleApiError = {
       code: 429,
-      message:
-        'No capacity available for model gemini-3.1-pro-preview on the server',
+      message: 'No capacity available for model gemini-3.1-pro-preview on the server',
       details: [
         {
           '@type': 'type.googleapis.com/google.rpc.ErrorInfo',
@@ -380,9 +374,7 @@ describe('classifyGoogleError', () => {
     vi.spyOn(errorParser, 'parseGoogleApiError').mockReturnValue(apiError);
     const result = classifyGoogleError(new Error());
     expect(result).toBeInstanceOf(RetryableQuotaError);
-    expect((result as RetryableQuotaError).retryDelayMs).toBeCloseTo(
-      539.477544,
-    );
+    expect((result as RetryableQuotaError).retryDelayMs).toBeCloseTo(539.477544);
   });
 
   it('should return TerminalQuotaError for Cloud Code RATE_LIMIT_EXCEEDED with retry delay over 5 minutes', () => {
@@ -774,9 +766,7 @@ describe('classifyGoogleError', () => {
     expect((result as ValidationRequiredError).validationLink).toBe(
       'https://staging.example.com/validate',
     );
-    expect(
-      (result as ValidationRequiredError).validationDescription,
-    ).toBeUndefined();
+    expect((result as ValidationRequiredError).validationDescription).toBeUndefined();
     expect((result as ValidationRequiredError).learnMoreUrl).toBeUndefined();
   });
 
@@ -935,9 +925,7 @@ describe('classifyGoogleError', () => {
       ],
     };
     vi.spyOn(errorParser, 'parseGoogleApiError').mockReturnValue(apiError);
-    const result = classifyGoogleError(
-      new Error('Quota exceeded for limit: 0'),
-    );
+    const result = classifyGoogleError(new Error('Quota exceeded for limit: 0'));
     expect(result).toBeInstanceOf(TerminalQuotaError);
   });
 
@@ -949,9 +937,7 @@ describe('classifyGoogleError', () => {
     };
     vi.spyOn(errorParser, 'parseGoogleApiError').mockReturnValue(apiError);
     const result = classifyGoogleError(
-      new Error(
-        'Quota exceeded for metric: ...\nlimit: 0, model: gemini-3-pro',
-      ),
+      new Error('Quota exceeded for metric: ...\nlimit: 0, model: gemini-3-pro'),
     );
     expect(result).toBeInstanceOf(TerminalQuotaError);
   });
@@ -964,9 +950,7 @@ describe('classifyGoogleError', () => {
     };
     vi.spyOn(errorParser, 'parseGoogleApiError').mockReturnValue(apiError);
     const result = classifyGoogleError(
-      new Error(
-        'Quota exceeded for metric: ...\nlimit: 0. Please retry in 59s.',
-      ),
+      new Error('Quota exceeded for metric: ...\nlimit: 0. Please retry in 59s.'),
     );
     expect(result).toBeInstanceOf(TerminalQuotaError);
   });
@@ -974,15 +958,12 @@ describe('classifyGoogleError', () => {
   it('should return RetryableQuotaError when limit is fractional (e.g., 0.5)', () => {
     const apiError: GoogleApiError = {
       code: 429,
-      message:
-        'Quota exceeded for metric: ...\nlimit: 0.5. Please retry in 59s.',
+      message: 'Quota exceeded for metric: ...\nlimit: 0.5. Please retry in 59s.',
       details: [],
     };
     vi.spyOn(errorParser, 'parseGoogleApiError').mockReturnValue(apiError);
     const result = classifyGoogleError(
-      new Error(
-        'Quota exceeded for metric: ...\nlimit: 0.5. Please retry in 59s.',
-      ),
+      new Error('Quota exceeded for metric: ...\nlimit: 0.5. Please retry in 59s.'),
     );
     expect(result).toBeInstanceOf(RetryableQuotaError);
   });

@@ -31,10 +31,7 @@ import {
   type McpToolContext,
 } from './types.js';
 import { defaultHookTranslator } from './hookTranslator.js';
-import type {
-  GenerateContentParameters,
-  GenerateContentResponse,
-} from '@google/genai';
+import type { GenerateContentParameters, GenerateContentResponse } from '@google/genai';
 import { logHookCall } from '../telemetry/loggers.js';
 import { HookCallEvent } from '../telemetry/types.js';
 import { debugLogger } from '../utils/debugLogger.js';
@@ -187,9 +184,7 @@ export class HookEventHandler {
   /**
    * Fire a SessionEnd event
    */
-  async fireSessionEndEvent(
-    reason: SessionEndReason,
-  ): Promise<AggregatedHookResult> {
+  async fireSessionEndEvent(reason: SessionEndReason): Promise<AggregatedHookResult> {
     const input: SessionEndInput = {
       ...this.createBaseInput(HookEventName.SessionEnd),
       reason,
@@ -226,12 +221,7 @@ export class HookEventHandler {
       llm_request: defaultHookTranslator.toHookLLMRequest(llmRequest),
     };
 
-    return this.executeHooks(
-      HookEventName.BeforeModel,
-      input,
-      undefined,
-      llmRequest,
-    );
+    return this.executeHooks(HookEventName.BeforeModel, input, undefined, llmRequest);
   }
 
   /**
@@ -248,12 +238,7 @@ export class HookEventHandler {
       llm_response: defaultHookTranslator.toHookLLMResponse(llmResponse),
     };
 
-    return this.executeHooks(
-      HookEventName.AfterModel,
-      input,
-      undefined,
-      llmRequest,
-    );
+    return this.executeHooks(HookEventName.AfterModel, input, undefined, llmRequest);
   }
 
   /**
@@ -335,22 +320,13 @@ export class HookEventHandler {
           );
 
       // Aggregate results
-      const aggregated = this.hookAggregator.aggregateResults(
-        results,
-        eventName,
-      );
+      const aggregated = this.hookAggregator.aggregateResults(results, eventName);
 
       // Process common hook output fields centrally
       this.processCommonHookOutputFields(aggregated);
 
       // Log hook execution
-      this.logHookExecution(
-        eventName,
-        input,
-        results,
-        aggregated,
-        requestContext,
-      );
+      this.logHookExecution(eventName, input, results, aggregated, requestContext);
 
       return aggregated;
     } catch (error) {
@@ -371,9 +347,8 @@ export class HookEventHandler {
   private createBaseInput(eventName: HookEventName): HookInput {
     // Get the transcript path from the ChatRecordingService if available
     const transcriptPath =
-      this.context.geminiClient
-        ?.getChatRecordingService()
-        ?.getConversationFilePath() ?? '';
+      this.context.geminiClient?.getChatRecordingService()?.getConversationFilePath() ??
+      '';
 
     return {
       session_id: this.context.config.getSessionId(),
@@ -479,9 +454,7 @@ export class HookEventHandler {
   /**
    * Process common hook output fields centrally
    */
-  private processCommonHookOutputFields(
-    aggregated: AggregatedHookResult,
-  ): void {
+  private processCommonHookOutputFields(aggregated: AggregatedHookResult): void {
     if (!aggregated.finalOutput) {
       return;
     }

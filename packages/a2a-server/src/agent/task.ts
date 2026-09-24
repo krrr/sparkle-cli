@@ -38,10 +38,7 @@ import {
   MessageBusType,
   type ToolCallsUpdateMessage,
 } from 'sparkle-cli-core';
-import {
-  type ExecutionEventBus,
-  type RequestContext,
-} from '@a2a-js/sdk/server';
+import { type ExecutionEventBus, type RequestContext } from '@a2a-js/sdk/server';
 import type {
   TaskStatusUpdateEvent,
   TaskArtifactUpdateEvent,
@@ -95,15 +92,12 @@ export class Task {
     cachedContentTokenCount?: number;
   };
   private get isYoloMatch(): boolean {
-    return (
-      this.autoExecute || this.config.getApprovalMode() === ApprovalMode.YOLO
-    );
+    return this.autoExecute || this.config.getApprovalMode() === ApprovalMode.YOLO;
   }
 
   // For tool waiting logic
   private pendingToolCalls: Map<string, string> = new Map(); //toolCallId --> status
-  private pendingOutcomes: Map<string, ToolConfirmationOutcome | undefined> =
-    new Map(); // toolCallId --> outcome
+  private pendingOutcomes: Map<string, ToolConfirmationOutcome | undefined> = new Map(); // toolCallId --> outcome
   private toolsAlreadyConfirmed: Set<string> = new Set();
   private toolUpdateEmitter = new EventEmitter();
   private cancellationError?: Error;
@@ -234,9 +228,7 @@ export class Task {
       logger.info(
         `[Task] Waiting for ${this.pendingToolCalls.size} pending tool(s)...`,
       );
-      await new Promise((resolve) =>
-        this.toolUpdateEmitter.once('update', resolve),
-      );
+      await new Promise((resolve) => this.toolUpdateEmitter.once('update', resolve));
     }
     if (this.cancellationError) {
       const error = this.cancellationError;
@@ -260,10 +252,7 @@ export class Task {
     this.toolUpdateEmitter.emit('update');
   }
 
-  private _createTextMessage(
-    text: string,
-    role: 'agent' | 'user' = 'agent',
-  ): Message {
+  private _createTextMessage(text: string, role: 'agent' | 'user' = 'agent'): Message {
     return {
       kind: 'message',
       role,
@@ -369,9 +358,7 @@ export class Task {
     } else if (Array.isArray(outputChunk)) {
       const ansiOutput: AnsiOutput = outputChunk;
       outputAsText = ansiOutput
-        .map((line: AnsiLine) =>
-          line.map((token: AnsiToken) => token.text).join(''),
-        )
+        .map((line: AnsiLine) => line.map((token: AnsiToken) => token.text).join(''))
         .join('\n');
     } else {
       outputAsText = String(outputChunk);
@@ -437,9 +424,7 @@ export class Task {
     this.scheduler.dispose();
   }
 
-  private handleEventDrivenToolCallsUpdate(
-    event: ToolCallsUpdateMessage,
-  ): void {
+  private handleEventDrivenToolCallsUpdate(event: ToolCallsUpdateMessage): void {
     if (
       event.type !== MessageBusType.TOOL_CALLS_UPDATE ||
       event.schedulerId !== this.id
@@ -471,8 +456,7 @@ export class Task {
 
     const previousStatus = this.pendingToolCalls.get(callId);
     const previousOutcome = this.pendingOutcomes.get(callId);
-    const hasChanged =
-      previousStatus !== tc.status || previousOutcome !== tc.outcome;
+    const hasChanged = previousStatus !== tc.status || previousOutcome !== tc.outcome;
 
     // Update outcome tracking
     this.pendingOutcomes.set(callId, tc.outcome);
@@ -483,17 +467,11 @@ export class Task {
     }
 
     // 2. Handle terminal states
-    if (
-      tc.status === 'success' ||
-      tc.status === 'error' ||
-      tc.status === 'cancelled'
-    ) {
+    if (tc.status === 'success' || tc.status === 'error' || tc.status === 'cancelled') {
       this.toolsAlreadyConfirmed.delete(callId);
       this.pendingOutcomes.delete(callId);
       if (hasChanged) {
-        logger.info(
-          `[Task] Tool call ${callId} completed with status: ${tc.status}`,
-        );
+        logger.info(`[Task] Tool call ${callId} completed with status: ${tc.status}`);
         this.completedToolCalls.push(tc);
         this._resolveToolCall(callId);
       }
@@ -558,11 +536,7 @@ export class Task {
       }
     }
 
-    if (
-      isAwaitingApproval &&
-      !isExecuting &&
-      !this.skipFinalTrueAfterInlineEdit
-    ) {
+    if (isAwaitingApproval && !isExecuting && !this.skipFinalTrueAfterInlineEdit) {
       this.skipFinalTrueAfterInlineEdit = false;
       const wasAlreadyInputRequired = this.taskState === 'input-required';
 
@@ -582,10 +556,10 @@ export class Task {
     }
   }
 
-  private _pickFields<
-    T extends ToolCall | AnyDeclarativeTool,
-    K extends UnionKeys<T>,
-  >(from: T, ...fields: K[]): Partial<T> {
+  private _pickFields<T extends ToolCall | AnyDeclarativeTool, K extends UnionKeys<T>>(
+    from: T,
+    ...fields: K[]
+  ): Partial<T> {
     const ret: Partial<T> = {};
     for (const field of fields) {
       if (field in from && from[field] !== undefined) {
@@ -595,11 +569,7 @@ export class Task {
     return ret;
   }
 
-  private toolStatusMessage(
-    tc: ToolCall,
-    taskId: string,
-    contextId: string,
-  ): Message {
+  private toolStatusMessage(tc: ToolCall, taskId: string, contextId: string): Message {
     const messageParts: Part[] = [];
 
     // Create a serializable version of the ToolCall (pick necessary
@@ -718,10 +688,7 @@ export class Task {
       EDIT_TOOL_NAMES.has(request.name),
     );
 
-    if (
-      restorableToolCalls.length > 0 &&
-      this.config.getCheckpointingEnabled()
-    ) {
+    if (restorableToolCalls.length > 0 && this.config.getCheckpointingEnabled()) {
       const gitService = await this.config.getGitService();
       if (gitService) {
         const { checkpointsToWrite, toolCallToCheckpointMap, errors } =
@@ -772,14 +739,8 @@ export class Task {
             typeof newString === 'string'
           ) {
             // Resolve and validate path to prevent path traversal (user-controlled file_path).
-            const resolvedPath = path.resolve(
-              this.config.getTargetDir(),
-              filePath,
-            );
-            const pathError = this.config.validatePathAccess(
-              resolvedPath,
-              'read',
-            );
+            const resolvedPath = path.resolve(this.config.getTargetDir(), filePath);
+            const pathError = this.config.validatePathAccess(resolvedPath, 'read');
             if (!pathError) {
               const newContent = await this.getProposedContent(
                 resolvedPath,
@@ -794,9 +755,7 @@ export class Task {
       }),
     );
 
-    logger.info(
-      `[Task] Scheduling batch of ${updatedRequests.length} tool calls.`,
-    );
+    logger.info(`[Task] Scheduling batch of ${updatedRequests.length} tool calls.`);
     const stateChange: StateChange = {
       kind: CoderAgentEvent.StateChangeEvent,
     };
@@ -818,8 +777,7 @@ export class Task {
     const stateChange: StateChange = {
       kind: CoderAgentEvent.StateChangeEvent,
     };
-    const traceId =
-      'traceId' in event && event.traceId ? event.traceId : undefined;
+    const traceId = 'traceId' in event && event.traceId ? event.traceId : undefined;
 
     switch (event.type) {
       case GeminiEventType.Content:
@@ -885,8 +843,7 @@ export class Task {
           typeof event.value === 'object' &&
           'usageMetadata' in event.value
         ) {
-          this.usageMetadata = event.value
-            .usageMetadata as typeof this.usageMetadata;
+          this.usageMetadata = event.value.usageMetadata as typeof this.usageMetadata;
         }
         break;
       case GeminiEventType.ModelInfo:
@@ -912,10 +869,7 @@ export class Task {
         const errorMessage = errorEvent?.value?.error
           ? getErrorMessage(errorEvent.value.error)
           : 'Unknown error from LLM stream';
-        logger.error(
-          '[Task] Received error event from LLM stream:',
-          errorMessage,
-        );
+        logger.error('[Task] Received error event from LLM stream:', errorMessage);
 
         let errMessage = `Unknown error from LLM stream: ${JSON.stringify(event)}`;
         if (errorEvent?.value?.error) {
@@ -1111,9 +1065,7 @@ export class Task {
     }
 
     const llmParts: PartUnion[] = [];
-    logger.info(
-      `[Task] Feeding ${completedToolCalls.length} tool responses to LLM.`,
-    );
+    logger.info(`[Task] Feeding ${completedToolCalls.length} tool responses to LLM.`);
     for (const completedToolCall of completedToolCalls) {
       logger.info(
         `[Task] Adding tool response for "${completedToolCall.request.name}" (callId: ${completedToolCall.request.callId}) to LLM input.`,
@@ -1189,10 +1141,7 @@ export class Task {
       // If all pending tools were just confirmed, waitForPendingTools will handle the wait.
       // If some tools are still pending approval, scheduler would have set InputRequired.
       // If not, and no new text, we are just waiting.
-      if (
-        this.pendingToolCalls.size > 0 &&
-        this.taskState !== 'input-required'
-      ) {
+      if (this.pendingToolCalls.size > 0 && this.taskState !== 'input-required') {
         const stateChange: StateChange = {
           kind: CoderAgentEvent.StateChangeEvent,
         };

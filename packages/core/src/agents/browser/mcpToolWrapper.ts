@@ -153,10 +153,7 @@ class McpToolInvocation extends BaseToolInvocation<
       }
 
       // Post-process to add contextual hints for common error patterns
-      const processedContent = postProcessToolResult(
-        this.toolName,
-        textContent,
-      );
+      const processedContent = postProcessToolResult(this.toolName, textContent);
 
       // Resume input blocker after interactive tool completes.
       if (this.needsBlockerSuspend) {
@@ -206,10 +203,7 @@ class McpToolInvocation extends BaseToolInvocation<
 /**
  * DeclarativeTool wrapper for an MCP tool.
  */
-class McpDeclarativeTool extends DeclarativeTool<
-  Record<string, unknown>,
-  ToolResult
-> {
+class McpDeclarativeTool extends DeclarativeTool<Record<string, unknown>, ToolResult> {
   constructor(
     protected readonly browserManager: BrowserManager,
     name: string,
@@ -299,9 +293,7 @@ export async function createMcpDeclarativeTools(
     );
   });
 
-  debugLogger.log(
-    `Total tools registered: ${tools.length} (${mcpTools.length} MCP)`,
-  );
+  debugLogger.log(`Total tools registered: ${tools.length} (${mcpTools.length} MCP)`);
 
   return tools;
 }
@@ -309,9 +301,7 @@ export async function createMcpDeclarativeTools(
 /**
  * Converts MCP tool definition to Gemini FunctionDeclaration.
  */
-function convertMcpToolToFunctionDeclaration(
-  mcpTool: McpTool,
-): FunctionDeclaration {
+function convertMcpToolToFunctionDeclaration(mcpTool: McpTool): FunctionDeclaration {
   // MCP tool inputSchema is a JSON Schema object
   // We pass it directly as parametersJsonSchema
   return {
@@ -376,18 +366,12 @@ function augmentToolDescription(toolName: string, description: string): string {
  * This helps the agent recover from overlay blocking, element not found, etc.
  * Also strips embedded snapshots to prevent token bloat.
  */
-export function postProcessToolResult(
-  toolName: string,
-  result: string,
-): string {
+export function postProcessToolResult(toolName: string, result: string): string {
   // Strip embedded snapshots to prevent token bloat (except for take_snapshot,
   // whose accessibility tree the model needs for uid-based interactions).
   let processedResult = result;
 
-  if (
-    toolName !== 'take_snapshot' &&
-    result.includes('## Latest page snapshot')
-  ) {
+  if (toolName !== 'take_snapshot' && result.includes('## Latest page snapshot')) {
     const parts = result.split('## Latest page snapshot');
     processedResult = parts[0].trim();
     if (parts[1]) {

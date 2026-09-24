@@ -68,20 +68,17 @@ export function useReverseSearchCompletion(
     prevMatchesRef.current = [];
   }, [history]);
 
-  const searchHistory = useCallback(
-    (query: string, items: readonly string[]) => {
-      const out: Suggestion[] = [];
-      for (let i = 0; i < items.length; i++) {
-        const cmd = items[i];
-        const idx = cmd.toLowerCase().indexOf(query);
-        if (idx !== -1) {
-          out.push({ label: cmd, value: cmd, matchedIndex: idx });
-        }
+  const searchHistory = useCallback((query: string, items: readonly string[]) => {
+    const out: Suggestion[] = [];
+    for (let i = 0; i < items.length; i++) {
+      const cmd = items[i];
+      const idx = cmd.toLowerCase().indexOf(query);
+      if (idx !== -1) {
+        out.push({ label: cmd, value: cmd, matchedIndex: idx });
       }
-      return out;
-    },
-    [],
-  );
+    }
+    return out;
+  }, []);
 
   const matches = useMemo<Suggestion[]>(() => {
     if (!reverseSearchActive) return [];
@@ -98,9 +95,7 @@ export function useReverseSearchCompletion(
       query.startsWith(prevQueryRef.current) &&
       prevMatchesRef.current.length > 0;
 
-    const source = canUseCache
-      ? prevMatchesRef.current.map((m) => m.value)
-      : history;
+    const source = canUseCache ? prevMatchesRef.current.map((m) => m.value) : history;
 
     return searchHistory(query, source);
   }, [debouncedQuery, history, reverseSearchActive, searchHistory]);

@@ -31,8 +31,7 @@ export interface SkillDefinition {
   extensionName?: string;
 }
 
-export const FRONTMATTER_REGEX =
-  /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n([\s\S]*))?/;
+export const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n([\s\S]*))?/;
 
 /**
  * Parses frontmatter content using YAML with a fallback to simple key-value parsing.
@@ -112,9 +111,7 @@ function parseSimpleFrontmatter(
 /**
  * Discovers and loads all skills in the provided directory.
  */
-export async function loadSkillsFromDir(
-  dir: string,
-): Promise<SkillDefinition[]> {
+export async function loadSkillsFromDir(dir: string): Promise<SkillDefinition[]> {
   const discoveredSkills: SkillDefinition[] = [];
 
   try {
@@ -148,11 +145,7 @@ export async function loadSkillsFromDir(
       }
     }
   } catch (error) {
-    coreEvents.emitFeedback(
-      'warning',
-      `Error discovering skills in ${dir}:`,
-      error,
-    );
+    coreEvents.emitFeedback('warning', `Error discovering skills in ${dir}:`, error);
   }
 
   return discoveredSkills;

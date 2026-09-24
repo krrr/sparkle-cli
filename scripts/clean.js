@@ -34,9 +34,7 @@ rmSync(join(root, 'packages/cli/src/generated/'), {
 const RMRF_OPTIONS = { recursive: true, force: true };
 rmSync(join(root, 'bundle'), RMRF_OPTIONS);
 // Dynamically clean dist directories in all workspaces
-const rootPackageJson = JSON.parse(
-  readFileSync(join(root, 'package.json'), 'utf-8'),
-);
+const rootPackageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf-8'));
 for (const workspace of rootPackageJson.workspaces) {
   // Note: this is a simple glob implementation that only supports "packages/*".
   const workspaceDir = join(root, dirname(workspace));

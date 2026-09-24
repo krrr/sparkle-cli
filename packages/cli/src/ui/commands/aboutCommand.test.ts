@@ -60,10 +60,9 @@ describe('aboutCommand', () => {
     } as unknown as CommandContext);
 
     vi.mocked(getVersion).mockResolvedValue('test-version');
-    vi.spyOn(
-      mockContext.services.agentContext!.config,
-      'getModel',
-    ).mockReturnValue('test-model');
+    vi.spyOn(mockContext.services.agentContext!.config, 'getModel').mockReturnValue(
+      'test-model',
+    );
     Object.defineProperty(process, 'platform', {
       value: 'test-os',
     });

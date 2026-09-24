@@ -27,8 +27,7 @@ vi.mock('node:os', async (importOriginal) => {
 // Mock shell-utils to ensure consistent behavior across platforms (especially Windows CI)
 // We want to test PolicyEngine logic with Bash syntax rules.
 vi.mock('../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../utils/shell-utils.js')>();
   return {
     ...actual,
     getShellConfiguration: () => ({

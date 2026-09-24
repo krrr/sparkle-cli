@@ -11,10 +11,7 @@ import { useUIState, type UIState } from '../contexts/UIStateContext.js';
 import { useInputState, type InputState } from '../contexts/InputContext.js';
 import { TransientMessageType } from '../../utils/events.js';
 
-export function shouldShowToast(
-  uiState: UIState,
-  inputState: InputState,
-): boolean {
+export function shouldShowToast(uiState: UIState, inputState: InputState): boolean {
   return (
     uiState.ctrlCPressedOnce ||
     Boolean(uiState.transientMessage) ||
@@ -31,24 +28,18 @@ export const ToastDisplay: React.FC = () => {
   const inputState = useInputState();
 
   if (uiState.ctrlCPressedOnce) {
-    return (
-      <Text color={theme.status.warning}>Press Ctrl+C again to exit.</Text>
-    );
+    return <Text color={theme.status.warning}>Press Ctrl+C again to exit.</Text>;
   }
 
   if (
     uiState.transientMessage?.type === TransientMessageType.Warning &&
     uiState.transientMessage.text
   ) {
-    return (
-      <Text color={theme.status.warning}>{uiState.transientMessage.text}</Text>
-    );
+    return <Text color={theme.status.warning}>{uiState.transientMessage.text}</Text>;
   }
 
   if (uiState.ctrlDPressedOnce) {
-    return (
-      <Text color={theme.status.warning}>Press Ctrl+D again to exit.</Text>
-    );
+    return <Text color={theme.status.warning}>Press Ctrl+D again to exit.</Text>;
   }
 
   if (inputState.showEscapePrompt) {
@@ -70,9 +61,7 @@ export const ToastDisplay: React.FC = () => {
     uiState.transientMessage?.type === TransientMessageType.Hint &&
     uiState.transientMessage.text
   ) {
-    return (
-      <Text color={theme.text.secondary}>{uiState.transientMessage.text}</Text>
-    );
+    return <Text color={theme.text.secondary}>{uiState.transientMessage.text}</Text>;
   }
 
   if (uiState.queueErrorMessage) {

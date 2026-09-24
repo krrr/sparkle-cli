@@ -26,10 +26,7 @@ import { VimModeProvider } from '../ui/contexts/VimModeContext.js';
 import { MouseProvider } from '../ui/contexts/MouseContext.js';
 import { ScrollProvider } from '../ui/contexts/ScrollProvider.js';
 import { StreamingContext } from '../ui/contexts/StreamingContext.js';
-import {
-  type UIActions,
-  UIActionsContext,
-} from '../ui/contexts/UIActionsContext.js';
+import { type UIActions, UIActionsContext } from '../ui/contexts/UIActionsContext.js';
 import { type HistoryItemToolGroup, StreamingState } from '../ui/types.js';
 import { ToolActionsProvider } from '../ui/contexts/ToolActionsContext.js';
 import { AskUserActionsProvider } from '../ui/contexts/AskUserActionsContext.js';
@@ -89,9 +86,7 @@ interface InkRenderMetrics extends RenderMetrics {
   staticOutput?: string;
 }
 
-function isInkRenderMetrics(
-  metrics: RenderMetrics,
-): metrics is InkRenderMetrics {
+function isInkRenderMetrics(metrics: RenderMetrics): metrics is InkRenderMetrics {
   const m = metrics as Record<string, unknown>;
   return (
     typeof m === 'object' &&
@@ -137,9 +132,7 @@ class XtermStdout extends EventEmitter {
   write = (data: string) => {
     this.pendingWrites++;
     this.queue.promise = this.queue.promise.then(async () => {
-      await new Promise<void>((resolve) =>
-        this.state.terminal.write(data, resolve),
-      );
+      await new Promise<void>((resolve) => this.state.terminal.write(data, resolve));
       this.pendingWrites--;
     });
   };
@@ -161,14 +154,12 @@ class XtermStdout extends EventEmitter {
     this.emit('render');
   };
 
-  private normalizeFrame = (text: string): string =>
-    text.replace(/\r\n/g, '\n');
+  private normalizeFrame = (text: string): string => text.replace(/\r\n/g, '\n');
 
   generateSvg = (): string => generateSvgForTerminal(this.state.terminal);
 
   lastFrameRaw = (options: { allowEmpty?: boolean } = {}) => {
-    const result =
-      (this.lastRenderStaticContent ?? '') + (this.lastRenderOutput ?? '');
+    const result = (this.lastRenderStaticContent ?? '') + (this.lastRenderOutput ?? '');
 
     const normalized = this.normalizeFrame(result);
 
@@ -219,12 +210,8 @@ class XtermStdout extends EventEmitter {
         // Wait for at least one render to be called if we haven't rendered yet or since start of this call,
         // but don't wait forever as some renders might be synchronous or skipped.
         if (this.renderCount === startRenderCount) {
-          const renderPromise = new Promise((resolve) =>
-            this.once('render', resolve),
-          );
-          const timeoutPromise = new Promise((resolve) =>
-            setTimeout(resolve, 1000),
-          );
+          const renderPromise = new Promise((resolve) => this.once('render', resolve));
+          const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 1000));
           await Promise.race([renderPromise, timeoutPromise]);
         }
       }
@@ -240,13 +227,9 @@ class XtermStdout extends EventEmitter {
       // Ensure all pending writes to the terminal are processed.
       await this.queue.promise;
 
-      const currentFrame = stripAnsi(
-        this.lastFrame({ allowEmpty: true }),
-      ).trim();
+      const currentFrame = stripAnsi(this.lastFrame({ allowEmpty: true })).trim();
       const expectedFrame = this.normalizeFrame(
-        stripAnsi(
-          (this.lastRenderStaticContent ?? '') + (this.lastRenderOutput ?? ''),
-        ),
+        stripAnsi((this.lastRenderStaticContent ?? '') + (this.lastRenderOutput ?? '')),
       ).trim();
 
       lastCurrent = currentFrame;
@@ -322,9 +305,7 @@ class XtermStderr extends EventEmitter {
   write = (data: string) => {
     this.pendingWrites++;
     this.queue.promise = this.queue.promise.then(async () => {
-      await new Promise<void>((resolve) =>
-        this.state.terminal.write(data, resolve),
-      );
+      await new Promise<void>((resolve) => this.state.terminal.write(data, resolve));
       this.pendingWrites--;
     });
   };
@@ -382,11 +363,7 @@ export type RenderInstance = {
 };
 
 export type RenderWithProvidersInstance = RenderInstance & {
-  simulateClick: (
-    col: number,
-    row: number,
-    button?: 0 | 1 | 2,
-  ) => Promise<void>;
+  simulateClick: (col: number, row: number, button?: 0 | 1 | 2) => Promise<void>;
 };
 
 const instances: InkInstance[] = [];
@@ -594,9 +571,7 @@ import { InputContext, type InputState } from '../ui/contexts/InputContext.js';
 
 let capturedOverflowState: OverflowState | undefined;
 let capturedOverflowActions: OverflowActions | undefined;
-const ContextCapture: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const ContextCapture: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   capturedOverflowState = useOverflowState();
   capturedOverflowActions = useOverflowActions();
   return <>{children}</>;
@@ -720,21 +695,16 @@ export const renderWithProviders = async (
               <VimModeProvider>
                 <ShellFocusContext.Provider value={shellFocus}>
                   <SessionStatsProvider sessionId={finalConfig.getSessionId()}>
-                    <StreamingContext.Provider
-                      value={finalUiState.streamingState}
-                    >
+                    <StreamingContext.Provider value={finalUiState.streamingState}>
                       <UIActionsContext.Provider value={finalUIActions}>
                         <OverflowProvider>
                           <ToolActionsProvider
                             config={finalConfig}
                             toolCalls={allToolCalls}
                             isExpanded={
-                              toolActions?.isExpanded ??
-                              vi.fn().mockReturnValue(false)
+                              toolActions?.isExpanded ?? vi.fn().mockReturnValue(false)
                             }
-                            toggleExpansion={
-                              toolActions?.toggleExpansion ?? vi.fn()
-                            }
+                            toggleExpansion={toolActions?.toggleExpansion ?? vi.fn()}
                             toggleAllExpansion={
                               toolActions?.toggleAllExpansion ?? vi.fn()
                             }
@@ -745,9 +715,7 @@ export const renderWithProviders = async (
                               onCancel={vi.fn()}
                             >
                               <KeypressProvider>
-                                <MouseProvider
-                                  mouseEventsEnabled={mouseEventsEnabled}
-                                >
+                                <MouseProvider mouseEventsEnabled={mouseEventsEnabled}>
                                   <TerminalProvider>
                                     <ScrollProvider>
                                       <ContextCapture>
@@ -779,10 +747,7 @@ export const renderWithProviders = async (
     </AppContext.Provider>
   );
 
-  const renderResult = await render(
-    wrapWithProviders(component),
-    terminalWidth,
-  );
+  const renderResult = await render(wrapWithProviders(component), terminalWidth);
 
   return {
     ...renderResult,

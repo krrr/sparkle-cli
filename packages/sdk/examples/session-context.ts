@@ -61,9 +61,7 @@ async function main() {
   });
 
   console.log("Sending prompt: 'What is my current session context?'");
-  for await (const chunk of agent.sendStream(
-    'What is my current session context?',
-  )) {
+  for await (const chunk of agent.sendStream('What is my current session context?')) {
     if (chunk.type === 'content') {
       process.stdout.write(chunk.value || '');
     }

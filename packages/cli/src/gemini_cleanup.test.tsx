@@ -174,8 +174,7 @@ const { cleanupMockState } = vi.hoisted(() => ({
 
 // Mock sessionCleanup.js at the top level
 vi.mock('./utils/sessionCleanup.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('./utils/sessionCleanup.js')>();
+  const actual = await importOriginal<typeof import('./utils/sessionCleanup.js')>();
   return {
     ...actual,
     cleanupExpiredSessions: async () => {
@@ -200,9 +199,7 @@ describe('gemini.tsx main function cleanup', () => {
   });
 
   it.skip('should log error when cleanupExpiredSessions fails', async () => {
-    const { loadCliConfig, parseArguments } = await import(
-      './config/config.js'
-    );
+    const { loadCliConfig, parseArguments } = await import('./config/config.js');
     const { loadSettings } = await import('./config/settings.js');
     cleanupMockState.shouldThrow = true;
     cleanupMockState.called = false;
@@ -270,9 +267,7 @@ describe('gemini.tsx main function cleanup', () => {
   });
 
   it('should register SessionEnd hook exactly once in non-interactive mode', async () => {
-    const { loadCliConfig, parseArguments } = await import(
-      './config/config.js'
-    );
+    const { loadCliConfig, parseArguments } = await import('./config/config.js');
     const { registerCleanup } = await import('./utils/cleanup.js');
 
     const mockHookSystem = {
@@ -295,9 +290,7 @@ describe('gemini.tsx main function cleanup', () => {
 
     await main();
 
-    const registeredCallbacks = vi
-      .mocked(registerCleanup)
-      .mock.calls.map(([fn]) => fn);
+    const registeredCallbacks = vi.mocked(registerCleanup).mock.calls.map(([fn]) => fn);
     for (const fn of registeredCallbacks) await fn();
     expect(mockHookSystem.fireSessionEndEvent).toHaveBeenCalledTimes(1);
     expect(mockHookSystem.fireSessionEndEvent).toHaveBeenCalledWith(
@@ -308,9 +301,7 @@ describe('gemini.tsx main function cleanup', () => {
   it('should not register ConsolePatcher cleanup in ACP mode', async () => {
     const { registerCleanup } = await import('./utils/cleanup.js');
     const { ConsolePatcher } = await import('./ui/utils/ConsolePatcher.js');
-    const { loadCliConfig, parseArguments } = await import(
-      './config/config.js'
-    );
+    const { loadCliConfig, parseArguments } = await import('./config/config.js');
     const { loadSettings } = await import('./config/settings.js');
 
     vi.mocked(parseArguments).mockResolvedValue({
@@ -362,9 +353,7 @@ describe('gemini.tsx main function cleanup', () => {
   it('should register ConsolePatcher cleanup in non-ACP mode', async () => {
     const { registerCleanup } = await import('./utils/cleanup.js');
     const { ConsolePatcher } = await import('./ui/utils/ConsolePatcher.js');
-    const { loadCliConfig, parseArguments } = await import(
-      './config/config.js'
-    );
+    const { loadCliConfig, parseArguments } = await import('./config/config.js');
     const { loadSettings } = await import('./config/settings.js');
 
     vi.mocked(parseArguments).mockResolvedValue({

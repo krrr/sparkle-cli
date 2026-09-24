@@ -24,10 +24,7 @@ export type { Key };
  */
 export function useKeypress(
   onKeypress: KeypressHandler,
-  {
-    isActive,
-    priority,
-  }: { isActive: boolean; priority?: KeypressPriority | boolean },
+  { isActive, priority }: { isActive: boolean; priority?: KeypressPriority | boolean },
 ) {
   const { subscribe, unsubscribe } = useKeypressContext();
   const handler = useEffectEvent(onKeypress);

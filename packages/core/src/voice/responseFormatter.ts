@@ -59,8 +59,7 @@ const STACK_BLOCK_RE = /(?:^[ \t]+at [^\n]+(?:\n|$)){2,}/gm;
 
 // Absolute Unix paths optionally ending with :line or :line:col
 // Hyphen placed at start of char class to avoid useless-escape lint error
-const UNIX_PATH_RE =
-  /(?:^|(?<=\s|[(`"']))(\/[-\w.@]+(?:\/[-\w.@]+)*)(:\d+(?::\d+)?)?/g;
+const UNIX_PATH_RE = /(?:^|(?<=\s|[(`"']))(\/[-\w.@]+(?:\/[-\w.@]+)*)(:\d+(?::\d+)?)?/g;
 
 // Absolute Windows paths  C:\...  or  C:/...  (any drive letter)
 const WIN_PATH_RE =
@@ -77,8 +76,7 @@ function abbreviatePath(
 ): string {
   const segments = full.split(/[/\\]/).filter(Boolean);
   const kept = segments.length > depth ? segments.slice(-depth) : segments;
-  const abbreviated =
-    segments.length > depth ? `\u2026/${kept.join('/')}` : full;
+  const abbreviated = segments.length > depth ? `\u2026/${kept.join('/')}` : full;
 
   if (!suffix) return abbreviated;
   // Convert ":142" → " line 142", ":142:7" → " line 142"

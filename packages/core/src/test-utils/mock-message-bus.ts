@@ -12,10 +12,7 @@ import { MessageBusType, type Message } from '../confirmation-bus/types.js';
  * Mock MessageBus for testing hook execution through MessageBus
  */
 export class MockMessageBus {
-  private subscriptions = new Map<
-    MessageBusType,
-    Set<(message: Message) => void>
-  >();
+  private subscriptions = new Map<MessageBusType, Set<(message: Message) => void>>();
   publishedMessages: Message[] = [];
   defaultToolDecision: 'allow' | 'deny' | 'ask_user' = 'allow';
 
@@ -107,8 +104,6 @@ export function createMockMessageBus(): MessageBus {
 /**
  * Get the MockMessageBus instance from a mocked MessageBus
  */
-export function getMockMessageBusInstance(
-  messageBus: MessageBus,
-): MockMessageBus {
+export function getMockMessageBusInstance(messageBus: MessageBus): MockMessageBus {
   return messageBus as unknown as MockMessageBus;
 }

@@ -28,10 +28,7 @@ async function findCommand(
   // 1. Check PATH first.
   try {
     if (platform === 'win32') {
-      const result = child_process
-        .execSync(`where.exe ${command}`)
-        .toString()
-        .trim();
+      const result = child_process.execSync(`where.exe ${command}`).toString().trim();
       // `where.exe` can return multiple paths. Return the first one.
       const firstPath = result.split(/\r?\n/)[0];
       if (firstPath) {
@@ -168,18 +165,12 @@ class VsCodeInstaller implements IdeInstaller {
     try {
       const result = child_process.spawnSync(
         commandPath,
-        [
-          '--install-extension',
-          'google.sparkle-cli-vscode-ide-companion',
-          '--force',
-        ],
+        ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
         { stdio: 'pipe', shell: this.platform === 'win32' },
       );
 
       if (result.status !== 0) {
-        throw new Error(
-          `Failed to install extension: ${result.stderr?.toString()}`,
-        );
+        throw new Error(`Failed to install extension: ${result.stderr?.toString()}`);
       }
 
       return {
@@ -218,18 +209,12 @@ class PositronInstaller implements IdeInstaller {
     try {
       const result = child_process.spawnSync(
         commandPath,
-        [
-          '--install-extension',
-          'google.sparkle-cli-vscode-ide-companion',
-          '--force',
-        ],
+        ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
         { stdio: 'pipe', shell: this.platform === 'win32' },
       );
 
       if (result.status !== 0) {
-        throw new Error(
-          `Failed to install extension: ${result.stderr?.toString()}`,
-        );
+        throw new Error(`Failed to install extension: ${result.stderr?.toString()}`);
       }
 
       return {
@@ -255,9 +240,7 @@ class AntigravityInstaller implements IdeInstaller {
     const envCommand = process.env['ANTIGRAVITY_CLI_ALIAS'];
     const safeCommandPattern = /^[a-zA-Z0-9.\-_/\\]+$/;
     const sanitizedEnvCommand =
-      envCommand && safeCommandPattern.test(envCommand)
-        ? envCommand
-        : undefined;
+      envCommand && safeCommandPattern.test(envCommand) ? envCommand : undefined;
     const fallbackCommands =
       this.platform === 'win32'
         ? ['agy.cmd', 'antigravity.cmd']
@@ -265,9 +248,7 @@ class AntigravityInstaller implements IdeInstaller {
     const commands = [
       ...(sanitizedEnvCommand ? [sanitizedEnvCommand] : []),
       ...fallbackCommands,
-    ].filter(
-      (command, index, allCommands) => allCommands.indexOf(command) === index,
-    );
+    ].filter((command, index, allCommands) => allCommands.indexOf(command) === index);
 
     let commandPath: string | null = null;
     for (const command of commands) {
@@ -288,18 +269,12 @@ class AntigravityInstaller implements IdeInstaller {
     try {
       const result = child_process.spawnSync(
         commandPath,
-        [
-          '--install-extension',
-          'google.sparkle-cli-vscode-ide-companion',
-          '--force',
-        ],
+        ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
         { stdio: 'pipe', shell: this.platform === 'win32' },
       );
 
       if (result.status !== 0) {
-        throw new Error(
-          `Failed to install extension: ${result.stderr?.toString()}`,
-        );
+        throw new Error(`Failed to install extension: ${result.stderr?.toString()}`);
       }
 
       return {

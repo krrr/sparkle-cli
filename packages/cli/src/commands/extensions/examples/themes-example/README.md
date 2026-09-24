@@ -20,12 +20,12 @@ This is an example of a Sparkle CLI extension that adds a custom theme.
     }
     ```
 
-    Alternatively, you can set it through the UI by running `sparkle` and then
-    typing `/theme` and pressing Enter.
+    Alternatively, you can set it through the UI by running `sparkle` and then typing
+    `/theme` and pressing Enter.
 
 3.  **Observe the Changes:**
 
-    After setting the theme, you should see the changes reflected in the Sparkle
-    CLI's UI. The background will be a dark green, the primary text a lighter
-    green, and various other UI elements will display different shades of green,
-    as defined in this extension's `sparkle-extension.json` file.
+    After setting the theme, you should see the changes reflected in the Sparkle CLI's
+    UI. The background will be a dark green, the primary text a lighter green, and
+    various other UI elements will display different shades of green, as defined in this
+    extension's `sparkle-extension.json` file.

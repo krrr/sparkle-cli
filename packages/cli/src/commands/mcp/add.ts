@@ -48,8 +48,7 @@ async function addMcpServer(
     process.exit(1);
   }
 
-  const settingsScope =
-    scope === 'user' ? SettingScope.User : SettingScope.Workspace;
+  const settingsScope = scope === 'user' ? SettingScope.User : SettingScope.Workspace;
 
   let newServer: Partial<MCPServerConfig> = {};
 
@@ -131,9 +130,7 @@ async function addMcpServer(
   if (isExistingServer) {
     debugLogger.log(`MCP server "${name}" updated in ${scope} settings.`);
   } else {
-    debugLogger.log(
-      `MCP server "${name}" added to ${scope} settings. (${transport})`,
-    );
+    debugLogger.log(`MCP server "${name}" added to ${scope} settings. (${transport})`);
   }
 }
 
@@ -191,8 +188,7 @@ export const addCommand: CommandModule = {
         type: 'number',
       })
       .option('trust', {
-        describe:
-          'Trust the server (bypass all tool call confirmation prompts)',
+        describe: 'Trust the server (bypass all tool call confirmation prompts)',
         type: 'boolean',
       })
       .option('description', {

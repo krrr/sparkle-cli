@@ -6,11 +6,7 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 import type { ConsoleMessageItem } from '../types.js';
-import {
-  coreEvents,
-  CoreEvent,
-  type ConsoleLogPayload,
-} from 'sparkle-cli-core';
+import { coreEvents, CoreEvent, type ConsoleLogPayload } from 'sparkle-cli-core';
 
 export interface UseErrorCountReturn {
   errorCount: number;
@@ -138,10 +134,7 @@ const handleConsoleLog = (payload: ConsoleLogPayload) => {
   });
 };
 
-const handleOutput = (payload: {
-  isStderr: boolean;
-  chunk: Uint8Array | string;
-}) => {
+const handleOutput = (payload: { isStderr: boolean; chunk: Uint8Array | string }) => {
   let content =
     typeof payload.chunk === 'string'
       ? payload.chunk

@@ -50,35 +50,26 @@ describe('extensionSettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockKeychainData = {};
-    vi.mocked(KeychainTokenStorage).mockImplementation(
-      (serviceName: string) => {
-        if (!mockKeychainData[serviceName]) {
-          mockKeychainData[serviceName] = {};
-        }
-        const keychainData = mockKeychainData[serviceName];
-        return {
-          getSecret: vi
-            .fn()
-            .mockImplementation(
-              async (key: string) => keychainData[key] || null,
-            ),
-          setSecret: vi
-            .fn()
-            .mockImplementation(async (key: string, value: string) => {
-              keychainData[key] = value;
-            }),
-          deleteSecret: vi.fn().mockImplementation(async (key: string) => {
-            delete keychainData[key];
-          }),
-          listSecrets: vi
-            .fn()
-            .mockImplementation(async () => Object.keys(keychainData)),
-          isAvailable: vi.fn().mockResolvedValue(true),
-        } as unknown as KeychainTokenStorage;
-      },
-    );
-    tempHomeDir =
-      os.tmpdir() + path.sep + `sparkle-cli-test-home-${Date.now()}`;
+    vi.mocked(KeychainTokenStorage).mockImplementation((serviceName: string) => {
+      if (!mockKeychainData[serviceName]) {
+        mockKeychainData[serviceName] = {};
+      }
+      const keychainData = mockKeychainData[serviceName];
+      return {
+        getSecret: vi
+          .fn()
+          .mockImplementation(async (key: string) => keychainData[key] || null),
+        setSecret: vi.fn().mockImplementation(async (key: string, value: string) => {
+          keychainData[key] = value;
+        }),
+        deleteSecret: vi.fn().mockImplementation(async (key: string) => {
+          delete keychainData[key];
+        }),
+        listSecrets: vi.fn().mockImplementation(async () => Object.keys(keychainData)),
+        isAvailable: vi.fn().mockResolvedValue(true),
+      } as unknown as KeychainTokenStorage;
+    });
+    tempHomeDir = os.tmpdir() + path.sep + `sparkle-cli-test-home-${Date.now()}`;
     tempWorkspaceDir = path.join(
       os.tmpdir(),
       `sparkle-cli-test-workspace-${Date.now()}`,
@@ -310,16 +301,12 @@ describe('extensionSettings', () => {
       const previousConfig: ExtensionConfig = {
         name: 'test-ext',
         version: '1.0.0',
-        settings: [
-          { name: 's1', description: 'd1', envVar: 'VAR1', sensitive: false },
-        ],
+        settings: [{ name: 's1', description: 'd1', envVar: 'VAR1', sensitive: false }],
       };
       const newConfig: ExtensionConfig = {
         name: 'test-ext',
         version: '1.0.0',
-        settings: [
-          { name: 's1', description: 'd1', envVar: 'VAR1', sensitive: true },
-        ],
+        settings: [{ name: 's1', description: 'd1', envVar: 'VAR1', sensitive: true }],
       };
       const previousSettings = { VAR1: 'previous-VAR1' };
 
@@ -473,8 +460,7 @@ describe('extensionSettings', () => {
   describe('promptForSetting', () => {
     it.each([
       {
-        description:
-          'should use prompts with type "password" for sensitive settings',
+        description: 'should use prompts with type "password" for sensitive settings',
         setting: {
           name: 'API Key',
           description: 'Your secret key',
@@ -485,8 +471,7 @@ describe('extensionSettings', () => {
         promptValue: 'secret-key',
       },
       {
-        description:
-          'should use prompts with type "text" for non-sensitive settings',
+        description: 'should use prompts with type "text" for non-sensitive settings',
         setting: {
           name: 'Username',
           description: 'Your public username',
@@ -568,10 +553,7 @@ describe('extensionSettings', () => {
     });
 
     it('should return combined contents from workspace .env and keychain for WORKSPACE scope', async () => {
-      const workspaceEnvPath = path.join(
-        tempWorkspaceDir,
-        EXTENSION_SETTINGS_FILENAME,
-      );
+      const workspaceEnvPath = path.join(tempWorkspaceDir, EXTENSION_SETTINGS_FILENAME);
       await fsPromises.writeFile(workspaceEnvPath, 'VAR1=workspace-value1');
       const workspaceKeychain = new KeychainTokenStorage(
         `Sparkle CLI Extensions test-ext 12345 ${tempWorkspaceDir}`,
@@ -592,10 +574,7 @@ describe('extensionSettings', () => {
     });
 
     it('should ignore .env if it is a directory', async () => {
-      const workspaceEnvPath = path.join(
-        tempWorkspaceDir,
-        EXTENSION_SETTINGS_FILENAME,
-      );
+      const workspaceEnvPath = path.join(tempWorkspaceDir, EXTENSION_SETTINGS_FILENAME);
       fs.mkdirSync(workspaceEnvPath);
       const workspaceKeychain = new KeychainTokenStorage(
         `Sparkle CLI Extensions test-ext 12345 ${tempWorkspaceDir}`,
@@ -630,31 +609,21 @@ describe('extensionSettings', () => {
     it('should merge user and workspace settings, with workspace taking precedence', async () => {
       // User settings
       const userEnvPath = path.join(extensionDir, EXTENSION_SETTINGS_FILENAME);
-      await fsPromises.writeFile(
-        userEnvPath,
-        'VAR1=user-value1\nVAR3=user-value3',
-      );
+      await fsPromises.writeFile(userEnvPath, 'VAR1=user-value1\nVAR3=user-value3');
       const userKeychain = new KeychainTokenStorage(
         `Sparkle CLI Extensions test-ext ${extensionId}`,
       );
       await userKeychain.setSecret('VAR2', 'user-secret2');
 
       // Workspace settings
-      const workspaceEnvPath = path.join(
-        tempWorkspaceDir,
-        EXTENSION_SETTINGS_FILENAME,
-      );
+      const workspaceEnvPath = path.join(tempWorkspaceDir, EXTENSION_SETTINGS_FILENAME);
       await fsPromises.writeFile(workspaceEnvPath, 'VAR1=workspace-value1');
       const workspaceKeychain = new KeychainTokenStorage(
         `Sparkle CLI Extensions test-ext ${extensionId} ${tempWorkspaceDir}`,
       );
       await workspaceKeychain.setSecret('VAR2', 'workspace-secret2');
 
-      const contents = await getEnvContents(
-        config,
-        extensionId,
-        tempWorkspaceDir,
-      );
+      const contents = await getEnvContents(config, extensionId, tempWorkspaceDir);
 
       expect(contents).toEqual({
         VAR1: 'workspace-value1',
@@ -772,9 +741,7 @@ describe('extensionSettings', () => {
       const workspaceKeychain = new KeychainTokenStorage(
         `Sparkle CLI Extensions test-ext 12345 ${tempWorkspaceDir}`,
       );
-      expect(await workspaceKeychain.getSecret('VAR2')).toBe(
-        'new-workspace-secret',
-      );
+      expect(await workspaceKeychain.getSecret('VAR2')).toBe('new-workspace-secret');
     });
 
     it('should leave existing, unmanaged .env variables intact when updating in WORKSPACE scope', async () => {
@@ -796,10 +763,7 @@ describe('extensionSettings', () => {
       );
 
       // Read the .env file after update
-      const actualContent = await fsPromises.readFile(
-        workspaceEnvPath,
-        'utf-8',
-      );
+      const actualContent = await fsPromises.readFile(workspaceEnvPath, 'utf-8');
 
       // Assert that original variables are intact and extension variable is updated
       expect(actualContent).toContain('PROJECT_VAR_1=value_1');

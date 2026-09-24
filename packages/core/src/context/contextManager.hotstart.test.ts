@@ -16,10 +16,7 @@ describe('ContextManager - Hot Start Calibration', () => {
   it('should not perform calibration if the buffer is empty', async () => {
     const mockLlm = createMockLlmClient();
     const config = createMockContextConfig(undefined, mockLlm);
-    const { contextManager } = setupContextComponentTest(
-      config,
-      stressTestProfile,
-    );
+    const { contextManager } = setupContextComponentTest(config, stressTestProfile);
 
     // We can spy on the underlying mock LLM client countTokens
     const countTokensSpy = vi.spyOn(mockLlm, 'countTokens');

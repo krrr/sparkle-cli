@@ -362,12 +362,8 @@ describe('useToolScheduler', () => {
 
     const [toolCalls] = result.current;
     expect(toolCalls).toHaveLength(2);
-    expect(
-      toolCalls.find((t) => t.request.callId === 'call-root'),
-    ).toBeDefined();
-    expect(
-      toolCalls.find((t) => t.request.callId === 'call-sub'),
-    ).toBeDefined();
+    expect(toolCalls.find((t) => t.request.callId === 'call-root')).toBeDefined();
+    expect(toolCalls.find((t) => t.request.callId === 'call-sub')).toBeDefined();
 
     act(() => {
       const [, , , setToolCalls] = result.current;
@@ -636,9 +632,7 @@ describe('useToolScheduler', () => {
     });
 
     expect(result.current[0][0].subagentHistory).toHaveLength(1);
-    expect(result.current[0][0].subagentHistory![0].content).toBe(
-      'Thinking...',
-    );
+    expect(result.current[0][0].subagentHistory![0].content).toBe('Thinking...');
 
     act(() => {
       void mockMessageBus.publish({
@@ -654,9 +648,7 @@ describe('useToolScheduler', () => {
     });
 
     expect(result.current[0][0].subagentHistory).toHaveLength(2);
-    expect(result.current[0][0].subagentHistory![1].content).toBe(
-      'Calling tool',
-    );
+    expect(result.current[0][0].subagentHistory![1].content).toBe('Calling tool');
   });
 
   it('replaces SUBAGENT_ACTIVITY events by ID instead of appending', async () => {
@@ -703,9 +695,7 @@ describe('useToolScheduler', () => {
     });
 
     expect(result.current[0][0].subagentHistory).toHaveLength(1);
-    expect(result.current[0][0].subagentHistory![0].content).toBe(
-      'Thinking...',
-    );
+    expect(result.current[0][0].subagentHistory![0].content).toBe('Thinking...');
 
     // Publish same ID with updated content
     act(() => {
@@ -723,9 +713,7 @@ describe('useToolScheduler', () => {
 
     // Should still be length 1, and content should be updated
     expect(result.current[0][0].subagentHistory).toHaveLength(1);
-    expect(result.current[0][0].subagentHistory![0].content).toBe(
-      'Thinking... Done!',
-    );
+    expect(result.current[0][0].subagentHistory![0].content).toBe('Thinking... Done!');
     expect(result.current[0][0].subagentHistory![0].status).toBe(
       SubagentState.COMPLETED,
     );

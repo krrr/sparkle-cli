@@ -13,10 +13,7 @@ import {
   type PolicyUpdateConfirmationRequest,
 } from 'sparkle-cli-core';
 import { theme } from '../semantic-colors.js';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
@@ -109,11 +106,7 @@ export const PolicyUpdateDialog: React.FC<PolicyUpdateDialogProps> = ({
           </Text>
         </Box>
 
-        <RadioButtonSelect
-          items={options}
-          onSelect={handleSelect}
-          isFocused={true}
-        />
+        <RadioButtonSelect items={options} onSelect={handleSelect} isFocused={true} />
       </Box>
     </Box>
   );

@@ -59,9 +59,7 @@ describe('useHistoryManager', () => {
   });
 
   it('should ensure new IDs start after existing IDs when resuming a session', async () => {
-    const initialItems: HistoryItem[] = [
-      { id: 5000, type: 'info', text: 'Existing' },
-    ];
+    const initialItems: HistoryItem[] = [{ id: 5000, type: 'info', text: 'Existing' }];
     const { result } = await renderHook(() => useHistory({ initialItems }));
 
     let newId!: number;

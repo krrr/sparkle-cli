@@ -5,11 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  PolicyDecision,
-  ApprovalMode,
-  PRIORITY_SUBAGENT_TOOL,
-} from './types.js';
+import { PolicyDecision, ApprovalMode, PRIORITY_SUBAGENT_TOOL } from './types.js';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as os from 'node:os';
@@ -93,12 +89,8 @@ priority = 100
       expect(result.rules).toHaveLength(2);
       expect(result.rules[0].toolName).toBe('run_shell_command');
       expect(result.rules[1].toolName).toBe('run_shell_command');
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git status"}'),
-      ).toBe(true);
-      expect(result.rules[1].argsPattern?.test('{"command":"git log"}')).toBe(
-        true,
-      );
+      expect(result.rules[0].argsPattern?.test('{"command":"git status"}')).toBe(true);
+      expect(result.rules[1].argsPattern?.test('{"command":"git log"}')).toBe(true);
       expect(result.errors).toHaveLength(0);
     });
 
@@ -159,15 +151,11 @@ priority = 100
 `);
 
       expect(result.rules).toHaveLength(1);
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git status"}'),
-      ).toBe(true);
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git log --all"}'),
-      ).toBe(true);
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git branch"}'),
-      ).toBe(false);
+      expect(result.rules[0].argsPattern?.test('{"command":"git status"}')).toBe(true);
+      expect(result.rules[0].argsPattern?.test('{"command":"git log --all"}')).toBe(
+        true,
+      );
+      expect(result.rules[0].argsPattern?.test('{"command":"git branch"}')).toBe(false);
       expect(result.errors).toHaveLength(0);
     });
 
@@ -183,9 +171,7 @@ priority = 100
       expect(result.rules).toHaveLength(1);
       // The generated pattern is "command":"^git status
       // This will NOT match '{"command":"git status"}' because of the '{"' at the start.
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git status"}'),
-      ).toBe(false);
+      expect(result.rules[0].argsPattern?.test('{"command":"git status"}')).toBe(false);
       expect(result.errors).toHaveLength(0);
     });
 
@@ -198,11 +184,7 @@ priority = 100
 `);
 
       expect(result.rules).toHaveLength(3);
-      expect(result.rules.map((r) => r.toolName)).toEqual([
-        'glob',
-        'grep',
-        'read',
-      ]);
+      expect(result.rules.map((r) => r.toolName)).toEqual(['glob', 'grep', 'read']);
       expect(getErrors(result)).toHaveLength(0);
     });
 
@@ -216,12 +198,8 @@ priority = 100
 `);
 
       expect(result.rules).toHaveLength(2);
-      expect(result.rules[0].toolName).toBe(
-        'mcp_google-workspace_calendar.list',
-      );
-      expect(result.rules[1].toolName).toBe(
-        'mcp_google-workspace_calendar.get',
-      );
+      expect(result.rules[0].toolName).toBe('mcp_google-workspace_calendar.list');
+      expect(result.rules[1].toolName).toBe('mcp_google-workspace_calendar.get');
       expect(result.errors).toHaveLength(0);
     });
 
@@ -415,12 +393,12 @@ priority = 100
 
       expect(result.rules).toHaveLength(1);
       // The regex should have escaped the * and .
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git log file.txt"}'),
-      ).toBe(false);
-      expect(
-        result.rules[0].argsPattern?.test('{"command":"git log *.txt"}'),
-      ).toBe(true);
+      expect(result.rules[0].argsPattern?.test('{"command":"git log file.txt"}')).toBe(
+        false,
+      );
+      expect(result.rules[0].argsPattern?.test('{"command":"git log *.txt"}')).toBe(
+        true,
+      );
       expect(result.errors).toHaveLength(0);
     });
 
@@ -865,10 +843,7 @@ priority = 100
         const getPolicyTier = () => 1; // Default tier
 
         // 1. Load the actual Plan Mode policies
-        const result = await loadPoliciesFromToml(
-          [tempPolicyDir],
-          getPolicyTier,
-        );
+        const result = await loadPoliciesFromToml([tempPolicyDir], getPolicyTier);
         expect(result.errors).toHaveLength(0);
 
         // Verify annotation rule was loaded correctly
@@ -895,10 +870,7 @@ priority = 100
             r.toolName === '*' &&
             r.denyMessage?.includes('Plan Mode'),
         );
-        expect(
-          denyRule,
-          'Should have loaded the catch-all deny rule',
-        ).toBeDefined();
+        expect(denyRule, 'Should have loaded the catch-all deny rule').toBeDefined();
         // Priority 40 in tier 1 => 1.040
         expect(denyRule!.priority).toBe(1.04);
 
@@ -969,11 +941,7 @@ priority = 100
 
     it('should override default subagent rules when in Plan Mode for unknown subagents', async () => {
       const planTomlPath = path.resolve(__dirname, 'policies', 'plan.toml');
-      const readOnlyTomlPath = path.resolve(
-        __dirname,
-        'policies',
-        'read-only.toml',
-      );
+      const readOnlyTomlPath = path.resolve(__dirname, 'policies', 'read-only.toml');
       const planContent = await fs.readFile(planTomlPath, 'utf-8');
       const readOnlyContent = await fs.readFile(readOnlyTomlPath, 'utf-8');
 
@@ -982,17 +950,11 @@ priority = 100
       );
       try {
         await fs.writeFile(path.join(tempPolicyDir, 'plan.toml'), planContent);
-        await fs.writeFile(
-          path.join(tempPolicyDir, 'read-only.toml'),
-          readOnlyContent,
-        );
+        await fs.writeFile(path.join(tempPolicyDir, 'read-only.toml'), readOnlyContent);
         const getPolicyTier = () => 1; // Default tier
 
         // 1. Load the actual Plan Mode policies
-        const result = await loadPoliciesFromToml(
-          [tempPolicyDir],
-          getPolicyTier,
-        );
+        const result = await loadPoliciesFromToml([tempPolicyDir], getPolicyTier);
 
         // 2. Initialize Policy Engine with these rules
         const engine = new PolicyEngine({
@@ -1048,10 +1010,9 @@ priority = 100
           { name: 'invoke_agent', args: { agent_name: 'cli_help' } },
           undefined,
         );
-        expect(
-          cliHelpResult.decision,
-          'cli_help should be ALLOWED in Plan Mode',
-        ).toBe(PolicyDecision.ALLOW);
+        expect(cliHelpResult.decision, 'cli_help should be ALLOWED in Plan Mode').toBe(
+          PolicyDecision.ALLOW,
+        );
 
         // 7. Verify MCP resource tools are ALLOWED
         const listMcpResult = await engine.check(

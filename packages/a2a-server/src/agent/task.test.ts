@@ -45,12 +45,7 @@ describe('Task', () => {
 
     // The Task constructor is private. We'll bypass it for this unit test.
     // @ts-expect-error - Calling private constructor for test purposes.
-    const task = new Task(
-      'task-id',
-      'context-id',
-      mockConfig as Config,
-      mockEventBus,
-    );
+    const task = new Task('task-id', 'context-id', mockConfig as Config, mockEventBus);
 
     task['setTaskStateAndPublishUpdate'] = vi.fn();
     task['getProposedContent'] = vi.fn().mockResolvedValue('new content');
@@ -608,9 +603,7 @@ describe('Task', () => {
 
       const otherEvent: ToolCallsUpdateMessage = {
         type: MessageBusType.TOOL_CALLS_UPDATE,
-        toolCalls: [
-          { request: { callId: '1' }, status: 'executing' } as ToolCall,
-        ],
+        toolCalls: [{ request: { callId: '1' }, status: 'executing' } as ToolCall],
         schedulerId: 'other-task-id',
       };
 
@@ -620,9 +613,7 @@ describe('Task', () => {
 
       const ownEvent: ToolCallsUpdateMessage = {
         type: MessageBusType.TOOL_CALLS_UPDATE,
-        toolCalls: [
-          { request: { callId: '1' }, status: 'executing' } as ToolCall,
-        ],
+        toolCalls: [{ request: { callId: '1' }, status: 'executing' } as ToolCall],
         schedulerId: 'task-id',
       };
 
@@ -787,11 +778,7 @@ describe('Task', () => {
         const oldString = 'line2\n';
         const newString = 'line2-optimized\n';
 
-        const result = await task['getProposedContent'](
-          tempFile,
-          oldString,
-          newString,
-        );
+        const result = await task['getProposedContent'](tempFile, oldString, newString);
 
         expect(result).toContain('line2-optimized');
         expect(result).toContain('\r\n'); // It should preserve the original CRLF line endings
@@ -828,10 +815,7 @@ describe('Task', () => {
         mockEventBus,
       );
 
-      const tempFile = path.resolve(
-        os.tmpdir(),
-        'crlf_test_file_crlf_inputs.txt',
-      );
+      const tempFile = path.resolve(os.tmpdir(), 'crlf_test_file_crlf_inputs.txt');
       const crlfContent = 'line1\r\nline2\r\nline3\r\n';
       fs.writeFileSync(tempFile, crlfContent, 'utf8');
 
@@ -839,11 +823,7 @@ describe('Task', () => {
         const oldString = 'line2\r\n';
         const newString = 'line2-optimized\r\n';
 
-        const result = await task['getProposedContent'](
-          tempFile,
-          oldString,
-          newString,
-        );
+        const result = await task['getProposedContent'](tempFile, oldString, newString);
 
         expect(result).toContain('line2-optimized');
         expect(result).toContain('\r\n'); // It should preserve the original CRLF line endings

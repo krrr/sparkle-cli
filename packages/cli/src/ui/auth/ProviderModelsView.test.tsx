@@ -59,17 +59,16 @@ describe('ProviderModelsView', () => {
   });
 
   it('handles list shortcuts for back, default, and delete', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={mockProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Press 's' to set default
     await act(async () => {
@@ -104,17 +103,16 @@ describe('ProviderModelsView', () => {
   });
 
   it('cancels delete confirmation when pressing escape without closing view', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={mockProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Arm confirmation
     await act(async () => {
@@ -145,17 +143,16 @@ describe('ProviderModelsView', () => {
       ],
     };
 
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={profileWithTwoModels}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={profileWithTwoModels}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Arm confirmation
     await act(async () => {
@@ -177,17 +174,16 @@ describe('ProviderModelsView', () => {
   });
 
   it('enters add model edit mode when pressing a', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={mockProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Press 'a' to enter add model mode
     await act(async () => {
@@ -206,17 +202,16 @@ describe('ProviderModelsView', () => {
   });
 
   it('enters edit mode for selected model when pressing e', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={mockProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Press 'e' to enter edit model mode
     await act(async () => {
@@ -234,17 +229,16 @@ describe('ProviderModelsView', () => {
   });
 
   it('saves added model from edit view and returns to list view', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={mockProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={mockProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     // Press 'a' to enter add model mode
     await act(async () => {
@@ -283,17 +277,16 @@ describe('ProviderModelsView', () => {
       models: [],
     };
 
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderModelsView
-          profile={emptyProfile}
-          onAddModel={onAddModel}
-          onUpdateModel={onUpdateModel}
-          onDeleteModel={onDeleteModel}
-          onSetDefaultModel={onSetDefaultModel}
-          onBack={onBack}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={emptyProfile}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
 
     expect(lastFrame()).toContain('No models configured for this provider.');
     expect(lastFrame()).toContain('[a] Add model');

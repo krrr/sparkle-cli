@@ -334,9 +334,7 @@ describe('AgentConfigDialog', () => {
         />,
         { settings, uiState: { mainAreaWidth: 100 } },
       );
-      await waitFor(() =>
-        expect(lastFrame()).toContain('Configure: Test Agent'),
-      );
+      await waitFor(() => expect(lastFrame()).toContain('Configure: Test Agent'));
 
       const frame = lastFrame();
       // At height 20, it should be heavily truncated and show '▼'

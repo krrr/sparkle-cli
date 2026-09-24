@@ -50,9 +50,7 @@ export class HookRegistry {
     const source = options?.source ?? ConfigSource.Runtime;
 
     if (!this.validateHookConfig(config, eventName, source)) {
-      throw new Error(
-        `Invalid hook configuration for ${eventName} from ${source}`,
-      );
+      throw new Error(`Invalid hook configuration for ${eventName} from ${source}`);
     }
 
     this.entries.push({
@@ -87,8 +85,7 @@ export class HookRegistry {
     return this.entries
       .filter((entry) => entry.eventName === eventName && entry.enabled)
       .sort(
-        (a, b) =>
-          this.getSourcePriority(a.source) - this.getSourcePriority(b.source),
+        (a, b) => this.getSourcePriority(a.source) - this.getSourcePriority(b.source),
       );
   }
 
@@ -124,9 +121,7 @@ export class HookRegistry {
   /**
    * Get hook name for identification and display purposes
    */
-  private getHookName(
-    entry: HookRegistryEntry | { config: HookConfig },
-  ): string {
+  private getHookName(entry: HookRegistryEntry | { config: HookConfig }): string {
     if (entry.config.type === 'command') {
       return entry.config.name || entry.config.command || 'unknown-command';
     }
@@ -156,10 +151,7 @@ please review the project settings (.sparkle/settings.json) and remove them.`;
         coreEvents.emitFeedback('warning', message);
 
         // Trust them so we don't warn again
-        trustedHooksManager.trustHooks(
-          this.config.getProjectRoot(),
-          projectHooks,
-        );
+        trustedHooksManager.trustHooks(this.config.getProjectRoot(), projectHooks);
       }
     } catch (error) {
       debugLogger.warn('Failed to check project hooks trust', error);
@@ -180,9 +172,7 @@ please review the project settings (.sparkle/settings.json) and remove them.`;
       if (this.config.isTrustedFolder()) {
         this.processHooksConfiguration(configHooks, ConfigSource.Project);
       } else {
-        debugLogger.warn(
-          'Project hooks disabled because the folder is not trusted.',
-        );
+        debugLogger.warn('Project hooks disabled because the folder is not trusted.');
       }
     }
 
@@ -190,10 +180,7 @@ please review the project settings (.sparkle/settings.json) and remove them.`;
     const extensions = this.config.getExtensions() || [];
     for (const extension of extensions) {
       if (extension.isActive && extension.hooks) {
-        this.processHooksConfiguration(
-          extension.hooks,
-          ConfigSource.Extensions,
-        );
+        this.processHooksConfiguration(extension.hooks, ConfigSource.Extensions);
       }
     }
   }
@@ -298,13 +285,8 @@ please review the project settings (.sparkle/settings.json) and remove them.`;
     eventName: HookEventName,
     source: ConfigSource,
   ): boolean {
-    if (
-      !config.type ||
-      !['command', 'plugin', 'runtime'].includes(config.type)
-    ) {
-      debugLogger.warn(
-        `Invalid hook ${eventName} from ${source} type: ${config.type}`,
-      );
+    if (!config.type || !['command', 'plugin', 'runtime'].includes(config.type)) {
+      debugLogger.warn(`Invalid hook ${eventName} from ${source} type: ${config.type}`);
       return false;
     }
 
@@ -316,9 +298,7 @@ please review the project settings (.sparkle/settings.json) and remove them.`;
     }
 
     if (config.type === 'runtime' && !config.name) {
-      debugLogger.warn(
-        `Runtime hook ${eventName} from ${source} missing name field`,
-      );
+      debugLogger.warn(`Runtime hook ${eventName} from ${source} missing name field`);
       return false;
     }
 

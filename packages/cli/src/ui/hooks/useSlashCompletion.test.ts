@@ -91,11 +91,7 @@ function simulateFuzzyMatching(items: readonly string[], query: string) {
       // Fuzzy matching: check if query chars appear in order
       let queryIndex = 0;
       let score = 0;
-      for (
-        let i = 0;
-        i < lowerItem.length && queryIndex < lowerQuery.length;
-        i++
-      ) {
+      for (let i = 0; i < lowerItem.length && queryIndex < lowerQuery.length; i++) {
         if (lowerItem[i] === lowerQuery[queryIndex]) {
           queryIndex++;
           score += 10 - i; // Earlier matches get higher scores
@@ -136,9 +132,7 @@ vi.mock('fzf', async () => {
       return {
         find: vi
           .fn()
-          .mockImplementation((query: string) =>
-            simulateFuzzyMatching(items, query),
-          ),
+          .mockImplementation((query: string) => simulateFuzzyMatching(items, query)),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
     }),
@@ -152,9 +146,7 @@ const createDefaultAsyncFzfMock =
     return {
       find: vi
         .fn()
-        .mockImplementation((query: string) =>
-          simulateFuzzyMatching(items, query),
-        ),
+        .mockImplementation((query: string) => simulateFuzzyMatching(items, query)),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   };
@@ -211,8 +203,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'stats',
           altNames: ['usage'],
-          description:
-            'check session stats. Usage: /stats [session|model|tools]',
+          description: 'check session stats. Usage: /stats [session|model|tools]',
         }),
         createTestCommand({ name: 'clear', description: 'Clear the screen' }),
         createTestCommand({
@@ -226,12 +217,7 @@ describe('useSlashCompletion', () => {
       ];
 
       const { result, unmount } = await renderHook(() =>
-        useTestHarnessForSlashCompletion(
-          true,
-          '/',
-          slashCommands,
-          mockCommandContext,
-        ),
+        useTestHarnessForSlashCompletion(true, '/', slashCommands, mockCommandContext),
       );
 
       await resolveMatch();
@@ -287,8 +273,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'stats',
           altNames: ['usage'],
-          description:
-            'check session stats. Usage: /stats [session|model|tools]',
+          description: 'check session stats. Usage: /stats [session|model|tools]',
         }),
       ];
 
@@ -308,8 +293,7 @@ describe('useSlashCompletion', () => {
           {
             label: 'stats',
             value: 'stats',
-            description:
-              'check session stats. Usage: /stats [session|model|tools]',
+            description: 'check session stats. Usage: /stats [session|model|tools]',
             commandKind: CommandKind.BUILT_IN,
           },
         ]);
@@ -359,8 +343,7 @@ describe('useSlashCompletion', () => {
           createTestCommand({
             name: 'stats',
             altNames: ['usage'],
-            description:
-              'check session stats. Usage: /stats [session|model|tools]',
+            description: 'check session stats. Usage: /stats [session|model|tools]',
             action: vi.fn(),
           }),
         ];
@@ -460,14 +443,13 @@ describe('useSlashCompletion', () => {
         }),
       ];
 
-      const { result: chatResult, unmount: unmountChat } = await renderHook(
-        () =>
-          useTestHarnessForSlashCompletion(
-            true,
-            '/chat ',
-            slashCommands,
-            mockCommandContext,
-          ),
+      const { result: chatResult, unmount: unmountChat } = await renderHook(() =>
+        useTestHarnessForSlashCompletion(
+          true,
+          '/chat ',
+          slashCommands,
+          mockCommandContext,
+        ),
       );
 
       await resolveMatch();
@@ -480,14 +462,13 @@ describe('useSlashCompletion', () => {
         });
       });
 
-      const { result: resumeResult, unmount: unmountResume } = await renderHook(
-        () =>
-          useTestHarnessForSlashCompletion(
-            true,
-            '/resume ',
-            slashCommands,
-            mockCommandContext,
-          ),
+      const { result: resumeResult, unmount: unmountResume } = await renderHook(() =>
+        useTestHarnessForSlashCompletion(
+          true,
+          '/resume ',
+          slashCommands,
+          mockCommandContext,
+        ),
       );
 
       await resolveMatch();
@@ -539,15 +520,15 @@ describe('useSlashCompletion', () => {
         }),
       ];
 
-      const { result: chatAliasResult, unmount: unmountChatAlias } =
-        await renderHook(() =>
+      const { result: chatAliasResult, unmount: unmountChatAlias } = await renderHook(
+        () =>
           useTestHarnessForSlashCompletion(
             true,
             '/chat ',
             slashCommands,
             mockCommandContext,
           ),
-        );
+      );
 
       await resolveMatch();
 
@@ -559,14 +540,13 @@ describe('useSlashCompletion', () => {
         });
       });
 
-      const { result: resumeResult, unmount: unmountResume } = await renderHook(
-        () =>
-          useTestHarnessForSlashCompletion(
-            true,
-            '/resume ',
-            slashCommands,
-            mockCommandContext,
-          ),
+      const { result: resumeResult, unmount: unmountResume } = await renderHook(() =>
+        useTestHarnessForSlashCompletion(
+          true,
+          '/resume ',
+          slashCommands,
+          mockCommandContext,
+        ),
       );
 
       await resolveMatch();
@@ -597,9 +577,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'chat',
           description: 'Manage chat history',
-          subCommands: [
-            createTestCommand({ name: 'list', description: 'List chats' }),
-          ],
+          subCommands: [createTestCommand({ name: 'list', description: 'List chats' })],
         }),
       ];
 
@@ -629,9 +607,7 @@ describe('useSlashCompletion', () => {
         createTestCommand({
           name: 'chat',
           description: 'Manage chat history',
-          subCommands: [
-            createTestCommand({ name: 'list', description: 'List chats' }),
-          ],
+          subCommands: [createTestCommand({ name: 'list', description: 'List chats' })],
         }),
       ];
 
@@ -672,12 +648,7 @@ describe('useSlashCompletion', () => {
       ];
 
       const { result, unmount } = await renderHook(() =>
-        useTestHarnessForSlashCompletion(
-          true,
-          '/?',
-          slashCommands,
-          mockCommandContext,
-        ),
+        useTestHarnessForSlashCompletion(true, '/?', slashCommands, mockCommandContext),
       );
 
       await resolveMatch();
@@ -818,12 +789,7 @@ describe('useSlashCompletion', () => {
       ];
 
       const { result, unmount } = await renderHook(() =>
-        useTestHarnessForSlashCompletion(
-          true,
-          '/',
-          slashCommands,
-          mockCommandContext,
-        ),
+        useTestHarnessForSlashCompletion(true, '/', slashCommands, mockCommandContext),
       );
 
       await resolveMatch();
@@ -1076,20 +1042,14 @@ describe('useSlashCompletion', () => {
 
   describe('Argument Completion', () => {
     it('should call the command.completion function for argument suggestions', async () => {
-      const availableTags = [
-        'my-chat-tag-1',
-        'my-chat-tag-2',
-        'another-channel',
-      ];
+      const availableTags = ['my-chat-tag-1', 'my-chat-tag-2', 'another-channel'];
       let deferredCompletion: { resolve: (v: string[]) => void } | null = null;
       const mockCompletionFn = vi.fn().mockImplementation(
         (_context: CommandContext, partialArg: string) =>
           new Promise((resolve) => {
             deferredCompletion = {
               resolve: () =>
-                resolve(
-                  availableTags.filter((tag) => tag.startsWith(partialArg)),
-                ),
+                resolve(availableTags.filter((tag) => tag.startsWith(partialArg))),
             };
           }),
       );
@@ -1151,8 +1111,7 @@ describe('useSlashCompletion', () => {
         () =>
           new Promise((resolve) => {
             deferredCompletion = {
-              resolve: () =>
-                resolve(['my-chat-tag-1', 'my-chat-tag-2', 'my-channel']),
+              resolve: () => resolve(['my-chat-tag-1', 'my-chat-tag-2', 'my-channel']),
             };
           }),
       );
@@ -1260,12 +1219,7 @@ describe('useSlashCompletion', () => {
       ] as SlashCommand[];
 
       const { result, unmount } = await renderHook(() =>
-        useTestHarnessForSlashCompletion(
-          true,
-          '/',
-          slashCommands,
-          mockCommandContext,
-        ),
+        useTestHarnessForSlashCompletion(true, '/', slashCommands, mockCommandContext),
       );
 
       await resolveMatch();

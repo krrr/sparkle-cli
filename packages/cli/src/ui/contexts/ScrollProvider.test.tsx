@@ -5,11 +5,7 @@
  */
 
 import { render } from '../../test-utils/render.js';
-import {
-  ScrollProvider,
-  useScrollable,
-  type ScrollState,
-} from './ScrollProvider.js';
+import { ScrollProvider, useScrollable, type ScrollState } from './ScrollProvider.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useRef, useImperativeHandle, forwardRef, type RefObject } from 'react';
 import { Box, type DOMElement } from 'ink';
@@ -538,9 +534,7 @@ describe('ScrollProvider', () => {
         innerHeight: 10,
       }));
 
-      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(
-        false,
-      );
+      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(false);
 
       await render(
         <ScrollProvider>
@@ -574,10 +568,7 @@ describe('ScrollProvider', () => {
       await vi.runAllTimersAsync();
 
       // We sum all calls to scrollBy as they might have been flushed individually due to advanceTimersByTime
-      const totalDelta = scrollBy.mock.calls.reduce(
-        (sum, call) => sum + call[0],
-        0,
-      );
+      const totalDelta = scrollBy.mock.calls.reduce((sum, call) => sum + call[0], 0);
       expect(totalDelta).toBeGreaterThan(60);
       expect(totalDelta).toBe(150);
     });
@@ -590,9 +581,7 @@ describe('ScrollProvider', () => {
         innerHeight: 10,
       }));
 
-      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(
-        true,
-      );
+      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(true);
 
       await render(
         <ScrollProvider>
@@ -624,10 +613,7 @@ describe('ScrollProvider', () => {
       await vi.runAllTimersAsync();
 
       // No acceleration means 60 scrolls = delta 60
-      const totalDelta = scrollBy.mock.calls.reduce(
-        (sum, call) => sum + call[0],
-        0,
-      );
+      const totalDelta = scrollBy.mock.calls.reduce((sum, call) => sum + call[0], 0);
       expect(totalDelta).toBe(60);
     });
 
@@ -639,9 +625,7 @@ describe('ScrollProvider', () => {
         innerHeight: 10,
       }));
 
-      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(
-        false,
-      );
+      vi.mocked(terminalCapabilityManager.isGhosttyTerminal).mockReturnValue(false);
 
       await render(
         <ScrollProvider>
@@ -674,10 +658,7 @@ describe('ScrollProvider', () => {
       await vi.runAllTimersAsync();
 
       // No acceleration because gaps were too large
-      const totalDelta = scrollBy.mock.calls.reduce(
-        (sum, call) => sum + call[0],
-        0,
-      );
+      const totalDelta = scrollBy.mock.calls.reduce((sum, call) => sum + call[0], 0);
       expect(totalDelta).toBe(60);
     });
   });

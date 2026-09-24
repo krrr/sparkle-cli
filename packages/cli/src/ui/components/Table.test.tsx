@@ -19,10 +19,7 @@ describe('Table', () => {
       { id: 2, name: 'Bob' },
     ];
 
-    const renderResult = await render(
-      <Table columns={columns} data={data} />,
-      100,
-    );
+    const renderResult = await render(<Table columns={columns} data={data} />, 100);
     const { lastFrame } = renderResult;
     const output = lastFrame();
 
@@ -48,10 +45,7 @@ describe('Table', () => {
     ];
     const data = [{ value: 10 }];
 
-    const renderResult = await render(
-      <Table columns={columns} data={data} />,
-      100,
-    );
+    const renderResult = await render(<Table columns={columns} data={data} />, 100);
     const { lastFrame } = renderResult;
     const output = lastFrame();
 
@@ -62,10 +56,7 @@ describe('Table', () => {
   it('should handle undefined values gracefully', async () => {
     const columns = [{ key: 'name', header: 'Name', flexGrow: 1 }];
     const data: Array<{ name: string | undefined }> = [{ name: undefined }];
-    const { lastFrame } = await render(
-      <Table columns={columns} data={data} />,
-      100,
-    );
+    const { lastFrame } = await render(<Table columns={columns} data={data} />, 100);
     const output = lastFrame();
     expect(output).toContain('undefined');
   });
@@ -76,17 +67,12 @@ describe('Table', () => {
         key: 'status',
         header: 'Status',
         flexGrow: 1,
-        renderCell: (item: { status: string }) => (
-          <Text inverse>{item.status}</Text>
-        ),
+        renderCell: (item: { status: string }) => <Text inverse>{item.status}</Text>,
       },
     ];
     const data = [{ status: 'Active' }];
 
-    const renderResult = await render(
-      <Table columns={columns} data={data} />,
-      100,
-    );
+    const renderResult = await render(<Table columns={columns} data={data} />, 100);
     const { lastFrame } = renderResult;
     const output = lastFrame();
 

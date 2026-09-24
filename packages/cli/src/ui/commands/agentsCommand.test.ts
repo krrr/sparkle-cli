@@ -149,9 +149,7 @@ describe('agentsCommand', () => {
     expect(result.content).toContain('- New: new-agent');
     expect(result.content).toContain('- Updated: updated-agent');
     expect(result.content).toContain('- Deleted: deleted-agent');
-    expect(result.content).toContain(
-      'Run /agents list to see all available agents.',
-    );
+    expect(result.content).toContain('Run /agents list to see all available agents.');
   });
 
   it('should show "reloaded with errors" if errors occurred during reload', async () => {
@@ -242,9 +240,7 @@ describe('agentsCommand', () => {
   });
 
   it('should handle no-op when enabling an agent', async () => {
-    mockConfig
-      .getAgentRegistry()
-      .getAllAgentNames.mockReturnValue(['test-agent']);
+    mockConfig.getAgentRegistry().getAllAgentNames.mockReturnValue(['test-agent']);
 
     const enableCommand = agentsCommand.subCommands?.find(
       (cmd) => cmd.name === 'enable',
@@ -301,9 +297,7 @@ describe('agentsCommand', () => {
       modifiedScopes: [],
       alreadyInStateScopes: [],
     });
-    vi.mocked(renderAgentActionFeedback).mockReturnValue(
-      'Disabled test-agent.',
-    );
+    vi.mocked(renderAgentActionFeedback).mockReturnValue('Disabled test-agent.');
 
     const disableCommand = agentsCommand.subCommands?.find(
       (cmd) => cmd.name === 'disable',

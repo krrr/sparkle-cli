@@ -48,11 +48,7 @@ function findSourceFiles(dir, allFiles = []) {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     // Simple check to avoid recursing into node_modules or build dir itself
-    if (
-      entry.isDirectory() &&
-      entry.name !== 'node_modules' &&
-      fullPath !== buildDir
-    ) {
+    if (entry.isDirectory() && entry.name !== 'node_modules' && fullPath !== buildDir) {
       findSourceFiles(fullPath, allFiles);
     } else if (entry.isFile()) {
       allFiles.push(fullPath);

@@ -26,8 +26,7 @@ test('ResultCache cache hit/miss', async () => {
   const files = ['foo.txt', 'bar.js', 'baz.md'];
   const cache = new ResultCache(files);
   // First call: miss
-  const { files: result1Files, isExactMatch: isExactMatch1 } =
-    await cache.get('*.js');
+  const { files: result1Files, isExactMatch: isExactMatch1 } = await cache.get('*.js');
   expect(result1Files).toEqual(files);
   expect(isExactMatch1).toBe(false);
 
@@ -35,8 +34,7 @@ test('ResultCache cache hit/miss', async () => {
   cache.set('*.js', ['bar.js']);
 
   // Second call: hit
-  const { files: result2Files, isExactMatch: isExactMatch2 } =
-    await cache.get('*.js');
+  const { files: result2Files, isExactMatch: isExactMatch2 } = await cache.get('*.js');
   expect(result2Files).toEqual(['bar.js']);
   expect(isExactMatch2).toBe(true);
 });

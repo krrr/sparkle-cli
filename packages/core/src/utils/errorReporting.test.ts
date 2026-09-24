@@ -23,9 +23,7 @@ describe('reportError', () => {
     // Create a temporary directory for logs
     testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-report-test-'));
     vi.resetAllMocks();
-    debugLoggerErrorSpy = vi
-      .spyOn(debugLogger, 'error')
-      .mockImplementation(() => {});
+    debugLoggerErrorSpy = vi.spyOn(debugLogger, 'error').mockImplementation(() => {});
     vi.spyOn(Date.prototype, 'toISOString').mockReturnValue(MOCK_TIMESTAMP);
   });
 
@@ -123,10 +121,7 @@ describe('reportError', () => {
       'Original error that triggered report generation:',
       error,
     );
-    expect(debugLoggerErrorSpy).toHaveBeenCalledWith(
-      'Original context:',
-      context,
-    );
+    expect(debugLoggerErrorSpy).toHaveBeenCalledWith('Original context:', context);
   });
 
   it('should handle stringification failure of report content (e.g. BigInt in context)', async () => {
@@ -135,9 +130,7 @@ describe('reportError', () => {
     const baseMessage = 'Failed operation with BigInt.';
     const context = { a: BigInt(1) }; // BigInt cannot be stringified by JSON.stringify
     const type = 'bigint-fail';
-    const stringifyError = new TypeError(
-      'Do not know how to serialize a BigInt',
-    );
+    const stringifyError = new TypeError('Do not know how to serialize a BigInt');
     const expectedMinimalReportPath = getExpectedReportPath(type);
 
     // Simulate JSON.stringify throwing an error for the full report

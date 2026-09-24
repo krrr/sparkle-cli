@@ -60,9 +60,7 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
     }
     const allNamesTheSame = new Set(contextFileNames).size < 2;
     const name = allNamesTheSame ? contextFileNames[0] : 'context';
-    return `${geminiMdFileCount} ${name} file${
-      geminiMdFileCount > 1 ? 's' : ''
-    }`;
+    return `${geminiMdFileCount} ${name} file${geminiMdFileCount > 1 ? 's' : ''}`;
   })();
 
   const mcpText = (() => {
@@ -72,9 +70,7 @@ export const ContextSummaryDisplay: React.FC<ContextSummaryDisplayProps> = ({
 
     const parts = [];
     if (mcpServerCount > 0) {
-      parts.push(
-        `${mcpServerCount} MCP server${mcpServerCount > 1 ? 's' : ''}`,
-      );
+      parts.push(`${mcpServerCount} MCP server${mcpServerCount > 1 ? 's' : ''}`);
     }
 
     if (blockedMcpServerCount > 0) {

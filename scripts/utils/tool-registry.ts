@@ -30,10 +30,7 @@ export interface ToolRegistry {
   aliasLookup: ReadonlyMap<string, string>;
 }
 
-const TOOL_CATEGORIES: Record<
-  (typeof ALL_BUILTIN_TOOL_NAMES)[number],
-  ToolCategory
-> = {
+const TOOL_CATEGORIES: Record<(typeof ALL_BUILTIN_TOOL_NAMES)[number], ToolCategory> = {
   glob: 'file-system',
   grep_search: 'file-system',
   list_directory: 'file-system',
@@ -78,9 +75,7 @@ export function buildToolRegistry(): ToolRegistry {
     const category = TOOL_CATEGORIES[name];
     const aliases: string[] = [];
 
-    for (const [legacyName, canonicalName] of Object.entries(
-      TOOL_LEGACY_ALIASES,
-    )) {
+    for (const [legacyName, canonicalName] of Object.entries(TOOL_LEGACY_ALIASES)) {
       if (canonicalName === name) {
         aliases.push(legacyName);
         aliasLookup.set(legacyName, name);
@@ -131,10 +126,7 @@ export function buildToolRegistry(): ToolRegistry {
     }
   }
 
-  const frozenCategories = new Map<
-    ToolCategory,
-    readonly ToolRegistryEntry[]
-  >();
+  const frozenCategories = new Map<ToolCategory, readonly ToolRegistryEntry[]>();
   for (const [cat, entries] of categoryGroups) {
     frozenCategories.set(cat, Object.freeze(entries));
   }

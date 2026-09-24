@@ -1,8 +1,8 @@
 # Release confidence checklist
 
-This document is a quality gate for releasing a new version of Sparkle CLI. It
-answers the question, "Is this release ready?" with a mix of automated checks
-and manual verification.
+This document is a quality gate for releasing a new version of Sparkle CLI. It answers
+the question, "Is this release ready?" with a mix of automated checks and manual
+verification.
 
 ## Level 1: Automated gates (must pass)
 
@@ -16,8 +16,7 @@ All workflows in `.github/workflows/ci.yml` must pass on the `main` branch:
 - **Checks:**
   - **Linting:** No linting errors (ESLint, Prettier, etc.).
   - **Typechecking:** No TypeScript errors.
-  - **Unit tests:** All unit tests in `packages/core` and `packages/cli` must
-    pass.
+  - **Unit tests:** All unit tests in `packages/core` and `packages/cli` must pass.
   - **Build:** The project must build and bundle successfully.
 
 ### End-to-end (E2E) tests
@@ -25,22 +24,22 @@ All workflows in `.github/workflows/ci.yml` must pass on the `main` branch:
 All workflows in `.github/workflows/chained_e2e.yml` must pass.
 
 - **Platforms:** **Linux, macOS and Windows**.
-- **Sandboxing:** Tests must pass with both `sandbox:none` and `sandbox:docker`
-  on Linux.
+- **Sandboxing:** Tests must pass with both `sandbox:none` and `sandbox:docker` on
+  Linux.
 
 ### Post-deployment smoke test
 
-After a release is published to npm, the `smoke-test.yml` workflow runs. It must
-pass to confirm the package is installable and the binary is executable.
+After a release is published to npm, the `smoke-test.yml` workflow runs. It must pass to
+confirm the package is installable and the binary is executable.
 
-- **Command:** `npx -y sparkle-cli@latest --version` must return the correct
-  version without error.
+- **Command:** `npx -y sparkle-cli@latest --version` must return the correct version
+  without error.
 - **Platform:** Currently runs on `ubuntu-latest`.
 
 ## Level 2: Manual verification
 
-Automated tests cannot catch everything, especially UX issues. Before releasing,
-run through this checklist on the release candidate:
+Automated tests cannot catch everything, especially UX issues. Before releasing, run
+through this checklist on the release candidate:
 
 - **Setup:**
 
@@ -64,8 +63,8 @@ run through this checklist on the release candidate:
 
 - **Context management:**
 
-  - [ ] In interactive mode, use `@file` to add a local file to context. Ask a
-        question about it.
+  - [ ] In interactive mode, use `@file` to add a local file to context. Ask a question
+        about it.
 
 - **Settings:**
 
@@ -74,16 +73,15 @@ run through this checklist on the release candidate:
 
 - **Function calling:**
 
-  - [ ] In interactive mode, ask sparkle to "create a file named hello.md with
-        the content 'hello world'" and verify the file is created correctly.
+  - [ ] In interactive mode, ask sparkle to "create a file named hello.md with the
+        content 'hello world'" and verify the file is created correctly.
 
-If any of these checks fail, fix the issue and cut a new patch release before
-shipping.
+If any of these checks fail, fix the issue and cut a new patch release before shipping.
 
 ## The "go/no-go" decision
 
 1.  [ ] **Level 1:** CI and E2E workflows are green for the release commit.
-2.  [ ] **Level 2:** The manual verification checklist has been completed with
-        no blocking issues.
+2.  [ ] **Level 2:** The manual verification checklist has been completed with no
+        blocking issues.
 
 If all checks pass, proceed with the release.

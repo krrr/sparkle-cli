@@ -43,9 +43,7 @@ interface SessionFileCandidate {
 }
 
 function isSupportedSessionFile(fileName: string): boolean {
-  return (
-    fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl')
-  );
+  return fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl');
 }
 
 async function listSessionFileCandidates(
@@ -90,21 +88,14 @@ function normalizeToolName(name: string): string {
   return trimmed.length > 0 ? trimmed : 'unknown_tool';
 }
 
-function pushUniqueLimited(
-  target: string[],
-  value: string,
-  limit: number,
-): void {
+function pushUniqueLimited(target: string[], value: string, limit: number): void {
   if (!value || target.includes(value) || target.length >= limit) {
     return;
   }
   target.push(value);
 }
 
-function normalizePathCandidate(
-  candidate: string,
-  projectRoot: string,
-): string | null {
+function normalizePathCandidate(candidate: string, projectRoot: string): string | null {
   const trimmed = candidate.trim();
   if (
     trimmed.length === 0 ||
@@ -141,10 +132,7 @@ function collectPathsFromValue(
   keyHint?: string,
   depth = 0,
 ): void {
-  if (
-    paths.length >= MAX_SCRATCHPAD_PATHS ||
-    depth > MAX_SCRATCHPAD_PATH_DEPTH
-  ) {
+  if (paths.length >= MAX_SCRATCHPAD_PATHS || depth > MAX_SCRATCHPAD_PATH_DEPTH) {
     return;
   }
 
@@ -304,9 +292,7 @@ function buildMemoryScratchpad(
 }
 
 function hasCurrentMemoryScratchpad(session: LoadedSession): boolean {
-  return Boolean(
-    session.memoryScratchpad && session.memoryScratchpadIsStale !== true,
-  );
+  return Boolean(session.memoryScratchpad && session.memoryScratchpadIsStale !== true);
 }
 
 function hasSessionSummaryMetadata(session: LoadedSession): boolean {
@@ -341,9 +327,7 @@ async function generateAndSaveSummary(
 
   // Skip if no messages
   if (conversation.messages.length === 0) {
-    debugLogger.debug(
-      `[SessionSummary] No messages to summarize in ${sessionPath}`,
-    );
+    debugLogger.debug(`[SessionSummary] No messages to summarize in ${sessionPath}`);
     return;
   }
 
@@ -392,8 +376,7 @@ async function generateAndSaveSummary(
 
   if (
     !hasCurrentMemoryScratchpad(freshConversation) &&
-    (getLoadedMessageCount(freshConversation) !==
-      getLoadedMessageCount(conversation) ||
+    (getLoadedMessageCount(freshConversation) !== getLoadedMessageCount(conversation) ||
       freshConversation.lastUpdated !== conversation.lastUpdated)
   ) {
     const latestConversation = await loadConversationRecord(sessionPath);
@@ -425,10 +408,7 @@ async function generateAndSaveSummary(
     return;
   }
 
-  await fs.appendFile(
-    sessionPath,
-    `${JSON.stringify({ $set: metadataUpdate })}\n`,
-  );
+  await fs.appendFile(sessionPath, `${JSON.stringify({ $set: metadataUpdate })}\n`);
   debugLogger.debug(
     `[SessionSummary] Saved summary metadata for ${sessionPath}${summary ? `: "${summary}"` : ''}`,
   );
@@ -438,9 +418,7 @@ async function generateAndSaveSummary(
  * Finds the most recently updated previous session that still needs workflow metadata.
  * Returns the path if it needs a scratchpad, null otherwise.
  */
-export async function getPreviousSession(
-  config: Config,
-): Promise<string | null> {
+export async function getPreviousSession(config: Config): Promise<string | null> {
   try {
     const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 

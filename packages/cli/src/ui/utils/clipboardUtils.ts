@@ -14,14 +14,7 @@ import { debugLogger, spawnAsync, escapePath, Storage } from 'sparkle-cli-core';
  * Supported image file extensions based on Gemini API.
  * See: https://ai.google.dev/gemini-api/docs/image-understanding
  */
-export const IMAGE_EXTENSIONS = [
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.webp',
-  '.heic',
-  '.heif',
-];
+export const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.heic', '.heif'];
 
 /** Matches strings that start with a path prefix (/, ~, ., Windows drive letter, or UNC path) */
 const PATH_PREFIX_PATTERN = /^([/~.]|[a-zA-Z]:|\\\\)/;
@@ -250,9 +243,7 @@ const saveFileWithXclip = async (tempFilePath: string) => {
  * @param targetDir The root directory of the current project.
  * @returns The absolute path to the images directory.
  */
-async function getProjectClipboardImagesDir(
-  targetDir: string,
-): Promise<string> {
+async function getProjectClipboardImagesDir(targetDir: string): Promise<string> {
   const storage = new Storage(targetDir);
   await storage.initialize();
   const baseDir = storage.getProjectTempDir();
@@ -264,9 +255,7 @@ async function getProjectClipboardImagesDir(
  * @param targetDir The target directory to create temp files within
  * @returns The path to the saved image file, or null if no image or error
  */
-export async function saveClipboardImage(
-  targetDir: string,
-): Promise<string | null> {
+export async function saveClipboardImage(targetDir: string): Promise<string | null> {
   try {
     const tempDir = await getProjectClipboardImagesDir(targetDir);
     await fs.mkdir(tempDir, { recursive: true });
@@ -389,9 +378,7 @@ export async function saveClipboardImage(
  * Removes files older than 1 hour
  * @param targetDir The target directory where temp files are stored
  */
-export async function cleanupOldClipboardImages(
-  targetDir: string,
-): Promise<void> {
+export async function cleanupOldClipboardImages(targetDir: string): Promise<void> {
   try {
     const tempDir = await getProjectClipboardImagesDir(targetDir);
     const files = await fs.readdir(tempDir);

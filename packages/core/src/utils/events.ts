@@ -280,10 +280,7 @@ export class CoreEventEmitter extends EventEmitter<CoreEvents> {
       this._eventBacklog.push({ event, args } as EventBacklogItem);
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      (this.emit as (event: K, ...args: CoreEvents[K]) => boolean)(
-        event,
-        ...args,
-      );
+      (this.emit as (event: K, ...args: CoreEvents[K]) => boolean)(event, ...args);
     }
   }
 
@@ -291,11 +288,7 @@ export class CoreEventEmitter extends EventEmitter<CoreEvents> {
    * Sends actionable feedback to the user.
    * Buffers automatically if the UI hasn't subscribed yet.
    */
-  emitFeedback(
-    severity: FeedbackSeverity,
-    message: string,
-    error?: unknown,
-  ): void {
+  emitFeedback(severity: FeedbackSeverity, message: string, error?: unknown): void {
     const payload: UserFeedbackPayload = { severity, message, error };
     this._emitOrQueue(CoreEvent.UserFeedback, payload);
   }

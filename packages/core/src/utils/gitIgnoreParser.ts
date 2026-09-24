@@ -30,9 +30,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
     this.processedExtraPatterns = ignore();
     if (this.extraPatterns) {
       // extraPatterns are assumed to be from project root (like .sparkleignore)
-      this.processedExtraPatterns.add(
-        this.processPatterns(this.extraPatterns, '.'),
-      );
+      this.processedExtraPatterns.add(this.processPatterns(this.extraPatterns, '.'));
     }
   }
 
@@ -59,10 +57,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
     return ignore().add(this.processPatterns(rawPatterns, relativeBaseDir));
   }
 
-  private processPatterns(
-    rawPatterns: string[],
-    relativeBaseDir: string,
-  ): string[] {
+  private processPatterns(rawPatterns: string[], relativeBaseDir: string): string[] {
     return rawPatterns
       .map((p) => p.trimStart())
       .filter((p) => p !== '' && !p.startsWith('#'))
@@ -126,11 +121,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
       isDirectory,
     );
     // Root directory is never ignored by gitignore
-    if (
-      normalizedPath === null ||
-      normalizedPath === '' ||
-      normalizedPath === '/'
-    ) {
+    if (normalizedPath === null || normalizedPath === '' || normalizedPath === '/') {
       return false;
     }
 
@@ -139,12 +130,7 @@ export class GitIgnoreParser implements GitIgnoreFilter {
 
       // Load global patterns from .git/info/exclude
       if (this.globalPatterns === undefined) {
-        const excludeFile = path.join(
-          this.projectRoot,
-          '.git',
-          'info',
-          'exclude',
-        );
+        const excludeFile = path.join(this.projectRoot, '.git', 'info', 'exclude');
         this.globalPatterns = fs.existsSync(excludeFile)
           ? this.loadPatternsForFile(excludeFile)
           : ignore();

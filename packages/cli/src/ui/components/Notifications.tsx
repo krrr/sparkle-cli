@@ -14,12 +14,7 @@ import { persistentState } from '../../utils/persistentState.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { KeypressPriority } from '../contexts/KeypressContext.js';
 
-import {
-  SPARKLE_DIR,
-  Storage,
-  homedir,
-  WarningPriority,
-} from 'sparkle-cli-core';
+import { SPARKLE_DIR, Storage, homedir, WarningPriority } from 'sparkle-cli-core';
 
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
@@ -38,8 +33,7 @@ export const Notifications = () => {
   const { initError, streamingState } = useUIState();
 
   const isScreenReaderEnabled = useIsScreenReaderEnabled();
-  const showInitError =
-    initError && streamingState !== StreamingState.Responding;
+  const showInitError = initError && streamingState !== StreamingState.Responding;
 
   const [hasSeenScreenReaderNudge, setHasSeenScreenReaderNudge] = useState(() =>
     persistentState.get('hasSeenScreenReaderNudge'),
@@ -160,9 +154,7 @@ export const Notifications = () => {
           paddingX={1}
           marginBottom={1}
         >
-          <Text color={theme.status.error}>
-            Initialization Error: {initError}
-          </Text>
+          <Text color={theme.status.error}>Initialization Error: {initError}</Text>
           <Text color={theme.status.error}>
             {' '}
             Please check API key and configuration.

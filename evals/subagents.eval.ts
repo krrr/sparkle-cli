@@ -18,18 +18,14 @@ const INDEX_TS = 'export const add = (a: number, b: number) => a + b;\n';
  * Helper to verify that a specific subagent was successfully invoked via the unified tool.
  */
 async function expectSubagentCall(rig: TestRig, agentName: string) {
-  await rig.expectToolCallSuccess(
-    [AGENT_TOOL_NAME],
-    undefined,
-    (args: string) => {
-      try {
-        const parsed = JSON.parse(args);
-        return parsed.agent_name === agentName;
-      } catch {
-        return false;
-      }
-    },
-  );
+  await rig.expectToolCallSuccess([AGENT_TOOL_NAME], undefined, (args: string) => {
+    try {
+      const parsed = JSON.parse(args);
+      return parsed.agent_name === agentName;
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -135,9 +131,7 @@ describe('subagent eval test cases', () => {
       }>;
 
       expect(updatedIndex).toContain('export const sum =');
-      expect(isSubagentCalled(toolLogs, TEST_AGENTS.DOCS_AGENT.name)).toBe(
-        false,
-      );
+      expect(isSubagentCalled(toolLogs, TEST_AGENTS.DOCS_AGENT.name)).toBe(false);
       expect(isSubagentCalled(toolLogs, 'generalist')).toBe(false);
     },
   });

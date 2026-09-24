@@ -98,10 +98,7 @@ export class A2AClientManager {
     // Authenticated fetch for API calls (transports).
     let authFetch: typeof fetch = this.a2aFetch;
     if (authHandler) {
-      authFetch = createAuthenticatingFetchWithRetry(
-        this.a2aFetch,
-        authHandler,
-      );
+      authFetch = createAuthenticatingFetchWithRetry(this.a2aFetch, authHandler);
     }
 
     // Use unauthenticated fetch for the agent card unless explicitly required.
@@ -146,8 +143,8 @@ export class A2AClientManager {
     const agentCard = normalizeAgentCard(rawCard);
 
     const grpcUrl =
-      agentCard.additionalInterfaces?.find((i) => i.transport === 'GRPC')
-        ?.url ?? agentCard.url;
+      agentCard.additionalInterfaces?.find((i) => i.transport === 'GRPC')?.url ??
+      agentCard.url;
 
     const transports: TransportFactory[] = [
       new RestTransportFactory({ fetchImpl: authFetch }),

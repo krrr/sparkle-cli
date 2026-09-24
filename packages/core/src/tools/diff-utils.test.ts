@@ -27,12 +27,8 @@ describe('getDiffContextSnippet', () => {
   });
 
   it('should use ellipses for changes far apart', () => {
-    const original = Array.from({ length: 20 }, (_, i) => `${i + 1}`).join(
-      '\n',
-    );
-    const modified = original
-      .replace('2\n', '2\nadded1\n')
-      .replace('19', '19\nadded2');
+    const original = Array.from({ length: 20 }, (_, i) => `${i + 1}`).join('\n');
+    const modified = original.replace('2\n', '2\nadded1\n').replace('19', '19\nadded2');
     const snippet = getDiffContextSnippet(original, modified, 2);
 
     expect(snippet).toContain('1\n2\nadded1\n3\n4');

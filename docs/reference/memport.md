@@ -1,14 +1,14 @@
 # Memory Import Processor
 
-The Memory Import Processor is a feature that lets you modularize your AGENTS.md
-files by importing content from other files using the `@file.md` syntax.
+The Memory Import Processor is a feature that lets you modularize your AGENTS.md files
+by importing content from other files using the `@file.md` syntax.
 
 ## Overview
 
 This feature enables you to break down large AGENTS.md files into smaller, more
-manageable components that can be reused across different contexts. The import
-processor supports both relative and absolute paths, with built-in safety
-features to prevent circular imports and ensure file access security.
+manageable components that can be reused across different contexts. The import processor
+supports both relative and absolute paths, with built-in safety features to prevent
+circular imports and ensure file access security.
 
 ## Syntax
 
@@ -92,40 +92,37 @@ The processor automatically detects and prevents circular imports:
 
 ### File access security
 
-The `validateImportPath` function ensures that imports are only allowed from
-specified directories, preventing access to sensitive files outside the allowed
-scope.
+The `validateImportPath` function ensures that imports are only allowed from specified
+directories, preventing access to sensitive files outside the allowed scope.
 
 ### Maximum import depth
 
-To prevent infinite recursion, there's a configurable maximum import depth
-(default: 5 levels).
+To prevent infinite recursion, there's a configurable maximum import depth (default: 5
+levels).
 
 ## Error handling
 
 ### Missing files
 
-If a referenced file doesn't exist, the import will fail gracefully with an
-error comment in the output.
+If a referenced file doesn't exist, the import will fail gracefully with an error
+comment in the output.
 
 ### File access errors
 
-Permission issues or other file system errors are handled gracefully with
-appropriate error messages.
+Permission issues or other file system errors are handled gracefully with appropriate
+error messages.
 
 ## Code region detection
 
-The import processor uses the `marked` library to detect code blocks and inline
-code spans, ensuring that `@` imports inside these regions are properly ignored.
-This provides robust handling of nested code blocks and complex Markdown
-structures.
+The import processor uses the `marked` library to detect code blocks and inline code
+spans, ensuring that `@` imports inside these regions are properly ignored. This
+provides robust handling of nested code blocks and complex Markdown structures.
 
 ## Import tree structure
 
-The processor returns an import tree that shows the hierarchy of imported files,
-similar to Claude's `/memory` feature. This helps users debug problems with
-their AGENTS.md files by showing which files were read and their import
-relationships.
+The processor returns an import tree that shows the hierarchy of imported files, similar
+to Claude's `/memory` feature. This helps users debug problems with their AGENTS.md
+files by showing which files were read and their import relationships.
 
 Example tree structure:
 
@@ -141,19 +138,19 @@ Memory Files
             L included.md
 ```
 
-The tree preserves the order that files were imported and shows the complete
-import chain for debugging purposes.
+The tree preserves the order that files were imported and shows the complete import
+chain for debugging purposes.
 
 ## Comparison to Claude Code's `/memory` (`claude.md`) approach
 
 Claude Code's `/memory` feature (as seen in `claude.md`) produces a flat, linear
-document by concatenating all included files, always marking file boundaries
-with clear comments and path names. It does not explicitly present the import
-hierarchy, but the LLM receives all file contents and paths, which is sufficient
-for reconstructing the hierarchy if needed.
+document by concatenating all included files, always marking file boundaries with clear
+comments and path names. It does not explicitly present the import hierarchy, but the
+LLM receives all file contents and paths, which is sufficient for reconstructing the
+hierarchy if needed.
 
-> [!NOTE] The import tree is mainly for clarity during development and has
-> limited relevance to LLM consumption.
+> [!NOTE] The import tree is mainly for clarity during development and has limited
+> relevance to LLM consumption.
 
 ## API reference
 
@@ -165,13 +162,11 @@ Processes import statements in AGENTS.md content.
 
 - `content` (string): The content to process for imports
 - `basePath` (string): The directory path where the current file is located
-- `debugMode` (boolean, optional): Whether to enable debug logging (default:
-  false)
-- `importState` (ImportState, optional): State tracking for circular import
-  prevention
+- `debugMode` (boolean, optional): Whether to enable debug logging (default: false)
+- `importState` (ImportState, optional): State tracking for circular import prevention
 
-**Returns:** Promise&lt;ProcessImportsResult&gt; - Object containing processed
-content and import tree
+**Returns:** Promise&lt;ProcessImportsResult&gt; - Object containing processed content
+and import tree
 
 ### `ProcessImportsResult`
 
@@ -205,16 +200,16 @@ Validates import paths to ensure they are safe and within allowed directories.
 
 ### `findProjectRoot(startDir)`
 
-Finds the project root by searching for a `.git` directory upwards from the
-given start directory. Implemented as an **async** function using non-blocking
-file system APIs to avoid blocking the Node.js event loop.
+Finds the project root by searching for a `.git` directory upwards from the given start
+directory. Implemented as an **async** function using non-blocking file system APIs to
+avoid blocking the Node.js event loop.
 
 **Parameters:**
 
 - `startDir` (string): The directory to start searching from
 
-**Returns:** Promise&lt;string&gt; - The project root directory (or the start
-directory if no `.git` is found)
+**Returns:** Promise&lt;string&gt; - The project root directory (or the start directory
+if no `.git` is found)
 
 ## Best Practices
 
@@ -229,12 +224,10 @@ directory if no `.git` is found)
 ### Common issues
 
 1. **Import not working**: Check that the file exists and the path is correct
-2. **Circular import warnings**: Review your import structure for circular
-   references
-3. **Permission errors**: Ensure the files are readable and within allowed
-   directories
-4. **Path resolution issues**: Use absolute paths if relative paths aren't
-   resolving correctly
+2. **Circular import warnings**: Review your import structure for circular references
+3. **Permission errors**: Ensure the files are readable and within allowed directories
+4. **Path resolution issues**: Use absolute paths if relative paths aren't resolving
+   correctly
 
 ### Debug mode
 

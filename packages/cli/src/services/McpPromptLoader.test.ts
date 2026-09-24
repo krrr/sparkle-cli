@@ -180,9 +180,7 @@ describe('McpPromptLoader', () => {
         ...mockPrompt,
         name: 'Prompt Name',
       };
-      vi.spyOn(cliCore, 'getMCPServerPrompts').mockReturnValue([
-        mockPromptWithSpaces,
-      ]);
+      vi.spyOn(cliCore, 'getMCPServerPrompts').mockReturnValue([mockPromptWithSpaces]);
 
       const loader = new McpPromptLoader(mockConfigWithPrompts);
       const commands = await loader.loadCommands(new AbortController().signal);
@@ -240,9 +238,7 @@ describe('McpPromptLoader', () => {
     });
 
     it('should return an error message if prompt invocation fails', async () => {
-      vi.spyOn(mockPrompt, 'invoke').mockRejectedValue(
-        new Error('Invocation failed!'),
-      );
+      vi.spyOn(mockPrompt, 'invoke').mockRejectedValue(new Error('Invocation failed!'));
       const loader = new McpPromptLoader(mockConfigWithPrompts);
       const commands = await loader.loadCommands(new AbortController().signal);
       const action = commands[0].action!;
@@ -267,9 +263,7 @@ describe('McpPromptLoader', () => {
           { ...mockPrompt, arguments: undefined },
         ]);
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         expect(commands[0].autoExecute).toBe(true);
       });
 
@@ -278,9 +272,7 @@ describe('McpPromptLoader', () => {
           { ...mockPrompt, arguments: [] },
         ]);
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         expect(commands[0].autoExecute).toBe(true);
       });
 
@@ -292,9 +284,7 @@ describe('McpPromptLoader', () => {
           },
         ]);
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         expect(commands[0].autoExecute).toBe(false);
       });
 
@@ -306,9 +296,7 @@ describe('McpPromptLoader', () => {
           },
         ]);
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         expect(commands[0].autoExecute).toBe(false);
       });
     });
@@ -316,9 +304,7 @@ describe('McpPromptLoader', () => {
     describe('completion', () => {
       it('should suggest no arguments when using positional arguments', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {} as CommandContext;
         const suggestions = await completion(context, 'test-name 6 tiger');
@@ -327,9 +313,7 @@ describe('McpPromptLoader', () => {
 
       it('should suggest all arguments when none are present', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -350,9 +334,7 @@ describe('McpPromptLoader', () => {
 
       it('should suggest remaining arguments when some are present', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -362,18 +344,12 @@ describe('McpPromptLoader', () => {
           },
         } as CommandContext;
         const suggestions = await completion(context, '');
-        expect(suggestions).toEqual([
-          '--species="',
-          '--enclosure="',
-          '--trail="',
-        ]);
+        expect(suggestions).toEqual(['--species="', '--enclosure="', '--trail="']);
       });
 
       it('should suggest no arguments when all are present', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {} as CommandContext;
         const suggestions = await completion(
@@ -389,9 +365,7 @@ describe('McpPromptLoader', () => {
           { ...mockPrompt, arguments: [] },
         ]);
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {} as CommandContext;
         const suggestions = await completion(context, '');
@@ -400,9 +374,7 @@ describe('McpPromptLoader', () => {
 
       it('should suggest arguments matching a partial argument', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -417,9 +389,7 @@ describe('McpPromptLoader', () => {
 
       it('should suggest arguments even when a partial argument is parsed as a value', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -434,9 +404,7 @@ describe('McpPromptLoader', () => {
 
       it('should auto-close the quote for a named argument value', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -451,9 +419,7 @@ describe('McpPromptLoader', () => {
 
       it('should auto-close the quote for an empty named argument value', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {
@@ -468,9 +434,7 @@ describe('McpPromptLoader', () => {
 
       it('should not add a quote if already present', async () => {
         const loader = new McpPromptLoader(mockConfigWithPrompts);
-        const commands = await loader.loadCommands(
-          new AbortController().signal,
-        );
+        const commands = await loader.loadCommands(new AbortController().signal);
         const completion = commands[0].completion!;
         const context = {
           invocation: {

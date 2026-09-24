@@ -6,11 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as path from 'node:path';
-import {
-  resolvePathFromEnv,
-  isSectionEnabled,
-  applySubstitutions,
-} from './utils.js';
+import { resolvePathFromEnv, isSectionEnabled, applySubstitutions } from './utils.js';
 import type { Config } from '../config/config.js';
 import type { ToolRegistry } from '../tools/tool-registry.js';
 
@@ -253,21 +249,13 @@ describe('applySubstitutions', () => {
       getAllTools: vi.fn().mockReturnValue([]),
     } as unknown as ToolRegistry;
 
-    const result = applySubstitutions(
-      'Tools: ${AvailableTools}',
-      mockConfig,
-      '',
-    );
+    const result = applySubstitutions('Tools: ${AvailableTools}', mockConfig, '');
     expect(result).toContain('- read_file');
     expect(result).toContain('- write_file');
   });
 
   it('should show no tools message when no tools available', () => {
-    const result = applySubstitutions(
-      'Tools: ${AvailableTools}',
-      mockConfig,
-      '',
-    );
+    const result = applySubstitutions('Tools: ${AvailableTools}', mockConfig, '');
     expect(result).toContain('No tools are currently available.');
   });
 

@@ -11,8 +11,7 @@ import { SettingScope } from '../config/settings.js';
 
 describe('hookUtils', () => {
   describe('renderHookActionFeedback', () => {
-    const mockFormatScope = (label: string, path: string) =>
-      `${label} (${path})`;
+    const mockFormatScope = (label: string, path: string) => `${label} (${path})`;
 
     it('should render error message', () => {
       const result: HookActionResult = {
@@ -128,9 +127,7 @@ describe('hookUtils', () => {
         modifiedScopes: [
           { scope: SettingScope.Workspace, path: '/path/workspace.json' },
         ],
-        alreadyInStateScopes: [
-          { scope: SettingScope.User, path: '/path/user.json' },
-        ],
+        alreadyInStateScopes: [{ scope: SettingScope.User, path: '/path/user.json' }],
       };
 
       const message = renderHookActionFeedback(result, mockFormatScope);

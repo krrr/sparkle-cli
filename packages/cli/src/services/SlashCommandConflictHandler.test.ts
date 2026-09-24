@@ -35,9 +35,9 @@ describe('SlashCommandConflictHandler', () => {
   const simulateEvent = (conflicts: SlashCommandConflict[]) => {
     const callback = vi
       .mocked(coreEvents.on)
-      .mock.calls.find(
-        (call) => call[0] === CoreEvent.SlashCommandConflicts,
-      )![1] as (payload: SlashCommandConflictsPayload) => void;
+      .mock.calls.find((call) => call[0] === CoreEvent.SlashCommandConflicts)![1] as (
+      payload: SlashCommandConflictsPayload,
+    ) => void;
     callback({ conflicts });
   };
 

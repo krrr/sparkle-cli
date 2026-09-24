@@ -163,9 +163,7 @@ export const DiffRenderer: React.FC<DiffRendererProps> = ({
         .join('\n');
       // Attempt to infer language from filename, default to plain text if no filename
       const fileExtension = getFileExtension(filename);
-      const language = fileExtension
-        ? getLanguageFromExtension(fileExtension)
-        : null;
+      const language = fileExtension ? getLanguageFromExtension(fileExtension) : null;
       return colorizeCode({
         code: addedContent,
         language,
@@ -255,10 +253,7 @@ const annotateIntraLineEmphasis = (displayLines: DiffLine[]): void => {
     const adds = displayLines.slice(addStart, i);
     const pairCount = Math.min(dels.length, adds.length);
     for (let k = 0; k < pairCount; k++) {
-      const emphasis = computeIntraLineEmphasis(
-        dels[k].content,
-        adds[k].content,
-      );
+      const emphasis = computeIntraLineEmphasis(dels[k].content, adds[k].content);
       if (emphasis) {
         dels[k].emphasis = emphasis.old;
         adds[k].emphasis = emphasis.new;
@@ -309,9 +304,7 @@ export const renderDiffLines = ({
   const gutterWidth = Math.max(1, maxLineNumber.toString().length);
 
   const fileExtension = getFileExtension(filename);
-  const language = fileExtension
-    ? getLanguageFromExtension(fileExtension)
-    : null;
+  const language = fileExtension ? getLanguageFromExtension(fileExtension) : null;
 
   // Calculate the minimum indentation across all displayable lines
   let baseIndentation = Infinity; // Start high to find the minimum
@@ -347,9 +340,7 @@ export const renderDiffLines = ({
     annotateIntraLineEmphasis(displayableLines);
   }
 
-  const emphasisAddedColor = getDiffEmphasisColor(
-    semanticTheme.background.diff.added,
-  );
+  const emphasisAddedColor = getDiffEmphasisColor(semanticTheme.background.diff.added);
   const emphasisRemovedColor = getDiffEmphasisColor(
     semanticTheme.background.diff.removed,
   );
@@ -357,144 +348,128 @@ export const renderDiffLines = ({
   let lastLineNumber: number | null = null;
   const MAX_CONTEXT_LINES_WITHOUT_GAP = 5;
 
-  const content = displayableLines.reduce<React.ReactNode[]>(
-    (acc, line, index) => {
-      // Determine the relevant line number for gap calculation based on type
-      let relevantLineNumberForGapCalc: number | null = null;
-      if (line.type === 'add' || line.type === 'context') {
-        relevantLineNumberForGapCalc = line.newLine ?? null;
-      } else if (line.type === 'del') {
-        // For deletions, the gap is typically in relation to the original file's line numbering
-        relevantLineNumberForGapCalc = line.oldLine ?? null;
-      }
+  const content = displayableLines.reduce<React.ReactNode[]>((acc, line, index) => {
+    // Determine the relevant line number for gap calculation based on type
+    let relevantLineNumberForGapCalc: number | null = null;
+    if (line.type === 'add' || line.type === 'context') {
+      relevantLineNumberForGapCalc = line.newLine ?? null;
+    } else if (line.type === 'del') {
+      // For deletions, the gap is typically in relation to the original file's line numbering
+      relevantLineNumberForGapCalc = line.oldLine ?? null;
+    }
 
-      if (
-        lastLineNumber !== null &&
-        relevantLineNumberForGapCalc !== null &&
-        relevantLineNumberForGapCalc >
-          lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1
-      ) {
-        acc.push(
-          <Box key={`gap-${index}`}>
-            <Box
-              borderStyle="double"
-              borderLeft={false}
-              borderRight={false}
-              borderBottom={false}
-              width={terminalWidth}
-              borderColor={semanticTheme.text.secondary}
-            ></Box>
-          </Box>,
-        );
-      }
-
-      const lineKey = `diff-line-${index}`;
-      let gutterNumStr = '';
-      let prefixSymbol = ' ';
-
-      switch (line.type) {
-        case 'add':
-          gutterNumStr = (line.newLine ?? '').toString();
-          prefixSymbol = '+';
-          lastLineNumber = line.newLine ?? null;
-          break;
-        case 'del':
-          gutterNumStr = (line.oldLine ?? '').toString();
-          prefixSymbol = '-';
-          // For deletions, update lastLineNumber based on oldLine if it's advancing.
-          // This helps manage gaps correctly if there are multiple consecutive deletions
-          // or if a deletion is followed by a context line far away in the original file.
-          if (line.oldLine !== undefined) {
-            lastLineNumber = line.oldLine;
-          }
-          break;
-        case 'context':
-          gutterNumStr = (line.newLine ?? '').toString();
-          prefixSymbol = ' ';
-          lastLineNumber = line.newLine ?? null;
-          break;
-        default:
-          return acc;
-      }
-
-      const displayContent = line.content;
-
-      const backgroundColor = disableColor
-        ? undefined
-        : line.type === 'add'
-          ? semanticTheme.background.diff.added
-          : line.type === 'del'
-            ? semanticTheme.background.diff.removed
-            : undefined;
-
-      const gutterColor = disableColor
-        ? undefined
-        : semanticTheme.text.secondary;
-
-      const symbolColor = disableColor
-        ? undefined
-        : line.type === 'add'
-          ? semanticTheme.status.success
-          : line.type === 'del'
-            ? semanticTheme.status.error
-            : undefined;
-
-      const emphasisColor =
-        !disableColor && line.emphasis
-          ? line.type === 'add'
-            ? emphasisAddedColor
-            : emphasisRemovedColor
-          : undefined;
-
+    if (
+      lastLineNumber !== null &&
+      relevantLineNumberForGapCalc !== null &&
+      relevantLineNumberForGapCalc > lastLineNumber + MAX_CONTEXT_LINES_WITHOUT_GAP + 1
+    ) {
       acc.push(
-        <Box key={lineKey} flexDirection="row">
+        <Box key={`gap-${index}`}>
           <Box
-            width={gutterWidth + 1}
-            paddingRight={1}
-            flexShrink={0}
-            backgroundColor={backgroundColor}
-            justifyContent="flex-end"
-          >
-            <Text color={gutterColor}>{gutterNumStr}</Text>
-          </Box>
-          {line.type === 'context' ? (
-            <>
-              <Text>{prefixSymbol} </Text>
-              <Text wrap="wrap">
-                {colorizeLine(
-                  displayContent,
-                  language,
-                  undefined,
-                  disableColor,
-                )}
-              </Text>
-            </>
-          ) : (
-            <Text backgroundColor={backgroundColor} wrap="wrap">
-              <Text color={symbolColor}>{prefixSymbol}</Text>{' '}
-              {emphasisColor
-                ? colorizeLineWithEmphasis(
-                    displayContent,
-                    language,
-                    line.emphasis!,
-                    emphasisColor,
-                    undefined,
-                    disableColor,
-                  )
-                : colorizeLine(
-                    displayContent,
-                    language,
-                    undefined,
-                    disableColor,
-                  )}
-            </Text>
-          )}
+            borderStyle="double"
+            borderLeft={false}
+            borderRight={false}
+            borderBottom={false}
+            width={terminalWidth}
+            borderColor={semanticTheme.text.secondary}
+          ></Box>
         </Box>,
       );
-      return acc;
-    },
-    [],
-  );
+    }
+
+    const lineKey = `diff-line-${index}`;
+    let gutterNumStr = '';
+    let prefixSymbol = ' ';
+
+    switch (line.type) {
+      case 'add':
+        gutterNumStr = (line.newLine ?? '').toString();
+        prefixSymbol = '+';
+        lastLineNumber = line.newLine ?? null;
+        break;
+      case 'del':
+        gutterNumStr = (line.oldLine ?? '').toString();
+        prefixSymbol = '-';
+        // For deletions, update lastLineNumber based on oldLine if it's advancing.
+        // This helps manage gaps correctly if there are multiple consecutive deletions
+        // or if a deletion is followed by a context line far away in the original file.
+        if (line.oldLine !== undefined) {
+          lastLineNumber = line.oldLine;
+        }
+        break;
+      case 'context':
+        gutterNumStr = (line.newLine ?? '').toString();
+        prefixSymbol = ' ';
+        lastLineNumber = line.newLine ?? null;
+        break;
+      default:
+        return acc;
+    }
+
+    const displayContent = line.content;
+
+    const backgroundColor = disableColor
+      ? undefined
+      : line.type === 'add'
+        ? semanticTheme.background.diff.added
+        : line.type === 'del'
+          ? semanticTheme.background.diff.removed
+          : undefined;
+
+    const gutterColor = disableColor ? undefined : semanticTheme.text.secondary;
+
+    const symbolColor = disableColor
+      ? undefined
+      : line.type === 'add'
+        ? semanticTheme.status.success
+        : line.type === 'del'
+          ? semanticTheme.status.error
+          : undefined;
+
+    const emphasisColor =
+      !disableColor && line.emphasis
+        ? line.type === 'add'
+          ? emphasisAddedColor
+          : emphasisRemovedColor
+        : undefined;
+
+    acc.push(
+      <Box key={lineKey} flexDirection="row">
+        <Box
+          width={gutterWidth + 1}
+          paddingRight={1}
+          flexShrink={0}
+          backgroundColor={backgroundColor}
+          justifyContent="flex-end"
+        >
+          <Text color={gutterColor}>{gutterNumStr}</Text>
+        </Box>
+        {line.type === 'context' ? (
+          <>
+            <Text>{prefixSymbol} </Text>
+            <Text wrap="wrap">
+              {colorizeLine(displayContent, language, undefined, disableColor)}
+            </Text>
+          </>
+        ) : (
+          <Text backgroundColor={backgroundColor} wrap="wrap">
+            <Text color={symbolColor}>{prefixSymbol}</Text>{' '}
+            {emphasisColor
+              ? colorizeLineWithEmphasis(
+                  displayContent,
+                  language,
+                  line.emphasis!,
+                  emphasisColor,
+                  undefined,
+                  disableColor,
+                )
+              : colorizeLine(displayContent, language, undefined, disableColor)}
+          </Text>
+        )}
+      </Box>,
+    );
+    return acc;
+  }, []);
 
   return content;
 };

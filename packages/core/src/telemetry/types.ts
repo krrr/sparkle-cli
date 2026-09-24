@@ -18,10 +18,7 @@ import { CoreToolCallStatus } from '../scheduler/types.js';
 import { DiscoveredMCPTool } from '../tools/mcp-tool.js';
 import { ProviderType } from '../config/constants.js';
 import type { LogAttributes, LogRecord } from '@opentelemetry/api-logs';
-import {
-  getDecisionFromOutcome,
-  ToolCallDecision,
-} from './tool-call-decision.js';
+import { getDecisionFromOutcome, ToolCallDecision } from './tool-call-decision.js';
 import { getConventionAttributes, type FileOperation } from './metrics.js';
 export { ToolCallDecision };
 import type { ToolRegistry } from '../tools/tool-registry.js';
@@ -100,10 +97,8 @@ export class StartSessionEvent implements BaseTelemetryEvent {
     this.debug_enabled = config.getDebugMode();
     this.mcp_servers = mcpServers ? Object.keys(mcpServers).join(',') : '';
     this.telemetry_enabled = config.getTelemetryEnabled();
-    this.telemetry_log_user_prompts_enabled =
-      config.getTelemetryLogPromptsEnabled();
-    this.file_filtering_respect_git_ignore =
-      config.getFileFilteringRespectGitIgnore();
+    this.telemetry_log_user_prompts_enabled = config.getTelemetryLogPromptsEnabled();
+    this.file_filtering_respect_git_ignore = config.getFileFilteringRespectGitIgnore();
     this.mcp_servers_count = mcpServers ? Object.keys(mcpServers).length : 0;
     this.output_format = config.getOutputFormat();
     const extensions = config.getExtensions();
@@ -291,19 +286,14 @@ export class ToolCallEvent implements BaseTelemetryEvent {
       this.function_args = call.request.args;
       this.duration_ms = call.durationMs ?? 0;
       this.success = call.status === CoreToolCallStatus.Success;
-      this.decision = call.outcome
-        ? getDecisionFromOutcome(call.outcome)
-        : undefined;
+      this.decision = call.outcome ? getDecisionFromOutcome(call.outcome) : undefined;
       this.error = call.response.error?.message;
       this.error_type = call.response.errorType;
       this.prompt_id = call.request.prompt_id;
       this.content_length = call.response.contentLength;
       this.start_time = call.startTime;
       this.end_time = call.endTime;
-      if (
-        typeof call.tool !== 'undefined' &&
-        call.tool instanceof DiscoveredMCPTool
-      ) {
+      if (typeof call.tool !== 'undefined' && call.tool instanceof DiscoveredMCPTool) {
         this.tool_type = 'mcp';
         this.mcp_server_name = call.tool.serverName;
         this.extension_name = call.tool.extensionName;
@@ -312,9 +302,7 @@ export class ToolCallEvent implements BaseTelemetryEvent {
         this.tool_type = 'native';
       }
 
-      const fileDiff = getFileDiffFromResultDisplay(
-        call.response.resultDisplay,
-      );
+      const fileDiff = getFileDiffFromResultDisplay(call.response.resultDisplay);
 
       if (
         call.status === CoreToolCallStatus.Success &&
@@ -408,9 +396,7 @@ export class ToolCallEvent implements BaseTelemetryEvent {
 export const EVENT_API_REQUEST = 'gemini_cli.api_request';
 
 function shouldIncludePayloads(config: Config): boolean {
-  return (
-    config.getTelemetryTracesEnabled() && config.getTelemetryLogPromptsEnabled()
-  );
+  return config.getTelemetryTracesEnabled() && config.getTelemetryLogPromptsEnabled();
 }
 
 export class ApiRequestEvent implements BaseTelemetryEvent {
@@ -889,8 +875,7 @@ export class LoopDetectedEvent implements BaseTelemetryEvent {
   }
 
   toLogBody(): string {
-    const status =
-      this.count === 1 ? 'Attempting recovery' : 'Terminating session';
+    const status = this.count === 1 ? 'Attempting recovery' : 'Terminating session';
     return `Loop detected (Strike ${this.count}: ${status}). Type: ${this.loop_type}.${this.confirmed_by_model ? ` Confirmed by: ${this.confirmed_by_model}` : ''}`;
   }
 }
@@ -1033,8 +1018,7 @@ export function makeChatCompressionEvent({
   };
 }
 
-export const EVENT_MALFORMED_JSON_RESPONSE =
-  'gemini_cli.malformed_json_response';
+export const EVENT_MALFORMED_JSON_RESPONSE = 'gemini_cli.malformed_json_response';
 export class MalformedJsonResponseEvent implements BaseTelemetryEvent {
   'event.name': 'malformed_json_response';
   'event.timestamp': string;
@@ -1249,8 +1233,7 @@ export class ContentRetryEvent implements BaseTelemetryEvent {
   }
 }
 
-export const EVENT_CONTENT_RETRY_FAILURE =
-  'gemini_cli.chat.content_retry_failure';
+export const EVENT_CONTENT_RETRY_FAILURE = 'gemini_cli.chat.content_retry_failure';
 
 export const EVENT_NETWORK_RETRY_ATTEMPT = 'gemini_cli.network_retry_attempt';
 export class NetworkRetryAttemptEvent implements BaseTelemetryEvent {
@@ -1889,10 +1872,7 @@ export class StartupStatsEvent implements BaseTelemetryEvent {
 }
 
 abstract class BaseAgentEvent implements BaseTelemetryEvent {
-  abstract 'event.name':
-    | 'agent_start'
-    | 'agent_finish'
-    | 'agent_recovery_attempt';
+  abstract 'event.name': 'agent_start' | 'agent_finish' | 'agent_recovery_attempt';
   'event.timestamp': string;
   agent_id: string;
   agent_name: string;
@@ -2009,8 +1989,7 @@ export class RecoveryAttemptEvent extends BaseAgentEvent {
   }
 }
 
-export const EVENT_WEB_FETCH_FALLBACK_ATTEMPT =
-  'gemini_cli.web_fetch_fallback_attempt';
+export const EVENT_WEB_FETCH_FALLBACK_ATTEMPT = 'gemini_cli.web_fetch_fallback_attempt';
 export type WebFetchFallbackReason =
   | 'private_ip'
   | 'primary_failed'
@@ -2044,8 +2023,7 @@ export class WebFetchFallbackAttemptEvent implements BaseTelemetryEvent {
 
 export const EVENT_HOOK_CALL = 'gemini_cli.hook_call';
 
-export const EVENT_APPROVAL_MODE_SWITCH =
-  'gemini_cli.plan.approval_mode_switch';
+export const EVENT_APPROVAL_MODE_SWITCH = 'gemini_cli.plan.approval_mode_switch';
 export class ApprovalModeSwitchEvent implements BaseTelemetryEvent {
   eventName = 'approval_mode_switch';
   from_mode: ApprovalMode;
@@ -2075,8 +2053,7 @@ export class ApprovalModeSwitchEvent implements BaseTelemetryEvent {
   }
 }
 
-export const EVENT_APPROVAL_MODE_DURATION =
-  'gemini_cli.plan.approval_mode_duration';
+export const EVENT_APPROVAL_MODE_DURATION = 'gemini_cli.plan.approval_mode_duration';
 export class ApprovalModeDurationEvent implements BaseTelemetryEvent {
   eventName = 'approval_mode_duration';
   mode: ApprovalMode;

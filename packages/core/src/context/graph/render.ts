@@ -50,8 +50,7 @@ export async function render(
   let headerTokens = 0;
   let headerBaseUnits = 0;
   if (header) {
-    const costs =
-      advancedTokenCalculator.calculateContentTokensAndBaseUnits(header);
+    const costs = advancedTokenCalculator.calculateContentTokensAndBaseUnits(header);
     headerTokens = costs.tokens;
     headerBaseUnits = costs.baseUnits;
   }
@@ -80,8 +79,7 @@ export async function render(
     });
 
     const baseUnits =
-      advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) +
-      headerBaseUnits;
+      advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) + headerBaseUnits;
 
     return {
       history,
@@ -155,8 +153,7 @@ export async function render(
       pendingHistory,
       didApplyManagement: false,
       baseUnits:
-        advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) +
-        headerBaseUnits,
+        advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) + headerBaseUnits,
       processedNodes: nodes,
     };
   }
@@ -255,8 +252,7 @@ export async function render(
     pendingHistory,
     didApplyManagement: true,
     baseUnits:
-      advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) +
-      headerBaseUnits,
+      advancedTokenCalculator.getRawBaseUnits(allVisibleNodes) + headerBaseUnits,
     processedNodes,
   };
 }

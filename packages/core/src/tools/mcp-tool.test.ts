@@ -5,21 +5,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mocked } from 'vitest';
 import { safeJsonStringify } from '../utils/safeJsonStringify.js';
-import {
-  DiscoveredMCPTool,
-  generateValidName,
-  formatMcpToolName,
-} from './mcp-tool.js'; // Added getStringifiedResultForDisplay
+import { DiscoveredMCPTool, generateValidName, formatMcpToolName } from './mcp-tool.js'; // Added getStringifiedResultForDisplay
 import { ToolConfirmationOutcome, type ToolResult } from './tools.js';
 import type { CallableTool, Part } from '@google/genai';
 import { ToolErrorType } from './tool-error.js';
@@ -39,10 +27,7 @@ const mockCallableToolInstance: Mocked<CallableTool> = {
   // Add other methods if DiscoveredMCPTool starts using them
 };
 
-const createSdkResponse = (
-  toolName: string,
-  response: Record<string, any>,
-): Part[] => [
+const createSdkResponse = (toolName: string, response: Record<string, any>): Part[] => [
   {
     functionResponse: {
       name: toolName,
@@ -76,19 +61,14 @@ describe('generateValidName', () => {
     { length: 63, expected: 63, description: 'exactly 63 characters' },
     { length: 64, expected: 63, description: 'exactly 64 characters' },
     { length: 80, expected: 63, description: 'longer than 64 characters' },
-  ])(
-    'should handle names that are $description long',
-    ({ length, expected }) => {
-      expect(generateValidName('a'.repeat(length)).length).toBe(expected);
-    },
-  );
+  ])('should handle names that are $description long', ({ length, expected }) => {
+    expect(generateValidName('a'.repeat(length)).length).toBe(expected);
+  });
 });
 
 describe('formatMcpToolName', () => {
   it('should format a fully qualified name', () => {
-    expect(formatMcpToolName('github', 'list_repos')).toBe(
-      'mcp_github_list_repos',
-    );
+    expect(formatMcpToolName('github', 'list_repos')).toBe('mcp_github_list_repos');
   });
 
   it('should handle global wildcards', () => {
@@ -149,9 +129,7 @@ describe('DiscoveredMCPTool', () => {
   describe('constructor', () => {
     it('should set properties correctly', () => {
       expect(tool.name).toBe('mcp_mock-mcp-server_actual-server-tool-name');
-      expect(tool.schema.name).toBe(
-        'mcp_mock-mcp-server_actual-server-tool-name',
-      );
+      expect(tool.schema.name).toBe('mcp_mock-mcp-server_actual-server-tool-name');
       expect(tool.schema.description).toBe(baseDescription);
       expect(tool.schema.parameters).toBeUndefined();
       expect(tool.schema.parametersJsonSchema).toEqual({
@@ -248,9 +226,7 @@ describe('DiscoveredMCPTool', () => {
         { name: serverToolName, args: params },
       ]);
 
-      const stringifiedResponseContent = JSON.stringify(
-        mockToolSuccessResultObject,
-      );
+      const stringifiedResponseContent = JSON.stringify(mockToolSuccessResultObject);
       expect(toolResult.llmContent).toEqual([
         {
           text: `<untrusted_context>\n${stringifiedResponseContent}\n</untrusted_context>`,
@@ -433,9 +409,7 @@ describe('DiscoveredMCPTool', () => {
         const toolResult = await invocation.execute({
           abortSignal: new AbortController().signal,
         });
-        const stringifiedResponseContent = JSON.stringify(
-          mockToolSuccessResultObject,
-        );
+        const stringifiedResponseContent = JSON.stringify(mockToolSuccessResultObject);
         expect(toolResult.llmContent).toEqual([
           {
             text: `<untrusted_context>\n${stringifiedResponseContent}\n</untrusted_context>`,
@@ -893,26 +867,26 @@ describe('DiscoveredMCPTool', () => {
         undefined,
       );
       const invocation = trustedTool.build({ param: 'mock' });
-      expect(
-        await invocation.shouldConfirmExecute(new AbortController().signal),
-      ).toBe(false);
+      expect(await invocation.shouldConfirmExecute(new AbortController().signal)).toBe(
+        false,
+      );
     });
 
     it('should return false if server is allowlisted', async () => {
       const invocation = tool.build({ param: 'mock' }) as any;
       invocation.constructor.allowlist.add(serverName);
-      expect(
-        await invocation.shouldConfirmExecute(new AbortController().signal),
-      ).toBe(false);
+      expect(await invocation.shouldConfirmExecute(new AbortController().signal)).toBe(
+        false,
+      );
     });
 
     it('should return false if tool is allowlisted', async () => {
       const toolAllowlistKey = `${serverName}.${serverToolName}`;
       const invocation = tool.build({ param: 'mock' }) as any;
       invocation.constructor.allowlist.add(toolAllowlistKey);
-      expect(
-        await invocation.shouldConfirmExecute(new AbortController().signal),
-      ).toBe(false);
+      expect(await invocation.shouldConfirmExecute(new AbortController().signal)).toBe(
+        false,
+      );
     });
 
     it('should return confirmation details if not trusted and not allowlisted', async () => {
@@ -928,13 +902,9 @@ describe('DiscoveredMCPTool', () => {
         expect(confirmation.toolName).toBe(serverToolName);
       } else if (confirmation) {
         // Handle other possible confirmation types if necessary, or strengthen test if only MCP is expected
-        throw new Error(
-          'Confirmation was not of expected type MCP or was false',
-        );
+        throw new Error('Confirmation was not of expected type MCP or was false');
       } else {
-        throw new Error(
-          'Confirmation details not in expected format or was false',
-        );
+        throw new Error('Confirmation details not in expected format or was false');
       }
     });
 
@@ -963,36 +933,29 @@ describe('DiscoveredMCPTool', () => {
         shouldAddServer: false,
         shouldAddTool: false,
       },
-    ])(
-      'should $description',
-      async ({ outcome, shouldAddServer, shouldAddTool }) => {
-        const toolAllowlistKey = `${serverName}.${serverToolName}`;
-        const invocation = tool.build({ param: 'mock' }) as any;
-        const confirmation = await invocation.shouldConfirmExecute(
-          new AbortController().signal,
-        );
+    ])('should $description', async ({ outcome, shouldAddServer, shouldAddTool }) => {
+      const toolAllowlistKey = `${serverName}.${serverToolName}`;
+      const invocation = tool.build({ param: 'mock' }) as any;
+      const confirmation = await invocation.shouldConfirmExecute(
+        new AbortController().signal,
+      );
 
-        expect(confirmation).not.toBe(false);
-        if (
-          confirmation &&
-          typeof confirmation === 'object' &&
-          'onConfirm' in confirmation &&
-          typeof confirmation.onConfirm === 'function'
-        ) {
-          await confirmation.onConfirm(outcome);
-          expect(invocation.constructor.allowlist.has(serverName)).toBe(
-            shouldAddServer,
-          );
-          expect(invocation.constructor.allowlist.has(toolAllowlistKey)).toBe(
-            shouldAddTool,
-          );
-        } else {
-          throw new Error(
-            'Confirmation details or onConfirm not in expected format',
-          );
-        }
-      },
-    );
+      expect(confirmation).not.toBe(false);
+      if (
+        confirmation &&
+        typeof confirmation === 'object' &&
+        'onConfirm' in confirmation &&
+        typeof confirmation.onConfirm === 'function'
+      ) {
+        await confirmation.onConfirm(outcome);
+        expect(invocation.constructor.allowlist.has(serverName)).toBe(shouldAddServer);
+        expect(invocation.constructor.allowlist.has(toolAllowlistKey)).toBe(
+          shouldAddTool,
+        );
+      } else {
+        throw new Error('Confirmation details or onConfirm not in expected format');
+      }
+    });
   });
 
   describe('shouldConfirmExecute with folder trust', () => {
@@ -1097,12 +1060,8 @@ describe('MCP Tool Naming Regression Fixes', () => {
 
     it('should ensure name starts with a letter or underscore', () => {
       expect(generateValidName('valid_tool_name')).toBe('mcp_valid_tool_name');
-      expect(generateValidName('alsoValid-123.name')).toBe(
-        'mcp_alsoValid-123.name',
-      );
-      expect(generateValidName('another:valid:name')).toBe(
-        'mcp_another:valid:name',
-      );
+      expect(generateValidName('alsoValid-123.name')).toBe('mcp_alsoValid-123.name');
+      expect(generateValidName('another:valid:name')).toBe('mcp_another:valid:name');
     });
 
     it('should handle very long names by truncating in the middle', () => {

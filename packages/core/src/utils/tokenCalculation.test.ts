@@ -130,9 +130,7 @@ describe('tokenCalculation', () => {
       vi.mocked(mockContentGenerator.countTokens).mockRejectedValue(
         new Error('API error'),
       );
-      const request = [
-        { inlineData: { mimeType: 'image/png', data: 'large_data' } },
-      ];
+      const request = [{ inlineData: { mimeType: 'image/png', data: 'large_data' } }];
 
       const count = await calculateRequestTokenCount(
         request,

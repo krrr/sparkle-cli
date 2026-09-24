@@ -5,10 +5,7 @@
  */
 
 import { Box, Text } from 'ink';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
 
@@ -80,9 +77,8 @@ export function LoopDetectionConfirmation({
           <Box marginTop={1}>
             <Box flexDirection="column">
               <Text color={theme.text.secondary}>
-                This can happen due to repetitive tool calls or other model
-                behavior. Do you want to keep loop detection enabled or disable
-                it for this session?
+                This can happen due to repetitive tool calls or other model behavior. Do
+                you want to keep loop detection enabled or disable it for this session?
               </Text>
               <Box marginTop={1}>
                 <RadioButtonSelect items={OPTIONS} onSelect={onComplete} />

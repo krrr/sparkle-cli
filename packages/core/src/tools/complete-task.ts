@@ -53,11 +53,7 @@ export class CompleteTaskTool<
       const jsonSchema = z.toJSONSchema(outputConfig.schema, {
         target: 'draft-07',
       });
-      const {
-        $schema: _$schema,
-        definitions: _definitions,
-        ...schema
-      } = jsonSchema;
+      const { $schema: _$schema, definitions: _definitions, ...schema } = jsonSchema;
       return {
         type: 'object',
         properties: {
@@ -89,9 +85,7 @@ export class CompleteTaskTool<
         return `Missing required argument '${outputName}' for completion.`;
       }
 
-      const validationResult = this.outputConfig.schema.safeParse(
-        params[outputName],
-      );
+      const validationResult = this.outputConfig.schema.safeParse(params[outputName]);
       if (!validationResult.success) {
         return `Output validation failed: ${JSON.stringify(validationResult.error.flatten())}`;
       }

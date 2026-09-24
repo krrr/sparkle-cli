@@ -39,10 +39,7 @@ vi.mock('../telemetry/types.js', () => ({
   ToolCallEvent: vi.fn().mockImplementation((call) => ({ ...call })),
 }));
 
-import {
-  SchedulerStateManager,
-  type TerminalCallHandler,
-} from './state-manager.js';
+import { SchedulerStateManager, type TerminalCallHandler } from './state-manager.js';
 import { checkPolicy, updatePolicy } from './policy.js';
 import { ToolExecutor } from './tool-executor.js';
 import { ToolModificationHandler } from './tool-modifier.js';
@@ -316,12 +313,10 @@ describe('Scheduler Parallel Execution', () => {
       configurable: true,
     });
 
-    vi.mocked(SchedulerStateManager).mockImplementation(
-      (_bus, _id, onTerminal) => {
-        capturedTerminalHandler = onTerminal;
-        return mockStateManager as unknown as SchedulerStateManager;
-      },
-    );
+    vi.mocked(SchedulerStateManager).mockImplementation((_bus, _id, onTerminal) => {
+      capturedTerminalHandler = onTerminal;
+      return mockStateManager as unknown as SchedulerStateManager;
+    });
 
     mockExecutor = { execute: vi.fn() } as unknown as Mocked<ToolExecutor>;
     vi.mocked(ToolExecutor).mockReturnValue(
@@ -647,12 +642,7 @@ describe('Scheduler Parallel Execution', () => {
       await scheduler.schedule([e1, e2], signal);
 
       // Even though wait_for_previous is false, EDIT_TOOL_NAMES enforces sequential execution
-      expect(executionLog).toEqual([
-        'start-e1',
-        'end-e1',
-        'start-e2',
-        'end-e2',
-      ]);
+      expect(executionLog).toEqual(['start-e1', 'end-e1', 'start-e2', 'end-e2']);
     },
   );
 });

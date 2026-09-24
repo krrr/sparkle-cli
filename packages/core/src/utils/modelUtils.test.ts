@@ -13,15 +13,11 @@ describe('modelUtils', () => {
       expect(normalizeModelId('models/gemini-3.1-pro-preview')).toBe(
         'gemini-3.1-pro-preview',
       );
-      expect(normalizeModelId('models/gemini-1.5-flash')).toBe(
-        'gemini-1.5-flash',
-      );
+      expect(normalizeModelId('models/gemini-1.5-flash')).toBe('gemini-1.5-flash');
     });
 
     it('should leave model ID untouched if prefix is not present', () => {
-      expect(normalizeModelId('gemini-3.1-pro-preview')).toBe(
-        'gemini-3.1-pro-preview',
-      );
+      expect(normalizeModelId('gemini-3.1-pro-preview')).toBe('gemini-3.1-pro-preview');
       expect(normalizeModelId('auto')).toBe('auto');
     });
 

@@ -150,21 +150,13 @@ describe('BaseTokenStorage', () => {
 
   describe('sanitizeServerName', () => {
     it.each([
-      [
-        'valid characters',
-        'test-server.example_123',
-        'test-server.example_123',
-      ],
+      ['valid characters', 'test-server.example_123', 'test-server.example_123'],
       [
         'invalid characters with underscore replacement',
         'test@server#example',
         'test_server_example',
       ],
-      [
-        'special characters',
-        'test server/example:123',
-        'test_server_example_123',
-      ],
+      ['special characters', 'test server/example:123', 'test_server_example_123'],
     ])('should handle %s', (_, input, expected) => {
       expect(storage.sanitizeServerName(input)).toBe(expected);
     });

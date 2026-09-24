@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  REFERENCE_CONTENT_START,
-  REFERENCE_CONTENT_END,
-} from 'sparkle-cli-core';
+import { REFERENCE_CONTENT_START, REFERENCE_CONTENT_END } from 'sparkle-cli-core';
 
 export const formatBytes = (bytes: number): string => {
   const gb = bytes / (1024 * 1024 * 1024);
@@ -120,9 +117,7 @@ export const formatResetTime = (
     const hoursStr = hours > 0 ? `${hours}h` : '';
     const minutesStr = minutes > 0 ? `${minutes}m` : '';
     const duration =
-      hoursStr && minutesStr
-        ? `${hoursStr} ${minutesStr}`
-        : hoursStr || minutesStr;
+      hoursStr && minutesStr ? `${hoursStr} ${minutesStr}` : hoursStr || minutesStr;
 
     if (isColumn) {
       const timeStr = new Intl.DateTimeFormat('en-US', {

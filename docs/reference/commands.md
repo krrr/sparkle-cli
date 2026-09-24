@@ -1,8 +1,8 @@
 # CLI commands
 
 Sparkle CLI supports several built-in commands to help you manage your session,
-customize the interface, and control its behavior. These commands are prefixed
-with a forward slash (`/`), an at symbol (`@`), or an exclamation mark (`!`).
+customize the interface, and control its behavior. These commands are prefixed with a
+forward slash (`/`), an at symbol (`@`), or an exclamation mark (`!`).
 
 ## Slash commands (`/`)
 
@@ -19,8 +19,8 @@ Slash commands provide meta-level control over the CLI itself.
 - **Description:** Manage local and remote subagents.
 - **Sub-commands:**
   - **`list`**:
-    - **Description:** Lists all discovered agents, including built-in, local,
-      and remote agents.
+    - **Description:** Lists all discovered agents, including built-in, local, and
+      remote agents.
     - **Usage:** `/agents list`
   - **`reload`** (alias: `refresh`):
     - **Description:** Rescans agent directories (`~/.sparkle/agents` and
@@ -33,27 +33,27 @@ Slash commands provide meta-level control over the CLI itself.
     - **Description:** Disables a specific subagent.
     - **Usage:** `/agents disable <agent-name>`
   - **`config`**:
-    - **Description:** Opens a configuration dialog for the specified agent to
-      adjust its model, temperature, or execution limits.
+    - **Description:** Opens a configuration dialog for the specified agent to adjust
+      its model, temperature, or execution limits.
     - **Usage:** `/agents config <agent-name>`
 
 ### `/provider`
 
-- **Description:** Open a dialog that lets you configure LLM API providers (for
-  example, setting up a Gemini API key profile).
+- **Description:** Open a dialog that lets you configure LLM API providers (for example,
+  setting up a Gemini API key profile).
 
 ### `/bug`
 
-- **Description:** File an issue about Sparkle CLI. By default, the issue is
-  filed within the GitHub repository for Sparkle CLI. The string you enter after
-  `/bug` will become the headline for the bug being filed. The default `/bug`
-  behavior can be modified using the `advanced.bugCommand` setting in your
-  `.sparkle/settings.json` files.
+- **Description:** File an issue about Sparkle CLI. By default, the issue is filed
+  within the GitHub repository for Sparkle CLI. The string you enter after `/bug` will
+  become the headline for the bug being filed. The default `/bug` behavior can be
+  modified using the `advanced.bugCommand` setting in your `.sparkle/settings.json`
+  files.
 
 ### `/chat`
 
-- **Description:** Browse and resume previous conversation sessions, and manage
-  manual chat checkpoints.
+- **Description:** Browse and resume previous conversation sessions, and manage manual
+  chat checkpoints.
 - **Features:**
   - **Auto sessions:** Run `/chat` to open the interactive session browser for
     automatically saved conversations.
@@ -61,22 +61,19 @@ Slash commands provide meta-level control over the CLI itself.
     `/chat resume`, etc.).
   - **Management:** Delete unwanted sessions directly from the browser.
   - **Resume:** Select any session to resume and continue the conversation.
-  - **Search:** Use `/` to search through conversation content across all
-    sessions.
+  - **Search:** Use `/` to search through conversation content across all sessions.
   - **Session Browser:** Interactive interface showing all saved sessions with
     timestamps, message counts, and first user message for context.
   - **Sorting:** Sort sessions by date or message count.
-- **Note:** All conversations are automatically saved as you chat - no manual
-  saving required. See [Session Management](../cli/session-management.md) for
-  complete details.
+- **Note:** All conversations are automatically saved as you chat - no manual saving
+  required. See [Session Management](../cli/session-management.md) for complete details.
 - **Alias:** `/resume` provides the same behavior and subcommands.
 - **Menu layout when typing `/chat` (or `/resume`)**:
   - `-- auto --`
     - `list` (selecting this opens the auto-saved session browser)
   - `-- checkpoints --`
     - `list`, `save`, `resume`, `delete`, `share` (manual tagged checkpoints)
-  - Unique prefixes (for example `/cha` or `/resu`) resolve to the same grouped
-    menu.
+  - Unique prefixes (for example `/cha` or `/resu`) resolve to the same grouped menu.
 - **Sub-commands:**
   - **`debug`**
     - **Description:** Export the most recent API request as a JSON payload.
@@ -85,43 +82,41 @@ Slash commands provide meta-level control over the CLI itself.
     - **Alias form:** `/resume delete <tag>`
   - **`list`**
     - **Description:** Lists available tags for manually saved checkpoints.
-    - **Note:** This command only lists chats saved within the current project.
-      Because chat history is project-scoped, chats saved in other project
-      directories will not be displayed.
+    - **Note:** This command only lists chats saved within the current project. Because
+      chat history is project-scoped, chats saved in other project directories will not
+      be displayed.
     - **Alias form:** `/resume list`
   - **`resume <tag>`**
     - **Description:** Resumes a conversation from a previous save.
-    - **Note:** You can only resume chats that were saved within the current
-      project. To resume a chat from a different project, you must run the
-      Sparkle CLI from that project's directory.
+    - **Note:** You can only resume chats that were saved within the current project. To
+      resume a chat from a different project, you must run the Sparkle CLI from that
+      project's directory.
     - **Alias form:** `/resume resume <tag>`
   - **`save <tag>`**
-    - **Description:** Saves the current conversation history. You must add a
-      `<tag>` for identifying the conversation state.
+    - **Description:** Saves the current conversation history. You must add a `<tag>`
+      for identifying the conversation state.
     - **Details on checkpoint location:** The default locations for saved chat
       checkpoints are:
       - Linux/macOS: `~/.sparkle/data/<project-id>/`
       - Windows: `C:\Users\<YourUsername>\.sparkle\data\<project-id>\`
-      - **Behavior:** Chats are saved into a project-specific directory,
-        determined by where you run the CLI. Consequently, saved chats are only
-        accessible when working within that same project.
-      - **Note:** These checkpoints are for manually saving and resuming
-        conversation states. For automatic checkpoints created before file
-        modifications, see the
+      - **Behavior:** Chats are saved into a project-specific directory, determined by
+        where you run the CLI. Consequently, saved chats are only accessible when
+        working within that same project.
+      - **Note:** These checkpoints are for manually saving and resuming conversation
+        states. For automatic checkpoints created before file modifications, see the
         [Checkpointing documentation](../cli/checkpointing.md).
       - **Alias form:** `/resume save <tag>`
   - **`share [filename]`**
-    - **Description:** Writes the current conversation to a provided Markdown or
-      JSON file. If no filename is provided, then the CLI will generate one.
+    - **Description:** Writes the current conversation to a provided Markdown or JSON
+      file. If no filename is provided, then the CLI will generate one.
     - **Usage:** `/chat share file.md` or `/chat share file.json`.
     - **Alias form:** `/resume share [filename]`
 
 ### `/clear`
 
-- **Description:** Clear the terminal screen, including the visible session
-  history and scrollback within the CLI. The underlying session data (for
-  history recall) might be preserved depending on the exact implementation, but
-  the visual display is cleared.
+- **Description:** Clear the terminal screen, including the visible session history and
+  scrollback within the CLI. The underlying session data (for history recall) might be
+  preserved depending on the exact implementation, but the visual display is cleared.
 - **Keyboard shortcut:** Press **Ctrl+L** at any time to perform a clear action.
 
 ### `/commands`
@@ -129,48 +124,46 @@ Slash commands provide meta-level control over the CLI itself.
 - **Description:** Manage custom slash commands loaded from `.toml` files.
 - **Sub-commands:**
   - **`list`**:
-    - **Description:** List available custom command `.toml` files from all
-      sources (user-level `~/.sparkle/commands/`, project-level
-      `<project>/.sparkle/commands/`, and active extensions).
+    - **Description:** List available custom command `.toml` files from all sources
+      (user-level `~/.sparkle/commands/`, project-level `<project>/.sparkle/commands/`,
+      and active extensions).
     - **Usage:** `/commands list`
   - **`reload`**:
-    - **Description:** Reload custom command definitions from all sources
-      (user-level `~/.sparkle/commands/`, project-level
-      `<project>/.sparkle/commands/`, MCP prompts, and extensions). Use this to
-      pick up new or modified `.toml` files without restarting the CLI.
+    - **Description:** Reload custom command definitions from all sources (user-level
+      `~/.sparkle/commands/`, project-level `<project>/.sparkle/commands/`, MCP prompts,
+      and extensions). Use this to pick up new or modified `.toml` files without
+      restarting the CLI.
     - **Usage:** `/commands reload`
 
 ### `/compress`
 
-- **Description:** Replace the entire chat context with a summary. This saves on
-  tokens used for future tasks while retaining a high level summary of what has
-  happened.
+- **Description:** Replace the entire chat context with a summary. This saves on tokens
+  used for future tasks while retaining a high level summary of what has happened.
 
 ### `/copy`
 
-- **Description:** Copies the last output produced by Sparkle CLI to your
-  clipboard, for easy sharing or reuse.
+- **Description:** Copies the last output produced by Sparkle CLI to your clipboard, for
+  easy sharing or reuse.
 - **Behavior:**
   - Local sessions use system clipboard tools (pbcopy/xclip/clip).
   - Remote sessions (SSH/WSL) use OSC 52 and require terminal support.
-- **Note:** This command requires platform-specific clipboard tools to be
-  installed.
-  - On Linux, it requires `xclip` or `xsel`. You can typically install them
-    using your system's package manager.
-  - On macOS, it requires `pbcopy`, and on Windows, it requires `clip`. These
-    tools are typically pre-installed on their respective systems.
+- **Note:** This command requires platform-specific clipboard tools to be installed.
+  - On Linux, it requires `xclip` or `xsel`. You can typically install them using your
+    system's package manager.
+  - On macOS, it requires `pbcopy`, and on Windows, it requires `clip`. These tools are
+    typically pre-installed on their respective systems.
 
 ### `/directory` (or `/dir`)
 
 - **Description:** Manage workspace directories for multi-directory support.
 - **Sub-commands:**
   - **`add`**:
-    - **Description:** Add a directory to the workspace. The path can be
-      absolute or relative to the current working directory. Moreover, the
-      reference from home directory is supported as well.
+    - **Description:** Add a directory to the workspace. The path can be absolute or
+      relative to the current working directory. Moreover, the reference from home
+      directory is supported as well.
     - **Usage:** `/directory add <path1>,<path2>`
-    - **Note:** Disabled in restrictive sandbox profiles. If you're using that,
-      use `--include-directories` when starting the session instead.
+    - **Note:** Disabled in restrictive sandbox profiles. If you're using that, use
+      `--include-directories` when starting the session instead.
   - **`show`**:
     - **Description:** Display all directories added by `/directory add` and
       `--include-directories`.
@@ -212,13 +205,13 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/help` (or `/?`)
 
-- **Description:** Display help information about Sparkle CLI, including
-  available commands and their usage.
+- **Description:** Display help information about Sparkle CLI, including available
+  commands and their usage.
 
 ### `/hooks`
 
-- **Description:** Manage hooks, which allow you to intercept and customize
-  Sparkle CLI behavior at specific lifecycle events.
+- **Description:** Manage hooks, which allow you to intercept and customize Sparkle CLI
+  behavior at specific lifecycle events.
 - **Sub-commands:**
   - **`disable-all`**:
     - **Description:** Disable all enabled hooks.
@@ -247,9 +240,8 @@ Slash commands provide meta-level control over the CLI itself.
 ### `/init`
 
 - **Description:** To help users easily create an `AGENTS.md` file, this command
-  analyzes the current directory and generates a tailored context file, making
-  it simpler for them to provide project-specific instructions to the Sparkle
-  agent.
+  analyzes the current directory and generates a tailored context file, making it
+  simpler for them to provide project-specific instructions to the Sparkle agent.
 
 ### `/mcp`
 
@@ -258,9 +250,9 @@ Slash commands provide meta-level control over the CLI itself.
   - **`auth`**:
     - **Description:** Authenticate with an OAuth-enabled MCP server.
     - **Usage:** `/mcp auth <server-name>`
-    - **Details:** If `<server-name>` is provided, it initiates the OAuth flow
-      for that server. If no server name is provided, it lists all configured
-      servers that support OAuth authentication.
+    - **Details:** If `<server-name>` is provided, it initiates the OAuth flow for that
+      server. If no server name is provided, it lists all configured servers that
+      support OAuth authentication.
   - **`desc`**
     - **Description:** List configured MCP servers and tools with descriptions.
   - **`disable`**
@@ -268,36 +260,33 @@ Slash commands provide meta-level control over the CLI itself.
   - **`enable`**
     - **Description:** Enable a disabled MCP server.
   - **`list`** or **`ls`**:
-    - **Description:** List configured MCP servers and tools. This is the
-      default action if no subcommand is specified.
+    - **Description:** List configured MCP servers and tools. This is the default action
+      if no subcommand is specified.
   - **`reload`**:
-    - **Description:** Reloads all MCP servers and re-discovers their available
-      tools.
+    - **Description:** Reloads all MCP servers and re-discovers their available tools.
   - **`schema`**:
-    - **Description:** List configured MCP servers and tools with descriptions
-      and schemas.
+    - **Description:** List configured MCP servers and tools with descriptions and
+      schemas.
 
 ### `/memory`
 
-- **Description:** Manage the AI's instructional context (hierarchical memory
-  loaded from `AGENTS.md` files).
+- **Description:** Manage the AI's instructional context (hierarchical memory loaded
+  from `AGENTS.md` files).
 - **Sub-commands:**
   - **`list`**:
-    - **Description:** Lists the paths of the AGENTS.md files in use for
-      hierarchical memory.
+    - **Description:** Lists the paths of the AGENTS.md files in use for hierarchical
+      memory.
   - **`refresh`**:
-    - **Description:** Reload the hierarchical instructional memory from all
-      `AGENTS.md` files found in the configured locations (global,
-      project/ancestors, and sub-directories). This command updates the model
-      with the latest `AGENTS.md` content.
+    - **Description:** Reload the hierarchical instructional memory from all `AGENTS.md`
+      files found in the configured locations (global, project/ancestors, and
+      sub-directories). This command updates the model with the latest `AGENTS.md`
+      content.
   - **`show`**:
     - **Description:** Display the full, concatenated content of the current
-      hierarchical memory that has been loaded from all `AGENTS.md` files. This
-      lets you inspect the instructional context being provided to the Gemini
-      model.
-  - **Note:** For more details on how `AGENTS.md` files contribute to
-    hierarchical memory, see the
-    [CLI Configuration documentation](./configuration.md).
+      hierarchical memory that has been loaded from all `AGENTS.md` files. This lets you
+      inspect the instructional context being provided to the Gemini model.
+  - **Note:** For more details on how `AGENTS.md` files contribute to hierarchical
+    memory, see the [CLI Configuration documentation](./configuration.md).
 
 ### `/model`
 
@@ -319,8 +308,8 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/plan`
 
-- **Description:** Switch to Plan Mode (read-only) and view the current plan if
-  one has been generated.
+- **Description:** Switch to Plan Mode (read-only) and view the current plan if one has
+  been generated.
   - **Note:** This feature is enabled by default. It can be disabled via the
     `general.plan.enabled` setting in your configuration.
 - **Sub-commands:**
@@ -336,24 +325,23 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/privacy`
 
-- **Description:** Display the Privacy Notice and allow users to select whether
-  they consent to the collection of their data for service improvement purposes.
+- **Description:** Display the Privacy Notice and allow users to select whether they
+  consent to the collection of their data for service improvement purposes.
 
 ### `/quit` (or `/exit`)
 
 - **Description:** Exit Sparkle CLI.
 - **Flags:**
-  - **`--delete`** _(optional)_: Exit and permanently delete the current
-    session's history and temporary files (chat recording, tool outputs). Useful
-    for privacy or one-off tasks where you don't want to leave any traces.
+  - **`--delete`** _(optional)_: Exit and permanently delete the current session's
+    history and temporary files (chat recording, tool outputs). Useful for privacy or
+    one-off tasks where you don't want to leave any traces.
   - **Usage:** `/quit --delete` or `/exit --delete`
 
 ### `/restore`
 
-- **Description:** Restores the project files to the state they were in just
-  before a tool was executed. This is particularly useful for undoing file edits
-  made by a tool. If run without a tool call ID, it will list available
-  checkpoints to restore from.
+- **Description:** Restores the project files to the state they were in just before a
+  tool was executed. This is particularly useful for undoing file edits made by a tool.
+  If run without a tool call ID, it will list available checkpoints to restore from.
 - **Usage:** `/restore [tool_call_id]`
 - **Note:** Only available if checkpointing is configured via
   [settings](./configuration.md). See
@@ -361,46 +349,41 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/rewind`
 
-- **Description:** Navigates backward through the conversation history, letting
-  you review past interactions and potentially revert both chat state and file
-  changes.
+- **Description:** Navigates backward through the conversation history, letting you
+  review past interactions and potentially revert both chat state and file changes.
 - **Usage:** Press **Esc** twice as a shortcut.
 - **Features:**
   - **Select Interaction:** Preview user prompts and file changes.
-  - **Action Selection:** Choose to rewind history only, revert code changes
-    only, or both.
+  - **Action Selection:** Choose to rewind history only, revert code changes only, or
+    both.
 
 ### `/resume`
 
-- **Description:** Alias for `/chat`. Both `/chat` and `/resume` open the
-  session browser and expose the same checkpoint subcommands.
-- **Compatibility alias:** `/resume checkpoints ...` is still accepted for the
-  same checkpoint commands.
+- **Description:** Alias for `/chat`. Both `/chat` and `/resume` open the session
+  browser and expose the same checkpoint subcommands.
+- **Compatibility alias:** `/resume checkpoints ...` is still accepted for the same
+  checkpoint commands.
 
 ### `/settings`
 
-- **Description:** Open the settings editor to view and modify Sparkle CLI
-  settings.
-- **Details:** This command provides a user-friendly interface for changing
-  settings that control the behavior and appearance of Sparkle CLI. It is
-  equivalent to manually editing the `.sparkle/settings.json` file, but with
-  validation and guidance to prevent errors. See the
-  [settings documentation](../cli/settings.md) for a full list of available
-  settings.
-- **Usage:** Simply run `/settings` and the editor will open. You can then
-  browse or search for specific settings, view their current values, and modify
-  them as desired. Changes to some settings are applied immediately, while
-  others require a restart.
+- **Description:** Open the settings editor to view and modify Sparkle CLI settings.
+- **Details:** This command provides a user-friendly interface for changing settings
+  that control the behavior and appearance of Sparkle CLI. It is equivalent to manually
+  editing the `.sparkle/settings.json` file, but with validation and guidance to prevent
+  errors. See the [settings documentation](../cli/settings.md) for a full list of
+  available settings.
+- **Usage:** Simply run `/settings` and the editor will open. You can then browse or
+  search for specific settings, view their current values, and modify them as desired.
+  Changes to some settings are applied immediately, while others require a restart.
 
 ### `/shells` (or `/bashes`)
 
-- **Description:** Toggle the background shells view. This lets you view and
-  manage long-running processes that you've sent to the background.
+- **Description:** Toggle the background shells view. This lets you view and manage
+  long-running processes that you've sent to the background.
 
 ### `/setup-github`
 
-- **Description:** Set up GitHub Actions to triage issues and review PRs with
-  Sparkle.
+- **Description:** Set up GitHub Actions to triage issues and review PRs with Sparkle.
 
 ### `/skills`
 
@@ -417,70 +400,65 @@ Slash commands provide meta-level control over the CLI itself.
     - **Description:** List all discovered skills and their current status
       (enabled/disabled).
   - **`reload`**:
-    - **Description:** Refresh the list of discovered skills from all tiers
-      (workspace, user, and extensions).
+    - **Description:** Refresh the list of discovered skills from all tiers (workspace,
+      user, and extensions).
 
 ### `/stats`
 
-- **Description:** Display detailed statistics for the current Sparkle CLI
-  session.
+- **Description:** Display detailed statistics for the current Sparkle CLI session.
 - **Sub-commands:**
   - **`session`**:
-    - **Description:** Show session-specific usage statistics, including
-      duration, tool calls, and performance metrics. This is the default view.
+    - **Description:** Show session-specific usage statistics, including duration, tool
+      calls, and performance metrics. This is the default view.
   - **`model`**:
-    - **Description:** Show model-specific usage statistics, including token
-      counts and quota information.
+    - **Description:** Show model-specific usage statistics, including token counts and
+      quota information.
   - **`tools`**:
     - **Description:** Show tool-specific usage statistics.
 
 ### `/terminal-setup`
 
-- **Description:** Configure terminal keybindings for multiline input (VS Code,
-  Cursor, Windsurf).
+- **Description:** Configure terminal keybindings for multiline input (VS Code, Cursor,
+  Windsurf).
 
 ### `/theme`
 
-- **Description:** Open a dialog that lets you change the visual theme of
-  Sparkle CLI.
+- **Description:** Open a dialog that lets you change the visual theme of Sparkle CLI.
 
 ### `/tools`
 
-- **Description:** Display a list of tools that are currently available within
-  Sparkle CLI.
+- **Description:** Display a list of tools that are currently available within Sparkle
+  CLI.
 - **Usage:** `/tools [desc]`
 - **Sub-commands:**
   - **`desc`** or **`descriptions`**:
-    - **Description:** Show detailed descriptions of each tool, including each
-      tool's name with its full description as provided to the model.
+    - **Description:** Show detailed descriptions of each tool, including each tool's
+      name with its full description as provided to the model.
   - **`nodesc`** or **`nodescriptions`**:
     - **Description:** Hide tool descriptions, showing only the tool names.
 
 ### `/vim`
 
-- **Description:** Toggle vim mode on or off. When vim mode is enabled, the
-  input area supports vim-style navigation and editing commands in both NORMAL
-  and INSERT modes.
+- **Description:** Toggle vim mode on or off. When vim mode is enabled, the input area
+  supports vim-style navigation and editing commands in both NORMAL and INSERT modes.
 - **Features:**
-  - **Count support:** Prefix commands with numbers (for example, `3h`, `5w`,
-    `10G`)
-  - **Editing commands:** Delete with `x`, change with `c`, insert with `i`,
-    `a`, `o`, `O`; complex operations like `dd`, `cc`, `dw`, `cw`
+  - **Count support:** Prefix commands with numbers (for example, `3h`, `5w`, `10G`)
+  - **Editing commands:** Delete with `x`, change with `c`, insert with `i`, `a`, `o`,
+    `O`; complex operations like `dd`, `cc`, `dw`, `cw`
   - **INSERT mode:** Standard text input with escape to return to NORMAL mode
-  - **NORMAL mode:** Navigate with `h`, `j`, `k`, `l`; jump by words with `w`,
-    `b`, `e`; go to line start/end with `0`, `$`, `^`; go to specific lines with
-    `G` (or `gg` for first line)
-  - **Persistent setting:** Vim mode preference is saved to
-    `~/.sparkle/settings.json` and restored between sessions
+  - **NORMAL mode:** Navigate with `h`, `j`, `k`, `l`; jump by words with `w`, `b`, `e`;
+    go to line start/end with `0`, `$`, `^`; go to specific lines with `G` (or `gg` for
+    first line)
+  - **Persistent setting:** Vim mode preference is saved to `~/.sparkle/settings.json`
+    and restored between sessions
   - **Repeat last command:** Use `.` to repeat the last editing operation
-  - **Status indicator:** When enabled, shows `[NORMAL]` or `[INSERT]` in the
-    footer
+  - **Status indicator:** When enabled, shows `[NORMAL]` or `[INSERT]` in the footer
 
 ### Custom commands
 
-Custom commands allow you to create personalized shortcuts for your most-used
-prompts. For detailed instructions on how to create, manage, and use them, see
-the dedicated [Custom Commands documentation](../cli/custom-commands.md).
+Custom commands allow you to create personalized shortcuts for your most-used prompts.
+For detailed instructions on how to create, manage, and use them, see the dedicated
+[Custom Commands documentation](../cli/custom-commands.md).
 
 ## Input prompt shortcuts
 
@@ -488,74 +466,71 @@ These shortcuts apply directly to the input prompt for text manipulation.
 
 - **Undo:**
 
-  - **Keyboard shortcut:** Press **Ctrl+z** (Windows), **Cmd+z** (macOS), or
-    **Alt+z** (Linux/WSL) to undo the last action in the input prompt.
+  - **Keyboard shortcut:** Press **Ctrl+z** (Windows), **Cmd+z** (macOS), or **Alt+z**
+    (Linux/WSL) to undo the last action in the input prompt.
 
 - **Redo:**
-  - **Keyboard shortcut:** Press **Shift+Cmd+Z** (macOS), or **Shift+Alt+Z**
-    (Linux/WSL) to redo the last undone action in the input prompt.
+  - **Keyboard shortcut:** Press **Shift+Cmd+Z** (macOS), or **Shift+Alt+Z** (Linux/WSL)
+    to redo the last undone action in the input prompt.
 
 ## At commands (`@`)
 
-At commands are used to include the content of files or directories as part of
-your prompt to Sparkle. These commands include git-aware filtering.
+At commands are used to include the content of files or directories as part of your
+prompt to Sparkle. These commands include git-aware filtering.
 
 - **`@<path_to_file_or_directory>`**
 
-  - **Description:** Inject the content of the specified file, or the structure
-    of the specified directory, into your current prompt. This is useful for
-    asking questions about specific code, text, or collections of files.
+  - **Description:** Inject the content of the specified file, or the structure of the
+    specified directory, into your current prompt. This is useful for asking questions
+    about specific code, text, or collections of files.
   - **Examples:**
     - `@path/to/your/file.txt Explain this text.`
     - `@src/my_project/ What files are in this directory?`
     - `What is this file about? @README.md`
   - **Details:**
     - If a path to a single file is provided, the content of that file is read.
-    - If a path to a directory is provided, the command lists the names of the
-      files and subdirectories directly within it instead of reading the files
-      hemselves. You can follow up by referencing specific files to read their
-      content.
+    - If a path to a directory is provided, the command lists the names of the files and
+      subdirectories directly within it instead of reading the files hemselves. You can
+      follow up by referencing specific files to read their content.
     - Spaces in paths should be escaped with a backslash (for example,
       `@My\ Documents/file.txt`).
-    - The command uses the `read_many_files` tool for files and the
-      `list_directory` tool for directories. The content is fetched and then
-      inserted into your query before being sent to the Gemini model.
-    - **Git-aware filtering:** By default, git-ignored files (like
-      `node_modules/`, `dist/`, `.env`, `.git/`) are excluded. This behavior can
-      be changed via the `context.fileFiltering` settings.
-    - **File types:** The command is intended for text-based files. While it
-      might attempt to read any file, binary files or very large files might be
-      skipped or truncated by the underlying `read_many_files` tool to ensure
-      performance and relevance. The tool indicates if files were skipped.
-  - **Output:** The CLI will show a tool call message indicating that
-    `read_many_files` was used for files (and `list_directory` for directories),
-    along with a message detailing the status and the path(s) that were
-    processed.
+    - The command uses the `read_many_files` tool for files and the `list_directory`
+      tool for directories. The content is fetched and then inserted into your query
+      before being sent to the Gemini model.
+    - **Git-aware filtering:** By default, git-ignored files (like `node_modules/`,
+      `dist/`, `.env`, `.git/`) are excluded. This behavior can be changed via the
+      `context.fileFiltering` settings.
+    - **File types:** The command is intended for text-based files. While it might
+      attempt to read any file, binary files or very large files might be skipped or
+      truncated by the underlying `read_many_files` tool to ensure performance and
+      relevance. The tool indicates if files were skipped.
+  - **Output:** The CLI will show a tool call message indicating that `read_many_files`
+    was used for files (and `list_directory` for directories), along with a message
+    detailing the status and the path(s) that were processed.
 
 - **`@` (Lone at symbol)**
-  - **Description:** If you type a lone `@` symbol without a path, the query is
-    passed as-is to the Gemini model. This might be useful if you are
-    specifically talking _about_ the `@` symbol in your prompt.
+  - **Description:** If you type a lone `@` symbol without a path, the query is passed
+    as-is to the Gemini model. This might be useful if you are specifically talking
+    _about_ the `@` symbol in your prompt.
 
 ### Error handling for `@` commands
 
-- If the path specified after `@` is not found or is invalid, an error message
-  will be displayed, and the query might not be sent to the Gemini model, or it
-  will be sent without the file content.
-- If the `read_many_files` tool encounters an error (for example, permission
-  issues), this will also be reported.
+- If the path specified after `@` is not found or is invalid, an error message will be
+  displayed, and the query might not be sent to the Gemini model, or it will be sent
+  without the file content.
+- If the `read_many_files` tool encounters an error (for example, permission issues),
+  this will also be reported.
 
 ## Shell mode and passthrough commands (`!`)
 
-The `!` prefix lets you interact with your system's shell directly from within
-Sparkle CLI.
+The `!` prefix lets you interact with your system's shell directly from within Sparkle
+CLI.
 
 - **`!<shell_command>`**
 
-  - **Description:** Execute the given `<shell_command>` using `bash` on
-    Linux/macOS or `powershell.exe -NoProfile -Command` on Windows (unless you
-    override `ComSpec`). Any output or errors from the command are displayed in
-    the terminal.
+  - **Description:** Execute the given `<shell_command>` using `bash` on Linux/macOS or
+    `powershell.exe -NoProfile -Command` on Windows (unless you override `ComSpec`). Any
+    output or errors from the command are displayed in the terminal.
   - **Examples:**
     - `!ls -la` (executes `ls -la` and returns to Sparkle CLI)
     - `!git status` (executes `git status` and returns to Sparkle CLI)
@@ -564,18 +539,15 @@ Sparkle CLI.
 
   - **Description:** Typing `!` on its own toggles shell mode.
     - **Entering shell mode:**
-      - When active, shell mode uses a different coloring and a "Shell Mode
-        Indicator".
-      - While in shell mode, text you type is interpreted directly as a shell
-        command.
+      - When active, shell mode uses a different coloring and a "Shell Mode Indicator".
+      - While in shell mode, text you type is interpreted directly as a shell command.
     - **Exiting shell mode:**
-      - When exited, the UI reverts to its standard appearance and normal
-        Sparkle CLI behavior resumes.
+      - When exited, the UI reverts to its standard appearance and normal Sparkle CLI
+        behavior resumes.
 
-- **Caution for all `!` usage:** Commands you execute in shell mode have the
-  same permissions and impact as if you ran them directly in your terminal.
+- **Caution for all `!` usage:** Commands you execute in shell mode have the same
+  permissions and impact as if you ran them directly in your terminal.
 
-- **Environment variable:** When a command is executed via `!` or in shell mode,
-  the `SPARKLE_CLI=1` environment variable is set in the subprocess's
-  environment. This allows scripts or tools to detect if they are being run from
-  within Sparkle CLI.
+- **Environment variable:** When a command is executed via `!` or in shell mode, the
+  `SPARKLE_CLI=1` environment variable is set in the subprocess's environment. This
+  allows scripts or tools to detect if they are being run from within Sparkle CLI.

@@ -71,9 +71,7 @@ export class OAuthUtils {
   static buildWellKnownUrls(baseUrl: string, useRootDiscovery = false) {
     const serverUrl = new URL(baseUrl);
     const base = `${serverUrl.protocol}//${serverUrl.host}`;
-    const pathSuffix = useRootDiscovery
-      ? ''
-      : serverUrl.pathname.replace(/\/$/, ''); // Remove trailing slash
+    const pathSuffix = useRootDiscovery ? '' : serverUrl.pathname.replace(/\/$/, ''); // Remove trailing slash
 
     return {
       protectedResource: new URL(
@@ -205,13 +203,10 @@ export class OAuthUtils {
     );
 
     // 2. OpenID Connect Discovery 1.0
-    endpointsToTry.push(
-      new URL('/.well-known/openid-configuration', base).toString(),
-    );
+    endpointsToTry.push(new URL('/.well-known/openid-configuration', base).toString());
 
     for (const endpoint of endpointsToTry) {
-      const authServerMetadata =
-        await this.fetchAuthorizationServerMetadata(endpoint);
+      const authServerMetadata = await this.fetchAuthorizationServerMetadata(endpoint);
       if (authServerMetadata) {
         return authServerMetadata;
       }
@@ -229,9 +224,7 @@ export class OAuthUtils {
    * @param serverUrl The base URL of the server
    * @returns The discovered OAuth configuration or null if not available
    */
-  static async discoverOAuthConfig(
-    serverUrl: string,
-  ): Promise<MCPOAuthConfig | null> {
+  static async discoverOAuthConfig(serverUrl: string): Promise<MCPOAuthConfig | null> {
     try {
       // RFC 9728 §3.1: Construct well-known URL by inserting /.well-known/oauth-protected-resource
       // between the host and path. This is the RFC-compliant approach.
@@ -341,8 +334,7 @@ export class OAuthUtils {
     wwwAuthenticate: string,
     mcpServerUrl?: string,
   ): Promise<MCPOAuthConfig | null> {
-    const resourceMetadataUri =
-      this.parseWWWAuthenticateHeader(wwwAuthenticate);
+    const resourceMetadataUri = this.parseWWWAuthenticateHeader(wwwAuthenticate);
     if (!resourceMetadataUri) {
       return null;
     }
@@ -443,10 +435,7 @@ export class OAuthUtils {
         return payload.exp * 1000; // Convert seconds to milliseconds
       }
     } catch (e) {
-      debugLogger.error(
-        'Failed to parse ID token for expiry time with error:',
-        e,
-      );
+      debugLogger.error('Failed to parse ID token for expiry time with error:', e);
     }
 
     // Return undefined if try block fails or 'exp' is missing/invalid

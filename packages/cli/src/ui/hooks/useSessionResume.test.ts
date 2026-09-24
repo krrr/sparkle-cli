@@ -58,17 +58,13 @@ describe('useSessionResume', () => {
 
   describe('loadHistoryForResume', () => {
     it('should return a loadHistoryForResume callback', async () => {
-      const { result } = await renderHook(() =>
-        useSessionResume(getDefaultProps()),
-      );
+      const { result } = await renderHook(() => useSessionResume(getDefaultProps()));
 
       expect(result.current.loadHistoryForResume).toBeInstanceOf(Function);
     });
 
     it('should clear history and add items when loading history', async () => {
-      const { result } = await renderHook(() =>
-        useSessionResume(getDefaultProps()),
-      );
+      const { result } = await renderHook(() => useSessionResume(getDefaultProps()));
 
       const uiHistory: HistoryItemWithoutId[] = [
         { type: 'user', text: 'Hello' },
@@ -129,12 +125,8 @@ describe('useSessionResume', () => {
         }),
       );
 
-      const uiHistory: HistoryItemWithoutId[] = [
-        { type: 'user', text: 'Hello' },
-      ];
-      const clientHistory = [
-        { role: 'user' as const, parts: [{ text: 'Hello' }] },
-      ];
+      const uiHistory: HistoryItemWithoutId[] = [{ type: 'user', text: 'Hello' }];
+      const clientHistory = [{ role: 'user' as const, parts: [{ text: 'Hello' }] }];
       const resumedData: ResumedSessionData = {
         conversation: {
           sessionId: 'test-123',
@@ -160,9 +152,7 @@ describe('useSessionResume', () => {
     });
 
     it('should handle empty history arrays', async () => {
-      const { result } = await renderHook(() =>
-        useSessionResume(getDefaultProps()),
-      );
+      const { result } = await renderHook(() => useSessionResume(getDefaultProps()));
 
       const resumedData: ResumedSessionData = {
         conversation: {
@@ -186,9 +176,7 @@ describe('useSessionResume', () => {
     });
 
     it('should restore directories from resumed session data', async () => {
-      const mockAddDirectories = vi
-        .fn()
-        .mockReturnValue({ added: [], failed: [] });
+      const mockAddDirectories = vi.fn().mockReturnValue({ added: [], failed: [] });
       const mockWorkspaceContext = {
         addDirectories: mockAddDirectories,
       };
@@ -479,9 +467,7 @@ describe('useSessionResume', () => {
       });
 
       // Should not resume again
-      expect(mockHistoryManager.clearItems).toHaveBeenCalledTimes(
-        clearItemsCallCount,
-      );
+      expect(mockHistoryManager.clearItems).toHaveBeenCalledTimes(clearItemsCallCount);
     });
 
     it('should convert session messages correctly during auto-resume', async () => {

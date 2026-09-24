@@ -63,9 +63,7 @@ describe('<ToolStatsDisplay />', () => {
       },
     });
 
-    expect(lastFrame()).toContain(
-      'No tool calls have been made in this session.',
-    );
+    expect(lastFrame()).toContain('No tool calls have been made in this session.');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });

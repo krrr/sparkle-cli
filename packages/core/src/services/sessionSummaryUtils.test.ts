@@ -28,9 +28,9 @@ vi.mock('../core/baseLlmClient.js', () => ({
 }));
 
 vi.mock('./chatRecordingService.js', async () => {
-  const actual = await vi.importActual<
-    typeof import('./chatRecordingService.js')
-  >('./chatRecordingService.js');
+  const actual = await vi.importActual<typeof import('./chatRecordingService.js')>(
+    './chatRecordingService.js',
+  );
   return {
     ...actual,
     loadConversationRecord: vi.fn(actual.loadConversationRecord),
@@ -85,10 +85,7 @@ async function writeSession(
   return filePath;
 }
 
-async function setSessionMtime(
-  filePath: string,
-  timestamp: string,
-): Promise<void> {
+async function setSessionMtime(filePath: string, timestamp: string): Promise<void> {
   const date = new Date(timestamp);
   await fs.utimes(filePath, date, date);
 }
@@ -123,14 +120,12 @@ describe('sessionSummaryUtils', () => {
 
     mockGenerateSummary = vi.fn().mockResolvedValue('Add dark mode to the app');
 
-    const { SessionSummaryService } = await import(
-      './sessionSummaryService.js'
+    const { SessionSummaryService } = await import('./sessionSummaryService.js');
+    (SessionSummaryService as unknown as ReturnType<typeof vi.fn>).mockImplementation(
+      () => ({
+        generateSummary: mockGenerateSummary,
+      }),
     );
-    (
-      SessionSummaryService as unknown as ReturnType<typeof vi.fn>
-    ).mockImplementation(() => ({
-      generateSummary: mockGenerateSummary,
-    }));
   });
 
   afterEach(async () => {
@@ -396,9 +391,7 @@ describe('sessionSummaryUtils', () => {
       await generateSummary(mockConfig);
 
       expect(mockGenerateSummary).toHaveBeenCalledTimes(1);
-      const lines = (await fs.readFile(filePath, 'utf-8'))
-        .split('\n')
-        .filter(Boolean);
+      const lines = (await fs.readFile(filePath, 'utf-8')).split('\n').filter(Boolean);
       const lastRecord = JSON.parse(lines[lines.length - 1]);
       expect(lastRecord).toEqual({
         $set: {
@@ -423,9 +416,7 @@ describe('sessionSummaryUtils', () => {
       await generateSummary(mockConfig);
 
       expect(mockGenerateSummary).not.toHaveBeenCalled();
-      const lines = (await fs.readFile(filePath, 'utf-8'))
-        .split('\n')
-        .filter(Boolean);
+      const lines = (await fs.readFile(filePath, 'utf-8')).split('\n').filter(Boolean);
       const lastRecord = JSON.parse(lines[lines.length - 1]);
       expect(lastRecord).toEqual({
         $set: {
@@ -576,11 +567,10 @@ describe('sessionSummaryUtils', () => {
       let sessionReadCount = 0;
       vi.mocked(chatRecordingService.loadConversationRecord).mockImplementation(
         async (targetPath, options) => {
-          const conversation =
-            await actualChatRecordingService.loadConversationRecord(
-              targetPath,
-              options,
-            );
+          const conversation = await actualChatRecordingService.loadConversationRecord(
+            targetPath,
+            options,
+          );
 
           if (targetPath === filePath) {
             sessionReadCount += 1;
@@ -611,9 +601,7 @@ describe('sessionSummaryUtils', () => {
       expect(savedConversation?.memoryScratchpad).toEqual({ version: 1 });
       expect(savedConversation?.lastUpdated).toBe(newerLastUpdated);
 
-      const lines = (await fs.readFile(filePath, 'utf-8'))
-        .split('\n')
-        .filter(Boolean);
+      const lines = (await fs.readFile(filePath, 'utf-8')).split('\n').filter(Boolean);
       const lastRecord = JSON.parse(lines[lines.length - 1]);
       expect(lastRecord).toEqual({
         $set: {
@@ -781,18 +769,18 @@ describe('sessionSummaryUtils', () => {
         workflowSummary: 'run_shell_command: curl -> run_shell_command: npm',
         toolSequence: ['run_shell_command: curl', 'run_shell_command: npm'],
       });
-      expect(
-        savedConversation?.memoryScratchpad?.workflowSummary,
-      ).not.toContain('Authorization');
-      expect(
-        savedConversation?.memoryScratchpad?.workflowSummary,
-      ).not.toContain('sk-secret-token');
-      expect(
-        savedConversation?.memoryScratchpad?.workflowSummary,
-      ).not.toContain('password');
-      expect(
-        savedConversation?.memoryScratchpad?.workflowSummary,
-      ).not.toContain('add-users');
+      expect(savedConversation?.memoryScratchpad?.workflowSummary).not.toContain(
+        'Authorization',
+      );
+      expect(savedConversation?.memoryScratchpad?.workflowSummary).not.toContain(
+        'sk-secret-token',
+      );
+      expect(savedConversation?.memoryScratchpad?.workflowSummary).not.toContain(
+        'password',
+      );
+      expect(savedConversation?.memoryScratchpad?.workflowSummary).not.toContain(
+        'add-users',
+      );
     });
 
     it('should not classify validation substrings as validation tools', async () => {

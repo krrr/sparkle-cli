@@ -14,9 +14,7 @@ import {
 } from '../../config/settings.js';
 
 const { emitConsoleLog, debugLogger } = await vi.hoisted(async () => {
-  const { createMockDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { createMockDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   return createMockDebugLogger({ stripAnsi: true });
 });
 
@@ -29,8 +27,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 vi.mock('../../config/settings.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../config/settings.js')>();
+  const actual = await importOriginal<typeof import('../../config/settings.js')>();
   return {
     ...actual,
     loadSettings: vi.fn(),
@@ -62,9 +59,7 @@ describe('skills disable command', () => {
         }),
         setValue: vi.fn(),
       };
-      mockLoadSettings.mockReturnValue(
-        mockSettings as unknown as LoadedSettings,
-      );
+      mockLoadSettings.mockReturnValue(mockSettings as unknown as LoadedSettings);
 
       await handleDisable({
         name: 'skill1',
@@ -90,9 +85,7 @@ describe('skills disable command', () => {
         }),
         setValue: vi.fn(),
       };
-      mockLoadSettings.mockReturnValue(
-        mockSettings as unknown as LoadedSettings,
-      );
+      mockLoadSettings.mockReturnValue(mockSettings as unknown as LoadedSettings);
 
       await handleDisable({
         name: 'skill1',

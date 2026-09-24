@@ -21,8 +21,7 @@ export const Tips: React.FC<TipsProps> = ({ config }) => {
       <Text color={theme.text.primary}>Tips for getting started:</Text>
       {geminiMdFileCount === 0 && (
         <Text color={theme.text.primary}>
-          1. Create <Text bold>AGENTS.md</Text> files to customize your
-          interactions
+          1. Create <Text bold>AGENTS.md</Text> files to customize your interactions
         </Text>
       )}
       <Text color={theme.text.primary}>
@@ -30,8 +29,8 @@ export const Tips: React.FC<TipsProps> = ({ config }) => {
         <Text color={theme.text.secondary}>/help</Text> for more information
       </Text>
       <Text color={theme.text.primary}>
-        {geminiMdFileCount === 0 ? '3.' : '2.'} Ask coding questions, edit code
-        or run commands
+        {geminiMdFileCount === 0 ? '3.' : '2.'} Ask coding questions, edit code or run
+        commands
       </Text>
       <Text color={theme.text.primary}>
         {geminiMdFileCount === 0 ? '4.' : '3.'} Be specific for the best results

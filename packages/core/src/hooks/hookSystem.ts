@@ -238,9 +238,7 @@ export class HookSystem {
     return this.hookEventHandler.firePreCompressEvent(trigger);
   }
 
-  async fireBeforeAgentEvent(
-    prompt: string,
-  ): Promise<DefaultHookOutput | undefined> {
+  async fireBeforeAgentEvent(prompt: string): Promise<DefaultHookOutput | undefined> {
     const result = await this.hookEventHandler.fireBeforeAgentEvent(prompt);
     return result.finalOutput;
   }
@@ -262,8 +260,7 @@ export class HookSystem {
     llmRequest: GenerateContentParameters,
   ): Promise<BeforeModelHookResult> {
     try {
-      const result =
-        await this.hookEventHandler.fireBeforeModelEvent(llmRequest);
+      const result = await this.hookEventHandler.fireBeforeModelEvent(llmRequest);
       const hookOutput = result.finalOutput;
 
       if (hookOutput?.shouldStopExecution()) {
@@ -281,8 +278,7 @@ export class HookSystem {
         const syntheticResponse = beforeModelOutput.getSyntheticResponse();
         return {
           blocked: true,
-          reason:
-            hookOutput?.getEffectiveReason() || 'Model call blocked by hook',
+          reason: hookOutput?.getEffectiveReason() || 'Model call blocked by hook',
           syntheticResponse,
         };
       }
@@ -361,12 +357,10 @@ export class HookSystem {
 
       if (hookOutput) {
         const toolSelectionOutput = hookOutput as BeforeToolSelectionHookOutput;
-        const modifiedConfig = toolSelectionOutput.applyToolConfigModifications(
-          {
-            toolConfig: llmRequest.config?.toolConfig,
-            tools: llmRequest.config?.tools,
-          },
-        );
+        const modifiedConfig = toolSelectionOutput.applyToolConfigModifications({
+          toolConfig: llmRequest.config?.toolConfig,
+          tools: llmRequest.config?.tools,
+        });
         return {
           toolConfig: modifiedConfig.toolConfig,
           tools: modifiedConfig.tools,

@@ -15,10 +15,7 @@ import type {
 import { resolveClassifierModel, isCustomModel } from '../../config/models.js';
 import { createUserContent, Type } from '@google/genai';
 import type { Config } from '../../config/config.js';
-import {
-  isFunctionCall,
-  isFunctionResponse,
-} from '../../utils/messageInspectors.js';
+import { isFunctionCall, isFunctionResponse } from '../../utils/messageInspectors.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { normalizeModelId } from '../../utils/modelUtils.js';
 import { LlmRole } from '../../telemetry/types.js';
@@ -176,8 +173,10 @@ export class NumericalClassifierStrategy implements RoutingStrategy {
       const routerResponse = ClassifierResponseSchema.parse(jsonResponse);
       const score = routerResponse.complexity_score;
 
-      const { threshold, groupLabel, modelAlias } =
-        await this.getRoutingDecision(score, config);
+      const { threshold, groupLabel, modelAlias } = await this.getRoutingDecision(
+        score,
+        config,
+      );
       const selectedModel = normalizeModelId(
         resolveClassifierModel(normalizeModelId(model), modelAlias, config),
       );

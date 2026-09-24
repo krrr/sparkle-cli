@@ -20,8 +20,7 @@ export function renderHookActionFeedback(
 
   if (status === 'error') {
     return (
-      error ||
-      `An error occurred while attempting to ${action} hook "${hookName}".`
+      error || `An error occurred while attempting to ${action} hook "${hookName}".`
     );
   }
 

@@ -122,37 +122,33 @@ describe('HookPlanner', () => {
       vi.mocked(mockHookRegistry.getHooksForEvent).mockReturnValue(mockEntries);
 
       // Test with EditTool - should match first hook
-      const editPlan = hookPlanner.createExecutionPlan(
-        HookEventName.BeforeTool,
-        { toolName: 'EditTool' },
-      );
+      const editPlan = hookPlanner.createExecutionPlan(HookEventName.BeforeTool, {
+        toolName: 'EditTool',
+      });
       expect(editPlan).not.toBeNull();
       expect(editPlan!.hookConfigs).toHaveLength(1);
       expect(editPlan!.hookConfigs[0].command).toBe('./edit_hook.sh');
 
       // Test with WriteTool - should match first hook
-      const writePlan = hookPlanner.createExecutionPlan(
-        HookEventName.BeforeTool,
-        { toolName: 'WriteTool' },
-      );
+      const writePlan = hookPlanner.createExecutionPlan(HookEventName.BeforeTool, {
+        toolName: 'WriteTool',
+      });
       expect(writePlan).not.toBeNull();
       expect(writePlan!.hookConfigs).toHaveLength(1);
       expect(writePlan!.hookConfigs[0].command).toBe('./edit_hook.sh');
 
       // Test with ReadTool - should match second hook
-      const readPlan = hookPlanner.createExecutionPlan(
-        HookEventName.BeforeTool,
-        { toolName: 'ReadTool' },
-      );
+      const readPlan = hookPlanner.createExecutionPlan(HookEventName.BeforeTool, {
+        toolName: 'ReadTool',
+      });
       expect(readPlan).not.toBeNull();
       expect(readPlan!.hookConfigs).toHaveLength(1);
       expect(readPlan!.hookConfigs[0].command).toBe('./read_hook.sh');
 
       // Test with unmatched tool - should match no hooks
-      const otherPlan = hookPlanner.createExecutionPlan(
-        HookEventName.BeforeTool,
-        { toolName: 'OtherTool' },
-      );
+      const otherPlan = hookPlanner.createExecutionPlan(HookEventName.BeforeTool, {
+        toolName: 'OtherTool',
+      });
       expect(otherPlan).toBeNull();
     });
 
@@ -226,12 +222,9 @@ describe('HookPlanner', () => {
       expect(plan!.hookConfigs).toHaveLength(1); // Should fall back to exact match
 
       // Should not match when toolName doesn't exactly equal the pattern
-      const planNoMatch = hookPlanner.createExecutionPlan(
-        HookEventName.BeforeTool,
-        {
-          toolName: 'other-tool',
-        },
-      );
+      const planNoMatch = hookPlanner.createExecutionPlan(HookEventName.BeforeTool, {
+        toolName: 'other-tool',
+      });
 
       expect(planNoMatch).toBeNull();
     });
@@ -367,19 +360,17 @@ describe('HookPlanner', () => {
       vi.mocked(mockHookRegistry.getHooksForEvent).mockReturnValue(mockEntries);
 
       // Test startup trigger
-      const startupPlan = hookPlanner.createExecutionPlan(
-        HookEventName.SessionStart,
-        { trigger: 'startup' },
-      );
+      const startupPlan = hookPlanner.createExecutionPlan(HookEventName.SessionStart, {
+        trigger: 'startup',
+      });
       expect(startupPlan).not.toBeNull();
       expect(startupPlan!.hookConfigs).toHaveLength(1);
       expect(startupPlan!.hookConfigs[0].command).toBe('./startup_hook.sh');
 
       // Test resume trigger
-      const resumePlan = hookPlanner.createExecutionPlan(
-        HookEventName.SessionStart,
-        { trigger: 'resume' },
-      );
+      const resumePlan = hookPlanner.createExecutionPlan(HookEventName.SessionStart, {
+        trigger: 'resume',
+      });
       expect(resumePlan).not.toBeNull();
       expect(resumePlan!.hookConfigs).toHaveLength(1);
       expect(resumePlan!.hookConfigs[0].command).toBe('./resume_hook.sh');

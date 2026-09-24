@@ -43,10 +43,7 @@ export async function main(argv = process.argv.slice(2)) {
 
   await generateSettingsSchema({ checkOnly });
 
-  const repoRoot = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-  );
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const docPath = path.join(repoRoot, 'docs/reference/configuration.md');
   const cliSettingsDocPath = path.join(repoRoot, 'docs/cli/settings.md');
 
@@ -64,11 +61,7 @@ export async function main(argv = process.argv.slice(2)) {
   await updateFile(cliSettingsDocPath, generatedTableBlock, checkOnly);
 }
 
-async function updateFile(
-  filePath: string,
-  newContent: string,
-  checkOnly: boolean,
-) {
+async function updateFile(filePath: string, newContent: string, checkOnly: boolean) {
   const doc = await readFile(filePath, 'utf8');
   const injectedDoc = injectBetweenMarkers({
     document: doc,
@@ -100,9 +93,7 @@ async function updateFile(
   }
 
   await writeFile(filePath, formattedDoc);
-  console.log(
-    `Settings documentation (${path.basename(filePath)}) regenerated.`,
-  );
+  console.log(`Settings documentation (${path.basename(filePath)}) regenerated.`);
 }
 
 async function loadSettingsSchemaModule() {
@@ -213,9 +204,7 @@ function renderSections(sections: Map<string, DocEntry[]>) {
         );
         lines.push('    ```');
       } else {
-        lines.push(
-          '  - **Default:** `' + escapeBackticks(entry.defaultValue) + '`',
-        );
+        lines.push('  - **Default:** `' + escapeBackticks(entry.defaultValue) + '`');
       }
 
       if (entry.enumValues && entry.enumValues.length > 0) {

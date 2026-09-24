@@ -81,8 +81,7 @@ function getFileOpData(
   isClickable: boolean,
 ): ViewParts {
   const added =
-    (diff.diffStat?.model_added_lines ?? 0) +
-    (diff.diffStat?.user_added_lines ?? 0);
+    (diff.diffStat?.model_added_lines ?? 0) + (diff.diffStat?.user_added_lines ?? 0);
   const removed =
     (diff.diffStat?.model_removed_lines ?? 0) +
     (diff.diffStat?.user_removed_lines ?? 0);
@@ -92,9 +91,7 @@ function getFileOpData(
     status === CoreToolCallStatus.Executing ||
     status === CoreToolCallStatus.AwaitingApproval;
 
-  const addColor = isAcceptedOrConfirming
-    ? theme.status.success
-    : theme.text.secondary;
+  const addColor = isAcceptedOrConfirming ? theme.status.success : theme.text.secondary;
   const removeColor = isAcceptedOrConfirming
     ? theme.status.error
     : theme.text.secondary;
@@ -124,8 +121,7 @@ function getFileOpData(
     resultSummary = 'Rejected';
     resultColor = theme.status.error;
   } else if (status === CoreToolCallStatus.Error) {
-    resultSummary =
-      typeof resultDisplay === 'string' ? resultDisplay : 'Failed';
+    resultSummary = typeof resultDisplay === 'string' ? resultDisplay : 'Failed';
     resultColor = theme.status.error;
   }
 
@@ -133,10 +129,7 @@ function getFileOpData(
     <Box flexDirection="row">
       {resultSummary && (
         <Text color={resultColor} wrap="truncate-end">
-          →{' '}
-          <Text underline={isClickable}>
-            {resultSummary.replace(/\n/g, ' ')}
-          </Text>
+          → <Text underline={isClickable}>{resultSummary.replace(/\n/g, ' ')}</Text>
         </Text>
       )}
       {showDiffStat && (
@@ -441,8 +434,7 @@ export const DenseToolMessage: React.FC<DenseToolMessageProps> = (props) => {
     outputFile,
   ]);
 
-  const keyExtractor = (_item: React.ReactNode, index: number) =>
-    `diff-line-${index}`;
+  const keyExtractor = (_item: React.ReactNode, index: number) => `diff-line-${index}`;
   const renderItem = ({ item }: { item: React.ReactNode }) => (
     <Box minHeight={1}>{item}</Box>
   );
@@ -481,17 +473,12 @@ export const DenseToolMessage: React.FC<DenseToolMessageProps> = (props) => {
           marginBottom={1}
           paddingX={1}
           flexDirection="column"
-          height={
-            Math.min(diffLines.length, COMPACT_TOOL_SUBVIEW_MAX_LINES) + 2
-          }
+          height={Math.min(diffLines.length, COMPACT_TOOL_SUBVIEW_MAX_LINES) + 2}
           maxHeight={COMPACT_TOOL_SUBVIEW_MAX_LINES + 2}
           borderStyle="round"
           borderColor={theme.border.default}
           borderDimColor={true}
-          maxWidth={Math.min(
-            PAYLOAD_MAX_WIDTH,
-            terminalWidth - PAYLOAD_MARGIN_LEFT,
-          )}
+          maxWidth={Math.min(PAYLOAD_MAX_WIDTH, terminalWidth - PAYLOAD_MARGIN_LEFT)}
         >
           <ScrollableList
             data={diffLines}
@@ -518,9 +505,7 @@ export const DenseToolMessage: React.FC<DenseToolMessageProps> = (props) => {
 
       {showPayload && outputFile && (
         <Box marginLeft={PAYLOAD_MARGIN_LEFT} marginTop={1} marginBottom={1}>
-          <Text color={theme.text.secondary}>
-            (Output saved to: {outputFile})
-          </Text>
+          <Text color={theme.text.secondary}>(Output saved to: {outputFile})</Text>
         </Box>
       )}
     </Box>

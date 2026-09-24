@@ -35,10 +35,9 @@ const chromeAvailable = (() => {
         },
       );
     } else if (process.platform === 'linux') {
-      execSync(
-        'which google-chrome || which chromium-browser || which chromium',
-        { stdio: 'ignore' },
-      );
+      execSync('which google-chrome || which chromium-browser || which chromium', {
+        stdio: 'ignore',
+      });
     } else if (process.platform === 'win32') {
       // Check standard Windows installation paths using Node.js fs
       const chromePaths = [
@@ -71,10 +70,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
 
   it('should navigate to a page and capture accessibility tree', async () => {
     rig.setup('browser-navigate-and-snapshot', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent.navigate-snapshot.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent.navigate-snapshot.responses'),
       settings: {
         agents: {
           overrides: {
@@ -102,10 +98,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
   });
 
   it('should take screenshots of web pages', async () => {
@@ -169,10 +162,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
 
     assertModelHasOutput(result);
   });
@@ -239,10 +229,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
 
   it('should keep browser open across multiple browser_agent invocations', async () => {
     rig.setup('browser-persistent-session', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent.persistent-session.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent.persistent-session.responses'),
       settings: {
         agents: {
           overrides: {
@@ -273,10 +260,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
     // Both browser_agent invocations must succeed — if the browser was
     // incorrectly closed after the first call (regression #24210),
     // the second call would fail.
-    expect(
-      browserCalls.length,
-      'Expected browser_agent to be called twice',
-    ).toBe(2);
+    expect(browserCalls.length, 'Expected browser_agent to be called twice').toBe(2);
     expect(
       browserCalls.every((c) => c.toolRequest.success),
       'Both browser_agent calls should succeed',
@@ -287,10 +271,7 @@ describe.skipIf(!chromeAvailable)('browser-agent', () => {
 
   it('should handle tool confirmation for write_file without crashing', async () => {
     rig.setup('tool-confirmation', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent.confirmation.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent.confirmation.responses'),
       settings: {
         agents: {
           overrides: {

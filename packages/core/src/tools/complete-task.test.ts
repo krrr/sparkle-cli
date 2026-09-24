@@ -94,9 +94,7 @@ describe('CompleteTaskTool', () => {
     it('should generate schema based on outputConfig', () => {
       const toolSchema = tool.getSchema();
 
-      expect(toolSchema.parametersJsonSchema).toHaveProperty(
-        'properties.my_output',
-      );
+      expect(toolSchema.parametersJsonSchema).toHaveProperty('properties.my_output');
       expect(toolSchema.parametersJsonSchema).toHaveProperty(
         'properties.my_output.type',
         'object',
@@ -146,8 +144,7 @@ describe('CompleteTaskTool', () => {
     });
 
     it('should use processOutput if provided', async () => {
-      const processOutput = (val: z.infer<typeof schema>) =>
-        `Score was ${val.score}`;
+      const processOutput = (val: z.infer<typeof schema>) => `Score was ${val.score}`;
       const toolWithProcess = new CompleteTaskTool(
         mockMessageBus,
         outputConfig,

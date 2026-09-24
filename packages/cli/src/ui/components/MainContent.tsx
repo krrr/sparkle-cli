@@ -84,8 +84,7 @@ export const MainContent = () => {
     () =>
       uiState.history.map((item, i) => {
         const prevType = i > 0 ? uiState.history[i - 1]?.type : undefined;
-        const isFirstThinking =
-          item.type === 'thinking' && prevType !== 'thinking';
+        const isFirstThinking = item.type === 'thinking' && prevType !== 'thinking';
         const isFirstAfterThinking =
           item.type !== 'thinking' && prevType === 'thinking';
         const isToolGroupBoundary =
@@ -156,11 +155,8 @@ export const MainContent = () => {
       <Box flexDirection="column" key="pending-items-group">
         {pendingHistoryItems.map((item, i) => {
           const prevType =
-            i === 0
-              ? uiState.history.at(-1)?.type
-              : pendingHistoryItems[i - 1]?.type;
-          const isFirstThinking =
-            item.type === 'thinking' && prevType !== 'thinking';
+            i === 0 ? uiState.history.at(-1)?.type : pendingHistoryItems[i - 1]?.type;
+          const isFirstThinking = item.type === 'thinking' && prevType !== 'thinking';
           const isFirstAfterThinking =
             item.type !== 'thinking' && prevType === 'thinking';
           const isToolGroupBoundary =
@@ -258,9 +254,7 @@ export const MainContent = () => {
       return (
         <ScrollableList
           ref={scrollableListRef}
-          hasFocus={
-            !uiState.isEditorDialogOpen && !uiState.embeddedShellFocused
-          }
+          hasFocus={!uiState.isEditorDialogOpen && !uiState.embeddedShellFocused}
           width={uiState.terminalWidth}
           data={virtualizedData}
           renderItem={renderItem}

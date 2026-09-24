@@ -219,9 +219,7 @@ export class MockModifiableTool
     );
   }
 
-  getModifyContext(
-    _abortSignal: AbortSignal,
-  ): ModifyContext<Record<string, unknown>> {
+  getModifyContext(_abortSignal: AbortSignal): ModifyContext<Record<string, unknown>> {
     return {
       getFilePath: () => 'test.txt',
       getCurrentContent: async () => 'old content',

@@ -132,12 +132,7 @@ describe('RemoteSessionInvocation', () => {
 
     it('accepts missing query (defaults to "Get Started!")', () => {
       expect(() => {
-        new RemoteSessionInvocation(
-          mockDefinition,
-          mockContext,
-          {},
-          mockMessageBus,
-        );
+        new RemoteSessionInvocation(mockDefinition, mockContext, {}, mockMessageBus);
       }).not.toThrow();
     });
 
@@ -394,12 +389,10 @@ describe('RemoteSessionInvocation', () => {
       });
 
       expect(result.returnDisplay).toMatchObject({ state: 'cancelled' });
-      expect(
-        (result.returnDisplay as SubagentProgress).recentActivity[0].status,
-      ).toBe(SubagentState.CANCELLED);
-      expect(result.llmContent).toEqual([
-        { text: 'Operation cancelled by user' },
-      ]);
+      expect((result.returnDisplay as SubagentProgress).recentActivity[0].status).toBe(
+        SubagentState.CANCELLED,
+      );
+      expect(result.llmContent).toEqual([{ text: 'Operation cancelled by user' }]);
     });
   });
 
@@ -480,10 +473,7 @@ describe('RemoteSessionInvocation', () => {
       const { mockSession } = setupMockSession();
 
       const controller = new AbortController();
-      const removeEventListenerSpy = vi.spyOn(
-        controller.signal,
-        'removeEventListener',
-      );
+      const removeEventListenerSpy = vi.spyOn(controller.signal, 'removeEventListener');
 
       const onAgentEvent = vi.fn();
       const invocation = new RemoteSessionInvocation(
@@ -658,9 +648,7 @@ describe('RemoteSessionInvocation', () => {
         }
       ).sessionState;
 
-      expect(stateMap.get('test-agent::http://test-agent/card')).toEqual(
-        stateOnError,
-      );
+      expect(stateMap.get('test-agent::http://test-agent/card')).toEqual(stateOnError);
     });
   });
 });

@@ -7,18 +7,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { act, useState } from 'react';
-import {
-  InlineRadioGroup,
-  type InlineRadioGroupProps,
-} from './InlineRadioGroup.js';
+import { InlineRadioGroup, type InlineRadioGroupProps } from './InlineRadioGroup.js';
 
 type TestOption = 'none' | 'flash-lite' | 'flash' | 'pro';
 const OPTIONS: readonly TestOption[] = ['none', 'flash-lite', 'flash', 'pro'];
 
-type HarnessProps = Omit<
-  InlineRadioGroupProps<TestOption>,
-  'value' | 'onChange'
-> & {
+type HarnessProps = Omit<InlineRadioGroupProps<TestOption>, 'value' | 'onChange'> & {
   initialValue: TestOption;
   onChange?: (value: TestOption) => void;
 };

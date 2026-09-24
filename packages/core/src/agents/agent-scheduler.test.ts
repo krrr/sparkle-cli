@@ -35,8 +35,7 @@ describe('agent-scheduler', () => {
       messageBus: mockMessageBus,
       toolRegistry: mockToolRegistry,
     } as unknown as Mocked<Config>;
-    (mockConfig as unknown as { messageBus: MessageBus }).messageBus =
-      mockMessageBus;
+    (mockConfig as unknown as { messageBus: MessageBus }).messageBus = mockMessageBus;
     (mockConfig as unknown as { toolRegistry: ToolRegistry }).toolRegistry =
       mockToolRegistry;
   });

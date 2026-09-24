@@ -58,10 +58,7 @@ async function readHistoryFile(filePath: string): Promise<string[]> {
   }
 }
 
-async function writeHistoryFile(
-  filePath: string,
-  history: string[],
-): Promise<void> {
+async function writeHistoryFile(filePath: string, history: string[]): Promise<void> {
   try {
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, history.join('\n'));

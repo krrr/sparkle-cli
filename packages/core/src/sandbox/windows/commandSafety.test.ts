@@ -36,9 +36,7 @@ describe('Windows commandSafety', () => {
 
     it('should strip .exe extension for dangerous commands', () => {
       expect(isDangerousCommand(['del.exe', 'file.txt'])).toBe(true);
-      expect(isDangerousCommand(['POWERSHELL.EXE', '-Command', 'echo'])).toBe(
-        true,
-      );
+      expect(isDangerousCommand(['POWERSHELL.EXE', '-Command', 'echo'])).toBe(true);
       expect(isDangerousCommand(['cmd.exe', '/c', 'dir'])).toBe(true);
     });
 

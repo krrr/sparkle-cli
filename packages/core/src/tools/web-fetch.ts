@@ -257,13 +257,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
 
     logNetworkRetryAttempt(
       this.context.config,
-      new NetworkRetryAttemptEvent(
-        attempt,
-        maxAttempts,
-        errorType,
-        delayMs,
-        modelName,
-      ),
+      new NetworkRetryAttemptEvent(attempt, maxAttempts, errorType, delayMs, modelName),
     );
   }
 
@@ -287,9 +281,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
     const url = convertGithubUrlToRaw(urlStr);
     if (this.isBlockedHost(url)) {
       debugLogger.warn(`[WebFetchTool] Blocked access to host: ${url}`);
-      throw new Error(
-        `Access to blocked or private host ${url} is not allowed.`,
-      );
+      throw new Error(`Access to blocked or private host ${url} is not allowed.`);
     }
 
     const response = await retryWithBackoff(
@@ -311,8 +303,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
       },
       {
         retryFetchErrors: this.context.config.getRetryFetchErrors(),
-        onRetry: (attempt, error, delayMs) =>
-          this.handleRetry(attempt, error, delayMs),
+        onRetry: (attempt, error, delayMs) => this.handleRetry(attempt, error, delayMs),
         signal,
       },
     );
@@ -340,11 +331,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
     }
 
     if (!this.context.config.isContextManagementEnabled()) {
-      return truncateString(
-        textContent,
-        MAX_CONTENT_LENGTH,
-        TRUNCATION_WARNING,
-      );
+      return truncateString(textContent, MAX_CONTENT_LENGTH, TRUNCATION_WARNING);
     }
 
     return textContent;
@@ -360,9 +347,7 @@ class WebFetchToolInvocation extends BaseToolInvocation<
 
     for (const url of uniqueUrls) {
       if (this.isBlockedHost(url)) {
-        debugLogger.warn(
-          `[WebFetchTool] Skipped private or local host: ${url}`,
-        );
+        debugLogger.warn(`[WebFetchTool] Skipped private or local host: ${url}`);
         logWebFetchFallbackAttempt(
           this.context.config,
           new WebFetchFallbackAttemptEvent('private_ip_skipped'),
@@ -617,9 +602,7 @@ ${aggregatedContent}
 
     if (this.isBlockedHost(url)) {
       const errorMessage = `Access to blocked or private host ${url} is not allowed.`;
-      debugLogger.warn(
-        `[WebFetchTool] Blocked experimental fetch to host: ${url}`,
-      );
+      debugLogger.warn(`[WebFetchTool] Blocked experimental fetch to host: ${url}`);
       return {
         llmContent: `Error: ${errorMessage}`,
         returnDisplay: `Error: ${errorMessage}`,
@@ -703,9 +686,7 @@ Response: ${rawResponseText}`;
         const html = bodyBuffer.toString('utf8');
         let textContent = convert(html, {
           wordwrap: false,
-          selectors: [
-            { selector: 'a', options: { ignoreHref: false, baseUrl: url } },
-          ],
+          selectors: [{ selector: 'a', options: { ignoreHref: false, baseUrl: url } }],
         });
         if (!this.context.config.isContextManagementEnabled()) {
           textContent = truncateString(
@@ -748,9 +729,7 @@ Response: ${rawResponseText}`;
       };
     } catch (e) {
       const errorMessage = `Error during experimental fetch for ${url}: ${getErrorMessage(e)}`;
-      debugLogger.error(
-        `[WebFetchTool] Experimental fetch error: ${errorMessage}`,
-      );
+      debugLogger.error(`[WebFetchTool] Experimental fetch error: ${errorMessage}`);
       return {
         llmContent: `Error: ${errorMessage}`,
         returnDisplay: `Error: ${errorMessage}`,
@@ -788,9 +767,7 @@ Response: ${rawResponseText}`;
     // The primary fetch path relies on the Gemini API's URL grounding
     // (urlContext tool), which is not available to non-Gemini (custom)
     // models. Skip straight to the direct-fetch fallback in that case.
-    if (
-      isCustomModel(this.context.config.getActiveModel(), this.context.config)
-    ) {
+    if (isCustomModel(this.context.config.getActiveModel(), this.context.config)) {
       debugLogger.warn(
         `[WebFetchTool] Model ${this.context.config.getActiveModel()} is not a Gemini model; using direct fetch fallback.`,
       );
@@ -821,10 +798,7 @@ ${toFetch.join('\n')}
       );
 
       debugLogger.debug(
-        `[WebFetchTool] Full response for prompt "${userPrompt.substring(
-          0,
-          50,
-        )}...":`,
+        `[WebFetchTool] Full response for prompt "${userPrompt.substring(0, 50)}...":`,
         JSON.stringify(response, null, 2),
       );
 
@@ -837,9 +811,8 @@ ${toFetch.join('\n')}
       }
 
       // 1. Apply Grounding Supports (Citations)
-      const groundingSupports = groundingMetadata?.groundingSupports?.filter(
-        isGroundingSupportItem,
-      );
+      const groundingSupports =
+        groundingMetadata?.groundingSupports?.filter(isGroundingSupportItem);
       if (groundingSupports && groundingSupports.length > 0) {
         const insertions: Array<{ index: number; marker: string }> = [];
         groundingSupports.forEach((support) => {
@@ -863,8 +836,7 @@ ${toFetch.join('\n')}
       }
 
       // 2. Append Source List
-      const sources =
-        groundingMetadata?.groundingChunks?.filter(isGroundingChunkItem);
+      const sources = groundingMetadata?.groundingChunks?.filter(isGroundingChunkItem);
       if (sources && sources.length > 0) {
         const sourceListFormatted: string[] = [];
         sources.forEach((source, index) => {
@@ -906,10 +878,7 @@ ${toFetch.join('\n')}
 /**
  * Implementation of the WebFetch tool logic
  */
-export class WebFetchTool extends BaseDeclarativeTool<
-  WebFetchToolParams,
-  ToolResult
-> {
+export class WebFetchTool extends BaseDeclarativeTool<WebFetchToolParams, ToolResult> {
   static readonly Name = WEB_FETCH_TOOL_NAME;
 
   constructor(
@@ -986,8 +955,7 @@ export class WebFetchTool extends BaseDeclarativeTool<
           properties: {
             url: {
               type: 'string',
-              description:
-                'The URL to fetch. Must be a valid http or https URL.',
+              description: 'The URL to fetch. Must be a valid http or https URL.',
             },
           },
           required: ['url'],

@@ -19,9 +19,7 @@ import { act } from 'react';
 
 vi.mock('../../contexts/ToolActionsContext.js', async (importOriginal) => {
   const actual =
-    await importOriginal<
-      typeof import('../../contexts/ToolActionsContext.js')
-    >();
+    await importOriginal<typeof import('../../contexts/ToolActionsContext.js')>();
   return {
     ...actual,
     useToolActions: vi.fn(),
@@ -73,11 +71,8 @@ describe('ToolConfirmationMessage', () => {
     const confirmationDetails: SerializableConfirmationDetails = {
       type: 'info',
       title: 'Confirm Web Fetch',
-      prompt:
-        'fetch https://github.com/google/gemini-react/blob/main/README.md',
-      urls: [
-        'https://raw.githubusercontent.com/google/gemini-react/main/README.md',
-      ],
+      prompt: 'fetch https://github.com/google/gemini-react/blob/main/README.md',
+      urls: ['https://raw.githubusercontent.com/google/gemini-react/main/README.md'],
     };
 
     const { lastFrame, unmount } = await renderWithProviders(
@@ -119,9 +114,7 @@ describe('ToolConfirmationMessage', () => {
     const output = lastFrame();
     expect(output).toContain('Deceptive URL(s) detected');
     expect(output).toContain('Original: https://täst.com');
-    expect(output).toContain(
-      'Actual Host (Punycode): https://xn--tst-qla.com/',
-    );
+    expect(output).toContain('Actual Host (Punycode): https://xn--tst-qla.com/');
     unmount();
   });
 
@@ -149,9 +142,7 @@ describe('ToolConfirmationMessage', () => {
     const output = lastFrame();
     expect(output).toContain('Deceptive URL(s) detected');
     expect(output).toContain('Original: https://еxample.com/');
-    expect(output).toContain(
-      'Actual Host (Punycode): https://xn--xample-2of.com/',
-    );
+    expect(output).toContain('Actual Host (Punycode): https://xn--xample-2of.com/');
     unmount();
   });
 
@@ -369,9 +360,7 @@ describe('ToolConfirmationMessage', () => {
         />,
       );
 
-      expect(lastFrame()).toContain(
-        'To run [Shell], allow access to the following?',
-      );
+      expect(lastFrame()).toContain('To run [Shell], allow access to the following?');
       unmount();
     });
   });

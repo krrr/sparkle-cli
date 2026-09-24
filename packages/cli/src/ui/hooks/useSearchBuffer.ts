@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  useTextBuffer,
-  type TextBuffer,
-} from '../components/shared/text-buffer.js';
+import { useTextBuffer, type TextBuffer } from '../components/shared/text-buffer.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 
 const MIN_VIEWPORT_WIDTH = 20;

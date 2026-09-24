@@ -8,10 +8,7 @@ import { Box, Text } from 'ink';
 import type React from 'react';
 import { useState } from 'react';
 import { theme } from '../semantic-colors.js';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { loadTrustedFolders, TrustLevel } from '../../config/trustedFolders.js';
 import { expandHomeDir } from '../utils/directoryUtils.js';
@@ -32,18 +29,12 @@ export interface MultiFolderTrustDialogProps {
   errors: string[];
   finishAddingDirectories: (
     config: Config,
-    addItem: (
-      itemData: Omit<HistoryItem, 'id'>,
-      baseTimestamp?: number,
-    ) => number,
+    addItem: (itemData: Omit<HistoryItem, 'id'>, baseTimestamp?: number) => number,
     added: string[],
     errors: string[],
   ) => Promise<void>;
   config: Config;
-  addItem: (
-    itemData: Omit<HistoryItem, 'id'>,
-    baseTimestamp?: number,
-  ) => number;
+  addItem: (itemData: Omit<HistoryItem, 'id'>, baseTimestamp?: number) => number;
 }
 
 export const MultiFolderTrustDialog: React.FC<MultiFolderTrustDialogProps> = ({
@@ -127,10 +118,7 @@ export const MultiFolderTrustDialog: React.FC<MultiFolderTrustDialogProps> = ({
         try {
           const expandedPath = path.resolve(expandHomeDir(dir));
           if (choice === MultiFolderTrustChoice.YES_AND_REMEMBER) {
-            await trustedFolders.setValue(
-              expandedPath,
-              TrustLevel.TRUST_FOLDER,
-            );
+            await trustedFolders.setValue(expandedPath, TrustLevel.TRUST_FOLDER);
           }
           workspaceContext.addDirectory(expandedPath);
           added.push(dir);
@@ -164,9 +152,9 @@ export const MultiFolderTrustDialog: React.FC<MultiFolderTrustDialogProps> = ({
             {folders.map((f) => `- ${f}`).join('\n')}
           </Text>
           <Text color={theme.text.primary}>
-            Trusting a folder allows Sparkle to read and perform auto-edits when
-            in auto-approval mode. This is a security feature to prevent
-            accidental execution in untrusted directories.
+            Trusting a folder allows Sparkle to read and perform auto-edits when in
+            auto-approval mode. This is a security feature to prevent accidental
+            execution in untrusted directories.
           </Text>
         </Box>
 

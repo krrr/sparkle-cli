@@ -48,9 +48,7 @@ describe('McpClientManager', () => {
       isTrustedFolder: vi.fn().mockReturnValue(true),
       getMcpServers: vi.fn().mockReturnValue({}),
       getPromptRegistry: vi.fn().mockReturnValue({ registerPrompt: vi.fn() }),
-      getResourceRegistry: vi
-        .fn()
-        .mockReturnValue({ setResourcesForServer: vi.fn() }),
+      getResourceRegistry: vi.fn().mockReturnValue({ setResourcesForServer: vi.fn() }),
       getDebugMode: () => false,
       getWorkspaceContext: () => ({ getDirectories: () => [] }),
       getAllowedMcpServers: vi.fn().mockReturnValue([]),
@@ -80,10 +78,8 @@ describe('McpClientManager', () => {
   const setupManager = (manager: McpClientManager) => {
     manager.setMainRegistries({
       toolRegistry,
-      promptRegistry:
-        mockConfig.getPromptRegistry() as unknown as PromptRegistry,
-      resourceRegistry:
-        mockConfig.getResourceRegistry() as unknown as ResourceRegistry,
+      promptRegistry: mockConfig.getPromptRegistry() as unknown as PromptRegistry,
+      resourceRegistry: mockConfig.getResourceRegistry() as unknown as ResourceRegistry,
     });
     return manager;
   };
@@ -398,9 +394,7 @@ describe('McpClientManager', () => {
             getInstructions: vi
               .fn()
               .mockReturnValue(
-                name === 'server-with-instructions'
-                  ? `Instructions for ${name}`
-                  : '',
+                name === 'server-with-instructions' ? `Instructions for ${name}` : '',
               ),
           }) as unknown as McpClient,
       );
@@ -418,9 +412,7 @@ describe('McpClientManager', () => {
         "The following are instructions provided by the tool server 'server-with-instructions':",
       );
       expect(instructions).toContain('---[start of server instructions]---');
-      expect(instructions).toContain(
-        'Instructions for server-with-instructions',
-      );
+      expect(instructions).toContain('Instructions for server-with-instructions');
       expect(instructions).toContain('---[end of server instructions]---');
 
       expect(instructions).not.toContain(
@@ -774,11 +766,7 @@ describe('McpClientManager', () => {
 
     it('should emit hint instead of full error when user has not interacted with MCP', () => {
       const manager = setupManager(new McpClientManager('0.0.1', mockConfig));
-      manager.emitDiagnostic(
-        'error',
-        'Something went wrong',
-        new Error('boom'),
-      );
+      manager.emitDiagnostic('error', 'Something went wrong', new Error('boom'));
 
       expect(coreEventsMock.emitFeedback).toHaveBeenCalledWith(
         'info',
@@ -794,11 +782,7 @@ describe('McpClientManager', () => {
     it('should emit full error when user has interacted with MCP', () => {
       const manager = setupManager(new McpClientManager('0.0.1', mockConfig));
       manager.setUserInteractedWithMcp();
-      manager.emitDiagnostic(
-        'error',
-        'Something went wrong',
-        new Error('boom'),
-      );
+      manager.emitDiagnostic('error', 'Something went wrong', new Error('boom'));
 
       expect(coreEventsMock.emitFeedback).toHaveBeenCalledWith(
         'error',
@@ -840,9 +824,7 @@ describe('McpClientManager', () => {
         'test-server',
       );
 
-      expect(manager.getLastError('test-server')).toBe(
-        'Error in server (test-server)',
-      );
+      expect(manager.getLastError('test-server')).toBe('Error in server (test-server)');
     });
 
     it('should show previously deduplicated errors after interaction clears state', () => {

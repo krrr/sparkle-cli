@@ -13,11 +13,7 @@ import {
 } from './turn.js';
 import type { GenerateContentResponse, Part, Content } from '@google/genai';
 import { reportError } from '../utils/errorReporting.js';
-import {
-  InvalidStreamError,
-  StreamEventType,
-  type GeminiChat,
-} from './geminiChat.js';
+import { InvalidStreamError, StreamEventType, type GeminiChat } from './geminiChat.js';
 
 const mockSendMessageStream = vi.fn();
 const mockGetHistory = vi.fn();
@@ -238,10 +234,7 @@ describe('Turn', () => {
     });
 
     it('should yield InvalidStream event if sendMessageStream throws InvalidStreamError', async () => {
-      const error = new InvalidStreamError(
-        'Test invalid stream',
-        'NO_FINISH_REASON',
-      );
+      const error = new InvalidStreamError('Test invalid stream', 'NO_FINISH_REASON');
       mockSendMessageStream.mockRejectedValue(error);
       const reqParts: Part[] = [{ text: 'Trigger invalid stream' }];
 
@@ -356,8 +349,7 @@ describe('Turn', () => {
 
     it.each([
       {
-        description:
-          'should yield finished event when response has finish reason',
+        description: 'should yield finished event when response has finish reason',
         contentText: 'Partial response',
         finishReason: 'STOP',
         usageMetadata: {
@@ -628,13 +620,9 @@ describe('Turn', () => {
         events.push(event);
       }
 
-      expect(events).toEqual([
-        { type: GeminiEventType.Content, value: 'Some text.' },
-      ]);
+      expect(events).toEqual([{ type: GeminiEventType.Content, value: 'Some text.' }]);
       // No Citation event (but we do get a Finished event with undefined reason)
-      expect(events.some((e) => e.type === GeminiEventType.Citation)).toBe(
-        false,
-      );
+      expect(events.some((e) => e.type === GeminiEventType.Citation)).toBe(false);
     });
 
     it('should ignore citations without a URI', async () => {
@@ -884,9 +872,7 @@ describe('Turn', () => {
 
       expect(events.length).toBe(5);
 
-      const thoughtEvent = events.find(
-        (e) => e.type === GeminiEventType.Thought,
-      );
+      const thoughtEvent = events.find((e) => e.type === GeminiEventType.Thought);
       expect(thoughtEvent).toBeDefined();
       expect(thoughtEvent).toMatchObject({
         type: GeminiEventType.Thought,
@@ -894,9 +880,7 @@ describe('Turn', () => {
         traceId: 'trace-789',
       });
 
-      const contentEvent = events.find(
-        (e) => e.type === GeminiEventType.Content,
-      );
+      const contentEvent = events.find((e) => e.type === GeminiEventType.Content);
       expect(contentEvent).toBeDefined();
       expect(contentEvent).toMatchObject({
         type: GeminiEventType.Content,
@@ -917,18 +901,14 @@ describe('Turn', () => {
         }),
       });
 
-      const citationEvent = events.find(
-        (e) => e.type === GeminiEventType.Citation,
-      );
+      const citationEvent = events.find((e) => e.type === GeminiEventType.Citation);
       expect(citationEvent).toBeDefined();
       expect(citationEvent).toMatchObject({
         type: GeminiEventType.Citation,
         value: expect.stringContaining('https://example.com'),
       });
 
-      const finishedEvent = events.find(
-        (e) => e.type === GeminiEventType.Finished,
-      );
+      const finishedEvent = events.find((e) => e.type === GeminiEventType.Finished);
       expect(finishedEvent).toBeDefined();
       expect(finishedEvent).toMatchObject({
         type: GeminiEventType.Finished,

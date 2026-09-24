@@ -57,9 +57,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... first 2 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... first 2 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
@@ -80,9 +78,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... last 2 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... last 2 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
@@ -103,9 +99,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... first 2 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... first 2 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
@@ -124,9 +118,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... first 1 line hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... first 1 line hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
@@ -147,9 +139,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... first 7 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... first 7 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
@@ -232,10 +222,9 @@ describe('<MaxSizedBox />', () => {
   });
 
   it('clips a long single text child from the top', async () => {
-    const THIRTY_LINES = Array.from(
-      { length: 30 },
-      (_, i) => `Line ${i + 1}`,
-    ).join('\n');
+    const THIRTY_LINES = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join(
+      '\n',
+    );
     const { lastFrame, waitUntilReady, unmount } = await render(
       <OverflowProvider>
         <MaxSizedBox maxWidth={80} maxHeight={10} overflowDirection="top">
@@ -250,18 +239,15 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... first 21 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... first 21 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
 
   it('clips a long single text child from the bottom', async () => {
-    const THIRTY_LINES = Array.from(
-      { length: 30 },
-      (_, i) => `Line ${i + 1}`,
-    ).join('\n');
+    const THIRTY_LINES = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}`).join(
+      '\n',
+    );
     const { lastFrame, waitUntilReady, unmount } = await render(
       <OverflowProvider>
         <MaxSizedBox maxWidth={80} maxHeight={10} overflowDirection="bottom">
@@ -276,9 +262,7 @@ describe('<MaxSizedBox />', () => {
       vi.runAllTimers();
     });
     await waitUntilReady();
-    expect(lastFrame()).toContain(
-      '... last 21 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... last 21 lines hidden (Ctrl+O to show) ...');
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });

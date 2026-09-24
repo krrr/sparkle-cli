@@ -145,10 +145,7 @@ export class CoderAgentExecutor implements AgentExecutor {
     envVars[cwdSymbol] = workspaceRoot;
 
     return envStorage.run(envVars, async () => {
-      const loadedEnv = await loadEnvironment(
-        isTrusted ?? false,
-        workspaceRoot,
-      );
+      const loadedEnv = await loadEnvironment(isTrusted ?? false, workspaceRoot);
       Object.assign(envVars, loadedEnv);
       return fn(isTrusted ?? false, workspaceRoot);
     });
@@ -193,43 +190,34 @@ export class CoderAgentExecutor implements AgentExecutor {
         error,
       );
       if (eventBus) {
-        void pushTaskStateFailed(
-          error,
-          eventBus,
-          sdkTask.id,
-          sdkTask.contextId,
-        );
+        void pushTaskStateFailed(error, eventBus, sdkTask.id, sdkTask.contextId);
       }
       throw error; // Re-throw to be caught by caller
     }
 
-    return this.runInIsolatedEnv(
-      agentSettings,
-      async (isTrusted, workspaceRoot) => {
-        const config = await this.getConfigWithEnv(
-          agentSettings,
-          sdkTask.id,
-          isTrusted,
-          workspaceRoot,
-        );
-        const contextId: string =
-          getContextIdFromMetadata(metadata) || sdkTask.contextId;
-        const runtimeTask = await Task.create(
-          sdkTask.id,
-          contextId,
-          config,
-          eventBus,
-          agentSettings.autoExecute,
-        );
-        runtimeTask.taskState = persistedState._taskState;
-        await runtimeTask.geminiClient.initialize();
+    return this.runInIsolatedEnv(agentSettings, async (isTrusted, workspaceRoot) => {
+      const config = await this.getConfigWithEnv(
+        agentSettings,
+        sdkTask.id,
+        isTrusted,
+        workspaceRoot,
+      );
+      const contextId: string = getContextIdFromMetadata(metadata) || sdkTask.contextId;
+      const runtimeTask = await Task.create(
+        sdkTask.id,
+        contextId,
+        config,
+        eventBus,
+        agentSettings.autoExecute,
+      );
+      runtimeTask.taskState = persistedState._taskState;
+      await runtimeTask.geminiClient.initialize();
 
-        const wrapper = new TaskWrapper(runtimeTask, agentSettings);
-        this.tasks.set(sdkTask.id, wrapper);
-        logger.info(`Task ${sdkTask.id} reconstructed from store.`);
-        return wrapper;
-      },
-    );
+      const wrapper = new TaskWrapper(runtimeTask, agentSettings);
+      this.tasks.set(sdkTask.id, wrapper);
+      logger.info(`Task ${sdkTask.id} reconstructed from store.`);
+      return wrapper;
+    });
   }
 
   async createTask(
@@ -242,30 +230,27 @@ export class CoderAgentExecutor implements AgentExecutor {
       kind: CoderAgentEvent.StateAgentSettingsEvent,
       workspacePath: process.cwd(),
     };
-    return this.runInIsolatedEnv(
-      agentSettings,
-      async (isTrusted, workspaceRoot) => {
-        const config = await this.getConfigWithEnv(
-          agentSettings,
-          taskId,
-          isTrusted,
-          workspaceRoot,
-        );
-        const runtimeTask = await Task.create(
-          taskId,
-          contextId,
-          config,
-          eventBus,
-          agentSettings.autoExecute,
-        );
-        await runtimeTask.geminiClient.initialize();
+    return this.runInIsolatedEnv(agentSettings, async (isTrusted, workspaceRoot) => {
+      const config = await this.getConfigWithEnv(
+        agentSettings,
+        taskId,
+        isTrusted,
+        workspaceRoot,
+      );
+      const runtimeTask = await Task.create(
+        taskId,
+        contextId,
+        config,
+        eventBus,
+        agentSettings.autoExecute,
+      );
+      await runtimeTask.geminiClient.initialize();
 
-        const wrapper = new TaskWrapper(runtimeTask, agentSettings);
-        this.tasks.set(taskId, wrapper);
-        logger.info(`New task ${taskId} created.`);
-        return wrapper;
-      },
-    );
+      const wrapper = new TaskWrapper(runtimeTask, agentSettings);
+      this.tasks.set(taskId, wrapper);
+      logger.info(`New task ${taskId} created.`);
+      return wrapper;
+    });
   }
 
   getTask(taskId: string): TaskWrapper | undefined {
@@ -276,13 +261,8 @@ export class CoderAgentExecutor implements AgentExecutor {
     return Array.from(this.tasks.values());
   }
 
-  cancelTask = async (
-    taskId: string,
-    eventBus: ExecutionEventBus,
-  ): Promise<void> => {
-    logger.info(
-      `[CoderAgentExecutor] Received cancel request for task ${taskId}`,
-    );
+  cancelTask = async (taskId: string, eventBus: ExecutionEventBus): Promise<void> => {
+    logger.info(`[CoderAgentExecutor] Received cancel request for task ${taskId}`);
 
     const abortControllers = this.activeAbortControllers.get(taskId);
     if (abortControllers && abortControllers.size > 0) {
@@ -331,9 +311,7 @@ export class CoderAgentExecutor implements AgentExecutor {
     const wrapper = this.tasks.get(taskId);
 
     if (!wrapper) {
-      logger.warn(
-        `[CoderAgentExecutor] Task ${taskId} not found for cancellation.`,
-      );
+      logger.warn(`[CoderAgentExecutor] Task ${taskId} not found for cancellation.`);
       eventBus.publish({
         kind: 'status-update',
         taskId,
@@ -384,9 +362,7 @@ export class CoderAgentExecutor implements AgentExecutor {
     }
 
     try {
-      logger.info(
-        `[CoderAgentExecutor] Initiating cancellation for task ${taskId}.`,
-      );
+      logger.info(`[CoderAgentExecutor] Initiating cancellation for task ${taskId}.`);
       task.cancelPendingTools('Task canceled by user request.');
 
       const stateChange: StateChange = {
@@ -408,8 +384,7 @@ export class CoderAgentExecutor implements AgentExecutor {
       // Cleanup listener subscriptions to avoid memory leaks.
       this.cleanupAndEvictTask(taskId);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error(
         `[CoderAgentExecutor] Error during task cancellation for ${taskId}: ${errorMessage}`,
         error,
@@ -468,9 +443,7 @@ export class CoderAgentExecutor implements AgentExecutor {
           isTrusted: false,
         };
       } else {
-        const rawAgentSettings = getAgentSettingsFromMetadata(
-          userMessage.metadata,
-        );
+        const rawAgentSettings = getAgentSettingsFromMetadata(userMessage.metadata);
         agentSettings = {
           kind: CoderAgentEvent.StateAgentSettingsEvent,
           ...(rawAgentSettings || {}),
@@ -494,9 +467,7 @@ export class CoderAgentExecutor implements AgentExecutor {
         logger.info(
           `[CoderAgentExecutor] Executing for taskId: ${taskId}, contextId: ${contextId}`,
         );
-        logger.info(
-          `[CoderAgentExecutor] userMessage: ${JSON.stringify(userMessage)}`,
-        );
+        logger.info(`[CoderAgentExecutor] userMessage: ${JSON.stringify(userMessage)}`);
         eventBus.on('event', (event: AgentExecutionEvent) =>
           logger.info('[EventBus event]: ', event),
         );
@@ -533,9 +504,7 @@ export class CoderAgentExecutor implements AgentExecutor {
               socket.removeListener('end', onSocketEnd);
             };
             socket.on('end', onSocketEnd);
-            socket.once('close', () =>
-              socket.removeListener('end', onSocketEnd),
-            );
+            socket.once('close', () => socket.removeListener('end', onSocketEnd));
             abortSignal.addEventListener('abort', () =>
               socket.removeListener('end', onSocketEnd),
             );
@@ -578,10 +547,7 @@ export class CoderAgentExecutor implements AgentExecutor {
                   `[CoderAgentExecutor] Task ${taskId} found in TaskStore. Reconstructing...`,
                 );
                 try {
-                  initializedWrapper = await this.reconstruct(
-                    sdkTask,
-                    eventBus,
-                  );
+                  initializedWrapper = await this.reconstruct(sdkTask, eventBus);
                 } catch (e) {
                   logger.error(
                     `[CoderAgentExecutor] Aborting execution due to failed task reconstruction for task ${taskId}:`,
@@ -643,9 +609,7 @@ export class CoderAgentExecutor implements AgentExecutor {
 
           const currentTask = wrapper.task;
 
-          if (
-            ['canceled', 'failed', 'completed'].includes(currentTask.taskState)
-          ) {
+          if (['canceled', 'failed', 'completed'].includes(currentTask.taskState)) {
             logger.warn(
               `[CoderAgentExecutor] Attempted to execute task ${taskId} which is already in state ${currentTask.taskState}. Ignoring.`,
             );
@@ -731,13 +695,8 @@ export class CoderAgentExecutor implements AgentExecutor {
           this.executingTasks.add(taskId);
 
           let agentTurnActive = true;
-          logger.info(
-            `[CoderAgentExecutor] Task ${taskId}: Processing user turn.`,
-          );
-          let agentEvents = currentTask.acceptUserMessage(
-            requestContext,
-            abortSignal,
-          );
+          logger.info(`[CoderAgentExecutor] Task ${taskId}: Processing user turn.`);
+          let agentEvents = currentTask.acceptUserMessage(requestContext, abortSignal);
 
           while (agentTurnActive) {
             if (abortSignal.aborted) {
@@ -770,10 +729,7 @@ export class CoderAgentExecutor implements AgentExecutor {
               logger.info(
                 `[CoderAgentExecutor] Task ${taskId}: Found ${toolCallRequests.length} tool call requests. Scheduling as a batch.`,
               );
-              await currentTask.scheduleToolCalls(
-                toolCallRequests,
-                abortSignal,
-              );
+              await currentTask.scheduleToolCalls(toolCallRequests, abortSignal);
             }
 
             logger.info(
@@ -795,9 +751,7 @@ export class CoderAgentExecutor implements AgentExecutor {
               const completedTools = currentTask.getAndClearCompletedTools();
 
               if (completedTools.length > 0) {
-                if (
-                  completedTools.every((tool) => tool.status === 'cancelled')
-                ) {
+                if (completedTools.every((tool) => tool.status === 'cancelled')) {
                   logger.info(
                     `[CoderAgentExecutor] Task ${taskId}: All tool calls were cancelled. Updating history and ending agent turn.`,
                   );
@@ -847,9 +801,7 @@ export class CoderAgentExecutor implements AgentExecutor {
           );
         } catch (error) {
           if (abortSignal.aborted) {
-            logger.warn(
-              `[CoderAgentExecutor] Task ${taskId} execution aborted.`,
-            );
+            logger.warn(`[CoderAgentExecutor] Task ${taskId} execution aborted.`);
             currentTask.cancelPendingTools('Execution aborted');
             if (
               currentTask.taskState !== 'canceled' &&
@@ -894,9 +846,7 @@ export class CoderAgentExecutor implements AgentExecutor {
               }
             }
             this.executingTasks.delete(taskId);
-            logger.info(
-              `[CoderAgentExecutor] Saving final state for task ${taskId}.`,
-            );
+            logger.info(`[CoderAgentExecutor] Saving final state for task ${taskId}.`);
             try {
               await this.taskStore?.save(wrapper.toSDKTask());
               logger.info(`[CoderAgentExecutor] Task ${taskId} state saved.`);
@@ -907,20 +857,13 @@ export class CoderAgentExecutor implements AgentExecutor {
               );
             }
 
-            if (
-              ['canceled', 'failed', 'completed'].includes(
-                currentTask.taskState,
-              )
-            ) {
+            if (['canceled', 'failed', 'completed'].includes(currentTask.taskState)) {
               this.cleanupAndEvictTask(taskId);
             }
           }
         }
       } catch (error) {
-        logger.error(
-          `[CoderAgentExecutor] Failed to execute task ${taskId}:`,
-          error,
-        );
+        logger.error(`[CoderAgentExecutor] Failed to execute task ${taskId}:`, error);
         void pushTaskStateFailed(error, eventBus, taskId, contextId);
         throw error;
       }

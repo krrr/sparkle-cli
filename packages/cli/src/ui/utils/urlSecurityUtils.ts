@@ -65,9 +65,7 @@ export function toUnicodeUrl(urlInput: string | URL): string {
  * @param urlString The URL string to check.
  * @returns DeceptiveUrlDetails if a potential deceptive URL is detected, otherwise null.
  */
-export function getDeceptiveUrlDetails(
-  urlString: string,
-): DeceptiveUrlDetails | null {
+export function getDeceptiveUrlDetails(urlString: string): DeceptiveUrlDetails | null {
   try {
     if (!urlString.includes('://')) {
       return null;

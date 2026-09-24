@@ -127,9 +127,7 @@ export function analyzeEvalSource(
     }
 
     const assertProp = getPropertyAssignment(evalCase, 'assert');
-    const assertBody = assertProp
-      ? getFunctionBody(assertProp.initializer)
-      : undefined;
+    const assertBody = assertProp ? getFunctionBody(assertProp.initializer) : undefined;
     const toolRefsInfo = assertBody
       ? collectToolReferences(assertBody, importedConstants)
       : [];
@@ -172,9 +170,7 @@ export function analyzeEvalSource(
 
   cases.sort(compareEvalCases);
 
-  const fileToolRefs = [
-    ...new Set(cases.flatMap((c) => [...c.toolReferences])),
-  ].sort();
+  const fileToolRefs = [...new Set(cases.flatMap((c) => [...c.toolReferences]))].sort();
 
   return {
     filePath,
@@ -208,11 +204,7 @@ function collectHelperMappings(
         const functionNode = getFunctionLikeNode(node);
         if (functionNode) {
           const baseHelper = findCalledHelper(functionNode, helpers);
-          if (
-            baseHelper &&
-            helpers[baseHelper] &&
-            helpers[baseHelper] !== 'unknown'
-          ) {
+          if (baseHelper && helpers[baseHelper] && helpers[baseHelper] !== 'unknown') {
             helpers[name] = helpers[baseHelper];
             changed = true;
           }
@@ -337,8 +329,7 @@ function getFunctionLikeNode(node: ts.Node) {
   if (
     ts.isVariableDeclaration(node) &&
     node.initializer &&
-    (ts.isArrowFunction(node.initializer) ||
-      ts.isFunctionExpression(node.initializer))
+    (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))
   ) {
     return node.initializer;
   }
@@ -385,9 +376,7 @@ function getStaticNumberProperty(
     return undefined;
   }
   const initializer = assignment.initializer;
-  return ts.isNumericLiteral(initializer)
-    ? Number(initializer.text)
-    : undefined;
+  return ts.isNumericLiteral(initializer) ? Number(initializer.text) : undefined;
 }
 
 function getPropertyAssignment(
@@ -419,13 +408,8 @@ function getStringLiteralValue(expression: ts.Expression | undefined) {
   return undefined;
 }
 
-function getLocation(
-  sourceFile: ts.SourceFile,
-  node: ts.Node,
-): EvalSourceLocation {
-  const location = sourceFile.getLineAndCharacterOfPosition(
-    node.getStart(sourceFile),
-  );
+function getLocation(sourceFile: ts.SourceFile, node: ts.Node): EvalSourceLocation {
+  const location = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
   return {
     line: location.line + 1,
     column: location.character + 1,
@@ -553,9 +537,7 @@ function collectImportedToolNameConstants(
   return constants;
 }
 
-function getFunctionBody(
-  node: ts.Expression,
-): ts.ConciseBody | ts.Block | undefined {
+function getFunctionBody(node: ts.Expression): ts.ConciseBody | ts.Block | undefined {
   if (ts.isArrowFunction(node)) {
     return node.body;
   }
@@ -605,10 +587,7 @@ function extractFromWaitForToolCall(
 
   if (!methodName) return;
 
-  if (
-    methodName === 'waitForToolCall' ||
-    methodName === 'waitForPendingConfirmation'
-  ) {
+  if (methodName === 'waitForToolCall' || methodName === 'waitForPendingConfirmation') {
     const firstArg = call.arguments[0];
     if (firstArg) {
       const resolved = resolveStringValue(firstArg, importedConstants);
@@ -616,10 +595,7 @@ function extractFromWaitForToolCall(
         refs.push({ name: resolved, node: firstArg });
       }
     }
-  } else if (
-    methodName === 'expectSubagentCall' ||
-    methodName === 'expectSubagent'
-  ) {
+  } else if (methodName === 'expectSubagentCall' || methodName === 'expectSubagent') {
     refs.push({ name: 'invoke_agent', node: call });
   }
 }

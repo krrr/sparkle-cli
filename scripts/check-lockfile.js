@@ -52,8 +52,7 @@ for (const [location, details] of Object.entries(packages)) {
   }
   // 2) Git and file dependencies only need a "resolved" field.
   const isGitOrFileDep =
-    details.resolved?.startsWith('git') ||
-    details.resolved?.startsWith('file:');
+    details.resolved?.startsWith('git') || details.resolved?.startsWith('file:');
   if (isGitOrFileDep) {
     continue;
   }

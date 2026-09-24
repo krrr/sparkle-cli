@@ -47,9 +47,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
   // Determine current preferred model
   const preferredModel =
-    config?.getModel() ||
-    activeProfile?.defaultModel ||
-    SPARKLE_MODEL_ALIAS_AUTO;
+    config?.getModel() || activeProfile?.defaultModel || SPARKLE_MODEL_ALIAS_AUTO;
 
   useKeypress(
     (key) => {
@@ -80,14 +78,12 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         return [];
       }
 
-      const isAutoDefault =
-        activeProfile.defaultModel === SPARKLE_MODEL_ALIAS_AUTO;
+      const isAutoDefault = activeProfile.defaultModel === SPARKLE_MODEL_ALIAS_AUTO;
       const autoOption = {
         value: SPARKLE_MODEL_ALIAS_AUTO,
         title: 'Auto',
         description:
-          (isAutoDefault ? 'remembered, ' : '') +
-          'auto routing based on model tier',
+          (isAutoDefault ? 'remembered, ' : '') + 'auto routing based on model tier',
         key: SPARKLE_MODEL_ALIAS_AUTO,
       };
 
@@ -113,9 +109,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       return [];
     }
 
-    const allOptions = config
-      .getModelConfigService()
-      .getAvailableModelOptions({});
+    const allOptions = config.getModelConfigService().getAvailableModelOptions({});
 
     return allOptions
       .filter((o) => o.tier !== 'auto')
@@ -133,9 +127,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     }
     let idx = options.findIndex((option) => option.value === preferredModel);
     if (idx === -1 && activeProfile?.models) {
-      const matchingModel = activeProfile.models.find(
-        (m) => m.tier === preferredModel,
-      );
+      const matchingModel = activeProfile.models.find((m) => m.tier === preferredModel);
       if (matchingModel) {
         idx = options.findIndex((option) => option.value === matchingModel.id);
       }
@@ -192,8 +184,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         <Text bold>Select Model</Text>
         <Box marginTop={1}>
           <Text color={theme.text.secondary}>
-            No active provider configured. Use /provider to configure a
-            provider.
+            No active provider configured. Use /provider to configure a provider.
           </Text>
         </Box>
         <Box marginTop={1}>
@@ -236,9 +227,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       padding={1}
       width="100%"
     >
-      <Text bold>
-        Select Model {activeProfile ? `(${activeProfile.id})` : ''}
-      </Text>
+      <Text bold>Select Model {activeProfile ? `(${activeProfile.id})` : ''}</Text>
 
       <Box marginTop={1}>
         <DescriptiveRadioButtonSelect
@@ -253,9 +242,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
           <Text bold color={theme.text.primary}>
             Remember model for future sessions:{' '}
           </Text>
-          <Text color={theme.status.success}>
-            {persistMode ? 'true' : 'false'}
-          </Text>
+          <Text color={theme.status.success}>{persistMode ? 'true' : 'false'}</Text>
           <Text color={theme.text.secondary}> (Press Tab to toggle)</Text>
         </Box>
       </Box>

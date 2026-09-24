@@ -51,9 +51,7 @@ describe('useAnimatedScrollbar', () => {
   });
 
   it('should decrement debugNumAnimatedComponents on unmount', async () => {
-    const { rerender, unmount } = await render(
-      <TestComponent isFocused={false} />,
-    );
+    const { rerender, unmount } = await render(<TestComponent isFocused={false} />);
     rerender(<TestComponent isFocused={true} />);
     expect(debugState.debugNumAnimatedComponents).toBe(1);
     unmount();

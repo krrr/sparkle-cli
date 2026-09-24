@@ -10,10 +10,7 @@ import type { ContextProfile } from './config/profiles.js';
 import type { ContextEnvironment } from './pipeline/environment.js';
 import type { ContextTracer } from './tracer.js';
 import type { PipelineOrchestrator } from './pipeline/orchestrator.js';
-import type {
-  AgentChatHistory,
-  HistoryTurn,
-} from '../core/agentChatHistory.js';
+import type { AgentChatHistory, HistoryTurn } from '../core/agentChatHistory.js';
 import type { AdvancedTokenCalculator } from './utils/contextTokenCalculator.js';
 import { createMockEnvironment } from './testing/contextTestUtils.js';
 import { ContextWorkingBufferImpl } from './pipeline/contextWorkingBuffer.js';
@@ -43,9 +40,7 @@ describe('ContextManager', () => {
     mockOrchestrator = {
       setNodeProvider: vi.fn(),
       waitForPipelines: vi.fn().mockResolvedValue(undefined),
-      executeTriggerSync: vi
-        .fn()
-        .mockImplementation(async (trigger, buffer) => buffer),
+      executeTriggerSync: vi.fn().mockImplementation(async (trigger, buffer) => buffer),
       shutdown: vi.fn(),
     } as unknown as PipelineOrchestrator;
 
@@ -72,9 +67,7 @@ describe('ContextManager', () => {
     mockAdvancedTokenCalculator = {
       getRawBaseUnits: vi.fn().mockReturnValue(0),
       getRawBaseUnitsForContent: vi.fn().mockReturnValue(0),
-      calculateTokensAndBaseUnits: vi
-        .fn()
-        .mockReturnValue({ tokens: 0, baseUnits: 0 }),
+      calculateTokensAndBaseUnits: vi.fn().mockReturnValue({ tokens: 0, baseUnits: 0 }),
     } as unknown as AdvancedTokenCalculator;
   });
 
@@ -115,8 +108,7 @@ describe('ContextManager', () => {
     );
 
     // Check that the node passed to the orchestrator corresponds to our pendingRequest
-    const call = (mockOrchestrator.executeTriggerSync as unknown as Mock).mock
-      .calls[0];
+    const call = (mockOrchestrator.executeTriggerSync as unknown as Mock).mock.calls[0];
     const passedBuffer = call[1];
     const passedNodes = passedBuffer.nodes;
     const passedNodeIds = call[2];
@@ -141,10 +133,7 @@ describe('ContextManager', () => {
     };
 
     // Setup history with Turn 0 and Turn 1
-    (mockChatHistory.get as Mock).mockReturnValue([
-      historicalTurn,
-      organicTurn,
-    ]);
+    (mockChatHistory.get as Mock).mockReturnValue([historicalTurn, organicTurn]);
 
     const contextManager = new ContextManager(
       mockSidecar,
@@ -173,9 +162,9 @@ describe('ContextManager', () => {
 
     // pendingApiHistory should contain ONLY the pending request
     expect(pendingApiHistory).toHaveLength(1);
-    expect(
-      (pendingApiHistory[0].parts![0] as unknown as { text: string }).text,
-    ).toBe('Active prompt');
+    expect((pendingApiHistory[0].parts![0] as unknown as { text: string }).text).toBe(
+      'Active prompt',
+    );
 
     // The total combined history should be a valid alternating sequence
     const combined = [...apiHistory, ...pendingApiHistory];
@@ -199,8 +188,7 @@ describe('ContextManager', () => {
       content: { role: 'user', parts: [{ text: 'Active prompt' }] },
     };
 
-    const { history, apiHistory } =
-      await contextManager.renderHistory(pendingRequest);
+    const { history, apiHistory } = await contextManager.renderHistory(pendingRequest);
 
     // Should be empty because mockChatHistory has no historical turns
     expect(history).toHaveLength(0);

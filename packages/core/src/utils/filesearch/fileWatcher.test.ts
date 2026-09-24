@@ -90,9 +90,7 @@ describe('FileWatcher', () => {
 
     await watcher.close();
 
-    expect(events.some((event) => event.relativePath === 'ignored.txt')).toBe(
-      false,
-    );
+    expect(events.some((event) => event.relativePath === 'ignored.txt')).toBe(false);
     expect(events).toContainEqual({
       eventType: 'add',
       relativePath: 'kept.txt',
@@ -123,8 +121,7 @@ describe('FileWatcher', () => {
     await fs.rm(dirPath, { recursive: true, force: true });
     await waitForEvent(
       events,
-      (event) =>
-        event.eventType === 'unlinkDir' && event.relativePath === dirName,
+      (event) => event.eventType === 'unlinkDir' && event.relativePath === dirName,
     );
 
     await watcher.close();
@@ -147,13 +144,11 @@ describe('FileWatcher', () => {
 
     await waitForEvent(
       events,
-      (event) =>
-        event.eventType === 'add' && event.relativePath === 'nested/file.txt',
+      (event) => event.eventType === 'add' && event.relativePath === 'nested/file.txt',
     );
 
     const nestedFileEvent = events.find(
-      (event) =>
-        event.eventType === 'add' && event.relativePath.endsWith('/file.txt'),
+      (event) => event.eventType === 'add' && event.relativePath.endsWith('/file.txt'),
     );
 
     expect(nestedFileEvent).toBeDefined();
@@ -179,8 +174,7 @@ describe('FileWatcher', () => {
     await fs.writeFile(beforeStopFile, 'x');
     await waitForEvent(
       events,
-      (event) =>
-        event.eventType === 'add' && event.relativePath === 'before-stop.txt',
+      (event) => event.eventType === 'add' && event.relativePath === 'before-stop.txt',
     );
 
     await watcher.close();
@@ -208,8 +202,7 @@ describe('FileWatcher', () => {
     await fs.writeFile(path.join(tmpDir, 'idempotent.txt'), 'x');
     await waitForEvent(
       events,
-      (event) =>
-        event.eventType === 'add' && event.relativePath === 'idempotent.txt',
+      (event) => event.eventType === 'add' && event.relativePath === 'idempotent.txt',
     );
 
     await watcher.close();

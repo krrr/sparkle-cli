@@ -23,10 +23,7 @@ import {
   type HistoryTurn,
   coalesceConsecutiveRoles,
 } from './geminiChat.js';
-import {
-  type CompletedToolCall,
-  CoreToolCallStatus,
-} from '../scheduler/types.js';
+import { type CompletedToolCall, CoreToolCallStatus } from '../scheduler/types.js';
 import { MockTool } from '../test-utils/mock-tool.js';
 import type { Config } from '../config/config.js';
 import { setSimulate429 } from '../utils/testUtils.js';
@@ -100,15 +97,12 @@ vi.mock('../fallback/handler.js', () => ({
   handleFallback: mockHandleFallback,
 }));
 
-const {
-  mockLogContentRetry,
-  mockLogContentRetryFailure,
-  mockLogNetworkRetryAttempt,
-} = vi.hoisted(() => ({
-  mockLogContentRetry: vi.fn(),
-  mockLogContentRetryFailure: vi.fn(),
-  mockLogNetworkRetryAttempt: vi.fn(),
-}));
+const { mockLogContentRetry, mockLogContentRetryFailure, mockLogNetworkRetryAttempt } =
+  vi.hoisted(() => ({
+    mockLogContentRetry: vi.fn(),
+    mockLogContentRetryFailure: vi.fn(),
+    mockLogNetworkRetryAttempt: vi.fn(),
+  }));
 
 vi.mock('../telemetry/loggers.js', () => ({
   logContentRetry: mockLogContentRetry,
@@ -397,12 +391,7 @@ describe('GeminiChat', () => {
       const initialHistory: HistoryTurn[] = [
         { id: '1', content: { role: 'user', parts: [{ text: 'Hello' }] } },
       ];
-      const chatWithHistory = new GeminiChat(
-        mockConfig,
-        '',
-        [],
-        initialHistory,
-      );
+      const chatWithHistory = new GeminiChat(mockConfig, '', [], initialHistory);
       const initialCount = chatWithHistory.getLastPromptTokenCount();
 
       const newHistory: HistoryTurn[] = [
@@ -420,9 +409,7 @@ describe('GeminiChat', () => {
       ];
       chatWithHistory.setHistory(newHistory);
 
-      expect(chatWithHistory.getLastPromptTokenCount()).toBeGreaterThan(
-        initialCount,
-      );
+      expect(chatWithHistory.getLastPromptTokenCount()).toBeGreaterThan(initialCount);
     });
   });
 
@@ -588,9 +575,7 @@ describe('GeminiChat', () => {
       // 1. Mock the API to return a stream where one chunk is just an empty text part.
       const multiChunkStream = (async function* () {
         yield {
-          candidates: [
-            { content: { role: 'model', parts: [{ text: 'Hello' }] } },
-          ],
+          candidates: [{ content: { role: 'model', parts: [{ text: 'Hello' }] } }],
         } as unknown as GenerateContentResponse;
         // FIX: The original test used { text: '' }, which is invalid.
         // A chunk can be empty but still valid. This chunk is now removed
@@ -1246,9 +1231,7 @@ describe('GeminiChat', () => {
         id: 'model-turn-cancel',
         content: {
           role: 'model',
-          parts: [
-            { functionCall: { id: 'c1', name: 'run_shell_command', args: {} } },
-          ],
+          parts: [{ functionCall: { id: 'c1', name: 'run_shell_command', args: {} } }],
         },
       });
       chat.addHistory({
@@ -1310,9 +1293,7 @@ describe('GeminiChat', () => {
         { role: 'user', parts: [{ text: 'run the tests' }] },
         {
           role: 'model',
-          parts: [
-            { functionCall: { id: 'c1', name: 'run_shell_command', args: {} } },
-          ],
+          parts: [{ functionCall: { id: 'c1', name: 'run_shell_command', args: {} } }],
         },
         {
           role: 'user',
@@ -1541,8 +1522,7 @@ describe('GeminiChat', () => {
       }
 
       // 1. The execution was successful, and final history turn has the correct text
-      const lastHistoryTurn =
-        chat.agentHistory.get()[chat.agentHistory.length - 1];
+      const lastHistoryTurn = chat.agentHistory.get()[chat.agentHistory.length - 1];
       expect(lastHistoryTurn.content.parts?.[0]?.text).toBe(
         'successful retry response',
       );
@@ -1560,9 +1540,7 @@ describe('GeminiChat', () => {
       const failedCalls = recordMessageSpy.mock.calls.filter((call) => {
         const payload = call[0];
         return (
-          typeof payload === 'object' &&
-          payload !== null &&
-          payload.content === ''
+          typeof payload === 'object' && payload !== null && payload.content === ''
         );
       });
 
@@ -1887,15 +1865,11 @@ describe('GeminiChat', () => {
         }
       }
 
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
       expect(mockLogContentRetry).toHaveBeenCalledTimes(1);
       expect(mockLogContentRetryFailure).not.toHaveBeenCalled();
       expect(chunks.length).toBe(2);
-      expect(chunks[0].candidates?.[0]?.content?.parts?.[0]?.thought).toBe(
-        true,
-      );
+      expect(chunks[0].candidates?.[0]?.content?.parts?.[0]?.thought).toBe(true);
       expect(chunks[1].candidates?.[0]?.content?.parts?.[0]?.text).toBe(
         'valid response after retry',
       );
@@ -1936,9 +1910,7 @@ describe('GeminiChat', () => {
         })(),
       ).rejects.toThrow(InvalidStreamError);
 
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        4,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(4);
       expect(mockLogContentRetry).toHaveBeenCalledTimes(3);
       expect(mockLogContentRetryFailure).toHaveBeenCalledTimes(1);
     });
@@ -2063,9 +2035,7 @@ describe('GeminiChat', () => {
 
       // 3. Assertions
       // Should be called twice (initial + retry)
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
       // Check for a retry event
       expect(events.some((e) => e.type === StreamEventType.RETRY)).toBe(true);
@@ -2254,9 +2224,7 @@ describe('GeminiChat', () => {
           },
         } as unknown as GenerateContentResponse;
       })();
-      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(
-        response,
-      );
+      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(response);
 
       const stream = await chat.sendMessageStream(
         { model: 'test-model' },
@@ -2304,9 +2272,7 @@ describe('GeminiChat', () => {
           ],
         } as unknown as GenerateContentResponse;
       })();
-      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(
-        response,
-      );
+      vi.mocked(mockContentGenerator.generateContentStream).mockResolvedValue(response);
 
       const stream = await chat.sendMessageStream(
         { model: 'gemini-3-test-only-model-string-for-testing' },
@@ -2516,9 +2482,7 @@ describe('GeminiChat', () => {
       // Assertions
       expect(mockLogContentRetry).toHaveBeenCalledTimes(1);
       expect(mockLogContentRetryFailure).not.toHaveBeenCalled();
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
       // Check for a retry event
       expect(chunks.some((c) => c.type === StreamEventType.RETRY)).toBe(true);
@@ -2586,14 +2550,10 @@ describe('GeminiChat', () => {
         // consume stream
       }
 
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
       // First call should have original temperature
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({
           config: expect.objectContaining({
@@ -2605,9 +2565,7 @@ describe('GeminiChat', () => {
       );
 
       // Second call (retry) should have temperature 1
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
           config: expect.objectContaining({
@@ -2663,14 +2621,10 @@ describe('GeminiChat', () => {
         // consume
       }
 
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
       // First call should have original system instruction
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({
           config: expect.objectContaining({
@@ -2682,9 +2636,7 @@ describe('GeminiChat', () => {
       );
 
       // Second call (retry) should have nudge message appended to systemInstruction
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
           config: expect.objectContaining({
@@ -2728,9 +2680,7 @@ describe('GeminiChat', () => {
       }).rejects.toThrow(InvalidStreamError);
 
       // Should be called 4 times (initial + 3 retries)
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        4,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(4);
       expect(mockLogContentRetry).toHaveBeenCalledTimes(3);
       expect(mockLogContentRetryFailure).toHaveBeenCalledTimes(1);
 
@@ -2749,10 +2699,7 @@ describe('GeminiChat', () => {
             // Simulate the logic of defaultShouldRetry for ApiError
             let shouldRetry = false;
             if (error instanceof ApiError && error.message) {
-              if (
-                error.status === 429 ||
-                (error.status >= 500 && error.status < 600)
-              ) {
+              if (error.status === 429 || (error.status >= 500 && error.status < 600)) {
                 shouldRetry = true;
               }
               // Explicitly don't retry on these
@@ -2794,9 +2741,7 @@ describe('GeminiChat', () => {
         ).rejects.toThrow(error400);
 
         // Should only be called once (no retry)
-        expect(
-          mockContentGenerator.generateContentStream,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(1);
       });
 
       it('should retry on 429 Rate Limit errors', async () => {
@@ -2832,9 +2777,7 @@ describe('GeminiChat', () => {
         }
 
         // Should be called twice (initial + retry)
-        expect(
-          mockContentGenerator.generateContentStream,
-        ).toHaveBeenCalledTimes(2);
+        expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
         // Should have successful content
         expect(
@@ -2883,9 +2826,7 @@ describe('GeminiChat', () => {
         }
 
         // Should be called twice (initial + retry)
-        expect(
-          mockContentGenerator.generateContentStream,
-        ).toHaveBeenCalledTimes(2);
+        expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
       });
 
       it('should retry on specific fetch errors when configured', async () => {
@@ -2941,9 +2882,7 @@ describe('GeminiChat', () => {
           events.push(event);
         }
 
-        expect(
-          mockContentGenerator.generateContentStream,
-        ).toHaveBeenCalledTimes(2);
+        expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
 
         expect(
           events.some(
@@ -3020,9 +2959,7 @@ describe('GeminiChat', () => {
 
     const turn2 = history[1];
     if (!turn2?.parts?.[0] || !('text' in turn2.parts[0])) {
-      throw new Error(
-        'Test setup error: Second turn is not a valid text part.',
-      );
+      throw new Error('Test setup error: Second turn is not a valid text part.');
     }
     expect(turn2.parts[0].text).toBe('First answer');
 
@@ -3034,9 +2971,7 @@ describe('GeminiChat', () => {
 
     const turn4 = history[3];
     if (!turn4?.parts?.[0] || !('text' in turn4.parts[0])) {
-      throw new Error(
-        'Test setup error: Fourth turn is not a valid text part.',
-      );
+      throw new Error('Test setup error: Fourth turn is not a valid text part.');
     }
     expect(turn4.parts[0].text).toBe('Second answer');
   });
@@ -3101,9 +3036,7 @@ describe('GeminiChat', () => {
 
     const turn2 = history[1];
     if (!turn2?.parts?.[0] || !('text' in turn2.parts[0])) {
-      throw new Error(
-        'Test setup error: Second turn is not a valid text part.',
-      );
+      throw new Error('Test setup error: Second turn is not a valid text part.');
     }
     expect(turn2.parts[0].text).toBe('Successful response after empty');
   });
@@ -3117,9 +3050,7 @@ describe('GeminiChat', () => {
     // 2. Mock the API to return controllable async generators
     const firstStreamGenerator = (async function* () {
       yield {
-        candidates: [
-          { content: { parts: [{ text: 'first response part 1' }] } },
-        ],
+        candidates: [{ content: { parts: [{ text: 'first response part 1' }] } }],
       } as unknown as GenerateContentResponse;
       await firstStreamContinuePromise; // Pause the stream
       yield {
@@ -3194,9 +3125,7 @@ describe('GeminiChat', () => {
 
     const turn4 = history[3];
     if (!turn4?.parts?.[0] || !('text' in turn4.parts[0])) {
-      throw new Error(
-        'Test setup error: Fourth turn is not a valid text part.',
-      );
+      throw new Error('Test setup error: Fourth turn is not a valid text part.');
     }
     expect(turn4.parts[0].text).toBe('second response');
   });
@@ -3219,10 +3148,7 @@ describe('GeminiChat', () => {
       } catch (error) {
         if (options.onPersistent429) {
           // We simulate the "persistent" trigger here for simplicity.
-          const shouldRetry = await options.onPersistent429(
-            options.authType,
-            error,
-          );
+          const shouldRetry = await options.onPersistent429(options.authType, error);
           if (shouldRetry) {
             return apiCall();
           }
@@ -3278,9 +3204,7 @@ describe('GeminiChat', () => {
         // no-op
       }
 
-      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(
-        2,
-      );
+      expect(mockContentGenerator.generateContentStream).toHaveBeenCalledTimes(2);
       expect(mockHandleFallback).toHaveBeenCalledTimes(1);
       expect(mockHandleFallback).toHaveBeenCalledWith(
         mockConfig,
@@ -3489,9 +3413,7 @@ describe('GeminiChat', () => {
         },
         {
           role: 'user',
-          parts: [
-            { functionResponse: { name: 'find_restaurant', response: {} } },
-          ],
+          parts: [{ functionResponse: { name: 'find_restaurant', response: {} } }],
         },
         {
           role: 'model',
@@ -3598,9 +3520,7 @@ describe('GeminiChat', () => {
 
       // Stateful mock for activeModel
       let activeModel = 'model-a';
-      vi.mocked(mockConfig.getActiveModel).mockImplementation(
-        () => activeModel,
-      );
+      vi.mocked(mockConfig.getActiveModel).mockImplementation(() => activeModel);
       vi.mocked(mockConfig.setActiveModel).mockImplementation((model) => {
         activeModel = model;
       });
@@ -3659,9 +3579,7 @@ describe('GeminiChat', () => {
         // consume
       }
 
-      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(
-        'model-b',
-      );
+      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith('model-b');
     });
 
     it('caps retries to a single attempt when selection is sticky', async () => {
@@ -3718,9 +3636,7 @@ describe('GeminiChat', () => {
         message: 'quota',
         details: [],
       });
-      vi.mocked(mockContentGenerator.generateContentStream).mockRejectedValue(
-        error,
-      );
+      vi.mocked(mockContentGenerator.generateContentStream).mockRejectedValue(error);
 
       // We need retryWithBackoff to trigger the callback
       mockRetryWithBackoff.mockImplementation(async (apiCall, options) => {
@@ -3761,26 +3677,24 @@ describe('GeminiChat', () => {
     it('re-resolves generateContentConfig when active model changes between retries', async () => {
       // Availability enabled with stateful active model
       let activeModel = 'model-a';
-      vi.mocked(mockConfig.getActiveModel).mockImplementation(
-        () => activeModel,
-      );
+      vi.mocked(mockConfig.getActiveModel).mockImplementation(() => activeModel);
       vi.mocked(mockConfig.setActiveModel).mockImplementation((model) => {
         activeModel = model;
       });
 
       // Different configs per model
-      vi.mocked(
-        mockConfig.modelConfigService.getResolvedConfig,
-      ).mockImplementation((key) => {
-        if (key.model === 'model-a') {
+      vi.mocked(mockConfig.modelConfigService.getResolvedConfig).mockImplementation(
+        (key) => {
+          if (key.model === 'model-a') {
+            return makeResolvedModelConfig('model-a', { temperature: 0.1 });
+          }
+          if (key.model === 'model-b') {
+            return makeResolvedModelConfig('model-b', { temperature: 0.9 });
+          }
+          // Default for the initial requested model in this test
           return makeResolvedModelConfig('model-a', { temperature: 0.1 });
-        }
-        if (key.model === 'model-b') {
-          return makeResolvedModelConfig('model-b', { temperature: 0.9 });
-        }
-        // Default for the initial requested model in this test
-        return makeResolvedModelConfig('model-a', { temperature: 0.1 });
-      });
+        },
+      );
 
       // First attempt uses model-a, then simulate availability switching to model-b
       mockRetryWithBackoff.mockImplementation(async (apiCall) => {
@@ -3826,9 +3740,7 @@ describe('GeminiChat', () => {
         // consume
       }
 
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({
           model: 'model-a',
@@ -3839,9 +3751,7 @@ describe('GeminiChat', () => {
         expect.any(String),
         LlmRole.MAIN,
       );
-      expect(
-        mockContentGenerator.generateContentStream,
-      ).toHaveBeenNthCalledWith(
+      expect(mockContentGenerator.generateContentStream).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
           model: 'model-b',
@@ -4064,9 +3974,7 @@ describe('GeminiChat', () => {
       expect(capturedContents[1].role).toBe('model');
       expect(capturedContents[1].parts![0].thought).toBe(true);
       expect(capturedContents[2].role).toBe('user');
-      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
-        'audio/mpeg',
-      );
+      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe('audio/mpeg');
     });
 
     it('should handle multiple parallel binary injections', async () => {
@@ -4142,12 +4050,8 @@ describe('GeminiChat', () => {
       expect(capturedContents[1].parts![0].thought).toBe(true);
       expect(capturedContents[2].role).toBe('user');
       expect(capturedContents[2].parts).toHaveLength(2);
-      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe(
-        'audio/mpeg',
-      );
-      expect(capturedContents[2].parts![1].inlineData!.mimeType).toBe(
-        'video/mp4',
-      );
+      expect(capturedContents[2].parts![0].inlineData!.mimeType).toBe('audio/mpeg');
+      expect(capturedContents[2].parts![1].inlineData!.mimeType).toBe('video/mp4');
     });
 
     it('should preserve all synthetic binary injection turns when the stream fails', async () => {
@@ -4349,9 +4253,7 @@ describe('GeminiChat', () => {
       ];
 
       const stripped = stripToolCallIdPrefixes(contents);
-      expect(stripped[0].parts![0].functionCall!.id).toBe(
-        'other_tool__call_123',
-      );
+      expect(stripped[0].parts![0].functionCall!.id).toBe('other_tool__call_123');
     });
 
     it('should correctly handle fallback to generic_tool when name is missing or has whitespace', () => {

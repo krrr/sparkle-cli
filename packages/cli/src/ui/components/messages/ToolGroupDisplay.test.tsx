@@ -8,14 +8,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { createMockSettings } from '../../../test-utils/settings.js';
 import { ToolGroupDisplay } from './ToolGroupDisplay.js';
-import {
-  CoreToolCallStatus,
-  UPDATE_TOPIC_DISPLAY_NAME,
-} from 'sparkle-cli-core';
-import type {
-  HistoryItemToolDisplayGroup,
-  ToolDisplayItem,
-} from '../../types.js';
+import { CoreToolCallStatus, UPDATE_TOPIC_DISPLAY_NAME } from 'sparkle-cli-core';
+import type { HistoryItemToolDisplayGroup, ToolDisplayItem } from '../../types.js';
 
 describe('<ToolGroupDisplay />', () => {
   afterEach(() => {
@@ -139,9 +133,7 @@ describe('<ToolGroupDisplay />', () => {
       ];
       const item = createHistoryItem(tools);
 
-      const { lastFrame } = await renderWithProviders(
-        <ToolGroupDisplay item={item} />,
-      );
+      const { lastFrame } = await renderWithProviders(<ToolGroupDisplay item={item} />);
 
       const output = lastFrame();
       expect(output).toContain('Error: Tool display missing');
@@ -157,9 +149,7 @@ describe('<ToolGroupDisplay />', () => {
       ];
       const item = createHistoryItem(tools);
 
-      const { lastFrame } = await renderWithProviders(
-        <ToolGroupDisplay item={item} />,
-      );
+      const { lastFrame } = await renderWithProviders(<ToolGroupDisplay item={item} />);
 
       // Should render nothing (null)
       expect(lastFrame({ allowEmpty: true })).toBe('');
@@ -201,9 +191,7 @@ describe('<ToolGroupDisplay />', () => {
       ];
       const item = createHistoryItem(tools);
 
-      const { lastFrame } = await renderWithProviders(
-        <ToolGroupDisplay item={item} />,
-      );
+      const { lastFrame } = await renderWithProviders(<ToolGroupDisplay item={item} />);
 
       const output = lastFrame();
       expect(output).toContain('→ Success summary');

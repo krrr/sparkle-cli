@@ -207,9 +207,7 @@ describe('BrowserAgentInvocation', () => {
         }),
       };
 
-      vi.mocked(LocalAgentExecutor.create).mockResolvedValue(
-        mockExecutor as never,
-      );
+      vi.mocked(LocalAgentExecutor.create).mockResolvedValue(mockExecutor as never);
       vi.mocked(removeInputBlocker).mockClear();
     });
 
@@ -370,8 +368,7 @@ describe('BrowserAgentInvocation', () => {
       const thoughtProgress = progressCalls.find((p) =>
         p.recentActivity.some(
           (a) =>
-            a.type === 'thought' &&
-            a.content.includes('Navigating to the page...'),
+            a.type === 'thought' && a.content.includes('Navigating to the page...'),
         ),
       );
 
@@ -694,8 +691,7 @@ describe('BrowserAgentInvocation', () => {
         .map((c) => c[0] as SubagentProgress)
         .filter((p) => p.isSubagentProgress);
 
-      const finalActivity =
-        progressCalls[progressCalls.length - 1].recentActivity;
+      const finalActivity = progressCalls[progressCalls.length - 1].recentActivity;
       const toolA = finalActivity.find(
         (a) => a.type === 'tool_call' && a.content === 'tool_a',
       );
@@ -817,9 +813,7 @@ describe('BrowserAgentInvocation', () => {
         }),
       };
 
-      vi.mocked(LocalAgentExecutor.create).mockResolvedValue(
-        mockExecutor as never,
-      );
+      vi.mocked(LocalAgentExecutor.create).mockResolvedValue(mockExecutor as never);
 
       const invocation = new BrowserAgentInvocation(
         mockConfig,

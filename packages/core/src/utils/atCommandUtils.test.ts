@@ -46,9 +46,7 @@ describe('atCommandUtils', () => {
 
     expect(result.status).toBe('resolved');
     if (result.status === 'resolved') {
-      expect(result.resolved.absolutePath).toBe(
-        path.resolve('/mock/root', 'file.ts'),
-      );
+      expect(result.resolved.absolutePath).toBe(path.resolve('/mock/root', 'file.ts'));
       expect(result.resolved.relativePath).toBe('file.ts');
     }
   });
@@ -97,9 +95,7 @@ describe('atCommandUtils', () => {
 
     expect(result.status).toBe('resolved');
     if (result.status === 'resolved') {
-      expect(result.resolved.absolutePath).toBe(
-        path.resolve('/dir2', 'file.txt'),
-      );
+      expect(result.resolved.absolutePath).toBe(path.resolve('/dir2', 'file.txt'));
       expect(result.resolved.relativePath).toBe('file.txt');
     }
   });
@@ -144,10 +140,7 @@ describe('atCommandUtils', () => {
     };
     vi.mocked(fsPromises.stat).mockResolvedValue(mockStats as unknown as Stats);
 
-    const result = await resolveAtCommandPath(
-      'src',
-      mockConfig as unknown as Config,
-    );
+    const result = await resolveAtCommandPath('src', mockConfig as unknown as Config);
 
     expect(result.status).toBe('resolved');
     if (result.status === 'resolved') {
@@ -156,9 +149,7 @@ describe('atCommandUtils', () => {
   });
 
   it('should respect validatePathAccess for paths within root', async () => {
-    (mockConfig['validatePathAccess'] as Mock).mockReturnValue(
-      'Unauthorized access',
-    );
+    (mockConfig['validatePathAccess'] as Mock).mockReturnValue('Unauthorized access');
     // Mock getTargetDir to match the resolved path so it's considered "within root"
     (mockConfig['getTargetDir'] as Mock).mockReturnValue('/mock/root');
 
@@ -170,9 +161,7 @@ describe('atCommandUtils', () => {
   });
 
   it('should return unauthorized for paths outside root', async () => {
-    (mockConfig['validatePathAccess'] as Mock).mockReturnValue(
-      'Outside workspace',
-    );
+    (mockConfig['validatePathAccess'] as Mock).mockReturnValue('Outside workspace');
     (mockConfig['getTargetDir'] as Mock).mockReturnValue('/mock/workspace');
 
     const mockStats = {
@@ -189,9 +178,7 @@ describe('atCommandUtils', () => {
 
     expect(result.status).toBe('unauthorized');
     if (result.status === 'unauthorized') {
-      expect(result.absolutePath).toBe(
-        path.resolve('/mock/root', 'outside.txt'),
-      );
+      expect(result.absolutePath).toBe(path.resolve('/mock/root', 'outside.txt'));
     }
   });
 
@@ -234,10 +221,7 @@ describe('atCommandUtils', () => {
     };
     vi.mocked(fsPromises.stat).mockResolvedValue(mockStats as unknown as Stats);
 
-    const result = await resolveAtCommandPath(
-      absFile,
-      mockConfig as unknown as Config,
-    );
+    const result = await resolveAtCommandPath(absFile, mockConfig as unknown as Config);
 
     expect(result.status).toBe('resolved');
     if (result.status === 'resolved') {
@@ -268,9 +252,7 @@ describe('atCommandUtils', () => {
 
     expect(result.status).toBe('resolved');
     if (result.status === 'resolved') {
-      expect(result.resolved.absolutePath).toBe(
-        path.resolve('/mock/root', buriedFile),
-      );
+      expect(result.resolved.absolutePath).toBe(path.resolve('/mock/root', buriedFile));
       expect(result.resolved.relativePath).toBe(buriedFile);
     }
   });
@@ -420,9 +402,7 @@ describe('atCommandUtils', () => {
       (mockConfig['validatePathAccess'] as Mock).mockImplementation((p) =>
         p === secretFile ? 'Unauthorized' : null,
       );
-      vi.mocked(fsPromises.stat).mockResolvedValue(
-        mockStats as unknown as Stats,
-      );
+      vi.mocked(fsPromises.stat).mockResolvedValue(mockStats as unknown as Stats);
 
       const result = await resolveAtCommandPath(
         `FAIL ${secretFile}`,
@@ -435,15 +415,9 @@ describe('atCommandUtils', () => {
 
   it('should include reason in debug message for unauthorized paths', async () => {
     const onDebug = vi.fn();
-    (mockConfig['validatePathAccess'] as Mock).mockReturnValue(
-      'FORBIDDEN_ZONE',
-    );
+    (mockConfig['validatePathAccess'] as Mock).mockReturnValue('FORBIDDEN_ZONE');
 
-    await resolveAtCommandPath(
-      'secret.txt',
-      mockConfig as unknown as Config,
-      onDebug,
-    );
+    await resolveAtCommandPath('secret.txt', mockConfig as unknown as Config, onDebug);
 
     expect(onDebug).toHaveBeenCalledWith(
       expect.stringContaining('Reason: FORBIDDEN_ZONE'),

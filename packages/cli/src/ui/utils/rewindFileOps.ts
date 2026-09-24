@@ -147,9 +147,7 @@ export async function revertFileChanges(
   conversation: ConversationRecord,
   targetMessageId: string,
 ): Promise<void> {
-  const messageIndex = conversation.messages.findIndex(
-    (m) => m.id === targetMessageId,
-  );
+  const messageIndex = conversation.messages.findIndex((m) => m.id === targetMessageId);
 
   if (messageIndex === -1) {
     debugLogger.error('Requested message to rewind to was not found ');
@@ -203,11 +201,7 @@ export async function revertFileChanges(
               const originalText = originalContent ?? '';
 
               // Create a patch that transforms Agent -> Original
-              const undoPatch = Diff.createPatch(
-                fileName,
-                newContent,
-                originalText,
-              );
+              const undoPatch = Diff.createPatch(fileName, newContent, originalText);
 
               // Apply that patch to the Current content
               const patchedContent = Diff.applyPatch(currentContent, undoPatch);

@@ -48,9 +48,7 @@ export class GoogleGenAiContentGenerator implements ContentGenerator {
     return this.models.generateContentStream(sanitizedRequest);
   }
 
-  async countTokens(
-    request: CountTokensParameters,
-  ): Promise<CountTokensResponse> {
+  async countTokens(request: CountTokensParameters): Promise<CountTokensResponse> {
     const contents = toContents(request.contents, true);
     const preparedContents = prepareGeminiContents(contents);
     return this.models.countTokens({
@@ -59,9 +57,7 @@ export class GoogleGenAiContentGenerator implements ContentGenerator {
     });
   }
 
-  async embedContent(
-    request: EmbedContentParameters,
-  ): Promise<EmbedContentResponse> {
+  async embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse> {
     return this.models.embedContent(request);
   }
 

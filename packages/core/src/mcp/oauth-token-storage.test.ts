@@ -155,10 +155,9 @@ describe('MCPOAuthTokenStorage', () => {
           'https://token.url',
         );
 
-        expect(fs.mkdir).toHaveBeenCalledWith(
-          path.join('/mock/home', SPARKLE_DIR),
-          { recursive: true },
-        );
+        expect(fs.mkdir).toHaveBeenCalledWith(path.join('/mock/home', SPARKLE_DIR), {
+          recursive: true,
+        });
         expect(fs.writeFile).toHaveBeenCalledWith(
           path.join('/mock/home', SPARKLE_DIR, 'mcp-oauth-tokens.json'),
           expect.stringContaining('test-server'),
@@ -171,9 +170,7 @@ describe('MCPOAuthTokenStorage', () => {
           ...mockCredentials,
           serverName: 'existing-server',
         };
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([existingCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([existingCredentials]));
         vi.mocked(fs.writeFile).mockResolvedValue(undefined);
 
         const newToken: OAuthToken = {
@@ -183,9 +180,7 @@ describe('MCPOAuthTokenStorage', () => {
         await tokenStorage.saveToken('existing-server', newToken);
 
         const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
-        const savedData = JSON.parse(
-          writeCall[1] as string,
-        ) as OAuthCredentials[];
+        const savedData = JSON.parse(writeCall[1] as string) as OAuthCredentials[];
 
         expect(savedData).toHaveLength(1);
         expect(savedData[0].token.accessToken).toBe('new_access_token');
@@ -201,9 +196,7 @@ describe('MCPOAuthTokenStorage', () => {
             refreshToken: 'old-refresh-token',
           },
         };
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([existingCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([existingCredentials]));
         vi.mocked(fs.writeFile).mockResolvedValue(undefined);
 
         const newToken: OAuthToken = {
@@ -215,9 +208,7 @@ describe('MCPOAuthTokenStorage', () => {
         await tokenStorage.saveToken('existing-server', newToken);
 
         const writeCall = vi.mocked(fs.writeFile).mock.calls[0];
-        const savedData = JSON.parse(
-          writeCall[1] as string,
-        ) as OAuthCredentials[];
+        const savedData = JSON.parse(writeCall[1] as string) as OAuthCredentials[];
 
         expect(savedData).toHaveLength(1);
         expect(savedData[0].token.accessToken).toBe('new_access_token');
@@ -230,9 +221,9 @@ describe('MCPOAuthTokenStorage', () => {
         const writeError = new Error('Disk full');
         vi.mocked(fs.writeFile).mockRejectedValue(writeError);
 
-        await expect(
-          tokenStorage.saveToken('test-server', mockToken),
-        ).rejects.toThrow('Disk full');
+        await expect(tokenStorage.saveToken('test-server', mockToken)).rejects.toThrow(
+          'Disk full',
+        );
 
         expect(coreEvents.emitFeedback).toHaveBeenCalledWith(
           'error',
@@ -244,9 +235,7 @@ describe('MCPOAuthTokenStorage', () => {
 
     describe('getCredentials', () => {
       it('should return token for existing server', async () => {
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([mockCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([mockCredentials]));
 
         const result = await tokenStorage.getCredentials('test-server');
 
@@ -254,9 +243,7 @@ describe('MCPOAuthTokenStorage', () => {
       });
 
       it('should return null for non-existent server', async () => {
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([mockCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([mockCredentials]));
 
         const result = await tokenStorage.getCredentials('non-existent');
 
@@ -297,9 +284,7 @@ describe('MCPOAuthTokenStorage', () => {
       });
 
       it('should remove token file when no tokens remain', async () => {
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([mockCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([mockCredentials]));
         vi.mocked(fs.unlink).mockResolvedValue(undefined);
 
         await tokenStorage.deleteCredentials('test-server');
@@ -311,9 +296,7 @@ describe('MCPOAuthTokenStorage', () => {
       });
 
       it('should handle removal of non-existent token gracefully', async () => {
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([mockCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([mockCredentials]));
 
         await tokenStorage.deleteCredentials('non-existent');
 
@@ -322,9 +305,7 @@ describe('MCPOAuthTokenStorage', () => {
       });
 
       it('should handle file operation errors gracefully', async () => {
-        vi.mocked(fs.readFile).mockResolvedValue(
-          JSON.stringify([mockCredentials]),
-        );
+        vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify([mockCredentials]));
         const unlinkError = new Error('Permission denied');
         vi.mocked(fs.unlink).mockRejectedValue(unlinkError);
 
@@ -493,9 +474,7 @@ describe('MCPOAuthTokenStorage', () => {
         updatedAt: now,
       };
 
-      mockHybridTokenStorage.getCredentials.mockResolvedValue(
-        existingCredentials,
-      );
+      mockHybridTokenStorage.getCredentials.mockResolvedValue(existingCredentials);
 
       const newToken: OAuthToken = {
         accessToken: 'new_access_token',
@@ -531,17 +510,13 @@ describe('MCPOAuthTokenStorage', () => {
     it('should use HybridTokenStorage to get credentials', async () => {
       mockHybridTokenStorage.getCredentials.mockResolvedValue(mockCredentials);
       const result = await tokenStorage.getCredentials('server1');
-      expect(mockHybridTokenStorage.getCredentials).toHaveBeenCalledWith(
-        'server1',
-      );
+      expect(mockHybridTokenStorage.getCredentials).toHaveBeenCalledWith('server1');
       expect(result).toBe(mockCredentials);
     });
 
     it('should use HybridTokenStorage to delete credentials', async () => {
       await tokenStorage.deleteCredentials('server1');
-      expect(mockHybridTokenStorage.deleteCredentials).toHaveBeenCalledWith(
-        'server1',
-      );
+      expect(mockHybridTokenStorage.deleteCredentials).toHaveBeenCalledWith('server1');
     });
 
     it('should use HybridTokenStorage to clear all tokens', async () => {

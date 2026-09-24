@@ -41,10 +41,7 @@ vi.mock('../telemetry/types.js', () => ({
   ToolCallEvent: vi.fn().mockImplementation((call) => ({ ...call })),
 }));
 
-import {
-  SchedulerStateManager,
-  type TerminalCallHandler,
-} from './state-manager.js';
+import { SchedulerStateManager, type TerminalCallHandler } from './state-manager.js';
 import { resolveConfirmation } from './confirmation.js';
 import { checkPolicy, updatePolicy } from './policy.js';
 import { ToolExecutor } from './tool-executor.js';
@@ -94,15 +91,8 @@ import { ToolErrorType } from '../tools/tool-error.js';
 import { GeminiCliOperation } from '../telemetry/constants.js';
 import * as ToolUtils from '../utils/tool-utils.js';
 import type { EditorType } from '../utils/editor.js';
-import {
-  getToolCallContext,
-  type ToolCallContext,
-} from '../utils/toolCallContext.js';
-import {
-  coreEvents,
-  CoreEvent,
-  type McpProgressPayload,
-} from '../utils/events.js';
+import { getToolCallContext, type ToolCallContext } from '../utils/toolCallContext.js';
+import { coreEvents, CoreEvent, type McpProgressPayload } from '../utils/events.js';
 
 describe('Scheduler (Orchestrator)', () => {
   let scheduler: Scheduler;
@@ -152,9 +142,7 @@ describe('Scheduler (Orchestrator)', () => {
   };
 
   beforeEach(() => {
-    vi.mocked(randomUUID).mockReturnValue(
-      '123e4567-e89b-12d3-a456-426614174000',
-    );
+    vi.mocked(randomUUID).mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
     abortController = new AbortController();
     signal = abortController.signal;
 
@@ -191,8 +179,7 @@ describe('Scheduler (Orchestrator)', () => {
 
     (mockConfig as unknown as { toolRegistry: ToolRegistry }).toolRegistry =
       mockToolRegistry;
-    (mockConfig as unknown as { messageBus: MessageBus }).messageBus =
-      mockMessageBus;
+    (mockConfig as unknown as { messageBus: MessageBus }).messageBus = mockMessageBus;
 
     getPreferredEditor = vi.fn().mockReturnValue('vim');
 
@@ -701,8 +688,7 @@ describe('Scheduler (Orchestrator)', () => {
             expect.objectContaining({
               functionResponse: expect.objectContaining({
                 response: {
-                  error:
-                    'Tool execution denied by policy. Custom denial reason',
+                  error: 'Tool execution denied by policy. Custom denial reason',
                 },
               }),
             }),
@@ -1187,9 +1173,7 @@ describe('Scheduler (Orchestrator)', () => {
         await scheduler.schedule(req1, signal);
 
         // Assert: The state manager is instructed to replace the call
-        expect(
-          mockStateManager.replaceActiveCallWithTailCall,
-        ).toHaveBeenCalledWith(
+        expect(mockStateManager.replaceActiveCallWithTailCall).toHaveBeenCalledWith(
           'call-1',
           expect.objectContaining({
             request: expect.objectContaining({
@@ -1237,9 +1221,7 @@ describe('Scheduler (Orchestrator)', () => {
         await scheduler.schedule(req1, signal);
 
         // Assert: Replaces active call with an errored call
-        expect(
-          mockStateManager.replaceActiveCallWithTailCall,
-        ).toHaveBeenCalledWith(
+        expect(mockStateManager.replaceActiveCallWithTailCall).toHaveBeenCalledWith(
           'call-1',
           expect.objectContaining({
             status: 'error',
@@ -1310,10 +1292,7 @@ describe('Scheduler (Orchestrator)', () => {
 
       const mockBus = {
         subscribe: vi.fn(
-          (
-            type: string,
-            handler: (message: Message) => void | Promise<void>,
-          ) => {
+          (type: string, handler: (message: Message) => void | Promise<void>) => {
             listeners[type] = listeners[type] || [];
             listeners[type].push(handler);
           },
@@ -1371,27 +1350,17 @@ describe('Scheduler (Orchestrator)', () => {
         schedulerId: 'cleanup-test',
       });
 
-      expect(onSpy).toHaveBeenCalledWith(
-        CoreEvent.McpProgress,
-        expect.any(Function),
-      );
+      expect(onSpy).toHaveBeenCalledWith(CoreEvent.McpProgress, expect.any(Function));
 
       s.dispose();
 
-      expect(offSpy).toHaveBeenCalledWith(
-        CoreEvent.McpProgress,
-        expect.any(Function),
-      );
+      expect(offSpy).toHaveBeenCalledWith(CoreEvent.McpProgress, expect.any(Function));
     });
 
     it('should abort disposeController signal on dispose()', () => {
       const mockSubscribe =
         vi.fn<
-          (
-            type: unknown,
-            listener: unknown,
-            options?: { signal?: AbortSignal },
-          ) => void
+          (type: unknown, listener: unknown, options?: { signal?: AbortSignal }) => void
         >();
       const mockBus = {
         subscribe: mockSubscribe,
@@ -1460,9 +1429,7 @@ describe('Scheduler MCP Progress', () => {
     }) as ExecutingToolCall;
 
   beforeEach(() => {
-    vi.mocked(randomUUID).mockReturnValue(
-      '123e4567-e89b-12d3-a456-426614174000',
-    );
+    vi.mocked(randomUUID).mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
 
     mockActiveCallsMap = new Map<string, ToolCall>();
 
@@ -1531,8 +1498,7 @@ describe('Scheduler MCP Progress', () => {
 
     (mockConfig as unknown as { toolRegistry: ToolRegistry }).toolRegistry =
       mockToolRegistry;
-    (mockConfig as unknown as { messageBus: MessageBus }).messageBus =
-      mockMessageBus;
+    (mockConfig as unknown as { messageBus: MessageBus }).messageBus = mockMessageBus;
 
     getPreferredEditor = vi.fn().mockReturnValue('vim');
 
@@ -1633,10 +1599,7 @@ describe('Scheduler MCP Progress', () => {
     const call = makeExecutingCall('call-A');
     mockActiveCallsMap.set('call-A', call);
 
-    coreEvents.emit(
-      CoreEvent.McpProgress,
-      makePayload('call-A', 50, { total: 100 }),
-    );
+    coreEvents.emit(CoreEvent.McpProgress, makePayload('call-A', 50, { total: 100 }));
 
     expect(mockStateManager.updateStatus).toHaveBeenCalledWith(
       'call-A',

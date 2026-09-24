@@ -5,11 +5,7 @@
  */
 
 import * as fs from 'node:fs/promises';
-import {
-  fetchWithTimeout,
-  resolveToRealPath,
-  isPrivateIp,
-} from 'sparkle-cli-core';
+import { fetchWithTimeout, resolveToRealPath, isPrivateIp } from 'sparkle-cli-core';
 import { AsyncFzf } from 'fzf';
 
 export interface RegistryExtension {
@@ -34,8 +30,7 @@ export interface RegistryExtension {
 }
 
 export class ExtensionRegistryClient {
-  static readonly DEFAULT_REGISTRY_URL =
-    'https://geminicli.com/extensions.json';
+  static readonly DEFAULT_REGISTRY_URL = 'https://geminicli.com/extensions.json';
   private static readonly FETCH_TIMEOUT_MS = 10000; // 10 seconds
 
   private static fetchPromise: Promise<RegistryExtension[]> | null = null;
@@ -43,8 +38,7 @@ export class ExtensionRegistryClient {
   private readonly registryURI: string;
 
   constructor(registryURI?: string) {
-    this.registryURI =
-      registryURI || ExtensionRegistryClient.DEFAULT_REGISTRY_URL;
+    this.registryURI = registryURI || ExtensionRegistryClient.DEFAULT_REGISTRY_URL;
   }
 
   /** @internal */
@@ -64,9 +58,7 @@ export class ExtensionRegistryClient {
         allExtensions.sort((a, b) => a.rank - b.rank);
         break;
       case 'alphabetical':
-        allExtensions.sort((a, b) =>
-          a.extensionName.localeCompare(b.extensionName),
-        );
+        allExtensions.sort((a, b) => a.extensionName.localeCompare(b.extensionName));
         break;
       default: {
         const _exhaustiveCheck: never = orderBy;
@@ -122,9 +114,7 @@ export class ExtensionRegistryClient {
             ExtensionRegistryClient.FETCH_TIMEOUT_MS,
           );
           if (!response.ok) {
-            throw new Error(
-              `Failed to fetch extensions: ${response.statusText}`,
-            );
+            throw new Error(`Failed to fetch extensions: ${response.statusText}`);
           }
 
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion

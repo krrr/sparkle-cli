@@ -5,11 +5,7 @@
  */
 
 import { render } from '../../test-utils/render.js';
-import {
-  ScrollProvider,
-  useScrollable,
-  type ScrollState,
-} from './ScrollProvider.js';
+import { ScrollProvider, useScrollable, type ScrollState } from './ScrollProvider.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useRef, useImperativeHandle, forwardRef, type RefObject } from 'react';
 import { Box, type DOMElement } from 'ink';

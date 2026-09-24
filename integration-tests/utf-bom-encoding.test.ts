@@ -86,34 +86,18 @@ describe('BOM end-to-end integraion', () => {
   });
 
   it('UTF-16 LE BOM', async () => {
-    await runAndAssert(
-      'utf16le.txt',
-      utf16LE('BOM_OK UTF-16LE'),
-      'BOM_OK UTF-16LE',
-    );
+    await runAndAssert('utf16le.txt', utf16LE('BOM_OK UTF-16LE'), 'BOM_OK UTF-16LE');
   });
 
   it('UTF-16 BE BOM', async () => {
-    await runAndAssert(
-      'utf16be.txt',
-      utf16BE('BOM_OK UTF-16BE'),
-      'BOM_OK UTF-16BE',
-    );
+    await runAndAssert('utf16be.txt', utf16BE('BOM_OK UTF-16BE'), 'BOM_OK UTF-16BE');
   });
 
   it('UTF-32 LE BOM', async () => {
-    await runAndAssert(
-      'utf32le.txt',
-      utf32LE('BOM_OK UTF-32LE'),
-      'BOM_OK UTF-32LE',
-    );
+    await runAndAssert('utf32le.txt', utf32LE('BOM_OK UTF-32LE'), 'BOM_OK UTF-32LE');
   });
 
   it('UTF-32 BE BOM', async () => {
-    await runAndAssert(
-      'utf32be.txt',
-      utf32BE('BOM_OK UTF-32BE'),
-      'BOM_OK UTF-32BE',
-    );
+    await runAndAssert('utf32be.txt', utf32BE('BOM_OK UTF-32BE'), 'BOM_OK UTF-32BE');
   });
 });

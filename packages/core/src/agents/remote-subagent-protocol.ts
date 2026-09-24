@@ -219,15 +219,11 @@ class RemoteSubagentProtocol implements AgentProtocol {
     const reassembler = new A2AResultReassembler();
     let prevText = '';
 
-    const stream = clientManager.sendMessageStream(
-      this.definition.name,
-      query,
-      {
-        contextId: this.contextId,
-        taskId: this.taskId,
-        signal: this._abortController.signal,
-      },
-    );
+    const stream = clientManager.sendMessageStream(this.definition.name, query, {
+      contextId: this.contextId,
+      taskId: this.taskId,
+      signal: this._abortController.signal,
+    });
 
     for await (const chunk of stream) {
       reassembler.update(chunk);

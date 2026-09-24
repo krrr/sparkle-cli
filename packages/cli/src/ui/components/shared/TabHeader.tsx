@@ -96,9 +96,7 @@ export function TabHeader({
           )}
           <Box maxWidth={i !== currentIndex ? 16 : 100}>
             <Text
-              color={
-                i === currentIndex ? theme.status.success : theme.text.secondary
-              }
+              color={i === currentIndex ? theme.status.success : theme.text.secondary}
               bold={i === currentIndex}
               underline={i === currentIndex}
               aria-current={i === currentIndex ? 'step' : undefined}

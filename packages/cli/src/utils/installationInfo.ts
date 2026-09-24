@@ -68,8 +68,7 @@ export function getInstallationInfo(
       return {
         packageManager: PackageManager.UNKNOWN, // Not managed by a package manager in this sense
         isGlobal: false,
-        updateMessage:
-          'Running from a local git clone. Please update with "git pull".',
+        updateMessage: 'Running from a local git clone. Please update with "git pull".',
       };
     }
 
@@ -81,10 +80,7 @@ export function getInstallationInfo(
         updateMessage: 'Running via npx, update not applicable.',
       };
     }
-    if (
-      realPath.includes('/.pnpm/_pnpx') ||
-      realPath.includes('/.cache/pnpm/dlx')
-    ) {
+    if (realPath.includes('/.pnpm/_pnpx') || realPath.includes('/.cache/pnpm/dlx')) {
       return {
         packageManager: PackageManager.PNPX,
         isGlobal: false,

@@ -33,11 +33,7 @@ const MAX_CHANGE_RATIO = 0.75;
 /** Ranges with a gap ≤ this value are merged at construction time. */
 const MERGE_GAP = 3;
 
-const pushRangeMerge = (
-  ranges: EmphasisRange[],
-  start: number,
-  end: number,
-) => {
+const pushRangeMerge = (ranges: EmphasisRange[], start: number, end: number) => {
   const last = ranges[ranges.length - 1];
   if (last && start - last.end <= MERGE_GAP) {
     last.end = Math.max(last.end, end);

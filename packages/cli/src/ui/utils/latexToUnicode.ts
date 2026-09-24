@@ -417,10 +417,7 @@ function convertFractionsAndRoots(text: string): string {
     /\\sqrt\[([^\]]*)\]\{([^{}]*)\}/g,
     (_, index: string, radicand: string) => `${index}√(${radicand})`,
   );
-  out = out.replace(
-    /\\sqrt\{([^{}]*)\}/g,
-    (_, radicand: string) => `√(${radicand})`,
-  );
+  out = out.replace(/\\sqrt\{([^{}]*)\}/g, (_, radicand: string) => `√(${radicand})`);
   return out;
 }
 
@@ -447,8 +444,7 @@ function convertEscapedSpecials(text: string): string {
 function convertNamedCommands(text: string): string {
   return text.replace(
     /\\([A-Za-z]+)(?![A-Za-z])/g,
-    (match, name: string) =>
-      GREEK_LETTERS[name] ?? LATEX_COMMANDS[name] ?? match,
+    (match, name: string) => GREEK_LETTERS[name] ?? LATEX_COMMANDS[name] ?? match,
   );
 }
 

@@ -152,10 +152,9 @@ describe('HooksDialog', () => {
 
     it('should scroll down when down arrow is pressed', async () => {
       const hooks = createManyHooks(15);
-      const { lastFrame, waitUntilReady, stdin, unmount } =
-        await renderWithProviders(
-          <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
-        );
+      const { lastFrame, waitUntilReady, stdin, unmount } = await renderWithProviders(
+        <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
+      );
 
       // Initially should not show up indicator
       expect(lastFrame()).not.toContain('▲');
@@ -172,10 +171,9 @@ describe('HooksDialog', () => {
 
     it('should scroll up when up arrow is pressed after scrolling down', async () => {
       const hooks = createManyHooks(15);
-      const { lastFrame, waitUntilReady, stdin, unmount } =
-        await renderWithProviders(
-          <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
-        );
+      const { lastFrame, waitUntilReady, stdin, unmount } = await renderWithProviders(
+        <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
+      );
 
       // Scroll down twice
       act(() => {
@@ -199,10 +197,9 @@ describe('HooksDialog', () => {
 
     it('should not scroll beyond the end', async () => {
       const hooks = createManyHooks(10);
-      const { lastFrame, waitUntilReady, stdin, unmount } =
-        await renderWithProviders(
-          <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
-        );
+      const { lastFrame, waitUntilReady, stdin, unmount } = await renderWithProviders(
+        <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
+      );
 
       // Scroll down many times past the end
       act(() => {
@@ -221,10 +218,9 @@ describe('HooksDialog', () => {
 
     it('should not scroll above the beginning', async () => {
       const hooks = createManyHooks(10);
-      const { lastFrame, waitUntilReady, stdin, unmount } =
-        await renderWithProviders(
-          <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
-        );
+      const { lastFrame, waitUntilReady, stdin, unmount } = await renderWithProviders(
+        <HooksDialog hooks={hooks} onClose={vi.fn()} maxVisibleHooks={5} />,
+      );
 
       // Try to scroll up when already at top
       act(() => {

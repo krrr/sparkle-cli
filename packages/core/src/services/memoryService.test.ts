@@ -140,10 +140,7 @@ async function writeConversationJsonl(
   );
 }
 
-async function setSessionMtime(
-  filePath: string,
-  timestamp: string,
-): Promise<void> {
+async function setSessionMtime(filePath: string, timestamp: string): Promise<void> {
   const date = new Date(timestamp);
   await fs.utimes(filePath, date, date);
 }
@@ -364,9 +361,7 @@ describe('memoryService', () => {
   describe('startMemoryService', () => {
     it('skips when lock is held by another instance', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       const memoryDir = path.join(tmpDir, 'memory');
       const skillsDir = path.join(tmpDir, 'skills');
@@ -404,9 +399,7 @@ describe('memoryService', () => {
 
     it('skips when no unprocessed sessions exist', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       const memoryDir = path.join(tmpDir, 'memory2');
       const skillsDir = path.join(tmpDir, 'skills2');
@@ -439,9 +432,7 @@ describe('memoryService', () => {
 
     it('releases lock on error', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
       const { ExecutionLifecycleService } = await import(
         './executionLifecycleService.js'
       );
@@ -498,9 +489,7 @@ describe('memoryService', () => {
 
     it('emits feedback when new skills are created during extraction', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       // Reset mocks that may carry state from prior tests
       vi.mocked(coreEvents.emitFeedback).mockClear();
@@ -530,10 +519,7 @@ describe('memoryService', () => {
         run: vi.fn().mockImplementation(async () => {
           const newSkillDir = path.join(skillsDir, 'my-new-skill');
           await fs.mkdir(newSkillDir, { recursive: true });
-          await fs.writeFile(
-            path.join(newSkillDir, 'SKILL.md'),
-            '# My New Skill',
-          );
+          await fs.writeFile(path.join(newSkillDir, 'SKILL.md'), '# My New Skill');
           return undefined;
         }),
       } as never);
@@ -572,9 +558,7 @@ describe('memoryService', () => {
       const { startMemoryService, readExtractionState } = await import(
         './memoryService.js'
       );
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       vi.mocked(coreEvents.emitFeedback).mockClear();
       vi.mocked(LocalAgentExecutor.create).mockReset();
@@ -649,9 +633,7 @@ describe('memoryService', () => {
       await startMemoryService(mockConfig);
 
       // No patch was applied — active files do not exist.
-      await expect(
-        fs.access(path.join(memoryDir, 'MEMORY.md')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(memoryDir, 'MEMORY.md'))).rejects.toThrow();
 
       // Both patches remain in inbox awaiting review.
       for (const relativePath of [
@@ -679,9 +661,7 @@ describe('memoryService', () => {
       const { startMemoryService, readExtractionState } = await import(
         './memoryService.js'
       );
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       vi.mocked(coreEvents.emitFeedback).mockClear();
       vi.mocked(LocalAgentExecutor.create).mockReset();
@@ -703,12 +683,7 @@ describe('memoryService', () => {
         conversation,
       );
 
-      const malformedPatchPath = path.join(
-        memoryDir,
-        '.inbox',
-        'private',
-        'bad.patch',
-      );
+      const malformedPatchPath = path.join(memoryDir, '.inbox', 'private', 'bad.patch');
       vi.mocked(LocalAgentExecutor.create).mockResolvedValueOnce({
         run: vi.fn().mockImplementation(async () => {
           await fs.mkdir(path.dirname(malformedPatchPath), {
@@ -763,9 +738,7 @@ describe('memoryService', () => {
       const { startMemoryService, readExtractionState } = await import(
         './memoryService.js'
       );
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       vi.mocked(LocalAgentExecutor.create).mockReset();
 
@@ -837,19 +810,10 @@ describe('memoryService', () => {
       await writeConversationJsonl(openedPath, openedConversation);
       await writeConversationJsonl(failedPath, failedConversation);
       await writeConversationJsonl(rejectedPath, rejectedConversation);
+      await writeConversationJsonl(mismatchedEndPath, mismatchedEndConversation);
+      await writeConversationJsonl(mismatchedErrorPath, mismatchedErrorConversation);
       await writeConversationJsonl(
-        mismatchedEndPath,
-        mismatchedEndConversation,
-      );
-      await writeConversationJsonl(
-        mismatchedErrorPath,
-        mismatchedErrorConversation,
-      );
-      await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-skipped.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-skipped.jsonl`),
         skippedConversation,
       );
 
@@ -1144,10 +1108,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-brandnew.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-brandnew.jsonl`),
         conversation,
       );
 
@@ -1166,10 +1127,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-oldsess1.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-oldsess1.jsonl`),
         conversation,
       );
 
@@ -1199,10 +1157,7 @@ describe('memoryService', () => {
         lastUpdated: '2025-01-01T03:00:00Z',
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-resumed01.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-resumed01.jsonl`),
         conversation,
       );
 
@@ -1253,10 +1208,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-scratch01.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-scratch01.jsonl`),
         conversation,
       );
 
@@ -1279,10 +1231,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-badpad.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-badpad.jsonl`),
         malformedConversation,
       );
 
@@ -1292,10 +1241,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-valid.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-valid.jsonl`),
         validConversation,
       );
 
@@ -1320,10 +1266,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-scratch02.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-scratch02.jsonl`),
         conversation,
       );
 
@@ -1394,10 +1337,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-shellraw.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-shellraw.jsonl`),
         conversation,
       );
 
@@ -1420,10 +1360,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-sub00001.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-sub00001.jsonl`),
         conversation,
       );
 
@@ -1442,10 +1379,7 @@ describe('memoryService', () => {
         messageCount: 2,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-short001.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-short001.jsonl`),
         conversation,
       );
 
@@ -1492,10 +1426,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-proc0001.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-proc0001.jsonl`),
         oldConv,
       );
 
@@ -1505,10 +1436,7 @@ describe('memoryService', () => {
         messageCount: 20,
       });
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-02T00-00-fres0001.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-02T00-00-fres0001.jsonl`),
         newConv,
       );
 
@@ -1548,17 +1476,11 @@ describe('memoryService', () => {
       });
 
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-02-01T00-00-oldername.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-02-01T00-00-oldername.jsonl`),
         olderByName,
       );
       await writeConversationJsonl(
-        path.join(
-          chatsDir,
-          `${SESSION_FILE_PREFIX}2025-01-01T00-00-neweractv.jsonl`,
-        ),
+        path.join(chatsDir, `${SESSION_FILE_PREFIX}2025-01-01T00-00-neweractv.jsonl`),
         newerByActivity,
       );
 
@@ -1615,9 +1537,7 @@ describe('memoryService', () => {
       const processedSessions: ExtractionRun['processedSessions'] = [];
 
       for (let i = 0; i < 105; i++) {
-        const timestamp = new Date(
-          Date.UTC(2025, 0, 1, 0, 0, 105 - i),
-        ).toISOString();
+        const timestamp = new Date(Date.UTC(2025, 0, 1, 0, 0, 105 - i)).toISOString();
         const conversation = createConversation({
           sessionId: `backlog-${i}`,
           summary: `Backlog ${i}`,
@@ -1696,10 +1616,7 @@ describe('memoryService', () => {
       const result = await readExtractionState(statePath);
 
       expect(result.runs).toHaveLength(1);
-      expect(result.runs[0].skillsCreated).toEqual([
-        'debug-helper',
-        'test-gen',
-      ]);
+      expect(result.runs[0].skillsCreated).toEqual(['debug-helper', 'test-gen']);
       expect(result.runs[0].candidateSessions).toEqual([
         {
           sessionId: 's1',
@@ -1776,10 +1693,7 @@ describe('memoryService', () => {
 
       const statePath = path.join(tmpDir, 'old-format-state.json');
       // Old format: an object without a runs array
-      await fs.writeFile(
-        statePath,
-        JSON.stringify({ lastProcessed: '2025-01-01' }),
-      );
+      await fs.writeFile(statePath, JSON.stringify({ lastProcessed: '2025-01-01' }));
 
       const result = await readExtractionState(statePath);
 
@@ -1971,9 +1885,7 @@ describe('memoryService', () => {
 
       expect(result).toEqual([]);
       await expect(fs.access(patchPath)).rejects.toThrow();
-      expect(await fs.readFile(targetFile, 'utf-8')).toBe(
-        'line1\nline2\nline3\n',
-      );
+      expect(await fs.readFile(targetFile, 'utf-8')).toBe('line1\nline2\nline3\n');
     });
 
     it('removes patches that contain no hunks', async () => {
@@ -2068,9 +1980,7 @@ describe('memoryService', () => {
   describe('startMemoryService feedback for patch-only runs', () => {
     it('emits feedback when extraction produces only patch suggestions', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       vi.mocked(coreEvents.emitFeedback).mockClear();
       vi.mocked(LocalAgentExecutor.create).mockReset();
@@ -2153,9 +2063,7 @@ describe('memoryService', () => {
 
     it('does not emit feedback for old inbox patches when this run creates none', async () => {
       const { startMemoryService } = await import('./memoryService.js');
-      const { LocalAgentExecutor } = await import(
-        '../agents/local-executor.js'
-      );
+      const { LocalAgentExecutor } = await import('../agents/local-executor.js');
 
       vi.mocked(coreEvents.emitFeedback).mockClear();
       vi.mocked(LocalAgentExecutor.create).mockReset();

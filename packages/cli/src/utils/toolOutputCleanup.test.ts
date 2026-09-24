@@ -224,11 +224,7 @@ describe('Tool Output Cleanup', () => {
       // Set file modification times
       await fs.utimes(file1, oneDayAgo / 1000, oneDayAgo / 1000);
       await fs.utimes(file2, twoDaysAgo / 1000, twoDaysAgo / 1000);
-      await fs.utimes(
-        file3,
-        twoAndHalfDaysAgo / 1000,
-        twoAndHalfDaysAgo / 1000,
-      );
+      await fs.utimes(file3, twoAndHalfDaysAgo / 1000, twoAndHalfDaysAgo / 1000);
       await fs.utimes(file4, fiveDaysAgo / 1000, fiveDaysAgo / 1000);
       await fs.utimes(file5, tenDaysAgo / 1000, tenDaysAgo / 1000);
 
@@ -269,9 +265,7 @@ describe('Tool Output Cleanup', () => {
       await fs.writeFile(oldFile, 'old content');
       await fs.utimes(oldFile, tenDaysAgo / 1000, tenDaysAgo / 1000);
 
-      const debugSpy = vi
-        .spyOn(debugLogger, 'debug')
-        .mockImplementation(() => {});
+      const debugSpy = vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
 
       await cleanupToolOutputFiles(settings, true, testTempDir);
 
@@ -334,9 +328,7 @@ describe('Tool Output Cleanup', () => {
       const unsafeDir = path.join(toolOutputDir, 'session-.._.._danger');
       await fs.mkdir(unsafeDir, { recursive: true });
 
-      const debugSpy = vi
-        .spyOn(debugLogger, 'debug')
-        .mockImplementation(() => {});
+      const debugSpy = vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
 
       await cleanupToolOutputFiles(settings, false, testTempDir);
 

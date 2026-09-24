@@ -9,11 +9,7 @@ import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents } from '../utils/events.js';
-import {
-  TrackerTaskSchema,
-  TaskStatus,
-  type TrackerTask,
-} from './trackerTypes.js';
+import { TrackerTaskSchema, TaskStatus, type TrackerTask } from './trackerTypes.js';
 import { type z } from 'zod';
 
 export class TrackerService {
@@ -136,10 +132,7 @@ export class TrackerService {
   /**
    * Updates an existing task and saves it to disk.
    */
-  async updateTask(
-    id: string,
-    updates: Partial<TrackerTask>,
-  ): Promise<TrackerTask> {
+  async updateTask(id: string, updates: Partial<TrackerTask>): Promise<TrackerTask> {
     const isClosing = updates.status === TaskStatus.CLOSED;
     const changingDependencies = updates.dependencies !== undefined;
 
@@ -154,9 +147,7 @@ export class TrackerService {
     if (updatedTask.parentId) {
       const parentExists = !!(await this.getTask(updatedTask.parentId));
       if (!parentExists) {
-        throw new Error(
-          `Parent task with ID ${updatedTask.parentId} not found.`,
-        );
+        throw new Error(`Parent task with ID ${updatedTask.parentId} not found.`);
       }
     }
 
@@ -202,9 +193,7 @@ export class TrackerService {
   /**
    * Validates that there are no circular dependencies.
    */
-  private async validateNoCircularDependencies(
-    task: TrackerTask,
-  ): Promise<void> {
+  private async validateNoCircularDependencies(task: TrackerTask): Promise<void> {
     const visited = new Set<string>();
     const stack = new Set<string>();
     const cache = new Map<string, TrackerTask>();
@@ -212,9 +201,7 @@ export class TrackerService {
 
     const check = async (currentId: string) => {
       if (stack.has(currentId)) {
-        throw new Error(
-          `Circular dependency detected involving task ${currentId}.`,
-        );
+        throw new Error(`Circular dependency detected involving task ${currentId}.`);
       }
       if (visited.has(currentId)) {
         return;

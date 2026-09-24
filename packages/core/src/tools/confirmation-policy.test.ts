@@ -29,10 +29,7 @@ vi.mock('../telemetry/loggers.js', () => ({
 describe('Tool Confirmation Policy Updates', () => {
   let mockConfig: any;
   let mockMessageBus: MessageBus;
-  const rootDir = path.join(
-    os.tmpdir(),
-    `sparkle-cli-policy-test-${Date.now()}`,
-  );
+  const rootDir = path.join(os.tmpdir(), `sparkle-cli-policy-test-${Date.now()}`);
 
   beforeEach(() => {
     if (!fs.existsSync(rootDir)) {
@@ -118,8 +115,7 @@ describe('Tool Confirmation Policy Updates', () => {
     },
     {
       name: 'WriteFileTool',
-      create: (config: Config, bus: MessageBus) =>
-        new WriteFileTool(config, bus),
+      create: (config: Config, bus: MessageBus) => new WriteFileTool(config, bus),
       params: {
         file_path: path.join(rootDir, 'test.txt'),
         content: 'new content',
@@ -127,8 +123,7 @@ describe('Tool Confirmation Policy Updates', () => {
     },
     {
       name: 'WebFetchTool',
-      create: (config: Config, bus: MessageBus) =>
-        new WebFetchTool(config, bus),
+      create: (config: Config, bus: MessageBus) => new WebFetchTool(config, bus),
       params: {
         prompt: 'fetch https://example.com',
       },
@@ -194,9 +189,7 @@ describe('Tool Confirmation Policy Updates', () => {
     );
 
     it('should skip confirmation in AUTO_EDIT mode', async () => {
-      vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(
-        ApprovalMode.AUTO_EDIT,
-      );
+      vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(ApprovalMode.AUTO_EDIT);
       const tool = create(mockConfig, mockMessageBus);
       const invocation = tool.build(params as any);
 
@@ -208,9 +201,7 @@ describe('Tool Confirmation Policy Updates', () => {
     });
 
     it('should NOT skip confirmation in AUTO_EDIT mode if forcedDecision is ask_user', async () => {
-      vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(
-        ApprovalMode.AUTO_EDIT,
-      );
+      vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(ApprovalMode.AUTO_EDIT);
       const tool = create(mockConfig, mockMessageBus);
       const invocation = tool.build(params as any);
 

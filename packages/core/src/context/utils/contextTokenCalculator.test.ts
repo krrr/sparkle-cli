@@ -47,9 +47,7 @@ describe('ContextTokenCalculator', () => {
     const breakdown = calculator.calculateTokenBreakdown([node]);
 
     expect(breakdown.overhead).toBe(MSG_OVERHEAD_TOKENS);
-    expect(breakdown.total).toBe(
-      calculator.getTokenCost(node) + MSG_OVERHEAD_TOKENS,
-    );
+    expect(breakdown.total).toBe(calculator.getTokenCost(node) + MSG_OVERHEAD_TOKENS);
   });
 
   it('should not double-count overhead for duplicate turn IDs in separate nodes', () => {

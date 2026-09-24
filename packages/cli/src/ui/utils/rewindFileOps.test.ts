@@ -255,10 +255,7 @@ describe('rewindFileOps', () => {
 
       vi.mocked(fs.readFile).mockResolvedValue('NEW_CONTENT');
 
-      await revertFileChanges(
-        conversation as unknown as ConversationRecord,
-        'target',
-      );
+      await revertFileChanges(conversation as unknown as ConversationRecord, 'target');
 
       expect(fs.writeFile).toHaveBeenCalledWith(
         '/abs/path/test.ts',
@@ -303,10 +300,7 @@ describe('rewindFileOps', () => {
 
       vi.mocked(fs.readFile).mockResolvedValue('SOME_CONTENT');
 
-      await revertFileChanges(
-        conversation as unknown as ConversationRecord,
-        'target',
-      );
+      await revertFileChanges(conversation as unknown as ConversationRecord, 'target');
 
       expect(fs.unlink).toHaveBeenCalledWith('/abs/path/new.ts');
     });
@@ -349,10 +343,7 @@ describe('rewindFileOps', () => {
       // Current content has FURTHER changes
       vi.mocked(fs.readFile).mockResolvedValue('LINE1\nEDITED\nLINE3\nNEWLINE');
 
-      await revertFileChanges(
-        conversation as unknown as ConversationRecord,
-        'target',
-      );
+      await revertFileChanges(conversation as unknown as ConversationRecord, 'target');
 
       // Should have successfully patched it back to ORIGINAL state but kept the NEWLINE
       expect(fs.writeFile).toHaveBeenCalledWith(
@@ -399,10 +390,7 @@ describe('rewindFileOps', () => {
       // Current content is completely unrelated - diff won't apply
       vi.mocked(fs.readFile).mockResolvedValue('UNRELATED');
 
-      await revertFileChanges(
-        conversation as unknown as ConversationRecord,
-        'target',
-      );
+      await revertFileChanges(conversation as unknown as ConversationRecord, 'target');
 
       expect(fs.writeFile).not.toHaveBeenCalled();
       expect(coreEvents.emitFeedback).toHaveBeenCalledWith(
@@ -448,16 +436,11 @@ describe('rewindFileOps', () => {
 
       vi.mocked(fs.readFile).mockRejectedValue(new Error('disk failure'));
 
-      await revertFileChanges(
-        conversation as unknown as ConversationRecord,
-        'target',
-      );
+      await revertFileChanges(conversation as unknown as ConversationRecord, 'target');
 
       expect(coreEvents.emitFeedback).toHaveBeenCalledWith(
         'error',
-        expect.stringContaining(
-          'Error reading test.ts during revert: disk failure',
-        ),
+        expect.stringContaining('Error reading test.ts during revert: disk failure'),
         expect.any(Error),
       );
     });

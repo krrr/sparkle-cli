@@ -44,9 +44,7 @@ function main() {
     const prRate = pr.passed / pr.total;
     if (pr.status === 'regression' || (prRate <= 0.34 && !pr.status)) {
       // Use relative path from workspace root
-      const relativeFile = pr.file
-        ? path.relative(process.cwd(), pr.file)
-        : 'evals/';
+      const relativeFile = pr.file ? path.relative(process.cwd(), pr.file) : 'evals/';
 
       regressions.push({
         name: testName,
@@ -75,8 +73,7 @@ function main() {
     markdown += `\n*The check passed or was cleared for ${passes.length} other trustworthy evaluations.*\n\n`;
 
     markdown += '<details>\n';
-    markdown +=
-      '<summary><b>🛠️ Troubleshooting & Fix Instructions</b></summary>\n\n';
+    markdown += '<summary><b>🛠️ Troubleshooting & Fix Instructions</b></summary>\n\n';
 
     for (let i = 0; i < regressions.length; i++) {
       const r = regressions[i];

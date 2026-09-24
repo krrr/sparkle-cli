@@ -48,9 +48,7 @@ vi.mock('./prompt-processors/shellProcessor.js', () => ({
 
 vi.mock('./prompt-processors/argumentProcessor.js', async (importOriginal) => {
   const original =
-    await importOriginal<
-      typeof import('./prompt-processors/argumentProcessor.js')
-    >();
+    await importOriginal<typeof import('./prompt-processors/argumentProcessor.js')>();
   return {
     DefaultArgumentProcessor: vi
       .fn()
@@ -78,17 +76,14 @@ describe('FileCommandLoader', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    const { glob: actualGlob } =
-      await vi.importActual<typeof import('glob')>('glob');
+    const { glob: actualGlob } = await vi.importActual<typeof import('glob')>('glob');
     vi.mocked(glob.glob).mockImplementation(actualGlob);
     mockShellProcess.mockImplementation(
       (prompt: PromptPipelineContent, context: CommandContext) => {
         const userArgsRaw = context?.invocation?.args || '';
         // This is a simplified mock. A real implementation would need to iterate
         // through all parts and process only the text parts.
-        const firstTextPart = prompt.find(
-          (p) => typeof p === 'string' || 'text' in p,
-        );
+        const firstTextPart = prompt.find((p) => typeof p === 'string' || 'text' in p);
         let textContent = '';
         if (typeof firstTextPart === 'string') {
           textContent = firstTextPart;
@@ -260,9 +255,7 @@ describe('FileCommandLoader', () => {
 
   it('returns both user and project commands in order', async () => {
     const userCommandsDir = Storage.getUserCommandsDir();
-    const projectCommandsDir = new Storage(
-      process.cwd(),
-    ).getProjectCommandsDir();
+    const projectCommandsDir = new Storage(process.cwd()).getProjectCommandsDir();
     mock({
       [userCommandsDir]: {
         'test.toml': 'prompt = "User prompt"',
@@ -558,9 +551,7 @@ describe('FileCommandLoader', () => {
   describe('Extension Command Loading', () => {
     it('loads commands from active extensions', async () => {
       const userCommandsDir = Storage.getUserCommandsDir();
-      const projectCommandsDir = new Storage(
-        process.cwd(),
-      ).getProjectCommandsDir();
+      const projectCommandsDir = new Storage(process.cwd()).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
         SPARKLE_DIR,
@@ -613,9 +604,7 @@ describe('FileCommandLoader', () => {
 
     it('extension commands have extensionName metadata for conflict resolution', async () => {
       const userCommandsDir = Storage.getUserCommandsDir();
-      const projectCommandsDir = new Storage(
-        process.cwd(),
-      ).getProjectCommandsDir();
+      const projectCommandsDir = new Storage(process.cwd()).getProjectCommandsDir();
       const extensionDir = path.join(
         process.cwd(),
         SPARKLE_DIR,
@@ -813,12 +802,7 @@ describe('FileCommandLoader', () => {
     });
 
     it('handles nested command structure in extensions', async () => {
-      const extensionDir = path.join(
-        process.cwd(),
-        SPARKLE_DIR,
-        'extensions',
-        'a',
-      );
+      const extensionDir = path.join(process.cwd(), SPARKLE_DIR, 'extensions', 'a');
 
       mock({
         [extensionDir]: {
@@ -869,9 +853,7 @@ describe('FileCommandLoader', () => {
         '',
       );
       if (result?.type === 'submit_prompt') {
-        expect(result.content).toEqual([
-          { text: 'Nested command from extension a' },
-        ]);
+        expect(result.content).toEqual([{ text: 'Nested command from extension a' }]);
       } else {
         assert.fail('Incorrect action type');
       }
@@ -1071,9 +1053,7 @@ describe('FileCommandLoader', () => {
       });
 
       // Mock the processor to throw the specific error
-      const error = new ConfirmationRequiredError('Confirmation needed', [
-        'rm -rf /',
-      ]);
+      const error = new ConfirmationRequiredError('Confirmation needed', ['rm -rf /']);
       mockShellProcess.mockRejectedValue(error);
 
       const loader = new FileCommandLoader(null as unknown as Config);
@@ -1211,9 +1191,7 @@ describe('FileCommandLoader', () => {
             '-at-file-processed-shell-processed-default-processed',
           );
         } else {
-          assert.fail(
-            'First part of content is not a text part or is a string',
-          );
+          assert.fail('First part of content is not a text part or is a string');
         }
       } else {
         assert.fail('Incorrect action type');
@@ -1232,20 +1210,18 @@ describe('FileCommandLoader', () => {
         './test.txt': 'file content',
       });
 
-      mockAtFileProcess.mockImplementation(
-        async (prompt: PromptPipelineContent) => {
-          // A simplified mock of AtFileProcessor's behavior
-          const textContent = (prompt[0] as { text: string }).text;
-          if (textContent.includes('@{./test.txt}')) {
-            return [
-              {
-                text: textContent.replace('@{./test.txt}', 'file content'),
-              },
-            ];
-          }
-          return prompt;
-        },
-      );
+      mockAtFileProcess.mockImplementation(async (prompt: PromptPipelineContent) => {
+        // A simplified mock of AtFileProcessor's behavior
+        const textContent = (prompt[0] as { text: string }).text;
+        if (textContent.includes('@{./test.txt}')) {
+          return [
+            {
+              text: textContent.replace('@{./test.txt}', 'file content'),
+            },
+          ];
+        }
+        return prompt;
+      });
 
       // Prevent default processor from interfering
       vi.mocked(DefaultArgumentProcessor).mockImplementation(
@@ -1272,9 +1248,7 @@ describe('FileCommandLoader', () => {
       );
       expect(result?.type).toBe('submit_prompt');
       if (result?.type === 'submit_prompt') {
-        expect(result.content).toEqual([
-          { text: 'Context from file: file content' },
-        ]);
+        expect(result.content).toEqual([{ text: 'Context from file: file content' }]);
       }
     });
   });
@@ -1328,9 +1302,7 @@ describe('FileCommandLoader', () => {
       const controller = new AbortController();
       const abortSignal = controller.signal;
 
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const mockConfig = {
         getProjectRoot: vi.fn(() => '/path/to/project'),

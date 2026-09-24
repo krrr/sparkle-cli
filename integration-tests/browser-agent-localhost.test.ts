@@ -39,10 +39,7 @@ describe('browser-agent-localhost', () => {
 
   it('should navigate to localhost fixture and read page content', async () => {
     rig.setup('localhost-navigate', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent-localhost.navigate.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent-localhost.navigate.responses'),
       settings: browserSettings,
     });
 
@@ -58,18 +55,12 @@ describe('browser-agent-localhost', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
   });
 
   it('should fill out and submit a form on localhost', async () => {
     rig.setup('localhost-form', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent-localhost.form.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent-localhost.form.responses'),
       settings: browserSettings,
     });
 
@@ -85,18 +76,12 @@ describe('browser-agent-localhost', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
   });
 
   it('should navigate through a multi-step flow', async () => {
     rig.setup('localhost-multistep', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent-localhost.multistep.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent-localhost.multistep.responses'),
       settings: browserSettings,
     });
 
@@ -112,18 +97,12 @@ describe('browser-agent-localhost', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
   });
 
   it('should handle dynamically loaded content', async () => {
     rig.setup('localhost-dynamic', {
-      fakeResponsesPath: join(
-        __dirname,
-        'browser-agent-localhost.dynamic.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'browser-agent-localhost.dynamic.responses'),
       settings: browserSettings,
     });
 
@@ -139,10 +118,7 @@ describe('browser-agent-localhost', () => {
         t.toolRequest.name === 'invoke_agent' &&
         JSON.parse(t.toolRequest.args).agent_name === 'browser_agent',
     );
-    expect(
-      browserAgentCall,
-      'Expected browser_agent to be called',
-    ).toBeDefined();
+    expect(browserAgentCall, 'Expected browser_agent to be called').toBeDefined();
   });
 
   it('should take a screenshot of localhost page', async () => {

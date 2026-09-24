@@ -125,9 +125,7 @@ describe('EnterPlanModeTool', () => {
         abortSignal: new AbortController().signal,
       });
 
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.PLAN,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.PLAN);
       expect(result.llmContent).toContain('Switching to Plan mode');
       expect(result.returnDisplay).toBe('Switching to Plan mode');
     });
@@ -152,9 +150,7 @@ describe('EnterPlanModeTool', () => {
         abortSignal: new AbortController().signal,
       });
 
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.PLAN,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.PLAN);
       expect(result.llmContent).toBe('Switching to Plan mode.');
       expect(result.llmContent).not.toContain(reason);
       expect(result.returnDisplay).toContain(reason);

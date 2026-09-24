@@ -109,17 +109,13 @@ describe('crawler', () => {
       cacheTtl: 0,
     });
 
-    expect(results).toEqual(
-      expect.arrayContaining(['.', 'src/', 'src/main.js']),
-    );
+    expect(results).toEqual(expect.arrayContaining(['.', 'src/', 'src/main.js']));
   });
 
   it('should handle negated directories', async () => {
     tmpDir = await createTmpDir({
       '.git': {},
-      '.gitignore': ['build/**', '!build/public', '!build/public/**'].join(
-        '\n',
-      ),
+      '.gitignore': ['build/**', '!build/public', '!build/public/**'].join('\n'),
       build: {
         'private.js': '',
         public: ['index.html'],
@@ -278,9 +274,7 @@ describe('crawler', () => {
       cache: false,
       cacheTtl: 0,
     });
-    expect(results).toEqual(
-      expect.arrayContaining(['.', 'src/', 'src/file1.js']),
-    );
+    expect(results).toEqual(expect.arrayContaining(['.', 'src/', 'src/file1.js']));
   });
 
   it('should handle empty or commented-only ignore files', async () => {
@@ -329,9 +323,7 @@ describe('crawler', () => {
       cacheTtl: 0,
     });
 
-    expect(results).toEqual(
-      expect.arrayContaining(['.', 'src/', 'src/main.js']),
-    );
+    expect(results).toEqual(expect.arrayContaining(['.', 'src/', 'src/main.js']));
   });
 
   describe('with in-memory cache', () => {
@@ -402,9 +394,7 @@ describe('crawler', () => {
       // Initial crawl to populate the cache
       const ignore1 = getIgnore();
       const results1 = await crawl(getOptions(ignore1));
-      expect(results1).toEqual(
-        expect.arrayContaining(['.', '.gitignore', 'b.txt']),
-      );
+      expect(results1).toEqual(expect.arrayContaining(['.', '.gitignore', 'b.txt']));
 
       // Modify the ignore file
       await fs.writeFile(path.join(tmpDir, '.gitignore'), 'b.txt');
@@ -412,9 +402,7 @@ describe('crawler', () => {
       // Second crawl should miss the cache and trigger a recrawl
       const ignore2 = getIgnore();
       const results2 = await crawl(getOptions(ignore2));
-      expect(results2).toEqual(
-        expect.arrayContaining(['.', '.gitignore', 'a.txt']),
-      );
+      expect(results2).toEqual(expect.arrayContaining(['.', '.gitignore', 'a.txt']));
     });
 
     it('should miss the cache after TTL expires', async () => {

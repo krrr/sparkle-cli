@@ -1,14 +1,14 @@
 # Activate skill tool (`activate_skill`)
 
-The `activate_skill` tool lets Sparkle CLI load specialized procedural expertise
-and resources when they are relevant to your request.
+The `activate_skill` tool lets Sparkle CLI load specialized procedural expertise and
+resources when they are relevant to your request.
 
 ## Description
 
-Skills are packages of instructions and tools designed for specific engineering
-tasks, such as reviewing code or creating pull requests. Sparkle CLI uses this
-tool to "activate" a skill, which provides it with detailed guidelines and
-specialized tools tailored to that task.
+Skills are packages of instructions and tools designed for specific engineering tasks,
+such as reviewing code or creating pull requests. Sparkle CLI uses this tool to
+"activate" a skill, which provides it with detailed guidelines and specialized tools
+tailored to that task.
 
 ### Arguments
 
@@ -19,23 +19,22 @@ specialized tools tailored to that task.
 
 ## Usage
 
-The `activate_skill` tool is used exclusively by the Sparkle agent. You cannot
-invoke this tool manually.
+The `activate_skill` tool is used exclusively by the Sparkle agent. You cannot invoke
+this tool manually.
 
 When the agent identifies that a task matches a discovered skill, it requests to
-activate that skill. Once activated, the agent's behavior is guided by the
-skill's specific instructions until the task is complete.
+activate that skill. Once activated, the agent's behavior is guided by the skill's
+specific instructions until the task is complete.
 
 ## Behavior
 
 The agent uses this tool to provide professional-grade assistance:
 
-- **Specialized logic:** Skills contain expert-level procedures for complex
-  workflows.
+- **Specialized logic:** Skills contain expert-level procedures for complex workflows.
 - **Dynamic capability:** Activating a skill can grant the agent access to new,
   task-specific tools.
-- **Contextual awareness:** Skills help the agent focus on the most relevant
-  standards and conventions for a particular task.
+- **Contextual awareness:** Skills help the agent focus on the most relevant standards
+  and conventions for a particular task.
 
 ## Next steps
 

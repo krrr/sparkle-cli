@@ -44,9 +44,9 @@ export function ProviderListView({
     const activeIdx = profiles.findIndex((p) => p.id === activeProfileId);
     return activeIdx >= 0 ? activeIdx : 0;
   });
-  const [pendingDeleteProfileId, setPendingDeleteProfileId] = useState<
-    string | null
-  >(null);
+  const [pendingDeleteProfileId, setPendingDeleteProfileId] = useState<string | null>(
+    null,
+  );
 
   const clampedIndex =
     profiles.length > 0 ? Math.min(selectedIndex, profiles.length - 1) : 0;
@@ -212,9 +212,7 @@ export function ProviderListView({
                 </Text>
                 {isActive && (
                   <Box justifyContent="flex-end" flexGrow={1}>
-                    <Text
-                      color={pendingDeleteTextColor ?? theme.status.success}
-                    >
+                    <Text color={pendingDeleteTextColor ?? theme.status.success}>
                       {'✓ Active'}
                     </Text>
                   </Box>

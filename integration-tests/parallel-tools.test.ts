@@ -64,20 +64,14 @@ describe('Parallel Tool Execution Integration', () => {
     await rig.expectToolCallSuccess(['write_file']);
     const toolLogs = rig.readToolLogs();
 
-    const readFiles = toolLogs.filter(
-      (l) => l.toolRequest.name === 'read_file',
-    );
-    const writeFiles = toolLogs.filter(
-      (l) => l.toolRequest.name === 'write_file',
-    );
+    const readFiles = toolLogs.filter((l) => l.toolRequest.name === 'read_file');
+    const writeFiles = toolLogs.filter((l) => l.toolRequest.name === 'write_file');
 
     expect(readFiles.length).toBe(4);
     expect(writeFiles.length).toBe(1);
     expect(toolLogs.every((l) => l.toolRequest.success)).toBe(true);
 
     // Check that output.txt was actually written
-    expect(fs.readFileSync(join(rig.testDir!, 'output.txt'), 'utf8')).toBe(
-      'wave2',
-    );
+    expect(fs.readFileSync(join(rig.testDir!, 'output.txt'), 'utf8')).toBe('wave2');
   }, 30000);
 });

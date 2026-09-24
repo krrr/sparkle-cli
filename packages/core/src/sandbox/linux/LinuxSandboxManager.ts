@@ -22,15 +22,9 @@ import {
   sanitizeEnvironment,
   getSecureSanitizationConfig,
 } from '../../services/environmentSanitization.js';
-import {
-  isStrictlyApproved,
-  verifySandboxOverrides,
-} from '../utils/commandUtils.js';
+import { isStrictlyApproved, verifySandboxOverrides } from '../utils/commandUtils.js';
 import { assertValidPathString } from '../../utils/paths.js';
-import {
-  isKnownSafeCommand,
-  isDangerousCommand,
-} from '../utils/commandSafety.js';
+import { isKnownSafeCommand, isDangerousCommand } from '../utils/commandSafety.js';
 import {
   parsePosixSandboxDenials,
   createSandboxDenialCache,
@@ -225,9 +219,7 @@ export class LinuxSandboxManager implements SandboxManager {
     await initializeShellParsers();
     const fullCmd = [command, ...args].join(' ');
     const stripped = stripShellWrapper(fullCmd);
-    const roots = getCommandRoots(stripped).filter(
-      (r) => r !== 'shopt' && r !== 'set',
-    );
+    const roots = getCommandRoots(stripped).filter((r) => r !== 'shopt' && r !== 'set');
     const commandName = roots.length > 0 ? roots[0] : join(command);
     const isGitCommand = roots.includes('git');
 
@@ -278,10 +270,7 @@ export class LinuxSandboxManager implements SandboxManager {
       req,
       mergedAdditional,
       this.options.workspace,
-      [
-        ...(req.policy?.allowedPaths || []),
-        ...(this.options.includeDirectories || []),
-      ],
+      [...(req.policy?.allowedPaths || []), ...(this.options.includeDirectories || [])],
     );
 
     const sanitizationConfig = getSecureSanitizationConfig(

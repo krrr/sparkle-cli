@@ -8,10 +8,7 @@ import { useState } from 'react';
 import { Box, Text } from 'ink';
 import { type AgentDefinition } from 'sparkle-cli-core';
 import { theme } from '../semantic-colors.js';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { CliSpinner } from './CliSpinner.js';
 
 export enum NewAgentsChoice {
@@ -74,17 +71,10 @@ export const NewAgentsNotification = ({
           <Text color={theme.text.primary}>
             The following agents were found in this project. Please review them:
           </Text>
-          <Box
-            flexDirection="column"
-            marginTop={1}
-            borderStyle="single"
-            padding={1}
-          >
+          <Box flexDirection="column" marginTop={1} borderStyle="single" padding={1}>
             {displayAgents.map((agent) => {
-              const mcpServers =
-                agent.kind === 'local' ? agent.mcpServers : undefined;
-              const hasMcpServers =
-                mcpServers && Object.keys(mcpServers).length > 0;
+              const mcpServers = agent.kind === 'local' ? agent.mcpServers : undefined;
+              const hasMcpServers = mcpServers && Object.keys(mcpServers).length > 0;
               return (
                 <Box key={agent.name} flexDirection="column">
                   <Box>
@@ -93,16 +83,12 @@ export const NewAgentsNotification = ({
                         - {agent.name}:{' '}
                       </Text>
                     </Box>
-                    <Text color={theme.text.secondary}>
-                      {' '}
-                      {agent.description}
-                    </Text>
+                    <Text color={theme.text.secondary}> {agent.description}</Text>
                   </Box>
                   {hasMcpServers && (
                     <Box marginLeft={2}>
                       <Text color={theme.text.secondary}>
-                        (Includes MCP servers:{' '}
-                        {Object.keys(mcpServers).join(', ')})
+                        (Includes MCP servers: {Object.keys(mcpServers).join(', ')})
                       </Text>
                     </Box>
                   )}
@@ -110,9 +96,7 @@ export const NewAgentsNotification = ({
               );
             })}
             {remaining > 0 && (
-              <Text color={theme.text.secondary}>
-                ... and {remaining} more.
-              </Text>
+              <Text color={theme.text.secondary}>... and {remaining} more.</Text>
             )}
           </Box>
         </Box>
@@ -123,11 +107,7 @@ export const NewAgentsNotification = ({
             <Text color={theme.text.primary}> Processing...</Text>
           </Box>
         ) : (
-          <RadioButtonSelect
-            items={options}
-            onSelect={handleSelect}
-            isFocused={true}
-          />
+          <RadioButtonSelect items={options} onSelect={handleSelect} isFocused={true} />
         )}
       </Box>
     </Box>

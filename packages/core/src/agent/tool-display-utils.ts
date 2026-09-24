@@ -5,11 +5,7 @@
  */
 
 import * as Diff from 'diff';
-import type {
-  ToolInvocation,
-  ToolResult,
-  ToolResultDisplay,
-} from '../tools/tools.js';
+import type { ToolInvocation, ToolResult, ToolResultDisplay } from '../tools/tools.js';
 import type { ToolDisplay, DisplayContent, DisplayDiff } from './types.js';
 
 /**

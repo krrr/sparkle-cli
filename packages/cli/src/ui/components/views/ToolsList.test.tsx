@@ -33,22 +33,14 @@ const mockTools: ToolDefinition[] = [
 describe('<ToolsList />', () => {
   it('renders correctly with descriptions', async () => {
     const { lastFrame } = await renderWithProviders(
-      <ToolsList
-        tools={mockTools}
-        showDescriptions={true}
-        terminalWidth={40}
-      />,
+      <ToolsList tools={mockTools} showDescriptions={true} terminalWidth={40} />,
     );
     expect(lastFrame()).toMatchSnapshot();
   });
 
   it('renders correctly without descriptions', async () => {
     const { lastFrame } = await renderWithProviders(
-      <ToolsList
-        tools={mockTools}
-        showDescriptions={false}
-        terminalWidth={40}
-      />,
+      <ToolsList tools={mockTools} showDescriptions={false} terminalWidth={40} />,
     );
     expect(lastFrame()).toMatchSnapshot();
   });

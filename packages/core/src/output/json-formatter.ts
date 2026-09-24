@@ -42,11 +42,7 @@ export class JsonFormatter {
     return JSON.stringify(output, null, 2);
   }
 
-  formatError(
-    error: Error,
-    code?: string | number,
-    sessionId?: string,
-  ): string {
+  formatError(error: Error, code?: string | number, sessionId?: string): string {
     const jsonError: JsonError = {
       type: getErrorType(error),
       message: stripAnsi(error.message),

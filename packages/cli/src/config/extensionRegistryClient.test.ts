@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import * as fs from 'node:fs/promises';
 import {
   ExtensionRegistryClient,
@@ -297,10 +289,7 @@ describe('ExtensionRegistryClient', () => {
 
     const result = await clientWithFile.getExtensions();
     expect(result.extensions).toHaveLength(3);
-    expect(mockReadFile).toHaveBeenCalledWith(
-      resolveToRealPath(filePath),
-      'utf-8',
-    );
+    expect(mockReadFile).toHaveBeenCalledWith(resolveToRealPath(filePath), 'utf-8');
   });
 
   it('should fetch extensions from a file:// URL', async () => {
@@ -311,9 +300,6 @@ describe('ExtensionRegistryClient', () => {
 
     const result = await clientWithFileUrl.getExtensions();
     expect(result.extensions).toHaveLength(3);
-    expect(mockReadFile).toHaveBeenCalledWith(
-      resolveToRealPath(fileUrl),
-      'utf-8',
-    );
+    expect(mockReadFile).toHaveBeenCalledWith(resolveToRealPath(fileUrl), 'utf-8');
   });
 });

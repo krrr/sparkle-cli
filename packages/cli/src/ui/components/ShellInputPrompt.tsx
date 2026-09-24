@@ -75,13 +75,7 @@ export const ShellInputPrompt: React.FC<ShellInputPromptProps> = ({
 
       return false;
     },
-    [
-      focus,
-      handleShellInputSubmit,
-      activeShellPtyId,
-      scrollPageSize,
-      keyMatchers,
-    ],
+    [focus, handleShellInputSubmit, activeShellPtyId, scrollPageSize, keyMatchers],
   );
 
   useKeypress(handleInput, { isActive: focus });

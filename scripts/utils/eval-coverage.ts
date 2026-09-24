@@ -159,8 +159,8 @@ export function computeCoverage(
     filePathLookup.set(f.filePath, f.relativePath);
   }
 
-  const resolvedDiagnostics: EvalAnalysisDiagnostic[] =
-    inventory.diagnostics.map((d) => {
+  const resolvedDiagnostics: EvalAnalysisDiagnostic[] = inventory.diagnostics.map(
+    (d) => {
       if (d.filePath === '<inline>') {
         return d;
       }
@@ -171,13 +171,12 @@ export function computeCoverage(
       if (path.isAbsolute(d.filePath) && inventory.repoRoot) {
         return {
           ...d,
-          filePath: path
-            .relative(inventory.repoRoot, d.filePath)
-            .replace(/\\/g, '/'),
+          filePath: path.relative(inventory.repoRoot, d.filePath).replace(/\\/g, '/'),
         };
       }
       return d;
-    });
+    },
+  );
 
   return {
     totalTools,

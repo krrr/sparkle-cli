@@ -73,9 +73,7 @@ export async function createBrowserAgentDefinition(
   visionEnabled: boolean;
   sessionMode: 'persistent' | 'isolated' | 'existing';
 }> {
-  debugLogger.log(
-    'Creating browser agent definition with isolated MCP tools...',
-  );
+  debugLogger.log('Creating browser agent definition with isolated MCP tools...');
 
   // Get or create browser manager singleton for this session mode/profile
   const browserManager = BrowserManager.getInstance(config);
@@ -178,12 +176,7 @@ export async function createBrowserAgentDefinition(
     }
 
     // Validate required semantic tools are available
-    const requiredSemanticTools = [
-      'click',
-      'fill',
-      'navigate_page',
-      'take_snapshot',
-    ];
+    const requiredSemanticTools = ['click', 'fill', 'navigate_page', 'take_snapshot'];
     const missingSemanticTools = requiredSemanticTools.filter(
       (t) => !availableToolNames.includes(t),
     );
@@ -245,9 +238,7 @@ export async function createBrowserAgentDefinition(
     if (visionDisabledReason) {
       debugLogger.log(`Vision disabled: ${visionDisabledReason.message}`);
     } else {
-      allTools.push(
-        createAnalyzeScreenshotTool(browserManager, config, messageBus),
-      );
+      allTools.push(createAnalyzeScreenshotTool(browserManager, config, messageBus));
     }
 
     debugLogger.log(
@@ -257,10 +248,7 @@ export async function createBrowserAgentDefinition(
 
     // Create configured definition with tools
     // BrowserAgentDefinition is a factory function - call it with config
-    const baseDefinition = BrowserAgentDefinition(
-      config,
-      !visionDisabledReason,
-    );
+    const baseDefinition = BrowserAgentDefinition(config, !visionDisabledReason);
     const definition: LocalAgentDefinition<typeof BrowserTaskResultSchema> = {
       ...baseDefinition,
       toolConfig: {

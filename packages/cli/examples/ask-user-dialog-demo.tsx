@@ -52,21 +52,14 @@ const Demo = () => {
   if (cancelled) {
     return (
       <Box padding={1}>
-        <Text color="red">
-          Dialog was cancelled. Project initialization aborted.
-        </Text>
+        <Text color="red">Dialog was cancelled. Project initialization aborted.</Text>
       </Box>
     );
   }
 
   if (result) {
     return (
-      <Box
-        flexDirection="column"
-        padding={1}
-        borderStyle="single"
-        borderColor="green"
-      >
+      <Box flexDirection="column" padding={1} borderStyle="single" borderColor="green">
         <Text bold color="green">
           Success! Project Configuration:
         </Text>

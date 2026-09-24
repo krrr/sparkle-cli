@@ -1,16 +1,15 @@
 # Local development guide
 
-This guide provides instructions for setting up and using local development
-features for Sparkle CLI.
+This guide provides instructions for setting up and using local development features for
+Sparkle CLI.
 
 ## Build the vendored ink fork
 
-Sparkle CLI bundles a patched version of ink from `third_party/ink`. The root
-install links `node_modules/ink` to this folder, so builds always use the
-vendored copy instead of the published package. The compiled output in
-`third_party/ink/build/` isn't committed to the repository, but the bundle step
-requires it. The bundle step runs automatically through the npm `prepare` script
-whenever you install dependencies.
+Sparkle CLI bundles a patched version of ink from `third_party/ink`. The root install
+links `node_modules/ink` to this folder, so builds always use the vendored copy instead
+of the published package. The compiled output in `third_party/ink/build/` isn't
+committed to the repository, but the bundle step requires it. The bundle step runs
+automatically through the npm `prepare` script whenever you install dependencies.
 
 On a fresh clone, build the vendored ink fork before you run the root install:
 
@@ -22,19 +21,19 @@ cd ../..
 ```
 
 The fork is a workspace member of the root project, so npm otherwise treats the
-repository root as the project and runs its install scripts. The `--prefix` flag
-keeps npm inside `third_party/ink`, and `--no-save` prevents npm from editing
-the fork's `package.json`. CI runs the same sequence through the
+repository root as the project and runs its install scripts. The `--prefix` flag keeps
+npm inside `third_party/ink`, and `--no-save` prevents npm from editing the fork's
+`package.json`. CI runs the same sequence through the
 `.github/actions/build-vendored-ink` composite action before every root install.
 
 ## Tracing
 
 Sparkle CLI uses OpenTelemetry (OTel) to record traces that help you debug agent
-behavior. Traces instrument key events like model calls, tool scheduler
-operations, and tool calls.
+behavior. Traces instrument key events like model calls, tool scheduler operations, and
+tool calls.
 
-Traces provide deep visibility into agent behavior and help you debug complex
-issues. They are captured automatically when you enable telemetry.
+Traces provide deep visibility into agent behavior and help you debug complex issues.
+They are captured automatically when you enable telemetry.
 
 ### Instrument code with traces
 
@@ -78,12 +77,11 @@ await runInDevTraceSpan(
 
 In this example:
 
-- `operation`: The operation type of the span, represented by the
-  `GeminiCliOperation` enum.
-- `metadata.input`: (Optional) An object containing the input data for the
-  traced operation.
-- `metadata.output`: (Optional) An object containing the output data from the
-  traced operation.
-- `metadata.attributes`: (Optional) A record of custom attributes to add to the
-  span.
+- `operation`: The operation type of the span, represented by the `GeminiCliOperation`
+  enum.
+- `metadata.input`: (Optional) An object containing the input data for the traced
+  operation.
+- `metadata.output`: (Optional) An object containing the output data from the traced
+  operation.
+- `metadata.attributes`: (Optional) A record of custom attributes to add to the span.
 - `metadata.error`: (Optional) An error object to record if the operation fails.

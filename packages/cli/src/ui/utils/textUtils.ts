@@ -44,9 +44,7 @@ export function isAscii(str: string): boolean {
 
 // Cache for code points
 const MAX_STRING_LENGTH_TO_CACHE = 1000;
-const codePointsCache = new LRUCache<string, string[]>(
-  LRU_BUFFER_PERF_CACHE_LIMIT,
-);
+const codePointsCache = new LRUCache<string, string[]>(LRU_BUFFER_PERF_CACHE_LIMIT);
 
 export function toCodePoints(str: string): string[] {
   // ASCII fast path
@@ -169,9 +167,7 @@ export function normalizeEscapedNewlines(value: string): string {
   return value.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n');
 }
 
-const stringWidthCache = new LRUCache<string, number>(
-  LRU_BUFFER_PERF_CACHE_LIMIT,
-);
+const stringWidthCache = new LRUCache<string, number>(LRU_BUFFER_PERF_CACHE_LIMIT);
 
 /**
  * Cached version of stringWidth function for better performance
@@ -230,9 +226,7 @@ export function escapeAnsiCtrlCodes<T>(obj: T): T {
 
     regex.lastIndex = 0; // needed for global regex
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    return obj.replace(regex, (match) =>
-      JSON.stringify(match).slice(1, -1),
-    ) as T;
+    return obj.replace(regex, (match) => JSON.stringify(match).slice(1, -1)) as T;
   }
 
   if (obj === null || typeof obj !== 'object') {

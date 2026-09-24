@@ -11,9 +11,7 @@ import { ExtensionManager } from '../../config/extension-manager.js';
 import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const { mockCoreDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { mockCoreDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   const mocked = mockCoreDebugLogger(actual, { stripAnsi: false });
   return { ...mocked, getErrorMessage: vi.fn() };
@@ -50,9 +48,7 @@ describe('extensions list command', () => {
   describe('handleList', () => {
     it('should log a message if no extensions are installed', async () => {
       const mockCwd = vi.spyOn(process, 'cwd').mockReturnValue('/test/dir');
-      mockExtensionManager.prototype.loadExtensions = vi
-        .fn()
-        .mockResolvedValue([]);
+      mockExtensionManager.prototype.loadExtensions = vi.fn().mockResolvedValue([]);
       await handleList();
 
       expect(coreEvents.emitConsoleLog).toHaveBeenCalledWith(
@@ -64,9 +60,7 @@ describe('extensions list command', () => {
 
     it('should output empty JSON array if no extensions are installed and output-format is json', async () => {
       const mockCwd = vi.spyOn(process, 'cwd').mockReturnValue('/test/dir');
-      mockExtensionManager.prototype.loadExtensions = vi
-        .fn()
-        .mockResolvedValue([]);
+      mockExtensionManager.prototype.loadExtensions = vi.fn().mockResolvedValue([]);
       await handleList({ outputFormat: 'json' });
 
       expect(coreEvents.emitConsoleLog).toHaveBeenCalledWith('log', '[]');
@@ -119,9 +113,7 @@ describe('extensions list command', () => {
           code?: string | number | null | undefined,
         ) => never);
       const error = new Error('List failed');
-      mockExtensionManager.prototype.loadExtensions = vi
-        .fn()
-        .mockRejectedValue(error);
+      mockExtensionManager.prototype.loadExtensions = vi.fn().mockRejectedValue(error);
       mockGetErrorMessage.mockReturnValue('List failed message');
 
       await handleList();
@@ -147,11 +139,9 @@ describe('extensions list command', () => {
       const mockYargs = {
         option: vi.fn().mockReturnThis(),
       };
-      (
-        command.builder as unknown as (
-          yargs: typeof mockYargs,
-        ) => typeof mockYargs
-      )(mockYargs);
+      (command.builder as unknown as (yargs: typeof mockYargs) => typeof mockYargs)(
+        mockYargs,
+      );
       expect(mockYargs.option).toHaveBeenCalledWith('output-format', {
         alias: 'o',
         type: 'string',
@@ -162,9 +152,7 @@ describe('extensions list command', () => {
     });
 
     it('handler should call handleList with parsed arguments', async () => {
-      mockExtensionManager.prototype.loadExtensions = vi
-        .fn()
-        .mockResolvedValue([]);
+      mockExtensionManager.prototype.loadExtensions = vi.fn().mockResolvedValue([]);
       await (
         command.handler as unknown as (args: {
           'output-format': string;

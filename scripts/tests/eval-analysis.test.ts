@@ -272,9 +272,7 @@ describe('eval-analysis', () => {
     );
 
     expect(analysis.cases).toEqual([]);
-    expect(
-      analysis.diagnostics.map((diagnostic) => diagnostic.message),
-    ).toEqual([
+    expect(analysis.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
       'Could not statically resolve policy for evalTest call.',
       'Could not statically resolve eval case object for evalTest call.',
     ]);
@@ -329,10 +327,7 @@ describe('eval-analysis', () => {
         });
       `);
 
-      expect(analysis.cases[0].toolReferences).toEqual([
-        'replace',
-        'write_file',
-      ]);
+      expect(analysis.cases[0].toolReferences).toEqual(['replace', 'write_file']);
     });
 
     it('extracts tool from imported constant', () => {

@@ -23,9 +23,7 @@ describe('sessionIndex', () => {
   let tmpDir: string;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'sparkle-cli-session-index-'),
-    );
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-cli-session-index-'));
   });
 
   afterEach(async () => {

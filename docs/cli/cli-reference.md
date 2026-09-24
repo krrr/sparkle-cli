@@ -1,7 +1,7 @@
 # Sparkle CLI cheatsheet
 
-This page provides a reference for commonly used Sparkle CLI commands, options,
-and parameters.
+This page provides a reference for commonly used Sparkle CLI commands, options, and
+parameters.
 
 ## CLI commands
 
@@ -71,8 +71,8 @@ These commands are available within the interactive REPL.
 
 ## Model selection
 
-The `--model` (or `-m`) flag lets you specify which Gemini model to use. You can
-use either model aliases (user-friendly names) or concrete model names.
+The `--model` (or `-m`) flag lets you specify which Gemini model to use. You can use
+either model aliases (user-friendly names) or concrete model names.
 
 ### Model aliases
 

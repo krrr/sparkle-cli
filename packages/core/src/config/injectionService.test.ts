@@ -24,10 +24,7 @@ describe('InjectionService', () => {
 
     expect(service.getInjections()).toEqual(['first hint', 'second hint']);
     expect(service.getLatestInjectionIndex()).toBe(1);
-    expect(service.getInjectionsAfter(-1)).toEqual([
-      'first hint',
-      'second hint',
-    ]);
+    expect(service.getInjectionsAfter(-1)).toEqual(['first hint', 'second hint']);
     expect(service.getInjectionsAfter(0)).toEqual(['second hint']);
     expect(service.getInjectionsAfter(1)).toEqual([]);
   });
@@ -82,10 +79,7 @@ describe('InjectionService', () => {
 
       service.addInjection('bg output', 'background_completion');
 
-      expect(listener).toHaveBeenCalledWith(
-        'bg output',
-        'background_completion',
-      );
+      expect(listener).toHaveBeenCalledWith('bg output', 'background_completion');
     });
 
     it('accepts background_completion even when model steering is disabled', () => {
@@ -95,10 +89,7 @@ describe('InjectionService', () => {
 
       service.addInjection('bg output', 'background_completion');
 
-      expect(listener).toHaveBeenCalledWith(
-        'bg output',
-        'background_completion',
-      );
+      expect(listener).toHaveBeenCalledWith('bg output', 'background_completion');
       expect(service.getInjections()).toEqual(['bg output']);
     });
 
@@ -108,18 +99,11 @@ describe('InjectionService', () => {
       service.addInjection('bg output', 'background_completion');
       service.addInjection('hint 2', 'user_steering');
 
-      expect(service.getInjections('user_steering')).toEqual([
-        'hint',
-        'hint 2',
-      ]);
-      expect(service.getInjections('background_completion')).toEqual([
-        'bg output',
-      ]);
+      expect(service.getInjections('user_steering')).toEqual(['hint', 'hint 2']);
+      expect(service.getInjections('background_completion')).toEqual(['bg output']);
       expect(service.getInjections()).toEqual(['hint', 'bg output', 'hint 2']);
 
-      expect(service.getInjectionsAfter(0, 'user_steering')).toEqual([
-        'hint 2',
-      ]);
+      expect(service.getInjectionsAfter(0, 'user_steering')).toEqual(['hint 2']);
       expect(service.getInjectionsAfter(0, 'background_completion')).toEqual([
         'bg output',
       ]);

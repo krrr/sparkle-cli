@@ -28,9 +28,7 @@ describe('gitProvider', () => {
     expect(result.suggestions).toEqual(
       expect.arrayContaining([expect.objectContaining({ value: 'checkout' })]),
     );
-    expect(
-      result.suggestions.find((s) => s.value === 'commit'),
-    ).toBeUndefined();
+    expect(result.suggestions.find((s) => s.value === 'commit')).toBeUndefined();
   });
 
   it('suggests branch names for checkout at cursorIndex 2', async () => {
@@ -108,11 +106,7 @@ describe('gitProvider', () => {
       },
     );
 
-    const result = await gitProvider.getCompletions(
-      ['git', 'checkout', ''],
-      2,
-      '/tmp',
-    );
+    const result = await gitProvider.getCompletions(['git', 'checkout', ''], 2, '/tmp');
 
     expect(result.exclusive).toBe(true);
     expect(result.suggestions).toHaveLength(0);

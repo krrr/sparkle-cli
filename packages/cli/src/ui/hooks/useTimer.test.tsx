@@ -18,10 +18,7 @@ describe('useTimer', () => {
     vi.restoreAllMocks();
   });
 
-  const renderTimerHook = async (
-    initialIsActive: boolean,
-    initialResetKey: number,
-  ) => {
+  const renderTimerHook = async (initialIsActive: boolean, initialResetKey: number) => {
     let hookResult: ReturnType<typeof useTimer>;
     function TestComponent({
       isActive,

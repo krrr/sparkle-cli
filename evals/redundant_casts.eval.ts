@@ -70,10 +70,9 @@ export function handleError() {
       // 3. Unsafe Cast Check (Error handling)
       // Bad: (err as Error).message
       // Good: if (err instanceof Error) { ... }
-      expect(
-        content,
-        'Should prefer instanceof over casting for errors',
-      ).not.toContain('as Error');
+      expect(content, 'Should prefer instanceof over casting for errors').not.toContain(
+        'as Error',
+      );
 
       // Verify implementation
       expect(content).toContain('toUpperCase()');

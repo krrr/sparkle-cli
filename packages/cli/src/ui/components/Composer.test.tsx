@@ -10,10 +10,7 @@ import { act, useEffect } from 'react';
 import { Box, Text } from 'ink';
 import { Composer } from './Composer.js';
 import { UIStateContext, type UIState } from '../contexts/UIStateContext.js';
-import {
-  UIActionsContext,
-  type UIActions,
-} from '../contexts/UIActionsContext.js';
+import { UIActionsContext, type UIActions } from '../contexts/UIActionsContext.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { SettingsContext } from '../contexts/SettingsContext.js';
 import { createMockSettings } from '../../test-utils/settings.js';
@@ -54,8 +51,7 @@ vi.mock('./LoadingIndicator.js', () => ({
     thought?: { subject?: string } | string;
     thoughtLabel?: string;
   }) => {
-    const fallbackText =
-      typeof thought === 'string' ? thought : thought?.subject;
+    const fallbackText = typeof thought === 'string' ? thought : thought?.subject;
     const text = thoughtLabel ?? fallbackText;
     return <Text>LoadingIndicator{text ? `: ${text}` : ''}</Text>;
   },
@@ -819,9 +815,7 @@ describe('Composer', () => {
 
       const { lastFrame } = await renderComposer(uiState);
 
-      expect(lastFrame()).toContain(
-        "InputPrompt:   Press 'Esc' for NORMAL mode.",
-      );
+      expect(lastFrame()).toContain("InputPrompt:   Press 'Esc' for NORMAL mode.");
     });
 
     it('shows correct placeholder in NORMAL mode', async () => {
@@ -836,9 +830,7 @@ describe('Composer', () => {
 
       const { lastFrame } = await renderComposer(uiState);
 
-      expect(lastFrame()).toContain(
-        "InputPrompt:   Press 'i' for INSERT mode.",
-      );
+      expect(lastFrame()).toContain("InputPrompt:   Press 'i' for INSERT mode.");
     });
   });
 
@@ -860,9 +852,7 @@ describe('Composer', () => {
         await vi.advanceTimersByTimeAsync(250);
       });
 
-      expect(lastFrame({ allowEmpty: true })).toContain(
-        'press tab twice for more',
-      );
+      expect(lastFrame({ allowEmpty: true })).toContain('press tab twice for more');
     });
 
     it('hides shortcuts hint when text is typed in buffer', async () => {

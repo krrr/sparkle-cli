@@ -26,9 +26,7 @@ describe('RateLimiter', () => {
     });
 
     it('should throw on negative interval', () => {
-      expect(() => new RateLimiter(-1)).toThrow(
-        'minIntervalMs must be non-negative.',
-      );
+      expect(() => new RateLimiter(-1)).toThrow('minIntervalMs must be non-negative.');
     });
   });
 
@@ -157,10 +155,7 @@ describe('RateLimiter', () => {
       // After 300ms, with 1000ms base interval, half rounded is 500ms
       vi.advanceTimersByTime(300);
 
-      const timeRemaining = rateLimiter.getTimeUntilNextAllowed(
-        'hp_metric',
-        true,
-      );
+      const timeRemaining = rateLimiter.getTimeUntilNextAllowed('hp_metric', true);
       expect(timeRemaining).toBeCloseTo(200, -1);
 
       vi.useRealTimers();

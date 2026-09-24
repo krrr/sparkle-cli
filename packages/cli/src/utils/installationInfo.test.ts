@@ -91,9 +91,7 @@ describe('getInstallationInfo', () => {
 
   it('should detect running from a local git clone', () => {
     process.argv[1] = `${projectRoot}/packages/cli/dist/index.js`;
-    mockedRealPathSync.mockReturnValue(
-      `${projectRoot}/packages/cli/dist/index.js`,
-    );
+    mockedRealPathSync.mockReturnValue(`${projectRoot}/packages/cli/dist/index.js`);
     mockedIsGitRepository.mockReturnValue(true);
 
     const info = getInstallationInfo(projectRoot, true);
@@ -153,10 +151,7 @@ describe('getInstallationInfo', () => {
     process.argv[1] = cliPath;
 
     mockedExecSync.mockImplementation((cmd) => {
-      if (
-        typeof cmd === 'string' &&
-        cmd.includes('brew --prefix sparkle-cli')
-      ) {
+      if (typeof cmd === 'string' && cmd.includes('brew --prefix sparkle-cli')) {
         return '/opt/homebrew/opt/sparkle-cli';
       }
       throw new Error(`Command failed: ${cmd}`);
@@ -390,10 +385,7 @@ describe('getInstallationInfo', () => {
         return Buffer.from('sparkle-cli\n');
       }
       // Future proofing for the fix:
-      if (
-        typeof cmd === 'string' &&
-        cmd.includes('brew --prefix sparkle-cli')
-      ) {
+      if (typeof cmd === 'string' && cmd.includes('brew --prefix sparkle-cli')) {
         return '/opt/homebrew/opt/sparkle-cli';
       }
       throw new Error(`Command failed: ${cmd}`);

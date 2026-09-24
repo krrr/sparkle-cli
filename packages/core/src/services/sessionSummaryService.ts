@@ -51,9 +51,7 @@ export class SessionSummaryService {
    * Generate a 1-line summary of a chat session focusing on user intent.
    * Returns null if generation fails for any reason.
    */
-  async generateSummary(
-    options: GenerateSummaryOptions,
-  ): Promise<string | null> {
+  async generateSummary(options: GenerateSummaryOptions): Promise<string | null> {
     const {
       messages,
       maxMessages = DEFAULT_MAX_MESSAGES,

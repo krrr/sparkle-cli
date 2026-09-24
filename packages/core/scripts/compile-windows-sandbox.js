@@ -32,10 +32,7 @@ function compileWindowsSandbox() {
     __dirname,
     '../dist/src/sandbox/windows/GeminiSandbox.exe',
   );
-  const sourcePath = path.resolve(
-    __dirname,
-    '../src/sandbox/windows/GeminiSandbox.cs',
-  );
+  const sourcePath = path.resolve(__dirname, '../src/sandbox/windows/GeminiSandbox.cs');
 
   if (!fs.existsSync(sourcePath)) {
     console.error(`Sandbox source not found at ${sourcePath}`);
@@ -54,20 +51,8 @@ function compileWindowsSandbox() {
   const systemRoot = process.env['SystemRoot'] || 'C:\\Windows';
   const cscPaths = [
     'csc.exe', // Try in PATH first
-    path.join(
-      systemRoot,
-      'Microsoft.NET',
-      'Framework64',
-      'v4.0.30319',
-      'csc.exe',
-    ),
-    path.join(
-      systemRoot,
-      'Microsoft.NET',
-      'Framework',
-      'v4.0.30319',
-      'csc.exe',
-    ),
+    path.join(systemRoot, 'Microsoft.NET', 'Framework64', 'v4.0.30319', 'csc.exe'),
+    path.join(systemRoot, 'Microsoft.NET', 'Framework', 'v4.0.30319', 'csc.exe'),
   ];
 
   let csc = undefined;
@@ -93,13 +78,9 @@ function compileWindowsSandbox() {
 
   console.log(`Compiling native Windows sandbox helper...`);
   // Compile to src
-  let result = spawnSync(
-    csc,
-    [`/out:${srcHelperPath}`, '/optimize', sourcePath],
-    {
-      stdio: 'inherit',
-    },
-  );
+  let result = spawnSync(csc, [`/out:${srcHelperPath}`, '/optimize', sourcePath], {
+    stdio: 'inherit',
+  });
 
   if (result.status === 0) {
     console.log('Successfully compiled GeminiSandbox.exe to src');

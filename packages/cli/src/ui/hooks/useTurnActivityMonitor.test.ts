@@ -70,9 +70,7 @@ describe('useTurnActivityMonitor', () => {
 
   it('should detect redirection from tool calls', async () => {
     // Force mock implementation to ensure it's active
-    vi.mocked(hasRedirection).mockImplementation((q: string) =>
-      q.includes('>'),
-    );
+    vi.mocked(hasRedirection).mockImplementation((q: string) => q.includes('>'));
 
     const { result, rerender } = await renderHook(
       ({ state, pendingToolCalls }) =>

@@ -80,11 +80,7 @@ const envProxy = new Proxy(originalEnv, {
   },
   set(target, prop, value) {
     if (typeof prop === 'string') {
-      if (
-        prop === '__proto__' ||
-        prop === 'constructor' ||
-        prop === 'prototype'
-      ) {
+      if (prop === '__proto__' || prop === 'constructor' || prop === 'prototype') {
         return false;
       }
       const taskEnv = envStorage.getStore();
@@ -102,11 +98,7 @@ const envProxy = new Proxy(originalEnv, {
   },
   deleteProperty(target, prop) {
     if (typeof prop === 'string') {
-      if (
-        prop === '__proto__' ||
-        prop === 'constructor' ||
-        prop === 'prototype'
-      ) {
+      if (prop === '__proto__' || prop === 'constructor' || prop === 'prototype') {
         return false;
       }
       const taskEnv = envStorage.getStore();
@@ -159,11 +151,7 @@ const envProxy = new Proxy(originalEnv, {
   },
   defineProperty(target, prop, descriptor) {
     if (typeof prop === 'string') {
-      if (
-        prop === '__proto__' ||
-        prop === 'constructor' ||
-        prop === 'prototype'
-      ) {
+      if (prop === '__proto__' || prop === 'constructor' || prop === 'prototype') {
         return false;
       }
       const taskEnv = envStorage.getStore();
@@ -211,19 +199,12 @@ process.chdir = function (directory: string) {
     try {
       const stats = fs.statSync(resolved);
       if (!stats.isDirectory()) {
-        const err = new Error(
-          "ENOTDIR: not a directory, chdir '" + resolved + "'",
-        );
+        const err = new Error("ENOTDIR: not a directory, chdir '" + resolved + "'");
         (err as NodeJS.ErrnoException).code = 'ENOTDIR';
         throw err;
       }
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        err.code === 'ENOENT'
-      ) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
         const chdirErr = new Error(
           "ENOENT: no such file or directory, chdir '" + resolved + "'",
         );
@@ -251,17 +232,13 @@ export async function loadConfig(
 ): Promise<Config> {
   const workspaceEnv = await loadEnvironment(trusted, workspaceDir);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  const envVars: Record<string, string> = { ...process.env } as Record<
-    string,
-    string
-  >;
+  const envVars: Record<string, string> = { ...process.env } as Record<string, string>;
   Object.assign(envVars, workspaceEnv);
 
   const getEnvLocal = (key: string) => envVars[key];
 
   const folderTrust =
-    settings.folderTrust === true ||
-    getEnvLocal('SPARKLE_FOLDER_TRUST') === 'true';
+    settings.folderTrust === true || getEnvLocal('SPARKLE_FOLDER_TRUST') === 'true';
 
   let checkpointing = getEnvLocal('CHECKPOINTING')
     ? getEnvLocal('CHECKPOINTING') === 'true'
@@ -324,8 +301,7 @@ export async function loadConfig(
     fileFiltering: {
       respectGitIgnore: settings.fileFiltering?.respectGitIgnore,
       respectSparkleIgnore: settings.fileFiltering?.respectSparkleIgnore,
-      enableRecursiveFileSearch:
-        settings.fileFiltering?.enableRecursiveFileSearch,
+      enableRecursiveFileSearch: settings.fileFiltering?.enableRecursiveFileSearch,
       customIgnoreFilePaths: [
         ...(settings.fileFiltering?.customIgnoreFilePaths || []),
         ...(getEnvLocal('CUSTOM_IGNORE_FILE_PATHS')
@@ -359,9 +335,7 @@ export async function loadConfig(
   return config;
 }
 
-export function setIsTrusted(
-  agentSettings: AgentSettings | undefined,
-): boolean {
+export function setIsTrusted(agentSettings: AgentSettings | undefined): boolean {
   const folderTrustEnv = getEnv('SPARKLE_FOLDER_TRUST');
   if (folderTrustEnv !== undefined) {
     return folderTrustEnv === 'true';
@@ -383,21 +357,14 @@ export async function setTargetDir(
     return originalCWD;
   }
 
-  logger.info(
-    `[CoderAgentExecutor] Overriding workspace path to: ${targetDir}`,
-  );
+  logger.info(`[CoderAgentExecutor] Overriding workspace path to: ${targetDir}`);
 
   try {
     let resolvedPath: string;
     try {
       resolvedPath = resolveToRealPath(targetDir);
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        err.code === 'ENOENT'
-      ) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
         const parentDir = path.dirname(path.resolve(targetDir));
         resolvedPath = path.join(
           resolveToRealPath(parentDir),
@@ -429,12 +396,7 @@ export async function setTargetDir(
     try {
       stats = await fs.promises.stat(resolvedPath);
     } catch (err: unknown) {
-      if (
-        err &&
-        typeof err === 'object' &&
-        'code' in err &&
-        err.code === 'ENOENT'
-      ) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'ENOENT') {
         if (isTestEnv) {
           await fs.promises.mkdir(resolvedPath, { recursive: true });
           stats = await fs.promises.stat(resolvedPath);
@@ -553,10 +515,7 @@ async function refreshAuthentication(
 
   if (getEnvLocal('GEMINI_API_KEY')) {
     logger.info(`[${logPrefix}] Using Gemini API Key`);
-    await config.refreshAuth(
-      ProviderType.USE_GEMINI,
-      getEnvLocal('GEMINI_API_KEY'),
-    );
+    await config.refreshAuth(ProviderType.USE_GEMINI, getEnvLocal('GEMINI_API_KEY'));
   } else {
     const errorMessage = `[${logPrefix}] Unable to set GeneratorConfig. Please provide a GEMINI_API_KEY.`;
     logger.error(errorMessage);

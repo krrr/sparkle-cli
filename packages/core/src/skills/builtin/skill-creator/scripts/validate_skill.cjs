@@ -40,8 +40,7 @@ function validateSkill(skillPath) {
     /^description:\s*(?:'([^']*)'|"([^"]*)"|(.+))$/m,
   );
 
-  if (!nameMatch)
-    return { valid: false, message: 'Missing "name" in frontmatter' };
+  if (!nameMatch) return { valid: false, message: 'Missing "name" in frontmatter' };
   if (!descMatch)
     return {
       valid: false,

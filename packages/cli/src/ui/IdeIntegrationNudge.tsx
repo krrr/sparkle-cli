@@ -23,10 +23,7 @@ interface IdeIntegrationNudgeProps {
   onComplete: (result: IdeIntegrationNudgeResult) => void;
 }
 
-export function IdeIntegrationNudge({
-  ide,
-  onComplete,
-}: IdeIntegrationNudgeProps) {
+export function IdeIntegrationNudge({ ide, onComplete }: IdeIntegrationNudgeProps) {
   useKeypress(
     (key) => {
       if (key.name === 'escape') {

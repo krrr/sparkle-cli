@@ -68,9 +68,7 @@ describe('ProjectRegistry', () => {
 
     const id1 = await registry.getShortId(path.join(tempDir, 'one', 'gemini'));
     const id2 = await registry.getShortId(path.join(tempDir, 'two', 'gemini'));
-    const id3 = await registry.getShortId(
-      path.join(tempDir, 'three', 'gemini'),
-    );
+    const id3 = await registry.getShortId(path.join(tempDir, 'three', 'gemini'));
 
     expect(id1).toBe('gemini');
     expect(id2).toBe('gemini-1');
@@ -236,12 +234,8 @@ describe('ProjectRegistry', () => {
     const id = await registry.getShortId(projectPath);
     expect(id).toBe(slug);
 
-    expect(fs.existsSync(path.join(baseDir1, slug, '.project_root'))).toBe(
-      true,
-    );
-    expect(fs.existsSync(path.join(baseDir2, slug, '.project_root'))).toBe(
-      true,
-    );
+    expect(fs.existsSync(path.join(baseDir1, slug, '.project_root'))).toBe(true);
+    expect(fs.existsSync(path.join(baseDir2, slug, '.project_root'))).toBe(true);
     expect(
       normalizePath(
         fs.readFileSync(path.join(baseDir1, slug, '.project_root'), 'utf8'),
@@ -347,19 +341,14 @@ describe('ProjectRegistry', () => {
     renameSpy.mockRejectedValue(expectedError);
 
     const projectPath = path.join(tempDir, 'failing-project');
-    await expect(registry.getShortId(projectPath)).rejects.toThrow(
-      'Persistent EBUSY',
-    );
+    await expect(registry.getShortId(projectPath)).rejects.toThrow('Persistent EBUSY');
 
     renameSpy.mockRestore();
   });
 
   it('protects against data destruction by throwing on EACCES instead of resetting', async () => {
     // 1. Write valid registry data
-    fs.writeFileSync(
-      registryPath,
-      JSON.stringify({ projects: { '/foo': 'bar' } }),
-    );
+    fs.writeFileSync(registryPath, JSON.stringify({ projects: { '/foo': 'bar' } }));
 
     const registry = new ProjectRegistry(registryPath);
 

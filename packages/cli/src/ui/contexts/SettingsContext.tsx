@@ -32,11 +32,7 @@ export interface SettingsState extends LoadedSettingsSnapshot {
 
 export interface SettingsStoreValue {
   settings: SettingsState;
-  setSetting: (
-    scope: LoadableSettingScope,
-    key: string,
-    value: unknown,
-  ) => void;
+  setSetting: (scope: LoadableSettingScope, key: string, value: unknown) => void;
 }
 
 // Components that call this hook will re render when a settings change event is emitted

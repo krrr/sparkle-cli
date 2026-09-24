@@ -18,9 +18,7 @@ export interface ListeningIndicatorProps {
   color?: string;
 }
 
-export const ListeningIndicator: React.FC<ListeningIndicatorProps> = ({
-  color,
-}) => {
+export const ListeningIndicator: React.FC<ListeningIndicatorProps> = ({ color }) => {
   const [tick, setTick] = useState(0);
   const isScreenReaderEnabled = useIsScreenReaderEnabled();
 

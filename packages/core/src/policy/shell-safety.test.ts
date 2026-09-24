@@ -8,8 +8,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock shell-utils to avoid relying on tree-sitter WASM which is flaky in CI on Windows
 vi.mock('../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../utils/shell-utils.js')>();
 
   // Static map of test commands to their expected subcommands
   // This mirrors what the real parser would output for these specific strings
@@ -31,10 +30,7 @@ vi.mock('../utils/shell-utils.js', async (importOriginal) => {
     ],
     'tee >(rm -rf /)': ['tee >(rm -rf /)', 'rm -rf /'],
     'git log | rm -rf /': ['git log', 'rm -rf /'],
-    'git log --format=$(rm -rf /)': [
-      'git log --format=$(rm -rf /)',
-      'rm -rf /',
-    ],
+    'git log --format=$(rm -rf /)': ['git log --format=$(rm -rf /)', 'rm -rf /'],
     'git log && echo $(git log | rm -rf /)': [
       'git log',
       'echo $(git log | rm -rf /)',
@@ -347,11 +343,7 @@ describe('Shell Safety Policy', () => {
 
   it('SHOULD allow generic redirection > /tmp/test if allowRedirection is true', async () => {
     // If PolicyRule has allowRedirection: true, it should stay ALLOW
-    const argsPatternsGitLog = buildArgsPatterns(
-      undefined,
-      'git log',
-      undefined,
-    );
+    const argsPatternsGitLog = buildArgsPatterns(undefined, 'git log', undefined);
     const policyWithRedirection = new PolicyEngine({
       rules: [
         {
@@ -389,11 +381,7 @@ describe('Shell Safety Policy', () => {
     // git commit -m "..." (Unknown/No Rule -> ASK_USER)
     // git push (DENY -> DENY)
     // Overall should be DENY.
-    const argsPatternsPush = buildArgsPatterns(
-      undefined,
-      'git push',
-      undefined,
-    );
+    const argsPatternsPush = buildArgsPatterns(undefined, 'git push', undefined);
 
     const denyPushPolicy = new PolicyEngine({
       rules: [
@@ -420,11 +408,7 @@ describe('Shell Safety Policy', () => {
     // Scenario:
     // `git status` (ALLOW) && `unknown_command` (ASK_USER by default)
     // Expected: ASK_USER, and the matched rule should be related to the unknown_command
-    const argsPatternsGitStatus = buildArgsPatterns(
-      undefined,
-      'git status',
-      undefined,
-    );
+    const argsPatternsGitStatus = buildArgsPatterns(undefined, 'git status', undefined);
 
     const policyEngine = new PolicyEngine({
       rules: [

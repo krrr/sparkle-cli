@@ -149,9 +149,7 @@ export class GeminiCliSession {
       if (registry.getTool(toolName)) {
         registry.unregisterTool(toolName);
       }
-      registry.registerTool(
-        new ActivateSkillTool(this.config, loopContext.messageBus),
-      );
+      registry.registerTool(new ActivateSkillTool(this.config, loopContext.messageBus));
     }
 
     // Register tools
@@ -167,19 +165,17 @@ export class GeminiCliSession {
     this.client = loopContext2.geminiClient;
 
     if (this.resumedData) {
-      const history: Content[] = this.resumedData.conversation.messages.map(
-        (m) => {
-          const role = m.type === 'gemini' ? 'model' : 'user';
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          let parts: any[] = [];
-          if (Array.isArray(m.content)) {
-            parts = m.content;
-          } else if (m.content) {
-            parts = [{ text: String(m.content) }];
-          }
-          return { role, parts };
-        },
-      );
+      const history: Content[] = this.resumedData.conversation.messages.map((m) => {
+        const role = m.type === 'gemini' ? 'model' : 'user';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let parts: any[] = [];
+        if (Array.isArray(m.content)) {
+          parts = m.content;
+        } else if (m.content) {
+          parts = [{ text: String(m.content) }];
+        }
+        return { role, parts };
+      });
       await this.client.resumeChat(history, this.resumedData);
     }
 
@@ -221,9 +217,7 @@ export class GeminiCliSession {
     const fs = new SdkAgentFilesystem(this.config);
     const shell = new SdkAgentShell(this.config);
 
-    let request: Parameters<GeminiClient['sendMessageStream']>[0] = [
-      { text: prompt },
-    ];
+    let request: Parameters<GeminiClient['sendMessageStream']>[0] = [{ text: prompt }];
 
     while (true) {
       if (typeof this.instructions === 'function') {

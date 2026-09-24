@@ -46,11 +46,7 @@ export class ListMcpResourcesTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: ListMcpResourcesParams,
   ): ListMcpResourcesToolInvocation {
-    return new ListMcpResourcesToolInvocation(
-      this.context,
-      params,
-      this.messageBus,
-    );
+    return new ListMcpResourcesToolInvocation(this.context, params, this.messageBus);
   }
 }
 
@@ -70,9 +66,7 @@ class ListMcpResourcesToolInvocation extends BaseToolInvocation<
     return 'List MCP resources';
   }
 
-  async execute({
-    abortSignal: _abortSignal,
-  }: ExecuteOptions): Promise<ToolResult> {
+  async execute({ abortSignal: _abortSignal }: ExecuteOptions): Promise<ToolResult> {
     const mcpManager = this.context.config.getMcpClientManager();
     if (!mcpManager) {
       return {

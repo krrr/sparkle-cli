@@ -24,9 +24,7 @@ describe('AskUserTool Helpers', () => {
     });
 
     it('returns true for Success status', () => {
-      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Success')).toBe(
-        true,
-      );
+      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Success')).toBe(true);
     });
 
     it('returns true for Error status', () => {
@@ -34,18 +32,12 @@ describe('AskUserTool Helpers', () => {
     });
 
     it('returns true for Canceled status', () => {
-      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Canceled')).toBe(
-        true,
-      );
+      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Canceled')).toBe(true);
     });
 
     it('returns false for in-progress statuses', () => {
-      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Executing')).toBe(
-        false,
-      );
-      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Pending')).toBe(
-        false,
-      );
+      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Executing')).toBe(false);
+      expect(isCompletedAskUserTool(ASK_USER_DISPLAY_NAME, 'Pending')).toBe(false);
     });
   });
 });
@@ -193,9 +185,7 @@ describe('AskUserTool', () => {
           },
         ],
       });
-      expect(result).toContain(
-        "type='choice' requires 'options' array with 2-4 items",
-      );
+      expect(result).toContain("type='choice' requires 'options' array with 2-4 items");
     });
 
     it('should return error if options has more than 4 items', () => {
@@ -361,9 +351,7 @@ describe('AskUserTool', () => {
         .mockReturnValue(null);
 
       const params = {
-        questions: [
-          { question: 'Valid?', header: 'Valid', type: QuestionType.TEXT },
-        ],
+        questions: [{ question: 'Valid?', header: 'Valid', type: QuestionType.TEXT }],
       };
 
       const mockInvocation = {
@@ -493,9 +481,7 @@ describe('AskUserTool', () => {
         abortSignal: new AbortController().signal,
       });
       expect(result.returnDisplay).toContain('User answered:');
-      expect(result.returnDisplay).toContain(
-        '  Approach → Quick fix (Recommended)',
-      );
+      expect(result.returnDisplay).toContain('  Approach → Quick fix (Recommended)');
       expect(JSON.parse(result.llmContent as string)).toEqual({
         answers: { '0': 'Quick fix (Recommended)' },
       });
@@ -537,9 +523,7 @@ describe('AskUserTool', () => {
       const result = await invocation.execute({
         abortSignal: new AbortController().signal,
       });
-      expect(result.returnDisplay).toBe(
-        'User submitted without answering questions.',
-      );
+      expect(result.returnDisplay).toBe('User submitted without answering questions.');
       expect(JSON.parse(result.llmContent as string)).toEqual({ answers: {} });
       expect(result.data).toEqual({
         ask_user: {

@@ -425,9 +425,7 @@ describe('ChatRecordingService', () => {
         }),
       ).rejects.toThrow('simulated rename failure');
 
-      const leftovers = fs
-        .readdirSync(chatsDir)
-        .filter((f) => f.includes('.tmp-'));
+      const leftovers = fs.readdirSync(chatsDir).filter((f) => f.includes('.tmp-'));
       expect(leftovers).toEqual([]);
     });
   });
@@ -443,9 +441,7 @@ describe('ChatRecordingService', () => {
           id: 'env-1',
           content: {
             role: 'user',
-            parts: [
-              { text: '<session_context>Startup context</session_context>' },
-            ],
+            parts: [{ text: '<session_context>Startup context</session_context>' }],
           },
         },
       ]);
@@ -483,9 +479,7 @@ describe('ChatRecordingService', () => {
           id: 'env-1',
           content: {
             role: 'user',
-            parts: [
-              { text: '<session_context>Startup context</session_context>' },
-            ],
+            parts: [{ text: '<session_context>Startup context</session_context>' }],
           },
         },
         {
@@ -499,10 +493,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         conversationFile,
       )) as ConversationRecord;
-      expect(conversation.messages.map((m) => m.id)).toEqual([
-        'env-1',
-        'user-1',
-      ]);
+      expect(conversation.messages.map((m) => m.id)).toEqual(['env-1', 'user-1']);
     });
 
     it('should write metadata first and clear the buffer after flushing', async () => {
@@ -518,10 +509,7 @@ describe('ChatRecordingService', () => {
       });
 
       const conversationFile = chatRecordingService.getConversationFilePath()!;
-      const lines = fs
-        .readFileSync(conversationFile, 'utf-8')
-        .trim()
-        .split('\n');
+      const lines = fs.readFileSync(conversationFile, 'utf-8').trim().split('\n');
       const first = JSON.parse(lines[0]) as ConversationRecord;
       expect(first.sessionId).toBe('test-session-id');
       expect(first.messages).toBeUndefined();
@@ -592,9 +580,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         conversationFile,
       )) as ConversationRecord;
-      const contents = conversation.messages.map((m) =>
-        JSON.stringify(m.content),
-      );
+      const contents = conversation.messages.map((m) => JSON.stringify(m.content));
       expect(contents).toHaveLength(2);
       expect(contents[0]).toContain('<session_context>');
       expect(conversation.messages[1].content).toBe('Second attempt');
@@ -970,8 +956,7 @@ describe('ChatRecordingService', () => {
       expect(conversation.messages).toHaveLength(2);
       expect(conversation.messages[1].type).toBe('gemini');
       expect(
-        (conversation.messages[1] as MessageRecord & { type: 'gemini' })
-          .toolCalls,
+        (conversation.messages[1] as MessageRecord & { type: 'gemini' }).toolCalls,
       ).toHaveLength(1);
     });
 
@@ -1090,17 +1075,13 @@ describe('ChatRecordingService', () => {
       const subagentFile = path.join(subagentDir, `${subagentSessionId}.jsonl`);
       fs.writeFileSync(
         subagentFile,
-        JSON.stringify({ sessionId: subagentSessionId, kind: 'subagent' }) +
-          '\n',
+        JSON.stringify({ sessionId: subagentSessionId, kind: 'subagent' }) + '\n',
       );
 
       // Create logs for both
       const parentLog = path.join(logsDir, `session-${parentSessionId}.jsonl`);
       fs.writeFileSync(parentLog, '{}');
-      const subagentLog = path.join(
-        logsDir,
-        `session-${subagentSessionId}.jsonl`,
-      );
+      const subagentLog = path.join(logsDir, `session-${subagentSessionId}.jsonl`);
       fs.writeFileSync(subagentLog, '{}');
 
       // Create tool outputs for both
@@ -1154,8 +1135,7 @@ describe('ChatRecordingService', () => {
       );
       fs.writeFileSync(
         subagentFile,
-        JSON.stringify({ sessionId: subagentSessionId, kind: 'subagent' }) +
-          '\n',
+        JSON.stringify({ sessionId: subagentSessionId, kind: 'subagent' }) + '\n',
       );
 
       // Call with parent sessionId
@@ -1291,19 +1271,13 @@ describe('ChatRecordingService', () => {
         content: 'ping',
         model: 'm',
       });
-      chatRecordingService.recordDirectories([
-        '/path/to/dir1',
-        '/path/to/dir2',
-      ]);
+      chatRecordingService.recordDirectories(['/path/to/dir1', '/path/to/dir2']);
 
       const sessionFile = chatRecordingService.getConversationFilePath()!;
       const conversation = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
-      expect(conversation.directories).toEqual([
-        '/path/to/dir1',
-        '/path/to/dir2',
-      ]);
+      expect(conversation.directories).toEqual(['/path/to/dir1', '/path/to/dir2']);
     });
 
     it('should overwrite existing directories', async () => {
@@ -1355,9 +1329,7 @@ describe('ChatRecordingService', () => {
       expect(result!.messages).toHaveLength(1);
       expect(result!.messages[0].content).toBe('msg1');
 
-      conversation = (await loadConversationRecord(
-        sessionFile,
-      )) as ConversationRecord;
+      conversation = (await loadConversationRecord(sessionFile)) as ConversationRecord;
       expect(conversation.messages).toHaveLength(1);
     });
 
@@ -1418,8 +1390,7 @@ describe('ChatRecordingService', () => {
       const bareMessage = chatRecordingService
         .getConversation()!
         .messages.find(
-          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
-            m.type === 'gemini',
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> => m.type === 'gemini',
         )!;
       expect(bareMessage.toolCalls![0]).toEqual({
         id: 'call-1',
@@ -1471,8 +1442,7 @@ describe('ChatRecordingService', () => {
       const mergedMessage = chatRecordingService
         .getConversation()!
         .messages.find(
-          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
-            m.type === 'gemini',
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> => m.type === 'gemini',
         )!;
       expect(mergedMessage.toolCalls![0]).toMatchObject({
         id: 'call-1',
@@ -1494,8 +1464,7 @@ describe('ChatRecordingService', () => {
         chatRecordingService.getConversationFilePath()!,
       )) as ConversationRecord;
       const persistedMessage = persisted.messages.find(
-        (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
-          m.type === 'gemini',
+        (m): m is Extract<MessageRecord, { type: 'gemini' }> => m.type === 'gemini',
       )!;
       expect(persistedMessage.toolCalls![0].resultDisplay).toBe('v22.14.0');
       expect(persistedMessage.thoughts).toEqual(sourceMessage.thoughts);
@@ -1529,8 +1498,7 @@ describe('ChatRecordingService', () => {
       const geminiMessage = chatRecordingService
         .getConversation()!
         .messages.find(
-          (m): m is Extract<MessageRecord, { type: 'gemini' }> =>
-            m.type === 'gemini',
+          (m): m is Extract<MessageRecord, { type: 'gemini' }> => m.type === 'gemini',
         )!;
       const source: ConversationRecord = {
         sessionId: 'source',
@@ -1754,9 +1722,7 @@ describe('ChatRecordingService', () => {
       const conversation = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
-      const duplicates = conversation.messages.filter(
-        (m) => m.id === 'duplicate-turn',
-      );
+      const duplicates = conversation.messages.filter((m) => m.id === 'duplicate-turn');
       expect(duplicates).toHaveLength(1);
     });
 
@@ -1810,9 +1776,7 @@ describe('ChatRecordingService', () => {
       const record = await loadConversationRecord(
         chatRecordingService.getConversationFilePath()!,
       );
-      const modelMsg = record!.messages.find(
-        (m) => m.id === id,
-      )! as MessageRecord & {
+      const modelMsg = record!.messages.find((m) => m.id === id)! as MessageRecord & {
         type: 'gemini';
       };
       // No "[Thought: ...]"/"[Function Call: ...]" labels may ever reach the
@@ -1833,10 +1797,7 @@ describe('ChatRecordingService', () => {
           thought: true,
         },
       ];
-      const id = chatRecordingService.recordSyntheticMessage(
-        'gemini',
-        ackParts,
-      );
+      const id = chatRecordingService.recordSyntheticMessage('gemini', ackParts);
 
       chatRecordingService.updateMessagesFromHistory([
         {
@@ -1937,9 +1898,9 @@ describe('ChatRecordingService', () => {
       const record = await loadConversationRecord(
         chatRecordingService.getConversationFilePath()!,
       );
-      const modelMsg = record!.messages.find(
-        (m) => m.id === id,
-      )! as MessageRecord & { type: 'gemini' };
+      const modelMsg = record!.messages.find((m) => m.id === id)! as MessageRecord & {
+        type: 'gemini';
+      };
       expect(modelMsg.content).toEqual([{ text: 'I will check the file.' }]);
       expect(modelMsg.toolCalls).toEqual([
         expect.objectContaining({
@@ -1950,9 +1911,7 @@ describe('ChatRecordingService', () => {
       ]);
       // The recording must contain exactly one model message (no orphaned
       // tool-call-only duplicate).
-      expect(record!.messages.filter((m) => m.type === 'gemini')).toHaveLength(
-        1,
-      );
+      expect(record!.messages.filter((m) => m.type === 'gemini')).toHaveLength(1);
     });
 
     it('should keep tool-call pairing intact after a resume-style rebuild', async () => {
@@ -2040,10 +1999,9 @@ describe('ChatRecordingService', () => {
 
       // mkdirSync should be called with the parent directory and recursive option
       const conversationFile = chatRecordingService.getConversationFilePath()!;
-      expect(mkdirSyncSpy).toHaveBeenCalledWith(
-        path.dirname(conversationFile),
-        { recursive: true },
-      );
+      expect(mkdirSyncSpy).toHaveBeenCalledWith(path.dirname(conversationFile), {
+        recursive: true,
+      });
 
       // mkdirSync should be called before writeFileSync
       const mkdirCallOrder = mkdirSyncSpy.mock.invocationCallOrder;

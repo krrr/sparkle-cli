@@ -33,18 +33,10 @@ describe('stdio utils', () => {
     const cleanup = patchStdio();
 
     process.stdout.write('test stdout');
-    expect(coreEvents.emitOutput).toHaveBeenCalledWith(
-      false,
-      'test stdout',
-      undefined,
-    );
+    expect(coreEvents.emitOutput).toHaveBeenCalledWith(false, 'test stdout', undefined);
 
     process.stderr.write('test stderr');
-    expect(coreEvents.emitOutput).toHaveBeenCalledWith(
-      true,
-      'test stderr',
-      undefined,
-    );
+    expect(coreEvents.emitOutput).toHaveBeenCalledWith(true, 'test stderr', undefined);
 
     cleanup();
 

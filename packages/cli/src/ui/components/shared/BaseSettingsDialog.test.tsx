@@ -110,9 +110,7 @@ describe('BaseSettingsDialog', () => {
       ...props,
     };
 
-    const result = await renderWithProviders(
-      <BaseSettingsDialog {...defaultProps} />,
-    );
+    const result = await renderWithProviders(<BaseSettingsDialog {...defaultProps} />);
     await result.waitUntilReady();
     return result;
   };
@@ -197,8 +195,7 @@ describe('BaseSettingsDialog', () => {
     });
 
     it('should navigate down with arrow key', async () => {
-      const { lastFrame, stdin, waitUntilReady, unmount } =
-        await renderDialog();
+      const { lastFrame, stdin, waitUntilReady, unmount } = await renderDialog();
 
       // Initially first item is active (indicated by bullet point)
       const initialFrame = lastFrame();

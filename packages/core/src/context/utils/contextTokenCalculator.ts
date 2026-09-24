@@ -145,32 +145,16 @@ export class StaticTokenCalculator implements AdvancedTokenCalculator {
 
       for (const part of parts) {
         if (typeof part.text === 'string') {
-          breakdown.text += estimateTokenCountSync(
-            [part],
-            0,
-            this.charsPerToken,
-          );
+          breakdown.text += estimateTokenCountSync([part], 0, this.charsPerToken);
         } else if (
           part.inlineData?.mimeType?.startsWith('image/') ||
           part.fileData?.mimeType?.startsWith('image/')
         ) {
-          breakdown.media += estimateTokenCountSync(
-            [part],
-            0,
-            this.charsPerToken,
-          );
+          breakdown.media += estimateTokenCountSync([part], 0, this.charsPerToken);
         } else if (part.functionCall || part.functionResponse) {
-          breakdown.tool += estimateTokenCountSync(
-            [part],
-            0,
-            this.charsPerToken,
-          );
+          breakdown.tool += estimateTokenCountSync([part], 0, this.charsPerToken);
         } else {
-          breakdown.overhead += estimateTokenCountSync(
-            [part],
-            0,
-            this.charsPerToken,
-          );
+          breakdown.overhead += estimateTokenCountSync([part], 0, this.charsPerToken);
         }
       }
     }
@@ -234,9 +218,7 @@ export class StaticTokenCalculator implements AdvancedTokenCalculator {
    * Calculates the token cost for a single Gemini Content object.
    */
   calculateContentTokens(content: Content): number {
-    return (
-      this.estimateTokensForParts(content.parts || []) + MSG_OVERHEAD_TOKENS
-    );
+    return this.estimateTokensForParts(content.parts || []) + MSG_OVERHEAD_TOKENS;
   }
 
   /**

@@ -11,8 +11,7 @@ export function createLogger(
   logger: vscode.OutputChannel,
 ) {
   return (message: string) => {
-    const isDevMode =
-      context.extensionMode === vscode.ExtensionMode.Development;
+    const isDevMode = context.extensionMode === vscode.ExtensionMode.Development;
     const isLoggingEnabled = vscode.workspace
       .getConfiguration('sparkle-cli.debug')
       .get('logging.enabled');

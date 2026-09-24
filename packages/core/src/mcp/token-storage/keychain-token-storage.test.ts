@@ -59,9 +59,7 @@ describe('KeychainTokenStorage', () => {
 
   describe('with keychain available', () => {
     beforeEach(() => {
-      vi.spyOn(KeychainService.prototype, 'isAvailable').mockResolvedValue(
-        true,
-      );
+      vi.spyOn(KeychainService.prototype, 'isAvailable').mockResolvedValue(true);
     });
 
     it('should store and retrieve credentials correctly', async () => {
@@ -162,9 +160,7 @@ describe('KeychainTokenStorage', () => {
 
   describe('unavailability handling', () => {
     beforeEach(() => {
-      vi.spyOn(KeychainService.prototype, 'isAvailable').mockResolvedValue(
-        false,
-      );
+      vi.spyOn(KeychainService.prototype, 'isAvailable').mockResolvedValue(false);
       vi.spyOn(KeychainService.prototype, 'getPassword').mockRejectedValue(
         new Error('Keychain is not available'),
       );
@@ -184,19 +180,13 @@ describe('KeychainTokenStorage', () => {
       { method: 'setCredentials', args: [validCredentials] },
       { method: 'deleteCredentials', args: ['s'] },
       { method: 'clearAll', args: [] },
-    ])(
-      '$method should propagate unavailability error',
-      async ({ method, args }) => {
-        await expect(
-          (
-            storage as unknown as Record<
-              string,
-              (...args: unknown[]) => Promise<unknown>
-            >
-          )[method](...args),
-        ).rejects.toThrow('Keychain is not available');
-      },
-    );
+    ])('$method should propagate unavailability error', async ({ method, args }) => {
+      await expect(
+        (
+          storage as unknown as Record<string, (...args: unknown[]) => Promise<unknown>>
+        )[method](...args),
+      ).rejects.toThrow('Keychain is not available');
+    });
 
     it.each([
       { method: 'listServers' },
@@ -205,9 +195,7 @@ describe('KeychainTokenStorage', () => {
     ])('$method should emit feedback and return empty', async ({ method }) => {
       const emitFeedbackSpy = vi.spyOn(coreEvents, 'emitFeedback');
       expect(
-        await (storage as unknown as Record<string, () => Promise<unknown>>)[
-          method
-        ](),
+        await (storage as unknown as Record<string, () => Promise<unknown>>)[method](),
       ).toEqual(method === 'getAllCredentials' ? new Map() : []);
       expect(emitFeedbackSpy).toHaveBeenCalledWith(
         'error',

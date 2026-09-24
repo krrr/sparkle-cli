@@ -30,12 +30,7 @@ describe('ExpandableText', () => {
   it('truncates long label when collapsed and no match', async () => {
     const long = 'x'.repeat(MAX_WIDTH + 25);
     const renderResult = await render(
-      <ExpandableText
-        label={long}
-        userInput=""
-        textColor={color}
-        isExpanded={false}
-      />,
+      <ExpandableText label={long} userInput="" textColor={color} isExpanded={false} />,
     );
     const { lastFrame, unmount } = renderResult;
     const out = lastFrame();
@@ -49,12 +44,7 @@ describe('ExpandableText', () => {
   it('shows full long label when expanded and no match', async () => {
     const long = 'y'.repeat(MAX_WIDTH + 25);
     const renderResult = await render(
-      <ExpandableText
-        label={long}
-        userInput=""
-        textColor={color}
-        isExpanded={true}
-      />,
+      <ExpandableText label={long} userInput="" textColor={color} isExpanded={true} />,
     );
     const { lastFrame, unmount } = renderResult;
     const out = lastFrame();

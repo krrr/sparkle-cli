@@ -94,9 +94,7 @@ export class ProviderProfileService {
     return this.getProfile(selectedId);
   }
 
-  async createProfile(
-    input: CreateProviderProfileInput,
-  ): Promise<ProviderProfile> {
+  async createProfile(input: CreateProviderProfileInput): Promise<ProviderProfile> {
     const id = (input.id || '').trim();
     validateProfileId(id);
 
@@ -202,9 +200,7 @@ export class ProviderProfileService {
       ...existing,
       id: targetId,
       providerType:
-        patch.providerType !== undefined
-          ? patch.providerType
-          : existing.providerType,
+        patch.providerType !== undefined ? patch.providerType : existing.providerType,
       baseUrl: 'baseUrl' in patch ? patch.baseUrl : existing.baseUrl,
       customHeaders:
         'customHeaders' in patch ? patch.customHeaders : existing.customHeaders,
@@ -271,14 +267,10 @@ export class ProviderProfileService {
 
     if (targetProfile.providerType === ProviderType.USE_GEMINI) {
       resolvedApiKey =
-        geminiEnvKey ||
-        (await loadApiKeyForProfile(targetProfile.id)) ||
-        undefined;
+        geminiEnvKey || (await loadApiKeyForProfile(targetProfile.id)) || undefined;
     } else if (targetProfile.providerType === ProviderType.USE_OPENAI) {
       resolvedApiKey =
-        openAiEnvKey ||
-        (await loadApiKeyForProfile(targetProfile.id)) ||
-        undefined;
+        openAiEnvKey || (await loadApiKeyForProfile(targetProfile.id)) || undefined;
     }
 
     if (!resolvedApiKey && !targetProfile.baseUrl) {
@@ -345,20 +337,14 @@ export class ProviderProfileService {
     // Update selectedProviderId in storage only if it actually changed.
     const currentSelectedId = this.storageDelegate.getSelectedProfileId();
     if (currentSelectedId !== targetProfile.id) {
-      await this.storageDelegate.saveProfiles(
-        this.listProfiles(),
-        targetProfile.id,
-      );
+      await this.storageDelegate.saveProfiles(this.listProfiles(), targetProfile.id);
     }
 
     // Notify UI / listeners
     coreEvents.emitModelChanged(chosenModel);
   }
 
-  async addModel(
-    profileId: ProviderProfileId,
-    model: ProviderModel,
-  ): Promise<void> {
+  async addModel(profileId: ProviderProfileId, model: ProviderModel): Promise<void> {
     const profile = this.getProfile(profileId);
     if (!profile) {
       throw new Error(`Profile with ID "${profileId}" not found.`);
@@ -368,9 +354,7 @@ export class ProviderProfileService {
     // If the added model specifies a tier, remove that tier from any existing model in this profile
     if (model.tier) {
       models = models.map((m) =>
-        m.tier === model.tier && m.id !== model.id
-          ? { ...m, tier: undefined }
-          : m,
+        m.tier === model.tier && m.id !== model.id ? { ...m, tier: undefined } : m,
       );
     }
 
@@ -390,10 +374,7 @@ export class ProviderProfileService {
     });
   }
 
-  async removeModel(
-    profileId: ProviderProfileId,
-    modelId: string,
-  ): Promise<void> {
+  async removeModel(profileId: ProviderProfileId, modelId: string): Promise<void> {
     const profile = this.getProfile(profileId);
     if (!profile) {
       throw new Error(`Profile with ID "${profileId}" not found.`);
@@ -418,10 +399,7 @@ export class ProviderProfileService {
     }
   }
 
-  async setDefaultModel(
-    profileId: ProviderProfileId,
-    modelId: string,
-  ): Promise<void> {
+  async setDefaultModel(profileId: ProviderProfileId, modelId: string): Promise<void> {
     const profile = this.getProfile(profileId);
     if (!profile) {
       throw new Error(`Profile with ID "${profileId}" not found.`);
@@ -458,9 +436,7 @@ export class ProviderProfileService {
     // If the patch specifies a tier, remove that tier from any other model in this profile
     if (patch.tier) {
       models = models.map((m) =>
-        m.tier === patch.tier && m.id !== modelId
-          ? { ...m, tier: undefined }
-          : m,
+        m.tier === patch.tier && m.id !== modelId ? { ...m, tier: undefined } : m,
       );
     }
 

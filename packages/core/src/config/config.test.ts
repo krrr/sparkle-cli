@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import {
   Config,
   DEFAULT_FILE_FILTERING_OPTIONS,
@@ -23,11 +15,7 @@ import { createMockSandboxConfig } from 'sparkle-cli-test-utils';
 import { DEFAULT_MAX_ATTEMPTS } from '../utils/retry.js';
 import { coreEvents } from '../utils/events.js';
 import { ApprovalMode } from '../policy/types.js';
-import {
-  HookType,
-  HookEventName,
-  type HookDefinition,
-} from '../hooks/types.js';
+import { HookType, HookEventName, type HookDefinition } from '../hooks/types.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -47,10 +35,7 @@ import { AgentTool } from '../agents/agent-tool.js';
 import { ReadFileTool } from '../tools/read-file.js';
 import { GrepTool } from '../tools/grep.js';
 import { RipGrepTool, resolveRipgrepPath } from '../tools/ripGrep.js';
-import {
-  logRipgrepFallback,
-  logApprovalModeDuration,
-} from '../telemetry/loggers.js';
+import { logRipgrepFallback, logApprovalModeDuration } from '../telemetry/loggers.js';
 import { RipgrepFallbackEvent } from '../telemetry/types.js';
 import { ToolRegistry } from '../tools/tool-registry.js';
 import { ACTIVATE_SKILL_TOOL_NAME } from '../tools/tool-names.js';
@@ -130,8 +115,7 @@ vi.mock('../tools/write-file');
 vi.mock('../tools/web-fetch');
 vi.mock('../tools/read-many-files');
 vi.mock('../tools/memoryTool', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../tools/memoryTool.js')>();
+  const actual = await importOriginal<typeof import('../tools/memoryTool.js')>();
   return {
     ...actual,
     setGeminiMdFilename: vi.fn(),
@@ -162,8 +146,7 @@ vi.mock('../telemetry/index.js', async (importOriginal) => {
 });
 
 vi.mock('../telemetry/loggers.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../telemetry/loggers.js')>();
+  const actual = await importOriginal<typeof import('../telemetry/loggers.js')>();
   return {
     ...actual,
     logRipgrepFallback: vi.fn(),
@@ -438,9 +421,7 @@ describe('Server Config (config.ts)', () => {
         // interactive defaults to false
       });
 
-      const { McpClientManager } = await import(
-        '../tools/mcp-client-manager.js'
-      );
+      const { McpClientManager } = await import('../tools/mcp-client-manager.js');
       let mcpStarted = false;
 
       vi.mocked(McpClientManager).mockImplementation(
@@ -468,9 +449,7 @@ describe('Server Config (config.ts)', () => {
         interactive: true,
       });
 
-      const { McpClientManager } = await import(
-        '../tools/mcp-client-manager.js'
-      );
+      const { McpClientManager } = await import('../tools/mcp-client-manager.js');
       let mcpStarted = false;
       let resolveMcp: (value: unknown) => void;
       const mcpPromise = new Promise((resolve) => {
@@ -538,9 +517,7 @@ describe('Server Config (config.ts)', () => {
         apiKey: 'test-key',
       };
 
-      vi.mocked(createContentGeneratorConfig).mockResolvedValue(
-        mockContentConfig,
-      );
+      vi.mocked(createContentGeneratorConfig).mockResolvedValue(mockContentConfig);
 
       await config.refreshAuth(authType);
 
@@ -641,9 +618,7 @@ describe('Server Config (config.ts)', () => {
       },
     };
     const config = new Config(params);
-    expect(config.getCustomIgnoreFilePaths()).toStrictEqual([
-      '/path/to/ignore/file',
-    ]);
+    expect(config.getCustomIgnoreFilePaths()).toStrictEqual(['/path/to/ignore/file']);
   });
 
   it('should set customIgnoreFilePaths to empty array if not provided', () => {
@@ -719,14 +694,11 @@ describe('Server Config (config.ts)', () => {
     const config = new Config(configParams);
     config.getFileService();
 
-    expect(FileDiscoveryService).toHaveBeenCalledWith(
-      path.resolve(TARGET_DIR),
-      {
-        respectGitIgnore: false,
-        respectSparkleIgnore: false,
-        customIgnoreFilePaths: ['.myignore'],
-      },
-    );
+    expect(FileDiscoveryService).toHaveBeenCalledWith(path.resolve(TARGET_DIR), {
+      respectGitIgnore: false,
+      respectSparkleIgnore: false,
+      customIgnoreFilePaths: ['.myignore'],
+    });
   });
 
   describe('Usage Statistics', () => {
@@ -772,10 +744,7 @@ describe('Server Config (config.ts)', () => {
 
     testCases.forEach(({ name, planSettings, expected }) => {
       it(`${name}`, () => {
-        const setCustomPlansDirSpy = vi.spyOn(
-          Storage.prototype,
-          'setCustomPlansDir',
-        );
+        const setCustomPlansDirSpy = vi.spyOn(Storage.prototype, 'setCustomPlansDir');
         new Config({
           ...baseParams,
           planSettings,
@@ -1007,24 +976,16 @@ describe('Server Config (config.ts)', () => {
 
     describe('with minified tool class names', () => {
       beforeEach(() => {
-        Object.defineProperty(
-          vi.mocked(ShellTool).prototype.constructor,
-          'name',
-          {
-            value: '_ShellTool',
-            configurable: true,
-          },
-        );
+        Object.defineProperty(vi.mocked(ShellTool).prototype.constructor, 'name', {
+          value: '_ShellTool',
+          configurable: true,
+        });
       });
 
       afterEach(() => {
-        Object.defineProperty(
-          vi.mocked(ShellTool).prototype.constructor,
-          'name',
-          {
-            value: 'ShellTool',
-          },
-        );
+        Object.defineProperty(vi.mocked(ShellTool).prototype.constructor, 'name', {
+          value: 'ShellTool',
+        });
       });
 
       it('should register a tool if coreTools contains the non-minified class name', async () => {
@@ -1076,13 +1037,10 @@ describe('Server Config (config.ts)', () => {
 
     it('should return the calculated threshold when it is smaller than the default', () => {
       const config = new Config(baseParams);
-      vi.spyOn(
-        config.getModelConfigService(),
-        'getContextWindow',
-      ).mockReturnValue(32000);
-      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
-        1000,
+      vi.spyOn(config.getModelConfigService(), 'getContextWindow').mockReturnValue(
+        32000,
       );
+      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(1000);
       // 4 * (32000 - 1000) = 4 * 31000 = 124000
       // default is 40_000, so min(124000, 40000) = 40000
       expect(config.getTruncateToolOutputThreshold()).toBe(40_000);
@@ -1090,13 +1048,10 @@ describe('Server Config (config.ts)', () => {
 
     it('should return the default threshold when the calculated value is larger', () => {
       const config = new Config(baseParams);
-      vi.spyOn(
-        config.getModelConfigService(),
-        'getContextWindow',
-      ).mockReturnValue(2_000_000);
-      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
-        500_000,
+      vi.spyOn(config.getModelConfigService(), 'getContextWindow').mockReturnValue(
+        2_000_000,
       );
+      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(500_000);
       // 4 * (2_000_000 - 500_000) = 4 * 1_500_000 = 6_000_000
       // default is 40_000
       expect(config.getTruncateToolOutputThreshold()).toBe(40_000);
@@ -1108,24 +1063,18 @@ describe('Server Config (config.ts)', () => {
         truncateToolOutputThreshold: 50000,
       };
       const config = new Config(customParams);
-      vi.spyOn(
-        config.getModelConfigService(),
-        'getContextWindow',
-      ).mockReturnValue(8000);
-      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
-        2000,
+      vi.spyOn(config.getModelConfigService(), 'getContextWindow').mockReturnValue(
+        8000,
       );
+      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(2000);
       // 4 * (8000 - 2000) = 4 * 6000 = 24000
       // custom threshold is 50000
       expect(config.getTruncateToolOutputThreshold()).toBe(24000);
 
-      vi.spyOn(
-        config.getModelConfigService(),
-        'getContextWindow',
-      ).mockReturnValue(32000);
-      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(
-        1000,
+      vi.spyOn(config.getModelConfigService(), 'getContextWindow').mockReturnValue(
+        32000,
       );
+      vi.mocked(uiTelemetryService.getLastPromptTokenCount).mockReturnValue(1000);
       // 4 * (32000 - 1000) = 124000
       // custom threshold is 50000
       expect(config.getTruncateToolOutputThreshold()).toBe(50000);
@@ -1144,9 +1093,7 @@ describe('Server Config (config.ts)', () => {
       };
       new Config(paramsWithProxy);
 
-      expect(mockSetGlobalProxy).toHaveBeenCalledWith(
-        'http://proxy.example.com:8080',
-      );
+      expect(mockSetGlobalProxy).toHaveBeenCalledWith('http://proxy.example.com:8080');
     });
 
     it('should not call setGlobalProxy when proxy is not configured', () => {
@@ -1228,9 +1175,7 @@ describe('Server Config (config.ts)', () => {
       expect(browserConfig.customConfig.sessionMode).toBe('existing');
       expect(browserConfig.customConfig.headless).toBe(true);
       expect(browserConfig.customConfig.profilePath).toBe('/path/to/profile');
-      expect(browserConfig.customConfig.visualModel).toBe(
-        'custom-visual-model',
-      );
+      expect(browserConfig.customConfig.visualModel).toBe('custom-visual-model');
       expect(browserConfig.customConfig.maxActionsPerTask).toBe(100); // default
     });
 
@@ -1281,9 +1226,7 @@ describe('Server Config (config.ts)', () => {
       });
 
       expect(config.getSandboxEnabled()).toBe(false);
-      expect(config.getSandboxAllowedPaths()).toEqual([
-        Storage.getGlobalTempDir(),
-      ]);
+      expect(config.getSandboxAllowedPaths()).toEqual([Storage.getGlobalTempDir()]);
       expect(config.getSandboxNetworkAccess()).toBe(false);
     });
 
@@ -1336,9 +1279,7 @@ describe('Server Config (config.ts)', () => {
       });
 
       const fileService = config.getFileService();
-      vi.spyOn(fileService, 'getIgnoredPaths').mockResolvedValue([
-        '/tmp/forbidden',
-      ]);
+      vi.spyOn(fileService, 'getIgnoredPaths').mockResolvedValue(['/tmp/forbidden']);
 
       await config.initialize();
       expect(fileService.getIgnoredPaths).not.toHaveBeenCalled();
@@ -1391,9 +1332,7 @@ describe('Server Config (config.ts)', () => {
     expect(config.getTrackerService().trackerDir).toBe(
       path.join(dataDir, 'session-two', 'tracker'),
     );
-    expect(config.getWorkspaceContext().getDirectories()).not.toContain(
-      oldPlansDir,
-    );
+    expect(config.getWorkspaceContext().getDirectories()).not.toContain(oldPlansDir);
   });
 
   it('clears fallback overrides when session changes', async () => {
@@ -1498,9 +1437,9 @@ describe('Server Config (config.ts)', () => {
     expect(config.topicState.getIntent()).toBeUndefined();
     expect(config.getSkillManager().isSkillActive('old-skill')).toBe(false);
     expect(config.getTrackerService()).not.toBe(oldTrackerService);
-    expect(
-      config.getModelAvailabilityService().snapshot('model-1').available,
-    ).toBe(true);
+    expect(config.getModelAvailabilityService().snapshot('model-1').available).toBe(
+      true,
+    );
     expect(config.getLatestApiRequest()).toBeUndefined();
   });
 });
@@ -1853,19 +1792,14 @@ describe('BaseLlmClient Lifecycle', () => {
     const authType = ProviderType.USE_GEMINI;
     const mockContentConfig = { model: 'gemini-flash', apiKey: 'test-key' };
 
-    vi.mocked(createContentGeneratorConfig).mockResolvedValue(
-      mockContentConfig,
-    );
+    vi.mocked(createContentGeneratorConfig).mockResolvedValue(mockContentConfig);
 
     await config.refreshAuth(authType);
 
     // Should not throw
     const llmService = config.getBaseLlmClient();
     expect(llmService).toBeDefined();
-    expect(BaseLlmClient).toHaveBeenCalledWith(
-      config.getContentGenerator(),
-      config,
-    );
+    expect(BaseLlmClient).toHaveBeenCalledWith(config.getContentGenerator(), config);
   });
 });
 
@@ -2345,14 +2279,9 @@ describe('Config Plan & Preview Model Access', () => {
 
     it('should reject paths with control characters', () => {
       const config = new Config(baseParams);
-      const malformedPath = path.join(
-        baseParams.targetDir,
-        'file\nwith\nnewline.txt',
-      );
+      const malformedPath = path.join(baseParams.targetDir, 'file\nwith\nnewline.txt');
       const result = config.validatePathAccess(malformedPath, 'read');
-      expect(result).toContain(
-        'Invalid path: Path contains invalid characters',
-      );
+      expect(result).toContain('Invalid path: Path contains invalid characters');
     });
 
     it('should allow normal paths', () => {
@@ -2479,10 +2408,7 @@ describe('Config JIT Initialization', () => {
       config = new Config(params);
       await config.initialize();
 
-      const globalGeminiMdPath = path.join(
-        Storage.getGlobalGeminiDir(),
-        'AGENTS.md',
-      );
+      const globalGeminiMdPath = path.join(Storage.getGlobalGeminiDir(), 'AGENTS.md');
       expect(config.isPathAllowed(globalGeminiMdPath)).toBe(true);
     });
 
@@ -2501,15 +2427,13 @@ describe('Config JIT Initialization', () => {
       await config.initialize();
 
       const globalDir = Storage.getGlobalGeminiDir();
-      expect(config.isPathAllowed(path.join(globalDir, 'settings.json'))).toBe(
+      expect(config.isPathAllowed(path.join(globalDir, 'settings.json'))).toBe(false);
+      expect(config.isPathAllowed(path.join(globalDir, 'keybindings.json'))).toBe(
         false,
       );
-      expect(
-        config.isPathAllowed(path.join(globalDir, 'keybindings.json')),
-      ).toBe(false);
-      expect(
-        config.isPathAllowed(path.join(globalDir, 'oauth_creds.json')),
-      ).toBe(false);
+      expect(config.isPathAllowed(path.join(globalDir, 'oauth_creds.json'))).toBe(
+        false,
+      );
     });
 
     it('should NOT allow isPathAllowed to write into the auto-memory inbox', () => {
@@ -2534,29 +2458,27 @@ describe('Config JIT Initialization', () => {
       vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
-      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(
-        fakeProjectTempDir,
-      );
+      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(fakeProjectTempDir);
 
       const inboxRoot = path.join(fakeMemoryTempDir, '.inbox');
 
       // The inbox directory itself and any path under it are denied.
       expect(config.isPathAllowed(inboxRoot)).toBe(false);
-      expect(
-        config.isPathAllowed(path.join(inboxRoot, 'private', 'foo.patch')),
-      ).toBe(false);
-      expect(
-        config.isPathAllowed(path.join(inboxRoot, 'global', 'bar.patch')),
-      ).toBe(false);
+      expect(config.isPathAllowed(path.join(inboxRoot, 'private', 'foo.patch'))).toBe(
+        false,
+      );
+      expect(config.isPathAllowed(path.join(inboxRoot, 'global', 'bar.patch'))).toBe(
+        false,
+      );
 
       // Sibling files under <projectMemoryDir> stay reachable so the main
       // agent can edit MEMORY.md and topic notes directly.
-      expect(
-        config.isPathAllowed(path.join(fakeMemoryTempDir, 'MEMORY.md')),
-      ).toBe(true);
-      expect(
-        config.isPathAllowed(path.join(fakeMemoryTempDir, 'some-topic.md')),
-      ).toBe(true);
+      expect(config.isPathAllowed(path.join(fakeMemoryTempDir, 'MEMORY.md'))).toBe(
+        true,
+      );
+      expect(config.isPathAllowed(path.join(fakeMemoryTempDir, 'some-topic.md'))).toBe(
+        true,
+      );
     });
 
     it('should allow scoped extraction access only to canonical inbox patches', () => {
@@ -2575,9 +2497,7 @@ describe('Config JIT Initialization', () => {
       vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
-      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(
-        fakeProjectTempDir,
-      );
+      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(fakeProjectTempDir);
 
       const inboxRoot = path.join(fakeMemoryTempDir, '.inbox');
       const privateExtractionPatch = path.join(
@@ -2585,11 +2505,7 @@ describe('Config JIT Initialization', () => {
         'private',
         'extraction.patch',
       );
-      const globalExtractionPatch = path.join(
-        inboxRoot,
-        'global',
-        'extraction.patch',
-      );
+      const globalExtractionPatch = path.join(inboxRoot, 'global', 'extraction.patch');
 
       expect(config.isPathAllowed(privateExtractionPatch)).toBe(false);
 
@@ -2610,11 +2526,7 @@ describe('Config JIT Initialization', () => {
 
         // Reads are broadened to the .inbox/{private,global}/ subtree so the
         // extractor can list and inspect prior patches before consolidating.
-        const privateOtherPatch = path.join(
-          inboxRoot,
-          'private',
-          'other.patch',
-        );
+        const privateOtherPatch = path.join(inboxRoot, 'private', 'other.patch');
         const globalLeftover = path.join(inboxRoot, 'global', 'topic-a.patch');
         const nestedReadPath = path.join(
           inboxRoot,
@@ -2669,9 +2581,7 @@ describe('Config JIT Initialization', () => {
       vi.spyOn(config.storage, 'getProjectMemoryDir').mockReturnValue(
         fakeMemoryTempDir,
       );
-      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(
-        fakeProjectTempDir,
-      );
+      vi.spyOn(config.storage, 'getProjectTempDir').mockReturnValue(fakeProjectTempDir);
       vi.spyOn(config.storage, 'getProjectSkillsMemoryDir').mockReturnValue(
         fakeSkillsMemoryDir,
       );
@@ -2682,11 +2592,7 @@ describe('Config JIT Initialization', () => {
         'private',
         'extraction.patch',
       );
-      const skillArtifact = path.join(
-        fakeSkillsMemoryDir,
-        'my-skill',
-        'SKILL.md',
-      );
+      const skillArtifact = path.join(fakeSkillsMemoryDir, 'my-skill', 'SKILL.md');
       const activeMemoryPath = path.join(fakeMemoryTempDir, 'MEMORY.md');
       const projectTempPath = path.join(fakeProjectTempDir, 'logs', 'run.log');
       const workspaceMemoryPath = path.join('/tmp/test', 'AGENTS.md');
@@ -2979,9 +2885,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
       generateContent: vi.fn(),
     } as Partial<ContentGenerator> as ContentGenerator;
 
-    vi.mocked(createContentGeneratorConfig).mockResolvedValue(
-      mockContentConfig,
-    );
+    vi.mocked(createContentGeneratorConfig).mockResolvedValue(mockContentConfig);
     vi.mocked(createContentGenerator).mockResolvedValue(mockContentGenerator);
     const config = new Config(baseParams);
 
@@ -3005,9 +2909,7 @@ describe('Model Persistence Bug Fix (#19864)', () => {
       generateContent: vi.fn(),
     } as Partial<ContentGenerator> as ContentGenerator;
 
-    vi.mocked(createContentGeneratorConfig).mockResolvedValue(
-      mockContentConfig,
-    );
+    vi.mocked(createContentGeneratorConfig).mockResolvedValue(mockContentConfig);
     vi.mocked(createContentGenerator).mockResolvedValue(mockContentGenerator);
 
     const config = new Config(baseParams);

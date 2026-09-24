@@ -78,10 +78,7 @@ export interface ExternalExecutionRegistration {
  * is formatted when reinjected into the model conversation after backgrounding.
  * Return `null` to skip injection entirely.
  */
-export type FormatInjectionFn = (
-  output: string,
-  error: Error | null,
-) => string | null;
+export type FormatInjectionFn = (output: string, error: Error | null) => string | null;
 
 /**
  * Controls what happens when a backgrounded execution completes:
@@ -131,9 +128,7 @@ export interface BackgroundCompletionInfo {
   completionBehavior: CompletionBehavior;
 }
 
-export type BackgroundCompletionListener = (
-  info: BackgroundCompletionInfo,
-) => void;
+export type BackgroundCompletionListener = (info: BackgroundCompletionInfo) => void;
 
 interface VirtualExecutionState extends ManagedExecutionBase {
   kind: 'virtual';
@@ -169,10 +164,7 @@ export class ExecutionLifecycleService {
   }
 
   private static activeExecutions = new Map<number, ManagedExecutionState>();
-  private static activeResolvers = new Map<
-    number,
-    (result: ExecutionResult) => void
-  >();
+  private static activeResolvers = new Map<number, (result: ExecutionResult) => void>();
   private static activeListeners = new Map<
     number,
     Set<(event: ExecutionOutputEvent) => void>
@@ -238,9 +230,7 @@ export class ExecutionLifecycleService {
     return executionId;
   }
 
-  private static createPendingResult(
-    executionId: number,
-  ): Promise<ExecutionResult> {
+  private static createPendingResult(executionId: number): Promise<ExecutionResult> {
     return new Promise<ExecutionResult>((resolve) => {
       this.activeResolvers.set(executionId, resolve);
     });
@@ -360,10 +350,7 @@ export class ExecutionLifecycleService {
     }
   }
 
-  private static resolvePending(
-    executionId: number,
-    result: ExecutionResult,
-  ): void {
+  private static resolvePending(executionId: number, result: ExecutionResult): void {
     const resolve = this.activeResolvers.get(executionId);
     if (!resolve) {
       return;
@@ -373,10 +360,7 @@ export class ExecutionLifecycleService {
     this.activeResolvers.delete(executionId);
   }
 
-  private static settleExecution(
-    executionId: number,
-    result: ExecutionResult,
-  ): void {
+  private static settleExecution(executionId: number, result: ExecutionResult): void {
     const execution = this.activeExecutions.get(executionId);
     if (!execution) {
       return;
@@ -396,10 +380,7 @@ export class ExecutionLifecycleService {
 
       // Inject directly into the model conversation from the backend.
       if (injectionText && this.injectionService) {
-        this.injectionService.addInjection(
-          injectionText,
-          'background_completion',
-        );
+        this.injectionService.addInjection(injectionText, 'background_completion');
       }
 
       const info: BackgroundCompletionInfo = {
@@ -429,11 +410,7 @@ export class ExecutionLifecycleService {
 
     this.activeListeners.delete(executionId);
     this.activeExecutions.delete(executionId);
-    this.storeExitInfo(
-      executionId,
-      result.exitCode ?? 0,
-      result.signal ?? undefined,
-    );
+    this.storeExitInfo(executionId, result.exitCode ?? 0, result.signal ?? undefined);
   }
 
   static completeExecution(
@@ -467,10 +444,7 @@ export class ExecutionLifecycleService {
     });
   }
 
-  static completeWithResult(
-    executionId: number,
-    result: ExecutionResult,
-  ): void {
+  static completeWithResult(executionId: number, result: ExecutionResult): void {
     this.settleExecution(executionId, result);
   }
 
@@ -506,8 +480,7 @@ export class ExecutionLifecycleService {
     const info: BackgroundStartInfo = {
       executionId,
       executionMethod: execution.executionMethod,
-      label:
-        execution.label ?? `${execution.executionMethod} (ID: ${executionId})`,
+      label: execution.label ?? `${execution.executionMethod} (ID: ${executionId})`,
       output,
       completionBehavior:
         execution.completionBehavior ??

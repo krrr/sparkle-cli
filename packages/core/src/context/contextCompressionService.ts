@@ -35,16 +35,8 @@ interface CompressionRecordJSON {
   end_line?: number;
 }
 
-function hashStringSlice(
-  content: string,
-  start: number = 0,
-  end: number = 12,
-): string {
-  return crypto
-    .createHash('sha256')
-    .update(content)
-    .digest('hex')
-    .slice(start, end);
+function hashStringSlice(content: string, start: number = 0, end: number = 12): string {
+  return crypto.createHash('sha256').update(content).digest('hex').slice(start, end);
 }
 
 export class ContextCompressionService {
@@ -95,11 +87,7 @@ export class ContextCompressionService {
       for (const [k, v] of this.state.entries()) {
         obj[k] = v;
       }
-      await fs.writeFile(
-        this.stateFilePath,
-        JSON.stringify(obj, null, 2),
-        'utf-8',
-      );
+      await fs.writeFile(this.stateFilePath, JSON.stringify(obj, null, 2), 'utf-8');
     } catch (e) {
       debugLogger.warn(`Failed to save compression state: ${e}`);
     }
@@ -168,8 +156,7 @@ export class ContextCompressionService {
       for (const part of turn.parts) {
         const resp = part.functionResponse;
         if (!resp) continue;
-        if (resp.name !== 'read_file' && resp.name !== 'read_many_files')
-          continue;
+        if (resp.name !== 'read_file' && resp.name !== 'read_many_files') continue;
 
         const output = resp.response?.['output'];
         if (!output || typeof output !== 'string') continue;
@@ -262,12 +249,7 @@ export class ContextCompressionService {
 
       const newParts = await Promise.all(
         turn.parts.map((part: Part) =>
-          this.applyCompressionDecision(
-            part,
-            protectedFiles,
-            userPrompt,
-            abortSignal,
-          ),
+          this.applyCompressionDecision(part, protectedFiles, userPrompt, abortSignal),
         ),
       );
       result.push({ ...turn, parts: newParts });
@@ -278,9 +260,7 @@ export class ContextCompressionService {
       const turn = result[i];
       if (turn.role !== 'user' || !turn.parts) continue;
       const hasFunctionResponse = turn.parts.some((p) => !!p.functionResponse);
-      const hasNonFunctionResponse = turn.parts.some(
-        (p) => !p.functionResponse,
-      );
+      const hasNonFunctionResponse = turn.parts.some((p) => !p.functionResponse);
       if (hasFunctionResponse && hasNonFunctionResponse) {
         debugLogger.warn(
           'Compression produced a mixed-part turn. Restoring original turn.',
@@ -337,8 +317,7 @@ export class ContextCompressionService {
   ): Promise<Part> {
     const resp = part.functionResponse;
     if (!resp) return part;
-    if (resp.name !== 'read_file' && resp.name !== 'read_many_files')
-      return part;
+    if (resp.name !== 'read_file' && resp.name !== 'read_many_files') return part;
 
     const output = resp.response?.['output'];
     if (!output || typeof output !== 'string') return part;
@@ -445,10 +424,7 @@ Respond ONLY with a JSON object where each key is the filepath and the value is:
 {"level":"FULL"|"PARTIAL"|"SUMMARY"|"EXCLUDED","start_line":null,"end_line":null}`;
 
     const fileList = files
-      .map(
-        (f) =>
-          `File: ${f.filepath} (${f.lineCount} lines)\nPreview:\n${f.preview}`,
-      )
+      .map((f) => `File: ${f.filepath} (${f.lineCount} lines)\nPreview:\n${f.preview}`)
       .join('\n\n---\n\n');
 
     const userMessage = `Query: "${userPrompt}"\n\n${fileList}`;
@@ -482,9 +458,7 @@ Respond ONLY with a JSON object where each key is the filepath and the value is:
       for (const f of files) {
         // Just throw if JSON parsing fails.
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        const decision = responseJson[f.filepath] as
-          | CompressionRecordJSON
-          | undefined;
+        const decision = responseJson[f.filepath] as CompressionRecordJSON | undefined;
         if (typeof decision !== 'object') continue;
         if (typeof decision === 'object' && decision && decision.level) {
           results.set(f.filepath, {
@@ -495,9 +469,7 @@ Respond ONLY with a JSON object where each key is the filepath and the value is:
         }
       }
     } catch (e) {
-      debugLogger.warn(
-        `Batch cloud routing failed: ${e}. Defaulting all to FULL.`,
-      );
+      debugLogger.warn(`Batch cloud routing failed: ${e}. Defaulting all to FULL.`);
     }
     return results;
   }

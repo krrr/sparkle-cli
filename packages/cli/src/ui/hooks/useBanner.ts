@@ -33,10 +33,7 @@ export function useBanner(bannerData: BannerData) {
 
   const activeText = warningText ? warningText : defaultText;
 
-  const hashedText = crypto
-    .createHash('sha256')
-    .update(activeText)
-    .digest('hex');
+  const hashedText = crypto.createHash('sha256').update(activeText).digest('hex');
 
   const currentBannerCount = bannerCounts[hashedText] || 0;
 

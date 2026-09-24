@@ -69,8 +69,7 @@ export class IdeClient {
   private client: Client | undefined = undefined;
   private state: IDEConnectionState = {
     status: IDEConnectionStatus.Disconnected,
-    details:
-      'IDE integration is currently disabled. To enable it, run /ide enable.',
+    details: 'IDE integration is currently disabled. To enable it, run /ide enable.',
   };
   private currentIde: IdeInfo | undefined;
   private ideProcessInfo: { pid: number; command: string } | undefined;
@@ -96,10 +95,7 @@ export class IdeClient {
         const connectionConfig = client.ideProcessInfo
           ? await getConnectionConfigFromFile(client.ideProcessInfo.pid)
           : undefined;
-        client.currentIde = detectIde(
-          client.ideProcessInfo,
-          connectionConfig?.ideInfo,
-        );
+        client.currentIde = detectIde(client.ideProcessInfo, connectionConfig?.ideInfo);
         return client;
       })();
     }
@@ -142,13 +138,9 @@ export class IdeClient {
       connectionConfig?.authToken ?? process.env['SPARKLE_CLI_IDE_AUTH_TOKEN'];
 
     const workspacePath =
-      connectionConfig?.workspacePath ??
-      process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'];
+      connectionConfig?.workspacePath ?? process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'];
 
-    const { isValid, error } = validateWorkspacePath(
-      workspacePath,
-      process.cwd(),
-    );
+    const { isValid, error } = validateWorkspacePath(workspacePath, process.cwd());
 
     if (!isValid) {
       this.setState(IDEConnectionStatus.Disconnected, error, logError);
@@ -166,9 +158,7 @@ export class IdeClient {
         }
       }
       if (connectionConfig.stdio) {
-        const connected = await this.establishStdioConnection(
-          connectionConfig.stdio,
-        );
+        const connected = await this.establishStdioConnection(connectionConfig.stdio);
         if (connected) {
           return;
         }
@@ -177,10 +167,7 @@ export class IdeClient {
 
     const portFromEnv = getPortFromEnv();
     if (portFromEnv) {
-      const connected = await this.establishHttpConnection(
-        portFromEnv,
-        authToken,
-      );
+      const connected = await this.establishHttpConnection(portFromEnv, authToken);
       if (connected) {
         return;
       }
@@ -219,10 +206,7 @@ export class IdeClient {
    *   whether the diff was 'accepted' or 'rejected' and including the final
    *   content if accepted.
    */
-  async openDiff(
-    filePath: string,
-    newContent: string,
-  ): Promise<DiffUpdateResult> {
+  async openDiff(filePath: string, newContent: string): Promise<DiffUpdateResult> {
     const release = await this.acquireMutex();
 
     const promise = new Promise<DiffUpdateResult>((resolve, reject) => {
@@ -333,11 +317,10 @@ export class IdeClient {
       }
 
       if (resultData.isError) {
-        const textPart = resultData.content.find(
-          (part) => part.type === 'text',
-        ) as { type: 'text'; text: string } | undefined;
-        const errorMessage =
-          textPart?.text ?? `Tool 'closeDiff' reported an error.`;
+        const textPart = resultData.content.find((part) => part.type === 'text') as
+          | { type: 'text'; text: string }
+          | undefined;
+        const errorMessage = textPart?.text ?? `Tool 'closeDiff' reported an error.`;
         logger.debug(
           `Request for closeDiff ${filePath} failed with isError:`,
           errorMessage,
@@ -451,17 +434,12 @@ export class IdeClient {
           `Discovered ${this.availableTools.length} tools from IDE: ${this.availableTools.join(', ')}`,
         );
       } else {
-        logger.debug(
-          'IDE supports tool discovery, but no tools are available.',
-        );
+        logger.debug('IDE supports tool discovery, but no tools are available.');
       }
     } catch (error) {
       // It's okay if this fails, the IDE might not support it.
       // Don't log an error if the method is not found, which is a common case.
-      if (
-        error instanceof Error &&
-        !error.message?.includes('Method not found')
-      ) {
+      if (error instanceof Error && !error.message?.includes('Method not found')) {
         logger.error(`Error discovering tools from IDE: ${error.message}`);
       } else {
         logger.debug('IDE does not support tool discovery.');
@@ -507,18 +485,15 @@ export class IdeClient {
       return;
     }
 
-    this.client.setNotificationHandler(
-      IdeContextNotificationSchema,
-      (notification) => {
-        ideContextStore.set(notification.params);
-        const isTrusted = notification.params.workspaceState?.isTrusted;
-        if (isTrusted !== undefined) {
-          for (const listener of this.trustChangeListeners) {
-            listener(isTrusted);
-          }
+    this.client.setNotificationHandler(IdeContextNotificationSchema, (notification) => {
+      ideContextStore.set(notification.params);
+      const isTrusted = notification.params.workspaceState?.isTrusted;
+      if (isTrusted !== undefined) {
+        for (const listener of this.trustChangeListeners) {
+          listener(isTrusted);
         }
-      },
-    );
+      }
+    });
     this.client.onerror = (_error) => {
       const errorMessage = _error instanceof Error ? _error.message : `_error`;
       this.setState(

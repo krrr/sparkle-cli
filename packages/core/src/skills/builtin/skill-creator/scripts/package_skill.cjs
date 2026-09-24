@@ -29,10 +29,7 @@ async function main() {
   const skillPathArg = args[0];
   const outputDirArg = args[1];
 
-  if (
-    skillPathArg.includes('..') ||
-    (outputDirArg && outputDirArg.includes('..'))
-  ) {
+  if (skillPathArg.includes('..') || (outputDirArg && outputDirArg.includes('..'))) {
     console.error('❌ Error: Path traversal detected in arguments.');
     process.exit(1);
   }
@@ -116,9 +113,7 @@ async function main() {
     }
 
     if (zipProcess.status !== 0) {
-      throw new Error(
-        `Packaging command failed with exit code ${zipProcess.status}`,
-      );
+      throw new Error(`Packaging command failed with exit code ${zipProcess.status}`);
     }
 
     console.log(`✅ Successfully packaged skill to: ${outputFilename}`);

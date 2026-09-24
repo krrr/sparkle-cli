@@ -43,11 +43,7 @@ export class ContextTracer {
     }
   }
 
-  logEvent(
-    component: string,
-    action: string,
-    details?: Record<string, unknown>,
-  ) {
+  logEvent(component: string, action: string, details?: Record<string, unknown>) {
     if (!this.enabled) return;
     try {
       let processedDetails: Record<string, unknown> | undefined;
@@ -55,8 +51,7 @@ export class ContextTracer {
       if (details) {
         processedDetails = {};
         for (const [key, value] of Object.entries(details)) {
-          const strValue =
-            typeof value === 'string' ? value : JSON.stringify(value);
+          const strValue = typeof value === 'string' ? value : JSON.stringify(value);
           if (strValue && strValue.length > this.MAX_INLINE_SIZE) {
             const assetId = this.saveAsset(component, key, value);
             processedDetails[key] = { $asset: assetId };
@@ -71,21 +66,13 @@ export class ContextTracer {
         ? ` | Details: ${JSON.stringify(processedDetails)}`
         : '';
       const logLine = `[${timestamp}] [${component}] ${action}${detailsStr}\n`;
-      fsSync.appendFileSync(
-        path.join(this.traceDir, 'trace.log'),
-        logLine,
-        'utf-8',
-      );
+      fsSync.appendFileSync(path.join(this.traceDir, 'trace.log'), logLine, 'utf-8');
     } catch (e) {
       debugLogger.warn(`Tracing failed: ${e}`);
     }
   }
 
-  private saveAsset(
-    component: string,
-    assetName: string,
-    data: unknown,
-  ): string {
+  private saveAsset(component: string, assetName: string, data: unknown): string {
     if (!this.enabled) return 'asset-recording-disabled';
     try {
       const assetId = `${Date.now()}-${randomUUID()}-${assetName}.json`;

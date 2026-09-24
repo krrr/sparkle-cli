@@ -43,9 +43,7 @@ describe('skill-creator scripts e2e', () => {
 
     expect(fs.existsSync(skillDir)).toBe(true);
     expect(fs.existsSync(path.join(skillDir, 'SKILL.md'))).toBe(true);
-    expect(
-      fs.existsSync(path.join(skillDir, 'scripts/example_script.cjs')),
-    ).toBe(true);
+    expect(fs.existsSync(path.join(skillDir, 'scripts/example_script.cjs'))).toBe(true);
 
     // 2. Validate (should have warning initially due to TODOs)
     const validateOutputInitial = execSync(

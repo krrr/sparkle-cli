@@ -41,8 +41,7 @@ export class HighWaterMarkTracker {
     }
 
     // Check if current value exceeds threshold
-    const thresholdValue =
-      currentWaterMark * (1 + this.growthThresholdPercent / 100);
+    const thresholdValue = currentWaterMark * (1 + this.growthThresholdPercent / 100);
 
     if (currentValue > thresholdValue) {
       // Update high-water mark

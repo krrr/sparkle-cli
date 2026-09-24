@@ -167,9 +167,7 @@ function pairToolsAndEnforceSignatures(
           const hasResponse =
             nextTurn?.content.role === 'user' &&
             nextTurn.content.parts?.some(
-              (p) =>
-                p.functionResponse?.id === id &&
-                p.functionResponse?.name === name,
+              (p) => p.functionResponse?.id === id && p.functionResponse?.name === name,
             );
 
           if (!hasResponse) {
@@ -225,8 +223,7 @@ function pairToolsAndEnforceSignatures(
           const hasCall =
             prevTurn?.content.role === 'model' &&
             prevTurn.content.parts?.some(
-              (cp) =>
-                cp.functionCall?.id === id && cp.functionCall?.name === name,
+              (cp) => cp.functionCall?.id === id && cp.functionCall?.name === name,
             );
 
           if (hasCall) {
@@ -302,8 +299,7 @@ function refineToolResponses(history: HistoryTurn[]): HistoryTurn[] {
       if (callOrder.length > 0) {
         const responseParts =
           turn.content.parts?.filter((p) => !!p.functionResponse) || [];
-        const otherParts =
-          turn.content.parts?.filter((p) => !p.functionResponse) || [];
+        const otherParts = turn.content.parts?.filter((p) => !p.functionResponse) || [];
 
         if (responseParts.length > 0) {
           // 1. Re-order: Sort responses to match the model's call order

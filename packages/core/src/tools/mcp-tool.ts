@@ -79,10 +79,7 @@ export function parseMcpToolName(name: string): {
  * @param toolName The name of the tool (can be undefined or '*' for tool-level wildcards).
  * @returns The fully qualified name (e.g., `mcp_server_tool`, `mcp_*`, `mcp_server_*`).
  */
-export function formatMcpToolName(
-  serverName: string,
-  toolName?: string,
-): string {
+export function formatMcpToolName(serverName: string, toolName?: string): string {
   if (serverName === '*' && (toolName === undefined || toolName === '*')) {
     return `${MCP_TOOL_PREFIX}*`;
   } else if (serverName === '*') {
@@ -366,10 +363,7 @@ export class DiscoveredMCPToolInvocation extends BaseToolInvocation<
   }
 }
 
-export class DiscoveredMCPTool extends BaseDeclarativeTool<
-  ToolParams,
-  ToolResult
-> {
+export class DiscoveredMCPTool extends BaseDeclarativeTool<ToolParams, ToolResult> {
   constructor(
     private readonly mcpTool: CallableTool,
     readonly serverName: string,
@@ -417,9 +411,7 @@ export class DiscoveredMCPTool extends BaseDeclarativeTool<
   }
 
   getFullyQualifiedPrefix(): string {
-    return generateValidName(
-      `${this.serverName}${MCP_QUALIFIED_NAME_SEPARATOR}`,
-    );
+    return generateValidName(`${this.serverName}${MCP_QUALIFIED_NAME_SEPARATOR}`);
   }
 
   getFullyQualifiedName(): string {
@@ -453,10 +445,7 @@ function transformTextBlock(block: McpTextBlock): Part {
   return { text: wrapUntrusted(block.text) };
 }
 
-function transformImageAudioBlock(
-  block: McpMediaBlock,
-  toolName: string,
-): Part[] {
+function transformImageAudioBlock(block: McpMediaBlock, toolName: string): Part[] {
   return [
     {
       text: `[Tool '${toolName}' provided the following ${
@@ -572,9 +561,7 @@ function getStringifiedResultForDisplay(rawResponse: Part[]): string {
         if (block.resource?.text) {
           return block.resource.text;
         }
-        return `[Embedded Resource: ${
-          block.resource?.mimeType || 'unknown type'
-        }]`;
+        return `[Embedded Resource: ${block.resource?.mimeType || 'unknown type'}]`;
       default:
         return `[Unknown content type: ${(block as { type: string }).type}]`;
     }
@@ -610,8 +597,7 @@ export function generateValidName(name: string) {
     debugLogger.warn(
       `Truncating MCP tool name "${validToolname}" to fit within the 64 character limit. This tool may require user approval.`,
     );
-    validToolname =
-      validToolname.slice(0, 30) + '...' + validToolname.slice(-30);
+    validToolname = validToolname.slice(0, 30) + '...' + validToolname.slice(-30);
   }
 
   return validToolname;

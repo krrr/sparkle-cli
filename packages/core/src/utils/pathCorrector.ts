@@ -28,17 +28,9 @@ type FailedPathCorrection = {
  * @param config The application configuration.
  * @returns A `PathCorrectionResult` object with either a `correctedPath` or an `error`.
  */
-export type PathCorrectionResult =
-  | SuccessfulPathCorrection
-  | FailedPathCorrection;
-export function correctPath(
-  filePath: string,
-  config: Config,
-): PathCorrectionResult {
-  const sanitizedPath = resolveDefensiveToolPath(
-    filePath,
-    config.getTargetDir(),
-  );
+export type PathCorrectionResult = SuccessfulPathCorrection | FailedPathCorrection;
+export function correctPath(filePath: string, config: Config): PathCorrectionResult {
+  const sanitizedPath = resolveDefensiveToolPath(filePath, config.getTargetDir());
 
   // Check for direct path relative to the primary target directory.
   const directPath = path.join(config.getTargetDir(), sanitizedPath);

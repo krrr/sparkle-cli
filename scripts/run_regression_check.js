@@ -24,10 +24,7 @@ import { escapeRegex } from './eval_utils.js';
  * Runs a set of tests using Vitest and returns the results.
  */
 function runTests(files, pattern, model) {
-  const outputDir = path.resolve(
-    process.cwd(),
-    `evals/logs/pr-run-${Date.now()}`,
-  );
+  const outputDir = path.resolve(process.cwd(), `evals/logs/pr-run-${Date.now()}`);
   fs.mkdirSync(outputDir, { recursive: true });
 
   const filesToRun = files || 'evals/';
@@ -58,9 +55,7 @@ function runTests(files, pattern, model) {
 function findAssertion(report, testName) {
   if (!report?.testResults) return null;
   for (const fileResult of report.testResults) {
-    const assertion = fileResult.assertionResults.find(
-      (a) => a.title === testName,
-    );
+    const assertion = fileResult.assertionResults.find((a) => a.title === testName);
     if (assertion) return assertion;
   }
   return null;
@@ -102,10 +97,9 @@ function parseArgs() {
 
   let manualFiles = 'evals/';
   try {
-    const grepResult = execSync(
-      `grep -l ${quote([manualPattern])} evals/*.eval.ts`,
-      { encoding: 'utf-8' },
-    );
+    const grepResult = execSync(`grep -l ${quote([manualPattern])} evals/*.eval.ts`, {
+      encoding: 'utf-8',
+    });
     manualFiles = grepResult.split('\n').filter(Boolean).join(' ');
   } catch {
     // Grep returns exit code 1 if no files match the pattern.
@@ -164,9 +158,7 @@ async function runRetries(testName, results, files, model) {
  */
 async function verifyBaseline(testName, results, files, model) {
   console.log('\n--- Step 3: Dynamic Baseline Verification ---');
-  console.log(
-    `⚠️ Potential regression detected. Verifying baseline on 'main'...`,
-  );
+  console.log(`⚠️ Potential regression detected. Verifying baseline on 'main'...`);
 
   try {
     execSync('git stash push -m "eval-regression-check-stash"', {
@@ -177,9 +169,7 @@ async function verifyBaseline(testName, results, files, model) {
       .includes('eval-regression-check-stash');
     execSync('git checkout main', { stdio: 'inherit' });
 
-    console.log(
-      `\n--- Running Baseline Verification on 'main' (Best-of-3) ---`,
-    );
+    console.log(`\n--- Running Baseline Verification on 'main' (Best-of-3) ---`);
     let baselinePasses = 0;
     let baselineTotal = 0;
 
@@ -199,9 +189,7 @@ async function verifyBaseline(testName, results, files, model) {
     if (hasStash) execSync('git stash pop', { stdio: 'inherit' });
 
     if (baselinePasses === 0) {
-      console.log(
-        `  ℹ️ Test also fails on 'main'. Marking as PRE-EXISTING (Cleared).`,
-      );
+      console.log(`  ℹ️ Test also fails on 'main'. Marking as PRE-EXISTING (Cleared).`);
       results[testName].status = 'pre-existing';
       results[testName].passed = results[testName].total; // Clear for report
     } else {

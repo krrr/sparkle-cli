@@ -39,9 +39,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   beforeEach(async () => {
     // Create a unique temporary root directory for each test run
     const realTmp = await fsp.realpath(os.tmpdir());
-    tempRootDir = await fsp.mkdtemp(
-      path.join(realTmp, 'at-ref-resolution-root-'),
-    );
+    tempRootDir = await fsp.mkdtemp(path.join(realTmp, 'at-ref-resolution-root-'));
 
     mockConfigInstance = {
       getFileService: () => new FileDiscoveryService(tempRootDir),
@@ -94,10 +92,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('ReadFileTool successfully reads a file when the path is prefixed with @', async () => {
-    const readFileTool = new ReadFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const readFileTool = new ReadFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = readFileTool.build({
       file_path: '@policies/new-policies.txt',
     });
@@ -110,10 +105,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('ReadFileTool successfully reads a file when the path is prefixed with @/', async () => {
-    const readFileTool = new ReadFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const readFileTool = new ReadFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = readFileTool.build({
       file_path: '@/policies/new-policies.txt',
     });
@@ -126,10 +118,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully writes to/updates a file when the path is prefixed with @', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@policies/new-policies.txt',
       content: '[[rule]]\nupdated_content = true\n',
@@ -140,16 +129,8 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     // The tool should succeed and update the correct file
     expect(result.error).toBeUndefined();
 
-    const incorrectFilePath = path.join(
-      tempRootDir,
-      '@policies',
-      'new-policies.txt',
-    );
-    const correctFilePath = path.join(
-      tempRootDir,
-      'policies',
-      'new-policies.txt',
-    );
+    const incorrectFilePath = path.join(tempRootDir, '@policies', 'new-policies.txt');
+    const correctFilePath = path.join(tempRootDir, 'policies', 'new-policies.txt');
 
     // It should NOT have created a literal "@policies" directory
     expect(fs.existsSync(incorrectFilePath)).toBe(false);
@@ -160,10 +141,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully creates a new file when the path is prefixed with @ and the parent directory exists', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@policies/brand-new-file.txt',
       content: '[[rule]]\nbrand_new_file = true\n',
@@ -174,16 +152,8 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     // The tool should succeed and create the correct file
     expect(result.error).toBeUndefined();
 
-    const incorrectFilePath = path.join(
-      tempRootDir,
-      '@policies',
-      'brand-new-file.txt',
-    );
-    const correctFilePath = path.join(
-      tempRootDir,
-      'policies',
-      'brand-new-file.txt',
-    );
+    const incorrectFilePath = path.join(tempRootDir, '@policies', 'brand-new-file.txt');
+    const correctFilePath = path.join(tempRootDir, 'policies', 'brand-new-file.txt');
 
     // It should NOT have created a literal "@policies" directory
     expect(fs.existsSync(incorrectFilePath)).toBe(false);
@@ -194,10 +164,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully creates a new file in a nested subdirectory when the path is prefixed with @ and the first segment exists', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@policies/sub/brand-new-file.txt',
       content: '[[rule]]\nnested_brand_new_file = true\n',
@@ -230,10 +197,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully creates a new file in a nested subdirectory when the path is prefixed with @ and the first segment does NOT exist', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@new-policies/sub/brand-new-file.txt',
       content: '[[rule]]\nnested_brand_new_file = true\n',
@@ -269,10 +233,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully creates a new file in a nested subdirectory when the path is prefixed with @/ and the first segment does NOT exist', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@/new-policies-alias/sub/brand-new-file.txt',
       content: '[[rule]]\nnested_brand_new_file_alias = true\n',
@@ -310,10 +271,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   });
 
   it('WriteFileTool successfully creates a new file in a nested subdirectory when the path is prefixed with @\\ and the first segment does NOT exist', async () => {
-    const writeFileTool = new WriteFileTool(
-      mockConfigInstance,
-      createMockMessageBus(),
-    );
+    const writeFileTool = new WriteFileTool(mockConfigInstance, createMockMessageBus());
     const invocation = writeFileTool.build({
       file_path: '@\\new-policies-alias-win\\sub\\brand-new-file.txt',
       content: '[[rule]]\nnested_brand_new_file_alias_win = true\n',
@@ -333,21 +291,10 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
           'sub',
           'brand-new-file.txt',
         )
-      : path.join(
-          tempRootDir,
-          '@\\new-policies-alias-win\\sub\\brand-new-file.txt',
-        );
+      : path.join(tempRootDir, '@\\new-policies-alias-win\\sub\\brand-new-file.txt');
     const correctFilePath = isWindows
-      ? path.join(
-          tempRootDir,
-          'new-policies-alias-win',
-          'sub',
-          'brand-new-file.txt',
-        )
-      : path.join(
-          tempRootDir,
-          'new-policies-alias-win\\sub\\brand-new-file.txt',
-        );
+      ? path.join(tempRootDir, 'new-policies-alias-win', 'sub', 'brand-new-file.txt')
+      : path.join(tempRootDir, 'new-policies-alias-win\\sub\\brand-new-file.txt');
 
     // It should NOT have created a literal "@" directory
     expect(fs.existsSync(literalAtFilePath)).toBe(false);
@@ -446,11 +393,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
   it('resolveAndReadFile successfully resolves paths in Plan Mode', async () => {
     const plansDir = path.join(tempRootDir, '.plans');
     await fsp.mkdir(plansDir, { recursive: true });
-    await fsp.writeFile(
-      path.join(plansDir, 'plan-file.txt'),
-      'plan content',
-      'utf8',
-    );
+    await fsp.writeFile(path.join(plansDir, 'plan-file.txt'), 'plan content', 'utf8');
 
     const planConfigInstance = Object.assign({}, mockConfigInstance, {
       isPlanMode: () => true,
@@ -485,11 +428,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
     // The tool should succeed and update the correct file
     expect(result.error).toBeUndefined();
 
-    const correctFilePath = path.join(
-      tempRootDir,
-      'policies',
-      'new-policies.txt',
-    );
+    const correctFilePath = path.join(tempRootDir, 'policies', 'new-policies.txt');
     const updatedContent = await fsp.readFile(correctFilePath, 'utf8');
     expect(updatedContent).toContain('decision = "deny"');
   });
@@ -635,10 +574,7 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
           'sub',
           'brand-new-file.txt',
         )
-      : path.join(
-          tempRootDir,
-          'new-policies-edit-alias-win\\sub\\brand-new-file.txt',
-        );
+      : path.join(tempRootDir, 'new-policies-edit-alias-win\\sub\\brand-new-file.txt');
 
     // It should NOT have created a literal "@" directory
     expect(fs.existsSync(literalAtFilePath)).toBe(false);
@@ -649,24 +585,15 @@ describe('Consolidated At-Reference Path Resolution Tests (b-495551283)', () => 
 
     // Verify the content of the created file
     const createdContent = await fsp.readFile(correctFilePath, 'utf8');
-    expect(createdContent).toContain(
-      'nested_brand_new_edit_file_alias_win = true',
-    );
+    expect(createdContent).toContain('nested_brand_new_edit_file_alias_win = true');
   });
 
   it('correctPath successfully resolves a path prefixed with @ to its clean counterpart', () => {
-    const result = correctPath(
-      '@policies/new-policies.txt',
-      mockConfigInstance,
-    );
+    const result = correctPath('@policies/new-policies.txt', mockConfigInstance);
 
     expect(result.success).toBe(true);
     if (result.success) {
-      const expectedPath = path.join(
-        tempRootDir,
-        'policies',
-        'new-policies.txt',
-      );
+      const expectedPath = path.join(tempRootDir, 'policies', 'new-policies.txt');
       expect(result.correctedPath).toBe(expectedPath);
     }
   });

@@ -158,9 +158,7 @@ export class LocalSubagentInvocation extends BaseToolInvocation<
             const description = activity.data['description']
               ? sanitizeErrorMessage(String(activity.data['description']))
               : undefined;
-            const args = JSON.stringify(
-              sanitizeToolArgs(activity.data['args']),
-            );
+            const args = JSON.stringify(sanitizeToolArgs(activity.data['args']));
             const callId = activity.data['callId']
               ? String(activity.data['callId'])
               : randomUUID();
@@ -322,8 +320,7 @@ ${output.result}`;
         data: { agentId: executor.agentId },
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       debugLogger.error(`Subagent '${this.definition.name}' failed:`, error);
 

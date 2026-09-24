@@ -92,9 +92,7 @@ export function createNodeDistillationProcessor(
               const newTokens = env.tokenCalculator.estimateTokensForParts([
                 { text: summary },
               ]);
-              const oldTokens = env.tokenCalculator.estimateTokensForParts([
-                { text },
-              ]);
+              const oldTokens = env.tokenCalculator.estimateTokensForParts([{ text }]);
 
               if (newTokens < oldTokens) {
                 const distilledPayload = updatePart(payload, { text: summary });
@@ -139,17 +137,15 @@ export function createNodeDistillationProcessor(
                 const newFR = cloneFunctionResponse(payload.functionResponse);
                 newFR.response = newObsObject;
 
-                const newObsTokens = env.tokenCalculator.estimateTokensForParts(
-                  [
-                    {
-                      functionResponse: newFR,
-                    },
-                  ],
-                );
+                const newObsTokens = env.tokenCalculator.estimateTokensForParts([
+                  {
+                    functionResponse: newFR,
+                  },
+                ]);
 
-                const oldObsTokens = env.tokenCalculator.estimateTokensForParts(
-                  [payload],
-                );
+                const oldObsTokens = env.tokenCalculator.estimateTokensForParts([
+                  payload,
+                ]);
 
                 if (newObsTokens < oldObsTokens) {
                   const newFR = cloneFunctionResponse(payload.functionResponse);

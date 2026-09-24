@@ -56,9 +56,7 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
   const activeProvider = config.getProviderProfileService()?.getActiveProfile();
   const providerLabel = getProviderLabel(activeProvider);
 
-  const showHeader = !(
-    settings.merged.ui.hideBanner || config.getScreenReader()
-  );
+  const showHeader = !(settings.merged.ui.hideBanner || config.getScreenReader());
 
   // If the terminal is too narrow to fit the icon and metadata (especially long nightly versions)
   // side-by-side, we switch to column mode to prevent wrapping.
@@ -96,9 +94,7 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
           {/* Line 3: Currently configured provider (auth type) */}
           {providerLabel && (
             <Box>
-              <Text color={theme.text.secondary}>
-                Provider: {providerLabel}
-              </Text>
+              <Text color={theme.text.secondary}>Provider: {providerLabel}</Text>
             </Box>
           )}
         </>
@@ -134,8 +130,9 @@ export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {
         />
       )}
 
-      {!(settings.merged.ui.hideTips || config.getScreenReader()) &&
-        showTips && <Tips config={config} />}
+      {!(settings.merged.ui.hideTips || config.getScreenReader()) && showTips && (
+        <Tips config={config} />
+      )}
     </Box>
   );
 };

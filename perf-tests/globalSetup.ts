@@ -33,9 +33,7 @@ export async function setup() {
   try {
     const testRuns = await readdir(perfTestsDir);
     if (testRuns.length > KEEP_RUNS_COUNT) {
-      const oldRuns = testRuns
-        .sort()
-        .slice(0, testRuns.length - KEEP_RUNS_COUNT);
+      const oldRuns = testRuns.sort().slice(0, testRuns.length - KEEP_RUNS_COUNT);
       await Promise.all(
         oldRuns.map((oldRun) =>
           rm(join(perfTestsDir, oldRun), {

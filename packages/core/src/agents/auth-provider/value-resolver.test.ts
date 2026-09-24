@@ -13,8 +13,7 @@ import {
 import * as shellUtils from '../../utils/shell-utils.js';
 
 vi.mock('../../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../../utils/shell-utils.js')>();
   return {
     ...actual,
     spawnAsync: vi.fn(),
@@ -88,21 +87,17 @@ describe('value-resolver', () => {
       });
 
       it('should throw error for failed command', async () => {
-        vi.mocked(shellUtils.spawnAsync).mockRejectedValue(
-          new Error('Command failed'),
+        vi.mocked(shellUtils.spawnAsync).mockRejectedValue(new Error('Command failed'));
+        await expect(resolveAuthValue('!nonexistent-command-12345')).rejects.toThrow(
+          /Command.*failed/,
         );
-        await expect(
-          resolveAuthValue('!nonexistent-command-12345'),
-        ).rejects.toThrow(/Command.*failed/);
       });
 
       it('should throw error for timeout', async () => {
         const timeoutError = new Error('AbortError');
         timeoutError.name = 'AbortError';
         vi.mocked(shellUtils.spawnAsync).mockRejectedValue(timeoutError);
-        await expect(resolveAuthValue('!sleep 100')).rejects.toThrow(
-          /timed out after/,
-        );
+        await expect(resolveAuthValue('!sleep 100')).rejects.toThrow(/timed out after/);
       });
     });
 

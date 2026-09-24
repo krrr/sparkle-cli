@@ -34,8 +34,6 @@ describe('ExportSessionMessage', () => {
       />,
     );
     expect(lastFrame()).toContain('✓');
-    expect(lastFrame()).toContain(
-      `Successfully exported session to ${testPath}`,
-    );
+    expect(lastFrame()).toContain(`Successfully exported session to ${testPath}`);
   });
 });

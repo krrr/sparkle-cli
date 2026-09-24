@@ -20,9 +20,7 @@ describe('jit-context', () => {
       } as unknown as MemoryContextManager;
 
       mockConfig = {
-        getMemoryContextManager: vi
-          .fn()
-          .mockReturnValue(mockMemoryContextManager),
+        getMemoryContextManager: vi.fn().mockReturnValue(mockMemoryContextManager),
         getWorkspaceContext: vi.fn().mockReturnValue({
           getDirectories: vi.fn().mockReturnValue(['/app']),
         }),

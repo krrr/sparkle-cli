@@ -15,10 +15,7 @@ const getRateLimitErrorMessageDefault = (
 ) =>
   `\nPossible quota limitations in place or slow response times detected. Switching to the ${fallbackModel} model for the rest of this session.`;
 
-function getRateLimitMessage(
-  authType?: ProviderType,
-  fallbackModel?: string,
-): string {
+function getRateLimitMessage(authType?: ProviderType, fallbackModel?: string): string {
   switch (authType) {
     case ProviderType.USE_GEMINI:
       return RATE_LIMIT_ERROR_MESSAGE_USE_GEMINI;

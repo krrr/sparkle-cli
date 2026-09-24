@@ -25,11 +25,7 @@ import {
 } from '../telemetry/types.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
 import type { Config } from '../config/config.js';
-import {
-  logApiError,
-  logApiRequest,
-  logApiResponse,
-} from '../telemetry/loggers.js';
+import { logApiError, logApiRequest, logApiResponse } from '../telemetry/loggers.js';
 import type { ContentGenerator } from './contentGenerator.js';
 import { toContents } from './partUtils.js';
 import { isStructuredError } from '../utils/quotaErrorDetection.js';
@@ -260,12 +256,8 @@ export class LoggingContentGenerator implements ContentGenerator {
         // Gaxios returned bytes as a comma-separated string
         try {
           const byteValues = data.split(',').map(Number);
-          if (
-            byteValues.every((b) => Number.isInteger(b) && b >= 0 && b <= 255)
-          ) {
-            response.data = new TextDecoder().decode(
-              new Uint8Array(byteValues),
-            );
+          if (byteValues.every((b) => Number.isInteger(b) && b >= 0 && b <= 255)) {
+            response.data = new TextDecoder().decode(new Uint8Array(byteValues));
           }
         } catch {
           // If parsing fails, just leave it alone
@@ -350,11 +342,7 @@ export class LoggingContentGenerator implements ContentGenerator {
         );
 
         try {
-          const response = await this.wrapped.generateContent(
-            req,
-            userPromptId,
-            role,
-          );
+          const response = await this.wrapped.generateContent(req, userPromptId, role);
           spanMetadata.output = response.candidates?.[0]?.content ?? null;
           spanMetadata.attributes[GEN_AI_USAGE_INPUT_TOKENS] =
             response.usageMetadata?.promptTokenCount ?? 0;
@@ -427,10 +415,7 @@ export class LoggingContentGenerator implements ContentGenerator {
         spanMetadata.input = req.contents;
 
         const startTime = Date.now();
-        const serverDetails = this._getEndpointUrl(
-          req,
-          'generateContentStream',
-        );
+        const serverDetails = this._getEndpointUrl(req, 'generateContentStream');
 
         // For debugging: Capture the latest main agent request payload.
         // Main agent prompt IDs end with exactly 8 hashes and a turn counter (e.g. "...########1")
@@ -449,11 +434,7 @@ export class LoggingContentGenerator implements ContentGenerator {
 
         let stream: AsyncGenerator<GenerateContentResponse>;
         try {
-          stream = await this.wrapped.generateContentStream(
-            req,
-            userPromptId,
-            role,
-          );
+          stream = await this.wrapped.generateContentStream(req, userPromptId, role);
         } catch (error) {
           const durationMs = Date.now() - startTime;
 
@@ -563,9 +544,7 @@ export class LoggingContentGenerator implements ContentGenerator {
     return this.wrapped.countTokens(req);
   }
 
-  async embedContent(
-    req: EmbedContentParameters,
-  ): Promise<EmbedContentResponse> {
+  async embedContent(req: EmbedContentParameters): Promise<EmbedContentResponse> {
     return runInDevTraceSpan(
       {
         operation: GeminiCliOperation.LLMCall,

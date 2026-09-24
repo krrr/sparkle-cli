@@ -173,9 +173,7 @@ describe('ThemeManager', () => {
     it('should not load a theme from an untrusted file path and log a message', () => {
       vi.spyOn(fs, 'existsSync').mockReturnValue(true);
       vi.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockTheme));
-      const consoleWarnSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       const result = themeManager.setActiveTheme('/untrusted/my-theme.json');
 
@@ -229,9 +227,7 @@ describe('ThemeManager', () => {
       themeManager.registerExtensionThemes('Ext', [extTheme]);
       themeManager.loadCustomThemes({ SettingsTheme: settingsTheme });
 
-      expect(themeManager.getCustomThemeNames()).toContain(
-        'ExtensionTheme (Ext)',
-      );
+      expect(themeManager.getCustomThemeNames()).toContain('ExtensionTheme (Ext)');
       expect(themeManager.getCustomThemeNames()).toContain('SettingsTheme');
 
       expect(themeManager.isCustomTheme('ExtensionTheme (Ext)')).toBe(true);

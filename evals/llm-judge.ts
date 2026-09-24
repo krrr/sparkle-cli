@@ -34,10 +34,7 @@ export class LLMJudge {
    * Asks the LLM a Yes/No question and returns a boolean verdict.
    * If selfConsistencyRuns > 1, it runs in parallel and returns the majority vote.
    */
-  async judgeYesNo(
-    question: string,
-    options: JudgeOptions = {},
-  ): Promise<JudgeResult> {
+  async judgeYesNo(question: string, options: JudgeOptions = {}): Promise<JudgeResult> {
     const runs = options.selfConsistencyRuns ?? 1;
     const model = options.model ?? 'internal-tool-flash';
 
@@ -58,9 +55,8 @@ export class LLMJudge {
         });
 
         const text =
-          response.candidates?.[0]?.content?.parts?.[0]?.text
-            ?.trim()
-            ?.toUpperCase() || 'ERROR';
+          response.candidates?.[0]?.content?.parts?.[0]?.text?.trim()?.toUpperCase() ||
+          'ERROR';
         return text;
       } catch (e: any) {
         return `ERROR: ${e.message}`;

@@ -106,8 +106,8 @@ export const Help: React.FC<Help> = ({ commands }) => (
       - shell command
     </Text>
     <Text color={theme.text.primary}>
-      <Text color={theme.text.secondary}>[MCP]</Text> - Model Context Protocol
-      command (from external servers)
+      <Text color={theme.text.secondary}>[MCP]</Text> - Model Context Protocol command
+      (from external servers)
     </Text>
 
     <Box height={1} />
@@ -118,8 +118,7 @@ export const Help: React.FC<Help> = ({ commands }) => (
     </Text>
     <Text color={theme.text.primary}>
       <Text bold color={theme.text.accent}>
-        {formatCommand(Command.MOVE_WORD_LEFT)}/
-        {formatCommand(Command.MOVE_WORD_RIGHT)}
+        {formatCommand(Command.MOVE_WORD_LEFT)}/{formatCommand(Command.MOVE_WORD_RIGHT)}
       </Text>{' '}
       - Jump through words in the input
     </Text>
@@ -185,8 +184,7 @@ export const Help: React.FC<Help> = ({ commands }) => (
     </Text>
     <Text color={theme.text.primary}>
       <Text bold color={theme.text.accent}>
-        {formatCommand(Command.HISTORY_UP)}/
-        {formatCommand(Command.HISTORY_DOWN)}
+        {formatCommand(Command.HISTORY_UP)}/{formatCommand(Command.HISTORY_DOWN)}
       </Text>{' '}
       - Cycle through your prompt history
     </Text>

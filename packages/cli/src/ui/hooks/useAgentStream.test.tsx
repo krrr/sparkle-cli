@@ -86,8 +86,7 @@ describe('useAgentStream', () => {
       }),
     );
 
-    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock
-      .calls[0][0];
+    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock.calls[0][0];
 
     expect(result.current.streamingState).toBe(StreamingState.Idle);
 
@@ -123,8 +122,7 @@ describe('useAgentStream', () => {
       }),
     );
 
-    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock
-      .calls[0][0];
+    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock.calls[0][0];
 
     act(() => {
       eventHandler({
@@ -167,8 +165,7 @@ describe('useAgentStream', () => {
       }),
     );
 
-    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock
-      .calls[0][0];
+    const eventHandler = vi.mocked(mockLegacyAgentProtocol.subscribe).mock.calls[0][0];
 
     act(() => {
       eventHandler({

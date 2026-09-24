@@ -104,8 +104,7 @@ describe('ThinkingMessage', () => {
       <ThinkingMessage
         thought={{
           subject: '',
-          description:
-            'Step one:\n    indented detail stays\n\n  two-space indent',
+          description: 'Step one:\n    indented detail stays\n\n  two-space indent',
         }}
         terminalWidth={80}
         isFirstThinking={false}

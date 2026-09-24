@@ -4,14 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  type MockInstance,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, type MockInstance } from 'vitest';
 import {
   runDeferredCommand,
   defer,
@@ -46,9 +39,7 @@ let mockExit: MockInstance;
 describe('deferred', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockExit = vi
-      .spyOn(process, 'exit')
-      .mockImplementation(() => undefined as never);
+    mockExit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
     setDeferredCommand(undefined as unknown as DeferredCommand); // Reset deferred command
   });
 

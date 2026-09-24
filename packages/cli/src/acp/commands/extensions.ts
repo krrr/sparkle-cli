@@ -12,11 +12,7 @@ import {
 } from '../../config/extension-manager.js';
 import { McpServerEnablementManager } from '../../config/mcp/mcpServerEnablement.js';
 import { stat } from 'node:fs/promises';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 
 export class ExtensionsCommand implements Command {
   readonly name = 'extensions';
@@ -98,8 +94,7 @@ function getEnableDisableContext(
   }
 
   const name = args.filter(
-    (a) =>
-      !a.startsWith('--scope') && !['user', 'workspace', 'session'].includes(a),
+    (a) => !a.startsWith('--scope') && !['user', 'workspace', 'session'].includes(a),
   )[0];
 
   let names: string[] = [];
@@ -146,14 +141,11 @@ export class EnableExtensionCommand implements Command {
         await extensionManager.enableExtension(name, scope);
         output.push(`Extension "${name}" enabled for scope "${scope}".`);
 
-        const extension = extensionManager
-          .getExtensions()
-          .find((e) => e.name === name);
+        const extension = extensionManager.getExtensions().find((e) => e.name === name);
 
         if (extension?.mcpServers) {
           const mcpEnablementManager = McpServerEnablementManager.getInstance();
-          const mcpClientManager =
-            context.agentContext.config.getMcpClientManager();
+          const mcpClientManager = context.agentContext.config.getMcpClientManager();
           const enabledServers = await mcpEnablementManager.autoEnableServers(
             Object.keys(extension.mcpServers),
           );
@@ -242,8 +234,7 @@ export class InstallExtensionCommand implements Command {
 
     try {
       const installMetadata = await inferInstallMetadata(source);
-      const extension =
-        await extensionLoader.installOrUpdateExtension(installMetadata);
+      const extension = await extensionLoader.installOrUpdateExtension(installMetadata);
       return {
         name: this.name,
         data: `Extension "${extension.name}" installed successfully.`,
@@ -381,13 +372,9 @@ export class RestartExtensionCommand implements Command {
       };
     }
 
-    let extensionsToRestart = extensionLoader
-      .getExtensions()
-      .filter((e) => e.isActive);
+    let extensionsToRestart = extensionLoader.getExtensions().filter((e) => e.isActive);
     if (names) {
-      extensionsToRestart = extensionsToRestart.filter((e) =>
-        names.includes(e.name),
-      );
+      extensionsToRestart = extensionsToRestart.filter((e) => names.includes(e.name));
     }
 
     if (extensionsToRestart.length === 0) {
@@ -403,9 +390,7 @@ export class RestartExtensionCommand implements Command {
         await extensionLoader.restartExtension(extension);
         output.push(`Restarted "${extension.name}".`);
       } catch (e) {
-        output.push(
-          `Failed to restart "${extension.name}": ${getErrorMessage(e)}`,
-        );
+        output.push(`Failed to restart "${extension.name}": ${getErrorMessage(e)}`);
       }
     }
 

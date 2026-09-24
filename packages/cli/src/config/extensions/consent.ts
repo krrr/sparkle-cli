@@ -33,9 +33,7 @@ export async function skillsConsentString(
   const action = isLink ? 'Linking' : 'Installing';
   const output: string[] = [];
   output.push(`${action} agent skill(s) from "${source}".`);
-  output.push(
-    `\nThe following agent skill(s) will be ${action.toLowerCase()}:\n`,
-  );
+  output.push(`\nThe following agent skill(s) will be ${action.toLowerCase()}:\n`);
   output.push(...(await renderSkillsList(skills)));
 
   if (targetDir) {

@@ -133,10 +133,7 @@ export class ActivityLogger extends EventEmitter {
   private requestStartTimes = new Map<string, number>();
   private networkLoggingEnabled = false;
 
-  private networkBufferMap = new Map<
-    string,
-    Array<NetworkLog | PartialNetworkLog>
-  >();
+  private networkBufferMap = new Map<string, Array<NetworkLog | PartialNetworkLog>>();
   private networkBufferIds: string[] = [];
   private consoleBuffer: Array<ConsoleLogPayload & { timestamp: number }> = [];
   private readonly bufferLimit = 10;
@@ -212,9 +209,7 @@ export class ActivityLogger extends EventEmitter {
       });
     } else if (typeof headers === 'object' && headers !== null) {
       for (const [key, val] of Object.entries(headers)) {
-        result[key.toLowerCase()] = Array.isArray(val)
-          ? val.join(', ')
-          : String(val);
+        result[key.toLowerCase()] = Array.isArray(val) ? val.join(', ') : String(val);
       }
     }
     return result;
@@ -231,11 +226,7 @@ export class ActivityLogger extends EventEmitter {
     if ('headers' in sanitized && sanitized.headers) {
       const headers = { ...sanitized.headers };
       for (const key of Object.keys(headers)) {
-        if (
-          ['authorization', 'cookie', 'x-goog-api-key'].includes(
-            key.toLowerCase(),
-          )
-        ) {
+        if (['authorization', 'cookie', 'x-goog-api-key'].includes(key.toLowerCase())) {
           headers[key] = '[REDACTED]';
         }
       }
@@ -304,13 +295,9 @@ export class ActivityLogger extends EventEmitter {
       const id = Math.random().toString(36).substring(7);
 
       const inputMethod =
-        typeof input === 'object' && 'method' in input
-          ? input.method
-          : undefined;
+        typeof input === 'object' && 'method' in input ? input.method : undefined;
       const inputHeaders =
-        typeof input === 'object' && 'headers' in input
-          ? input.headers
-          : undefined;
+        typeof input === 'object' && 'headers' in input ? input.headers : undefined;
 
       const method = (init?.method ?? inputMethod ?? 'GET').toUpperCase();
       const headers = new Headers(init?.headers ?? inputHeaders ?? {});
@@ -469,9 +456,7 @@ export class ActivityLogger extends EventEmitter {
       } else {
         // Some callers pass URL-like objects that include href
         const href =
-          'href' in options && typeof options.href === 'string'
-            ? options.href
-            : '';
+          'href' in options && typeof options.href === 'string' ? options.href : '';
         url =
           href ||
           `${protocol}//${options.hostname || options.host || 'localhost'}${options.path || '/'}`;
@@ -482,9 +467,7 @@ export class ActivityLogger extends EventEmitter {
       }
 
       const rawHeaders =
-        typeof options === 'object' &&
-        options !== null &&
-        !(options instanceof URL)
+        typeof options === 'object' && options !== null && !(options instanceof URL)
           ? options.headers
           : undefined;
       let headers: http.OutgoingHttpHeaders = {};
@@ -509,17 +492,13 @@ export class ActivityLogger extends EventEmitter {
         if (chunk) {
           const arg0 = etc[0];
           const encoding =
-            typeof arg0 === 'string' && Buffer.isEncoding(arg0)
-              ? arg0
-              : undefined;
+            typeof arg0 === 'string' && Buffer.isEncoding(arg0) ? arg0 : undefined;
           requestChunks.push(
             Buffer.isBuffer(chunk)
               ? chunk
               : typeof chunk === 'string'
                 ? Buffer.from(chunk, encoding)
-                : Buffer.from(
-                    chunk instanceof Uint8Array ? chunk : String(chunk),
-                  ),
+                : Buffer.from(chunk instanceof Uint8Array ? chunk : String(chunk)),
           );
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unsafe-return
@@ -535,17 +514,13 @@ export class ActivityLogger extends EventEmitter {
         if (chunk) {
           const arg0 = etc[0];
           const encoding =
-            typeof arg0 === 'string' && Buffer.isEncoding(arg0)
-              ? arg0
-              : undefined;
+            typeof arg0 === 'string' && Buffer.isEncoding(arg0) ? arg0 : undefined;
           requestChunks.push(
             Buffer.isBuffer(chunk)
               ? chunk
               : typeof chunk === 'string'
                 ? Buffer.from(chunk, encoding)
-                : Buffer.from(
-                    chunk instanceof Uint8Array ? chunk : String(chunk),
-                  ),
+                : Buffer.from(chunk instanceof Uint8Array ? chunk : String(chunk)),
           );
         }
         const body = Buffer.concat(requestChunks).toString('utf8');
@@ -661,11 +636,7 @@ export class ActivityLogger extends EventEmitter {
             : options !== undefined
               ? [url, options]
               : [url];
-        return wrapRequest(
-          originalHttpsRequest as typeof http.request,
-          args,
-          'https:',
-        );
+        return wrapRequest(originalHttpsRequest as typeof http.request, args, 'https:');
       },
       writable: true,
       configurable: true,
@@ -798,10 +769,7 @@ function setupNetworkLogging(
     }
   };
 
-  const handleServerMessage = (message: {
-    type: string;
-    sessionId?: string;
-  }) => {
+  const handleServerMessage = (message: { type: string; sessionId?: string }) => {
     switch (message.type) {
       case 'registered':
         sessionId = message.sessionId || null;
@@ -831,9 +799,7 @@ function setupNetworkLogging(
               type: TransientMessageType.Hint,
             });
           })
-          .catch((err) =>
-            debugLogger.debug('Failed to trigger debugger:', err),
-          );
+          .catch((err) => debugLogger.debug('Failed to trigger debugger:', err));
         break;
       }
       case 'ping':
@@ -861,11 +827,7 @@ function setupNetworkLogging(
     };
 
     // If not connected or network logging not enabled, buffer
-    if (
-      !ws ||
-      ws.readyState !== WebSocket.OPEN ||
-      !capture.isNetworkLoggingEnabled()
-    ) {
+    if (!ws || ws.readyState !== WebSocket.OPEN || !capture.isNetworkLoggingEnabled()) {
       transportBuffer.push(message);
       if (transportBuffer.length > MAX_BUFFER_SIZE) transportBuffer.shift();
       return;
@@ -875,11 +837,7 @@ function setupNetworkLogging(
   };
 
   const flushBuffer = () => {
-    if (
-      !ws ||
-      ws.readyState !== WebSocket.OPEN ||
-      !capture.isNetworkLoggingEnabled()
-    ) {
+    if (!ws || ws.readyState !== WebSocket.OPEN || !capture.isNetworkLoggingEnabled()) {
       return;
     }
 

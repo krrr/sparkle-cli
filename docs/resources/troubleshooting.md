@@ -1,7 +1,6 @@
 # Troubleshooting guide
 
-This guide provides solutions to common issues and debugging tips, including
-topics on:
+This guide provides solutions to common issues and debugging tips, including topics on:
 
 - Authentication or login errors
 - Frequently asked questions (FAQs)
@@ -12,49 +11,47 @@ topics on:
 
 - **Error: `UNABLE_TO_GET_ISSUER_CERT_LOCALLY` or
   `unable to get local issuer certificate`**
-  - **Cause:** You may be on a corporate network with a firewall that intercepts
-    and inspects SSL/TLS traffic. This often requires a custom root CA
-    certificate to be trusted by Node.js.
-  - **Solution:** First try setting `NODE_USE_SYSTEM_CA`; if that does not
-    resolve the issue, set `NODE_EXTRA_CA_CERTS`.
-    - Set the `NODE_USE_SYSTEM_CA=1` environment variable to tell Node.js to use
-      the operating system's native certificate store (where corporate
-      certificates are typically already installed).
+  - **Cause:** You may be on a corporate network with a firewall that intercepts and
+    inspects SSL/TLS traffic. This often requires a custom root CA certificate to be
+    trusted by Node.js.
+  - **Solution:** First try setting `NODE_USE_SYSTEM_CA`; if that does not resolve the
+    issue, set `NODE_EXTRA_CA_CERTS`.
+    - Set the `NODE_USE_SYSTEM_CA=1` environment variable to tell Node.js to use the
+      operating system's native certificate store (where corporate certificates are
+      typically already installed).
       - Example: `export NODE_USE_SYSTEM_CA=1` (Windows PowerShell:
         `$env:NODE_USE_SYSTEM_CA=1`)
-    - Set the `NODE_EXTRA_CA_CERTS` environment variable to the absolute path of
-      your corporate root CA certificate file.
-      - Example: `export NODE_EXTRA_CA_CERTS=/path/to/your/corporate-ca.crt`
-        (Windows PowerShell:
-        `$env:NODE_EXTRA_CA_CERTS="C:\path\to\your\corporate-ca.crt"`)
+    - Set the `NODE_EXTRA_CA_CERTS` environment variable to the absolute path of your
+      corporate root CA certificate file.
+      - Example: `export NODE_EXTRA_CA_CERTS=/path/to/your/corporate-ca.crt` (Windows
+        PowerShell: `$env:NODE_EXTRA_CA_CERTS="C:\path\to\your\corporate-ca.crt"`)
 
 ## Common error messages and solutions
 
 - **Error: `EADDRINUSE` (Address already in use) when starting an MCP server.**
 
-  - **Cause:** Another process is already using the port that the MCP server is
-    trying to bind to.
-  - **Solution:** Either stop the other process that is using the port or
-    configure the MCP server to use a different port.
+  - **Cause:** Another process is already using the port that the MCP server is trying
+    to bind to.
+  - **Solution:** Either stop the other process that is using the port or configure the
+    MCP server to use a different port.
 
-- **Error: Command not found (when attempting to run Sparkle CLI with
-  `sparkle`).**
+- **Error: Command not found (when attempting to run Sparkle CLI with `sparkle`).**
 
-  - **Cause:** Sparkle CLI is not correctly installed or it is not in your
-    system's `PATH`.
+  - **Cause:** Sparkle CLI is not correctly installed or it is not in your system's
+    `PATH`.
   - **Solution:** The update depends on how you installed Sparkle CLI:
-    - If you installed `sparkle` globally, check that your `npm` global binary
-      directory is in your `PATH`. You can update Sparkle CLI using the command
+    - If you installed `sparkle` globally, check that your `npm` global binary directory
+      is in your `PATH`. You can update Sparkle CLI using the command
       `npm install -g sparkle-cli@latest`.
-    - If you are running `sparkle` from source, ensure you are using the correct
-      command to invoke it (for example, `node packages/cli/dist/index.js ...`).
-      To update Sparkle CLI, pull the latest changes from the repository, and
-      then rebuild using the command `npm run build`.
+    - If you are running `sparkle` from source, ensure you are using the correct command
+      to invoke it (for example, `node packages/cli/dist/index.js ...`). To update
+      Sparkle CLI, pull the latest changes from the repository, and then rebuild using
+      the command `npm run build`.
 
 - **Error: `MODULE_NOT_FOUND` or import errors.**
 
-  - **Cause:** Dependencies are not installed correctly, or the project hasn't
-    been built.
+  - **Cause:** Dependencies are not installed correctly, or the project hasn't been
+    built.
   - **Solution:**
     1.  Run `npm install` to ensure all dependencies are present.
     2.  Run `npm run build` to compile the project.
@@ -62,58 +59,53 @@ topics on:
 
 - **Error: "Operation not permitted", "Permission denied", or similar.**
 
-  - **Cause:** When sandboxing is enabled, Sparkle CLI may attempt operations
-    that are restricted by your sandbox configuration, such as writing outside
-    the project directory or system temp directory.
+  - **Cause:** When sandboxing is enabled, Sparkle CLI may attempt operations that are
+    restricted by your sandbox configuration, such as writing outside the project
+    directory or system temp directory.
   - **Solution:** Refer to the [Configuration: Sandboxing](../cli/sandbox.md)
     documentation for more information, including how to customize your sandbox
     configuration.
 
 - **Sparkle CLI is not running in interactive mode in "CI" environments**
 
-  - **Issue:** Sparkle CLI does not enter interactive mode (no prompt appears)
-    if an environment variable starting with `CI_` (for example, `CI_TOKEN`) is
-    set. This is because the `is-in-ci` package, used by the underlying UI
-    framework, detects these variables and assumes a non-interactive CI
-    environment.
+  - **Issue:** Sparkle CLI does not enter interactive mode (no prompt appears) if an
+    environment variable starting with `CI_` (for example, `CI_TOKEN`) is set. This is
+    because the `is-in-ci` package, used by the underlying UI framework, detects these
+    variables and assumes a non-interactive CI environment.
   - **Cause:** The `is-in-ci` package checks for the presence of `CI`,
-    `CONTINUOUS_INTEGRATION`, or any environment variable with a `CI_` prefix.
-    When any of these are found, it signals that the environment is
-    non-interactive, which prevents Sparkle CLI from starting in its interactive
-    mode.
-  - **Solution:** If the `CI_` prefixed variable is not needed for the CLI to
-    function, you can temporarily unset it for the command. For example,
-    `env -u CI_TOKEN sparkle`
+    `CONTINUOUS_INTEGRATION`, or any environment variable with a `CI_` prefix. When any
+    of these are found, it signals that the environment is non-interactive, which
+    prevents Sparkle CLI from starting in its interactive mode.
+  - **Solution:** If the `CI_` prefixed variable is not needed for the CLI to function,
+    you can temporarily unset it for the command. For example, `env -u CI_TOKEN sparkle`
 
 - **DEBUG mode not working from project .env file**
 
-  - **Issue:** Setting `DEBUG=true` in a project's `.env` file doesn't enable
-    debug mode for sparkle-cli.
-  - **Cause:** The `DEBUG` and `DEBUG_MODE` variables are automatically excluded
-    from project `.env` files to prevent interference with sparkle-cli behavior.
+  - **Issue:** Setting `DEBUG=true` in a project's `.env` file doesn't enable debug mode
+    for sparkle-cli.
+  - **Cause:** The `DEBUG` and `DEBUG_MODE` variables are automatically excluded from
+    project `.env` files to prevent interference with sparkle-cli behavior.
   - **Solution:** Use a `.sparkle/.env` file instead, or configure the
     `advanced.excludedEnvVars` setting in your `settings.json` to exclude fewer
     variables.
 
-- **Warning: `npm WARN deprecated node-domexception@1.0.0` or
-  `npm WARN deprecated glob` during install/update**
+- **Warning: `npm WARN deprecated node-domexception@1.0.0` or `npm WARN deprecated glob`
+  during install/update**
   - **Issue:** When installing or updating Sparkle CLI globally via
     `npm install -g sparkle-cli` or `npm update -g sparkle-cli`, you might see
-    deprecation warnings regarding `node-domexception` or old versions of
-    `glob`.
+    deprecation warnings regarding `node-domexception` or old versions of `glob`.
   - **Cause:** These warnings occur because some dependencies (or their
-    sub-dependencies, like `google-auth-library`) rely on older package
-    versions. Since Sparkle CLI requires Node.js 20 or higher, the platform's
-    native features (like the native `DOMException`) are used, making these
-    warnings purely informational.
+    sub-dependencies, like `google-auth-library`) rely on older package versions. Since
+    Sparkle CLI requires Node.js 20 or higher, the platform's native features (like the
+    native `DOMException`) are used, making these warnings purely informational.
   - **Solution:** These warnings are harmless and can be safely ignored. Your
-    installation or update will complete successfully and function properly
-    without any action required.
+    installation or update will complete successfully and function properly without any
+    action required.
 
 ## Exit codes
 
-Sparkle CLI uses specific exit codes to indicate the reason for termination.
-This is especially useful for scripting and automation.
+Sparkle CLI uses specific exit codes to indicate the reason for termination. This is
+especially useful for scripting and automation.
 
 | Exit Code | Error Type                 | Description                                                                                         |
 | --------- | -------------------------- | --------------------------------------------------------------------------------------------------- |
@@ -127,39 +119,36 @@ This is especially useful for scripting and automation.
 
 - **CLI debugging:**
 
-  - Use the `--debug` flag for more detailed output. In interactive mode, press
-    F12 to view the debug console.
-  - Check the CLI logs, often found in a user-specific configuration or cache
-    directory.
+  - Use the `--debug` flag for more detailed output. In interactive mode, press F12 to
+    view the debug console.
+  - Check the CLI logs, often found in a user-specific configuration or cache directory.
 
 - **Core debugging:**
 
   - Check the server console output for error messages or stack traces.
   - Increase log verbosity if configurable. For example, set the `DEBUG_MODE`
     environment variable to `true` or `1`.
-  - Use Node.js debugging tools (for example, `node --inspect`) if you need to
-    step through server-side code.
+  - Use Node.js debugging tools (for example, `node --inspect`) if you need to step
+    through server-side code.
 
 - **Tool issues:**
 
-  - If a specific tool is failing, try to isolate the issue by running the
-    simplest possible version of the command or operation the tool performs.
-  - For `run_shell_command`, check that the command works directly in your shell
-    first.
-  - For _file system tools_, verify that paths are correct and check the
-    permissions.
+  - If a specific tool is failing, try to isolate the issue by running the simplest
+    possible version of the command or operation the tool performs.
+  - For `run_shell_command`, check that the command works directly in your shell first.
+  - For _file system tools_, verify that paths are correct and check the permissions.
 
 - **Pre-flight checks:**
-  - Always run `npm run preflight` before committing code. This can catch many
-    common issues related to formatting, linting, and type errors.
+  - Always run `npm run preflight` before committing code. This can catch many common
+    issues related to formatting, linting, and type errors.
 
 ## Existing GitHub issues similar to yours or creating new issues
 
-If you encounter an issue that was not covered here in this _Troubleshooting
-guide_, consider searching Sparkle CLI
-[Issue tracker on GitHub](https://github.com/krrr/sparkle-cli/issues). If you
-can't find an issue similar to yours, consider creating a new GitHub Issue with
-a detailed description. Pull requests are also welcome!
+If you encounter an issue that was not covered here in this _Troubleshooting guide_,
+consider searching Sparkle CLI
+[Issue tracker on GitHub](https://github.com/krrr/sparkle-cli/issues). If you can't find
+an issue similar to yours, consider creating a new GitHub Issue with a detailed
+description. Pull requests are also welcome!
 
 <!-- prettier-ignore -->
 > [!NOTE]

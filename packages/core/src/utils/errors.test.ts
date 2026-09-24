@@ -324,9 +324,7 @@ describe('getErrorType', () => {
       'FatalAuthenticationError',
     );
     expect(getErrorType(new FatalInputError('test'))).toBe('FatalInputError');
-    expect(getErrorType(new FatalSandboxError('test'))).toBe(
-      'FatalSandboxError',
-    );
+    expect(getErrorType(new FatalSandboxError('test'))).toBe('FatalSandboxError');
     expect(getErrorType(new FatalConfigError('test'))).toBe('FatalConfigError');
     expect(getErrorType(new FatalTurnLimitedError('test'))).toBe(
       'FatalTurnLimitedError',
@@ -341,9 +339,7 @@ describe('getErrorType', () => {
     expect(getErrorType(new AccountSuspendedError('test'))).toBe(
       'AccountSuspendedError',
     );
-    expect(getErrorType(new UnauthorizedError('test'))).toBe(
-      'UnauthorizedError',
-    );
+    expect(getErrorType(new UnauthorizedError('test'))).toBe('UnauthorizedError');
     expect(getErrorType(new BadRequestError('test'))).toBe('BadRequestError');
   });
 

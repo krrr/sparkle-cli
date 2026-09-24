@@ -92,9 +92,7 @@ describe('partUtils', () => {
 
     it('should return descriptive string for codeExecutionResult part', () => {
       const part = { codeExecutionResult: {} } as Part;
-      expect(partToString(part, verboseOptions)).toBe(
-        '[Code Execution Result]',
-      );
+      expect(partToString(part, verboseOptions)).toBe('[Code Execution Result]');
     });
 
     it('should return descriptive string for executableCode part', () => {
@@ -109,9 +107,7 @@ describe('partUtils', () => {
 
     it('should return descriptive string for functionCall part', () => {
       const part = { functionCall: { name: 'myFunction' } } as Part;
-      expect(partToString(part, verboseOptions)).toBe(
-        '[Function Call: myFunction]',
-      );
+      expect(partToString(part, verboseOptions)).toBe('[Function Call: myFunction]');
     });
 
     it('should return descriptive string for functionResponse part', () => {
@@ -123,9 +119,7 @@ describe('partUtils', () => {
 
     it('should return descriptive string for inlineData part', () => {
       const part = { inlineData: { mimeType: 'image/png', data: '' } } as Part;
-      expect(partToString(part, verboseOptions)).toBe(
-        '[Image: image/png, 0.0 KB]',
-      );
+      expect(partToString(part, verboseOptions)).toBe('[Image: image/png, 0.0 KB]');
     });
 
     it('should show size for inlineData with non-empty base64 data', () => {
@@ -133,9 +127,7 @@ describe('partUtils', () => {
       const part = {
         inlineData: { mimeType: 'audio/mp3', data: 'AAAA' },
       } as Part;
-      expect(partToString(part, verboseOptions)).toBe(
-        '[Audio: audio/mp3, 0.0 KB]',
-      );
+      expect(partToString(part, verboseOptions)).toBe('[Audio: audio/mp3, 0.0 KB]');
     });
 
     it('should return an empty string for an unknown part type', () => {
@@ -214,10 +206,7 @@ describe('partUtils', () => {
     });
 
     it('should transform a single text part object', async () => {
-      const result = await flatMapTextParts(
-        { text: 'cat' },
-        splitCharsTransform,
-      );
+      const result = await flatMapTextParts({ text: 'cat' }, splitCharsTransform);
       expect(result).toEqual([{ text: 'c' }, { text: 'a' }, { text: 't' }]);
     });
 

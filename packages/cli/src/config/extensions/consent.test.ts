@@ -58,9 +58,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 });
 
 async function expectConsentSnapshot(consentString: string) {
-  const renderResult = await render(
-    React.createElement(Text, null, consentString),
-  );
+  const renderResult = await render(React.createElement(Text, null, consentString));
   await expect(renderResult).toMatchSvgSnapshot();
 }
 
@@ -101,26 +99,23 @@ describe('consent', () => {
       { input: 'n', expected: false },
       { input: 'N', expected: false },
       { input: 'yes', expected: true },
-    ])(
-      'should return $expected for input "$input"',
-      async ({ input, expected }) => {
-        const questionMock = vi.fn().mockImplementation((_, callback) => {
-          callback(input);
-        });
-        mockReadline.createInterface.mockReturnValue({
-          question: questionMock,
-          close: vi.fn(),
-        });
+    ])('should return $expected for input "$input"', async ({ input, expected }) => {
+      const questionMock = vi.fn().mockImplementation((_, callback) => {
+        callback(input);
+      });
+      mockReadline.createInterface.mockReturnValue({
+        question: questionMock,
+        close: vi.fn(),
+      });
 
-        const consent = await requestConsentNonInteractive('Test consent');
-        expect(debugLogger.log).toHaveBeenCalledWith('Test consent');
-        expect(questionMock).toHaveBeenCalledWith(
-          'Do you want to continue? [Y/n]: ',
-          expect.any(Function),
-        );
-        expect(consent).toBe(expected);
-      },
-    );
+      const consent = await requestConsentNonInteractive('Test consent');
+      expect(debugLogger.log).toHaveBeenCalledWith('Test consent');
+      expect(questionMock).toHaveBeenCalledWith(
+        'Do you want to continue? [Y/n]: ',
+        expect.any(Function),
+      );
+      expect(consent).toBe(expected);
+    });
   });
 
   describe('requestConsentInteractive', () => {
@@ -187,12 +182,7 @@ describe('consent', () => {
 
     it('should request consent if there is no previous config', async () => {
       const requestConsent = vi.fn().mockResolvedValue(true);
-      await maybeRequestConsentOrFail(
-        baseConfig,
-        requestConsent,
-        false,
-        undefined,
-      );
+      await maybeRequestConsentOrFail(baseConfig, requestConsent, false, undefined);
       expect(requestConsent).toHaveBeenCalledTimes(1);
     });
 
@@ -227,12 +217,7 @@ describe('consent', () => {
           excludeTools: ['tool1', 'tool2'],
         };
         const requestConsent = vi.fn().mockResolvedValue(true);
-        await maybeRequestConsentOrFail(
-          config,
-          requestConsent,
-          false,
-          undefined,
-        );
+        await maybeRequestConsentOrFail(config, requestConsent, false, undefined);
 
         expect(requestConsent).toHaveBeenCalledTimes(1);
         const consentString = requestConsent.mock.calls[0][0] as string;
@@ -292,12 +277,7 @@ describe('consent', () => {
 
       it('should include warning when hooks are present', async () => {
         const requestConsent = vi.fn().mockResolvedValue(true);
-        await maybeRequestConsentOrFail(
-          baseConfig,
-          requestConsent,
-          true,
-          undefined,
-        );
+        await maybeRequestConsentOrFail(baseConfig, requestConsent, true, undefined);
 
         expect(requestConsent).toHaveBeenCalledTimes(1);
         const consentString = requestConsent.mock.calls[0][0] as string;

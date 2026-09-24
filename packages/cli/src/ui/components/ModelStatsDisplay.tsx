@@ -15,10 +15,7 @@ import {
   calculateErrorRate,
   calculateTokensPerSecond,
 } from '../utils/computeStats.js';
-import {
-  useSessionStats,
-  type ModelMetrics,
-} from '../contexts/SessionContext.js';
+import { useSessionStats, type ModelMetrics } from '../contexts/SessionContext.js';
 import { Table, type Column } from './Table.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { getDisplayString, isAutoModel, LlmRole } from 'sparkle-cli-core';
@@ -68,21 +65,15 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 
   const modelNames = activeModels.map(([name]) => name);
 
-  const hasThoughts = activeModels.some(
-    ([, metrics]) => metrics.tokens.thoughts > 0,
-  );
+  const hasThoughts = activeModels.some(([, metrics]) => metrics.tokens.thoughts > 0);
   const hasTool = activeModels.some(([, metrics]) => metrics.tokens.tool > 0);
-  const hasCached = activeModels.some(
-    ([, metrics]) => metrics.tokens.cached > 0,
-  );
+  const hasCached = activeModels.some(([, metrics]) => metrics.tokens.cached > 0);
   const hasTimeToFirstToken = activeModels.some(
     ([, metrics]) => metrics.api.totalTimeToFirstTokenMs !== undefined,
   );
 
   const allRoles = [
-    ...new Set(
-      activeModels.flatMap(([, metrics]) => Object.keys(metrics.roles ?? {})),
-    ),
+    ...new Set(activeModels.flatMap(([, metrics]) => Object.keys(metrics.roles ?? {}))),
   ]
     .filter((role): role is LlmRole => {
       const validRoles: string[] = Object.values(LlmRole);
@@ -98,9 +89,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
   // Helper to create a row with values for each model
   const createRow = (
     metric: string,
-    getValue: (
-      metrics: (typeof activeModels)[0][1],
-    ) => string | React.ReactNode,
+    getValue: (metrics: (typeof activeModels)[0][1]) => string | React.ReactNode,
     options: { isSection?: boolean; isSubtle?: boolean } = {},
   ): StatRowData => {
     const row: StatRowData = {
@@ -123,11 +112,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
     createRow('Errors', (m) => {
       const errorRate = calculateErrorRate(m);
       return (
-        <Text
-          color={
-            m.api.totalErrors > 0 ? theme.status.error : theme.text.primary
-          }
-        >
+        <Text color={m.api.totalErrors > 0 ? theme.status.error : theme.text.primary}>
           {m.api.totalErrors.toLocaleString()} ({errorRate.toFixed(1)}%)
         </Text>
       );
@@ -161,19 +146,13 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
   rows.push({ metric: 'Tokens', isSection: true });
   rows.push(
     createRow('Total', (m) => (
-      <Text color={theme.text.secondary}>
-        {m.tokens.total.toLocaleString()}
-      </Text>
+      <Text color={theme.text.secondary}>{m.tokens.total.toLocaleString()}</Text>
     )),
   );
   rows.push(
     createRow(
       'Input',
-      (m) => (
-        <Text color={theme.text.primary}>
-          {m.tokens.input.toLocaleString()}
-        </Text>
-      ),
+      (m) => <Text color={theme.text.primary}>{m.tokens.input.toLocaleString()}</Text>,
       { isSubtle: true },
     ),
   );
@@ -200,9 +179,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
       createRow(
         'Thoughts',
         (m) => (
-          <Text color={theme.text.primary}>
-            {m.tokens.thoughts.toLocaleString()}
-          </Text>
+          <Text color={theme.text.primary}>{m.tokens.thoughts.toLocaleString()}</Text>
         ),
         { isSubtle: true },
       ),
@@ -213,11 +190,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
     rows.push(
       createRow(
         'Tool',
-        (m) => (
-          <Text color={theme.text.primary}>
-            {m.tokens.tool.toLocaleString()}
-          </Text>
-        ),
+        (m) => <Text color={theme.text.primary}>{m.tokens.tool.toLocaleString()}</Text>,
         { isSubtle: true },
       ),
     );
@@ -227,9 +200,7 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
     createRow(
       'Output',
       (m) => (
-        <Text color={theme.text.primary}>
-          {m.tokens.candidates.toLocaleString()}
-        </Text>
+        <Text color={theme.text.primary}>{m.tokens.candidates.toLocaleString()}</Text>
       ),
       { isSubtle: true },
     ),
@@ -272,19 +243,13 @@ export const ModelStatsDisplay: React.FC<ModelStatsDisplayProps> = ({
 
       addRoleMetric('Requests', (r) => r.totalRequests.toLocaleString());
       addRoleMetric('Input', (r) => (
-        <Text color={theme.text.primary}>
-          {r.tokens.input.toLocaleString()}
-        </Text>
+        <Text color={theme.text.primary}>{r.tokens.input.toLocaleString()}</Text>
       ));
       addRoleMetric('Output', (r) => (
-        <Text color={theme.text.primary}>
-          {r.tokens.candidates.toLocaleString()}
-        </Text>
+        <Text color={theme.text.primary}>{r.tokens.candidates.toLocaleString()}</Text>
       ));
       addRoleMetric('Cache Reads', (r) => (
-        <Text color={theme.text.secondary}>
-          {r.tokens.cached.toLocaleString()}
-        </Text>
+        <Text color={theme.text.secondary}>{r.tokens.cached.toLocaleString()}</Text>
       ));
     });
   }

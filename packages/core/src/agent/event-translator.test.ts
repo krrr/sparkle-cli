@@ -80,9 +80,7 @@ describe('translateEvent', () => {
       const result = translateEvent(event, state);
       expect(result).toHaveLength(1);
       const msg = result[0] as AgentEvent<'message'>;
-      expect(msg.content).toEqual([
-        { type: 'thought', thought: 'I am thinking...' },
-      ]);
+      expect(msg.content).toEqual([{ type: 'thought', thought: 'I am thinking...' }]);
       expect(msg._meta?.['subject']).toBe('Planning');
     });
   });
@@ -474,9 +472,7 @@ describe('translateEvent', () => {
       const result = translateEvent(event, state);
       expect(result).toHaveLength(1);
       const msg = result[0] as AgentEvent<'message'>;
-      expect(msg.content).toEqual([
-        { type: 'text', text: 'Source: example.com' },
-      ]);
+      expect(msg.content).toEqual([{ type: 'text', text: 'Source: example.com' }]);
       expect(msg._meta?.['citation']).toBe(true);
     });
   });
@@ -592,14 +588,8 @@ describe('translateEvent', () => {
   describe('Event IDs', () => {
     it('generates sequential IDs', () => {
       state.streamStartEmitted = true;
-      const e1 = translateEvent(
-        { type: GeminiEventType.Content, value: 'a' },
-        state,
-      );
-      const e2 = translateEvent(
-        { type: GeminiEventType.Content, value: 'b' },
-        state,
-      );
+      const e1 = translateEvent({ type: GeminiEventType.Content, value: 'a' }, state);
+      const e2 = translateEvent({ type: GeminiEventType.Content, value: 'b' }, state);
       expect(e1[0]?.id).toBe('test-stream-0');
       expect(e2[0]?.id).toBe('test-stream-1');
     });
@@ -634,9 +624,7 @@ describe('mapFinishReason', () => {
   });
 
   it('maps MALFORMED_FUNCTION_CALL to failed', () => {
-    expect(mapFinishReason(FinishReason.MALFORMED_FUNCTION_CALL)).toBe(
-      'failed',
-    );
+    expect(mapFinishReason(FinishReason.MALFORMED_FUNCTION_CALL)).toBe('failed');
   });
 
   it('maps RECITATION to refusal', () => {
@@ -664,9 +652,7 @@ describe('mapFinishReason', () => {
   });
 
   it('maps IMAGE_PROHIBITED_CONTENT to refusal', () => {
-    expect(mapFinishReason(FinishReason.IMAGE_PROHIBITED_CONTENT)).toBe(
-      'refusal',
-    );
+    expect(mapFinishReason(FinishReason.IMAGE_PROHIBITED_CONTENT)).toBe('refusal');
   });
 
   it('maps UNEXPECTED_TOOL_CALL to failed', () => {

@@ -63,11 +63,10 @@ describe('ThemeDialog Snapshots', () => {
 
   it('should render correctly in scope selector mode', async () => {
     const settings = createMockSettings();
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ThemeDialog {...baseProps} settings={settings} />,
-        { settings },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ThemeDialog {...baseProps} settings={settings} />,
+      { settings },
+    );
 
     // Press Tab to switch to scope selector mode
     await act(async () => {
@@ -85,11 +84,7 @@ describe('ThemeDialog Snapshots', () => {
     const mockOnCancel = vi.fn();
     const settings = createMockSettings();
     const { stdin, waitUntilReady, unmount } = await renderWithProviders(
-      <ThemeDialog
-        {...baseProps}
-        onCancel={mockOnCancel}
-        settings={settings}
-      />,
+      <ThemeDialog {...baseProps} onCancel={mockOnCancel} settings={settings} />,
       { settings },
     );
 

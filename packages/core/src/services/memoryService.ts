@@ -23,10 +23,7 @@ import { FRONTMATTER_REGEX, parseFrontmatter } from '../skills/skillLoader.js';
 import { LocalAgentExecutor } from '../agents/local-executor.js';
 import { SkillExtractionAgent } from '../agents/skill-extraction-agent.js';
 import { getModelConfigAlias } from '../agents/registry.js';
-import {
-  isToolActivityError,
-  type SubagentActivityEvent,
-} from '../agents/types.js';
+import { isToolActivityError, type SubagentActivityEvent } from '../agents/types.js';
 import { ExecutionLifecycleService } from './executionLifecycleService.js';
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { ResourceRegistry } from '../resources/resource-registry.js';
@@ -108,8 +105,7 @@ export function getProcessedSessionIds(state: ExtractionState): Set<string> {
   const ids = new Set<string>();
   for (const run of state.runs) {
     const processedSessionIds =
-      run.processedSessions?.map((session) => session.sessionId) ??
-      run.sessionIds;
+      run.processedSessions?.map((session) => session.sessionId) ?? run.sessionIds;
     for (const id of processedSessionIds) {
       ids.add(id);
     }
@@ -159,9 +155,7 @@ function normalizeStringArray(value: unknown): string[] {
 }
 
 function normalizeOptionalNumber(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isFinite(value)
-    ? value
-    : undefined;
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
 function normalizeOptionalString(value: unknown): string | undefined {
@@ -222,9 +216,7 @@ function buildExtractionRun(value: unknown): ExtractionRun | null {
     run.processedSessions = processedSessions;
   }
   if ('memoryCandidatesCreated' in value) {
-    run.memoryCandidatesCreated = normalizeStringArray(
-      value.memoryCandidatesCreated,
-    );
+    run.memoryCandidatesCreated = normalizeStringArray(value.memoryCandidatesCreated);
   }
   if ('memoryFilesUpdated' in value) {
     run.memoryFilesUpdated = normalizeStringArray(value.memoryFilesUpdated);
@@ -316,8 +308,7 @@ function getSessionAttemptCount(
 }
 
 function compareIndexedSessions(a: IndexedSession, b: IndexedSession): number {
-  const timestampDelta =
-    getTimestampMs(b.lastUpdated) - getTimestampMs(a.lastUpdated);
+  const timestampDelta = getTimestampMs(b.lastUpdated) - getTimestampMs(a.lastUpdated);
   if (timestampDelta !== 0) {
     return timestampDelta;
   }
@@ -338,8 +329,7 @@ function isReadFileActivity(
   data: { name: string; args?: { file_path?: unknown }; callId?: unknown };
 } {
   return (
-    activity.type === 'TOOL_CALL_START' &&
-    activity.data['name'] === READ_FILE_TOOL_NAME
+    activity.type === 'TOOL_CALL_START' && activity.data['name'] === READ_FILE_TOOL_NAME
   );
 }
 
@@ -357,10 +347,7 @@ function getReadFileCallId(activity: SubagentActivityEvent): string | null {
     return typeof id === 'string' ? id : null;
   }
 
-  if (
-    activity.type === 'ERROR' &&
-    activity.data['name'] === READ_FILE_TOOL_NAME
-  ) {
+  if (activity.type === 'ERROR' && activity.data['name'] === READ_FILE_TOOL_NAME) {
     const callId = activity.data['callId'];
     return typeof callId === 'string' ? callId : null;
   }
@@ -400,19 +387,14 @@ function getUserMessageCount(
 }
 
 function isSupportedSessionFile(fileName: string): boolean {
-  return (
-    fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl')
-  );
+  return fileName.startsWith(SESSION_FILE_PREFIX) && fileName.endsWith('.jsonl');
 }
 
 /**
  * Attempts to acquire an exclusive lock file using O_CREAT | O_EXCL.
  * Returns true if the lock was acquired, false if another instance owns it.
  */
-export async function tryAcquireLock(
-  lockPath: string,
-  retries = 1,
-): Promise<boolean> {
+export async function tryAcquireLock(lockPath: string, retries = 1): Promise<boolean> {
   const lockInfo: LockInfo = {
     pid: process.pid,
     startedAt: new Date().toISOString(),
@@ -438,9 +420,7 @@ export async function tryAcquireLock(
         await releaseLock(lockPath);
         return tryAcquireLock(lockPath, retries - 1);
       }
-      debugLogger.debug(
-        '[MemoryService] Lock held by another instance, skipping',
-      );
+      debugLogger.debug('[MemoryService] Lock held by another instance, skipping');
       return false;
     }
     throw error;
@@ -499,9 +479,7 @@ export async function releaseLock(lockPath: string): Promise<void> {
 /**
  * Reads the extraction state file, or returns a default state.
  */
-export async function readExtractionState(
-  statePath: string,
-): Promise<ExtractionState> {
+export async function readExtractionState(statePath: string): Promise<ExtractionState> {
   try {
     const content = await fs.readFile(statePath, 'utf-8');
     const parsed: unknown = JSON.parse(content);
@@ -518,10 +496,7 @@ export async function readExtractionState(
 
     return { runs };
   } catch (error) {
-    debugLogger.debug(
-      '[MemoryService] Failed to read extraction state:',
-      error,
-    );
+    debugLogger.debug('[MemoryService] Failed to read extraction state:', error);
     return { runs: [] };
   }
 }
@@ -566,9 +541,7 @@ function shouldProcessConversation(
  * here so already-processed recent sessions cannot permanently block older
  * backlog sessions from surfacing as new candidates.
  */
-async function scanEligibleSessions(
-  chatsDir: string,
-): Promise<IndexedSession[]> {
+async function scanEligibleSessions(chatsDir: string): Promise<IndexedSession[]> {
   let allFiles: string[];
   try {
     allFiles = await fs.readdir(chatsDir);
@@ -635,11 +608,7 @@ function formatSessionHeadline(session: IndexedSession): string {
     : undefined;
   const summary = session.summary ?? workflowSummary ?? '(no summary)';
 
-  if (
-    session.summary &&
-    workflowSummary &&
-    workflowSummary !== session.summary
-  ) {
+  if (session.summary && workflowSummary && workflowSummary !== session.summary) {
     return `${summary} | workflow: ${workflowSummary}`;
   }
 
@@ -688,23 +657,18 @@ export async function buildSessionIndex(
   });
 
   const candidateSessions = newSessions.slice(0, MAX_NEW_SESSION_BATCH_SIZE);
-  const remainingSlots = Math.max(
-    0,
-    MAX_SESSION_INDEX_SIZE - candidateSessions.length,
-  );
+  const remainingSlots = Math.max(0, MAX_SESSION_INDEX_SIZE - candidateSessions.length);
   const displayedOldSessions = oldSessions.slice(0, remainingSlots);
   const candidateSessionIds = new Set(
     candidateSessions.map((session) => getSessionVersionKey(session)),
   );
 
-  const lines = [...candidateSessions, ...displayedOldSessions].map(
-    (session) => {
-      const status = candidateSessionIds.has(getSessionVersionKey(session))
-        ? '[NEW]'
-        : '[old]';
-      return `${status} ${formatSessionHeadline(session)} (${session.userMessageCount} user msgs) — ${session.filePath}`;
-    },
-  );
+  const lines = [...candidateSessions, ...displayedOldSessions].map((session) => {
+    const status = candidateSessionIds.has(getSessionVersionKey(session))
+      ? '[NEW]'
+      : '[old]';
+    return `${status} ${formatSessionHeadline(session)} (${session.userMessageCount} user msgs) — ${session.filePath}`;
+  });
 
   return {
     sessionIndex: lines.join('\n'),
@@ -773,10 +737,7 @@ async function buildExistingSkillsSummary(
           builtinSkills.push(`- **${s.name}**: ${s.description}`);
         } else if (loc.startsWith(userSkillsDir)) {
           globalSkills.push(`- **${s.name}**: ${s.description} (${loc})`);
-        } else if (
-          loc.includes('/extensions/') ||
-          loc.includes('\\extensions\\')
-        ) {
+        } else if (loc.includes('/extensions/') || loc.includes('\\extensions\\')) {
           extensionSkills.push(`- **${s.name}**: ${s.description}`);
         } else {
           workspaceSkills.push(`- **${s.name}**: ${s.description} (${loc})`);
@@ -970,26 +931,17 @@ async function snapshotFiles(
   return snapshot;
 }
 
-async function snapshotInboxCandidates(
-  memoryDir: string,
-): Promise<FileSnapshot> {
+async function snapshotInboxCandidates(memoryDir: string): Promise<FileSnapshot> {
   return snapshotFiles(path.join(memoryDir, '.inbox'));
 }
 
-const MEMORY_INBOX_PATCH_KINDS: readonly InboxMemoryPatchKind[] = [
-  'private',
-  'global',
-];
+const MEMORY_INBOX_PATCH_KINDS: readonly InboxMemoryPatchKind[] = ['private', 'global'];
 
 async function validateMemoryInboxPatches(config: Config): Promise<void> {
   for (const kind of MEMORY_INBOX_PATCH_KINDS) {
     const patchFiles = await listInboxPatchFiles(config, kind);
     for (const patchFile of patchFiles) {
-      const validation = await validateInboxMemoryPatchFile(
-        config,
-        kind,
-        patchFile,
-      );
+      const validation = await validateInboxMemoryPatchFile(config, kind, patchFile);
       if (validation.valid) {
         continue;
       }
@@ -1107,10 +1059,7 @@ function getChangedSnapshotPaths(diff: FileSnapshotDiff): string[] {
   return [...diff.added, ...diff.updated].sort();
 }
 
-function prefixRelativePaths(
-  prefix: string,
-  relativePaths: string[],
-): string[] {
+function prefixRelativePaths(prefix: string, relativePaths: string[]): string[] {
   return relativePaths.map((relativePath) => path.join(prefix, relativePath));
 }
 
@@ -1184,8 +1133,10 @@ export async function startMemoryService(config: Config): Promise<void> {
 
     // Build session index: all eligible sessions with summaries + file paths.
     // The agent decides which to read in full via read_file.
-    const { sessionIndex, newSessionIds, candidateSessions } =
-      await buildSessionIndex(chatsDir, state);
+    const { sessionIndex, newSessionIds, candidateSessions } = await buildSessionIndex(
+      chatsDir,
+      state,
+    );
 
     const totalInIndex = sessionIndex ? sessionIndex.split('\n').length : 0;
     debugLogger.log(
@@ -1219,17 +1170,12 @@ export async function startMemoryService(config: Config): Promise<void> {
     } catch {
       // Empty skills dir
     }
-    debugLogger.log(
-      `[MemoryService] ${skillsBefore.size} existing skill(s) in memory`,
-    );
+    debugLogger.log(`[MemoryService] ${skillsBefore.size} existing skill(s) in memory`);
 
     const inboxCandidatesBefore = await snapshotInboxCandidates(memoryDir);
 
     // Read existing skills for context (memory-extracted + global/workspace)
-    const existingSkillsSummary = await buildExistingSkillsSummary(
-      skillsDir,
-      config,
-    );
+    const existingSkillsSummary = await buildExistingSkillsSummary(skillsDir, config);
     if (existingSkillsSummary) {
       debugLogger.log(
         `[MemoryService] Existing skills context:\n${existingSkillsSummary}`,
@@ -1268,8 +1214,7 @@ export async function startMemoryService(config: Config): Promise<void> {
     config.modelConfigService.registerRuntimeModelOverride({
       match: { overrideScope: agentDefinition.name },
       modelConfig: {
-        generateContentConfig:
-          agentDefinition.modelConfig.generateContentConfig,
+        generateContentConfig: agentDefinition.modelConfig.generateContentConfig,
       },
     });
     debugLogger.log(
@@ -1277,10 +1222,7 @@ export async function startMemoryService(config: Config): Promise<void> {
     );
 
     const candidateSessionsByPath = new Map(
-      candidateSessions.map((session) => [
-        path.resolve(session.filePath),
-        session,
-      ]),
+      candidateSessions.map((session) => [path.resolve(session.filePath), session]),
     );
     const pendingReadFileSessions = new Map<string, SessionVersion>();
     const processedSessionKeys = new Set<string>();
@@ -1383,9 +1325,7 @@ export async function startMemoryService(config: Config): Promise<void> {
     );
 
     const processedSessions = candidateSessions
-      .filter((session) =>
-        processedSessionKeys.has(getSessionVersionKey(session)),
-      )
+      .filter((session) => processedSessionKeys.has(getSessionVersionKey(session)))
       .map((session) => ({
         sessionId: session.sessionId,
         lastUpdated: session.lastUpdated,
@@ -1405,9 +1345,7 @@ export async function startMemoryService(config: Config): Promise<void> {
       skillsCreated,
       turnCount: normalizeOptionalNumber(executorResult?.turn_count),
       durationMs: normalizeOptionalNumber(executorResult?.duration_ms),
-      terminateReason: normalizeOptionalString(
-        executorResult?.terminate_reason,
-      ),
+      terminateReason: normalizeOptionalString(executorResult?.terminate_reason),
     };
     const updatedState: ExtractionState = {
       runs: [...state.runs, run],
@@ -1480,10 +1418,7 @@ export async function startMemoryService(config: Config): Promise<void> {
     await releaseLock(lockPath);
     debugLogger.log('[MemoryService] Lock released');
     if (executionId !== undefined) {
-      ExecutionLifecycleService.completeExecution(
-        executionId,
-        completionResult,
-      );
+      ExecutionLifecycleService.completeExecution(executionId, completionResult);
     }
   }
 }

@@ -48,21 +48,16 @@ export class PromptProvider {
     interactiveOverride?: boolean,
     topicUpdateNarrationOverride?: boolean,
   ): string {
-    const systemMdResolution = resolvePathFromEnv(
-      process.env['SPARKLE_SYSTEM_MD'],
-    );
+    const systemMdResolution = resolvePathFromEnv(process.env['SPARKLE_SYSTEM_MD']);
 
-    const interactiveMode =
-      interactiveOverride ?? context.config.isInteractive();
-    const approvalMode =
-      context.config.getApprovalMode?.() ?? ApprovalMode.DEFAULT;
+    const interactiveMode = interactiveOverride ?? context.config.isInteractive();
+    const approvalMode = context.config.getApprovalMode?.() ?? ApprovalMode.DEFAULT;
     const isPlanMode = approvalMode === ApprovalMode.PLAN;
     const isYoloMode = approvalMode === ApprovalMode.YOLO;
     const skills = context.config.getSkillManager().getSkills();
     const toolNames = context.toolRegistry.getAllToolNames();
     const isTopicUpdateNarrationEnabled =
-      topicUpdateNarrationOverride ??
-      context.config.isTopicUpdateNarrationEnabled();
+      topicUpdateNarrationOverride ?? context.config.isTopicUpdateNarrationEnabled();
 
     const enabledToolNames = new Set(toolNames);
 
@@ -166,14 +161,10 @@ export class PromptProvider {
                 agentRegistry.getDefinition(CodebaseInvestigatorAgent.name) !==
                 undefined,
               enableWriteTodosTool: enabledToolNames.has(WRITE_TODOS_TOOL_NAME),
-              enableEnterPlanModeTool: enabledToolNames.has(
-                ENTER_PLAN_MODE_TOOL_NAME,
-              ),
+              enableEnterPlanModeTool: enabledToolNames.has(ENTER_PLAN_MODE_TOOL_NAME),
               enableGrep: enabledToolNames.has(GREP_TOOL_NAME),
               enableGlob: enabledToolNames.has(GLOB_TOOL_NAME),
-              approvedPlan: approvedPlanPath
-                ? { path: approvedPlanPath }
-                : undefined,
+              approvedPlan: approvedPlanPath ? { path: approvedPlanPath } : undefined,
               taskTracker: trackerDir,
               topicUpdateNarration: isTopicUpdateNarrationEnabled,
             };
@@ -201,20 +192,16 @@ export class PromptProvider {
           }),
           isPlanMode,
         ),
-        operationalGuidelines: this.withSection(
-          'operationalGuidelines',
-          () => ({
-            interactive: interactiveMode,
-            enableShellEfficiency:
-              context.config.getEnableShellOutputEfficiency(),
-            interactiveShellEnabled: context.config.isInteractiveShellEnabled(),
-            topicUpdateNarration: isTopicUpdateNarrationEnabled,
-            userProjectMemoryPath: normalizePromptPath(
-              getProjectMemoryIndexFilePath(context.config.storage),
-            ),
-            globalMemoryPath: normalizePromptPath(getGlobalMemoryFilePath()),
-          }),
-        ),
+        operationalGuidelines: this.withSection('operationalGuidelines', () => ({
+          interactive: interactiveMode,
+          enableShellEfficiency: context.config.getEnableShellOutputEfficiency(),
+          interactiveShellEnabled: context.config.isInteractiveShellEnabled(),
+          topicUpdateNarration: isTopicUpdateNarrationEnabled,
+          userProjectMemoryPath: normalizePromptPath(
+            getProjectMemoryIndexFilePath(context.config.storage),
+          ),
+          globalMemoryPath: normalizePromptPath(getGlobalMemoryFilePath()),
+        })),
         sandbox: this.withSection('sandbox', () => ({
           mode: getSandboxMode(),
           toolSandboxingEnabled: context.config.getSandboxEnabled(),

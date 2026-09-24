@@ -77,12 +77,8 @@ describe('Retry Utility Fallback Integration', () => {
 
     const mockApiCall = vi
       .fn()
-      .mockRejectedValueOnce(
-        new TerminalQuotaError('Daily limit', mockGoogleApiError),
-      )
-      .mockRejectedValueOnce(
-        new TerminalQuotaError('Daily limit', mockGoogleApiError),
-      )
+      .mockRejectedValueOnce(new TerminalQuotaError('Daily limit', mockGoogleApiError))
+      .mockRejectedValueOnce(new TerminalQuotaError('Daily limit', mockGoogleApiError))
       .mockResolvedValueOnce('success after fallback');
 
     const mockPersistent429Callback = vi.fn(async (_authType?: string) => {
@@ -170,9 +166,7 @@ describe('Retry Utility Fallback Integration', () => {
 
     const mockApiCall = vi
       .fn()
-      .mockRejectedValueOnce(
-        new TerminalQuotaError('Daily limit', mockGoogleApiError),
-      );
+      .mockRejectedValueOnce(new TerminalQuotaError('Daily limit', mockGoogleApiError));
 
     const promise = retryWithBackoff(mockApiCall, {
       maxAttempts: 2,

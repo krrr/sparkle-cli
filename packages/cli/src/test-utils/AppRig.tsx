@@ -118,9 +118,7 @@ class MockExtensionManager extends ExtensionLoader {
   setRequestConsent = vi.fn();
   setRequestSetting = vi.fn();
   integrityManager = {
-    verifyExtensionIntegrity: vi
-      .fn()
-      .mockResolvedValue(IntegrityDataStatus.VERIFIED),
+    verifyExtensionIntegrity: vi.fn().mockResolvedValue(IntegrityDataStatus.VERIFIED),
     storeExtensionIntegrity: vi.fn().mockResolvedValue(undefined),
   };
 }
@@ -419,8 +417,7 @@ export class AppRig {
   }
 
   async render() {
-    if (!this.config || !this.settings)
-      throw new Error('AppRig not initialized');
+    if (!this.config || !this.settings) throw new Error('AppRig not initialized');
 
     await act(async () => {
       this.renderResult = await renderWithProviders(
@@ -557,8 +554,7 @@ export class AppRig {
   async waitForNextEvent(
     timeout = 60000,
   ): Promise<
-    | { type: 'confirmation'; confirmation: PendingConfirmation }
-    | { type: 'idle' }
+    { type: 'confirmation'; confirmation: PendingConfirmation } | { type: 'idle' }
   > {
     let confirmation: PendingConfirmation | undefined;
     let isIdle = false;
@@ -741,9 +737,7 @@ export class AppRig {
 
     // Poison the chat recording service to prevent late writes to the test directory
     if (this.config) {
-      const recordingService = this.config
-        .getGeminiClient()
-        ?.getChatRecordingService();
+      const recordingService = this.config.getGeminiClient()?.getChatRecordingService();
       if (recordingService) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (recordingService as any).conversationFile = null;
@@ -776,10 +770,7 @@ export class AppRig {
       try {
         fs.rmSync(this.testDir, { recursive: true, force: true });
       } catch (e) {
-        debugLogger.warn(
-          `Failed to cleanup test directory ${this.testDir}:`,
-          e,
-        );
+        debugLogger.warn(`Failed to cleanup test directory ${this.testDir}:`, e);
       }
     }
   }

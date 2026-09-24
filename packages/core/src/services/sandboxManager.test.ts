@@ -22,9 +22,7 @@ import type fs from 'node:fs';
 
 vi.mock('node:fs/promises', async () => {
   const actual =
-    await vi.importActual<typeof import('node:fs/promises')>(
-      'node:fs/promises',
-    );
+    await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
   return {
     ...actual,
     default: {
@@ -45,9 +43,7 @@ vi.mock('node:fs/promises', async () => {
 
 vi.mock('../utils/paths.js', async () => {
   const actual =
-    await vi.importActual<typeof import('../utils/paths.js')>(
-      '../utils/paths.js',
-    );
+    await vi.importActual<typeof import('../utils/paths.js')>('../utils/paths.js');
   return {
     ...actual,
     resolveToRealPath: vi.fn((p) => p),

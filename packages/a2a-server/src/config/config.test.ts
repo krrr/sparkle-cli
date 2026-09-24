@@ -50,30 +50,28 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     isHeadlessMode: vi.fn().mockReturnValue(false),
     createPolicyEngineConfig: vi
       .fn()
-      .mockImplementation(
-        (_settings, mode, _defaultPoliciesDir, _interactive) => ({
-          rules:
-            mode === actual.ApprovalMode.YOLO
-              ? [
-                  {
-                    toolName: '*',
-                    decision: actual.PolicyDecision.ALLOW,
-                    priority: actual.PRIORITY_YOLO_ALLOW_ALL,
-                    modes: [actual.ApprovalMode.YOLO],
-                    allowRedirection: true,
-                  },
-                ]
-              : [
-                  {
-                    toolName: 'read_file',
-                    decision: actual.PolicyDecision.ALLOW,
-                    priority: 1.05,
-                    source: 'Default: read-only.toml',
-                  },
-                ],
-          checkers: [],
-        }),
-      ),
+      .mockImplementation((_settings, mode, _defaultPoliciesDir, _interactive) => ({
+        rules:
+          mode === actual.ApprovalMode.YOLO
+            ? [
+                {
+                  toolName: '*',
+                  decision: actual.PolicyDecision.ALLOW,
+                  priority: actual.PRIORITY_YOLO_ALLOW_ALL,
+                  modes: [actual.ApprovalMode.YOLO],
+                  allowRedirection: true,
+                },
+              ]
+            : [
+                {
+                  toolName: 'read_file',
+                  decision: actual.PolicyDecision.ALLOW,
+                  priority: 1.05,
+                  source: 'Default: read-only.toml',
+                },
+              ],
+        checkers: [],
+      })),
   };
 });
 
@@ -115,9 +113,7 @@ describe('loadConfig', () => {
     vi.stubEnv('CUSTOM_IGNORE_FILE_PATHS', testPath);
     const config = await loadConfig(mockSettings, mockExtensionLoader, taskId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((config as any).fileFiltering.customIgnoreFilePaths).toEqual([
-      testPath,
-    ]);
+    expect((config as any).fileFiltering.customIgnoreFilePaths).toEqual([testPath]);
   });
 
   it('should set customIgnoreFilePaths when settings.fileFiltering.customIgnoreFilePaths is present', async () => {
@@ -129,9 +125,7 @@ describe('loadConfig', () => {
     };
     const config = await loadConfig(settings, mockExtensionLoader, taskId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((config as any).fileFiltering.customIgnoreFilePaths).toEqual([
-      testPath,
-    ]);
+    expect((config as any).fileFiltering.customIgnoreFilePaths).toEqual([testPath]);
   });
 
   it('should merge customIgnoreFilePaths from settings and env var', async () => {

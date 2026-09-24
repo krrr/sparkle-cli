@@ -159,9 +159,7 @@ export function disableFeature(
 
   // Check if it's already disabled in the other writable scope
   const otherScope =
-    scope === SettingScope.Workspace
-      ? SettingScope.User
-      : SettingScope.Workspace;
+    scope === SettingScope.Workspace ? SettingScope.User : SettingScope.Workspace;
   const alreadyDisabledInOther: ModifiedScope[] = [];
 
   if (isLoadableSettingScope(otherScope)) {

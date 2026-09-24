@@ -47,39 +47,29 @@ describe('BaseToolInvocation', () => {
     );
 
     let capturedRequest: ToolConfirmationRequest | undefined;
-    vi.mocked(messageBus.publish).mockImplementation(
-      async (request: Message) => {
-        if (request.type === MessageBusType.TOOL_CONFIRMATION_REQUEST) {
-          capturedRequest = request;
-        }
-      },
-    );
+    vi.mocked(messageBus.publish).mockImplementation(async (request: Message) => {
+      if (request.type === MessageBusType.TOOL_CONFIRMATION_REQUEST) {
+        capturedRequest = request;
+      }
+    });
 
-    let responseHandler:
-      | ((response: ToolConfirmationResponse) => void)
-      | undefined;
+    let responseHandler: ((response: ToolConfirmationResponse) => void) | undefined;
     vi.mocked(messageBus.subscribe).mockImplementation(
       (type: MessageBusType, handler: (message: Message) => void) => {
         if (type === MessageBusType.TOOL_CONFIRMATION_RESPONSE) {
-          responseHandler = handler as (
-            response: ToolConfirmationResponse,
-          ) => void;
+          responseHandler = handler as (response: ToolConfirmationResponse) => void;
         }
       },
     );
 
-    const confirmationPromise = tool.shouldConfirmExecute(
-      abortController.signal,
-    );
+    const confirmationPromise = tool.shouldConfirmExecute(abortController.signal);
 
     // Wait for microtasks to ensure publish is called
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(messageBus.publish).toHaveBeenCalledTimes(1);
     expect(capturedRequest).toBeDefined();
-    expect(capturedRequest?.type).toBe(
-      MessageBusType.TOOL_CONFIRMATION_REQUEST,
-    );
+    expect(capturedRequest?.type).toBe(MessageBusType.TOOL_CONFIRMATION_REQUEST);
     expect(capturedRequest?.serverName).toBe(serverName);
 
     // Simulate response to finish the promise cleanly
@@ -104,20 +94,16 @@ describe('BaseToolInvocation', () => {
     );
 
     let capturedRequest: ToolConfirmationRequest | undefined;
-    vi.mocked(messageBus.publish).mockImplementation(
-      async (request: Message) => {
-        if (request.type === MessageBusType.TOOL_CONFIRMATION_REQUEST) {
-          capturedRequest = request;
-        }
-      },
-    );
+    vi.mocked(messageBus.publish).mockImplementation(async (request: Message) => {
+      if (request.type === MessageBusType.TOOL_CONFIRMATION_REQUEST) {
+        capturedRequest = request;
+      }
+    });
 
     // We need to mock subscribe to avoid hanging if we want to await the promise,
     // but for this test we just need to check publish.
     // We'll abort to clean up.
-    const confirmationPromise = tool.shouldConfirmExecute(
-      abortController.signal,
-    );
+    const confirmationPromise = tool.shouldConfirmExecute(abortController.signal);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 

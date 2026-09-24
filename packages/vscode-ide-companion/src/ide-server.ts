@@ -13,11 +13,7 @@ import {
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import express, {
-  type Request,
-  type Response,
-  type NextFunction,
-} from 'express';
+import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import { randomUUID } from 'node:crypto';
 import { type Server as HTTPServer } from 'node:http';
@@ -69,10 +65,7 @@ async function writePortAndWorkspace({
     IDE_WORKSPACE_PATH_ENV_VAR,
     workspacePath,
   );
-  context.environmentVariableCollection.replace(
-    IDE_AUTH_TOKEN_ENV_VAR,
-    authToken,
-  );
+  context.environmentVariableCollection.replace(IDE_AUTH_TOKEN_ENV_VAR, authToken);
 
   if (!portFile) {
     log('Missing portFile, cannot write port and workspace info.');
@@ -125,8 +118,7 @@ export class IDEServer {
 
   private port: number | undefined;
   private authToken: string | undefined;
-  private transports: { [sessionId: string]: StreamableHTTPServerTransport } =
-    {};
+  private transports: { [sessionId: string]: StreamableHTTPServerTransport } = {};
   private openFilesManager: OpenFilesManager | undefined;
   diffManager: DiffManager;
 
@@ -151,20 +143,14 @@ export class IDEServer {
             if (!origin) {
               return callback(null, true);
             }
-            return callback(
-              new CORSError('Request denied by CORS policy.'),
-              false,
-            );
+            return callback(new CORSError('Request denied by CORS policy.'), false);
           },
         }),
       );
 
       app.use((req, res, next) => {
         const host = req.headers.host || '';
-        const allowedHosts = [
-          `localhost:${this.port}`,
-          `127.0.0.1:${this.port}`,
-        ];
+        const allowedHosts = [`localhost:${this.port}`, `127.0.0.1:${this.port}`];
         if (!allowedHosts.includes(host)) {
           return res.status(403).json({ error: 'Invalid Host header' });
         }
@@ -276,8 +262,7 @@ export class IDEServer {
         try {
           await transport.handleRequest(req, res, req.body);
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Unknown error';
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           this.log(`Error handling MCP request: ${errorMessage}`);
           if (!res.headersSent) {
             res.status(500).json({
@@ -304,18 +289,14 @@ export class IDEServer {
         try {
           await transport.handleRequest(req, res);
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Unknown error';
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           this.log(`Error handling session request: ${errorMessage}`);
           if (!res.headersSent) {
             res.status(400).send('Bad Request');
           }
         }
 
-        if (
-          this.openFilesManager &&
-          !sessionsWithInitialNotification.has(sessionId)
-        ) {
+        if (this.openFilesManager && !sessionsWithInitialNotification.has(sessionId)) {
           sendIdeContextUpdateNotification(
             transport,
             this.log.bind(this),
@@ -431,10 +412,7 @@ export class IDEServer {
   }
 }
 
-const createMcpServer = (
-  diffManager: DiffManager,
-  log: (message: string) => void,
-) => {
+const createMcpServer = (diffManager: DiffManager, log: (message: string) => void) => {
   const server = new McpServer(
     {
       name: 'sparkle-cli-companion-mcp-server',

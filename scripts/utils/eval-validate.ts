@@ -6,10 +6,7 @@
 
 import path from 'node:path';
 import { execSync } from 'node:child_process';
-import type {
-  EvalCaseRecord,
-  EvalAnalysisDiagnostic,
-} from './eval-analysis.js';
+import type { EvalCaseRecord, EvalAnalysisDiagnostic } from './eval-analysis.js';
 import type { InventoryResult } from './eval-inventory.js';
 import type { ToolRegistry } from './tool-registry.js';
 
@@ -65,8 +62,7 @@ export const VALIDATION_RULES: readonly ValidationRule[] = [
   },
   {
     id: 'case-name-static',
-    description:
-      'The case name must be a static string literal, not a computed value.',
+    description: 'The case name must be a static string literal, not a computed value.',
   },
   {
     id: 'invalid-tool-refs',
@@ -75,8 +71,7 @@ export const VALIDATION_RULES: readonly ValidationRule[] = [
   },
   {
     id: 'positive-assertion',
-    description:
-      'Behavioral evaluation cases must assert on at least one tool call.',
+    description: 'Behavioral evaluation cases must assert on at least one tool call.',
   },
   {
     id: 'workspace-setup',
@@ -90,11 +85,7 @@ export const VALIDATION_RULES: readonly ValidationRule[] = [
 ];
 
 const VALID_FILE_SUFFIXES = ['.eval.ts', '.eval.tsx'] as const;
-const VALID_POLICIES = new Set([
-  'ALWAYS_PASSES',
-  'USUALLY_PASSES',
-  'USUALLY_FAILS',
-]);
+const VALID_POLICIES = new Set(['ALWAYS_PASSES', 'USUALLY_PASSES', 'USUALLY_FAILS']);
 
 function checkFileNaming(
   evalCase: EvalCaseRecord,
@@ -242,10 +233,7 @@ function checkWorkspaceSetup(
     return undefined;
   }
 
-  if (
-    evalCase.suiteType === 'workspace' ||
-    evalCase.suiteType === 'file-system'
-  ) {
+  if (evalCase.suiteType === 'workspace' || evalCase.suiteType === 'file-system') {
     return {
       ruleId: 'workspace-setup',
       message:
@@ -307,14 +295,11 @@ function getNewEvalFiles(repoRoot?: string): Set<string> {
           stdio: ['ignore', 'pipe', 'ignore'],
         }).trim();
         if (mergeBase) {
-          const diff = execSync(
-            `git diff --diff-filter=A --name-only ${mergeBase}`,
-            {
-              cwd,
-              encoding: 'utf8',
-              stdio: ['ignore', 'pipe', 'ignore'],
-            },
-          );
+          const diff = execSync(`git diff --diff-filter=A --name-only ${mergeBase}`, {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+          });
           addFromOutput(diff);
           break; // succeeded, no need to try next base
         }
@@ -373,9 +358,7 @@ export function validateInventory(
           } else {
             abs = path.resolve(inventory.repoRoot || process.cwd(), p);
           }
-          const rel = inventory.repoRoot
-            ? path.relative(inventory.repoRoot, abs)
-            : abs;
+          const rel = inventory.repoRoot ? path.relative(inventory.repoRoot, abs) : abs;
           const normalized = rel.replace(/\\/g, '/');
           filterMap.set(normalized, p);
           return normalized;
@@ -556,8 +539,8 @@ export function formatValidationReport(
     }
   }
 
-  for (const [displayPath, violations] of [...byFile.entries()].sort(
-    ([a], [b]) => a.localeCompare(b, 'en'),
+  for (const [displayPath, violations] of [...byFile.entries()].sort(([a], [b]) =>
+    a.localeCompare(b, 'en'),
   )) {
     lines.push(displayPath);
     for (const v of violations) {
@@ -613,8 +596,7 @@ export function formatValidationJson(
   }
   if (
     !generatedDate &&
-    (process.env.EVAL_VALIDATE_STABLE_DATE ||
-      process.env.EVAL_INVENTORY_DETERMINISTIC)
+    (process.env.EVAL_VALIDATE_STABLE_DATE || process.env.EVAL_INVENTORY_DETERMINISTIC)
   ) {
     generatedDate = new Date(0);
   }

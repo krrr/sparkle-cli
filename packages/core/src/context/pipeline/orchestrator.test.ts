@@ -7,10 +7,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { PipelineOrchestrator } from './orchestrator.js';
 import { ContextWorkingBufferImpl } from './contextWorkingBuffer.js';
-import {
-  createMockEnvironment,
-  createDummyNode,
-} from '../testing/contextTestUtils.js';
+import { createMockEnvironment, createDummyNode } from '../testing/contextTestUtils.js';
 import { NodeType } from '../graph/types.js';
 import type { ContextEnvironment } from './environment.js';
 import type {
@@ -28,10 +25,7 @@ function createModifyingProcessor(id: string): ContextProcessor {
     name: 'ModifyingProcessor',
     process: async (args: ProcessArgs) => {
       const newTargets = [...args.targets];
-      if (
-        newTargets.length > 0 &&
-        newTargets[0].type === NodeType.USER_PROMPT
-      ) {
+      if (newTargets.length > 0 && newTargets[0].type === NodeType.USER_PROMPT) {
         const prompt = newTargets[0];
         if (prompt.payload.text) {
           newTargets[0] = {
@@ -91,12 +85,7 @@ describe('PipelineOrchestrator (Component)', () => {
     pipelines: PipelineDef[],
     asyncPipelines: AsyncPipelineDef[] = [],
   ) => {
-    orchestrator = new PipelineOrchestrator(
-      pipelines,
-      asyncPipelines,
-      env,
-      env.tracer,
-    );
+    orchestrator = new PipelineOrchestrator(pipelines, asyncPipelines, env, env.tracer);
 
     return orchestrator;
   };
@@ -193,10 +182,7 @@ describe('PipelineOrchestrator (Component)', () => {
   describe('Asynchronous async pipeline Events', () => {
     it('routes emitChunkReceived to async pipelines with nodes_added trigger', async () => {
       const executeSpy = vi.fn();
-      const asyncProcessor = createMockAsyncProcessor(
-        'MyAsyncProcessor',
-        executeSpy,
-      );
+      const asyncProcessor = createMockAsyncProcessor('MyAsyncProcessor', executeSpy);
 
       setupOrchestrator(
         [],

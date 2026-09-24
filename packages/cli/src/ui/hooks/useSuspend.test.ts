@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { useSuspend } from './useSuspend.js';
@@ -67,9 +59,7 @@ describe('useSuspend', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
-    killSpy = vi
-      .spyOn(process, 'kill')
-      .mockReturnValue(true) as unknown as Mock;
+    killSpy = vi.spyOn(process, 'kill').mockReturnValue(true) as unknown as Mock;
     // Default tests to a POSIX platform so suspend path assertions are stable.
     setPlatform('linux');
   });

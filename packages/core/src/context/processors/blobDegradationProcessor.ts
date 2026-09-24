@@ -72,18 +72,14 @@ export function createBlobDegradationProcessor(
           const mb = (buffer.byteLength / 1024 / 1024).toFixed(2);
           newText = `[Multi-Modal Blob (${payload.inlineData.mimeType}, ${mb}MB) degraded to text to preserve context window. Saved to: ${filePath}]`;
 
-          const oldTokens = env.tokenCalculator.estimateTokensForParts([
-            payload,
-          ]);
+          const oldTokens = env.tokenCalculator.estimateTokensForParts([payload]);
           const newTokens = env.tokenCalculator.estimateTokensForParts([
             { text: newText },
           ]);
           tokensSaved = oldTokens - newTokens;
         } else if (payload.fileData?.mimeType && payload.fileData?.fileUri) {
           newText = `[File Reference (${payload.fileData.mimeType}) degraded to text to preserve context window. Original URI: ${payload.fileData.fileUri}]`;
-          const oldTokens = env.tokenCalculator.estimateTokensForParts([
-            payload,
-          ]);
+          const oldTokens = env.tokenCalculator.estimateTokensForParts([payload]);
           const newTokens = env.tokenCalculator.estimateTokensForParts([
             { text: newText },
           ]);

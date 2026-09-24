@@ -56,9 +56,7 @@ class WriteTodosToolInvocation extends BaseToolInvocation<
   async execute({ abortSignal: _signal }: ExecuteOptions): Promise<ToolResult> {
     const todos = this.params.todos ?? [];
     const todoListString = todos
-      .map(
-        (todo, index) => `${index + 1}. [${todo.status}] ${todo.description}`,
-      )
+      .map((todo, index) => `${index + 1}. [${todo.status}] ${todo.description}`)
       .join('\n');
 
     const llmContent =
@@ -133,11 +131,6 @@ export class WriteTodosTool extends BaseDeclarativeTool<
     _toolName?: string,
     _displayName?: string,
   ): ToolInvocation<WriteTodosToolParams, ToolResult> {
-    return new WriteTodosToolInvocation(
-      params,
-      messageBus,
-      _toolName,
-      _displayName,
-    );
+    return new WriteTodosToolInvocation(params, messageBus, _toolName, _displayName);
   }
 }

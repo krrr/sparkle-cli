@@ -49,16 +49,10 @@ const ChecklistTitleDisplay: React.FC<{
   );
 };
 
-const ChecklistListDisplay: React.FC<{ items: ChecklistItemData[] }> = ({
-  items,
-}) => (
+const ChecklistListDisplay: React.FC<{ items: ChecklistItemData[] }> = ({ items }) => (
   <Box flexDirection="column" aria-role="list">
     {items.map((item, index) => (
-      <ChecklistItem
-        item={item}
-        key={`${index}-${item.label}`}
-        role="listitem"
-      />
+      <ChecklistItem item={item} key={`${index}-${item.label}`} role="listitem" />
     ))}
   </Box>
 );
@@ -76,9 +70,7 @@ export const Checklist: React.FC<ChecklistProps> = ({
 
   const hasActiveItems = useMemo(
     () =>
-      items.some(
-        (item) => item.status === 'pending' || item.status === 'in_progress',
-      ),
+      items.some((item) => item.status === 'pending' || item.status === 'in_progress'),
     [items],
   );
 
@@ -98,11 +90,7 @@ export const Checklist: React.FC<ChecklistProps> = ({
     >
       {isExpanded ? (
         <Box flexDirection="column" rowGap={1}>
-          <ChecklistTitleDisplay
-            title={title}
-            items={items}
-            toggleHint={toggleHint}
-          />
+          <ChecklistTitleDisplay title={title} items={items} toggleHint={toggleHint} />
           <ChecklistListDisplay items={items} />
         </Box>
       ) : (

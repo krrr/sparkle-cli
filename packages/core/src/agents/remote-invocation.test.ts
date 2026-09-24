@@ -4,21 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import type { Client } from '@a2a-js/sdk/client';
 import { RemoteAgentInvocation } from './remote-invocation.js';
-import {
-  type SendMessageResult,
-  type A2AClientManager,
-} from './a2a-client-manager.js';
+import { type SendMessageResult, type A2AClientManager } from './a2a-client-manager.js';
 
 import {
   type RemoteAgentDefinition,
@@ -118,27 +107,20 @@ describe('RemoteAgentInvocation', () => {
 
     it('accepts missing query (defaults to "Get Started!")', () => {
       expect(() => {
-        new RemoteAgentInvocation(
-          mockDefinition,
-          mockContext,
-          {},
-          mockMessageBus,
-        );
+        new RemoteAgentInvocation(mockDefinition, mockContext, {}, mockMessageBus);
       }).not.toThrow();
     });
 
     it('uses "Get Started!" default when query is missing during execution', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello' }],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -170,16 +152,14 @@ describe('RemoteAgentInvocation', () => {
   describe('Execution Logic', () => {
     it('should lazy load the agent without auth handler when no auth configured', async () => {
       mockClientManager.getClient.mockReturnValue(undefined);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello' }],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -217,16 +197,14 @@ describe('RemoteAgentInvocation', () => {
       } as unknown as A2AAuthProvider;
       (A2AAuthProviderFactory.create as Mock).mockResolvedValue(mockHandler);
       mockClientManager.getClient.mockReturnValue(undefined);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello' }],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         authDefinition,
@@ -281,16 +259,14 @@ describe('RemoteAgentInvocation', () => {
 
     it('should not load the agent if already present', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello' }],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -309,18 +285,16 @@ describe('RemoteAgentInvocation', () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
 
       // First call return values
-      mockClientManager.sendMessageStream.mockImplementationOnce(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Response 1' }],
-            contextId: 'ctx-1',
-            taskId: 'task-1',
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementationOnce(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Response 1' }],
+          contextId: 'ctx-1',
+          taskId: 'task-1',
+        };
+      });
 
       const invocation1 = new RemoteAgentInvocation(
         mockDefinition,
@@ -345,18 +319,16 @@ describe('RemoteAgentInvocation', () => {
       );
 
       // Prepare for second call with simulated state persistence
-      mockClientManager.sendMessageStream.mockImplementationOnce(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-2',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Response 2' }],
-            contextId: 'ctx-1',
-            taskId: 'task-2',
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementationOnce(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-2',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Response 2' }],
+          contextId: 'ctx-1',
+          taskId: 'task-2',
+        };
+      });
 
       const invocation2 = new RemoteAgentInvocation(
         mockDefinition,
@@ -369,9 +341,7 @@ describe('RemoteAgentInvocation', () => {
       const result2 = await invocation2.execute({
         abortSignal: new AbortController().signal,
       });
-      expect((result2.returnDisplay as SubagentProgress).result).toBe(
-        'Response 2',
-      );
+      expect((result2.returnDisplay as SubagentProgress).result).toBe('Response 2');
 
       expect(mockClientManager.sendMessageStream).toHaveBeenLastCalledWith(
         'test-agent',
@@ -380,18 +350,16 @@ describe('RemoteAgentInvocation', () => {
       );
 
       // Third call: Task completes
-      mockClientManager.sendMessageStream.mockImplementationOnce(
-        async function* () {
-          yield {
-            kind: 'task',
-            id: 'task-2',
-            contextId: 'ctx-1',
-            status: { state: 'completed', message: undefined },
-            artifacts: [],
-            history: [],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementationOnce(async function* () {
+        yield {
+          kind: 'task',
+          id: 'task-2',
+          contextId: 'ctx-1',
+          status: { state: 'completed', message: undefined },
+          artifacts: [],
+          history: [],
+        };
+      });
 
       const invocation3 = new RemoteAgentInvocation(
         mockDefinition,
@@ -404,16 +372,14 @@ describe('RemoteAgentInvocation', () => {
       await invocation3.execute({ abortSignal: new AbortController().signal });
 
       // Fourth call: Should start new task (taskId undefined)
-      mockClientManager.sendMessageStream.mockImplementationOnce(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-3',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'New Task' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementationOnce(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-3',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'New Task' }],
+        };
+      });
 
       const invocation4 = new RemoteAgentInvocation(
         mockDefinition,
@@ -434,22 +400,20 @@ describe('RemoteAgentInvocation', () => {
 
     it('should handle streaming updates and reassemble output', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello' }],
-          };
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Hello World' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello' }],
+        };
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Hello World' }],
+        };
+      });
 
       const updateOutput = vi.fn();
       const invocation = new RemoteAgentInvocation(
@@ -484,24 +448,22 @@ describe('RemoteAgentInvocation', () => {
     it('should abort when signal is aborted during streaming', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
       const controller = new AbortController();
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Partial' }],
-          };
-          // Simulate abort between chunks
-          controller.abort();
-          yield {
-            kind: 'message',
-            messageId: 'msg-2',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Partial response continued' }],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Partial' }],
+        };
+        // Simulate abort between chunks
+        controller.abort();
+        yield {
+          kind: 'message',
+          messageId: 'msg-2',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Partial response continued' }],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -520,12 +482,10 @@ describe('RemoteAgentInvocation', () => {
 
     it('should handle errors gracefully', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          if (Math.random() < 0) yield {} as unknown as SendMessageResult;
-          throw new Error('Network error');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        if (Math.random() < 0) yield {} as unknown as SendMessageResult;
+        throw new Error('Network error');
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -548,19 +508,17 @@ describe('RemoteAgentInvocation', () => {
     it('should use a2a helpers for extracting text', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
       // Mock a complex message part that needs extraction
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [
-              { kind: 'text', text: 'Extracted text' },
-              { kind: 'data', data: { foo: 'bar' } },
-            ],
-          };
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [
+            { kind: 'text', text: 'Extracted text' },
+            { kind: 'data', data: { foo: 'bar' } },
+          ],
+        };
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -582,31 +540,29 @@ describe('RemoteAgentInvocation', () => {
 
     it('should handle mixed response types during streaming (TaskStatusUpdateEvent + Message)', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'status-update',
-            taskId: 'task-1',
-            contextId: 'ctx-1',
-            final: false,
-            status: {
-              state: 'working',
-              message: {
-                kind: 'message',
-                role: 'agent',
-                messageId: 'm1',
-                parts: [{ kind: 'text', text: 'Thinking...' }],
-              },
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'status-update',
+          taskId: 'task-1',
+          contextId: 'ctx-1',
+          final: false,
+          status: {
+            state: 'working',
+            message: {
+              kind: 'message',
+              role: 'agent',
+              messageId: 'm1',
+              parts: [{ kind: 'text', text: 'Thinking...' }],
             },
-          };
-          yield {
-            kind: 'message',
-            messageId: 'msg-final',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Final Answer' }],
-          };
-        },
-      );
+          },
+        };
+        yield {
+          kind: 'message',
+          messageId: 'msg-final',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Final Answer' }],
+        };
+      });
 
       const updateOutput = vi.fn();
       const invocation = new RemoteAgentInvocation(
@@ -643,47 +599,45 @@ describe('RemoteAgentInvocation', () => {
 
     it('should handle artifact reassembly with append: true', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'status-update',
-            taskId: 'task-1',
-            contextId: 'ctx-1',
-            final: false,
-            status: {
-              state: 'working',
-              message: {
-                kind: 'message',
-                role: 'agent',
-                messageId: 'm1',
-                parts: [{ kind: 'text', text: 'Generating...' }],
-              },
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'status-update',
+          taskId: 'task-1',
+          contextId: 'ctx-1',
+          final: false,
+          status: {
+            state: 'working',
+            message: {
+              kind: 'message',
+              role: 'agent',
+              messageId: 'm1',
+              parts: [{ kind: 'text', text: 'Generating...' }],
             },
-          };
-          yield {
-            kind: 'artifact-update',
-            taskId: 'task-1',
-            contextId: 'ctx-1',
-            append: false,
-            artifact: {
-              artifactId: 'art-1',
-              name: 'Result',
-              parts: [{ kind: 'text', text: 'Part 1' }],
-            },
-          };
-          yield {
-            kind: 'artifact-update',
-            taskId: 'task-1',
-            contextId: 'ctx-1',
-            append: true,
-            artifact: {
-              artifactId: 'art-1',
-              parts: [{ kind: 'text', text: ' Part 2' }],
-            },
-          };
-          return;
-        },
-      );
+          },
+        };
+        yield {
+          kind: 'artifact-update',
+          taskId: 'task-1',
+          contextId: 'ctx-1',
+          append: false,
+          artifact: {
+            artifactId: 'art-1',
+            name: 'Result',
+            parts: [{ kind: 'text', text: 'Part 1' }],
+          },
+        };
+        yield {
+          kind: 'artifact-update',
+          taskId: 'task-1',
+          contextId: 'ctx-1',
+          append: true,
+          artifact: {
+            artifactId: 'art-1',
+            parts: [{ kind: 'text', text: ' Part 2' }],
+          },
+        };
+        return;
+      });
 
       const updateOutput = vi.fn();
       const invocation = new RemoteAgentInvocation(
@@ -777,9 +731,7 @@ describe('RemoteAgentInvocation', () => {
 
     it('should use generic message for non-A2AAgentError errors', async () => {
       mockClientManager.getClient.mockReturnValue(undefined);
-      mockClientManager.loadAgent.mockRejectedValue(
-        new Error('something unexpected'),
-      );
+      mockClientManager.loadAgent.mockRejectedValue(new Error('something unexpected'));
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,
@@ -801,18 +753,16 @@ describe('RemoteAgentInvocation', () => {
 
     it('should include partial output when error occurs mid-stream', async () => {
       mockClientManager.getClient.mockReturnValue(mockClient);
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield {
-            kind: 'message',
-            messageId: 'msg-1',
-            role: 'agent',
-            parts: [{ kind: 'text', text: 'Partial response' }],
-          };
-          // Raw errors propagate from the A2A SDK — no wrapping or classification.
-          throw new Error('connection reset');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield {
+          kind: 'message',
+          messageId: 'msg-1',
+          role: 'agent',
+          parts: [{ kind: 'text', text: 'Partial response' }],
+        };
+        // Raw errors propagate from the A2A SDK — no wrapping or classification.
+        throw new Error('connection reset');
+      });
 
       const invocation = new RemoteAgentInvocation(
         mockDefinition,

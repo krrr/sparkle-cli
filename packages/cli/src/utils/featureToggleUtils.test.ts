@@ -22,10 +22,7 @@ function createMockLoadedSettings(opts: {
   userPath?: string;
   workspacePath?: string;
 }): LoadedSettings {
-  const scopes: Record<
-    string,
-    { settings: Record<string, unknown>; path: string }
-  > = {
+  const scopes: Record<string, { settings: Record<string, unknown>; path: string }> = {
     [SettingScope.User]: {
       settings: opts.userSettings ?? {},
       path: opts.userPath ?? '/home/user/.sparkle/settings.json',
@@ -59,9 +56,7 @@ function createMockStrategy(overrides?: {
   return {
     needsEnabling: vi.fn(overrides?.needsEnabling ?? (() => false)),
     enable: vi.fn(),
-    isExplicitlyDisabled: vi.fn(
-      overrides?.isExplicitlyDisabled ?? (() => false),
-    ),
+    isExplicitlyDisabled: vi.fn(overrides?.isExplicitlyDisabled ?? (() => false)),
     disable: vi.fn(),
   };
 }

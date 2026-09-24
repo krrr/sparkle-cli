@@ -77,20 +77,16 @@ describe('McpStatus', () => {
 
   it('renders correctly with unauthenticated OAuth status', async () => {
     const { lastFrame, unmount } = await render(
-      <McpStatus
-        {...baseProps}
-        authStatus={{ 'server-1': 'unauthenticated' }}
-      />,
+      <McpStatus {...baseProps} authStatus={{ 'server-1': 'unauthenticated' }} />,
     );
     expect(lastFrame()).toMatchSnapshot();
     unmount();
   });
 
   it('renders correctly with a disconnected server', async () => {
-    vi.spyOn(
-      await import('sparkle-cli-core'),
-      'getMCPServerStatus',
-    ).mockReturnValue(MCPServerStatus.DISCONNECTED);
+    vi.spyOn(await import('sparkle-cli-core'), 'getMCPServerStatus').mockReturnValue(
+      MCPServerStatus.DISCONNECTED,
+    );
     const { lastFrame, unmount } = await render(<McpStatus {...baseProps} />);
     expect(lastFrame()).toMatchSnapshot();
     unmount();

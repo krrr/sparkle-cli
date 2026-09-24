@@ -14,10 +14,7 @@ import {
   type FinishReason,
   type GenerateContentResponseUsageMetadata,
 } from '@google/genai';
-import type {
-  ToolCallConfirmationDetails,
-  ToolResult,
-} from '../tools/tools.js';
+import type { ToolCallConfirmationDetails, ToolResult } from '../tools/tools.js';
 import { getResponseText } from '../utils/partUtils.js';
 import { reportError } from '../utils/errorReporting.js';
 import { ragLogger, type RagSnippet } from '../utils/ragLogger.js';
@@ -47,10 +44,7 @@ export interface ServerTool {
   name: string;
   schema: FunctionDeclaration;
   // The execute method signature might differ slightly or be wrapped
-  execute(
-    params: Record<string, unknown>,
-    signal?: AbortSignal,
-  ): Promise<ToolResult>;
+  execute(params: Record<string, unknown>, signal?: AbortSignal): Promise<ToolResult>;
   shouldConfirmExecute(
     params: Record<string, unknown>,
     abortSignal: AbortSignal,
@@ -337,10 +331,7 @@ export class Turn {
         if (!resp) continue; // Skip if there's no response body
 
         // Log RAG trace if enabled (only once per turn to avoid log bloat on streams)
-        if (
-          !this.hasLoggedRagTrace &&
-          this.chat.context.config.getLogRagSnippets?.()
-        ) {
+        if (!this.hasLoggedRagTrace && this.chat.context.config.getLogRagSnippets?.()) {
           let ragStatus: string | undefined;
           let snippets: RagSnippet[] | undefined;
 

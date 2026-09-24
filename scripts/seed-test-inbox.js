@@ -40,9 +40,7 @@ const corePath = path.join(REPO_ROOT, 'packages/core/dist/src/index.js');
 try {
   await fs.access(corePath);
 } catch {
-  console.error(
-    `Cannot find built core at ${corePath}. Run \`npm run build\` first.`,
-  );
+  console.error(`Cannot find built core at ${corePath}. Run \`npm run build\` first.`);
   process.exit(1);
 }
 

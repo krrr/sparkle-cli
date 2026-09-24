@@ -65,9 +65,9 @@ const authCommand: SlashCommand = {
         .filter(([_, server]) => server.oauth?.enabled)
         .map(([name, _]) => name);
 
-      const detectedOAuthServers = Array.from(
-        mcpServerRequiresOAuth.keys(),
-      ).filter((name) => mcpServers[name]); // Only include configured servers
+      const detectedOAuthServers = Array.from(mcpServerRequiresOAuth.keys()).filter(
+        (name) => mcpServers[name],
+      ); // Only include configured servers
 
       // Combine and deduplicate
       const allOAuthServers = [
@@ -168,9 +168,7 @@ const authCommand: SlashCommand = {
     if (!config) return [];
 
     const mcpServers = config.getMcpClientManager()?.getMcpServers() || {};
-    return Object.keys(mcpServers).filter((name) =>
-      name.startsWith(partialArg),
-    );
+    return Object.keys(mcpServers).filter((name) => name.startsWith(partialArg));
   },
 };
 
@@ -202,8 +200,7 @@ const listAction = async (
   }
 
   let mcpServers = config.getMcpClientManager()?.getMcpServers() || {};
-  const blockedMcpServers =
-    config.getMcpClientManager()?.getBlockedMcpServers() || [];
+  const blockedMcpServers = config.getMcpClientManager()?.getBlockedMcpServers() || [];
 
   if (serverNameFilter) {
     const filter = serverNameFilter.trim().toLowerCase();
@@ -225,8 +222,7 @@ const listAction = async (
   );
   const discoveryState = getMCPDiscoveryState();
   const discoveryInProgress =
-    discoveryState === MCPDiscoveryState.IN_PROGRESS ||
-    connectingServers.length > 0;
+    discoveryState === MCPDiscoveryState.IN_PROGRESS || connectingServers.length > 0;
 
   const allTools = toolRegistry.getAllTools();
   const mcpTools = allTools.filter((tool) => tool instanceof DiscoveredMCPTool);
@@ -235,8 +231,7 @@ const listAction = async (
   const mcpPrompts = promptRegistry
     .getAllPrompts()
     .filter(
-      (prompt) =>
-        'serverName' in prompt && serverNames.includes(prompt.serverName),
+      (prompt) => 'serverName' in prompt && serverNames.includes(prompt.serverName),
     );
 
   const resourceRegistry = config.getResourceRegistry();
@@ -269,8 +264,7 @@ const listAction = async (
   const enablementManager = McpServerEnablementManager.getInstance();
   const enablementState: HistoryItemMcpStatus['enablementState'] = {};
   for (const serverName of serverNames) {
-    enablementState[serverName] =
-      await enablementManager.getDisplayState(serverName);
+    enablementState[serverName] = await enablementManager.getDisplayState(serverName);
   }
   const errors: Record<string, string> = {};
   for (const serverName of serverNames) {
@@ -337,8 +331,7 @@ const descCommand: SlashCommand = {
 
 const schemaCommand: SlashCommand = {
   name: 'schema',
-  description:
-    'List configured MCP servers and tools with descriptions and schemas',
+  description: 'List configured MCP servers and tools with descriptions and schemas',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: (context, args) => listAction(context, true, true, args),
@@ -351,9 +344,7 @@ const reloadCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   takesArgs: false,
-  action: async (
-    context: CommandContext,
-  ): Promise<void | SlashCommandActionReturn> => {
+  action: async (context: CommandContext): Promise<void | SlashCommandActionReturn> => {
     const agentContext = context.services.agentContext;
     const config = agentContext?.config;
     if (!config) {
@@ -471,10 +462,7 @@ async function handleEnableDisable(
 
   const mcpClientManager = config.getMcpClientManager();
   if (mcpClientManager) {
-    context.ui.addItem(
-      { type: 'info', text: 'Reloading MCP servers...' },
-      Date.now(),
-    );
+    context.ui.addItem({ type: 'info', text: 'Reloading MCP servers...' }, Date.now());
     await mcpClientManager.restart();
   }
   if (agentContext.geminiClient?.isInitialized())
@@ -492,9 +480,7 @@ async function getEnablementCompletion(
   const agentContext = context.services.agentContext;
   const config = agentContext?.config;
   if (!config) return [];
-  const servers = Object.keys(
-    config.getMcpClientManager()?.getMcpServers() || {},
-  );
+  const servers = Object.keys(config.getMcpClientManager()?.getMcpServers() || {});
   const manager = McpServerEnablementManager.getInstance();
   const results: string[] = [];
   for (const n of servers) {

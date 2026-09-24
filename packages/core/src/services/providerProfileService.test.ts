@@ -108,9 +108,7 @@ describe('ProviderProfileService', () => {
 
       expect(profile.id).toBe('work-openai');
       expect(profile.baseUrl).toBe('https://api.openai.com/v1');
-      expect(profile.models).toEqual([
-        { id: DEFAULT_OPENAI_MODEL, tier: 'pro' },
-      ]);
+      expect(profile.models).toEqual([{ id: DEFAULT_OPENAI_MODEL, tier: 'pro' }]);
       expect(profile.defaultModel).toBe(DEFAULT_OPENAI_MODEL);
     });
 
@@ -196,10 +194,7 @@ describe('ProviderProfileService', () => {
       expect(storedSelectedId).toBe('new-id');
 
       expect(loadApiKeyForProfileMock).toHaveBeenCalledWith('old-id');
-      expect(saveApiKeyForProfileMock).toHaveBeenCalledWith(
-        'new-id',
-        'sk-secret-key',
-      );
+      expect(saveApiKeyForProfileMock).toHaveBeenCalledWith('new-id', 'sk-secret-key');
       expect(clearApiKeyForProfileMock).toHaveBeenCalledWith('old-id');
     });
 
@@ -254,9 +249,7 @@ describe('ProviderProfileService', () => {
         tier: 'pro',
       });
       updated = service.getProfile(profile.id);
-      expect(updated?.models.find((m) => m.id === 'o1-preview')?.tier).toBe(
-        'pro',
-      );
+      expect(updated?.models.find((m) => m.id === 'o1-preview')?.tier).toBe('pro');
 
       await service.removeModel(profile.id, 'o1-preview');
       updated = service.getProfile(profile.id);
@@ -316,9 +309,7 @@ describe('ProviderProfileService', () => {
         defaultModel: 'model-a',
       });
       storedSelectedId = profile.id;
-      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
-        'model-a',
-      );
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue('model-a');
 
       await service.removeModel(profile.id, 'model-a');
 
@@ -335,19 +326,14 @@ describe('ProviderProfileService', () => {
         defaultModel: 'only-model',
       });
       storedSelectedId = profile.id;
-      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
-        'only-model',
-      );
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue('only-model');
 
       await service.removeModel(profile.id, 'only-model');
 
       const updated = service.getProfile(profile.id);
       expect(updated?.models).toHaveLength(0);
       expect(updated?.defaultModel).toBeUndefined();
-      expect(mockConfig.setModel).toHaveBeenCalledWith(
-        SPARKLE_MODEL_ALIAS_AUTO,
-        false,
-      );
+      expect(mockConfig.setModel).toHaveBeenCalledWith(SPARKLE_MODEL_ALIAS_AUTO, false);
     });
 
     it('should not update config model when removing a model from an inactive profile', async () => {
@@ -401,18 +387,13 @@ describe('ProviderProfileService', () => {
       await service.deleteProfile(p1.id);
       expect(service.listProfiles()).toHaveLength(0);
       expect(service.getActiveProfile()).toBeUndefined();
-      expect(mockConfig.setModel).toHaveBeenCalledWith(
-        DEFAULT_GEMINI_MODEL,
-        false,
-      );
+      expect(mockConfig.setModel).toHaveBeenCalledWith(DEFAULT_GEMINI_MODEL, false);
     });
   });
 
   describe('activateProfile', () => {
     it('should throw error when profile not found', async () => {
-      await expect(service.activateProfile('nonexistent')).rejects.toThrow(
-        /not found/,
-      );
+      await expect(service.activateProfile('nonexistent')).rejects.toThrow(/not found/);
     });
 
     it('should reject when active provider is Gemini but OPENAI_API_KEY is present without GEMINI_API_KEY', async () => {
@@ -494,13 +475,11 @@ describe('ProviderProfileService', () => {
       });
 
       storedSelectedId = p1.id;
-      (
-        mockConfig.refreshAuth as ReturnType<typeof vi.fn>
-      ).mockRejectedValueOnce(new Error('Network error'));
-
-      await expect(service.activateProfile(p2.id)).rejects.toThrow(
-        'Network error',
+      (mockConfig.refreshAuth as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error('Network error'),
       );
+
+      await expect(service.activateProfile(p2.id)).rejects.toThrow('Network error');
       expect(storedSelectedId).toBe(p1.id); // Not changed!
     });
 
@@ -516,9 +495,7 @@ describe('ProviderProfileService', () => {
         defaultModel: DEFAULT_OPENAI_MODEL,
       });
 
-      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue(
-        'gpt-4o-mini',
-      );
+      (mockConfig.getModel as ReturnType<typeof vi.fn>).mockReturnValue('gpt-4o-mini');
       await service.activateProfile(p.id);
       expect(mockConfig.setModel).toHaveBeenCalledWith('gpt-4o-mini', true);
 
@@ -526,10 +503,7 @@ describe('ProviderProfileService', () => {
         'unknown-model',
       );
       await service.activateProfile(p.id);
-      expect(mockConfig.setModel).toHaveBeenCalledWith(
-        DEFAULT_OPENAI_MODEL,
-        true,
-      );
+      expect(mockConfig.setModel).toHaveBeenCalledWith(DEFAULT_OPENAI_MODEL, true);
     });
 
     it('should skip saveProfiles when activating the already-selected profile', async () => {

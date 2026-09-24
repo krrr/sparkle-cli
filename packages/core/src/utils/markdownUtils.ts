@@ -42,11 +42,7 @@ export function jsonToMarkdown(data: unknown, indent = 0): string {
 
     return data
       .map((item) => {
-        if (
-          typeof item === 'object' &&
-          item !== null &&
-          Object.keys(item).length > 0
-        ) {
+        if (typeof item === 'object' && item !== null && Object.keys(item).length > 0) {
           const rendered = jsonToMarkdown(item, indent + 1);
           return `${spacing}-\n${rendered}`;
         }
@@ -132,9 +128,7 @@ function renderTable(data: Array<Record<string, unknown>>, indent = 0): string {
         .map((key) => {
           const val = item[key];
           if (typeof val === 'object' && val !== null) {
-            return JSON.stringify(val)
-              .replace(/\\/g, '\\\\')
-              .replace(/\|/g, '\\|');
+            return JSON.stringify(val).replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
           }
           return String(val)
             .replace(/\\/g, '\\\\')

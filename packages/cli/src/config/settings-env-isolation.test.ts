@@ -58,9 +58,7 @@ describe('Environment Isolation', () => {
 
   it('should load local .env by default', () => {
     const workspaceEnv = path.join(mockWorkspace, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === workspaceEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === workspaceEnv);
     vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=local');
 
     const settings = { advanced: { ignoreLocalEnv: false } } as Settings;
@@ -118,9 +116,7 @@ describe('Environment Isolation', () => {
 
   it('should respect --ignore-env flag', () => {
     const workspaceEnv = path.join(mockWorkspace, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === workspaceEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === workspaceEnv);
     vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=local');
 
     process.argv = ['node', 'gemini', '--ignore-env'];
@@ -135,9 +131,7 @@ describe('Environment Isolation', () => {
 
   it('should allow home .env even with ignoreLocalEnv true', () => {
     const homeEnv = path.join(mockHome, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === homeEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === homeEnv);
     vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=home');
 
     const settings = { advanced: { ignoreLocalEnv: true } } as Settings;
@@ -181,13 +175,9 @@ describe('Environment Isolation', () => {
 
   it('should respect trust whitelist even when loading from home .env', () => {
     const homeEnv = path.join(mockHome, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === homeEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === homeEnv);
     // Include one whitelisted and one non-whitelisted variable
-    vi.mocked(fs.readFileSync).mockReturnValue(
-      'GEMINI_API_KEY=home\nOTHER_VAR=secret',
-    );
+    vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=home\nOTHER_VAR=secret');
 
     const settings = { advanced: { ignoreLocalEnv: true } } as Settings;
     // Running from an UNTRUSTED workspace
@@ -203,9 +193,7 @@ describe('Environment Isolation', () => {
 
   it('should prioritize --ignore-env flag even if setting is false', () => {
     const workspaceEnv = path.join(mockWorkspace, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === workspaceEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === workspaceEnv);
     vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=local');
 
     process.argv = ['node', 'gemini', '--ignore-env'];
@@ -220,9 +208,7 @@ describe('Environment Isolation', () => {
 
   it('should respect both -s and --ignore-env flags simultaneously', () => {
     const workspaceEnv = path.join(mockWorkspace, '.env');
-    vi.mocked(fs.existsSync).mockImplementation(
-      (p) => p.toString() === workspaceEnv,
-    );
+    vi.mocked(fs.existsSync).mockImplementation((p) => p.toString() === workspaceEnv);
     vi.mocked(fs.readFileSync).mockReturnValue('GEMINI_API_KEY=local');
 
     process.argv = ['node', 'gemini', '-s', '--ignore-env'];

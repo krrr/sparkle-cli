@@ -95,9 +95,7 @@ describe('UpdateTopicTool', () => {
     expect(mockConfig.topicState.getIntent()).toBe('Initial Move');
     expect(result.returnDisplay).toContain('## 📂 Topic: **New Chapter**');
     expect(result.returnDisplay).toContain('**Summary:**');
-    expect(result.returnDisplay).toContain(
-      '> [!STRATEGY]\n> **Intent:** Initial Move',
-    );
+    expect(result.returnDisplay).toContain('> [!STRATEGY]\n> **Intent:** Initial Move');
   });
 
   it('should render only intent for tactical updates (same topic)', async () => {
@@ -112,9 +110,7 @@ describe('UpdateTopicTool', () => {
     });
 
     expect(result.returnDisplay).not.toContain('## 📂 Topic:');
-    expect(result.returnDisplay).toBe(
-      '> [!STRATEGY]\n> **Intent:** Subsequent Move',
-    );
+    expect(result.returnDisplay).toBe('> [!STRATEGY]\n> **Intent:** Subsequent Move');
     expect(result.llmContent).toBe('Strategic Intent: Subsequent Move');
   });
 
@@ -126,9 +122,7 @@ describe('UpdateTopicTool', () => {
       expect.fail('Should have thrown validation error');
     } catch (e: unknown) {
       if (e instanceof Error) {
-        expect(e.message).toContain(
-          "must have required property 'strategic_intent'",
-        );
+        expect(e.message).toContain("must have required property 'strategic_intent'");
       } else {
         expect.fail('Expected Error instance');
       }

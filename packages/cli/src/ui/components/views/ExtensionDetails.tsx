@@ -143,9 +143,7 @@ export function ExtensionDetails({
         justifyContent="center"
         alignItems="center"
       >
-        <Text color={theme.text.primary}>
-          Installing {extension.extensionName}...
-        </Text>
+        <Text color={theme.text.primary}>Installing {extension.extensionName}...</Text>
       </Box>
     );
   }
@@ -181,16 +179,11 @@ export function ExtensionDetails({
         </Box>
         <Box flexDirection="row">
           <Text color={theme.text.secondary}>
-            {extension.extensionVersion ? `v${extension.extensionVersion}` : ''}{' '}
-            |{' '}
+            {extension.extensionVersion ? `v${extension.extensionVersion}` : ''} |{' '}
           </Text>
           <Text color={theme.status.warning}>⭐ </Text>
-          <Text color={theme.text.secondary}>
-            {String(extension.stars || 0)} |{' '}
-          </Text>
-          {extension.isGoogleOwned && (
-            <Text color={theme.text.primary}>[G] </Text>
-          )}
+          <Text color={theme.text.secondary}>{String(extension.stars || 0)} | </Text>
+          {extension.isGoogleOwned && <Text color={theme.text.primary}>[G] </Text>}
           <Text color={theme.text.primary}>{extension.fullName}</Text>
         </Box>
       </Box>
@@ -240,9 +233,7 @@ export function ExtensionDetails({
             This extension will run the following MCP servers:
           </Text>
           <Box marginLeft={2}>
-            <Text color={theme.text.primary}>
-              * {extension.extensionName} (local)
-            </Text>
+            <Text color={theme.text.primary}>* {extension.extensionName} (local)</Text>
           </Box>
         </Box>
       )}
@@ -270,12 +261,11 @@ export function ExtensionDetails({
           <Text color={theme.text.primary}>
             The extension you are about to install may have been created by a
             third-party developer and sourced{'\n'}
-            from a public repository. Google does not vet, endorse, or guarantee
-            the functionality or security{'\n'}
-            of extensions. Please carefully inspect any extension and its source
-            code before installing to{'\n'}
-            understand the permissions it requires and the actions it may
-            perform.
+            from a public repository. Google does not vet, endorse, or guarantee the
+            functionality or security{'\n'}
+            of extensions. Please carefully inspect any extension and its source code
+            before installing to{'\n'}
+            understand the permissions it requires and the actions it may perform.
           </Text>
           <Box marginTop={1} flexDirection="row">
             <Box marginRight={2}>

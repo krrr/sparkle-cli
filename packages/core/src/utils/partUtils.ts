@@ -117,9 +117,7 @@ export function cloneFunctionCall(
   return { ...call };
 }
 
-export function getResponseText(
-  response: GenerateContentResponse,
-): string | null {
+export function getResponseText(response: GenerateContentResponse): string | null {
   if (response.candidates && response.candidates.length > 0) {
     const candidate = response.candidates[0];
 

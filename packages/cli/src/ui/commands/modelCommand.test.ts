@@ -33,9 +33,7 @@ describe('modelCommand', () => {
 
   describe('manage subcommand', () => {
     it('should return a dialog action to open the model dialog', async () => {
-      const manageCommand = modelCommand.subCommands?.find(
-        (c) => c.name === 'manage',
-      );
+      const manageCommand = modelCommand.subCommands?.find((c) => c.name === 'manage');
       expect(manageCommand).toBeDefined();
 
       const result = await manageCommand!.action!(mockContext, '');
@@ -49,9 +47,7 @@ describe('modelCommand', () => {
 
   describe('set subcommand', () => {
     it('should set the model and log the command', async () => {
-      const setCommand = modelCommand.subCommands?.find(
-        (c) => c.name === 'set',
-      );
+      const setCommand = modelCommand.subCommands?.find((c) => c.name === 'set');
       expect(setCommand).toBeDefined();
 
       const mockSetModel = vi.fn();
@@ -60,9 +56,7 @@ describe('modelCommand', () => {
         getUserId: vi.fn().mockReturnValue('test-user'),
         getUsageStatisticsEnabled: vi.fn().mockReturnValue(true),
         getSessionId: vi.fn().mockReturnValue('test-session'),
-        getContentGeneratorConfig: vi
-          .fn()
-          .mockReturnValue({ authType: 'test-auth' }),
+        getContentGeneratorConfig: vi.fn().mockReturnValue({ authType: 'test-auth' }),
         isInteractive: vi.fn().mockReturnValue(true),
         getExperiments: vi.fn().mockReturnValue({ experimentIds: [] }),
         getPolicyEngine: vi.fn().mockReturnValue({
@@ -85,18 +79,14 @@ describe('modelCommand', () => {
     });
 
     it('should set the model with persistence when --persist is used', async () => {
-      const setCommand = modelCommand.subCommands?.find(
-        (c) => c.name === 'set',
-      );
+      const setCommand = modelCommand.subCommands?.find((c) => c.name === 'set');
       const mockSetModel = vi.fn();
       mockContext.services.agentContext = {
         setModel: mockSetModel,
         getUserId: vi.fn().mockReturnValue('test-user'),
         getUsageStatisticsEnabled: vi.fn().mockReturnValue(true),
         getSessionId: vi.fn().mockReturnValue('test-session'),
-        getContentGeneratorConfig: vi
-          .fn()
-          .mockReturnValue({ authType: 'test-auth' }),
+        getContentGeneratorConfig: vi.fn().mockReturnValue({ authType: 'test-auth' }),
         isInteractive: vi.fn().mockReturnValue(true),
         getExperiments: vi.fn().mockReturnValue({ experimentIds: [] }),
         getPolicyEngine: vi.fn().mockReturnValue({
@@ -119,9 +109,7 @@ describe('modelCommand', () => {
     });
 
     it('should show error if no model name is provided', async () => {
-      const setCommand = modelCommand.subCommands?.find(
-        (c) => c.name === 'set',
-      );
+      const setCommand = modelCommand.subCommands?.find((c) => c.name === 'set');
       await setCommand!.action!(mockContext, '');
 
       expect(mockContext.ui.addItem).toHaveBeenCalledWith(

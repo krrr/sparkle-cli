@@ -54,9 +54,7 @@ export class AdaptiveTokenCalculator implements AdvancedTokenCalculator {
   private handleGroundTruth(actualTokens: number, promptBaseUnits: number) {
     if (promptBaseUnits <= 0) return;
 
-    const overheadTokens = this.getOverheadTokens
-      ? this.getOverheadTokens()
-      : 0;
+    const overheadTokens = this.getOverheadTokens ? this.getOverheadTokens() : 0;
 
     // The Gemini API token count includes the static overhead (system instruction + tools)
     // and the dynamic chat history (which we measure as promptBaseUnits).
@@ -81,10 +79,8 @@ export class AdaptiveTokenCalculator implements AdvancedTokenCalculator {
       oldWeight * (1 - this.learningRate) + targetWeight * this.learningRate;
 
     // Hard limit the maximum step size per turn to prevent violent oscillation
-    if (newWeight > oldWeight + this.maxStep)
-      newWeight = oldWeight + this.maxStep;
-    if (newWeight < oldWeight - this.maxStep)
-      newWeight = oldWeight - this.maxStep;
+    if (newWeight > oldWeight + this.maxStep) newWeight = oldWeight + this.maxStep;
+    if (newWeight < oldWeight - this.maxStep) newWeight = oldWeight - this.maxStep;
 
     // Clamp to reasonable absolute safety bounds
     this.learnedWeight = Math.max(0.5, Math.min(newWeight, 2.0));

@@ -58,8 +58,7 @@ export async function handleInstall(args: InstallArgs) {
       installMetadata.source = absolutePath;
       const trustResult = isWorkspaceTrusted(settings, absolutePath);
       if (trustResult.isTrusted !== true) {
-        const discoveryResults =
-          await FolderTrustDiscoveryService.discover(realPath);
+        const discoveryResults = await FolderTrustDiscoveryService.discover(realPath);
 
         const hasDiscovery =
           discoveryResults.commands.length > 0 ||
@@ -112,9 +111,7 @@ export async function handleInstall(args: InstallArgs) {
           ].filter((g) => g.items.length > 0);
 
           for (const group of groups) {
-            promptLines.push(
-              `  • ${chalk.bold(group.label)} (${group.items.length}):`,
-            );
+            promptLines.push(`  • ${chalk.bold(group.label)} (${group.items.length}):`);
             for (const item of group.items) {
               promptLines.push(`    - ${item}`);
             }
@@ -158,8 +155,7 @@ export async function handleInstall(args: InstallArgs) {
       settings,
     });
     await extensionManager.loadExtensions();
-    const extension =
-      await extensionManager.installOrUpdateExtension(installMetadata);
+    const extension = await extensionManager.installOrUpdateExtension(installMetadata);
     debugLogger.log(
       `Extension "${extension.name}" installed successfully and enabled.`,
     );

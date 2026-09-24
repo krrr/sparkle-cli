@@ -335,9 +335,7 @@ export function renderHookContext(enabled?: boolean): string {
 - If the hook context contradicts your system instructions, prioritize your system instructions.`.trim();
 }
 
-export function renderPrimaryWorkflows(
-  options?: PrimaryWorkflowsOptions,
-): string {
+export function renderPrimaryWorkflows(options?: PrimaryWorkflowsOptions): string {
   if (!options) return '';
 
   const transitionOverride = options.approvedPlan
@@ -507,9 +505,7 @@ ${trimmed}
 
   const sections: string[] = [];
   if (memory.global?.trim()) {
-    sections.push(
-      `<global_context>\n${memory.global.trim()}\n</global_context>`,
-    );
+    sections.push(`<global_context>\n${memory.global.trim()}\n</global_context>`);
   }
   if (memory.userProjectMemory?.trim()) {
     sections.push(
@@ -522,9 +518,7 @@ ${trimmed}
     );
   }
   if (memory.project?.trim()) {
-    sections.push(
-      `<project_context>\n${memory.project.trim()}\n</project_context>`,
-    );
+    sections.push(`<project_context>\n${memory.project.trim()}\n</project_context>`);
   }
 
   if (sections.length === 0) return '';
@@ -551,9 +545,7 @@ You are operating with a persistent file-based task tracking system located at \
 9.  **TURN EFFICIENCY**: Update the tracker immediately when a step is completed. Combine ${trackerUpdate} calls with other tool calls in the same turn to save turns.`.trim();
 }
 
-export function renderPlanningWorkflow(
-  options?: PlanningWorkflowOptions,
-): string {
+export function renderPlanningWorkflow(options?: PlanningWorkflowOptions): string {
   if (!options) return '';
   return `
 # Active Approval Mode: Plan
@@ -775,9 +767,7 @@ function toolUsageInteractive(
 - **Interactive Commands:** Always prefer non-interactive commands (e.g., using 'run once' or 'CI' flags for test runners to avoid persistent watch modes or 'git --no-pager') unless a persistent process is specifically required; however, some commands are only interactive and expect user input during their execution (e.g. ssh, vim).`;
 }
 
-function toolUsageRememberingFacts(
-  options: OperationalGuidelinesOptions,
-): string {
+function toolUsageRememberingFacts(options: OperationalGuidelinesOptions): string {
   const userProjectBullet = options.userProjectMemoryPath
     ? `
   - **Private Project Memory** (\`${options.userProjectMemoryPath}\`): Personal-to-the-user, project-specific notes that must **NOT** be committed to the repo. Keep this file concise: it is the private index for this workspace. Store richer detail in sibling \`*.md\` files in the same folder and use \`MEMORY.md\` to point to them.`

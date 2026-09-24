@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { coreEvents, getErrorMessage } from 'sparkle-cli-core';
 import { type Argv } from 'yargs';
 import { handleLink, linkCommand } from './link.js';
@@ -20,9 +12,7 @@ import { ExtensionManager } from '../../config/extension-manager.js';
 import { loadSettings, type LoadedSettings } from '../../config/settings.js';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const { mockCoreDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { mockCoreDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
   const mocked = mockCoreDebugLogger(actual, { stripAnsi: true });
   return { ...mocked, getErrorMessage: vi.fn() };
@@ -136,9 +126,7 @@ describe('extensions link command', () => {
       });
 
       it('should configure positional argument', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
         expect(yargsMock.positional).toHaveBeenCalledWith('path', {
           describe: 'The name of the extension to link.',
           type: 'string',
@@ -164,9 +152,7 @@ describe('extensions link command', () => {
         _: [],
         $0: '',
       };
-      await (command.handler as unknown as (args: TestArgv) => Promise<void>)(
-        argv,
-      );
+      await (command.handler as unknown as (args: TestArgv) => Promise<void>)(argv);
 
       expect(
         mockExtensionManager.prototype.installOrUpdateExtension,

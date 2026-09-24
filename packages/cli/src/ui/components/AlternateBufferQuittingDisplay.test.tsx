@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  renderWithProviders,
-  persistentStateMock,
-} from '../../test-utils/render.js';
+import { renderWithProviders, persistentStateMock } from '../../test-utils/render.js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AlternateBufferQuittingDisplay } from './AlternateBufferQuittingDisplay.js';
 import type { HistoryItem, HistoryItemWithoutId } from '../types.js';
@@ -19,8 +16,7 @@ vi.mock('../utils/terminalSetup.js', () => ({
 }));
 
 vi.mock('../contexts/AppContext.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../contexts/AppContext.js')>();
+  const actual = await importOriginal<typeof import('../contexts/AppContext.js')>();
   return {
     ...actual,
     useAppContext: () => ({

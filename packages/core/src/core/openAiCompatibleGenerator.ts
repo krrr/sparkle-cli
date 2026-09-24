@@ -136,9 +136,7 @@ export class OpenAiCompatibleGenerator {
    * heuristic (plus an estimate for tools and system instructions), since
    * OpenAI-compatible APIs have no standard countTokens endpoint.
    */
-  async countTokens(
-    request: CountTokensParameters,
-  ): Promise<CountTokensResponse> {
+  async countTokens(request: CountTokensParameters): Promise<CountTokensResponse> {
     const contents = toContents(request.contents);
     const parts = contents.flatMap((content) => content.parts ?? []);
     let totalTokens = estimateTokenCountSync(parts);
@@ -156,9 +154,7 @@ export class OpenAiCompatibleGenerator {
     return { totalTokens };
   }
 
-  async embedContent(
-    request: EmbedContentParameters,
-  ): Promise<EmbedContentResponse> {
+  async embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse> {
     const contents = toContents(request.contents);
     const text = contents
       .flatMap((content) => content.parts ?? [])
@@ -235,9 +231,7 @@ export class OpenAiCompatibleGenerator {
     }
     return tools.filter(
       (tool): tool is Tool =>
-        tool !== null &&
-        typeof tool === 'object' &&
-        'functionDeclarations' in tool,
+        tool !== null && typeof tool === 'object' && 'functionDeclarations' in tool,
     );
   }
 

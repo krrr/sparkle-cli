@@ -58,8 +58,7 @@ vi.mock('../utils/retry.js', async (importOriginal) => {
         const shouldRetry = options.shouldRetryOnContent(result);
         if (shouldRetry) {
           // Check if we need to simulate retry exhaustion (for error testing)
-          const responseText =
-            result?.candidates?.[0]?.content?.parts?.[0]?.text;
+          const responseText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (
             !responseText ||
             responseText.trim() === '' ||
@@ -296,18 +295,14 @@ describe('BaseLlmClient', () => {
       expect(shouldRetryOnContent!(createMockResponse(''))).toBe(true);
 
       // Invalid JSON should trigger retry
-      expect(
-        shouldRetryOnContent!(createMockResponse('{"color": "blue"')),
-      ).toBe(true);
+      expect(shouldRetryOnContent!(createMockResponse('{"color": "blue"'))).toBe(true);
     });
   });
 
   describe('generateJson - Response Cleaning', () => {
     it('should clean JSON wrapped in markdown backticks and log telemetry', async () => {
       const malformedResponse = '```json\n{"color": "purple"}\n```';
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse(malformedResponse),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse(malformedResponse));
 
       const result = await client.generateJson(defaultOptions);
 
@@ -325,9 +320,7 @@ describe('BaseLlmClient', () => {
 
     it('should handle extra whitespace correctly without logging malformed telemetry', async () => {
       const responseWithWhitespace = '  \n  {"color": "orange"}  \n';
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse(responseWithWhitespace),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse(responseWithWhitespace));
 
       const result = await client.generateJson(defaultOptions);
 
@@ -351,9 +344,7 @@ describe('BaseLlmClient', () => {
       });
 
       const malformedResponse = '```json\n{"color": "red"}\n```';
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse(malformedResponse),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse(malformedResponse));
 
       const options = {
         ...defaultOptions,
@@ -460,10 +451,7 @@ describe('BaseLlmClient', () => {
         [0.4, 0.5, 0.6],
       ];
       mockEmbedContent.mockResolvedValue({
-        embeddings: [
-          { values: mockEmbeddings[0] },
-          { values: mockEmbeddings[1] },
-        ],
+        embeddings: [{ values: mockEmbeddings[0] }, { values: mockEmbeddings[1] }],
       });
 
       const result = await client.generateEmbedding(texts);
@@ -533,9 +521,7 @@ describe('BaseLlmClient', () => {
     it('should propagate errors from the API call', async () => {
       mockEmbedContent.mockRejectedValue(new Error('API Failure'));
 
-      await expect(client.generateEmbedding(texts)).rejects.toThrow(
-        'API Failure',
-      );
+      await expect(client.generateEmbedding(texts)).rejects.toThrow('API Failure');
     });
   });
 
@@ -679,9 +665,7 @@ describe('BaseLlmClient', () => {
         selectedModel: successfulModel,
         skipped: [],
       });
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse('Some text response'),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse('Some text response'));
 
       await client.generateContent({
         ...contentOptions,
@@ -689,9 +673,7 @@ describe('BaseLlmClient', () => {
         role: LlmRole.UTILITY_TOOL,
       });
 
-      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(
-        successfulModel,
-      );
+      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(successfulModel);
     });
 
     it('marks the final attempted model healthy after a retry with availability enabled', async () => {
@@ -743,9 +725,7 @@ describe('BaseLlmClient', () => {
 
       expect(result).toEqual(createMockResponse('final-response'));
       expect(mockConfig.setActiveModel).toHaveBeenCalledWith(fallbackModel);
-      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(
-        fallbackModel,
-      );
+      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(fallbackModel);
     });
 
     it('should consume sticky attempt if selection has attempts', async () => {
@@ -755,9 +735,7 @@ describe('BaseLlmClient', () => {
         attempts: 1,
         skipped: [],
       });
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse('Some text response'),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse('Some text response'));
       vi.mocked(retryWithBackoff).mockImplementation(async (fn, options) => {
         const result = await fn();
         const context = options?.getAvailabilityContext?.();
@@ -789,9 +767,7 @@ describe('BaseLlmClient', () => {
         selectedModel: availableModel,
         skipped: [],
       });
-      mockGenerateContent.mockResolvedValue(
-        createMockResponse('{"color":"violet"}'),
-      );
+      mockGenerateContent.mockResolvedValue(createMockResponse('{"color":"violet"}'));
       vi.mocked(retryWithBackoff).mockImplementation(async (fn, options) => {
         const result = await fn();
         const context = options?.getAvailabilityContext?.();
@@ -810,9 +786,7 @@ describe('BaseLlmClient', () => {
       });
 
       expect(result).toEqual({ color: 'violet' });
-      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(
-        availableModel,
-      );
+      expect(mockAvailabilityService.markHealthy).toHaveBeenCalledWith(availableModel);
       expect(mockGenerateContent).toHaveBeenLastCalledWith(
         expect.objectContaining({ model: availableModel }),
         jsonOptions.promptId,
@@ -874,9 +848,9 @@ describe('BaseLlmClient', () => {
       expect(mockGenerateContent).toHaveBeenCalledTimes(2);
       const secondCall = mockGenerateContent.mock.calls[1]?.[0];
 
-      expect(
-        mockConfig.modelConfigService.getResolvedConfig,
-      ).toHaveBeenCalledWith({ model: fallbackModel });
+      expect(mockConfig.modelConfigService.getResolvedConfig).toHaveBeenCalledWith({
+        model: fallbackModel,
+      });
       expect(secondCall?.model).toBe(fallbackModel);
       expect(secondCall?.config?.temperature).toBe(0.9);
     });

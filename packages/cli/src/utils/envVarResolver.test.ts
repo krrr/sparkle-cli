@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  resolveEnvVarsInString,
-  resolveEnvVarsInObject,
-} from './envVarResolver.js';
+import { resolveEnvVarsInString, resolveEnvVarsInObject } from './envVarResolver.js';
 
 describe('resolveEnvVarsInString', () => {
   beforeEach(() => {
@@ -103,9 +100,7 @@ describe('resolveEnvVarsInString', () => {
   });
 
   it('should correctly handle default values that contain colons or dashes', () => {
-    const result = resolveEnvVarsInString(
-      'Value: ${MISSING_VAR:-val:-123-abc}',
-    );
+    const result = resolveEnvVarsInString('Value: ${MISSING_VAR:-val:-123-abc}');
     expect(result).toBe('Value: val:-123-abc');
   });
 });

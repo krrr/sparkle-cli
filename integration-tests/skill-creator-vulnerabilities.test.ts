@@ -58,17 +58,11 @@ describe('skill-creator scripts security and bug fixes', () => {
 
     const maliciousName = '../traversal-success';
 
-    const result = spawnSync(
-      'node',
-      [initScript, maliciousName, '--path', tempDir],
-      {
-        encoding: 'utf8',
-      },
-    );
+    const result = spawnSync('node', [initScript, maliciousName, '--path', tempDir], {
+      encoding: 'utf8',
+    });
 
-    expect(result.stderr).toContain(
-      'Error: Skill name cannot contain path separators',
-    );
+    expect(result.stderr).toContain('Error: Skill name cannot contain path separators');
     const traversalDir = path.join(path.dirname(tempDir), 'traversal-success');
     expect(fs.existsSync(traversalDir)).toBe(false);
   });

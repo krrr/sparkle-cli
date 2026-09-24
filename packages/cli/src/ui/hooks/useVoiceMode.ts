@@ -78,9 +78,7 @@ export function useVoiceMode({
 
     if (serviceToDisconnect) {
       const gracePeriodMs = settings.experimental.voice.stopGracePeriodMs;
-      debugLogger.debug(
-        `[Voice] Draining transcription for ${gracePeriodMs}ms`,
-      );
+      debugLogger.debug(`[Voice] Draining transcription for ${gracePeriodMs}ms`);
 
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
       disconnectTimerRef.current = setTimeout(() => {
@@ -100,10 +98,7 @@ export function useVoiceMode({
   }, [settings.experimental.voice]);
 
   const startVoiceRecording = useCallback(() => {
-    if (
-      isRecordingRef.current ||
-      Date.now() - lastFailureTimeRef.current < 2000
-    ) {
+    if (isRecordingRef.current || Date.now() - lastFailureTimeRef.current < 2000) {
       return;
     }
 
@@ -124,9 +119,7 @@ export function useVoiceMode({
     stopRequestedRef.current = false;
 
     const apiKey =
-      config.getContentGeneratorConfig()?.apiKey ||
-      process.env['GEMINI_API_KEY'] ||
-      '';
+      config.getContentGeneratorConfig()?.apiKey || process.env['GEMINI_API_KEY'] || '';
 
     const startAsync = async () => {
       // If there's an active draining service, disconnect it immediately
@@ -161,8 +154,7 @@ export function useVoiceMode({
 
       if (cleanupIfStopped()) return;
 
-      const voiceBackend =
-        settings.experimental.voice?.backend ?? 'gemini-live';
+      const voiceBackend = settings.experimental.voice?.backend ?? 'gemini-live';
 
       if (!apiKey && voiceBackend === 'gemini-live') {
         setQueueErrorMessage(
@@ -291,12 +283,7 @@ export function useVoiceMode({
     };
 
     void startAsync();
-  }, [
-    config,
-    settings.experimental.voice,
-    setQueueErrorMessage,
-    stopVoiceRecording,
-  ]);
+  }, [config, settings.experimental.voice, setQueueErrorMessage, stopVoiceRecording]);
 
   useEffect(
     () => () => {
@@ -356,13 +343,7 @@ export function useVoiceMode({
         }
 
         if (keyMatchers[Command.VOICE_MODE_PTT](key)) {
-          if (
-            key.name === 'space' &&
-            !key.ctrl &&
-            !key.alt &&
-            !key.shift &&
-            !key.cmd
-          ) {
+          if (key.name === 'space' && !key.ctrl && !key.alt && !key.shift && !key.cmd) {
             if (activationMode === 'toggle') {
               startVoiceRecording();
               return true;

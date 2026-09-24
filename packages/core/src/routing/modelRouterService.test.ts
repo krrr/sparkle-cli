@@ -47,12 +47,8 @@ describe('ModelRouterService', () => {
     mockBaseLlmClient = {} as BaseLlmClient;
     vi.spyOn(mockConfig, 'getBaseLlmClient').mockReturnValue(mockBaseLlmClient);
     vi.spyOn(mockConfig, 'getNumericalRoutingEnabled').mockResolvedValue(true);
-    vi.spyOn(mockConfig, 'getResolvedClassifierThreshold').mockResolvedValue(
-      90,
-    );
-    vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(
-      ApprovalMode.DEFAULT,
-    );
+    vi.spyOn(mockConfig, 'getResolvedClassifierThreshold').mockResolvedValue(90);
+    vi.spyOn(mockConfig, 'getApprovalMode').mockReturnValue(ApprovalMode.DEFAULT);
 
     mockCompositeStrategy = new CompositeStrategy(
       [
@@ -65,9 +61,7 @@ describe('ModelRouterService', () => {
       ],
       'agent-router',
     );
-    vi.mocked(CompositeStrategy).mockImplementation(
-      () => mockCompositeStrategy,
-    );
+    vi.mocked(CompositeStrategy).mockImplementation(() => mockCompositeStrategy);
 
     service = new ModelRouterService(mockConfig);
 
@@ -124,9 +118,7 @@ describe('ModelRouterService', () => {
     });
 
     it('should log a telemetry event on a successful decision', async () => {
-      vi.spyOn(mockCompositeStrategy, 'route').mockResolvedValue(
-        strategyDecision,
-      );
+      vi.spyOn(mockCompositeStrategy, 'route').mockResolvedValue(strategyDecision);
 
       await service.route(mockContext);
 

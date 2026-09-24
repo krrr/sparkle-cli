@@ -56,9 +56,7 @@ export async function checkPolicy(
   subagent?: string,
 ): Promise<CheckResult> {
   const serverName =
-    toolCall.tool instanceof DiscoveredMCPTool
-      ? toolCall.tool.serverName
-      : undefined;
+    toolCall.tool instanceof DiscoveredMCPTool ? toolCall.tool.serverName : undefined;
 
   const toolAnnotations = toolCall.tool.toolAnnotations;
 
@@ -195,8 +193,7 @@ function isAutoEditTransition(
   // tools. We should refactor this so that callbacks can be removed from
   // tools.
   return (
-    outcome === ToolConfirmationOutcome.ProceedAlways &&
-    EDIT_TOOL_NAMES.has(tool.name)
+    outcome === ToolConfirmationOutcome.ProceedAlways && EDIT_TOOL_NAMES.has(tool.name)
   );
 }
 
@@ -248,10 +245,7 @@ async function handleStandardPolicyUpdate(
 async function handleMcpPolicyUpdate(
   tool: AnyDeclarativeTool,
   outcome: ToolConfirmationOutcome,
-  confirmationDetails: Extract<
-    SerializableConfirmationDetails,
-    { type: 'mcp' }
-  >,
+  confirmationDetails: Extract<SerializableConfirmationDetails, { type: 'mcp' }>,
   messageBus: MessageBus,
   persistScope?: 'workspace' | 'user',
   modes?: ApprovalMode[],

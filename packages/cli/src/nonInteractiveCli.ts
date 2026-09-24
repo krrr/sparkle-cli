@@ -73,9 +73,7 @@ export async function runNonInteractive(
 ): Promise<void> {
   const useAgentSession = params.config.getAgentSessionNoninteractiveEnabled();
   if (useAgentSession) {
-    debugLogger.debug(
-      '[ADK] Running non-interactive mode with ADK agent session',
-    );
+    debugLogger.debug('[ADK] Running non-interactive mode with ADK agent session');
     return runNonInteractiveAgentSession(params);
   }
 
@@ -92,9 +90,7 @@ export async function runNonInteractive(
     });
 
     if (process.env['SPARKLE_CLI_ACTIVITY_LOG_TARGET']) {
-      const { setupInitialActivityLogger } = await import(
-        './utils/devtoolsService.js'
-      );
+      const { setupInitialActivityLogger } = await import('./utils/devtoolsService.js');
       setupInitialActivityLogger(config);
     }
 
@@ -150,10 +146,7 @@ export async function runNonInteractive(
       readline.emitKeypressEvents(process.stdin, rl);
 
       // Listen for Ctrl+C
-      const keypressHandler = (
-        str: string,
-        key: { name?: string; ctrl?: boolean },
-      ) => {
+      const keypressHandler = (str: string, key: { name?: string; ctrl?: boolean }) => {
         // Detect Ctrl+C: either ctrl+c key combo or raw character code 3
         if ((key && key.ctrl && key.name === 'c') || str === '\u0003') {
           // Only handle once
@@ -241,9 +234,7 @@ export async function runNonInteractive(
       // Initialize chat.  Resume if resume data is passed.
       if (resumedSessionData) {
         await geminiClient.resumeChat(
-          convertSessionToClientHistory(
-            resumedSessionData.conversation.messages,
-          ),
+          convertSessionToClientHistory(resumedSessionData.conversation.messages),
           resumedSessionData,
         );
       }
@@ -337,8 +328,7 @@ export async function runNonInteractive(
           }
 
           if (event.type === GeminiEventType.Content) {
-            const isRaw =
-              config.getRawOutput() || config.getAcceptRawOutputRisk();
+            const isRaw = config.getRawOutput() || config.getAcceptRawOutputRisk();
             const output = isRaw ? event.value : stripAnsi(event.value);
             if (streamFormatter) {
               streamFormatter.emitEvent({
@@ -403,10 +393,7 @@ export async function runNonInteractive(
                 type: JsonStreamEventType.RESULT,
                 timestamp: new Date().toISOString(),
                 status: 'success',
-                stats: streamFormatter.convertToStreamStats(
-                  metrics,
-                  durationMs,
-                ),
+                stats: streamFormatter.convertToStreamStats(metrics, durationMs),
               });
             } else if (config.getOutputFormat() === OutputFormat.JSON) {
               const formatter = new JsonFormatter();
@@ -495,8 +482,7 @@ export async function runNonInteractive(
                 type: JsonStreamEventType.TOOL_RESULT,
                 timestamp: new Date().toISOString(),
                 tool_id: requestInfo.callId,
-                status:
-                  completedToolCall.status === 'error' ? 'error' : 'success',
+                status: completedToolCall.status === 'error' ? 'error' : 'success',
                 output:
                   typeof toolResponse.resultDisplay === 'string'
                     ? toolResponse.resultDisplay
@@ -560,10 +546,7 @@ export async function runNonInteractive(
                 type: JsonStreamEventType.RESULT,
                 timestamp: new Date().toISOString(),
                 status: 'success',
-                stats: streamFormatter.convertToStreamStats(
-                  metrics,
-                  durationMs,
-                ),
+                stats: streamFormatter.convertToStreamStats(metrics, durationMs),
               });
             } else if (config.getOutputFormat() === OutputFormat.JSON) {
               const formatter = new JsonFormatter();

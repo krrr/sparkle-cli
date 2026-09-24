@@ -130,9 +130,7 @@ describe('GeminiCliAgent Tool Integration', () => {
 
     const events = [];
     const session = agent.session();
-    const stream = session.sendStream(
-      'Check the system status and report any errors.',
-    );
+    const stream = session.sendStream('Check the system status and report any errors.');
 
     for await (const event of stream) {
       events.push(event);

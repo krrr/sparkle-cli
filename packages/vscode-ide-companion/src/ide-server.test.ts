@@ -125,10 +125,9 @@ describe('IDEServer', () => {
       expect.any(String), // port is a number as a string
     );
 
-    const expectedWorkspacePaths = [
-      '/test/workspace1',
-      '/test/workspace2',
-    ].join(path.delimiter);
+    const expectedWorkspacePaths = ['/test/workspace1', '/test/workspace2'].join(
+      path.delimiter,
+    );
 
     expect(replaceMock).toHaveBeenNthCalledWith(
       2,
@@ -157,10 +156,7 @@ describe('IDEServer', () => {
     expect(fs.mkdir).toHaveBeenCalledWith(path.join('/tmp', 'sparkle', 'ide'), {
       recursive: true,
     });
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expectedPortFile,
-      expectedContent,
-    );
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent);
     expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
   });
 
@@ -187,10 +183,7 @@ describe('IDEServer', () => {
       workspacePath: '/foo/bar',
       authToken: 'test-auth-token',
     });
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expectedPortFile,
-      expectedContent,
-    );
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent);
     expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
   });
 
@@ -200,10 +193,7 @@ describe('IDEServer', () => {
     await ideServer.start(mockContext);
     const replaceMock = mockContext.environmentVariableCollection.replace;
 
-    expect(replaceMock).toHaveBeenCalledWith(
-      'SPARKLE_CLI_IDE_WORKSPACE_PATH',
-      '',
-    );
+    expect(replaceMock).toHaveBeenCalledWith('SPARKLE_CLI_IDE_WORKSPACE_PATH', '');
 
     const port = getPortFromMock(replaceMock);
     const expectedPortFile = path.join(
@@ -217,10 +207,7 @@ describe('IDEServer', () => {
       workspacePath: '',
       authToken: 'test-auth-token',
     });
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expectedPortFile,
-      expectedContent,
-    );
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent);
     expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
   });
 
@@ -241,9 +228,7 @@ describe('IDEServer', () => {
     ];
     await ideServer.syncEnvVars();
 
-    const expectedWorkspacePaths = ['/foo/bar', '/baz/qux'].join(
-      path.delimiter,
-    );
+    const expectedWorkspacePaths = ['/foo/bar', '/baz/qux'].join(path.delimiter);
     expect(replaceMock).toHaveBeenCalledWith(
       'SPARKLE_CLI_IDE_WORKSPACE_PATH',
       expectedWorkspacePaths,
@@ -265,10 +250,7 @@ describe('IDEServer', () => {
       workspacePath: expectedWorkspacePaths,
       authToken: 'test-auth-token',
     });
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expectedPortFile,
-      expectedContent,
-    );
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent);
     expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
 
     // Simulate removing a folder
@@ -284,10 +266,7 @@ describe('IDEServer', () => {
       workspacePath: '/baz/qux',
       authToken: 'test-auth-token',
     });
-    expect(fs.writeFile).toHaveBeenCalledWith(
-      expectedPortFile,
-      expectedContent2,
-    );
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent2);
     expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
   });
 
@@ -309,42 +288,36 @@ describe('IDEServer', () => {
     expect(fs.unlink).toHaveBeenCalledWith(portFile);
   });
 
-  it.skipIf(process.platform !== 'win32')(
-    'should handle windows paths',
-    async () => {
-      vscodeMock.workspace.workspaceFolders = [
-        { uri: { fsPath: 'c:\\foo\\bar' } },
-        { uri: { fsPath: 'd:\\baz\\qux' } },
-      ];
+  it.skipIf(process.platform !== 'win32')('should handle windows paths', async () => {
+    vscodeMock.workspace.workspaceFolders = [
+      { uri: { fsPath: 'c:\\foo\\bar' } },
+      { uri: { fsPath: 'd:\\baz\\qux' } },
+    ];
 
-      await ideServer.start(mockContext);
-      const replaceMock = mockContext.environmentVariableCollection.replace;
-      const expectedWorkspacePaths = 'c:\\foo\\bar;d:\\baz\\qux';
+    await ideServer.start(mockContext);
+    const replaceMock = mockContext.environmentVariableCollection.replace;
+    const expectedWorkspacePaths = 'c:\\foo\\bar;d:\\baz\\qux';
 
-      expect(replaceMock).toHaveBeenCalledWith(
-        'SPARKLE_CLI_IDE_WORKSPACE_PATH',
-        expectedWorkspacePaths,
-      );
+    expect(replaceMock).toHaveBeenCalledWith(
+      'SPARKLE_CLI_IDE_WORKSPACE_PATH',
+      expectedWorkspacePaths,
+    );
 
-      const port = getPortFromMock(replaceMock);
-      const expectedPortFile = path.join(
-        '/tmp',
-        'sparkle',
-        'ide',
-        `sparkle-ide-server-${process.ppid}-${port}.json`,
-      );
-      const expectedContent = JSON.stringify({
-        port: parseInt(port, 10),
-        workspacePath: expectedWorkspacePaths,
-        authToken: 'test-auth-token',
-      });
-      expect(fs.writeFile).toHaveBeenCalledWith(
-        expectedPortFile,
-        expectedContent,
-      );
-      expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
-    },
-  );
+    const port = getPortFromMock(replaceMock);
+    const expectedPortFile = path.join(
+      '/tmp',
+      'sparkle',
+      'ide',
+      `sparkle-ide-server-${process.ppid}-${port}.json`,
+    );
+    const expectedContent = JSON.stringify({
+      port: parseInt(port, 10),
+      workspacePath: expectedWorkspacePaths,
+      authToken: 'test-auth-token',
+    });
+    expect(fs.writeFile).toHaveBeenCalledWith(expectedPortFile, expectedContent);
+    expect(fs.chmod).toHaveBeenCalledWith(expectedPortFile, 0o600);
+  });
 
   describe('auth token', () => {
     let port: number;
@@ -405,11 +378,7 @@ describe('IDEServer', () => {
     });
 
     it('should reject request with malformed auth token', async () => {
-      const malformedHeaders = [
-        'Bearer',
-        'invalid-token',
-        'Bearer token extra',
-      ];
+      const malformedHeaders = ['Bearer', 'invalid-token', 'Bearer token extra'];
 
       for (const header of malformedHeaders) {
         const response = await fetch(`http://localhost:${port}/mcp`, {

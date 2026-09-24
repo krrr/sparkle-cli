@@ -35,9 +35,7 @@ describe('read_many_files', () => {
     // Check for either read_many_files or multiple read_file calls
     const allTools = rig.readToolLogs();
     const readManyFilesCall = await rig.waitForToolCall('read_many_files');
-    const readFileCalls = allTools.filter(
-      (t) => t.toolRequest.name === 'read_file',
-    );
+    const readFileCalls = allTools.filter((t) => t.toolRequest.name === 'read_file');
 
     // Accept either read_many_files OR at least 2 read_file calls
     const foundValidPattern = readManyFilesCall || readFileCalls.length >= 2;

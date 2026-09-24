@@ -41,11 +41,7 @@ describe('keyMatchers', () => {
     {
       command: Command.ESCAPE,
       positive: [createKey('escape')],
-      negative: [
-        createKey('e'),
-        createKey('esc'),
-        createKey('escape', { ctrl: true }),
-      ],
+      negative: [createKey('e'), createKey('esc'), createKey('escape', { ctrl: true })],
     },
 
     // Cursor movement
@@ -209,18 +205,12 @@ describe('keyMatchers', () => {
     },
     {
       command: Command.SCROLL_HOME,
-      positive: [
-        createKey('home', { ctrl: true }),
-        createKey('home', { shift: true }),
-      ],
+      positive: [createKey('home', { ctrl: true }), createKey('home', { shift: true })],
       negative: [createKey('end'), createKey('home')],
     },
     {
       command: Command.SCROLL_END,
-      positive: [
-        createKey('end', { ctrl: true }),
-        createKey('end', { shift: true }),
-      ],
+      positive: [createKey('end', { ctrl: true }), createKey('end', { shift: true })],
       negative: [createKey('home'), createKey('end')],
     },
     {
@@ -256,20 +246,12 @@ describe('keyMatchers', () => {
     {
       command: Command.NAVIGATION_UP,
       positive: [createKey('up')],
-      negative: [
-        createKey('p'),
-        createKey('u'),
-        createKey('up', { ctrl: true }),
-      ],
+      negative: [createKey('p'), createKey('u'), createKey('up', { ctrl: true })],
     },
     {
       command: Command.NAVIGATION_DOWN,
       positive: [createKey('down')],
-      negative: [
-        createKey('n'),
-        createKey('d'),
-        createKey('down', { ctrl: true }),
-      ],
+      negative: [createKey('n'), createKey('d'), createKey('down', { ctrl: true })],
     },
 
     // Dialog navigation
@@ -350,10 +332,7 @@ describe('keyMatchers', () => {
     {
       command: Command.SHOW_ERROR_DETAILS,
       positive: [createKey('f12')],
-      negative: [
-        createKey('o', { ctrl: true }),
-        createKey('b', { ctrl: true }),
-      ],
+      negative: [createKey('o', { ctrl: true }), createKey('b', { ctrl: true })],
     },
     {
       command: Command.SHOW_FULL_TODOS,
@@ -479,28 +458,18 @@ describe('keyMatchers', () => {
   describe('Custom key bindings', () => {
     it('should work with custom configuration', () => {
       const customConfig = new Map(defaultKeyBindingConfig);
-      customConfig.set(Command.HOME, [
-        new KeyBinding('ctrl+h'),
-        new KeyBinding('0'),
-      ]);
+      customConfig.set(Command.HOME, [new KeyBinding('ctrl+h'), new KeyBinding('0')]);
 
       const customMatchers = createKeyMatchers(customConfig);
 
-      expect(customMatchers[Command.HOME](createKey('h', { ctrl: true }))).toBe(
-        true,
-      );
+      expect(customMatchers[Command.HOME](createKey('h', { ctrl: true }))).toBe(true);
       expect(customMatchers[Command.HOME](createKey('0'))).toBe(true);
-      expect(customMatchers[Command.HOME](createKey('a', { ctrl: true }))).toBe(
-        false,
-      );
+      expect(customMatchers[Command.HOME](createKey('a', { ctrl: true }))).toBe(false);
     });
 
     it('should support multiple key bindings for same command', () => {
       const config = new Map(defaultKeyBindingConfig);
-      config.set(Command.QUIT, [
-        new KeyBinding('ctrl+q'),
-        new KeyBinding('alt+q'),
-      ]);
+      config.set(Command.QUIT, [new KeyBinding('ctrl+q'), new KeyBinding('alt+q')]);
 
       const matchers = createKeyMatchers(config);
       expect(matchers[Command.QUIT](createKey('q', { ctrl: true }))).toBe(true);
@@ -513,9 +482,7 @@ describe('keyMatchers', () => {
       const matchers = createKeyMatchers(config);
 
       // Å is normalized to å with shift=true by the parser
-      expect(matchers[Command.QUIT](createKey('å', { shift: true }))).toBe(
-        true,
-      );
+      expect(matchers[Command.QUIT](createKey('å', { shift: true }))).toBe(true);
       expect(matchers[Command.QUIT](createKey('å'))).toBe(false);
 
       // CJK characters do not have a lower/upper case
@@ -530,9 +497,7 @@ describe('keyMatchers', () => {
       config.set(Command.HOME, []);
 
       const matchers = createKeyMatchers(config);
-      expect(matchers[Command.HOME](createKey('a', { ctrl: true }))).toBe(
-        false,
-      );
+      expect(matchers[Command.HOME](createKey('a', { ctrl: true }))).toBe(false);
     });
   });
 });
@@ -542,9 +507,7 @@ describe('loadKeyMatchers integration', () => {
   let tempFilePath: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'gemini-keymatchers-test-'),
-    );
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-keymatchers-test-'));
     tempFilePath = path.join(tempDir, 'keybindings.json');
     vi.spyOn(Storage, 'getUserKeybindingsPath').mockReturnValue(tempFilePath);
   });
@@ -555,9 +518,7 @@ describe('loadKeyMatchers integration', () => {
   });
 
   it('loads matchers from a real file on disk', async () => {
-    const customJson = JSON.stringify([
-      { command: Command.QUIT, key: 'ctrl+y' },
-    ]);
+    const customJson = JSON.stringify([{ command: Command.QUIT, key: 'ctrl+y' }]);
     await fs.writeFile(tempFilePath, customJson, 'utf8');
 
     const { matchers, errors } = await loadKeyMatchers();

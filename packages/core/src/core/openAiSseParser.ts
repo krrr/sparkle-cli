@@ -30,9 +30,7 @@ export async function* parseOpenAiSseStream(
   let buffer = '';
   let pendingData = '';
 
-  const processDataLine = function* (
-    data: string,
-  ): Generator<OpenAiStreamChunk> {
+  const processDataLine = function* (data: string): Generator<OpenAiStreamChunk> {
     if (data === '[DONE]' || data === '') {
       return;
     }

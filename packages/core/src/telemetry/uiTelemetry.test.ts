@@ -223,12 +223,10 @@ describe('UiTelemetryService', () => {
       service.addEvent(event2);
 
       expect(
-        service.getMetrics().models['gemini-2.5-pro'].api
-          .totalTimeToFirstTokenMs,
+        service.getMetrics().models['gemini-2.5-pro'].api.totalTimeToFirstTokenMs,
       ).toBe(300);
       expect(
-        service.getMetrics().models['gemini-2.5-pro'].api
-          .totalTimeToFirstTokenRequests,
+        service.getMetrics().models['gemini-2.5-pro'].api.totalTimeToFirstTokenRequests,
       ).toBe(2);
     });
 
@@ -607,9 +605,7 @@ describe('UiTelemetryService', () => {
       const { tools } = metrics;
 
       expect(tools.totalDecisions[ToolCallDecision.MODIFY]).toBe(1);
-      expect(tools.byName['test_tool'].decisions[ToolCallDecision.MODIFY]).toBe(
-        1,
-      );
+      expect(tools.byName['test_tool'].decisions[ToolCallDecision.MODIFY]).toBe(1);
     });
 
     it('should process a ToolCallEvent without a decision', () => {

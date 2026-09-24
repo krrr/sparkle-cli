@@ -25,9 +25,7 @@ export const sortSessions = (
   const sorted = [...sessions].sort((a, b) => {
     switch (sortBy) {
       case 'date':
-        return (
-          new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime()
-        );
+        return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
       case 'messages':
         return b.messageCount - a.messageCount;
       case 'name':
@@ -113,9 +111,7 @@ export const filterSessions = (
       session.id.toLowerCase().includes(lowerQuery) ||
       session.firstUserMessage.toLowerCase().includes(lowerQuery);
 
-    const contentMatch = session.fullContent
-      ?.toLowerCase()
-      .includes(lowerQuery);
+    const contentMatch = session.fullContent?.toLowerCase().includes(lowerQuery);
 
     if (titleMatch || contentMatch) {
       if (session.messages) {

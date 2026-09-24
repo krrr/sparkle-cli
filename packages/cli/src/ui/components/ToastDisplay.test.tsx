@@ -238,8 +238,6 @@ describe('ToastDisplay', () => {
       showIsExpandableHint: true,
       constrainHeight: false,
     });
-    expect(lastFrame()).toContain(
-      'Ctrl+O to collapse lines of the last response',
-    );
+    expect(lastFrame()).toContain('Ctrl+O to collapse lines of the last response');
   });
 });

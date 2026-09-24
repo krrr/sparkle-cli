@@ -26,12 +26,7 @@ describe('expandEnvVars', () => {
 
     it.each([
       ['$VAR (POSIX)', 'Hello $USER', defaultEnv, 'Hello morty'],
-      [
-        '${VAR} (POSIX)',
-        'Welcome to ${HOME}',
-        defaultEnv,
-        'Welcome to /home/morty',
-      ],
+      ['${VAR} (POSIX)', 'Welcome to ${HOME}', defaultEnv, 'Welcome to /home/morty'],
       [
         'should NOT expand %VAR% on non-Windows',
         'Data in %TEMP%',
@@ -50,18 +45,8 @@ describe('expandEnvVars', () => {
         defaultEnv,
         'Missing  and  and %MISSING%',
       ],
-      [
-        'empty or undefined values',
-        'Value is "$EMPTY"',
-        defaultEnv,
-        'Value is ""',
-      ],
-      [
-        'original string if no variables',
-        'No vars here',
-        defaultEnv,
-        'No vars here',
-      ],
+      ['empty or undefined values', 'Value is "$EMPTY"', defaultEnv, 'Value is ""'],
+      ['original string if no variables', 'No vars here', defaultEnv, 'No vars here'],
       ['literal values like "1234"', '1234', defaultEnv, '1234'],
       ['empty input string', '', defaultEnv, ''],
       [
@@ -86,12 +71,7 @@ describe('expandEnvVars', () => {
 
     it.each([
       ['$VAR (POSIX)', 'Hello $USER', defaultEnv, 'Hello morty'],
-      [
-        '${VAR} (POSIX)',
-        'Welcome to ${HOME}',
-        defaultEnv,
-        'Welcome to /home/morty',
-      ],
+      ['${VAR} (POSIX)', 'Welcome to ${HOME}', defaultEnv, 'Welcome to /home/morty'],
       [
         'should expand %VAR% on Windows',
         'Data in %TEMP%',

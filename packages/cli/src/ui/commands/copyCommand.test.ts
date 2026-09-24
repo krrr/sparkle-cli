@@ -240,10 +240,7 @@ describe('copyCommand', () => {
       content: `Failed to copy to the clipboard. ${clipboardError.message}`,
     });
 
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(
-      'AI response',
-      expect.anything(),
-    );
+    expect(mockCopyToClipboard).toHaveBeenCalledWith('AI response', expect.anything());
   });
 
   it('should handle non-Error clipboard errors', async () => {
@@ -268,10 +265,7 @@ describe('copyCommand', () => {
       content: `Failed to copy to the clipboard. ${rejectedValue}`,
     });
 
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(
-      'AI response',
-      expect.anything(),
-    );
+    expect(mockCopyToClipboard).toHaveBeenCalledWith('AI response', expect.anything());
   });
 
   it('should return info message when no text parts found in AI message', async () => {

@@ -41,9 +41,7 @@ describe('GitIgnoreParser', () => {
     it('should identify paths ignored by the root .gitignore', async () => {
       await createTestFile('.gitignore', 'node_modules/\n*.log\n/dist\n.env');
 
-      expect(parser.isIgnored('node_modules/package/index.js', false)).toBe(
-        true,
-      );
+      expect(parser.isIgnored('node_modules/package/index.js', false)).toBe(true);
       expect(parser.isIgnored('src/app.log', false)).toBe(true);
       expect(parser.isIgnored('dist/bundle.js', false)).toBe(true);
       expect(parser.isIgnored('.env', false)).toBe(true);
@@ -51,10 +49,7 @@ describe('GitIgnoreParser', () => {
     });
 
     it('should identify paths ignored by .git/info/exclude', async () => {
-      await createTestFile(
-        path.join('.git', 'info', 'exclude'),
-        'temp/\n*.tmp',
-      );
+      await createTestFile(path.join('.git', 'info', 'exclude'), 'temp/\n*.tmp');
       expect(parser.isIgnored('temp/file.txt', false)).toBe(true);
       expect(parser.isIgnored('src/file.tmp', false)).toBe(true);
     });
@@ -75,10 +70,7 @@ describe('GitIgnoreParser', () => {
     beforeEach(async () => {
       await setupGitRepo();
       await createTestFile('.gitignore', '*.log\n/ignored-at-root/');
-      await createTestFile(
-        'subdir/.gitignore',
-        '!special.log\nfile-in-subdir.txt',
-      );
+      await createTestFile('subdir/.gitignore', '!special.log\nfile-in-subdir.txt');
     });
 
     it('should prioritize nested rules over root rules', () => {
@@ -93,15 +85,10 @@ describe('GitIgnoreParser', () => {
     });
 
     it('should stop processing if an ancestor directory is ignored', async () => {
-      await createTestFile(
-        'ignored-at-root/.gitignore',
-        '!should-not-work.txt',
-      );
+      await createTestFile('ignored-at-root/.gitignore', '!should-not-work.txt');
       await createTestFile('ignored-at-root/should-not-work.txt', 'content');
 
-      expect(
-        parser.isIgnored('ignored-at-root/should-not-work.txt', false),
-      ).toBe(true);
+      expect(parser.isIgnored('ignored-at-root/should-not-work.txt', false)).toBe(true);
     });
   });
 

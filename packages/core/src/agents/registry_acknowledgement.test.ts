@@ -63,9 +63,7 @@ describe('AgentRegistry Acknowledgement', () => {
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
     vi.spyOn(config, 'getFolderTrust').mockReturnValue(true);
     vi.spyOn(config, 'getProjectRoot').mockReturnValue('/project');
-    vi.spyOn(config, 'getAcknowledgedAgentsService').mockReturnValue(
-      ackService,
-    );
+    vi.spyOn(config, 'getAcknowledgedAgentsService').mockReturnValue(ackService);
 
     // We cannot easily spy on storage.getProjectAgentsDir if it's a property/getter unless we cast to any or it's a method
     // Assuming it's a method on Storage class
@@ -76,17 +74,15 @@ describe('AgentRegistry Acknowledgement', () => {
 
     registry = new AgentRegistry(config);
 
-    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(
-      async (dir) => {
-        if (dir === '/project/.sparkle/agents') {
-          return {
-            agents: [MOCK_AGENT_WITH_HASH],
-            errors: [],
-          };
-        }
-        return { agents: [], errors: [] };
-      },
-    );
+    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(async (dir) => {
+      if (dir === '/project/.sparkle/agents') {
+        return {
+          agents: [MOCK_AGENT_WITH_HASH],
+          errors: [],
+        };
+      }
+      return { agents: [], errors: [] };
+    });
   });
 
   afterEach(async () => {
@@ -116,17 +112,15 @@ describe('AgentRegistry Acknowledgement', () => {
     // Acknowledge the agent explicitly
     await ackService.acknowledge('/project', 'ProjectAgent', 'hash123');
 
-    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(
-      async (dir) => {
-        if (dir === '/project/.sparkle/agents') {
-          return {
-            agents: [MOCK_AGENT_WITH_HASH],
-            errors: [],
-          };
-        }
-        return { agents: [], errors: [] };
-      },
-    );
+    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(async (dir) => {
+      if (dir === '/project/.sparkle/agents') {
+        return {
+          agents: [MOCK_AGENT_WITH_HASH],
+          errors: [],
+        };
+      }
+      return { agents: [], errors: [] };
+    });
 
     const emitSpy = vi.spyOn(coreEvents, 'emitAgentsDiscovered');
 
@@ -139,17 +133,15 @@ describe('AgentRegistry Acknowledgement', () => {
   it('should register agents without hash (legacy/safe?)', async () => {
     // Current logic: if no hash, allow it.
     const agentNoHash = { ...MOCK_AGENT_WITH_HASH, metadata: undefined };
-    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(
-      async (dir) => {
-        if (dir === '/project/.sparkle/agents') {
-          return {
-            agents: [agentNoHash],
-            errors: [],
-          };
-        }
-        return { agents: [], errors: [] };
-      },
-    );
+    vi.mocked(tomlLoader.loadAgentsFromDirectory).mockImplementation(async (dir) => {
+      if (dir === '/project/.sparkle/agents') {
+        return {
+          agents: [agentNoHash],
+          errors: [],
+        };
+      }
+      return { agents: [], errors: [] };
+    });
 
     await registry.initialize();
 
@@ -160,9 +152,9 @@ describe('AgentRegistry Acknowledgement', () => {
     await registry.acknowledgeAgent(MOCK_AGENT_WITH_HASH);
 
     // Verify against real service state
-    expect(
-      await ackService.isAcknowledged('/project', 'ProjectAgent', 'hash123'),
-    ).toBe(true);
+    expect(await ackService.isAcknowledged('/project', 'ProjectAgent', 'hash123')).toBe(
+      true,
+    );
 
     expect(registry.getDefinition('ProjectAgent')).toBeDefined();
   });

@@ -104,10 +104,7 @@ describe('useShellHistory', () => {
     );
 
     await waitFor(() => {
-      expect(mockedFs.readFile).toHaveBeenCalledWith(
-        MOCKED_HISTORY_FILE,
-        'utf-8',
-      );
+      expect(mockedFs.readFile).toHaveBeenCalledWith(MOCKED_HISTORY_FILE, 'utf-8');
     });
 
     let command: string | null = null;

@@ -7,10 +7,7 @@
 import { renderWithProviders } from '../../../test-utils/render.js';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { ToolGroupMessage } from './ToolGroupMessage.js';
-import {
-  ScrollableList,
-  type ScrollableListRef,
-} from '../shared/ScrollableList.js';
+import { ScrollableList, type ScrollableListRef } from '../shared/ScrollableList.js';
 import { Box, Text } from 'ink';
 import { act, useRef, useEffect } from 'react';
 import { waitFor } from '../../../test-utils/async.js';

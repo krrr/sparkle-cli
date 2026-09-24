@@ -45,9 +45,7 @@ describe('memory commands', () => {
       getMemoryContextManager: vi.fn().mockReturnValue({
         refresh: mockMemoryContextRefresh,
       }),
-      updateSystemInstructionIfInitialized: vi
-        .fn()
-        .mockResolvedValue(undefined),
+      updateSystemInstructionIfInitialized: vi.fn().mockResolvedValue(undefined),
     } as unknown as Config;
   });
 
@@ -57,9 +55,7 @@ describe('memory commands', () => {
 
   describe('showMemory', () => {
     it('should show memory content if it exists', () => {
-      vi.mocked(mockConfig.getUserMemory).mockReturnValue(
-        'some memory content',
-      );
+      vi.mocked(mockConfig.getUserMemory).mockReturnValue('some memory content');
       vi.mocked(mockConfig.getGeminiMdFileCount).mockReturnValue(1);
 
       const result = showMemory(mockConfig);
@@ -67,9 +63,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toContain(
-          'Current memory content from 1 file(s)',
-        );
+        expect(result.content).toContain('Current memory content from 1 file(s)');
         expect(result.content).toContain('some memory content');
       }
     });
@@ -98,9 +92,7 @@ describe('memory commands', () => {
       const result = await refreshMemory(mockConfig);
 
       expect(mockMemoryContextRefresh).toHaveBeenCalled();
-      expect(
-        mockConfig.updateSystemInstructionIfInitialized,
-      ).toHaveBeenCalled();
+      expect(mockConfig.updateSystemInstructionIfInitialized).toHaveBeenCalled();
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
@@ -135,9 +127,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toContain(
-          'There are 2 AGENTS.md file(s) in use:',
-        );
+        expect(result.content).toContain('There are 2 AGENTS.md file(s) in use:');
         expect(result.content).toContain(filePaths.join('\n'));
       }
     });
@@ -300,10 +290,7 @@ describe('memory commands', () => {
       ].join('\n');
     }
 
-    function buildCreationPatch(
-      absoluteTargetPath: string,
-      content: string,
-    ): string {
+    function buildCreationPatch(absoluteTargetPath: string, content: string): string {
       const contentLines = content.split('\n');
       const lineCount = content.endsWith('\n')
         ? contentLines.length - 1
@@ -385,10 +372,7 @@ describe('memory commands', () => {
       });
       // Both source files contributed their hunks.
       expect(memoryPatch.entries).toHaveLength(2);
-      expect(memoryPatch.sourceFiles).toEqual([
-        'a-update.patch',
-        'b-topic.patch',
-      ]);
+      expect(memoryPatch.sourceFiles).toEqual(['a-update.patch', 'b-topic.patch']);
       expect(memoryPatch.entries[0].targetPath).toBe(target);
       expect(memoryPatch.entries[0].isNewFile).toBe(false);
       expect(memoryPatch.entries[1].targetPath).toBe(sibling);
@@ -426,14 +410,8 @@ describe('memory commands', () => {
       const rejectedTargets = [
         ['state.patch', path.join(memoryTempDir, '.extraction-state.json')],
         ['lock.patch', path.join(memoryTempDir, '.extraction.lock')],
-        [
-          'inbox.patch',
-          path.join(memoryTempDir, '.inbox', 'private', 'review.md'),
-        ],
-        [
-          'skills.patch',
-          path.join(memoryTempDir, 'skills', 'generated', 'SKILL.md'),
-        ],
+        ['inbox.patch', path.join(memoryTempDir, '.inbox', 'private', 'review.md')],
+        ['skills.patch', path.join(memoryTempDir, 'skills', 'generated', 'SKILL.md')],
         ['text.patch', path.join(memoryTempDir, 'notes.txt')],
         ['nested.patch', path.join(memoryTempDir, 'nested', 'topic.md')],
       ] as const;
@@ -449,11 +427,7 @@ describe('memory commands', () => {
       expect(patches).toHaveLength(0);
 
       for (const [fileName, targetPath] of rejectedTargets) {
-        const result = await applyInboxMemoryPatch(
-          patchConfig,
-          'private',
-          fileName,
-        );
+        const result = await applyInboxMemoryPatch(patchConfig, 'private', fileName);
         expect(result.success).toBe(false);
         expect(result.message).toMatch(
           /outside the private memory root or target allowlist/i,
@@ -470,17 +444,11 @@ describe('memory commands', () => {
       await fs.mkdir(patchDir, { recursive: true });
       await fs.writeFile(
         path.join(patchDir, 'wrong-name.patch'),
-        buildCreationPatch(
-          path.join(globalMemoryDir, 'memory.md'),
-          'rejected\n',
-        ),
+        buildCreationPatch(path.join(globalMemoryDir, 'memory.md'), 'rejected\n'),
       );
       await fs.writeFile(
         path.join(patchDir, 'sibling.patch'),
-        buildCreationPatch(
-          path.join(globalMemoryDir, 'notes.md'),
-          'rejected\n',
-        ),
+        buildCreationPatch(path.join(globalMemoryDir, 'notes.md'), 'rejected\n'),
       );
       await fs.writeFile(
         path.join(patchDir, 'settings.patch'),
@@ -517,9 +485,7 @@ describe('memory commands', () => {
 
       expect(result.success).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe('- accepted\n');
-      await expect(
-        fs.access(path.join(patchDir, 'MEMORY.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'MEMORY.patch'))).rejects.toThrow();
     });
 
     it.runIf(isCaseInsensitivePathPlatform)(
@@ -532,11 +498,7 @@ describe('memory commands', () => {
         await fs.mkdir(patchDir, { recursive: true });
         await fs.writeFile(
           path.join(patchDir, 'MEMORY.patch'),
-          buildUpdatePatch(
-            swapAsciiPathCase(target),
-            '- old\n',
-            '- accepted\n',
-          ),
+          buildUpdatePatch(swapAsciiPathCase(target), '- old\n', '- accepted\n'),
         );
 
         const patches = await listInboxMemoryPatches(patchConfig);
@@ -549,9 +511,7 @@ describe('memory commands', () => {
         );
 
         expect(result.success).toBe(true);
-        await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-          '- accepted\n',
-        );
+        await expect(fs.readFile(target, 'utf-8')).resolves.toBe('- accepted\n');
       },
     );
 
@@ -576,22 +536,12 @@ describe('memory commands', () => {
         );
       await fs.writeFile(path.join(patchDir, 'topic.patch'), multiHunkPatch);
 
-      const result = await applyInboxMemoryPatch(
-        patchConfig,
-        'private',
-        'topic.patch',
-      );
+      const result = await applyInboxMemoryPatch(patchConfig, 'private', 'topic.patch');
 
       expect(result.success).toBe(true);
-      await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-        '# Topic\n- new fact\n',
-      );
-      await expect(fs.readFile(memoryMd, 'utf-8')).resolves.toContain(
-        'See topic.md',
-      );
-      await expect(
-        fs.access(path.join(patchDir, 'topic.patch')),
-      ).rejects.toThrow();
+      await expect(fs.readFile(target, 'utf-8')).resolves.toBe('# Topic\n- new fact\n');
+      await expect(fs.readFile(memoryMd, 'utf-8')).resolves.toContain('See topic.md');
+      await expect(fs.access(path.join(patchDir, 'topic.patch'))).rejects.toThrow();
     });
 
     it('auto-bundles a MEMORY.md pointer when the patch creates an orphan sibling', async () => {
@@ -619,9 +569,7 @@ describe('memory commands', () => {
       expect(result.message).toMatch(/auto-added MEMORY\.md pointer/i);
       expect(result.message).toContain('"orphan-topic.md"');
       // The sibling exists.
-      await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-        '# Orphan Topic\n',
-      );
+      await expect(fs.readFile(target, 'utf-8')).resolves.toBe('# Orphan Topic\n');
       // MEMORY.md now references the sibling — using ABSOLUTE PATH so a
       // future agent can `read_file` it without resolving relatives. We
       // assert the line shape is `- See <absolute>/orphan-topic.md ...` and
@@ -630,9 +578,7 @@ describe('memory commands', () => {
       // Windows where the absolute path is e.g. `C:\Users\...\orphan-topic.md`).
       const memoryAfter = await fs.readFile(memoryMd, 'utf-8');
       expect(memoryAfter).toContain(target);
-      const pointerLineMatch = memoryAfter.match(
-        /^- See (.+orphan-topic\.md) /m,
-      );
+      const pointerLineMatch = memoryAfter.match(/^- See (.+orphan-topic\.md) /m);
       expect(pointerLineMatch).not.toBeNull();
       expect(path.isAbsolute(pointerLineMatch![1])).toBe(true);
       // The patch was committed and removed from inbox.
@@ -693,9 +639,7 @@ describe('memory commands', () => {
       );
 
       expect(result.success).toBe(true);
-      await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-        '# Later Topic\n',
-      );
+      await expect(fs.readFile(target, 'utf-8')).resolves.toBe('# Later Topic\n');
     });
 
     it('applies a global creation patch to ~/.sparkle/AGENTS.md', async () => {
@@ -710,19 +654,13 @@ describe('memory commands', () => {
         buildCreationPatch(target, '# Personal preferences\n- prefer X\n'),
       );
 
-      const result = await applyInboxMemoryPatch(
-        patchConfig,
-        'global',
-        'AGENTS.patch',
-      );
+      const result = await applyInboxMemoryPatch(patchConfig, 'global', 'AGENTS.patch');
 
       expect(result.success).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
         '# Personal preferences\n- prefer X\n',
       );
-      await expect(
-        fs.access(path.join(patchDir, 'AGENTS.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'AGENTS.patch'))).rejects.toThrow();
     });
 
     it('applies a global update patch to ~/.sparkle/AGENTS.md', async () => {
@@ -736,17 +674,11 @@ describe('memory commands', () => {
         buildUpdatePatch(target, '- prefer X\n', '- prefer Y\n'),
       );
 
-      const result = await applyInboxMemoryPatch(
-        patchConfig,
-        'global',
-        'AGENTS.patch',
-      );
+      const result = await applyInboxMemoryPatch(patchConfig, 'global', 'AGENTS.patch');
 
       expect(result.success).toBe(true);
       await expect(fs.readFile(target, 'utf-8')).resolves.toBe('- prefer Y\n');
-      await expect(
-        fs.access(path.join(patchDir, 'AGENTS.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'AGENTS.patch'))).rejects.toThrow();
     });
 
     it.runIf(isCaseInsensitivePathPlatform)(
@@ -759,11 +691,7 @@ describe('memory commands', () => {
         await fs.mkdir(patchDir, { recursive: true });
         await fs.writeFile(
           path.join(patchDir, 'AGENTS.patch'),
-          buildUpdatePatch(
-            swapAsciiPathCase(target),
-            '- prefer X\n',
-            '- prefer Y\n',
-          ),
+          buildUpdatePatch(swapAsciiPathCase(target), '- prefer X\n', '- prefer Y\n'),
         );
 
         const patches = await listInboxMemoryPatches(patchConfig);
@@ -776,9 +704,7 @@ describe('memory commands', () => {
         );
 
         expect(result.success).toBe(true);
-        await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-          '- prefer Y\n',
-        );
+        await expect(fs.readFile(target, 'utf-8')).resolves.toBe('- prefer Y\n');
       },
     );
 
@@ -800,9 +726,7 @@ describe('memory commands', () => {
       );
 
       expect(result.success).toBe(true);
-      await expect(
-        fs.access(path.join(patchDir, 'AGENTS.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'AGENTS.patch'))).rejects.toThrow();
     });
 
     it('apply with relativePath = kind runs every source patch in sequence', async () => {
@@ -837,12 +761,8 @@ describe('memory commands', () => {
       // Both targets were updated, both source patches removed.
       await expect(fs.readFile(memoryMd, 'utf-8')).resolves.toBe('- new\n');
       await expect(fs.readFile(sibling, 'utf-8')).resolves.toBe('topic B\n');
-      await expect(
-        fs.access(path.join(patchDir, 'a-update.patch')),
-      ).rejects.toThrow();
-      await expect(
-        fs.access(path.join(patchDir, 'b-topic.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'a-update.patch'))).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'b-topic.patch'))).rejects.toThrow();
     });
 
     it('aggregate apply reports successes and failures when one source patch is stale', async () => {
@@ -862,11 +782,7 @@ describe('memory commands', () => {
         buildUpdatePatch(memoryMd, '- never existed\n', '- attempted\n'),
       );
 
-      const result = await applyInboxMemoryPatch(
-        patchConfig,
-        'private',
-        'private',
-      );
+      const result = await applyInboxMemoryPatch(patchConfig, 'private', 'private');
 
       // Any failure → success=false so the dialog keeps the inbox entry
       // visible. (The successful sub-patches were already removed from disk;
@@ -877,9 +793,7 @@ describe('memory commands', () => {
 
       // Good patch committed and removed; stale patch stays in inbox.
       await expect(fs.readFile(memoryMd, 'utf-8')).resolves.toBe('- new\n');
-      await expect(
-        fs.access(path.join(patchDir, 'a-good.patch')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(patchDir, 'a-good.patch'))).rejects.toThrow();
       await expect(
         fs.access(path.join(patchDir, 'b-stale.patch')),
       ).resolves.toBeUndefined();
@@ -897,11 +811,7 @@ describe('memory commands', () => {
         buildCreationPatch(path.join(memoryTempDir, 'b.md'), 'b\n'),
       );
 
-      const result = await dismissInboxMemoryPatch(
-        patchConfig,
-        'private',
-        'private',
-      );
+      const result = await dismissInboxMemoryPatch(patchConfig, 'private', 'private');
 
       expect(result.success).toBe(true);
       expect(result.message).toMatch(/dismissed 2/i);
@@ -934,10 +844,7 @@ describe('memory commands', () => {
       // Non-memory files (settings, credentials) must stay off-limits.
       await fs.writeFile(
         path.join(patchDir, 'settings.patch'),
-        buildCreationPatch(
-          path.join(globalMemoryDir, 'settings.json'),
-          '{"foo": 1}\n',
-        ),
+        buildCreationPatch(path.join(globalMemoryDir, 'settings.json'), '{"foo": 1}\n'),
       );
 
       // Child paths under the single allowed file path are not allowed either.
@@ -955,20 +862,14 @@ describe('memory commands', () => {
         'settings.patch',
         'nested.patch',
       ]) {
-        const result = await applyInboxMemoryPatch(
-          patchConfig,
-          'global',
-          fileName,
-        );
+        const result = await applyInboxMemoryPatch(patchConfig, 'global', fileName);
         expect(result.success).toBe(false);
         expect(result.message).toMatch(/outside the global memory root/i);
       }
 
       // None of the bogus targets were created.
       for (const orphan of ['memory.md', 'notes.md', 'settings.json']) {
-        await expect(
-          fs.access(path.join(globalMemoryDir, orphan)),
-        ).rejects.toThrow();
+        await expect(fs.access(path.join(globalMemoryDir, orphan))).rejects.toThrow();
       }
       await expect(
         fs.access(path.join(globalMemoryDir, 'AGENTS.md', 'nested.md')),
@@ -1005,9 +906,7 @@ describe('memory commands', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toMatch(/declares a new file/);
-      await expect(fs.readFile(target, 'utf-8')).resolves.toBe(
-        'pre-existing\n',
-      );
+      await expect(fs.readFile(target, 'utf-8')).resolves.toBe('pre-existing\n');
       await expect(
         fs.access(path.join(patchDir, 'MEMORY.patch')),
       ).resolves.toBeUndefined();
@@ -1071,9 +970,7 @@ describe('memory commands', () => {
       expect(targetSkill).toContain('name: my-skill');
 
       // Verify the skill was removed from inbox
-      await expect(
-        fs.access(path.join(skillsDir, 'my-skill')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(skillsDir, 'my-skill'))).rejects.toThrow();
     });
 
     it('should move a skill to project skills directory', async () => {
@@ -1092,9 +989,7 @@ describe('memory commands', () => {
       expect(targetSkill).toContain('name: my-skill');
 
       // Verify the skill was removed from inbox
-      await expect(
-        fs.access(path.join(skillsDir, 'my-skill')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(skillsDir, 'my-skill'))).rejects.toThrow();
     });
 
     it('should return an error when the source skill does not exist', async () => {
@@ -1128,21 +1023,12 @@ describe('memory commands', () => {
     });
 
     it('should detect conflicts based on the normalized skill name', async () => {
-      await writeSkillMd(
-        'inbox-skill',
-        'gke:prs-troubleshooter',
-        'A test skill',
-      );
-      await fs.mkdir(
-        path.join(globalSkillsDir, 'existing-gke-prs-troubleshooter'),
-        { recursive: true },
-      );
+      await writeSkillMd('inbox-skill', 'gke:prs-troubleshooter', 'A test skill');
+      await fs.mkdir(path.join(globalSkillsDir, 'existing-gke-prs-troubleshooter'), {
+        recursive: true,
+      });
       await fs.writeFile(
-        path.join(
-          globalSkillsDir,
-          'existing-gke-prs-troubleshooter',
-          'SKILL.md',
-        ),
+        path.join(globalSkillsDir, 'existing-gke-prs-troubleshooter', 'SKILL.md'),
         [
           '---',
           'name: gke-prs-troubleshooter',
@@ -1211,9 +1097,7 @@ describe('memory commands', () => {
       expect(result.message).toBe('Dismissed "my-skill" from inbox.');
 
       // Verify the skill directory was removed
-      await expect(
-        fs.access(path.join(skillsDir, 'my-skill')),
-      ).rejects.toThrow();
+      await expect(fs.access(path.join(skillsDir, 'my-skill'))).rejects.toThrow();
     });
 
     it('should return an error when the skill does not exist', async () => {
@@ -1286,10 +1170,7 @@ describe('memory commands', () => {
         '',
       ].join('\n');
 
-      await fs.writeFile(
-        path.join(skillsDir, 'update-skill.patch'),
-        patchContent,
-      );
+      await fs.writeFile(path.join(skillsDir, 'update-skill.patch'), patchContent);
 
       const result = await listInboxPatches(patchConfig);
 
@@ -1355,22 +1236,15 @@ describe('memory commands', () => {
       );
 
       const result = await listInboxPatches(patchConfig);
-      const firstPatch = result.find(
-        (patch) => patch.fileName === 'first.patch',
-      );
-      const secondPatch = result.find(
-        (patch) => patch.fileName === 'second.patch',
-      );
+      const firstPatch = result.find((patch) => patch.fileName === 'first.patch');
+      const secondPatch = result.find((patch) => patch.fileName === 'second.patch');
 
       expect(firstPatch?.extractedAt).toBe(firstTimestamp.toISOString());
       expect(secondPatch?.extractedAt).toBe(secondTimestamp.toISOString());
     });
 
     it('should skip patches with no hunks', async () => {
-      await fs.writeFile(
-        path.join(skillsDir, 'empty.patch'),
-        'not a valid patch',
-      );
+      await fs.writeFile(path.join(skillsDir, 'empty.patch'), 'not a valid patch');
 
       const result = await listInboxPatches(patchConfig);
       expect(result).toEqual([]);
@@ -1566,10 +1440,7 @@ describe('memory commands', () => {
         ' d',
         '',
       ].join('\n');
-      await fs.writeFile(
-        path.join(skillsDir, 'bad-target.patch'),
-        patchContent,
-      );
+      await fs.writeFile(path.join(skillsDir, 'bad-target.patch'), patchContent);
 
       const result = await applyInboxPatch(applyConfig, 'bad-target.patch');
 
@@ -1687,18 +1558,13 @@ describe('memory commands', () => {
       expect(result.message).toContain(
         'Project skill patches are unavailable until this workspace is trusted.',
       );
-      expect(await fs.readFile(targetFile, 'utf-8')).toBe(
-        'line1\nline2\nline3\n',
-      );
+      expect(await fs.readFile(targetFile, 'utf-8')).toBe('line1\nline2\nline3\n');
       await expect(fs.access(patchPath)).resolves.toBeUndefined();
     });
 
     it('should reject project-scope patches through a symlinked project skills root when the workspace is untrusted', async () => {
       const realProjectSkillsDir = path.join(tmpDir, 'project-skills-real');
-      const symlinkedProjectSkillsDir = path.join(
-        tmpDir,
-        'project-skills-link',
-      );
+      const symlinkedProjectSkillsDir = path.join(tmpDir, 'project-skills-link');
       await fs.mkdir(realProjectSkillsDir, { recursive: true });
       await fs.symlink(
         realProjectSkillsDir,
@@ -1729,18 +1595,13 @@ describe('memory commands', () => {
         storage: applyConfig.storage,
         isTrustedFolder: () => false,
       } as Config;
-      const result = await applyInboxPatch(
-        untrustedConfig,
-        'workspace-symlink.patch',
-      );
+      const result = await applyInboxPatch(untrustedConfig, 'workspace-symlink.patch');
 
       expect(result.success).toBe(false);
       expect(result.message).toContain(
         'Project skill patches are unavailable until this workspace is trusted.',
       );
-      expect(await fs.readFile(targetFile, 'utf-8')).toBe(
-        'line1\nline2\nline3\n',
-      );
+      expect(await fs.readFile(targetFile, 'utf-8')).toBe('line1\nline2\nline3\n');
       await expect(fs.access(patchPath)).resolves.toBeUndefined();
     });
 
@@ -1765,10 +1626,7 @@ describe('memory commands', () => {
         ].join('\n'),
       );
 
-      const result = await applyInboxPatch(
-        applyConfig,
-        'mismatched-headers.patch',
-      );
+      const result = await applyInboxPatch(applyConfig, 'mismatched-headers.patch');
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('invalid diff headers');
@@ -1912,10 +1770,7 @@ describe('memory commands', () => {
     });
 
     it('should return error when patch does not exist', async () => {
-      const result = await dismissInboxPatch(
-        dismissPatchConfig,
-        'nonexistent.patch',
-      );
+      const result = await dismissInboxPatch(dismissPatchConfig, 'nonexistent.patch');
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('not found');
@@ -1925,10 +1780,7 @@ describe('memory commands', () => {
       const outsidePatch = path.join(tmpDir, 'outside.patch');
       await fs.writeFile(outsidePatch, 'outside patch content');
 
-      const result = await dismissInboxPatch(
-        dismissPatchConfig,
-        '../outside.patch',
-      );
+      const result = await dismissInboxPatch(dismissPatchConfig, '../outside.patch');
 
       expect(result.success).toBe(false);
       expect(result.message).toBe('Invalid patch file name.');

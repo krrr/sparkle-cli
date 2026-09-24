@@ -62,22 +62,17 @@ describe('<ModelDialog />', () => {
     mockUpdateModel.mockResolvedValue(undefined);
     mockRemoveModel.mockResolvedValue(undefined);
     vi.mocked(mockConfig.getProviderProfileService).mockReturnValue(
-      mockProfileService as unknown as ReturnType<
-        Config['getProviderProfileService']
-      >,
+      mockProfileService as unknown as ReturnType<Config['getProviderProfileService']>,
     );
   });
 
   const renderComponent = async (configValue = mockConfig) => {
     const settings = createMockSettings({});
 
-    const result = await renderWithProviders(
-      <ModelDialog onClose={mockOnClose} />,
-      {
-        config: configValue,
-        settings,
-      },
-    );
+    const result = await renderWithProviders(<ModelDialog onClose={mockOnClose} />, {
+      config: configValue,
+      settings,
+    });
     return result;
   };
 
@@ -123,8 +118,7 @@ describe('<ModelDialog />', () => {
   });
 
   it('persists default model to profile when Tab toggle is active', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderComponent();
 
     // Toggle persist mode with Tab
     await act(async () => {
@@ -177,10 +171,7 @@ describe('<ModelDialog />', () => {
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(mockSetModel).toHaveBeenCalledWith(
-        SPARKLE_MODEL_ALIAS_AUTO,
-        false,
-      );
+      expect(mockSetModel).toHaveBeenCalledWith(SPARKLE_MODEL_ALIAS_AUTO, false);
       expect(mockSetDefaultModel).toHaveBeenCalledWith(
         fakeProfile.id,
         SPARKLE_MODEL_ALIAS_AUTO,
@@ -207,8 +198,7 @@ describe('<ModelDialog />', () => {
   });
 
   it('opens the provider model settings view when m is pressed', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderComponent();
 
     expect(lastFrame()).toContain('Manage models');
 
@@ -226,8 +216,7 @@ describe('<ModelDialog />', () => {
   });
 
   it('returns to the model list from the settings view with Escape', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderComponent();
 
     await act(async () => {
       stdin.write('m');
@@ -304,8 +293,7 @@ describe('<ModelDialog />', () => {
       models: [],
       defaultModel: undefined,
     });
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderComponent();
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderComponent();
 
     expect(lastFrame()).toContain('No models configured for provider "p1"');
 

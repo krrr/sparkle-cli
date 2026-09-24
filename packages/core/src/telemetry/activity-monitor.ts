@@ -87,10 +87,7 @@ export class ActivityMonitor {
     this.addListener(this.memoryMonitoringListener);
 
     // Record activity monitoring start
-    this.recordActivity(
-      ActivityType.MANUAL_TRIGGER,
-      'activity_monitoring_start',
-    );
+    this.recordActivity(ActivityType.MANUAL_TRIGGER, 'activity_monitoring_start');
   }
 
   /**
@@ -203,10 +200,7 @@ export class ActivityMonitor {
   /**
    * Handle memory monitoring for activity events
    */
-  private handleMemoryMonitoringActivity(
-    event: ActivityEvent,
-    config: Config,
-  ): void {
+  private handleMemoryMonitoringActivity(event: ActivityEvent, config: Config): void {
     // Check if this activity type should trigger memory monitoring
     if (!this.config.triggerActivities.includes(event.type)) {
       return;

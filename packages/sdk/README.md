@@ -1,7 +1,7 @@
 # sparkle-cli-sdk
 
-The Sparkle CLI SDK provides a programmatic interface to interact with Gemini
-models and tools.
+The Sparkle CLI SDK provides a programmatic interface to interact with Gemini models and
+tools.
 
 ## Installation
 

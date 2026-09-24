@@ -28,16 +28,10 @@ export function couldBeMouseSequence(buffer: string): boolean {
   if (buffer.length === 0) return true;
 
   // Check SGR prefix
-  if (
-    SGR_EVENT_PREFIX.startsWith(buffer) ||
-    buffer.startsWith(SGR_EVENT_PREFIX)
-  )
+  if (SGR_EVENT_PREFIX.startsWith(buffer) || buffer.startsWith(SGR_EVENT_PREFIX))
     return true;
   // Check X11 prefix
-  if (
-    X11_EVENT_PREFIX.startsWith(buffer) ||
-    buffer.startsWith(X11_EVENT_PREFIX)
-  )
+  if (X11_EVENT_PREFIX.startsWith(buffer) || buffer.startsWith(X11_EVENT_PREFIX))
     return true;
 
   return false;

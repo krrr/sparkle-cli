@@ -196,8 +196,7 @@ export function serializeTerminalToObject(
             italic: lastCell.isAttribute(Attribute.italic),
             underline: lastCell.isAttribute(Attribute.underline),
             dim: lastCell.isAttribute(Attribute.dim),
-            inverse:
-              lastCell.isAttribute(Attribute.inverse) || lastCell.isCursor(),
+            inverse: lastCell.isAttribute(Attribute.inverse) || lastCell.isCursor(),
             isUninitialized: lastCell.isUninitialized(),
             fg: convertColorToHex(lastCell.fg, lastCell.fgColorMode, defaultFg),
             bg: convertColorToHex(lastCell.bg, lastCell.bgColorMode, defaultBg),

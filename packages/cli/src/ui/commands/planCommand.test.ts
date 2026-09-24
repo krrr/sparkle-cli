@@ -78,15 +78,13 @@ describe('planCommand', () => {
 
   it('should have the correct name and description', () => {
     expect(planCommand.name).toBe('plan');
-    expect(planCommand.description).toBe(
-      'Switch to Plan Mode and view current plan',
-    );
+    expect(planCommand.description).toBe('Switch to Plan Mode and view current plan');
   });
 
   it('should switch to plan mode if enabled', async () => {
-    vi.mocked(
-      mockContext.services.agentContext!.config.isPlanEnabled,
-    ).mockReturnValue(true);
+    vi.mocked(mockContext.services.agentContext!.config.isPlanEnabled).mockReturnValue(
+      true,
+    );
     vi.mocked(
       mockContext.services.agentContext!.config.getApprovedPlanPath,
     ).mockReturnValue(undefined);
@@ -104,9 +102,9 @@ describe('planCommand', () => {
   });
 
   it('should not return a submit_prompt action if arguments are empty', async () => {
-    vi.mocked(
-      mockContext.services.agentContext!.config.isPlanEnabled,
-    ).mockReturnValue(true);
+    vi.mocked(mockContext.services.agentContext!.config.isPlanEnabled).mockReturnValue(
+      true,
+    );
     mockContext.invocation = {
       raw: '/plan',
       name: 'plan',
@@ -123,9 +121,9 @@ describe('planCommand', () => {
   });
 
   it('should return a submit_prompt action if arguments are provided', async () => {
-    vi.mocked(
-      mockContext.services.agentContext!.config.isPlanEnabled,
-    ).mockReturnValue(true);
+    vi.mocked(mockContext.services.agentContext!.config.isPlanEnabled).mockReturnValue(
+      true,
+    );
     mockContext.invocation = {
       raw: '/plan implement auth',
       name: 'plan',
@@ -146,9 +144,9 @@ describe('planCommand', () => {
 
   it('should display the approved plan from config', async () => {
     const mockPlanPath = '/mock/plans/dir/approved-plan.md';
-    vi.mocked(
-      mockContext.services.agentContext!.config.isPlanEnabled,
-    ).mockReturnValue(true);
+    vi.mocked(mockContext.services.agentContext!.config.isPlanEnabled).mockReturnValue(
+      true,
+    );
     vi.mocked(
       mockContext.services.agentContext!.config.getApprovedPlanPath,
     ).mockReturnValue(mockPlanPath);
@@ -178,9 +176,7 @@ describe('planCommand', () => {
       ).mockReturnValue(mockPlanPath);
       vi.mocked(readFileWithEncoding).mockResolvedValue('# Plan Content');
 
-      const copySubCommand = planCommand.subCommands?.find(
-        (sc) => sc.name === 'copy',
-      );
+      const copySubCommand = planCommand.subCommands?.find((sc) => sc.name === 'copy');
       if (!copySubCommand?.action) throw new Error('Copy action missing');
 
       await copySubCommand.action(mockContext, '');
@@ -198,9 +194,7 @@ describe('planCommand', () => {
         mockContext.services.agentContext!.config.getApprovedPlanPath,
       ).mockReturnValue(undefined);
 
-      const copySubCommand = planCommand.subCommands?.find(
-        (sc) => sc.name === 'copy',
-      );
+      const copySubCommand = planCommand.subCommands?.find((sc) => sc.name === 'copy');
       if (!copySubCommand?.action) throw new Error('Copy action missing');
 
       await copySubCommand.action(mockContext, '');

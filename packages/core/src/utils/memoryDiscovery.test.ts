@@ -22,11 +22,7 @@ import {
   DEFAULT_CONTEXT_FILENAME,
   PROJECT_MEMORY_INDEX_FILENAME,
 } from '../tools/memoryTool.js';
-import {
-  SPARKLE_DIR,
-  toAbsolutePath,
-  homedir as pathsHomedir,
-} from './paths.js';
+import { SPARKLE_DIR, toAbsolutePath, homedir as pathsHomedir } from './paths.js';
 import type { GeminiCLIExtension } from '../config/config.js';
 import { SimpleExtensionLoader } from './extensionLoader.js';
 
@@ -68,9 +64,7 @@ describe('memoryDiscovery', () => {
 
   beforeEach(async () => {
     testRootDir = toAbsolutePath(
-      await fsPromises.mkdtemp(
-        path.join(os.tmpdir(), 'folder-structure-test-'),
-      ),
+      await fsPromises.mkdtemp(path.join(os.tmpdir(), 'folder-structure-test-')),
     );
 
     vi.resetAllMocks();
@@ -161,9 +155,7 @@ describe('memoryDiscovery', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toContain(PROJECT_MEMORY_INDEX_FILENAME);
-      expect(result[0]).not.toContain(
-        PROJECT_MEMORY_INDEX_FILENAME.toLowerCase(),
-      );
+      expect(result[0]).not.toContain(PROJECT_MEMORY_INDEX_FILENAME.toLowerCase());
     });
 
     it('should fall back to legacy AGENTS.md when MEMORY.md is absent', async () => {
@@ -296,13 +288,10 @@ describe('memoryDiscovery', () => {
     });
 
     it('should preserve case-distinct files before identity deduplication', async () => {
-      const platformSpy = vi
-        .spyOn(process, 'platform', 'get')
-        .mockReturnValue('win32');
+      const platformSpy = vi.spyOn(process, 'platform', 'get').mockReturnValue('win32');
       vi.resetModules();
       vi.doMock('node:fs/promises', async () => {
-        const actual =
-          await vi.importActual<typeof fsPromises>('node:fs/promises');
+        const actual = await vi.importActual<typeof fsPromises>('node:fs/promises');
         return {
           ...actual,
           access: vi.fn().mockResolvedValue(undefined),
@@ -340,9 +329,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should recognize .git as a file (submodules/worktrees)', async () => {
-      const repoDir = await createEmptyDir(
-        path.join(testRootDir, 'worktree_repo'),
-      );
+      const repoDir = await createEmptyDir(path.join(testRootDir, 'worktree_repo'));
       // .git as a file, like in submodules and worktrees
       await createTestFile(
         path.join(repoDir, '.git'),
@@ -371,9 +358,7 @@ describe('memoryDiscovery', () => {
       // Configure multiple memory filenames
       setGeminiMdFilename(['PRIMARY.md', 'SECONDARY.md']);
 
-      const dir = await createEmptyDir(
-        path.join(testRootDir, 'multi_file_dir'),
-      );
+      const dir = await createEmptyDir(path.join(testRootDir, 'multi_file_dir'));
       await createEmptyDir(path.join(dir, '.git'));
 
       const primaryFile = await createTestFile(
@@ -408,8 +393,7 @@ describe('memoryDiscovery', () => {
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         if (
           errorMessage.includes('cross-device') ||
           errorMessage.includes('EXDEV') ||
@@ -425,10 +409,7 @@ describe('memoryDiscovery', () => {
       expect(stats1.ino).toBe(stats2.ino);
       expect(stats1.dev).toBe(stats2.dev);
 
-      const result = await deduplicatePathsByFileIdentity([
-        geminiFileLink,
-        geminiFile,
-      ]);
+      const result = await deduplicatePathsByFileIdentity([geminiFileLink, geminiFile]);
 
       expect(result.paths).toHaveLength(1);
       expect(result.identityMap.get(geminiFile)).toBe(
@@ -474,10 +455,7 @@ describe('memoryDiscovery', () => {
       );
       const missingFile = path.join(projectRoot, 'missing.md');
 
-      const result = await deduplicatePathsByFileIdentity([
-        geminiFile,
-        missingFile,
-      ]);
+      const result = await deduplicatePathsByFileIdentity([geminiFile, missingFile]);
 
       expect(result.paths).toEqual([geminiFile, missingFile]);
       expect(result.identityMap.has(missingFile)).toBe(false);
@@ -496,8 +474,7 @@ describe('memoryDiscovery', () => {
         await fsPromises.link(geminiFile, link1);
         await fsPromises.link(geminiFile, link2);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         if (
           errorMessage.includes('cross-device') ||
           errorMessage.includes('EXDEV') ||
@@ -514,19 +491,11 @@ describe('memoryDiscovery', () => {
       expect(stats1.ino).toBe(stats2.ino);
       expect(stats1.ino).toBe(stats3.ino);
 
-      const result = await deduplicatePathsByFileIdentity([
-        geminiFile,
-        link1,
-        link2,
-      ]);
+      const result = await deduplicatePathsByFileIdentity([geminiFile, link1, link2]);
 
       expect(result.paths).toHaveLength(1);
-      expect(result.identityMap.get(geminiFile)).toBe(
-        result.identityMap.get(link1),
-      );
-      expect(result.identityMap.get(geminiFile)).toBe(
-        result.identityMap.get(link2),
-      );
+      expect(result.identityMap.get(geminiFile)).toBe(result.identityMap.get(link1));
+      expect(result.identityMap.get(geminiFile)).toBe(result.identityMap.get(link2));
 
       try {
         await fsPromises.unlink(link1);
@@ -549,11 +518,7 @@ describe('memoryDiscovery', () => {
         'Subdir JIT content',
       );
 
-      const result = await loadJitSubdirectoryMemory(
-        targetFile,
-        [rootDir],
-        new Set(),
-      );
+      const result = await loadJitSubdirectoryMemory(targetFile, [rootDir], new Set());
 
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
@@ -561,12 +526,8 @@ describe('memoryDiscovery', () => {
     });
 
     it('should skip JIT memory when target is outside trusted roots', async () => {
-      const trustedRoot = await createEmptyDir(
-        path.join(testRootDir, 'trusted'),
-      );
-      const untrustedDir = await createEmptyDir(
-        path.join(testRootDir, 'untrusted'),
-      );
+      const trustedRoot = await createEmptyDir(path.join(testRootDir, 'trusted'));
+      const untrustedDir = await createEmptyDir(path.join(testRootDir, 'untrusted'));
       const targetFile = path.join(untrustedDir, 'target.txt');
 
       await createTestFile(
@@ -627,8 +588,7 @@ describe('memoryDiscovery', () => {
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         if (
           errorMessage.includes('cross-device') ||
           errorMessage.includes('EXDEV') ||
@@ -645,16 +605,11 @@ describe('memoryDiscovery', () => {
 
       setGeminiMdFilename(['agents.md', 'AGENTS.md']);
 
-      const result = await loadJitSubdirectoryMemory(
-        targetFile,
-        [rootDir],
-        new Set(),
-      );
+      const result = await loadJitSubdirectoryMemory(targetFile, [rootDir], new Set());
 
       expect(result.files).toHaveLength(1);
       expect(result.files[0].content).toBe('JIT memory content');
-      const contentMatches =
-        result.files[0].content.match(/JIT memory content/g);
+      const contentMatches = result.files[0].content.match(/JIT memory content/g);
       expect(contentMatches).toHaveLength(1);
 
       try {
@@ -693,9 +648,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should resolve file target to its parent directory for traversal', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'jit_file_resolve'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'jit_file_resolve'));
       await createEmptyDir(path.join(rootDir, '.git'));
       const subDir = await createEmptyDir(path.join(rootDir, 'src'));
 
@@ -710,11 +663,7 @@ describe('memoryDiscovery', () => {
         'Src context rules',
       );
 
-      const result = await loadJitSubdirectoryMemory(
-        targetFile,
-        [rootDir],
-        new Set(),
-      );
+      const result = await loadJitSubdirectoryMemory(targetFile, [rootDir], new Set());
 
       // Should find the AGENTS.md in the same directory as the file
       expect(result.files).toHaveLength(1);
@@ -723,9 +672,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should handle non-existent file target by using parent directory', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'jit_nonexistent'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'jit_nonexistent'));
       await createEmptyDir(path.join(rootDir, '.git'));
       const subDir = await createEmptyDir(path.join(rootDir, 'src'));
 
@@ -737,11 +684,7 @@ describe('memoryDiscovery', () => {
         'Rules for new files',
       );
 
-      const result = await loadJitSubdirectoryMemory(
-        targetFile,
-        [rootDir],
-        new Set(),
-      );
+      const result = await loadJitSubdirectoryMemory(targetFile, [rootDir], new Set());
 
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
@@ -749,9 +692,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should fall back to trusted root as ceiling when no git root exists', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'jit_no_git'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'jit_no_git'));
       // No .git directory created — ceiling falls back to trusted root
       const subDir = await createEmptyDir(path.join(rootDir, 'subdir'));
       const targetFile = path.join(subDir, 'target.txt');
@@ -761,11 +702,7 @@ describe('memoryDiscovery', () => {
         'Content without git',
       );
 
-      const result = await loadJitSubdirectoryMemory(
-        targetFile,
-        [rootDir],
-        new Set(),
-      );
+      const result = await loadJitSubdirectoryMemory(targetFile, [rootDir], new Set());
 
       // subDir is within the trusted root, so its AGENTS.md is found
       expect(result.files).toHaveLength(1);
@@ -774,9 +711,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should stop at a custom boundary marker instead of .git', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'custom_marker'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'custom_marker'));
       // Use a custom marker file instead of .git
       await createTestFile(path.join(rootDir, '.monorepo-root'), '');
       const subDir = await createEmptyDir(path.join(rootDir, 'packages/app'));
@@ -805,9 +740,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should support multiple boundary markers', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'multi_marker'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'multi_marker'));
       // Use a non-.git marker
       await createTestFile(path.join(rootDir, 'package.json'), '{}');
       const subDir = await createEmptyDir(path.join(rootDir, 'src'));
@@ -832,9 +765,7 @@ describe('memoryDiscovery', () => {
     });
 
     it('should disable parent traversal when boundary markers array is empty', async () => {
-      const rootDir = await createEmptyDir(
-        path.join(testRootDir, 'empty_markers'),
-      );
+      const rootDir = await createEmptyDir(path.join(testRootDir, 'empty_markers'));
       await createEmptyDir(path.join(rootDir, '.git'));
       const subDir = await createEmptyDir(path.join(rootDir, 'subdir'));
       const targetFile = path.join(subDir, 'target.txt');

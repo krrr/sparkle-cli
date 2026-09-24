@@ -8,10 +8,7 @@ import type { GitService } from '../services/gitService.js';
 import type { CommandActionReturn } from './types.js';
 import { type ToolCallData } from '../utils/checkpointUtils.js';
 
-export async function* performRestore<
-  HistoryType = unknown,
-  ArgsType = unknown,
->(
+export async function* performRestore<HistoryType = unknown, ArgsType = unknown>(
   toolCallData: ToolCallData<HistoryType, ArgsType>,
   gitService: GitService | undefined,
 ): AsyncGenerator<CommandActionReturn<HistoryType>> {

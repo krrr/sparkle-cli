@@ -9,10 +9,7 @@ import { getUserStartupWarnings } from './userStartupWarnings.js';
 import * as os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import {
-  isFolderTrustEnabled,
-  isWorkspaceTrusted,
-} from '../config/trustedFolders.js';
+import { isFolderTrustEnabled, isWorkspaceTrusted } from '../config/trustedFolders.js';
 import { getCompatibilityWarnings, WarningPriority } from 'sparkle-cli-core';
 
 // Mock os.homedir to control the home directory in tests
@@ -201,9 +198,9 @@ describe('getUserStartupWarnings', () => {
       });
       vi.mocked(isHeadlessMode).mockReturnValue(true);
 
-      await expect(
-        getUserStartupWarnings({}, testRootDir),
-      ).rejects.toThrowError(FatalUntrustedWorkspaceError);
+      await expect(getUserStartupWarnings({}, testRootDir)).rejects.toThrowError(
+        FatalUntrustedWorkspaceError,
+      );
     });
 
     it('should not return a warning when trusted in headless mode', async () => {

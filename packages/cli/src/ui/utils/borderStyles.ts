@@ -60,11 +60,7 @@ export function getToolGroupBorderAppearance(
 
   const hasPending = toolsToInspect.some((t) => {
     if (isTrackedToolCall(t)) {
-      return (
-        t.status !== 'success' &&
-        t.status !== 'error' &&
-        t.status !== 'cancelled'
-      );
+      return t.status !== 'success' && t.status !== 'error' && t.status !== 'cancelled';
     } else {
       return (
         t.status !== CoreToolCallStatus.Success &&
@@ -105,16 +101,12 @@ export function getToolGroupBorderAppearance(
   const isCurrentlyInShellTurn =
     !!activeShellPtyId && !backgroundTasks.has(activeShellPtyId);
 
-  const isShell =
-    isShellCommand || (item.tools.length === 0 && isCurrentlyInShellTurn);
-  const isPending =
-    hasPending || (item.tools.length === 0 && isCurrentlyInShellTurn);
+  const isShell = isShellCommand || (item.tools.length === 0 && isCurrentlyInShellTurn);
+  const isPending = hasPending || (item.tools.length === 0 && isCurrentlyInShellTurn);
 
   const isEffectivelyFocused =
     isEmbeddedShellFocused ||
-    (item.tools.length === 0 &&
-      isCurrentlyInShellTurn &&
-      !!embeddedShellFocused);
+    (item.tools.length === 0 && isCurrentlyInShellTurn && !!embeddedShellFocused);
 
   const borderColor = isEffectivelyFocused
     ? theme.ui.focus

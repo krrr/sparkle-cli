@@ -15,10 +15,7 @@ interface SkillsListProps {
   showDescriptions: boolean;
 }
 
-export const SkillsList: React.FC<SkillsListProps> = ({
-  skills,
-  showDescriptions,
-}) => {
+export const SkillsList: React.FC<SkillsListProps> = ({ skills, showDescriptions }) => {
   const sortSkills = (a: SkillDefinition, b: SkillDefinition) => {
     if (a.isBuiltin === b.isBuiltin) {
       return a.name.localeCompare(b.name);
@@ -35,21 +32,14 @@ export const SkillsList: React.FC<SkillsListProps> = ({
       <Text color={theme.text.primary}>{'  '}- </Text>
       <Box flexDirection="column">
         <Box flexDirection="row">
-          <Text
-            bold
-            color={skill.disabled ? theme.text.secondary : theme.text.link}
-          >
+          <Text bold color={skill.disabled ? theme.text.secondary : theme.text.link}>
             {skill.name}
           </Text>
-          {skill.isBuiltin && (
-            <Text color={theme.text.secondary}>{' [Built-in]'}</Text>
-          )}
+          {skill.isBuiltin && <Text color={theme.text.secondary}>{' [Built-in]'}</Text>}
         </Box>
         {showDescriptions && skill.description && (
           <Box marginLeft={2}>
-            <Text
-              color={skill.disabled ? theme.text.secondary : theme.text.primary}
-            >
+            <Text color={skill.disabled ? theme.text.secondary : theme.text.primary}>
               {skill.description}
             </Text>
           </Box>

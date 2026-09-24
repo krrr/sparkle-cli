@@ -9,10 +9,7 @@ import type React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { theme } from '../semantic-colors.js';
 import stripAnsi from 'strip-ansi';
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { MaxSizedBox } from './shared/MaxSizedBox.js';
 import { Scrollable } from './shared/Scrollable.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -109,8 +106,7 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
       discoveryResults.skills.length > 0 ||
       discoveryResults.settings.length > 0);
 
-  const hasWarnings =
-    discoveryResults && discoveryResults.securityWarnings.length > 0;
+  const hasWarnings = discoveryResults && discoveryResults.securityWarnings.length > 0;
 
   const hasErrors =
     discoveryResults &&
@@ -141,9 +137,9 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
       <Box marginBottom={1}>
         <Text color={theme.text.primary}>
           Trusting a folder allows Sparkle CLI to load its local configurations,
-          including custom commands, hooks, MCP servers, agent skills, and
-          settings. These configurations could execute code on your behalf or
-          change the behavior of the CLI.
+          including custom commands, hooks, MCP servers, agent skills, and settings.
+          These configurations could execute code on your behalf or change the behavior
+          of the CLI.
         </Text>
       </Box>
 
@@ -202,11 +198,7 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
   );
 
   const selectOptions = (
-    <RadioButtonSelect
-      items={options}
-      onSelect={onSelect}
-      isFocused={!isRestarting}
-    />
+    <RadioButtonSelect items={options} onSelect={onSelect} isFocused={!isRestarting} />
   );
 
   const renderContent = () => {
@@ -303,8 +295,8 @@ export const FolderTrustDialog: React.FC<FolderTrustDialogProps> = ({
       {exiting && (
         <Box marginLeft={1} marginTop={1}>
           <Text color={theme.status.warning}>
-            A folder trust level must be selected to continue. Exiting since
-            escape was pressed.
+            A folder trust level must be selected to continue. Exiting since escape was
+            pressed.
           </Text>
         </Box>
       )}

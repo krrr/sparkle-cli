@@ -124,18 +124,14 @@ describe('keybindingUtils', () => {
     it('formats default commands (using default platform behavior)', () => {
       expect(formatCommand(Command.QUIT, undefined, 'default')).toBe('Ctrl+C');
       expect(formatCommand(Command.SUBMIT, undefined, 'default')).toBe('Enter');
-      expect(
-        formatCommand(Command.TOGGLE_BACKGROUND_SHELL, undefined, 'default'),
-      ).toBe('Ctrl+B');
+      expect(formatCommand(Command.TOGGLE_BACKGROUND_SHELL, undefined, 'default')).toBe(
+        'Ctrl+B',
+      );
     });
 
     it('returns empty string for unknown commands', () => {
       expect(
-        formatCommand(
-          'unknown.command' as unknown as Command,
-          undefined,
-          'default',
-        ),
+        formatCommand('unknown.command' as unknown as Command, undefined, 'default'),
       ).toBe('');
     });
   });

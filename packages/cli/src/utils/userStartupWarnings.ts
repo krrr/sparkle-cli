@@ -16,10 +16,7 @@ import {
   FatalUntrustedWorkspaceError,
 } from 'sparkle-cli-core';
 import type { Settings } from '../config/settingsSchema.js';
-import {
-  isFolderTrustEnabled,
-  isWorkspaceTrusted,
-} from '../config/trustedFolders.js';
+import { isFolderTrustEnabled, isWorkspaceTrusted } from '../config/trustedFolders.js';
 
 type WarningCheck = {
   id: string;
@@ -44,10 +41,7 @@ const homeDirectoryCheck: WarningCheck = {
 
       if (path.resolve(workspaceRealPath) === path.resolve(homeRealPath)) {
         // If folder trust is enabled and the user trusts the home directory, don't show the warning.
-        if (
-          isFolderTrustEnabled(settings) &&
-          isWorkspaceTrusted(settings).isTrusted
-        ) {
+        if (isFolderTrustEnabled(settings) && isWorkspaceTrusted(settings).isTrusted) {
           return null;
         }
 

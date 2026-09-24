@@ -128,12 +128,8 @@ describe('ListMcpResourcesTool', () => {
       returnDisplay: string;
     };
 
-    expect(result.llmContent).toBe(
-      'No resources found for server: nonexistent',
-    );
-    expect(result.returnDisplay).toBe(
-      'No resources found for server: nonexistent',
-    );
+    expect(result.llmContent).toBe('No resources found for server: nonexistent');
+    expect(result.returnDisplay).toBe('No resources found for server: nonexistent');
   });
 
   it('should return error if MCP Client Manager not available', async () => {

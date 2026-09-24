@@ -48,10 +48,7 @@ describe.skip('ACP Environment and Auth', () => {
       // Create a project directory with a .env file containing a recognizable invalid key
       const projectDir = resolve(join(rig.testDir!, 'project'));
       mkdirSync(projectDir, { recursive: true });
-      writeFileSync(
-        join(projectDir, '.env'),
-        'GEMINI_API_KEY=test-key-from-env\n',
-      );
+      writeFileSync(join(projectDir, '.env'), 'GEMINI_API_KEY=test-key-from-env\n');
 
       const bundlePath = join(import.meta.dirname, '..', 'bundle/sparkle.js');
 
@@ -67,9 +64,7 @@ describe.skip('ACP Environment and Auth', () => {
       });
 
       const input = Writable.toWeb(child.stdin!);
-      const output = Readable.toWeb(
-        child.stdout!,
-      ) as ReadableStream<Uint8Array>;
+      const output = Readable.toWeb(child.stdout!) as ReadableStream<Uint8Array>;
       const testClient = new MockClient();
       const stream = acp.ndJsonStream(input, output);
       const connection = new acp.ClientSideConnection(() => testClient, stream);
@@ -98,9 +93,7 @@ describe.skip('ACP Environment and Auth', () => {
         }),
       ).rejects.toSatisfy((error: unknown) => {
         const acpError = error as acp.RequestError;
-        const errorData = acpError.data as
-          | { error?: { message?: string } }
-          | undefined;
+        const errorData = acpError.data as { error?: { message?: string } } | undefined;
         const message = String(errorData?.error?.message || acpError.message);
         // It should NOT be our internal "Authentication required" message
         expect(message).not.toContain('Authentication required');
@@ -113,51 +106,44 @@ describe.skip('ACP Environment and Auth', () => {
     },
   );
 
-  itMaybe(
-    'should fail with authRequired when no API key is found',
-    async () => {
-      rig.setup('acp-auth-failure');
+  itMaybe('should fail with authRequired when no API key is found', async () => {
+    rig.setup('acp-auth-failure');
 
-      const bundlePath = join(import.meta.dirname, '..', 'bundle/sparkle.js');
+    const bundlePath = join(import.meta.dirname, '..', 'bundle/sparkle.js');
 
-      child = spawn('node', [bundlePath, '--acp'], {
-        cwd: rig.homeDir!,
-        stdio: ['pipe', 'pipe', 'inherit'],
-        env: {
-          ...process.env,
-          SPARKLE_CLI_HOME: rig.homeDir!,
-          GEMINI_API_KEY: undefined,
-          VERBOSE: 'true',
-        },
-      });
+    child = spawn('node', [bundlePath, '--acp'], {
+      cwd: rig.homeDir!,
+      stdio: ['pipe', 'pipe', 'inherit'],
+      env: {
+        ...process.env,
+        SPARKLE_CLI_HOME: rig.homeDir!,
+        GEMINI_API_KEY: undefined,
+        VERBOSE: 'true',
+      },
+    });
 
-      const input = Writable.toWeb(child.stdin!);
-      const output = Readable.toWeb(
-        child.stdout!,
-      ) as ReadableStream<Uint8Array>;
-      const testClient = new MockClient();
-      const stream = acp.ndJsonStream(input, output);
-      const connection = new acp.ClientSideConnection(() => testClient, stream);
+    const input = Writable.toWeb(child.stdin!);
+    const output = Readable.toWeb(child.stdout!) as ReadableStream<Uint8Array>;
+    const testClient = new MockClient();
+    const stream = acp.ndJsonStream(input, output);
+    const connection = new acp.ClientSideConnection(() => testClient, stream);
 
-      await connection.initialize({
-        protocolVersion: acp.PROTOCOL_VERSION,
-        clientCapabilities: {
-          fs: { readTextFile: false, writeTextFile: false },
-        },
-      });
+    await connection.initialize({
+      protocolVersion: acp.PROTOCOL_VERSION,
+      clientCapabilities: {
+        fs: { readTextFile: false, writeTextFile: false },
+      },
+    });
 
-      await expect(
-        connection.newSession({
-          cwd: resolve(rig.testDir!),
-          mcpServers: [],
-        }),
-      ).rejects.toMatchObject({
-        message: expect.stringContaining(
-          'Gemini API key is missing or not configured.',
-        ),
-      });
+    await expect(
+      connection.newSession({
+        cwd: resolve(rig.testDir!),
+        mcpServers: [],
+      }),
+    ).rejects.toMatchObject({
+      message: expect.stringContaining('Gemini API key is missing or not configured.'),
+    });
 
-      child.stdin!.end();
-    },
-  );
+    child.stdin!.end();
+  });
 });

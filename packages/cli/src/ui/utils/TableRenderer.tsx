@@ -35,10 +35,7 @@ const TABLE_MARGIN = 2;
  * This ensures character counts are accurate (markdown markers are removed
  * and styles are applied to the character's internal style object).
  */
-const parseMarkdownToStyledLine = (
-  text: string,
-  defaultColor?: string,
-): StyledLine => {
+const parseMarkdownToStyledLine = (text: string, defaultColor?: string): StyledLine => {
   const ansi = parseMarkdownToANSI(text, defaultColor);
   return toStyledCharacters(ansi);
 };
@@ -70,10 +67,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
   const styledHeaders = useMemo<StyledLine[]>(
     () =>
       headers.map((header) =>
-        parseMarkdownToStyledLine(
-          stripUnsafeCharacters(header),
-          theme.text.link,
-        ),
+        parseMarkdownToStyledLine(stripUnsafeCharacters(header), theme.text.link),
       ),
     [headers],
   );
@@ -82,10 +76,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
     () =>
       rows.map((row) =>
         row.map((cell) =>
-          parseMarkdownToStyledLine(
-            stripUnsafeCharacters(cell),
-            theme.text.primary,
-          ),
+          parseMarkdownToStyledLine(stripUnsafeCharacters(cell), theme.text.primary),
         ),
       ),
     [rows],
@@ -98,35 +89,30 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
     );
 
     // --- Define Constraints per Column ---
-    const constraints = Array.from({ length: numColumns }).map(
-      (_, colIndex) => {
-        const headerStyledLine = styledHeaders[colIndex] || StyledLine.empty(0);
-        let { contentWidth: maxContentWidth, maxWordWidth } =
-          calculateWidths(headerStyledLine);
+    const constraints = Array.from({ length: numColumns }).map((_, colIndex) => {
+      const headerStyledLine = styledHeaders[colIndex] || StyledLine.empty(0);
+      let { contentWidth: maxContentWidth, maxWordWidth } =
+        calculateWidths(headerStyledLine);
 
-        styledRows.forEach((row) => {
-          const cellStyledLine = row[colIndex] || StyledLine.empty(0);
-          const { contentWidth: cellWidth, maxWordWidth: cellWordWidth } =
-            calculateWidths(cellStyledLine);
+      styledRows.forEach((row) => {
+        const cellStyledLine = row[colIndex] || StyledLine.empty(0);
+        const { contentWidth: cellWidth, maxWordWidth: cellWordWidth } =
+          calculateWidths(cellStyledLine);
 
-          maxContentWidth = Math.max(maxContentWidth, cellWidth);
-          maxWordWidth = Math.max(maxWordWidth, cellWordWidth);
-        });
+        maxContentWidth = Math.max(maxContentWidth, cellWidth);
+        maxWordWidth = Math.max(maxWordWidth, cellWordWidth);
+      });
 
-        const minWidth = maxWordWidth;
-        const maxWidth = Math.max(minWidth, maxContentWidth);
+      const minWidth = maxWordWidth;
+      const maxWidth = Math.max(minWidth, maxContentWidth);
 
-        return { minWidth, maxWidth };
-      },
-    );
+      return { minWidth, maxWidth };
+    });
 
     // --- Calculate Available Space ---
     // Fixed overhead: borders (n+1) + padding (2n)
     const fixedOverhead = numColumns + 1 + numColumns * COLUMN_PADDING;
-    const availableWidth = Math.max(
-      0,
-      terminalWidth - fixedOverhead - TABLE_MARGIN,
-    );
+    const availableWidth = Math.max(0, terminalWidth - fixedOverhead - TABLE_MARGIN);
 
     // --- Allocation Algorithm ---
     const totalMinWidth = constraints.reduce((sum, c) => sum + c.minWidth, 0);
@@ -134,9 +120,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
 
     if (totalMinWidth > availableWidth) {
       // We must scale all the columns except the ones that are very short(<=5 characters)
-      const shortColumns = constraints.filter(
-        (c) => c.maxWidth <= MIN_COLUMN_WIDTH,
-      );
+      const shortColumns = constraints.filter((c) => c.maxWidth <= MIN_COLUMN_WIDTH);
       const totalShortColumnWidth = shortColumns.reduce(
         (sum, c) => sum + c.minWidth,
         0,
@@ -187,10 +171,7 @@ export const TableRenderer: React.FC<TableRendererProps> = ({
         const allocatedWidth = finalContentWidths[colIndex];
         const contentWidth = Math.max(1, allocatedWidth);
 
-        const wrappedStyledLines = wrapStyledChars(
-          cellStyledLine,
-          contentWidth,
-        );
+        const wrappedStyledLines = wrapStyledChars(cellStyledLine, contentWidth);
 
         const maxLineWidth = widestLineFromStyledChars(wrappedStyledLines);
         actualColumnWidths[colIndex] = Math.max(

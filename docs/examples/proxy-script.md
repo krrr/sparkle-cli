@@ -1,8 +1,8 @@
 # Example proxy script
 
 The following is an example of a proxy script that can be used with the
-`SPARKLE_SANDBOX_PROXY_COMMAND` environment variable. This script only allows
-`HTTPS` connections to `example.com:443` and declines all other requests.
+`SPARKLE_SANDBOX_PROXY_COMMAND` environment variable. This script only allows `HTTPS`
+connections to `example.com:443` and declines all other requests.
 
 ```javascript
 #!/usr/bin/env node
@@ -28,9 +28,7 @@ const ALLOWED_PORT = '443';
 
 const server = http.createServer((req, res) => {
   // Deny all requests other than CONNECT for HTTPS
-  console.log(
-    `[PROXY] Denying non-CONNECT request for: ${req.method} ${req.url}`,
-  );
+  console.log(`[PROXY] Denying non-CONNECT request for: ${req.method} ${req.url}`);
   res.writeHead(405, { 'Content-Type': 'text/plain' });
   res.end('Method Not Allowed');
 });

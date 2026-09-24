@@ -52,13 +52,11 @@ vi.mock('../contexts/SettingsContext.js', () => ({
 }));
 
 vi.mock('../themes/theme-manager.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../themes/theme-manager.js')>();
+  const actual = await importOriginal<typeof import('../themes/theme-manager.js')>();
   return {
     ...actual,
     themeManager: {
-      isDefaultTheme: (name: string) =>
-        name === 'default' || name === 'default-light',
+      isDefaultTheme: (name: string) => name === 'default' || name === 'default-light',
       setTerminalBackground: vi.fn(),
     },
     DEFAULT_THEME: { name: 'default' },
@@ -169,10 +167,7 @@ describe('useTerminalTheme', () => {
     expect(config.setTerminalBackground).toHaveBeenCalledWith('#000000');
     expect(themeManager.setTerminalBackground).toHaveBeenCalledWith('#000000');
     expect(refreshStatic).not.toHaveBeenCalled();
-    expect(mockHandleThemeSelect).toHaveBeenCalledWith(
-      'default',
-      expect.anything(),
-    );
+    expect(mockHandleThemeSelect).toHaveBeenCalledWith('default', expect.anything());
 
     mockSettings.merged.ui.theme = 'default';
     unmount();
@@ -216,10 +211,7 @@ describe('useTerminalTheme', () => {
     expect(themeManager.setTerminalBackground).not.toHaveBeenCalled();
     expect(refreshStatic).not.toHaveBeenCalled();
     // But it SHOULD select the dark theme because of the mismatch!
-    expect(mockHandleThemeSelect).toHaveBeenCalledWith(
-      'default',
-      expect.anything(),
-    );
+    expect(mockHandleThemeSelect).toHaveBeenCalledWith('default', expect.anything());
 
     mockSettings.merged.ui.theme = 'default';
     unmount();

@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  vi,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mocked } from 'vitest';
 import { detectLineEnding } from '../utils/textUtils.js';
 import { WriteFileTool } from './write-file.js';
 import { EditTool } from './edit.js';
@@ -100,9 +92,7 @@ describe('Line Ending Preservation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    tempDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'line-ending-test-external-'),
-    );
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'line-ending-test-external-'));
     if (!fs.existsSync(rootDir)) {
       fs.mkdirSync(rootDir, { recursive: true });
     }
@@ -116,12 +106,8 @@ describe('Line Ending Preservation', () => {
       generateJson: vi.fn(),
     } as unknown as Mocked<BaseLlmClient>;
 
-    mockConfigInternal.getGeminiClient.mockReturnValue(
-      mockGeminiClientInstance,
-    );
-    mockConfigInternal.getBaseLlmClient.mockReturnValue(
-      mockBaseLlmClientInstance,
-    );
+    mockConfigInternal.getGeminiClient.mockReturnValue(mockGeminiClientInstance);
+    mockConfigInternal.getBaseLlmClient.mockReturnValue(mockBaseLlmClientInstance);
   });
 
   afterEach(() => {

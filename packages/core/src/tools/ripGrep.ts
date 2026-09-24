@@ -30,16 +30,10 @@ import type { Config } from '../config/config.js';
 import { fileExists } from '../utils/fileUtils.js';
 import { GREP_TOOL_NAME } from './tool-names.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import {
-  FileExclusions,
-  COMMON_DIRECTORY_EXCLUDES,
-} from '../utils/ignorePatterns.js';
+import { FileExclusions, COMMON_DIRECTORY_EXCLUDES } from '../utils/ignorePatterns.js';
 import { FileDiscoveryService } from '../services/fileDiscoveryService.js';
 import { execStreaming, resolveExecutable } from '../utils/shell-utils.js';
-import {
-  DEFAULT_TOTAL_MAX_MATCHES,
-  DEFAULT_SEARCH_TIMEOUT_MS,
-} from './constants.js';
+import { DEFAULT_TOTAL_MAX_MATCHES, DEFAULT_SEARCH_TIMEOUT_MS } from './constants.js';
 import { RIP_GREP_DECLARATION } from './definitions/coreTools.js';
 import { type GrepMatch, formatGrepResults } from './grep-utils.js';
 
@@ -163,10 +157,7 @@ export interface RipGrepToolParams {
   total_max_matches?: number;
 }
 
-class GrepToolInvocation extends BaseToolInvocation<
-  RipGrepToolParams,
-  ToolResult
-> {
+class GrepToolInvocation extends BaseToolInvocation<RipGrepToolParams, ToolResult> {
   constructor(
     private readonly config: Config,
     private readonly fileDiscoveryService: FileDiscoveryService,
@@ -200,10 +191,7 @@ class GrepToolInvocation extends BaseToolInvocation<
           },
         };
       }
-      const validationError = this.config.validatePathAccess(
-        searchDirAbs,
-        'read',
-      );
+      const validationError = this.config.validatePathAccess(searchDirAbs, 'read');
       if (validationError) {
         return {
           llmContent: validationError,
@@ -301,14 +289,9 @@ class GrepToolInvocation extends BaseToolInvocation<
       }
 
       if (!this.params.no_ignore) {
-        const uniqueFiles = Array.from(
-          new Set(allMatches.map((m) => m.filePath)),
-        );
-        const absoluteFilePaths = uniqueFiles.map((f) =>
-          path.resolve(searchDirAbs, f),
-        );
-        const allowedFiles =
-          this.fileDiscoveryService.filterFiles(absoluteFilePaths);
+        const uniqueFiles = Array.from(new Set(allMatches.map((m) => m.filePath)));
+        const absoluteFilePaths = uniqueFiles.map((f) => path.resolve(searchDirAbs, f));
+        const allowedFiles = this.fileDiscoveryService.filterFiles(absoluteFilePaths);
         const allowedSet = new Set(allowedFiles);
         allMatches = allMatches.filter((m) =>
           allowedSet.has(path.resolve(searchDirAbs, m.filePath)),
@@ -370,9 +353,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       this.params.after === undefined
     ) {
       const contextLines = matchCount === 1 ? 50 : 15;
-      const uniqueFiles = Array.from(
-        new Set(allMatches.map((m) => m.absolutePath)),
-      );
+      const uniqueFiles = Array.from(new Set(allMatches.map((m) => m.absolutePath)));
 
       let enrichedMatches = await this.performRipgrepSearch({
         pattern: this.params.pattern,
@@ -392,9 +373,7 @@ class GrepToolInvocation extends BaseToolInvocation<
       if (!this.params.no_ignore) {
         const allowedFiles = this.fileDiscoveryService.filterFiles(uniqueFiles);
         const allowedSet = new Set(allowedFiles);
-        enrichedMatches = enrichedMatches.filter((m) =>
-          allowedSet.has(m.absolutePath),
-        );
+        enrichedMatches = enrichedMatches.filter((m) => allowedSet.has(m.absolutePath));
       }
 
       // Set context to prevent grep-utils from doing the JS fallback auto-context
@@ -542,10 +521,7 @@ class GrepToolInvocation extends BaseToolInvocation<
     }
   }
 
-  private parseRipgrepJsonLine(
-    line: string,
-    basePath: string,
-  ): GrepMatch | null {
+  private parseRipgrepJsonLine(line: string, basePath: string): GrepMatch | null {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const json = JSON.parse(line);
@@ -604,10 +580,7 @@ class GrepToolInvocation extends BaseToolInvocation<
     if (resolvedPath === this.config.getTargetDir() || pathParam === '.') {
       description += ` within ./`;
     } else {
-      const relativePath = makeRelative(
-        resolvedPath,
-        this.config.getTargetDir(),
-      );
+      const relativePath = makeRelative(resolvedPath, this.config.getTargetDir());
       description += ` within ${shortenPath(relativePath)}`;
     }
     return description;
@@ -617,10 +590,7 @@ class GrepToolInvocation extends BaseToolInvocation<
 /**
  * Implementation of the Grep tool logic (moved from CLI)
  */
-export class RipGrepTool extends BaseDeclarativeTool<
-  RipGrepToolParams,
-  ToolResult
-> {
+export class RipGrepTool extends BaseDeclarativeTool<RipGrepToolParams, ToolResult> {
   static readonly Name = GREP_TOOL_NAME;
   private readonly fileDiscoveryService: FileDiscoveryService;
 
@@ -655,9 +625,7 @@ export class RipGrepTool extends BaseDeclarativeTool<
    * @param params Parameters to validate
    * @returns An error message string if invalid, null otherwise
    */
-  protected override validateToolParamValues(
-    params: RipGrepToolParams,
-  ): string | null {
+  protected override validateToolParamValues(params: RipGrepToolParams): string | null {
     if (!params.fixed_strings) {
       try {
         new RegExp(params.pattern);
@@ -674,17 +642,11 @@ export class RipGrepTool extends BaseDeclarativeTool<
       }
     }
 
-    if (
-      params.max_matches_per_file !== undefined &&
-      params.max_matches_per_file < 1
-    ) {
+    if (params.max_matches_per_file !== undefined && params.max_matches_per_file < 1) {
       return 'max_matches_per_file must be at least 1.';
     }
 
-    if (
-      params.total_max_matches !== undefined &&
-      params.total_max_matches < 1
-    ) {
+    if (params.total_max_matches !== undefined && params.total_max_matches < 1) {
       return 'total_max_matches must be at least 1.';
     }
 
@@ -698,10 +660,7 @@ export class RipGrepTool extends BaseDeclarativeTool<
       } catch (err) {
         return err instanceof Error ? err.message : String(err);
       }
-      const validationError = this.config.validatePathAccess(
-        resolvedPath,
-        'read',
-      );
+      const validationError = this.config.validatePathAccess(resolvedPath, 'read');
       if (validationError) {
         return validationError;
       }

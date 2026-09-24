@@ -29,10 +29,7 @@ export async function handleDisable(args: DisableArgs) {
 
   try {
     if (args.scope?.toLowerCase() === 'workspace') {
-      await extensionManager.disableExtension(
-        args.name,
-        SettingScope.Workspace,
-      );
+      await extensionManager.disableExtension(args.name, SettingScope.Workspace);
     } else {
       await extensionManager.disableExtension(args.name, SettingScope.User);
     }

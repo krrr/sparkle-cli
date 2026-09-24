@@ -132,9 +132,7 @@ class ThemeManager {
       return;
     }
 
-    for (const [name, customThemeConfig] of Object.entries(
-      customThemesSettings,
-    )) {
+    for (const [name, customThemeConfig] of Object.entries(customThemesSettings)) {
       const validation = validateCustomTheme(customThemeConfig);
       if (validation.isValid) {
         if (validation.warning) {
@@ -172,10 +170,7 @@ class ThemeManager {
    * @param extensionName The name of the extension providing the themes.
    * @param customThemes Custom themes from extensions.
    */
-  registerExtensionThemes(
-    extensionName: string,
-    customThemes?: CustomTheme[],
-  ): void {
+  registerExtensionThemes(extensionName: string, customThemes?: CustomTheme[]): void {
     if (!customThemes) {
       return;
     }
@@ -207,10 +202,7 @@ class ThemeManager {
           const theme = createCustomTheme(themeWithDefaults);
           this.extensionThemes.set(namespacedName, theme);
         } catch (error) {
-          debugLogger.warn(
-            `Failed to load custom theme "${namespacedName}":`,
-            error,
-          );
+          debugLogger.warn(`Failed to load custom theme "${namespacedName}":`, error);
         }
       } else {
         debugLogger.warn(
@@ -225,10 +217,7 @@ class ThemeManager {
    * @param extensionName The name of the extension.
    * @param customThemes Custom themes to unregister.
    */
-  unregisterExtensionThemes(
-    extensionName: string,
-    customThemes?: CustomTheme[],
-  ): void {
+  unregisterExtensionThemes(extensionName: string, customThemes?: CustomTheme[]): void {
     if (!customThemes) {
       return;
     }
@@ -283,10 +272,7 @@ class ThemeManager {
    * Resets the ThemeManager state to defaults.
    * This is for testing purposes to ensure test isolation.
    */
-  resetForTesting(dependencies?: {
-    fs?: typeof fs;
-    homedir?: () => string;
-  }): void {
+  resetForTesting(dependencies?: { fs?: typeof fs; homedir?: () => string }): void {
     if (dependencies) {
       this.reinitialize(dependencies);
     }
@@ -611,13 +597,8 @@ class ThemeManager {
     } catch (error) {
       // Any error in the process (file not found, bad JSON, etc.) is caught here.
       // We can return undefined silently for file-not-found, and warn for others.
-      if (
-        !(error instanceof Error && 'code' in error && error.code === 'ENOENT')
-      ) {
-        debugLogger.warn(
-          `Could not load theme from file "${themePath}":`,
-          error,
-        );
+      if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+        debugLogger.warn(`Could not load theme from file "${themePath}":`, error);
       }
       return undefined;
     }
@@ -629,9 +610,7 @@ class ThemeManager {
     }
 
     // First check built-in themes
-    const builtInTheme = this.availableThemes.find(
-      (theme) => theme.name === themeName,
-    );
+    const builtInTheme = this.availableThemes.find((theme) => theme.name === themeName);
     if (builtInTheme) {
       return builtInTheme;
     }

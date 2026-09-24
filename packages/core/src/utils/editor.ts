@@ -52,9 +52,7 @@ export function isGuiEditor(editor: EditorType): editor is GuiEditorType {
   return GUI_EDITORS_SET.has(editor);
 }
 
-export function isTerminalEditor(
-  editor: EditorType,
-): editor is TerminalEditorType {
+export function isTerminalEditor(editor: EditorType): editor is TerminalEditorType {
   return TERMINAL_EDITORS_SET.has(editor);
 }
 
@@ -106,9 +104,7 @@ interface DiffCommand {
 const execAsync = promisify(exec);
 
 function getCommandExistsCmd(cmd: string): string {
-  return process.platform === 'win32'
-    ? `where.exe ${cmd}`
-    : `command -v ${cmd}`;
+  return process.platform === 'win32' ? `where.exe ${cmd}` : `command -v ${cmd}`;
 }
 
 function commandExists(cmd: string): boolean {
@@ -133,10 +129,7 @@ async function commandExistsAsync(cmd: string): Promise<boolean> {
  * Editor command configurations for different platforms.
  * Each editor can have multiple possible command names, listed in order of preference.
  */
-const editorCommands: Record<
-  EditorType,
-  { win32: string[]; default: string[] }
-> = {
+const editorCommands: Record<EditorType, { win32: string[]; default: string[] }> = {
   vscode: { win32: ['code.cmd'], default: ['code'] },
   vscodium: { win32: ['codium.cmd'], default: ['codium'] },
   windsurf: { win32: ['windsurf'], default: ['windsurf'] },
@@ -161,18 +154,14 @@ const editorCommands: Record<
 
 function getEditorCommands(editor: EditorType): string[] {
   const commandConfig = editorCommands[editor];
-  return process.platform === 'win32'
-    ? commandConfig.win32
-    : commandConfig.default;
+  return process.platform === 'win32' ? commandConfig.win32 : commandConfig.default;
 }
 
 export function hasValidEditorCommand(editor: EditorType): boolean {
   return getEditorCommands(editor).some((cmd) => commandExists(cmd));
 }
 
-export async function hasValidEditorCommandAsync(
-  editor: EditorType,
-): Promise<boolean> {
+export async function hasValidEditorCommandAsync(editor: EditorType): Promise<boolean> {
   return Promise.any(
     getEditorCommands(editor).map((cmd) =>
       commandExistsAsync(cmd).then((exists) => exists || Promise.reject()),
@@ -196,9 +185,7 @@ export function getEditorCommand(editor: EditorType): string {
  * and `win32` lists) so that, for example, `$EDITOR=code` is recognized as
  * vscode on Windows and `$EDITOR=code.cmd` is recognized as vscode on macOS.
  */
-export function resolveEditorTypeFromCommand(
-  command: string,
-): EditorType | undefined {
+export function resolveEditorTypeFromCommand(command: string): EditorType | undefined {
   const lowerCmd = command.toLowerCase();
   for (const editor of EDITORS) {
     const { win32, default: nonWin32 } = editorCommands[editor];
@@ -269,12 +256,8 @@ export function allowEditorTypeInSandbox(editor: EditorType): boolean {
   return true;
 }
 
-function isEditorTypeAvailable(
-  editor: string | undefined,
-): editor is EditorType {
-  return (
-    !!editor && isValidEditorType(editor) && allowEditorTypeInSandbox(editor)
-  );
+function isEditorTypeAvailable(editor: string | undefined): editor is EditorType {
+  return !!editor && isValidEditorType(editor) && allowEditorTypeInSandbox(editor);
 }
 
 /**
@@ -292,9 +275,7 @@ export function isEditorAvailable(editor: string | undefined): boolean {
 export async function isEditorAvailableAsync(
   editor: string | undefined,
 ): Promise<boolean> {
-  return (
-    isEditorTypeAvailable(editor) && (await hasValidEditorCommandAsync(editor))
-  );
+  return isEditorTypeAvailable(editor) && (await hasValidEditorCommandAsync(editor));
 }
 
 /**
@@ -406,9 +387,7 @@ export async function openDiff(
   editor: EditorType,
 ): Promise<void> {
   if (isHeadlessMode()) {
-    debugLogger.warn(
-      'External editor spawning is disabled in headless/server mode.',
-    );
+    debugLogger.warn('External editor spawning is disabled in headless/server mode.');
     return;
   }
 

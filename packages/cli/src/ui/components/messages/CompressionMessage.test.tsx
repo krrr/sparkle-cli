@@ -53,9 +53,7 @@ describe('<CompressionMessage />', () => {
       const output = lastFrame();
 
       expect(output).toContain('✦');
-      expect(output).toContain(
-        'Chat history compressed from 100 to 50 tokens.',
-      );
+      expect(output).toContain('Chat history compressed from 100 to 50 tokens.');
       unmount();
     });
 
@@ -77,9 +75,7 @@ describe('<CompressionMessage />', () => {
         const output = lastFrame();
 
         expect(output).toContain('✦');
-        expect(output).toContain(
-          `compressed from ${original} to ${newTokens} tokens`,
-        );
+        expect(output).toContain(`compressed from ${original} to ${newTokens} tokens`);
         expect(output).not.toContain('Skipping compression');
         expect(output).not.toContain('did not reduce size');
         unmount();
@@ -93,8 +89,7 @@ describe('<CompressionMessage />', () => {
         isPending: false,
         originalTokenCount: 50,
         newTokenCount: 75,
-        compressionStatus:
-          CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
+        compressionStatus: CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
       });
       const { lastFrame, unmount } = await renderWithProviders(
         <CompressionMessage {...props} />,
@@ -102,9 +97,7 @@ describe('<CompressionMessage />', () => {
       const output = lastFrame();
 
       expect(output).toContain('✦');
-      expect(output).toContain(
-        'Compression was not beneficial for this history size.',
-      );
+      expect(output).toContain('Compression was not beneficial for this history size.');
       unmount();
     });
 
@@ -113,17 +106,14 @@ describe('<CompressionMessage />', () => {
         isPending: false,
         originalTokenCount: 50,
         newTokenCount: 50,
-        compressionStatus:
-          CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
+        compressionStatus: CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
       });
       const { lastFrame, unmount } = await renderWithProviders(
         <CompressionMessage {...props} />,
       );
       const output = lastFrame();
 
-      expect(output).toContain(
-        'Compression was not beneficial for this history size.',
-      );
+      expect(output).toContain('Compression was not beneficial for this history size.');
       unmount();
     });
   });
@@ -175,8 +165,7 @@ describe('<CompressionMessage />', () => {
           isPending: false,
           originalTokenCount: original,
           newTokenCount: newTokens,
-          compressionStatus:
-            CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
         });
         const { lastFrame, unmount } = await renderWithProviders(
           <CompressionMessage {...props} />,
@@ -202,8 +191,7 @@ describe('<CompressionMessage />', () => {
           isPending: false,
           originalTokenCount: original,
           newTokenCount: newTokens,
-          compressionStatus:
-            CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.COMPRESSION_FAILED_INFLATED_TOKEN_COUNT,
         });
         const { lastFrame, unmount } = await renderWithProviders(
           <CompressionMessage {...props} />,
@@ -239,8 +227,7 @@ describe('<CompressionMessage />', () => {
     it('renders failure message for token count errors', async () => {
       const props = createCompressionProps({
         isPending: false,
-        compressionStatus:
-          CompressionStatus.COMPRESSION_FAILED_TOKEN_COUNT_ERROR,
+        compressionStatus: CompressionStatus.COMPRESSION_FAILED_TOKEN_COUNT_ERROR,
       });
       const { lastFrame, unmount } = await renderWithProviders(
         <CompressionMessage {...props} />,

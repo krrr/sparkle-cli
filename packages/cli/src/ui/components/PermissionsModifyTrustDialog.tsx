@@ -84,9 +84,7 @@ export function PermissionsModifyTrustDialog({
     { isActive: true },
   );
 
-  const index = TRUST_LEVEL_ITEMS.findIndex(
-    (item) => item.value === currentTrustLevel,
-  );
+  const index = TRUST_LEVEL_ITEMS.findIndex((item) => item.value === currentTrustLevel);
   const initialIndex = index === -1 ? 0 : index;
 
   return (
@@ -106,17 +104,17 @@ export function PermissionsModifyTrustDialog({
           </Text>
           {isInheritedTrustFromParent && (
             <Text color={theme.text.secondary}>
-              Note: This folder behaves as a trusted folder because one of the
-              parent folders is trusted. It will remain trusted even if you set
-              a different trust level here. To change this, you need to modify
-              the trust setting in the parent folder.
+              Note: This folder behaves as a trusted folder because one of the parent
+              folders is trusted. It will remain trusted even if you set a different
+              trust level here. To change this, you need to modify the trust setting in
+              the parent folder.
             </Text>
           )}
           {isInheritedTrustFromIde && (
             <Text color={theme.text.secondary}>
-              Note: This folder behaves as a trusted folder because the
-              connected IDE workspace is trusted. It will remain trusted even if
-              you set a different trust level here.
+              Note: This folder behaves as a trusted folder because the connected IDE
+              workspace is trusted. It will remain trusted even if you set a different
+              trust level here.
             </Text>
           )}
         </Box>
@@ -128,9 +126,7 @@ export function PermissionsModifyTrustDialog({
           initialIndex={initialIndex}
         />
         <Box marginTop={1}>
-          <Text color={theme.text.secondary}>
-            (Use Enter to select, Esc to close)
-          </Text>
+          <Text color={theme.text.secondary}>(Use Enter to select, Esc to close)</Text>
         </Box>
       </Box>
       {needsRestart && (

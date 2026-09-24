@@ -16,9 +16,7 @@ vi.mock('../../services/FileCommandLoader.js');
 
 vi.mock('sparkle-cli-core', async () => {
   const actual =
-    await vi.importActual<typeof import('sparkle-cli-core')>(
-      'sparkle-cli-core',
-    );
+    await vi.importActual<typeof import('sparkle-cli-core')>('sparkle-cli-core');
   return {
     ...actual,
     Storage: class extends actual.Storage {
@@ -76,9 +74,7 @@ describe('commandsCommand', () => {
 
   describe('list', () => {
     it('should list .toml files from available sources', async () => {
-      vi.mocked(
-        FileCommandLoader.prototype.listAvailableFiles,
-      ).mockResolvedValue([
+      vi.mocked(FileCommandLoader.prototype.listAvailableFiles).mockResolvedValue([
         {
           displayName: 'User',
           path: '/mock/user/commands',
@@ -96,9 +92,7 @@ describe('commandsCommand', () => {
         },
       ]);
 
-      const listCmd = commandsCommand.subCommands!.find(
-        (s) => s.name === 'list',
-      )!;
+      const listCmd = commandsCommand.subCommands!.find((s) => s.name === 'list')!;
 
       await listCmd.action!(context, '');
 
@@ -117,31 +111,23 @@ describe('commandsCommand', () => {
     });
 
     it('should show "No custom command files found" message if no .toml files exist', async () => {
-      vi.mocked(
-        FileCommandLoader.prototype.listAvailableFiles,
-      ).mockResolvedValue([]);
+      vi.mocked(FileCommandLoader.prototype.listAvailableFiles).mockResolvedValue([]);
 
-      const listCmd = commandsCommand.subCommands!.find(
-        (s) => s.name === 'list',
-      )!;
+      const listCmd = commandsCommand.subCommands!.find((s) => s.name === 'list')!;
 
       const result = await listCmd.action!(context, '');
 
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: expect.stringContaining(
-          'No custom command files (.toml) found.',
-        ),
+        content: expect.stringContaining('No custom command files (.toml) found.'),
       });
     });
   });
 
   describe('reload', () => {
     it('should call reloadCommands and show a success message', async () => {
-      const reloadCmd = commandsCommand.subCommands!.find(
-        (s) => s.name === 'reload',
-      )!;
+      const reloadCmd = commandsCommand.subCommands!.find((s) => s.name === 'reload')!;
 
       await reloadCmd.action!(context, '');
 

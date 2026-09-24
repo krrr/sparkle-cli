@@ -8,8 +8,7 @@ import type React from 'react';
 import { createContext, useContext } from 'react';
 import { defaultKeyMatchers, type KeyMatchers } from '../key/keyMatchers.js';
 
-export const KeyMatchersContext =
-  createContext<KeyMatchers>(defaultKeyMatchers);
+export const KeyMatchersContext = createContext<KeyMatchers>(defaultKeyMatchers);
 
 export const KeyMatchersProvider = ({
   children,
@@ -18,9 +17,7 @@ export const KeyMatchersProvider = ({
   children: React.ReactNode;
   value: KeyMatchers;
 }): React.JSX.Element => (
-  <KeyMatchersContext.Provider value={value}>
-    {children}
-  </KeyMatchersContext.Provider>
+  <KeyMatchersContext.Provider value={value}>{children}</KeyMatchersContext.Provider>
 );
 
 /**

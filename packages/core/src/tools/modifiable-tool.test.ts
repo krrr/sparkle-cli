@@ -52,9 +52,7 @@ describe('modifyWithEditor', () => {
   beforeEach(async () => {
     vi.resetAllMocks();
 
-    testProjectDir = await fsp.mkdtemp(
-      path.join(os.tmpdir(), 'modifiable-tool-test-'),
-    );
+    testProjectDir = await fsp.mkdtemp(path.join(os.tmpdir(), 'modifiable-tool-test-'));
     abortSignal = new AbortController().signal;
 
     currentContent = 'original content\nline 2\nline 3';
@@ -109,12 +107,8 @@ describe('modifyWithEditor', () => {
         abortSignal,
       );
 
-      expect(mockModifyContext.getCurrentContent).toHaveBeenCalledWith(
-        mockParams,
-      );
-      expect(mockModifyContext.getProposedContent).toHaveBeenCalledWith(
-        mockParams,
-      );
+      expect(mockModifyContext.getCurrentContent).toHaveBeenCalledWith(mockParams);
+      expect(mockModifyContext.getProposedContent).toHaveBeenCalledWith(mockParams);
       expect(mockModifyContext.getFilePath).toHaveBeenCalledWith(mockParams);
 
       expect(mockOpenDiff).toHaveBeenCalledOnce();
@@ -302,12 +296,7 @@ describe('modifyWithEditor', () => {
     const writeSpy = vi.spyOn(fs, 'writeFileSync');
 
     await expect(
-      modifyWithEditor(
-        mockParams,
-        mockModifyContext,
-        DEFAULT_GUI_EDITOR,
-        abortSignal,
-      ),
+      modifyWithEditor(mockParams, mockModifyContext, DEFAULT_GUI_EDITOR, abortSignal),
     ).rejects.toThrow('Editor failed to open');
 
     expect(writeSpy).toHaveBeenCalledTimes(2);
@@ -321,9 +310,7 @@ describe('modifyWithEditor', () => {
   });
 
   it('should handle temp file cleanup errors gracefully', async () => {
-    const consoleErrorSpy = vi
-      .spyOn(debugLogger, 'error')
-      .mockImplementation(() => {});
+    const consoleErrorSpy = vi.spyOn(debugLogger, 'error').mockImplementation(() => {});
     vi.spyOn(fs, 'unlinkSync').mockImplementation(() => {
       throw new Error('Failed to delete file');
     });
@@ -350,11 +337,7 @@ describe('modifyWithEditor', () => {
   });
 
   it('should create temp files with correct naming with extension', async () => {
-    const testFilePath = path.join(
-      testProjectDir,
-      'subfolder',
-      'test-file.txt',
-    );
+    const testFilePath = path.join(testProjectDir, 'subfolder', 'test-file.txt');
     mockModifyContext.getFilePath = vi.fn().mockReturnValue(testFilePath);
 
     await modifyWithEditor(

@@ -15,9 +15,7 @@ describe('FolderTrustDiscoveryService', () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'sparkle-discovery-test-'),
-    );
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-discovery-test-'));
   });
 
   afterEach(async () => {
@@ -32,10 +30,7 @@ describe('FolderTrustDiscoveryService', () => {
     // Mock commands
     const commandsDir = path.join(geminiDir, 'commands');
     await fs.mkdir(commandsDir);
-    await fs.writeFile(
-      path.join(commandsDir, 'test-cmd.toml'),
-      'prompt = "test"',
-    );
+    await fs.writeFile(path.join(commandsDir, 'test-cmd.toml'), 'prompt = "test"');
 
     // Mock skills
     const skillsDir = path.join(geminiDir, 'skills');
@@ -58,10 +53,7 @@ describe('FolderTrustDiscoveryService', () => {
       general: { vimMode: true },
       ui: { theme: 'Dark' },
     };
-    await fs.writeFile(
-      path.join(geminiDir, 'settings.json'),
-      JSON.stringify(settings),
-    );
+    await fs.writeFile(path.join(geminiDir, 'settings.json'), JSON.stringify(settings));
 
     const results = await FolderTrustDiscoveryService.discover(tempDir);
 
@@ -91,10 +83,7 @@ describe('FolderTrustDiscoveryService', () => {
         },
       },
     };
-    await fs.writeFile(
-      path.join(geminiDir, 'settings.json'),
-      JSON.stringify(settings),
-    );
+    await fs.writeFile(path.join(geminiDir, 'settings.json'), JSON.stringify(settings));
 
     const results = await FolderTrustDiscoveryService.discover(tempDir);
 
@@ -170,8 +159,6 @@ describe('FolderTrustDiscoveryService', () => {
     const results = await FolderTrustDiscoveryService.discover(tempDir);
 
     expect(results.agents).toContain('test-agent');
-    expect(results.securityWarnings).toContain(
-      'This project contains custom agents.',
-    );
+    expect(results.securityWarnings).toContain('This project contains custom agents.');
   });
 });

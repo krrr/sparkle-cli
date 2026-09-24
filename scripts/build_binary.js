@@ -42,10 +42,7 @@ function runCommand(command, args, options = {}) {
   let useShell = options.shell || false;
 
   // On Windows, npm/npx are batch files and need a shell
-  if (
-    process.platform === 'win32' &&
-    (command === 'npm' || command === 'npx')
-  ) {
+  if (process.platform === 'win32' && (command === 'npm' || command === 'npx')) {
     finalCommand = `${command}.cmd`;
     useShell = true;
   }
@@ -63,9 +60,7 @@ function runCommand(command, args, options = {}) {
     if (result.error) {
       throw result.error;
     }
-    throw new Error(
-      `Command failed with exit code ${result.status}: ${command}`,
-    );
+    throw new Error(`Command failed with exit code ${result.status}: ${command}`);
   }
 
   return result;
@@ -144,9 +139,7 @@ if (!includeNativeModules) {
 
 // 4. Generate SEA Configuration and Manifest
 console.log('Generating SEA configuration and manifest...');
-const packageJson = JSON.parse(
-  readFileSync(join(root, 'package.json'), 'utf8'),
-);
+const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 
 // Helper to calc hash
 const sha256 = (content) => createHash('sha256').update(content).digest('hex');
@@ -264,8 +257,7 @@ try {
   // Cleanup
   if (existsSync(seaConfigPath)) rmSync(seaConfigPath);
   if (existsSync(manifestPath)) rmSync(manifestPath);
-  if (existsSync(stagingDir))
-    rmSync(stagingDir, { recursive: true, force: true });
+  if (existsSync(stagingDir)) rmSync(stagingDir, { recursive: true, force: true });
   process.exit(1);
 }
 
@@ -296,13 +288,7 @@ if (platform === 'darwin') {
   console.log(`Thinning universal binary for ${arch}...`);
   try {
     // Attempt to thin the binary. Will fail safely if it's not a fat binary.
-    runCommand('lipo', [
-      targetBinaryPath,
-      '-thin',
-      arch,
-      '-output',
-      targetBinaryPath,
-    ]);
+    runCommand('lipo', [targetBinaryPath, '-thin', arch, '-output', targetBinaryPath]);
   } catch (e) {
     console.log(`Skipping lipo thinning: ${e.message}`);
   }
@@ -370,7 +356,6 @@ console.log('Cleaning up artifacts...');
 rmSync(blobPath);
 if (existsSync(seaConfigPath)) rmSync(seaConfigPath);
 if (existsSync(manifestPath)) rmSync(manifestPath);
-if (existsSync(stagingDir))
-  rmSync(stagingDir, { recursive: true, force: true });
+if (existsSync(stagingDir)) rmSync(stagingDir, { recursive: true, force: true });
 
 console.log(`Binary built successfully in ${targetDir}`);

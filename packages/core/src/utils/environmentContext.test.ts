@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import {
   getEnvironmentContext,
   getDirectoryContextString,
@@ -114,9 +106,7 @@ describe('getEnvironmentContext', () => {
     expect(context).toContain('<session_context>');
     expect(context).toContain('- **Workspace Directories:**');
     expect(context).toContain('  - /test/dir');
-    expect(context).toContain(
-      '- **Directory Structure:**\n\nMock Folder Structure',
-    );
+    expect(context).toContain('- **Directory Structure:**\n\nMock Folder Structure');
     expect(context).toContain('Mock Session Memory');
     expect(context).toContain('</session_context>');
     expect(getFolderStructure).toHaveBeenCalledWith('/test/dir', {
@@ -141,17 +131,13 @@ describe('getEnvironmentContext', () => {
     expect(context).toContain('- **Workspace Directories:**');
     expect(context).toContain('  - /test/dir1');
     expect(context).toContain('  - /test/dir2');
-    expect(context).toContain(
-      '- **Directory Structure:**\n\nStructure 1\nStructure 2',
-    );
+    expect(context).toContain('- **Directory Structure:**\n\nStructure 1\nStructure 2');
     expect(context).toContain('</session_context>');
     expect(getFolderStructure).toHaveBeenCalledTimes(2);
   });
 
   it('should omit directory structure when getIncludeDirectoryTree is false', async () => {
-    (vi.mocked(mockConfig.getIncludeDirectoryTree!) as Mock).mockReturnValue(
-      false,
-    );
+    (vi.mocked(mockConfig.getIncludeDirectoryTree!) as Mock).mockReturnValue(false);
 
     const parts = await getEnvironmentContext(mockConfig as Config);
 

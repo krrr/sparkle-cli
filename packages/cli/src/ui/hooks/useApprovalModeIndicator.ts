@@ -65,9 +65,7 @@ export function useApprovalModeIndicator({
             nextApprovalMode = ApprovalMode.AUTO_EDIT;
             break;
           case ApprovalMode.AUTO_EDIT:
-            nextApprovalMode = allowPlanMode
-              ? ApprovalMode.PLAN
-              : ApprovalMode.DEFAULT;
+            nextApprovalMode = allowPlanMode ? ApprovalMode.PLAN : ApprovalMode.DEFAULT;
             break;
           case ApprovalMode.PLAN:
             nextApprovalMode = ApprovalMode.DEFAULT;

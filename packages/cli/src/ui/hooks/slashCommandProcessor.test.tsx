@@ -309,9 +309,7 @@ describe('useSlashCommandProcessor', () => {
       const result = await setupProcessorHook();
       await waitFor(() => expect(result.current.slashCommands).toBeDefined());
 
-      let handled: Awaited<
-        ReturnType<typeof result.current.handleSlashCommand>
-      >;
+      let handled: Awaited<ReturnType<typeof result.current.handleSlashCommand>>;
       await act(async () => {
         handled = await result.current.handleSlashCommand('/nonexistent');
       });
@@ -330,9 +328,7 @@ describe('useSlashCommandProcessor', () => {
       const result = await setupProcessorHook();
       await waitFor(() => expect(result.current.slashCommands).toBeDefined());
 
-      let handled: Awaited<
-        ReturnType<typeof result.current.handleSlashCommand>
-      >;
+      let handled: Awaited<ReturnType<typeof result.current.handleSlashCommand>>;
       await act(async () => {
         handled = await result.current.handleSlashCommand('/mcp-command');
       });
@@ -378,9 +374,7 @@ describe('useSlashCommandProcessor', () => {
       expect(mockAddItem).toHaveBeenLastCalledWith(
         {
           type: MessageType.INFO,
-          text: expect.stringContaining(
-            "Command '/parent' requires a subcommand.",
-          ),
+          text: expect.stringContaining("Command '/parent' requires a subcommand."),
         },
         expect.any(Number),
       );
@@ -508,16 +502,12 @@ describe('useSlashCommandProcessor', () => {
         async ({ dialogType, commandName, mockFn }) => {
           const command = createTestCommand({
             name: commandName,
-            action: vi
-              .fn()
-              .mockResolvedValue({ type: 'dialog', dialog: dialogType }),
+            action: vi.fn().mockResolvedValue({ type: 'dialog', dialog: dialogType }),
           });
           const result = await setupProcessorHook({
             builtinCommands: [command],
           });
-          await waitFor(() =>
-            expect(result.current.slashCommands).toHaveLength(1),
-          );
+          await waitFor(() => expect(result.current.slashCommands).toHaveLength(1));
 
           await act(async () => {
             await result.current.handleSlashCommand(`/${commandName}`);
@@ -549,9 +539,7 @@ describe('useSlashCommandProcessor', () => {
           openAgentConfigDialog: mockOpenAgentConfigDialog,
         });
 
-        await waitFor(() =>
-          expect(result.current.slashCommands).toHaveLength(1),
-        );
+        await waitFor(() => expect(result.current.slashCommands).toHaveLength(1));
 
         await act(async () => {
           await result.current.handleSlashCommand(`/${commandName}`);
@@ -616,9 +604,7 @@ describe('useSlashCommandProcessor', () => {
     });
 
     it('should handle a "quit" action', async () => {
-      const quitAction = vi
-        .fn()
-        .mockResolvedValue({ type: 'quit', messages: ['bye'] });
+      const quitAction = vi.fn().mockResolvedValue({ type: 'quit', messages: ['bye'] });
       const command = createTestCommand({
         name: 'exit',
         action: quitAction,
@@ -637,9 +623,7 @@ describe('useSlashCommandProcessor', () => {
     });
 
     it('should delete the current session when quit action has deleteSession flag', async () => {
-      const mockDeleteCurrentSessionAsync = vi
-        .fn()
-        .mockResolvedValue(undefined);
+      const mockDeleteCurrentSessionAsync = vi.fn().mockResolvedValue(undefined);
 
       const mockClient = {
         getChatRecordingService: vi.fn().mockReturnValue({
@@ -672,9 +656,7 @@ describe('useSlashCommandProcessor', () => {
     });
 
     it('should not delete session when quit action does not have deleteSession flag', async () => {
-      const mockDeleteCurrentSessionAsync = vi
-        .fn()
-        .mockResolvedValue(undefined);
+      const mockDeleteCurrentSessionAsync = vi.fn().mockResolvedValue(undefined);
       const mockClient = {
         getChatRecordingService: vi.fn().mockReturnValue({
           deleteCurrentSessionAsync: mockDeleteCurrentSessionAsync,
@@ -814,9 +796,7 @@ describe('useSlashCommandProcessor', () => {
       });
       await waitFor(() => expect(result.current.slashCommands).toHaveLength(1));
 
-      let handled: Awaited<
-        ReturnType<typeof result.current.handleSlashCommand>
-      >;
+      let handled: Awaited<ReturnType<typeof result.current.handleSlashCommand>>;
       await act(async () => {
         // Use uppercase when command is lowercase
         handled = await result.current.handleSlashCommand('/Test');
@@ -1152,8 +1132,6 @@ describe('useSlashCommandProcessor', () => {
     act(() => {
       coreEvents.emit('extensionsStarting');
     });
-    await waitFor(() =>
-      expect(result.current.slashCommands).toEqual([newCommand]),
-    );
+    await waitFor(() => expect(result.current.slashCommands).toEqual([newCommand]));
   });
 });

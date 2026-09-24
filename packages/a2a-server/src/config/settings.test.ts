@@ -46,10 +46,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
 
 describe('loadSettings', () => {
   const mockHomeDir = path.join(os.tmpdir(), `gemini-home-${mocks.suffix}`);
-  const mockWorkspaceDir = path.join(
-    os.tmpdir(),
-    `sparkle-workspace-${mocks.suffix}`,
-  );
+  const mockWorkspaceDir = path.join(os.tmpdir(), `sparkle-workspace-${mocks.suffix}`);
   const mockGeminiHomeDir = path.join(mockHomeDir, '.sparkle');
   const mockGeminiWorkspaceDir = path.join(mockWorkspaceDir, '.sparkle');
 
@@ -67,10 +64,7 @@ describe('loadSettings', () => {
     if (fs.existsSync(USER_SETTINGS_PATH)) {
       fs.rmSync(USER_SETTINGS_PATH);
     }
-    const workspaceSettingsPath = path.join(
-      mockGeminiWorkspaceDir,
-      'settings.json',
-    );
+    const workspaceSettingsPath = path.join(mockGeminiWorkspaceDir, 'settings.json');
     if (fs.existsSync(workspaceSettingsPath)) {
       fs.rmSync(workspaceSettingsPath);
     }
@@ -143,10 +137,7 @@ describe('loadSettings', () => {
         respectGitIgnore: false,
       },
     };
-    const workspaceSettingsPath = path.join(
-      mockGeminiWorkspaceDir,
-      'settings.json',
-    );
+    const workspaceSettingsPath = path.join(mockGeminiWorkspaceDir, 'settings.json');
     fs.writeFileSync(workspaceSettingsPath, JSON.stringify(workspaceSettings));
 
     const result = loadSettings(mockWorkspaceDir, true);
@@ -164,14 +155,8 @@ describe('loadSettings', () => {
       fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
       const workspaceSettings = { folderTrust: true };
-      const workspaceSettingsPath = path.join(
-        mockGeminiWorkspaceDir,
-        'settings.json',
-      );
-      fs.writeFileSync(
-        workspaceSettingsPath,
-        JSON.stringify(workspaceSettings),
-      );
+      const workspaceSettingsPath = path.join(mockGeminiWorkspaceDir, 'settings.json');
+      fs.writeFileSync(workspaceSettingsPath, JSON.stringify(workspaceSettings));
 
       // checkPathTrust is mocked to return isTrusted: false by default
       const result = loadSettings(mockWorkspaceDir);
@@ -187,14 +172,8 @@ describe('loadSettings', () => {
       fs.writeFileSync(USER_SETTINGS_PATH, JSON.stringify(userSettings));
 
       const workspaceSettings = { folderTrust: true };
-      const workspaceSettingsPath = path.join(
-        mockGeminiWorkspaceDir,
-        'settings.json',
-      );
-      fs.writeFileSync(
-        workspaceSettingsPath,
-        JSON.stringify(workspaceSettings),
-      );
+      const workspaceSettingsPath = path.join(mockGeminiWorkspaceDir, 'settings.json');
+      fs.writeFileSync(workspaceSettingsPath, JSON.stringify(workspaceSettings));
 
       const result = loadSettings(mockWorkspaceDir);
       expect(result.folderTrust).toBe(true);
@@ -214,14 +193,8 @@ describe('loadSettings', () => {
         policyPaths: ['./malicious/user'],
         folderTrust: true,
       };
-      const workspaceSettingsPath = path.join(
-        mockGeminiWorkspaceDir,
-        'settings.json',
-      );
-      fs.writeFileSync(
-        workspaceSettingsPath,
-        JSON.stringify(workspaceSettings),
-      );
+      const workspaceSettingsPath = path.join(mockGeminiWorkspaceDir, 'settings.json');
+      fs.writeFileSync(workspaceSettingsPath, JSON.stringify(workspaceSettings));
 
       const result = loadSettings(mockWorkspaceDir);
       expect(result.folderTrust).toBe(true);

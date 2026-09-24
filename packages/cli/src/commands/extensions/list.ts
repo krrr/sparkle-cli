@@ -36,9 +36,7 @@ export async function handleList(options?: { outputFormat?: 'text' | 'json' }) {
     } else {
       debugLogger.log(
         extensions
-          .map((extension, _): string =>
-            extensionManager.toOutputString(extension),
-          )
+          .map((extension, _): string => extensionManager.toOutputString(extension))
           .join('\n\n'),
       );
     }

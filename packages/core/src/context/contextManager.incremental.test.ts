@@ -6,10 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ContextManager } from './contextManager.js';
-import {
-  createMockEnvironment,
-  createDummyNode,
-} from './testing/contextTestUtils.js';
+import { createMockEnvironment, createDummyNode } from './testing/contextTestUtils.js';
 import type { ContextProfile } from './config/profiles.js';
 import { NodeType, type ConcreteNode } from './graph/types.js';
 import type { PipelineOrchestrator } from './pipeline/orchestrator.js';
@@ -31,12 +28,8 @@ describe('ContextManager - Multi-stage and Incremental GC', () => {
     mockOrchestrator = {
       setNodeProvider: vi.fn(),
       waitForPipelines: vi.fn().mockResolvedValue(undefined),
-      executeTriggerSync: vi
-        .fn()
-        .mockImplementation(async (trigger, buffer) => buffer),
-      executeIngestionPipeline: vi
-        .fn()
-        .mockImplementation(async (nodes) => nodes),
+      executeTriggerSync: vi.fn().mockImplementation(async (trigger, buffer) => buffer),
+      executeIngestionPipeline: vi.fn().mockImplementation(async (nodes) => nodes),
       shutdown: vi.fn(),
     } as unknown as PipelineOrchestrator;
 
@@ -97,11 +90,7 @@ describe('ContextManager - Multi-stage and Incremental GC', () => {
         ),
       );
 
-    const createNodeWithTokens = (
-      id: string,
-      type: NodeType,
-      tokens: number,
-    ) => {
+    const createNodeWithTokens = (id: string, type: NodeType, tokens: number) => {
       const node = createDummyNode(id, type);
       // @ts-expect-error - attaching mock tokens for test
       node._mockTokens = tokens;

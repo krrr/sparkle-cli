@@ -23,8 +23,7 @@ export function renderAgentActionFeedback(
 
   if (status === 'error') {
     return (
-      error ||
-      `An error occurred while attempting to ${action} agent "${agentName}".`
+      error || `An error occurred while attempting to ${action} agent "${agentName}".`
     );
   }
 

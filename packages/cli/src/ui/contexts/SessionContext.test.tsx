@@ -55,9 +55,8 @@ const TestHarness = ({
 
 describe('SessionStatsContext', () => {
   it('should provide the correct initial state', async () => {
-    const contextRef: MutableRefObject<
-      ReturnType<typeof useSessionStats> | undefined
-    > = { current: undefined };
+    const contextRef: MutableRefObject<ReturnType<typeof useSessionStats> | undefined> =
+      { current: undefined };
 
     const { unmount } = await render(
       <SessionStatsProvider sessionId="test-session-id">
@@ -74,9 +73,8 @@ describe('SessionStatsContext', () => {
   });
 
   it('should update metrics when the uiTelemetryService emits an update', async () => {
-    const contextRef: MutableRefObject<
-      ReturnType<typeof useSessionStats> | undefined
-    > = { current: undefined };
+    const contextRef: MutableRefObject<ReturnType<typeof useSessionStats> | undefined> =
+      { current: undefined };
 
     const { unmount } = await render(
       <SessionStatsProvider sessionId="test-session-id">
@@ -150,9 +148,8 @@ describe('SessionStatsContext', () => {
   });
 
   it('should not update metrics if the data is the same', async () => {
-    const contextRef: MutableRefObject<
-      ReturnType<typeof useSessionStats> | undefined
-    > = { current: undefined };
+    const contextRef: MutableRefObject<ReturnType<typeof useSessionStats> | undefined> =
+      { current: undefined };
 
     let renderCount = 0;
     const CountingTestHarness = () => {
@@ -240,9 +237,8 @@ describe('SessionStatsContext', () => {
   });
 
   it('should update session ID and reset stats when the uiTelemetryService emits a clear event', async () => {
-    const contextRef: MutableRefObject<
-      ReturnType<typeof useSessionStats> | undefined
-    > = { current: undefined };
+    const contextRef: MutableRefObject<ReturnType<typeof useSessionStats> | undefined> =
+      { current: undefined };
 
     const { unmount } = await render(
       <SessionStatsProvider sessionId="test-session-id">

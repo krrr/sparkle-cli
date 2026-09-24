@@ -18,10 +18,7 @@ describe('TabHeader', () => {
   describe('rendering', () => {
     it('renders null for single tab', async () => {
       const { lastFrame, unmount } = await renderWithProviders(
-        <TabHeader
-          tabs={[{ key: '0', header: 'Only Tab' }]}
-          currentIndex={0}
-        />,
+        <TabHeader tabs={[{ key: '0', header: 'Only Tab' }]} currentIndex={0} />,
       );
       expect(lastFrame({ allowEmpty: true })).toBe('');
       unmount();

@@ -6,11 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { CoderAgentExecutor } from './executor.js';
-import type {
-  ExecutionEventBus,
-  RequestContext,
-  TaskStore,
-} from '@a2a-js/sdk/server';
+import type { ExecutionEventBus, RequestContext, TaskStore } from '@a2a-js/sdk/server';
 import { EventEmitter } from 'node:events';
 import { requestStorage } from '../http/requestStorage.js';
 
@@ -66,20 +62,18 @@ vi.mock('./task.js', () => {
     id: taskId,
     contextId,
     taskState: 'working',
-    acceptUserMessage: vi
-      .fn()
-      .mockImplementation(async function* (context, aborted) {
-        const isConfirmation = (
-          context.userMessage.parts as Array<{ kind: string }>
-        ).some((p) => p.kind === 'confirmation');
-        // Hang only for main user messages (text), allow confirmations to finish quickly
-        if (!isConfirmation && aborted) {
-          await new Promise((resolve) => {
-            aborted.addEventListener('abort', resolve, { once: true });
-          });
-        }
-        yield { type: 'content', value: 'hello' };
-      }),
+    acceptUserMessage: vi.fn().mockImplementation(async function* (context, aborted) {
+      const isConfirmation = (
+        context.userMessage.parts as Array<{ kind: string }>
+      ).some((p) => p.kind === 'confirmation');
+      // Hang only for main user messages (text), allow confirmations to finish quickly
+      if (!isConfirmation && aborted) {
+        await new Promise((resolve) => {
+          aborted.addEventListener('abort', resolve, { once: true });
+        });
+      }
+      yield { type: 'content', value: 'hello' };
+    }),
     acceptAgentMessage: vi.fn().mockResolvedValue(undefined),
     scheduleToolCalls: vi.fn().mockResolvedValue(undefined),
     waitForPendingTools: vi.fn().mockResolvedValue(undefined),
@@ -170,9 +164,9 @@ describe('CoderAgentExecutor', () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     expect(
-      (
-        executor as unknown as { executingTasks: Set<string> }
-      ).executingTasks.has(taskId),
+      (executor as unknown as { executingTasks: Set<string> }).executingTasks.has(
+        taskId,
+      ),
     ).toBe(true);
     const wrapper = executor.getTask(taskId);
     expect(wrapper).toBeDefined();
@@ -195,10 +189,7 @@ describe('CoderAgentExecutor', () => {
       },
     } as unknown as RequestContext;
 
-    const secondaryPromise = executor.execute(
-      secondaryRequestContext,
-      mockEventBus,
-    );
+    const secondaryPromise = executor.execute(secondaryRequestContext, mockEventBus);
 
     // Secondary execution should NOT add to executingTasks (already there)
     // and should return early after its loop
@@ -206,18 +197,18 @@ describe('CoderAgentExecutor', () => {
 
     // Task should still be in executingTasks and NOT disposed
     expect(
-      (
-        executor as unknown as { executingTasks: Set<string> }
-      ).executingTasks.has(taskId),
+      (executor as unknown as { executingTasks: Set<string> }).executingTasks.has(
+        taskId,
+      ),
     ).toBe(true);
     expect(wrapper?.task.dispose).not.toHaveBeenCalled();
 
     // Now simulate secondary socket closure - it should NOT affect primary
     secondarySocket.emit('end');
     expect(
-      (
-        executor as unknown as { executingTasks: Set<string> }
-      ).executingTasks.has(taskId),
+      (executor as unknown as { executingTasks: Set<string> }).executingTasks.has(
+        taskId,
+      ),
     ).toBe(true);
     expect(wrapper?.task.dispose).not.toHaveBeenCalled();
 
@@ -230,9 +221,9 @@ describe('CoderAgentExecutor', () => {
     await primaryPromise;
 
     expect(
-      (
-        executor as unknown as { executingTasks: Set<string> }
-      ).executingTasks.has(taskId),
+      (executor as unknown as { executingTasks: Set<string> }).executingTasks.has(
+        taskId,
+      ),
     ).toBe(false);
     expect(wrapper?.task.dispose).toHaveBeenCalled();
   });

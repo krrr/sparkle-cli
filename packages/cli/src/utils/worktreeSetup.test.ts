@@ -71,9 +71,7 @@ describe('setupWorktree', () => {
     expect(coreFunctions.getProjectRootForWorktree).toHaveBeenCalledWith(
       '/mock/project',
     );
-    expect(coreFunctions.createWorktreeService).toHaveBeenCalledWith(
-      '/mock/project',
-    );
+    expect(coreFunctions.createWorktreeService).toHaveBeenCalledWith('/mock/project');
     expect(mockService.setup).toHaveBeenCalledWith('my-feature');
     expect(process.chdir).toHaveBeenCalledWith(
       '/mock/project/.sparkle/worktrees/my-feature',
@@ -112,9 +110,7 @@ describe('setupWorktree', () => {
     await expect(setupWorktree('my-feature')).rejects.toThrow('PROCESS_EXIT');
 
     expect(coreFunctions.writeToStderr).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Failed to create or switch to worktree: Git failure',
-      ),
+      expect.stringContaining('Failed to create or switch to worktree: Git failure'),
     );
     expect(mockExit).toHaveBeenCalledWith(1);
 

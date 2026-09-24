@@ -179,11 +179,7 @@ export async function resolveConfirmation(
     }
 
     if (outcome === ToolConfirmationOutcome.ModifyWithEditor) {
-      const modResult = await handleExternalModification(
-        deps,
-        toolCall,
-        signal,
-      );
+      const modResult = await handleExternalModification(deps, toolCall, signal);
       // Editor is not available - emit error feedback and stay in the loop
       // to return to previous confirmation screen.
       if (modResult.error) {
@@ -255,11 +251,7 @@ async function handleExternalModification(
   );
   if (result) {
     const newInvocation = toolCall.tool.build(result.updatedParams);
-    state.updateArgs(
-      toolCall.request.callId,
-      result.updatedParams,
-      newInvocation,
-    );
+    state.updateArgs(toolCall.request.callId, result.updatedParams, newInvocation);
   }
   return {};
 }
@@ -282,11 +274,7 @@ async function handleInlineModification(
   );
   if (result) {
     const newInvocation = toolCall.tool.build(result.updatedParams);
-    state.updateArgs(
-      toolCall.request.callId,
-      result.updatedParams,
-      newInvocation,
-    );
+    state.updateArgs(toolCall.request.callId, result.updatedParams, newInvocation);
   }
 }
 

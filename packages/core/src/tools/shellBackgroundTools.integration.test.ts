@@ -51,10 +51,7 @@ describe('Background Tools Integration', () => {
     // 1. Start a backgroundable process
     // We use node to print continuous logs until killed
     const scriptPath = path.join(tempRootDir, 'log.js');
-    fs.writeFileSync(
-      scriptPath,
-      "setInterval(() => console.log('Log line'), 100);",
-    );
+    fs.writeFileSync(scriptPath, "setInterval(() => console.log('Log line'), 100);");
 
     // Using 'node' directly avoids cross-platform shell quoting issues with absolute paths.
     const commandString = `node "${scriptPath}"`;

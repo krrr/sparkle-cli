@@ -19,11 +19,7 @@ interface VimModeContextType {
 
 const VimModeContext = createContext<VimModeContextType | undefined>(undefined);
 
-export const VimModeProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const VimModeProvider = ({ children }: { children: React.ReactNode }) => {
   const { settings, setSetting } = useSettingsStore();
   const vimEnabled = settings.merged.general.vimMode;
   const [vimMode, setVimMode] = useState<VimMode>('INSERT');
@@ -45,9 +41,7 @@ export const VimModeProvider = ({
     setVimMode,
   };
 
-  return (
-    <VimModeContext.Provider value={value}>{children}</VimModeContext.Provider>
-  );
+  return <VimModeContext.Provider value={value}>{children}</VimModeContext.Provider>;
 };
 
 export const useVimMode = () => {

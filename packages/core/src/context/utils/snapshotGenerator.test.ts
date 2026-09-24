@@ -201,10 +201,7 @@ describe('SnapshotGenerator', () => {
 
     // Facts and rules should be appended
     expect(result.discovered_facts).toEqual(['Old Fact', 'New Fact']);
-    expect(result.constraints_and_preferences).toEqual([
-      'Old Rule',
-      'New Rule',
-    ]);
+    expect(result.constraints_and_preferences).toEqual(['Old Rule', 'New Rule']);
 
     // Arc should be appended
     expect(result.recent_arc).toEqual(['Old summary.', 'New summary.']);
@@ -222,12 +219,7 @@ describe('SnapshotGenerator', () => {
   it('should explicitly delete obsolete facts and constraints using array indices', async () => {
     const prevState: SnapshotState = {
       active_tasks: [],
-      discovered_facts: [
-        'Keep me',
-        'Delete me',
-        'Keep me too',
-        'Delete this also',
-      ],
+      discovered_facts: ['Keep me', 'Delete me', 'Keep me too', 'Delete this also'],
       constraints_and_preferences: ['Rule 1', 'Rule to drop', 'Rule 3'],
       recent_arc: [],
     };
@@ -353,9 +345,9 @@ describe('SnapshotGenerator', () => {
         recent_arc: ['Arc 1'],
       };
       mockGenerateJson.mockResolvedValue({});
-      vi.mocked(
-        mockEnv.tokenCalculator.estimateTokensForString,
-      ).mockImplementation((str) => str.length);
+      vi.mocked(mockEnv.tokenCalculator.estimateTokensForString).mockImplementation(
+        (str) => str.length,
+      );
       const generator = new SnapshotGenerator(mockEnv);
       const resultJson = await generator.synthesizeSnapshot(
         dummyNodes,
@@ -375,9 +367,9 @@ describe('SnapshotGenerator', () => {
         recent_arc: ['Arc 1'],
       };
       mockGenerateJson.mockResolvedValue({});
-      vi.mocked(
-        mockEnv.tokenCalculator.estimateTokensForString,
-      ).mockImplementation((str) => str.length);
+      vi.mocked(mockEnv.tokenCalculator.estimateTokensForString).mockImplementation(
+        (str) => str.length,
+      );
       const generator = new SnapshotGenerator(mockEnv);
       const resultJson = await generator.synthesizeSnapshot(
         dummyNodes,
@@ -400,9 +392,9 @@ describe('SnapshotGenerator', () => {
 
       mockGenerateJson.mockResolvedValue({});
 
-      vi.mocked(
-        mockEnv.tokenCalculator.estimateTokensForString,
-      ).mockImplementation((str) => str.length);
+      vi.mocked(mockEnv.tokenCalculator.estimateTokensForString).mockImplementation(
+        (str) => str.length,
+      );
 
       const generator = new SnapshotGenerator(mockEnv);
       const resultJson = await generator.synthesizeSnapshot(
@@ -429,9 +421,9 @@ describe('SnapshotGenerator', () => {
         recent_arc: [],
       };
       mockGenerateJson.mockResolvedValue({});
-      vi.mocked(
-        mockEnv.tokenCalculator.estimateTokensForString,
-      ).mockImplementation((str) => str.length);
+      vi.mocked(mockEnv.tokenCalculator.estimateTokensForString).mockImplementation(
+        (str) => str.length,
+      );
       const generator = new SnapshotGenerator(mockEnv);
       const resultJson = await generator.synthesizeSnapshot(
         dummyNodes,
@@ -452,9 +444,7 @@ describe('SnapshotGenerator', () => {
       };
       mockGenerateJson.mockResolvedValue({});
       // Hardcode it to return 5000 always to simulate empty shell over budget
-      vi.mocked(
-        mockEnv.tokenCalculator.estimateTokensForString,
-      ).mockReturnValue(5000);
+      vi.mocked(mockEnv.tokenCalculator.estimateTokensForString).mockReturnValue(5000);
       const generator = new SnapshotGenerator(mockEnv);
       const resultJson = await generator.synthesizeSnapshot(
         dummyNodes,

@@ -52,13 +52,8 @@ interface GenerateOptions {
   checkOnly: boolean;
 }
 
-export async function generateSettingsSchema(
-  options: GenerateOptions,
-): Promise<void> {
-  const repoRoot = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-  );
+export async function generateSettingsSchema(options: GenerateOptions): Promise<void> {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const outputPath = path.join(repoRoot, ...OUTPUT_RELATIVE_PATH);
   await mkdir(path.dirname(outputPath), { recursive: true });
 
@@ -77,10 +72,7 @@ export async function generateSettingsSchema(
     }
   }
 
-  if (
-    existing &&
-    normalizeForCompare(existing) === normalizeForCompare(formatted)
-  ) {
+  if (existing && normalizeForCompare(existing) === normalizeForCompare(formatted)) {
     if (!options.checkOnly) {
       console.log('Settings JSON schema already up to date.');
     }
@@ -205,9 +197,7 @@ function buildSchemaForType(
 }
 
 function buildEnumSchema(
-  options:
-    | SettingDefinition['options']
-    | SettingCollectionDefinition['options'],
+  options: SettingDefinition['options'] | SettingCollectionDefinition['options'],
 ): JsonSchema {
   const values = options?.map((option) => option.value) ?? [];
   const inferred = inferTypeFromValues(values);
@@ -289,10 +279,7 @@ function buildInlineObjectSchema(
   };
 }
 
-function buildRefSchema(
-  ref: string,
-  defs: Map<string, JsonSchema>,
-): JsonSchema {
+function buildRefSchema(ref: string, defs: Map<string, JsonSchema>): JsonSchema {
   ensureDefinition(ref, defs);
   return { $ref: `#/$defs/${ref}` };
 }
@@ -314,9 +301,7 @@ function buildMarkdownDescription(definition: SettingDefinition): string {
 
   lines.push('');
   lines.push(`- Category: \`${definition.category}\``);
-  lines.push(
-    `- Requires restart: \`${definition.requiresRestart ? 'yes' : 'no'}\``,
-  );
+  lines.push(`- Requires restart: \`${definition.requiresRestart ? 'yes' : 'no'}\``);
 
   if (definition.default !== undefined) {
     lines.push(`- Default: \`${formatDefaultValue(definition.default)}\``);
@@ -325,9 +310,7 @@ function buildMarkdownDescription(definition: SettingDefinition): string {
   return lines.join('\n');
 }
 
-function inferTypeFromValues(
-  values: Array<string | number>,
-): string | undefined {
+function inferTypeFromValues(values: Array<string | number>): string | undefined {
   if (values.length === 0) {
     return undefined;
   }

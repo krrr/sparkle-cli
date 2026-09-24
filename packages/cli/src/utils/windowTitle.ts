@@ -55,10 +55,7 @@ export function computeTerminalTitle({
   const getSuffix = (context: string) => ` (${context})`;
 
   let title;
-  if (
-    isConfirming ||
-    streamingState === StreamingState.WaitingForConfirmation
-  ) {
+  if (isConfirming || streamingState === StreamingState.WaitingForConfirmation) {
     const base = '✋  Action Required';
     // Max context length is 80 - base.length - 3 (for ' (' and ')')
     const maxContextLen = MAX_LEN - base.length - 3;

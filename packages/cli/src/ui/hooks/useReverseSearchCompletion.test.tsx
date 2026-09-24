@@ -34,11 +34,7 @@ describe('useReverseSearchCompletion', () => {
         const mockShellHistory = ['echo hello'];
 
         const { result } = await renderHookWithProviders(() =>
-          useReverseSearchCompletion(
-            useTextBufferForTest(''),
-            mockShellHistory,
-            false,
-          ),
+          useReverseSearchCompletion(useTextBufferForTest(''), mockShellHistory, false),
         );
 
         expect(result.current.suggestions).toEqual([]);
@@ -53,11 +49,7 @@ describe('useReverseSearchCompletion', () => {
         const { result, rerender } = await renderHookWithProviders(
           ({ text, active }) => {
             const textBuffer = useTextBufferForTest(text);
-            return useReverseSearchCompletion(
-              textBuffer,
-              mockShellHistory,
-              active,
-            );
+            return useReverseSearchCompletion(textBuffer, mockShellHistory, active);
           },
           { initialProps: { text: 'echo', active: true } },
         );
@@ -210,10 +202,7 @@ describe('useReverseSearchCompletion', () => {
         });
 
         it('should handle navigation with large suggestion lists and scrolling', async () => {
-          const largeMockCommands = Array.from(
-            { length: 15 },
-            (_, i) => `echo ${i}`,
-          );
+          const largeMockCommands = Array.from({ length: 15 }, (_, i) => `echo ${i}`);
 
           const { result } = await renderHookWithProviders(() =>
             useReverseSearchCompletion(
@@ -246,10 +235,7 @@ describe('useReverseSearchCompletion', () => {
       );
 
       // should only return the two entries containing "foo"
-      expect(result.current.suggestions.map((s) => s.value)).toEqual([
-        'foo',
-        'barfoo',
-      ]);
+      expect(result.current.suggestions.map((s) => s.value)).toEqual(['foo', 'barfoo']);
       expect(result.current.showSuggestions).toBe(true);
     });
 

@@ -280,9 +280,7 @@ describe('HookRegistry', () => {
       const hooks = hookRegistry.getAllHooks();
       expect(hooks).toHaveLength(1);
       expect(hooks[0].enabled).toBe(false);
-      expect(
-        hookRegistry.getHooksForEvent(HookEventName.BeforeTool),
-      ).toHaveLength(0);
+      expect(hookRegistry.getHooksForEvent(HookEventName.BeforeTool)).toHaveLength(0);
     });
   });
 
@@ -331,14 +329,10 @@ describe('HookRegistry', () => {
     });
 
     it('should return hooks for specific event', () => {
-      const beforeToolHooks = hookRegistry.getHooksForEvent(
-        HookEventName.BeforeTool,
-      );
+      const beforeToolHooks = hookRegistry.getHooksForEvent(HookEventName.BeforeTool);
       expect(beforeToolHooks).toHaveLength(2);
 
-      const afterToolHooks = hookRegistry.getHooksForEvent(
-        HookEventName.AfterTool,
-      );
+      const afterToolHooks = hookRegistry.getHooksForEvent(HookEventName.AfterTool);
       expect(afterToolHooks).toHaveLength(1);
     });
 
@@ -637,9 +631,7 @@ describe('HookRegistry', () => {
       // Should only load the valid hook
       const hooks = hookRegistry.getAllHooks();
       expect(hooks).toHaveLength(1);
-      expect((hooks[0].config as CommandHookConfig).command).toBe(
-        './valid-hook.sh',
-      );
+      expect((hooks[0].config as CommandHookConfig).command).toBe('./valid-hook.sh');
 
       // Verify the warnings for invalid configurations
       // 1st warning: non-object hookConfig ('invalid-string')

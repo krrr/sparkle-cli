@@ -25,10 +25,7 @@ const createAnsiToken = (overrides: Partial<AnsiToken>): AnsiToken => ({
 describe('<AnsiOutputText />', () => {
   it('renders a simple AnsiOutput object correctly', async () => {
     const data: AnsiOutput = [
-      [
-        createAnsiToken({ text: 'Hello, ' }),
-        createAnsiToken({ text: 'world!' }),
-      ],
+      [createAnsiToken({ text: 'Hello, ' }), createAnsiToken({ text: 'world!' })],
     ];
     const { lastFrame, unmount } = await render(
       <AnsiOutputText data={data} width={80} />,

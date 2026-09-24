@@ -91,9 +91,7 @@ function parsePartialPath(partialPath: string): ParsedPath {
  * @param partialPath The partial path typed by the user.
  * @returns A promise resolving to an array of directory path suggestions.
  */
-export async function getDirectorySuggestions(
-  partialPath: string,
-): Promise<string[]> {
+export async function getDirectorySuggestions(partialPath: string): Promise<string[]> {
   try {
     const { searchDir, filter, resultPrefix } = parsePartialPath(partialPath);
 

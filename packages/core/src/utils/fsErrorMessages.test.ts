@@ -67,8 +67,7 @@ describe('getFsErrorMessage', () => {
       {
         code: 'ENOSPC',
         message: 'ENOSPC: no space left on device',
-        expected:
-          'No space left on device. Free up some disk space and try again.',
+        expected: 'No space left on device. Free up some disk space and try again.',
       },
       {
         code: 'EISDIR',
@@ -131,8 +130,7 @@ describe('getFsErrorMessage', () => {
       {
         code: 'EMFILE',
         message: 'EMFILE: too many open files',
-        expected:
-          'Too many open files. Close some unused files or applications.',
+        expected: 'Too many open files. Close some unused files or applications.',
       },
       {
         code: 'ENFILE',
@@ -212,20 +210,12 @@ describe('getFsErrorMessage', () => {
       { value: undefined, expected: 'An unknown error occurred' },
     ];
 
-    it.each(fallbackCases)(
-      'returns a message for $value',
-      ({ value, expected }) => {
-        expect(getFsErrorMessage(value)).toBe(expected);
-      },
-    );
+    it.each(fallbackCases)('returns a message for $value', ({ value, expected }) => {
+      expect(getFsErrorMessage(value)).toBe(expected);
+    });
 
-    it.each([null, undefined] as const)(
-      'uses custom default for %s',
-      (value) => {
-        expect(getFsErrorMessage(value, 'Custom default')).toBe(
-          'Custom default',
-        );
-      },
-    );
+    it.each([null, undefined] as const)('uses custom default for %s', (value) => {
+      expect(getFsErrorMessage(value, 'Custom default')).toBe('Custom default');
+    });
   });
 });

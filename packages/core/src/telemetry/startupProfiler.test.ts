@@ -46,8 +46,9 @@ describe('StartupProfiler', () => {
 
     // Get the mocked function
     const metricsModule = await import('./metrics.js');
-    recordStartupPerformance =
-      metricsModule.recordStartupPerformance as ReturnType<typeof vi.fn>;
+    recordStartupPerformance = metricsModule.recordStartupPerformance as ReturnType<
+      typeof vi.fn
+    >;
 
     const loggersModule = await import('./loggers.js');
     logStartupStats = loggersModule.logStartupStats as ReturnType<typeof vi.fn>;
@@ -88,9 +89,7 @@ describe('StartupProfiler', () => {
 
       // Verify performance mark was created
       const marks = performance.getEntriesByType('mark');
-      const startMark = marks.find(
-        (m) => m.name === 'startup:test_phase:start',
-      );
+      const startMark = marks.find((m) => m.name === 'startup:test_phase:start');
       expect(startMark).toBeDefined();
     });
 

@@ -44,11 +44,7 @@ function buildZodSchemaFromJsonSchema(def: any): z.ZodTypeAny {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-type-assertion
       for (const [key, propDef] of Object.entries(def.properties) as any) {
         let propSchema = buildZodSchemaFromJsonSchema(propDef);
-        if (
-          def.required &&
-          Array.isArray(def.required) &&
-          def.required.includes(key)
-        ) {
+        if (def.required && Array.isArray(def.required) && def.required.includes(key)) {
           // keep it required
         } else {
           propSchema = propSchema.optional();
@@ -63,9 +59,7 @@ function buildZodSchemaFromJsonSchema(def: any): z.ZodTypeAny {
     if (def.additionalProperties === false) {
       schema = schema.strict();
     } else if (typeof def.additionalProperties === 'object') {
-      schema = schema.catchall(
-        buildZodSchemaFromJsonSchema(def.additionalProperties),
-      );
+      schema = schema.catchall(buildZodSchemaFromJsonSchema(def.additionalProperties));
     }
 
     return schema;
@@ -109,9 +103,7 @@ function buildObjectShapeFromProperties(
 /**
  * Builds a Zod schema for primitive types (string, number, boolean)
  */
-function buildPrimitiveSchema(
-  type: 'string' | 'number' | 'boolean',
-): z.ZodTypeAny {
+function buildPrimitiveSchema(type: 'string' | 'number' | 'boolean'): z.ZodTypeAny {
   switch (type) {
     case 'string':
       return z.string();
@@ -147,18 +139,14 @@ for (const [name, def] of Object.entries(SETTINGS_SCHEMA_DEFINITIONS)) {
 /**
  * Recursively builds a Zod schema from a SettingDefinition
  */
-function buildZodSchemaFromDefinition(
-  definition: SettingDefinition,
-): z.ZodTypeAny {
+function buildZodSchemaFromDefinition(definition: SettingDefinition): z.ZodTypeAny {
   let baseSchema: z.ZodTypeAny;
 
   // Special handling for TelemetrySettings which can be boolean or object
   if (definition.ref === 'TelemetrySettings') {
     const objectSchema = REF_SCHEMAS['TelemetrySettings'];
     if (objectSchema) {
-      return z
-        .union([buildPrimitiveSchema('boolean'), objectSchema])
-        .optional();
+      return z.union([buildPrimitiveSchema('boolean'), objectSchema]).optional();
     }
   }
 
@@ -287,10 +275,7 @@ export function validateSettings(data: unknown): {
 /**
  * Format a Zod error into a helpful error message
  */
-export function formatValidationError(
-  error: z.ZodError,
-  filePath: string,
-): string {
+export function formatValidationError(error: z.ZodError, filePath: string): string {
   const lines: string[] = [];
   lines.push(`Invalid configuration in ${filePath}:`);
   lines.push('');
@@ -318,9 +303,7 @@ export function formatValidationError(
   }
 
   if (error.issues.length > MAX_ERRORS_TO_DISPLAY) {
-    lines.push(
-      `...and ${error.issues.length - MAX_ERRORS_TO_DISPLAY} more errors.`,
-    );
+    lines.push(`...and ${error.issues.length - MAX_ERRORS_TO_DISPLAY} more errors.`);
     lines.push('');
   }
 

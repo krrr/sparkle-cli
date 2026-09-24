@@ -23,9 +23,7 @@ function isTextPart(part: Part): part is Part & { text: string } {
   return typeof part.text === 'string';
 }
 
-function isInlineDataPart(
-  part: Part,
-): part is Part & { inlineData: { data: string } } {
+function isInlineDataPart(part: Part): part is Part & { inlineData: { data: string } } {
   return (
     typeof part.inlineData === 'object' &&
     part.inlineData !== null &&
@@ -33,9 +31,7 @@ function isInlineDataPart(
   );
 }
 
-function isFileDataPart(
-  part: Part,
-): part is Part & { fileData: { fileUri: string } } {
+function isFileDataPart(part: Part): part is Part & { fileData: { fileUri: string } } {
   return (
     typeof part.fileData === 'object' &&
     part.fileData !== null &&
@@ -117,14 +113,10 @@ export function getStableId(
     contentHash = createHash('sha256').update(part.text).digest('hex');
     id = `text_${contentHash}_${turnSalt}_${partIdx}`;
   } else if (isInlineDataPart(part)) {
-    contentHash = createHash('sha256')
-      .update(part.inlineData.data)
-      .digest('hex');
+    contentHash = createHash('sha256').update(part.inlineData.data).digest('hex');
     id = `media_${contentHash}_${turnSalt}_${partIdx}`;
   } else if (isFileDataPart(part)) {
-    contentHash = createHash('sha256')
-      .update(part.fileData.fileUri)
-      .digest('hex');
+    contentHash = createHash('sha256').update(part.fileData.fileUri).digest('hex');
     id = `file_${contentHash}_${turnSalt}_${partIdx}`;
   } else if (isFunctionCallPart(part)) {
     if (part.functionCall.id) {
@@ -150,9 +142,7 @@ export function getStableId(
     }
   } else if (isExecutableCodePart(part)) {
     contentHash = createHash('sha256')
-      .update(
-        `exec:${part.executableCode.language}:${part.executableCode.code}`,
-      )
+      .update(`exec:${part.executableCode.language}:${part.executableCode.code}`)
       .digest('hex');
     id = `exec_${contentHash}_${turnSalt}_${partIdx}`;
   } else if (isCodeExecutionResultPart(part)) {
@@ -204,9 +194,7 @@ export class ContextGraphBuilder {
         hasEnvHeader && turnIdx === 0
           ? deriveStableId(['environment-context'])
           : turn.id;
-      const turnId = turnSalt.startsWith('turn_')
-        ? turnSalt
-        : `turn_${turnSalt}`;
+      const turnId = turnSalt.startsWith('turn_') ? turnSalt : `turn_${turnSalt}`;
 
       if (msg.role === 'user') {
         for (let partIdx = 0; partIdx < msg.parts.length; partIdx++) {

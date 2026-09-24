@@ -11,8 +11,7 @@ import { MaxSizedBox, type MaxSizedBoxProps } from './MaxSizedBox.js';
 // outputs that will get truncated further MaxSizedBox anyway.
 const MAXIMUM_RESULT_DISPLAY_CHARACTERS = 20000;
 
-export interface SlicingMaxSizedBoxProps<T>
-  extends Omit<MaxSizedBoxProps, 'children'> {
+export interface SlicingMaxSizedBoxProps<T> extends Omit<MaxSizedBoxProps, 'children'> {
   data: T;
   maxLines?: number;
   isAlternateBuffer?: boolean;
@@ -56,12 +55,10 @@ export function SlicingMaxSizedBox<T>({
           hiddenLines = lines.length - targetLines;
           if (overflowDirection === 'bottom') {
             text =
-              lines.slice(0, targetLines).join('\n') +
-              (hasTrailingNewline ? '\n' : '');
+              lines.slice(0, targetLines).join('\n') + (hasTrailingNewline ? '\n' : '');
           } else {
             text =
-              lines.slice(-targetLines).join('\n') +
-              (hasTrailingNewline ? '\n' : '');
+              lines.slice(-targetLines).join('\n') + (hasTrailingNewline ? '\n' : '');
           }
         }
       }

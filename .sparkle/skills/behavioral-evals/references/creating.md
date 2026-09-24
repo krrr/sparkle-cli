@@ -11,28 +11,27 @@
 
 ## 🏗️ Scenario Design
 
-Evals must simulate realistic agent environments to effectively test
-decision-making.
+Evals must simulate realistic agent environments to effectively test decision-making.
 
 - **Workspace State**: Seed with standard project anchors if testing general
   capabilities:
   - `package.json` for NodeJS environments.
   - Minimal configuration files (`tsconfig.json`, `GEMINI.md`).
-- **Structural Complexity**: Provide enough files to force the agent to _search_
-  or _navigate_, rather than giving the answer directly. Avoid trivial one-file
-  tests unless testing exact prompt steering.
+- **Structural Complexity**: Provide enough files to force the agent to _search_ or
+  _navigate_, rather than giving the answer directly. Avoid trivial one-file tests
+  unless testing exact prompt steering.
 
 ---
 
 ## ❌ Fail First Principle
 
-Before asserting a new capability or locking in a fix, **verify that the test
-fails first**.
+Before asserting a new capability or locking in a fix, **verify that the test fails
+first**.
 
-- It is easy to accidentally write an eval that asserts behaviors that are
-  already met or pass by default.
-- **Process**: reproduce failure with test -> apply fix (prompt/tool) -> verify
-  test passes.
+- It is easy to accidentally write an eval that asserts behaviors that are already met
+  or pass by default.
+- **Process**: reproduce failure with test -> apply fix (prompt/tool) -> verify test
+  passes.
 
 ---
 
@@ -40,8 +39,8 @@ fails first**.
 
 ### 1. Breakpoints
 
-Verifies the agent _intends_ to use a tool BEFORE executing it. Useful for
-interactive prompts or safety checks.
+Verifies the agent _intends_ to use a tool BEFORE executing it. Useful for interactive
+prompts or safety checks.
 
 ```typescript
 // ⚠️ Only works with appEvalTest (AppRig)
@@ -82,17 +81,15 @@ assert: async (rig, result) => {
   await rig.waitForTelemetryReady();
   const toolLogs = rig.readToolLogs();
 
-  const writeCall = toolLogs.find(
-    (log) => log.toolRequest.name === 'write_file',
-  );
+  const writeCall = toolLogs.find((log) => log.toolRequest.name === 'write_file');
   expect(writeCall).toBeDefined();
 };
 ```
 
 ### 4. Mock MCP Facades
 
-To evaluate tools connected via MCP without hitting live endpoints, load a mock
-server configuration in the `setup` hook.
+To evaluate tools connected via MCP without hitting live endpoints, load a mock server
+configuration in the `setup` hook.
 
 ```typescript
 setup: async (rig) => {
@@ -114,17 +111,15 @@ assert: async (rig) => {
 
 ### 1. Breakpoint Deadlocks
 
-Breakpoints (`setBreakpoint`) pause execution. In standard `evalTest`,
-`rig.run()` waits for the process to exit _before_ assertions run. **This will
-hang indefinitely.**
+Breakpoints (`setBreakpoint`) pause execution. In standard `evalTest`, `rig.run()` waits
+for the process to exit _before_ assertions run. **This will hang indefinitely.**
 
 - **Use Breakpoints** for `appEvalTest` or interactive simulations.
 - **Use Audit Tool Logs** (above) for standard trajectory tests.
 
 ### 2. Runaway Timeout
 
-Always set a budget boundary in the `EvalCase` to prevent runaway loops on
-quota:
+Always set a budget boundary in the `EvalCase` to prevent runaway loops on quota:
 
 ```typescript
 evalTest('USUALLY_PASSES', {

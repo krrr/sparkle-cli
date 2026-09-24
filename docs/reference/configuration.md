@@ -1,8 +1,8 @@
 # Sparkle CLI configuration
 
 Sparkle CLI offers several ways to configure its behavior, including environment
-variables, command-line arguments, and settings files. This document outlines
-the different configuration methods and available settings.
+variables, command-line arguments, and settings files. This document outlines the
+different configuration methods and available settings.
 
 ## Configuration layers
 
@@ -10,20 +10,20 @@ Configuration is applied in the following order of precedence (lower numbers are
 overridden by higher numbers):
 
 1.  **Default values:** Hardcoded defaults within the application.
-2.  **System defaults file:** System-wide default settings that can be
-    overridden by other settings files.
+2.  **System defaults file:** System-wide default settings that can be overridden by
+    other settings files.
 3.  **User settings file:** Global settings for the current user.
 4.  **Project settings file:** Project-specific settings.
-5.  **System settings file:** System-wide settings that override all other
-    settings files.
-6.  **Environment variables:** System-wide or session-specific variables,
-    potentially loaded from `.env` files.
+5.  **System settings file:** System-wide settings that override all other settings
+    files.
+6.  **Environment variables:** System-wide or session-specific variables, potentially
+    loaded from `.env` files.
 7.  **Command-line arguments:** Values passed when launching the CLI.
 
 ## Settings files
 
-Sparkle CLI uses JSON settings files for persistent configuration. There are
-four locations for these files:
+Sparkle CLI uses JSON settings files for persistent configuration. There are four
+locations for these files:
 
 <!-- prettier-ignore -->
 > [!TIP]
@@ -35,58 +35,53 @@ four locations for these files:
 - **System defaults file:**
   - **Location:** `/etc/sparkle-cli/system-defaults.json` (Linux),
     `C:\ProgramData\sparkle-cli\system-defaults.json` (Windows) or
-    `/Library/Application Support/GeminiCli/system-defaults.json` (macOS). The
-    path can be overridden using the `SPARKLE_CLI_SYSTEM_DEFAULTS_PATH`
-    environment variable.
-  - **Scope:** Provides a base layer of system-wide default settings. These
-    settings have the lowest precedence and are intended to be overridden by
-    user, project, or system override settings.
+    `/Library/Application Support/GeminiCli/system-defaults.json` (macOS). The path can
+    be overridden using the `SPARKLE_CLI_SYSTEM_DEFAULTS_PATH` environment variable.
+  - **Scope:** Provides a base layer of system-wide default settings. These settings
+    have the lowest precedence and are intended to be overridden by user, project, or
+    system override settings.
 - **User settings file:**
   - **Location:** `~/.sparkle/settings.json` (where `~` is your home directory).
-  - **Scope:** Applies to all Sparkle CLI sessions for the current user. User
-    settings override system defaults.
+  - **Scope:** Applies to all Sparkle CLI sessions for the current user. User settings
+    override system defaults.
 - **Project settings file:**
   - **Location:** `.sparkle/settings.json` within your project's root directory.
-  - **Scope:** Applies only when running Sparkle CLI from that specific project.
-    Project settings override user settings and system defaults.
+  - **Scope:** Applies only when running Sparkle CLI from that specific project. Project
+    settings override user settings and system defaults.
 - **System settings file:**
   - **Location:** `/etc/sparkle-cli/settings.json` (Linux),
     `C:\ProgramData\sparkle-cli\settings.json` (Windows) or
-    `/Library/Application Support/GeminiCli/settings.json` (macOS). The path can
-    be overridden using the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment
-    variable.
-  - **Scope:** Applies to all Sparkle CLI sessions on the system, for all users.
-    System settings act as overrides, taking precedence over all other settings
-    files. May be useful for system administrators at enterprises to have
-    controls over users' Sparkle CLI setups.
+    `/Library/Application Support/GeminiCli/settings.json` (macOS). The path can be
+    overridden using the `SPARKLE_CLI_SYSTEM_SETTINGS_PATH` environment variable.
+  - **Scope:** Applies to all Sparkle CLI sessions on the system, for all users. System
+    settings act as overrides, taking precedence over all other settings files. May be
+    useful for system administrators at enterprises to have controls over users' Sparkle
+    CLI setups.
 
-**Note on environment variables in settings:** String values within your
-`settings.json` and `sparkle-extension.json` files can reference environment
-variables using `$VAR_NAME`, `${VAR_NAME}`, or `${VAR_NAME:-DEFAULT_VALUE}`
-syntax. These variables will be automatically resolved when the settings are
-loaded. For example, if you have an environment variable `MY_API_TOKEN`, you
-could use it in `settings.json` like this: `"apiKey": "$MY_API_TOKEN"`. If you
-want to provide a fallback value, use `${MY_API_TOKEN:-default-token}`.
-Additionally, each extension can have its own `.env` file in its directory,
-which will be loaded automatically.
+**Note on environment variables in settings:** String values within your `settings.json`
+and `sparkle-extension.json` files can reference environment variables using
+`$VAR_NAME`, `${VAR_NAME}`, or `${VAR_NAME:-DEFAULT_VALUE}` syntax. These variables will
+be automatically resolved when the settings are loaded. For example, if you have an
+environment variable `MY_API_TOKEN`, you could use it in `settings.json` like this:
+`"apiKey": "$MY_API_TOKEN"`. If you want to provide a fallback value, use
+`${MY_API_TOKEN:-default-token}`. Additionally, each extension can have its own `.env`
+file in its directory, which will be loaded automatically.
 
-**Note for Enterprise Users:** For guidance on deploying and managing Sparkle
-CLI in a corporate environment, see the
-[Enterprise Configuration](../cli/enterprise.md) documentation.
+**Note for Enterprise Users:** For guidance on deploying and managing Sparkle CLI in a
+corporate environment, see the [Enterprise Configuration](../cli/enterprise.md)
+documentation.
 
 ### The `.sparkle` directory in your project
 
-In addition to a project settings file, a project's `.sparkle` directory can
-contain other project-specific files related to Sparkle CLI's operation, such
-as:
+In addition to a project settings file, a project's `.sparkle` directory can contain
+other project-specific files related to Sparkle CLI's operation, such as:
 
-- [Custom sandbox profiles](#sandboxing) (for example,
-  `.sparkle/sandbox.Dockerfile`).
+- [Custom sandbox profiles](#sandboxing) (for example, `.sparkle/sandbox.Dockerfile`).
 
 ### Available settings in `settings.json`
 
-Settings are organized into categories. All settings should be placed within
-their corresponding top-level category object in your `settings.json` file.
+Settings are organized into categories. All settings should be placed within their
+corresponding top-level category object in your `settings.json` file.
 
 <!-- SETTINGS-AUTOGEN:START -->
 
@@ -101,9 +96,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`general.preferredEditor`** (enum):
 
-  - **Description:** The preferred editor to open files in. Must be one of the
-    built-in supported identifiers. Use /editor in the CLI to pick
-    interactively, or leave unset to use $VISUAL/$EDITOR.
+  - **Description:** The preferred editor to open files in. Must be one of the built-in
+    supported identifiers. Use /editor in the CLI to pick interactively, or leave unset
+    to use $VISUAL/$EDITOR.
   - **Default:** `undefined`
   - **Values:** `"vscode"`, `"vscodium"`, `"windsurf"`, `"cursor"`, `"zed"`,
     `"antigravity"`, `"sublimetext"`, `"lapce"`, `"nova"`, `"bbedit"`, `"vim"`,
@@ -111,8 +106,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`general.openEditorInNewWindow`** (boolean):
 
-  - **Description:** Open VS Code-family editors in a new window when editing
-    files.
+  - **Description:** Open VS Code-family editors in a new window when editing files.
   - **Default:** `false`
 
 - **`general.vimMode`** (boolean):
@@ -122,10 +116,10 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`general.defaultApprovalMode`** (enum):
 
-  - **Description:** The default approval mode for tool execution. 'default'
-    prompts for approval, 'auto_edit' auto-approves edit tools, and 'plan' is
-    read-only mode. YOLO mode (auto-approve all actions) can only be enabled via
-    command line (--yolo or --approval-mode=yolo).
+  - **Description:** The default approval mode for tool execution. 'default' prompts for
+    approval, 'auto_edit' auto-approves edit tools, and 'plan' is read-only mode. YOLO
+    mode (auto-approve all actions) can only be enabled via command line (--yolo or
+    --approval-mode=yolo).
   - **Default:** `"default"`
   - **Values:** `"default"`, `"auto_edit"`, `"plan"`
 
@@ -146,8 +140,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`general.enableNotifications`** (boolean):
 
-  - **Description:** Enable terminal run-event notifications for action-required
-    prompts and session completion.
+  - **Description:** Enable terminal run-event notifications for action-required prompts
+    and session completion.
   - **Default:** `false`
 
 - **`general.notificationMethod`** (enum):
@@ -171,28 +165,27 @@ their corresponding top-level category object in your `settings.json` file.
 - **`general.plan.directory`** (string):
 
   - **Description:** The directory where planning artifacts are stored. If not
-    specified, defaults to the managed data directory. A custom directory
-    requires a policy to allow write access in Plan Mode.
+    specified, defaults to the managed data directory. A custom directory requires a
+    policy to allow write access in Plan Mode.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
 - **`general.plan.modelRouting`** (boolean):
 
-  - **Description:** Automatically switch between Pro and Flash models based on
-    Plan Mode status. Uses Pro for the planning phase and Flash for the
-    implementation phase.
+  - **Description:** Automatically switch between Pro and Flash models based on Plan
+    Mode status. Uses Pro for the planning phase and Flash for the implementation phase.
   - **Default:** `true`
 
 - **`general.retryFetchErrors`** (boolean):
 
-  - **Description:** Retry on "exception TypeError: fetch failed sending
-    request" errors.
+  - **Description:** Retry on "exception TypeError: fetch failed sending request"
+    errors.
   - **Default:** `true`
 
 - **`general.maxAttempts`** (number):
 
-  - **Description:** Maximum number of attempts for requests to the main chat
-    model. Cannot exceed 10.
+  - **Description:** Maximum number of attempts for requests to the main chat model.
+    Cannot exceed 10.
   - **Default:** `10`
 
 - **`general.debugKeystrokeLogging`** (boolean):
@@ -207,14 +200,13 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`general.sessionRetention.maxAge`** (string):
 
-  - **Description:** Automatically delete chats older than this time period
-    (e.g., "30d", "7d", "24h", "1w")
+  - **Description:** Automatically delete chats older than this time period (e.g.,
+    "30d", "7d", "24h", "1w")
   - **Default:** `"30d"`
 
 - **`general.sessionRetention.maxCount`** (number):
 
-  - **Description:** Alternative: Maximum number of sessions to keep (most
-    recent)
+  - **Description:** Alternative: Maximum number of sessions to keep (most recent)
   - **Default:** `undefined`
 
 - **`general.sessionRetention.minRetention`** (string):
@@ -229,8 +221,8 @@ their corresponding top-level category object in your `settings.json` file.
   - **Default:** `true`
 
 - **`general.logRagSnippets`** (boolean):
-  - **Description:** Log full Code Customization (RAG) retrieved snippets to a
-    local file for debugging.
+  - **Description:** Log full Code Customization (RAG) retrieved snippets to a local
+    file for debugging.
   - **Default:** `false`
 
 #### `output`
@@ -244,21 +236,21 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.debugRainbow`** (boolean):
 
-  - **Description:** Enable debug rainbow rendering. Only useful for debugging
-    rendering bugs and performance issues.
+  - **Description:** Enable debug rainbow rendering. Only useful for debugging rendering
+    bugs and performance issues.
   - **Default:** `false`
   - **Requires restart:** Yes
 
 - **`ui.theme`** (string):
 
-  - **Description:** The color theme for the UI. See the CLI themes guide for
-    available options.
+  - **Description:** The color theme for the UI. See the CLI themes guide for available
+    options.
   - **Default:** `undefined`
 
 - **`ui.autoThemeSwitching`** (boolean):
 
-  - **Description:** Automatically switch between default light and dark themes
-    based on terminal background color.
+  - **Description:** Automatically switch between default light and dark themes based on
+    terminal background color.
   - **Default:** `true`
 
 - **`ui.terminalBackgroundPollingInterval`** (number):
@@ -279,27 +271,26 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.inlineThinkingMode`** (enum):
 
-  - **Description:** Model thinking display: compact (one-line summaries in
-    history, live streaming tail), full (full text), or off.
+  - **Description:** Model thinking display: compact (one-line summaries in history,
+    live streaming tail), full (full text), or off.
   - **Default:** `"compact"`
   - **Values:** `"off"`, `"compact"`, `"full"`
 
 - **`ui.showStatusInTitle`** (boolean):
 
-  - **Description:** Show Sparkle CLI model thoughts in the terminal window
-    title during the working phase
+  - **Description:** Show Sparkle CLI model thoughts in the terminal window title during
+    the working phase
   - **Default:** `false`
 
 - **`ui.dynamicWindowTitle`** (boolean):
 
-  - **Description:** Update the terminal window title with current status icons
-    (Ready: ◇, Action Required: ✋, Working: ✦)
+  - **Description:** Update the terminal window title with current status icons (Ready:
+    ◇, Action Required: ✋, Working: ✦)
   - **Default:** `true`
 
 - **`ui.showHomeDirectoryWarning`** (boolean):
 
-  - **Description:** Show a warning when running Sparkle CLI in the home
-    directory.
+  - **Description:** Show a warning when running Sparkle CLI in the home directory.
   - **Default:** `true`
   - **Requires restart:** Yes
 
@@ -316,8 +307,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.escapePastedAtSymbols`** (boolean):
 
-  - **Description:** When enabled, @ symbols in pasted text are escaped to
-    prevent unintended @path expansion.
+  - **Description:** When enabled, @ symbols in pasted text are escaped to prevent
+    unintended @path expansion.
   - **Default:** `false`
 
 - **`ui.showShortcutsHint`** (boolean):
@@ -327,8 +318,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.compactToolOutput`** (boolean):
 
-  - **Description:** Display tool outputs (like directory listings and file
-    reads) in a compact, structured format.
+  - **Description:** Display tool outputs (like directory listings and file reads) in a
+    compact, structured format.
   - **Default:** `true`
 
 - **`ui.hideBanner`** (boolean):
@@ -338,20 +329,18 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.hideContextSummary`** (boolean):
 
-  - **Description:** Hide the context summary (AGENTS.md, MCP servers) above the
-    input.
+  - **Description:** Hide the context summary (AGENTS.md, MCP servers) above the input.
   - **Default:** `false`
 
 - **`ui.footer.items`** (array):
 
-  - **Description:** List of item IDs to display in the footer. Rendered in
-    order
+  - **Description:** List of item IDs to display in the footer. Rendered in order
   - **Default:** `undefined`
 
 - **`ui.footer.showLabels`** (boolean):
 
-  - **Description:** Display a second line above the footer items with
-    descriptive headers (e.g., /model).
+  - **Description:** Display a second line above the footer items with descriptive
+    headers (e.g., /model).
   - **Default:** `true`
 
 - **`ui.hideFooter`** (boolean):
@@ -411,9 +400,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.incrementalRendering`** (boolean):
 
-  - **Description:** Enable incremental rendering for the UI. This option will
-    reduce flickering but may cause rendering artifacts. Only supported when
-    useAlternateBuffer is enabled.
+  - **Description:** Enable incremental rendering for the UI. This option will reduce
+    flickering but may cause rendering artifacts. Only supported when useAlternateBuffer
+    is enabled.
   - **Default:** `true`
   - **Requires restart:** Yes
 
@@ -424,34 +413,33 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`ui.loadingPhrases`** (enum):
 
-  - **Description:** What to show while the model is working: tips, witty
-    comments, all, or off.
+  - **Description:** What to show while the model is working: tips, witty comments, all,
+    or off.
   - **Default:** `"off"`
   - **Values:** `"tips"`, `"witty"`, `"all"`, `"off"`
 
 - **`ui.errorVerbosity`** (enum):
 
-  - **Description:** Controls whether recoverable errors are hidden (low) or
-    fully shown (full).
+  - **Description:** Controls whether recoverable errors are hidden (low) or fully shown
+    (full).
   - **Default:** `"low"`
   - **Values:** `"low"`, `"full"`
 
 - **`ui.customWittyPhrases`** (array):
 
-  - **Description:** Custom witty phrases to display during loading. When
-    provided, the CLI cycles through these instead of the defaults.
+  - **Description:** Custom witty phrases to display during loading. When provided, the
+    CLI cycles through these instead of the defaults.
   - **Default:** `[]`
 
 - **`ui.accessibility.enableLoadingPhrases`** (boolean):
 
-  - **Description:** @deprecated Use ui.loadingPhrases instead. Enable loading
-    phrases during operations.
+  - **Description:** @deprecated Use ui.loadingPhrases instead. Enable loading phrases
+    during operations.
   - **Default:** `true`
   - **Requires restart:** Yes
 
 - **`ui.accessibility.screenReader`** (boolean):
-  - **Description:** Render output in plain-text to be more screen reader
-    accessible
+  - **Description:** Render output in plain-text to be more screen reader accessible
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -478,15 +466,15 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`model.maxSessionTurns`** (number):
 
-  - **Description:** Maximum number of user/model/tool turns to keep in a
-    session. -1 means unlimited.
+  - **Description:** Maximum number of user/model/tool turns to keep in a session. -1
+    means unlimited.
   - **Default:** `-1`
 
 - **`model.summarizeToolOutput`** (object):
 
   - **Description:** Enables or disables summarization of tool output. Configure
-    per-tool token budgets (for example {"run_shell_command": {"tokenBudget":
-    2000}}). Currently only the run_shell_command tool supports summarization.
+    per-tool token budgets (for example {"run_shell_command": {"tokenBudget": 2000}}).
+    Currently only the run_shell_command tool supports summarization.
   - **Default:** `undefined`
 
 - **`model.compressionThreshold`** (number):
@@ -497,8 +485,7 @@ their corresponding top-level category object in your `settings.json` file.
   - **Requires restart:** Yes
 
 - **`model.disableLoopDetection`** (boolean):
-  - **Description:** Disable automatic detection and prevention of infinite
-    loops.
+  - **Description:** Disable automatic detection and prevention of infinite loops.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -506,8 +493,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.aliases`** (object):
 
-  - **Description:** Named presets for model configs. Can be used in place of a
-    model name and can inherit from other aliases using an `extends` property.
+  - **Description:** Named presets for model configs. Can be used in place of a model
+    name and can inherit from other aliases using an `extends` property.
   - **Default:**
 
     ```json
@@ -677,21 +664,20 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.customAliases`** (object):
 
-  - **Description:** Custom named presets for model configs. These are merged
-    with (and override) the built-in aliases.
+  - **Description:** Custom named presets for model configs. These are merged with (and
+    override) the built-in aliases.
   - **Default:** `{}`
 
 - **`modelConfigs.customOverrides`** (array):
 
-  - **Description:** Custom model config overrides. These are merged with (and
-    added to) the built-in overrides.
+  - **Description:** Custom model config overrides. These are merged with (and added to)
+    the built-in overrides.
   - **Default:** `[]`
 
 - **`modelConfigs.overrides`** (array):
 
-  - **Description:** Apply specific configuration overrides based on matches,
-    with a primary key of model (or alias). The most specific match will be
-    used.
+  - **Description:** Apply specific configuration overrides based on matches, with a
+    primary key of model (or alias). The most specific match will be used.
   - **Default:** `[]`
 
 - **`modelConfigs.modelDefinitions`** (object):
@@ -768,8 +754,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.modelIdResolutions`** (object):
 
-  - **Description:** Rules for resolving requested model names to concrete model
-    IDs based on context.
+  - **Description:** Rules for resolving requested model names to concrete model IDs
+    based on context.
   - **Default:**
 
     ```json
@@ -793,8 +779,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.classifierIdResolutions`** (object):
 
-  - **Description:** Rules for resolving classifier tiers (flash, pro) to
-    concrete model IDs.
+  - **Description:** Rules for resolving classifier tiers (flash, pro) to concrete model
+    IDs.
   - **Default:**
 
     ```json
@@ -812,8 +798,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`modelConfigs.modelChains`** (object):
 
-  - **Description:** Availability policy chains defining fallback behavior for
-    models.
+  - **Description:** Availability policy chains defining fallback behavior for models.
   - **Default:**
 
     ```json
@@ -944,8 +929,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`agents.overrides`** (object):
 
-  - **Description:** Override settings for specific agents, e.g. to disable the
-    agent, set a custom model config, or run config.
+  - **Description:** Override settings for specific agents, e.g. to disable the agent,
+    set a custom model config, or run config.
   - **Default:** `{}`
   - **Requires restart:** Yes
 
@@ -970,8 +955,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`agents.browser.visualModel`** (string):
 
-  - **Description:** Model for the visual agent's analyze_screenshot tool. When
-    set, enables the tool.
+  - **Description:** Model for the visual agent's analyze_screenshot tool. When set,
+    enables the tool.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
@@ -1000,8 +985,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`agents.browser.confirmSensitiveActions`** (boolean):
 
-  - **Description:** Require manual confirmation for sensitive browser actions
-    (e.g., fill_form, evaluate_script).
+  - **Description:** Require manual confirmation for sensitive browser actions (e.g.,
+    fill_form, evaluate_script).
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1014,8 +999,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.fileName`** (string | string[]):
 
-  - **Description:** The name of the context file or files to load into memory.
-    Accepts either a single string or an array of strings.
+  - **Description:** The name of the context file or files to load into memory. Accepts
+    either a single string or an array of strings.
   - **Default:** `undefined`
 
 - **`context.importFormat`** (string):
@@ -1025,8 +1010,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.includeDirectoryTree`** (boolean):
 
-  - **Description:** Whether to include the directory tree of the current
-    working directory in the initial request to the model.
+  - **Description:** Whether to include the directory tree of the current working
+    directory in the initial request to the model.
   - **Default:** `true`
 
 - **`context.discoveryMaxDirs`** (number):
@@ -1036,9 +1021,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.memoryBoundaryMarkers`** (array):
 
-  - **Description:** File or directory names that mark the boundary for
-    AGENTS.md discovery. The upward traversal stops at the first directory
-    containing any of these markers. An empty array disables parent traversal.
+  - **Description:** File or directory names that mark the boundary for AGENTS.md
+    discovery. The upward traversal stops at the first directory containing any of these
+    markers. An empty array disables parent traversal.
   - **Default:**
 
     ```json
@@ -1049,15 +1034,14 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.includeDirectories`** (array):
 
-  - **Description:** Additional directories to include in the workspace context.
-    Missing directories will be skipped with a warning.
+  - **Description:** Additional directories to include in the workspace context. Missing
+    directories will be skipped with a warning.
   - **Default:** `[]`
 
 - **`context.loadMemoryFromIncludeDirectories`** (boolean):
 
-  - **Description:** Controls how /memory reload loads AGENTS.md files. When
-    true, include directories are scanned; when false, only the current
-    directory is used.
+  - **Description:** Controls how /memory reload loads AGENTS.md files. When true,
+    include directories are scanned; when false, only the current directory is used.
   - **Default:** `false`
 
 - **`context.fileFiltering.respectGitIgnore`** (boolean):
@@ -1074,15 +1058,14 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.fileFiltering.enableFileWatcher`** (boolean):
 
-  - **Description:** Enable file watcher updates for @ file suggestions
-    (experimental).
+  - **Description:** Enable file watcher updates for @ file suggestions (experimental).
   - **Default:** `false`
   - **Requires restart:** Yes
 
 - **`context.fileFiltering.enableRecursiveFileSearch`** (boolean):
 
-  - **Description:** Enable recursive file search functionality when completing
-    @ references in the prompt.
+  - **Description:** Enable recursive file search functionality when completing @
+    references in the prompt.
   - **Default:** `true`
   - **Requires restart:** Yes
 
@@ -1094,9 +1077,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`context.fileFiltering.customIgnoreFilePaths`** (array):
   - **Description:** Additional ignore file paths to respect. These files take
-    precedence over .sparkleignore and .gitignore. Files earlier in the array
-    take precedence over files later in the array, e.g. the first file takes
-    precedence over the second one.
+    precedence over .sparkleignore and .gitignore. Files earlier in the array take
+    precedence over files later in the array, e.g. the first file takes precedence over
+    the second one.
   - **Default:** `[]`
   - **Requires restart:** Yes
 
@@ -1104,17 +1087,16 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`tools.sandbox`** (string):
 
-  - **Description:** Legacy full-process sandbox execution environment. Set to a
-    boolean to enable or disable the sandbox, provide a string path to a sandbox
-    profile, or specify an explicit sandbox command (e.g., "docker", "podman",
-    "lxc", "windows-native").
+  - **Description:** Legacy full-process sandbox execution environment. Set to a boolean
+    to enable or disable the sandbox, provide a string path to a sandbox profile, or
+    specify an explicit sandbox command (e.g., "docker", "podman", "lxc",
+    "windows-native").
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
 - **`tools.sandboxAllowedPaths`** (array):
 
-  - **Description:** List of additional paths that the sandbox is allowed to
-    access.
+  - **Description:** List of additional paths that the sandbox is allowed to access.
   - **Default:** `[]`
   - **Requires restart:** Yes
 
@@ -1126,24 +1108,23 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`tools.shell.enableInteractiveShell`** (boolean):
 
-  - **Description:** Use node-pty for an interactive shell experience. Fallback
-    to child_process still applies.
+  - **Description:** Use node-pty for an interactive shell experience. Fallback to
+    child_process still applies.
   - **Default:** `true`
   - **Requires restart:** Yes
 
 - **`tools.shell.backgroundCompletionBehavior`** (enum):
 
-  - **Description:** Controls what happens when a background shell command
-    finishes. 'silent': quietly exits in background. 'inject': automatically
-    returns output to agent. 'notify' (default): sends a brief completion
-    message with a pointer to the full output log.
+  - **Description:** Controls what happens when a background shell command finishes.
+    'silent': quietly exits in background. 'inject': automatically returns output to
+    agent. 'notify' (default): sends a brief completion message with a pointer to the
+    full output log.
   - **Default:** `"notify"`
   - **Values:** `"silent"`, `"inject"`, `"notify"`
 
 - **`tools.shell.pager`** (string):
 
-  - **Description:** The pager command to use for shell output. Defaults to
-    `cat`.
+  - **Description:** The pager command to use for shell output. Defaults to `cat`.
   - **Default:** `"cat"`
 
 - **`tools.shell.showColor`** (boolean):
@@ -1153,8 +1134,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`tools.shell.inactivityTimeout`** (number):
 
-  - **Description:** The maximum time in seconds allowed without output from the
-    shell command. Defaults to 5 minutes.
+  - **Description:** The maximum time in seconds allowed without output from the shell
+    command. Defaults to 5 minutes.
   - **Default:** `300`
 
 - **`tools.shell.enableShellOutputEfficiency`** (boolean):
@@ -1166,24 +1147,23 @@ their corresponding top-level category object in your `settings.json` file.
 - **`tools.core`** (array):
 
   - **Description:** Restrict the set of built-in tools with an allowlist. Match
-    semantics mirror tools.allowed; see the built-in tools documentation for
-    available names.
+    semantics mirror tools.allowed; see the built-in tools documentation for available
+    names.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
 - **`tools.allowed`** (array):
 
-  - **Description:** Tool names that bypass the confirmation dialog. Useful for
-    trusted commands (for example ["run_shell_command(git)",
-    "run_shell_command(npm test)"]). See shell tool command restrictions for
-    matching details.
+  - **Description:** Tool names that bypass the confirmation dialog. Useful for trusted
+    commands (for example ["run_shell_command(git)", "run_shell_command(npm test)"]).
+    See shell tool command restrictions for matching details.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
 - **`tools.confirmationRequired`** (array):
 
-  - **Description:** Tool names that always require user confirmation. Takes
-    precedence over allowed tools and core tool allowlists.
+  - **Description:** Tool names that always require user confirmation. Takes precedence
+    over allowed tools and core tool allowlists.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
@@ -1201,9 +1181,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`tools.callCommand`** (string):
 
-  - **Description:** Defines a custom shell command for invoking discovered
-    tools. The command must take the tool name as the first argument, read JSON
-    arguments from stdin, and emit JSON results on stdout.
+  - **Description:** Defines a custom shell command for invoking discovered tools. The
+    command must take the tool name as the first argument, read JSON arguments from
+    stdin, and emit JSON results on stdout.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
@@ -1215,24 +1195,24 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`tools.truncateToolOutputThreshold`** (number):
 
-  - **Description:** Maximum characters to show when truncating large tool
-    outputs. Set to 0 or negative to disable truncation.
+  - **Description:** Maximum characters to show when truncating large tool outputs. Set
+    to 0 or negative to disable truncation.
   - **Default:** `40000`
   - **Requires restart:** Yes
 
 - **`tools.webSearch.thirdPartyProvider`** (enum):
 
-  - **Description:** Third-party search API to use when the active provider is
-    not Gemini. Requires the matching API key in tools.webSearch.apiKey.
+  - **Description:** Third-party search API to use when the active provider is not
+    Gemini. Requires the matching API key in tools.webSearch.apiKey.
   - **Default:** `undefined`
   - **Values:** `"exa"`
   - **Requires restart:** Yes
 
 - **`tools.webSearch.apiKey`** (string):
   - **Description:** API key for the provider selected in
-    tools.webSearch.thirdPartyProvider. Supports environment variable references
-    such as ${EXA_API_KEY}; the EXA_API_KEY environment variable takes
-    precedence over this value.
+    tools.webSearch.thirdPartyProvider. Supports environment variable references such as
+    ${EXA_API_KEY}; the EXA_API_KEY environment variable takes precedence over this
+    value.
   - **Default:** `undefined`
   - **Requires restart:** Yes
 
@@ -1265,8 +1245,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`security.toolSandboxing`** (boolean):
 
-  - **Description:** Tool-level sandboxing. Isolates individual tools instead of
-    the entire CLI process.
+  - **Description:** Tool-level sandboxing. Isolates individual tools instead of the
+    entire CLI process.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1278,8 +1258,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`security.autoAddToPolicyByDefault`** (boolean):
 
-  - **Description:** When enabled, the "Allow for all future sessions" option
-    becomes the default choice for low-risk tools in trusted workspaces.
+  - **Description:** When enabled, the "Allow for all future sessions" option becomes
+    the default choice for low-risk tools in trusted workspaces.
   - **Default:** `false`
 
 - **`security.blockGitExtensions`** (boolean):
@@ -1290,9 +1270,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`security.allowedExtensions`** (array):
 
-  - **Description:** List of Regex patterns for allowed extensions. If nonempty,
-    only extensions that match the patterns in this list are allowed. Overrides
-    the blockGitExtensions setting.
+  - **Description:** List of Regex patterns for allowed extensions. If nonempty, only
+    extensions that match the patterns in this list are allowed. Overrides the
+    blockGitExtensions setting.
   - **Default:** `[]`
   - **Requires restart:** Yes
 
@@ -1316,8 +1296,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`security.environmentVariableRedaction.enabled`** (boolean):
 
-  - **Description:** Enable redaction of environment variables that may contain
-    secrets.
+  - **Description:** Enable redaction of environment variables that may contain secrets.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1336,10 +1315,9 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`advanced.autoConfigureMemory`** (boolean):
 
-  - **Description:** Automatically configure Node.js memory limits. Note:
-    Because memory is allocated during the initial process boot, this setting is
-    only read from the global user settings file and ignores workspace-level
-    overrides.
+  - **Description:** Automatically configure Node.js memory limits. Note: Because memory
+    is allocated during the initial process boot, this setting is only read from the
+    global user settings file and ignores workspace-level overrides.
   - **Default:** `true`
   - **Requires restart:** Yes
 
@@ -1360,8 +1338,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`advanced.ignoreLocalEnv`** (boolean):
 
-  - **Description:** Whether to ignore generic .env files in the project
-    directory.
+  - **Description:** Whether to ignore generic .env files in the project directory.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1373,8 +1350,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.voiceMode`** (boolean):
 
-  - **Description:** Enable experimental voice dictation and commands (/voice,
-    /voice model).
+  - **Description:** Enable experimental voice dictation and commands (/voice, /voice
+    model).
   - **Default:** `false`
 
 - **`experimental.voice.activationMode`** (enum):
@@ -1385,9 +1362,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.voice.backend`** (enum):
 
-  - **Description:** The backend to use for voice transcription. Note: When
-    using the Gemini Live backend, voice recordings are sent to Google Cloud for
-    transcription.
+  - **Description:** The backend to use for voice transcription. Note: When using the
+    Gemini Live backend, voice recordings are sent to Google Cloud for transcription.
   - **Default:** `"gemini-live"`
   - **Values:** `"gemini-live"`, `"whisper"`
 
@@ -1400,8 +1376,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.voice.stopGracePeriodMs`** (number):
 
-  - **Description:** How long to wait for final transcription after stopping
-    recording.
+  - **Description:** How long to wait for final transcription after stopping recording.
   - **Default:** `4000`
 
 - **`experimental.adk.agentSessionNoninteractiveEnabled`** (boolean):
@@ -1412,15 +1387,14 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.adk.agentSessionInteractiveEnabled`** (boolean):
 
-  - **Description:** Enable the agent session implementation for the interactive
-    CLI.
+  - **Description:** Enable the agent session implementation for the interactive CLI.
   - **Default:** `false`
   - **Requires restart:** Yes
 
 - **`experimental.adk.agentSessionSubagentEnabled`** (boolean):
 
-  - **Description:** Route subagent invocations through the AgentSession
-    protocol instead of legacy executors.
+  - **Description:** Route subagent invocations through the AgentSession protocol
+    instead of legacy executors.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1456,8 +1430,7 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.extensionRegistryURI`** (string):
 
-  - **Description:** The URI (web URL or local file path) of the extension
-    registry.
+  - **Description:** The URI (web URL or local file path) of the extension registry.
   - **Default:** `"https://geminicli.com/extensions.json"`
   - **Requires restart:** Yes
 
@@ -1469,16 +1442,16 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.useOSC52Paste`** (boolean):
 
-  - **Description:** Use OSC 52 for pasting. This may be more robust than the
-    default system when using remote terminal sessions (if your terminal is
-    configured to allow it).
+  - **Description:** Use OSC 52 for pasting. This may be more robust than the default
+    system when using remote terminal sessions (if your terminal is configured to allow
+    it).
   - **Default:** `false`
 
 - **`experimental.useOSC52Copy`** (boolean):
 
-  - **Description:** Use OSC 52 for copying. This may be more robust than the
-    default system when using remote terminal sessions (if your terminal is
-    configured to allow it).
+  - **Description:** Use OSC 52 for copying. This may be more robust than the default
+    system when using remote terminal sessions (if your terminal is configured to allow
+    it).
   - **Default:** `false`
 
 - **`experimental.taskTracker`** (boolean):
@@ -1489,8 +1462,8 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.modelSteering`** (boolean):
 
-  - **Description:** Enable model steering (user hints) to guide the model
-    during tool execution.
+  - **Description:** Enable model steering (user hints) to guide the model during tool
+    execution.
   - **Default:** `false`
 
 - **`experimental.directWebFetch`** (boolean):
@@ -1501,17 +1474,17 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`experimental.stressTestProfile`** (boolean):
 
-  - **Description:** Significantly lowers token limits to force early garbage
-    collection and distillation for testing purposes.
+  - **Description:** Significantly lowers token limits to force early garbage collection
+    and distillation for testing purposes.
   - **Default:** `false`
   - **Requires restart:** Yes
 
 - **`experimental.autoMemory`** (boolean):
 
-  - **Description:** Automatically extract memory patches and skills from past
-    sessions in the background. Every change is written as a unified diff
-    `.patch` file under `<projectMemoryDir>/.inbox/<kind>/` and held for review
-    in /memory inbox; nothing is applied until you approve it.
+  - **Description:** Automatically extract memory patches and skills from past sessions
+    in the background. Every change is written as a unified diff `.patch` file under
+    `<projectMemoryDir>/.inbox/<kind>/` and held for review in /memory inbox; nothing is
+    applied until you approve it.
   - **Default:** `false`
   - **Requires restart:** Yes
 
@@ -1549,15 +1522,15 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`hooksConfig.enabled`** (boolean):
 
-  - **Description:** Canonical toggle for the hooks system. When disabled, no
-    hooks will be executed.
+  - **Description:** Canonical toggle for the hooks system. When disabled, no hooks will
+    be executed.
   - **Default:** `true`
   - **Requires restart:** Yes
 
 - **`hooksConfig.disabled`** (array):
 
-  - **Description:** List of hook names (commands) that should be disabled.
-    Hooks in this list will not execute even if configured.
+  - **Description:** List of hook names (commands) that should be disabled. Hooks in
+    this list will not execute even if configured.
   - **Default:** `[]`
 
 - **`hooksConfig.notifications`** (boolean):
@@ -1568,32 +1541,32 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`hooks.BeforeTool`** (array):
 
-  - **Description:** Hooks that execute before tool execution. Can intercept,
-    validate, or modify tool calls.
+  - **Description:** Hooks that execute before tool execution. Can intercept, validate,
+    or modify tool calls.
   - **Default:** `[]`
 
 - **`hooks.AfterTool`** (array):
 
-  - **Description:** Hooks that execute after tool execution. Can process
-    results, log outputs, or trigger follow-up actions.
+  - **Description:** Hooks that execute after tool execution. Can process results, log
+    outputs, or trigger follow-up actions.
   - **Default:** `[]`
 
 - **`hooks.BeforeAgent`** (array):
 
-  - **Description:** Hooks that execute before agent loop starts. Can set up
-    context or initialize resources.
+  - **Description:** Hooks that execute before agent loop starts. Can set up context or
+    initialize resources.
   - **Default:** `[]`
 
 - **`hooks.AfterAgent`** (array):
 
-  - **Description:** Hooks that execute after agent loop completes. Can perform
-    cleanup or summarize results.
+  - **Description:** Hooks that execute after agent loop completes. Can perform cleanup
+    or summarize results.
   - **Default:** `[]`
 
 - **`hooks.Notification`** (array):
 
-  - **Description:** Hooks that execute on notification events (errors,
-    warnings, info). Can log or alert on specific conditions.
+  - **Description:** Hooks that execute on notification events (errors, warnings, info).
+    Can log or alert on specific conditions.
   - **Default:** `[]`
 
 - **`hooks.SessionStart`** (array):
@@ -1604,39 +1577,38 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`hooks.SessionEnd`** (array):
 
-  - **Description:** Hooks that execute when a session ends. Can perform cleanup
-    or persist session data.
+  - **Description:** Hooks that execute when a session ends. Can perform cleanup or
+    persist session data.
   - **Default:** `[]`
 
 - **`hooks.PreCompress`** (array):
 
-  - **Description:** Hooks that execute before chat history compression. Can
-    back up or analyze conversation before compression.
+  - **Description:** Hooks that execute before chat history compression. Can back up or
+    analyze conversation before compression.
   - **Default:** `[]`
 
 - **`hooks.BeforeModel`** (array):
 
-  - **Description:** Hooks that execute before LLM requests. Can modify prompts,
-    inject context, or control model parameters.
+  - **Description:** Hooks that execute before LLM requests. Can modify prompts, inject
+    context, or control model parameters.
   - **Default:** `[]`
 
 - **`hooks.AfterModel`** (array):
 
-  - **Description:** Hooks that execute after LLM responses. Can process
-    outputs, extract information, or log interactions.
+  - **Description:** Hooks that execute after LLM responses. Can process outputs,
+    extract information, or log interactions.
   - **Default:** `[]`
 
 - **`hooks.BeforeToolSelection`** (array):
-  - **Description:** Hooks that execute before tool selection. Can filter or
-    prioritize available tools dynamically.
+  - **Description:** Hooks that execute before tool selection. Can filter or prioritize
+    available tools dynamically.
   - **Default:** `[]`
 
 #### `contextManagement`
 
 - **`contextManagement.historyWindow.maxTokens`** (number):
 
-  - **Description:** The number of tokens to allow before triggering
-    compression.
+  - **Description:** The number of tokens to allow before triggering compression.
   - **Default:** `150000`
   - **Requires restart:** Yes
 
@@ -1648,58 +1620,55 @@ their corresponding top-level category object in your `settings.json` file.
 
 - **`contextManagement.messageLimits.normalMaxTokens`** (number):
 
-  - **Description:** The target number of tokens to budget for a normal
-    conversation turn.
+  - **Description:** The target number of tokens to budget for a normal conversation
+    turn.
   - **Default:** `2500`
   - **Requires restart:** Yes
 
 - **`contextManagement.messageLimits.retainedMaxTokens`** (number):
 
-  - **Description:** The maximum number of tokens a single conversation turn can
-    consume before truncation.
+  - **Description:** The maximum number of tokens a single conversation turn can consume
+    before truncation.
   - **Default:** `12000`
   - **Requires restart:** Yes
 
 - **`contextManagement.messageLimits.normalizationHeadRatio`** (number):
 
-  - **Description:** The ratio of tokens to retain from the beginning of a
-    truncated message (0.0 to 1.0).
+  - **Description:** The ratio of tokens to retain from the beginning of a truncated
+    message (0.0 to 1.0).
   - **Default:** `0.25`
   - **Requires restart:** Yes
 
 - **`contextManagement.tools.distillation.maxOutputTokens`** (number):
 
-  - **Description:** Maximum tokens to show to the model when truncating large
-    tool outputs.
+  - **Description:** Maximum tokens to show to the model when truncating large tool
+    outputs.
   - **Default:** `10000`
   - **Requires restart:** Yes
 
-- **`contextManagement.tools.distillation.summarizationThresholdTokens`**
-  (number):
+- **`contextManagement.tools.distillation.summarizationThresholdTokens`** (number):
 
-  - **Description:** Threshold above which truncated tool outputs will be
-    summarized by an LLM.
+  - **Description:** Threshold above which truncated tool outputs will be summarized by
+    an LLM.
   - **Default:** `20000`
   - **Requires restart:** Yes
 
-- **`contextManagement.tools.outputMasking.protectionThresholdTokens`**
-  (number):
+- **`contextManagement.tools.outputMasking.protectionThresholdTokens`** (number):
 
-  - **Description:** Minimum number of tokens to protect from masking (most
-    recent tool outputs).
+  - **Description:** Minimum number of tokens to protect from masking (most recent tool
+    outputs).
   - **Default:** `50000`
   - **Requires restart:** Yes
 
-- **`contextManagement.tools.outputMasking.minPrunableThresholdTokens`**
-  (number):
+- **`contextManagement.tools.outputMasking.minPrunableThresholdTokens`** (number):
 
   - **Description:** Minimum prunable tokens required to trigger a masking pass.
   - **Default:** `30000`
   - **Requires restart:** Yes
 
 - **`contextManagement.tools.outputMasking.protectLatestTurn`** (boolean):
-  - **Description:** Ensures the absolute latest turn is never masked,
-    regardless of token count.
+  - **Description:** Ensures the absolute latest turn is never masked, regardless of
+    token count.
   - **Default:** `true`
   - **Requires restart:** Yes
   <!-- SETTINGS-AUTOGEN:END -->
@@ -1707,14 +1676,13 @@ their corresponding top-level category object in your `settings.json` file.
 #### `mcpServers`
 
 Configures connections to one or more Model-Context Protocol (MCP) servers for
-discovering and using custom tools. Sparkle CLI attempts to connect to each
-configured MCP server to discover available tools. Every discovered tool is
-prepended with the `mcp_` prefix and its server alias to form a fully qualified
-name (FQN) (for example, `mcp_serverAlias_actualToolName`) to avoid conflicts.
-Note that the system might strip certain schema properties from MCP tool
-definitions for compatibility. At least one of `command`, `url`, or `httpUrl`
-must be provided. If multiple are specified, the order of precedence is
-`httpUrl`, then `url`, then `command`.
+discovering and using custom tools. Sparkle CLI attempts to connect to each configured
+MCP server to discover available tools. Every discovered tool is prepended with the
+`mcp_` prefix and its server alias to form a fully qualified name (FQN) (for example,
+`mcp_serverAlias_actualToolName`) to avoid conflicts. Note that the system might strip
+certain schema properties from MCP tool definitions for compatibility. At least one of
+`command`, `url`, or `httpUrl` must be provided. If multiple are specified, the order of
+precedence is `httpUrl`, then `url`, then `command`.
 
 <!-- prettier-ignore -->
 > [!WARNING]
@@ -1725,54 +1693,50 @@ must be provided. If multiple are specified, the order of precedence is
 > misidentify the server name, which can cause security policies to fail
 > silently.
 
-- **`mcpServers.<SERVER_NAME>`** (object): The server parameters for the named
-  server.
-  - `command` (string, optional): The command to execute to start the MCP server
-    via standard I/O.
+- **`mcpServers.<SERVER_NAME>`** (object): The server parameters for the named server.
+  - `command` (string, optional): The command to execute to start the MCP server via
+    standard I/O.
   - `args` (array of strings, optional): Arguments to pass to the command.
-  - `env` (object, optional): Environment variables to set for the server
-    process.
-  - `cwd` (string, optional): The working directory in which to start the
+  - `env` (object, optional): Environment variables to set for the server process.
+  - `cwd` (string, optional): The working directory in which to start the server.
+  - `url` (string, optional): The URL of an MCP server that uses Server-Sent Events
+    (SSE) for communication.
+  - `httpUrl` (string, optional): The URL of an MCP server that uses streamable HTTP for
+    communication.
+  - `headers` (object, optional): A map of HTTP headers to send with requests to `url`
+    or `httpUrl`.
+  - `timeout` (number, optional): Timeout in milliseconds for requests to this MCP
     server.
-  - `url` (string, optional): The URL of an MCP server that uses Server-Sent
-    Events (SSE) for communication.
-  - `httpUrl` (string, optional): The URL of an MCP server that uses streamable
-    HTTP for communication.
-  - `headers` (object, optional): A map of HTTP headers to send with requests to
-    `url` or `httpUrl`.
-  - `timeout` (number, optional): Timeout in milliseconds for requests to this
-    MCP server.
   - `trust` (boolean, optional): Trust this server and bypass all tool call
     confirmations.
-  - `description` (string, optional): A brief description of the server, which
-    may be used for display purposes.
-  - `includeTools` (array of strings, optional): List of tool names to include
-    from this MCP server. When specified, only the tools listed here will be
-    available from this server (allowlist behavior). If not specified, all tools
-    from the server are enabled by default.
-  - `excludeTools` (array of strings, optional): List of tool names to exclude
-    from this MCP server. Tools listed here will not be available to the model,
-    even if they are exposed by the server. **Note:** `excludeTools` takes
-    precedence over `includeTools` - if a tool is in both lists, it will be
-    excluded.
+  - `description` (string, optional): A brief description of the server, which may be
+    used for display purposes.
+  - `includeTools` (array of strings, optional): List of tool names to include from this
+    MCP server. When specified, only the tools listed here will be available from this
+    server (allowlist behavior). If not specified, all tools from the server are enabled
+    by default.
+  - `excludeTools` (array of strings, optional): List of tool names to exclude from this
+    MCP server. Tools listed here will not be available to the model, even if they are
+    exposed by the server. **Note:** `excludeTools` takes precedence over
+    `includeTools` - if a tool is in both lists, it will be excluded.
 
 #### `telemetry`
 
-Configures logging and metrics collection for Sparkle CLI. For more information,
-see [Telemetry](../cli/telemetry.md).
+Configures logging and metrics collection for Sparkle CLI. For more information, see
+[Telemetry](../cli/telemetry.md).
 
 - **Properties:**
   - **`enabled`** (boolean): Whether or not telemetry is enabled.
-  - **`traces`** (boolean): Whether detailed traces with large attributes (like
-    tool outputs and file reads) are captured. Defaults to `false`.
-  - **`logPrompts`** (boolean): Whether or not to include the content of user
-    prompts in the logs.
+  - **`traces`** (boolean): Whether detailed traces with large attributes (like tool
+    outputs and file reads) are captured. Defaults to `false`.
+  - **`logPrompts`** (boolean): Whether or not to include the content of user prompts in
+    the logs.
   - **`outfile`** (string): The file to write telemetry to.
 
 ### Example `settings.json`
 
-Here is an example of a `settings.json` file with the nested structure, new as
-of v0.3.0:
+Here is an example of a `settings.json` file with the nested structure, new as of
+v0.3.0:
 
 ```json
 {
@@ -1842,9 +1806,9 @@ of v0.3.0:
 
 ## Shell history
 
-The CLI keeps a history of shell commands you run. To avoid conflicts between
-different projects, this history is stored in a project-specific directory
-within your user's home folder.
+The CLI keeps a history of shell commands you run. To avoid conflicts between different
+projects, this history is stored in a project-specific directory within your user's home
+folder.
 
 - **Location:** `~/.sparkle/data/<project-id>/shell_history`
   - `<project-id>` is a unique identifier for your project directory.
@@ -1855,61 +1819,59 @@ within your user's home folder.
 Environment variables are a common way to configure applications, especially for
 sensitive information like API keys or for settings that might change between
 environments. For authentication setup, see the
-[Authentication documentation](../get-started/authentication.mdx) which covers
-all available authentication methods.
+[Authentication documentation](../get-started/authentication.mdx) which covers all
+available authentication methods.
 
-The CLI automatically loads environment variables from an `.env` file. The
-loading order is:
+The CLI automatically loads environment variables from an `.env` file. The loading order
+is:
 
 1.  `.env` file in the current working directory.
-2.  If not found, it searches upwards in parent directories until it finds an
-    `.env` file or reaches the project root (identified by a `.git` folder) or
-    the home directory.
+2.  If not found, it searches upwards in parent directories until it finds an `.env`
+    file or reaches the project root (identified by a `.git` folder) or the home
+    directory.
 3.  If still not found, it looks for `~/.env` (in the user's home directory).
 
 **Environment variable exclusion:** Some environment variables (like `DEBUG` and
-`DEBUG_MODE`) are automatically excluded from being loaded from project `.env`
-files to prevent interference with sparkle-cli behavior. Variables from
-`.sparkle/.env` files are never excluded. You can customize this behavior using
-the `advanced.excludedEnvVars` setting in your `settings.json` file.
+`DEBUG_MODE`) are automatically excluded from being loaded from project `.env` files to
+prevent interference with sparkle-cli behavior. Variables from `.sparkle/.env` files are
+never excluded. You can customize this behavior using the `advanced.excludedEnvVars`
+setting in your `settings.json` file.
 
 - **`GEMINI_API_KEY`**:
   - Your API key for the Gemini API.
   - One of several available
     [authentication methods](../get-started/authentication.mdx).
-  - Set this in your shell profile (for example, `~/.bashrc`, `~/.zshrc`) or an
-    `.env` file.
+  - Set this in your shell profile (for example, `~/.bashrc`, `~/.zshrc`) or an `.env`
+    file.
 - **`SPARKLE_MODEL`**:
   - Specifies the default Gemini model to use.
   - Overrides the hardcoded default
-  - Example: `export SPARKLE_MODEL="gemini-3-flash-preview"` (Windows
-    PowerShell: `$env:SPARKLE_MODEL="gemini-3-flash-preview"`)
+  - Example: `export SPARKLE_MODEL="gemini-3-flash-preview"` (Windows PowerShell:
+    `$env:SPARKLE_MODEL="gemini-3-flash-preview"`)
 - **`SPARKLE_CLI_TRUST_WORKSPACE`**:
-  - If set to `"true"`, trusts the current workspace for the duration of the
-    session, bypassing the folder trust check.
+  - If set to `"true"`, trusts the current workspace for the duration of the session,
+    bypassing the folder trust check.
   - Useful for headless environments (for example, CI/CD pipelines).
 - **`SPARKLE_CLI_TRUSTED_FOLDERS_PATH`**:
   - Overrides the default location for the `trustedFolders.json` file.
-  - Useful if you want to store this configuration in a custom location instead
-    of the default `~/.sparkle/`.
+  - Useful if you want to store this configuration in a custom location instead of the
+    default `~/.sparkle/`.
 - **`SPARKLE_CLI_IDE_PID`**:
-  - Manually specifies the PID of the IDE process to use for integration. This
-    is useful when running Sparkle CLI in a standalone terminal while still
-    wanting to associate it with a specific IDE instance.
+  - Manually specifies the PID of the IDE process to use for integration. This is useful
+    when running Sparkle CLI in a standalone terminal while still wanting to associate
+    it with a specific IDE instance.
   - Overrides the automatic IDE detection logic.
 - **`SPARKLE_CLI_HOME`**:
-  - Specifies the root directory for Sparkle CLI's user-level configuration and
-    storage.
+  - Specifies the root directory for Sparkle CLI's user-level configuration and storage.
   - By default, this is the user's system home directory. The CLI will create a
     `.sparkle` folder inside this directory.
   - Useful for shared compute environments or keeping CLI state isolated.
-  - Example: `export SPARKLE_CLI_HOME="/path/to/user/config"` (Windows
-    PowerShell: `$env:SPARKLE_CLI_HOME="C:\path\to\user\config"`)
+  - Example: `export SPARKLE_CLI_HOME="/path/to/user/config"` (Windows PowerShell:
+    `$env:SPARKLE_CLI_HOME="C:\path\to\user\config"`)
 - **`SPARKLE_CLI_SURFACE`**:
-  - Specifies a custom label to include in the `User-Agent` header for API
-    traffic reporting.
-  - This is useful for tracking specific internal tools or distribution
-    channels.
+  - Specifies a custom label to include in the `User-Agent` header for API traffic
+    reporting.
+  - This is useful for tracking specific internal tools or distribution channels.
   - Example: `export SPARKLE_CLI_SURFACE="my-custom-tool"` (Windows PowerShell:
     `$env:SPARKLE_CLI_SURFACE="my-custom-tool"`)
 - **`GOOGLE_GENAI_API_VERSION`**:
@@ -1918,23 +1880,23 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
   - Example: `export GOOGLE_GENAI_API_VERSION="v1"` (Windows PowerShell:
     `$env:GOOGLE_GENAI_API_VERSION="v1"`)
 - **`GOOGLE_GEMINI_BASE_URL`**:
-  - Overrides the default base URL for Gemini API requests (when using
-    `gemini-api-key` authentication).
-  - Must be a valid URL. For security, it must use HTTPS unless pointing to
-    `localhost` (or `127.0.0.1` / `[::1]`).
-  - Example: `export GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"` (Windows
-    PowerShell: `$env:GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"`)
+  - Overrides the default base URL for Gemini API requests (when using `gemini-api-key`
+    authentication).
+  - Must be a valid URL. For security, it must use HTTPS unless pointing to `localhost`
+    (or `127.0.0.1` / `[::1]`).
+  - Example: `export GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"` (Windows PowerShell:
+    `$env:GOOGLE_GEMINI_BASE_URL="https://my-proxy.com"`)
 - **`GEMINI_TELEMETRY_ENABLED`**:
-  - Set to `true` or `1` to enable telemetry. Any other value is treated as
-    disabling it.
+  - Set to `true` or `1` to enable telemetry. Any other value is treated as disabling
+    it.
   - Overrides the `telemetry.enabled` setting.
 - **`GEMINI_TELEMETRY_TRACES_ENABLED`**:
-  - Set to `true` or `1` to enable detailed tracing with large attributes. Any
-    other value is treated as disabling it.
+  - Set to `true` or `1` to enable detailed tracing with large attributes. Any other
+    value is treated as disabling it.
   - Overrides the `telemetry.traces` setting.
 - **`GEMINI_TELEMETRY_LOG_PROMPTS`**:
-  - Set to `true` or `1` to enable or disable logging of user prompts. Any other
-    value is treated as disabling it.
+  - Set to `true` or `1` to enable or disable logging of user prompts. Any other value
+    is treated as disabling it.
   - Overrides the `telemetry.logPrompts` setting.
 - **`GEMINI_TELEMETRY_OUTFILE`**:
   - Sets the file path to write telemetry to.
@@ -1945,22 +1907,19 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
 - **`SPARKLE_SYSTEM_MD`**:
   - Replaces the built‑in system prompt with content from a Markdown file.
   - `true`/`1`: Use project default path `./.sparkle/system.md`.
-  - Any other string: Treat as a path (relative/absolute supported, `~`
-    expands).
+  - Any other string: Treat as a path (relative/absolute supported, `~` expands).
   - `false`/`0` or unset: Use the built‑in prompt. See
     [System Prompt Override](../cli/system-prompt.md).
 - **`SPARKLE_WRITE_SYSTEM_MD`**:
   - Writes the current built‑in system prompt to a file for review.
-  - `true`/`1`: Write to `./.sparkle/system.md`. Otherwise treat the value as a
-    path.
+  - `true`/`1`: Write to `./.sparkle/system.md`. Otherwise treat the value as a path.
   - Run the CLI once with this set to generate the file.
-- **`DEBUG` or `DEBUG_MODE`** (often used by underlying libraries or the CLI
-  itself):
-  - Set to `true` or `1` to enable verbose debug logging, which can be helpful
-    for troubleshooting.
-  - **Note:** These variables are automatically excluded from project `.env`
-    files by default to prevent interference with sparkle-cli behavior. Use
-    `.sparkle/.env` files if you need to set these for sparkle-cli specifically.
+- **`DEBUG` or `DEBUG_MODE`** (often used by underlying libraries or the CLI itself):
+  - Set to `true` or `1` to enable verbose debug logging, which can be helpful for
+    troubleshooting.
+  - **Note:** These variables are automatically excluded from project `.env` files by
+    default to prevent interference with sparkle-cli behavior. Use `.sparkle/.env` files
+    if you need to set these for sparkle-cli specifically.
 - **`NO_COLOR`**:
   - Set to any value to disable all color output in the CLI.
 - **`CLI_TITLE`**:
@@ -1968,24 +1927,23 @@ the `advanced.excludedEnvVars` setting in your `settings.json` file.
 
 ### Environment variable redaction
 
-To prevent accidental leakage of sensitive information, Sparkle CLI
-automatically redacts potential secrets from environment variables when
-executing tools (such as shell commands). This "best effort" redaction applies
-to variables inherited from the system or loaded from `.env` files.
+To prevent accidental leakage of sensitive information, Sparkle CLI automatically
+redacts potential secrets from environment variables when executing tools (such as shell
+commands). This "best effort" redaction applies to variables inherited from the system
+or loaded from `.env` files.
 
 **Default Redaction Rules:**
 
-- **By Name:** Variables are redacted if their names contain sensitive terms
-  like `TOKEN`, `SECRET`, `PASSWORD`, `KEY`, `AUTH`, `CREDENTIAL`, `PRIVATE`, or
-  `CERT`.
-- **By Value:** Variables are redacted if their values match known secret
-  patterns, such as:
+- **By Name:** Variables are redacted if their names contain sensitive terms like
+  `TOKEN`, `SECRET`, `PASSWORD`, `KEY`, `AUTH`, `CREDENTIAL`, `PRIVATE`, or `CERT`.
+- **By Value:** Variables are redacted if their values match known secret patterns, such
+  as:
   - Private keys (RSA, OpenSSH, PGP, etc.)
   - Certificates
   - URLs containing credentials
   - API keys and tokens (GitHub, Google, AWS, Stripe, Slack, etc.)
-- **Specific Blocklist:** Certain variables like `CLIENT_ID`, `DB_URI`,
-  `DATABASE_URL`, and `CONNECTION_STRING` are always redacted by default.
+- **Specific Blocklist:** Certain variables like `CLIENT_ID`, `DB_URI`, `DATABASE_URL`,
+  and `CONNECTION_STRING` are always redacted by default.
 
 **Allowlist (Never Redacted):**
 
@@ -1998,10 +1956,10 @@ to variables inherited from the system or loaded from `.env` files.
 
 You can customize this behavior in your `settings.json` file:
 
-- **`security.allowedEnvironmentVariables`**: A list of variable names to
-  _never_ redact, even if they match sensitive patterns.
-- **`security.blockedEnvironmentVariables`**: A list of variable names to
-  _always_ redact, even if they don't match sensitive patterns.
+- **`security.allowedEnvironmentVariables`**: A list of variable names to _never_
+  redact, even if they match sensitive patterns.
+- **`security.blockedEnvironmentVariables`**: A list of variable names to _always_
+  redact, even if they don't match sensitive patterns.
 
 ```json
 {
@@ -2014,16 +1972,15 @@ You can customize this behavior in your `settings.json` file:
 
 ## Command-line arguments
 
-Arguments passed directly when running the CLI can override other configurations
-for that specific session.
+Arguments passed directly when running the CLI can override other configurations for
+that specific session.
 
 - **`--acp`**:
   - Starts the agent in Agent Communication Protocol (ACP) mode.
 - **`--allowed-mcp-server-names`**:
   - A comma-separated list of MCP server names to allow for the session.
 - **`--allowed-tools <tool1,tool2,...>`**:
-  - A comma-separated list of tool names that will bypass the confirmation
-    dialog.
+  - A comma-separated list of tool names that will bypass the confirmation dialog.
   - Example: `sparkle --allowed-tools "ShellTool(git status)"`
 - **`--approval-mode <mode>`**:
   - Sets the approval mode for tool calls. Available modes:
@@ -2031,20 +1988,18 @@ for that specific session.
     - `auto_edit`: Automatically approve edit tools (replace, write_file) while
       prompting for others
     - `yolo`: Automatically approve all tool calls (equivalent to `--yolo`)
-    - `plan`: Read-only mode for tool calls (requires experimental planning to
-      be enabled).
-      > **Note:** This mode is currently under development and not yet fully
-      > functional.
+    - `plan`: Read-only mode for tool calls (requires experimental planning to be
+      enabled).
+      > **Note:** This mode is currently under development and not yet fully functional.
   - Cannot be used together with `--yolo`. Use `--approval-mode=yolo` instead of
     `--yolo` for the new unified approach.
   - Example: `sparkle --approval-mode auto_edit`
 - **`--debug`** (**`-d`**):
-  - Enables debug mode for this session, providing more verbose output. Open the
-    debug console with F12 to see the additional logging.
+  - Enables debug mode for this session, providing more verbose output. Open the debug
+    console with F12 to see the additional logging.
 - **`--delete-session <identifier>`**:
   - Delete a specific chat session by its index number or full session UUID.
-  - Use `--list-sessions` first to see available sessions, their indices, and
-    UUIDs.
+  - Use `--list-sessions` first to see available sessions, their indices, and UUIDs.
   - Example: `sparkle --delete-session 3` or
     `sparkle --delete-session a1b2c3d4-e5f6-7890-abcd-ef1234567890`
 - **`--extensions <extension_name ...>`** (**`-e <extension_name ...>`**):
@@ -2057,8 +2012,7 @@ for that specific session.
 - **`--help`** (or **`-h`**):
   - Displays help information about command-line arguments.
 - **`--include-directories <dir1,dir2,...>`**:
-  - Includes additional directories in the workspace for multi-directory
-    support.
+  - Includes additional directories in the workspace for multi-directory support.
   - Can be specified multiple times or as comma-separated values.
   - 5 directories can be added at maximum.
   - Example: `--include-directories /path/to/project1,/path/to/project2` or
@@ -2067,21 +2021,19 @@ for that specific session.
   - Lists all available extensions and exits.
 - **`--list-sessions`**:
   - List all available chat sessions for the current project and exit.
-  - Shows session indices, dates, message counts, and preview of first user
-    message.
+  - Shows session indices, dates, message counts, and preview of first user message.
   - Example: `sparkle --list-sessions`
 - **`--model <model_name>`** (**`-m <model_name>`**):
   - Specifies the Gemini model to use for this session.
   - Example: `npm start -- --model gemini-3-pro-preview`
 - **`--output-format <format>`**:
-  - **Description:** Specifies the format of the CLI output for non-interactive
-    mode.
+  - **Description:** Specifies the format of the CLI output for non-interactive mode.
   - **Values:**
     - `text`: (Default) The standard human-readable output.
     - `json`: A machine-readable JSON output.
     - `stream-json`: A streaming JSON output that emits real-time events.
-  - **Note:** For structured output and scripting, use the
-    `--output-format json` or `--output-format stream-json` flag.
+  - **Note:** For structured output and scripting, use the `--output-format json` or
+    `--output-format stream-json` flag.
 - **`--prompt <your_prompt>`** (**`-p <your_prompt>`**):
   - Used to pass a prompt directly to the command. This invokes Sparkle CLI in a
     non-interactive mode.
@@ -2093,18 +2045,17 @@ for that specific session.
 - **`--record-responses`**:
   - Path to a file to record model responses for testing.
 - **`--resume [session_id]`** (**`-r [session_id]`**):
-  - Resume a previous chat session. Use "latest" for the most recent session,
-    provide a session index number, or provide a full session UUID.
+  - Resume a previous chat session. Use "latest" for the most recent session, provide a
+    session index number, or provide a full session UUID.
   - If no session_id is provided, defaults to "latest".
   - Example: `sparkle --resume 5` or `sparkle --resume latest` or
-    `sparkle --resume a1b2c3d4-e5f6-7890-abcd-ef1234567890` or
-    `sparkle --resume`
+    `sparkle --resume a1b2c3d4-e5f6-7890-abcd-ef1234567890` or `sparkle --resume`
   - See [Session Management](../cli/session-management.md) for more details.
 - **`--sandbox`** (**`-s`**):
   - Enables sandbox mode for this session.
 - **`--screen-reader`**:
-  - Enables screen reader mode, which adjusts the TUI for better compatibility
-    with screen readers.
+  - Enables screen reader mode, which adjusts the TUI for better compatibility with
+    screen readers.
 - **`--version`**:
   - Displays the version of the CLI.
 - **`--yolo`**:
@@ -2112,24 +2063,23 @@ for that specific session.
 
 ## Context files (hierarchical instructional context)
 
-While not strictly configuration for the CLI's _behavior_, context files
-(defaulting to `AGENTS.md` but configurable via the `context.fileName` setting)
-are crucial for configuring the _instructional context_ (also referred to as
-"memory") provided to the Gemini model. This powerful feature lets you give
-project-specific instructions, coding style guides, or any relevant background
-information to the AI, making its responses more tailored and accurate to your
-needs. The CLI includes UI elements, such as an indicator in the footer showing
-the number of loaded context files, to keep you informed about the active
-context.
+While not strictly configuration for the CLI's _behavior_, context files (defaulting to
+`AGENTS.md` but configurable via the `context.fileName` setting) are crucial for
+configuring the _instructional context_ (also referred to as "memory") provided to the
+Gemini model. This powerful feature lets you give project-specific instructions, coding
+style guides, or any relevant background information to the AI, making its responses
+more tailored and accurate to your needs. The CLI includes UI elements, such as an
+indicator in the footer showing the number of loaded context files, to keep you informed
+about the active context.
 
-- **Purpose:** These Markdown files contain instructions, guidelines, or context
-  that you want the Gemini model to be aware of during your interactions. The
-  system is designed to manage this instructional context hierarchically.
+- **Purpose:** These Markdown files contain instructions, guidelines, or context that
+  you want the Gemini model to be aware of during your interactions. The system is
+  designed to manage this instructional context hierarchically.
 
 ### Example context file content (for example, `AGENTS.md`)
 
-Here's a conceptual example of what a context file at the root of a TypeScript
-project might contain:
+Here's a conceptual example of what a context file at the root of a TypeScript project
+might contain:
 
 ```markdown
 # Project: My Awesome TypeScript Library
@@ -2151,8 +2101,8 @@ project might contain:
 ## Specific Component: `src/api/client.ts`
 
 - This file handles all outbound API requests.
-- When adding new API call functions, ensure they include robust error handling
-  and logging.
+- When adding new API call functions, ensure they include robust error handling and
+  logging.
 - Use the existing `fetchWithRetry` utility for all GET requests.
 
 ## Regarding Dependencies:
@@ -2161,62 +2111,58 @@ project might contain:
 - If a new dependency is required, state the reason.
 ```
 
-This example demonstrates how you can provide general project context, specific
-coding conventions, and even notes about particular files or components. The
-more relevant and precise your context files are, the better the AI can assist
-you. Project-specific context files are highly encouraged to establish
-conventions and context.
+This example demonstrates how you can provide general project context, specific coding
+conventions, and even notes about particular files or components. The more relevant and
+precise your context files are, the better the AI can assist you. Project-specific
+context files are highly encouraged to establish conventions and context.
 
 - **Hierarchical loading and precedence:** The CLI implements a sophisticated
-  hierarchical memory system by loading context files (for example, `AGENTS.md`)
-  from several locations. Content from files lower in this list (more specific)
-  typically overrides or supplements content from files higher up (more
-  general). The exact concatenation order and final context can be inspected
-  using the `/memory show` command. The typical loading order is:
+  hierarchical memory system by loading context files (for example, `AGENTS.md`) from
+  several locations. Content from files lower in this list (more specific) typically
+  overrides or supplements content from files higher up (more general). The exact
+  concatenation order and final context can be inspected using the `/memory show`
+  command. The typical loading order is:
   1.  **Global context file:**
       - Location: `~/.sparkle/<configured-context-filename>` (for example,
         `~/.sparkle/AGENTS.md` in your user home directory).
       - Scope: Provides default instructions for all your projects.
   2.  **Project root and ancestors context files:**
-      - Location: The CLI searches for the configured context file in the
-        current working directory and then in each parent directory up to either
-        the project root (identified by a `.git` folder) or your home directory.
-      - Scope: Provides context relevant to the entire project or a significant
-        portion of it.
+      - Location: The CLI searches for the configured context file in the current
+        working directory and then in each parent directory up to either the project
+        root (identified by a `.git` folder) or your home directory.
+      - Scope: Provides context relevant to the entire project or a significant portion
+        of it.
   3.  **Sub-directory context files (contextual/local):**
-      - Location: The CLI also scans for the configured context file in
-        subdirectories _below_ the current working directory (respecting common
-        ignore patterns like `node_modules`, `.git`, etc.). The breadth of this
-        search is limited to 200 directories by default, but can be configured
-        with the `context.discoveryMaxDirs` setting in your `settings.json`
-        file.
+      - Location: The CLI also scans for the configured context file in subdirectories
+        _below_ the current working directory (respecting common ignore patterns like
+        `node_modules`, `.git`, etc.). The breadth of this search is limited to 200
+        directories by default, but can be configured with the
+        `context.discoveryMaxDirs` setting in your `settings.json` file.
       - Scope: Allows for highly specific instructions relevant to a particular
         component, module, or subsection of your project.
-- **Concatenation and UI indication:** The contents of all found context files
-  are concatenated (with separators indicating their origin and path) and
-  provided as part of the system prompt to the Gemini model. The CLI footer
-  displays the count of loaded context files, giving you a quick visual cue
-  about the active instructional context.
-- **Importing content:** You can modularize your context files by importing
-  other Markdown files using the `@path/to/file.md` syntax. For more details,
-  see the [Memory Import Processor documentation](./memport.md).
+- **Concatenation and UI indication:** The contents of all found context files are
+  concatenated (with separators indicating their origin and path) and provided as part
+  of the system prompt to the Gemini model. The CLI footer displays the count of loaded
+  context files, giving you a quick visual cue about the active instructional context.
+- **Importing content:** You can modularize your context files by importing other
+  Markdown files using the `@path/to/file.md` syntax. For more details, see the
+  [Memory Import Processor documentation](./memport.md).
 - **Commands for memory management:**
-  - Use `/memory refresh` to force a re-scan and reload of all context files
-    from all configured locations. This updates the AI's instructional context.
-  - Use `/memory show` to display the combined instructional context currently
-    loaded, allowing you to verify the hierarchy and content being used by the
-    AI.
-  - See the [Commands documentation](./commands.md#memory) for full details on
-    the `/memory` command and its sub-commands (`show` and `reload`).
+  - Use `/memory refresh` to force a re-scan and reload of all context files from all
+    configured locations. This updates the AI's instructional context.
+  - Use `/memory show` to display the combined instructional context currently loaded,
+    allowing you to verify the hierarchy and content being used by the AI.
+  - See the [Commands documentation](./commands.md#memory) for full details on the
+    `/memory` command and its sub-commands (`show` and `reload`).
 
-By understanding and utilizing these configuration layers and the hierarchical
-nature of context files, you can effectively manage the AI's memory and tailor
-Sparkle CLI's responses to your specific needs and projects.
+By understanding and utilizing these configuration layers and the hierarchical nature of
+context files, you can effectively manage the AI's memory and tailor Sparkle CLI's
+responses to your specific needs and projects.
 
 ## Sandboxing
 
-Sparkle CLI can execute potentially unsafe operations (like shell commands and
-file modifications) within a sandboxed environment to protect your system.
+Sparkle CLI can execute potentially unsafe operations (like shell commands and file
+modifications) within a sandboxed environment to protect your system.
 
 Sandboxing is disabled by default, but you can enable it in a few ways:
 
@@ -2227,8 +2173,8 @@ Sandboxing is disabled by default, but you can enable it in a few ways:
 By default, it uses a pre-built `sparkle-cli-sandbox` Docker image.
 
 For project-specific sandboxing needs, you can create a custom Dockerfile at
-`.sparkle/sandbox.Dockerfile` in your project's root directory. This Dockerfile
-can be based on the base sandbox image:
+`.sparkle/sandbox.Dockerfile` in your project's root directory. This Dockerfile can be
+based on the base sandbox image:
 
 ```dockerfile
 FROM sparkle-cli-sandbox
@@ -2243,49 +2189,47 @@ FROM sparkle-cli-sandbox
 # COPY ./my-config /app/my-config
 ```
 
-When `.sparkle/sandbox.Dockerfile` exists, you can use `BUILD_SANDBOX`
-environment variable when running Sparkle CLI to automatically build the custom
-sandbox image:
+When `.sparkle/sandbox.Dockerfile` exists, you can use `BUILD_SANDBOX` environment
+variable when running Sparkle CLI to automatically build the custom sandbox image:
 
 ```bash
 BUILD_SANDBOX=1 sparkle -s
 ```
 
-Building a custom sandbox with `BUILD_SANDBOX` is only supported when running
-Sparkle CLI from source. If you installed the CLI with npm, build the Docker
-image separately and reference that image in your sandbox configuration.
+Building a custom sandbox with `BUILD_SANDBOX` is only supported when running Sparkle
+CLI from source. If you installed the CLI with npm, build the Docker image separately
+and reference that image in your sandbox configuration.
 
 ## Usage statistics
 
-To help us improve Sparkle CLI, we collect anonymized usage statistics. This
-data helps us understand how the CLI is used, identify common issues, and
-prioritize new features.
+To help us improve Sparkle CLI, we collect anonymized usage statistics. This data helps
+us understand how the CLI is used, identify common issues, and prioritize new features.
 
 **What we collect:**
 
-- **Tool calls:** We log the names of the tools that are called, whether they
-  succeed or fail, and how long they take to execute. We do not collect the
-  arguments passed to the tools or any data returned by them.
-- **API requests:** We log the Gemini model used for each request, the duration
-  of the request, and whether it was successful. We do not collect the content
-  of the prompts or responses.
-- **Session information:** We collect information about the configuration of the
-  CLI, such as the enabled tools and the approval mode.
+- **Tool calls:** We log the names of the tools that are called, whether they succeed or
+  fail, and how long they take to execute. We do not collect the arguments passed to the
+  tools or any data returned by them.
+- **API requests:** We log the Gemini model used for each request, the duration of the
+  request, and whether it was successful. We do not collect the content of the prompts
+  or responses.
+- **Session information:** We collect information about the configuration of the CLI,
+  such as the enabled tools and the approval mode.
 
 **What we DON'T collect:**
 
 - **Personally identifiable information (PII):** We do not collect any personal
   information, such as your name, email address, or API keys.
-- **Prompt and response content:** We do not log the content of your prompts or
-  the responses from the Gemini model.
-- **File content:** We do not log the content of any files that are read or
-  written by the CLI.
+- **Prompt and response content:** We do not log the content of your prompts or the
+  responses from the Gemini model.
+- **File content:** We do not log the content of any files that are read or written by
+  the CLI.
 
 **How to opt out:**
 
 You can opt out of usage statistics collection at any time by setting the
-`usageStatisticsEnabled` property to `false` under the `privacy` category in
-your `settings.json` file:
+`usageStatisticsEnabled` property to `false` under the `privacy` category in your
+`settings.json` file:
 
 ```json
 {

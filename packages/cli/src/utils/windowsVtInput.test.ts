@@ -99,12 +99,10 @@ describe('installWindowsVtInputPatch', () => {
     platformSpy!.mockReturnValue('win32');
     const handle = { fakeHandle: true };
     mockKoffi.getStdHandle.mockReturnValue(handle);
-    mockKoffi.getConsoleMode.mockImplementation(
-      (_h: unknown, out: [number]) => {
-        out[0] = 0x0008; // libuv raw mode: ENABLE_WINDOW_INPUT only
-        return 1;
-      },
-    );
+    mockKoffi.getConsoleMode.mockImplementation((_h: unknown, out: [number]) => {
+      out[0] = 0x0008; // libuv raw mode: ENABLE_WINDOW_INPUT only
+      return 1;
+    });
     mockKoffi.setConsoleMode.mockReturnValue(1);
 
     await installWindowsVtInputPatch();

@@ -16,13 +16,9 @@ import type { InboxSnapshotImpl } from '../pipeline/inbox.js';
 describe('StateSnapshotProcessor', () => {
   it('should ignore if budget is satisfied', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      {
-        target: 'incremental',
-      },
-    );
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'incremental',
+    });
     const targets = [createDummyNode('ep1', NodeType.USER_PROMPT)];
     const result = await processor.process(createMockProcessArgs(targets));
     expect(result).toBe(targets); // Strict equality
@@ -30,35 +26,13 @@ describe('StateSnapshotProcessor', () => {
 
   it('should apply a valid snapshot from the Inbox (Fast Path)', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      {
-        target: 'incremental',
-      },
-    );
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'incremental',
+    });
 
-    const nodeA = createDummyNode(
-      'ep1',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-A',
-    );
-    const nodeB = createDummyNode(
-      'ep1',
-      NodeType.AGENT_THOUGHT,
-      60,
-      {},
-      'node-B',
-    );
-    const nodeC = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-C',
-    );
+    const nodeA = createDummyNode('ep1', NodeType.USER_PROMPT, 50, {}, 'node-A');
+    const nodeB = createDummyNode('ep1', NodeType.AGENT_THOUGHT, 60, {}, 'node-B');
+    const nodeC = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-C');
 
     const targets = [nodeA, nodeB, nodeC];
 
@@ -85,30 +59,20 @@ describe('StateSnapshotProcessor', () => {
     expect(result[1].id).toBe('node-C');
 
     // Should consume the message
-    expect(
-      (processArgs.inbox as InboxSnapshotImpl).getConsumedIds().has('msg-1'),
-    ).toBe(true);
+    expect((processArgs.inbox as InboxSnapshotImpl).getConsumedIds().has('msg-1')).toBe(
+      true,
+    );
   });
 
   it('should reject a snapshot if the nodes were modified/deleted (Cache Invalidated)', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      {
-        target: 'incremental',
-      },
-    );
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'incremental',
+    });
     // Make deficit 0 so we don't fall through to the sync backstop and fail the test that way
 
     // node-A is MISSING (user deleted it)
-    const nodeB = createDummyNode(
-      'ep1',
-      NodeType.AGENT_THOUGHT,
-      60,
-      {},
-      'node-B',
-    );
+    const nodeB = createDummyNode('ep1', NodeType.AGENT_THOUGHT, 60, {}, 'node-B');
     const targets = [nodeB];
 
     const messages = [
@@ -129,40 +93,20 @@ describe('StateSnapshotProcessor', () => {
     // Because deficit is 0, and Inbox was rejected, nothing should change
     expect(result.length).toBe(1);
     expect(result[0].id).toBe('node-B');
-    expect(
-      (processArgs.inbox as InboxSnapshotImpl).getConsumedIds().has('msg-1'),
-    ).toBe(false);
+    expect((processArgs.inbox as InboxSnapshotImpl).getConsumedIds().has('msg-1')).toBe(
+      false,
+    );
   });
 
   it('should fall back to sync backstop if inbox is empty', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      { target: 'max' },
-    ); // Summarize all
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'max',
+    }); // Summarize all
 
-    const nodeA = createDummyNode(
-      'ep1',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-A',
-    );
-    const nodeB = createDummyNode(
-      'ep1',
-      NodeType.AGENT_THOUGHT,
-      60,
-      {},
-      'node-B',
-    );
-    const nodeC = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-C',
-    );
+    const nodeA = createDummyNode('ep1', NodeType.USER_PROMPT, 50, {}, 'node-A');
+    const nodeB = createDummyNode('ep1', NodeType.AGENT_THOUGHT, 60, {}, 'node-B');
+    const nodeC = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-C');
     const targets = [nodeA, nodeB, nodeC];
     const result = await processor.process(createMockProcessArgs(targets));
 
@@ -174,11 +118,9 @@ describe('StateSnapshotProcessor', () => {
 
   it('should use Global Lookback to find an existing snapshot in the graph as the baseline', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      { target: 'incremental' },
-    );
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'incremental',
+    });
 
     // Create an old snapshot with existing JSON state
     const oldStateJson = JSON.stringify({
@@ -191,13 +133,7 @@ describe('StateSnapshotProcessor', () => {
       { payload: { text: oldStateJson } },
       'old-snap',
     );
-    const nodeA = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-A',
-    );
+    const nodeA = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-A');
 
     // targets array contains the snapshot
     const targets = [oldSnapshot, nodeA];
@@ -222,11 +158,9 @@ describe('StateSnapshotProcessor', () => {
 
   it('should garbage collect the old baseline snapshot from the live graph when creating a new sync snapshot', async () => {
     const env = createMockEnvironment();
-    const processor = createStateSnapshotProcessor(
-      'StateSnapshotProcessor',
-      env,
-      { target: 'incremental' },
-    );
+    const processor = createStateSnapshotProcessor('StateSnapshotProcessor', env, {
+      target: 'incremental',
+    });
 
     const oldSnapshot = createDummyNode(
       'ep1',
@@ -235,18 +169,10 @@ describe('StateSnapshotProcessor', () => {
       { payload: { text: '{}' } },
       'old-snap',
     );
-    const nodeA = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-A',
-    );
+    const nodeA = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-A');
 
     // The processor summarizes these 2 nodes
-    const result = await processor.process(
-      createMockProcessArgs([oldSnapshot, nodeA]),
-    );
+    const result = await processor.process(createMockProcessArgs([oldSnapshot, nodeA]));
 
     // It should have replaced BOTH the old snapshot and the new node with ONE new snapshot
     expect(result.length).toBe(1);

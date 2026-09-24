@@ -24,11 +24,7 @@ describe('SkillExtractionAgent', () => {
   const existingSkillsSummary =
     '## Workspace Skills (.sparkle/skills — do NOT duplicate)\n- **existing-skill**: Existing description';
 
-  const agent = SkillExtractionAgent(
-    skillsDir,
-    sessionIndex,
-    existingSkillsSummary,
-  );
+  const agent = SkillExtractionAgent(skillsDir, sessionIndex, existingSkillsSummary);
 
   it('should expose expected metadata, model, and tools', () => {
     expect(agent.kind).toBe('local');
@@ -107,9 +103,7 @@ describe('SkillExtractionAgent', () => {
     expect(prompt).toContain('MEMORY PATCH FORMAT (STRICT)');
     expect(prompt).toContain('--- /dev/null');
     expect(prompt).toContain('NEVER directly edit MEMORY.md');
-    expect(prompt).toContain(
-      'Every patch you write is held for /memory inbox review.',
-    );
+    expect(prompt).toContain('Every patch you write is held for /memory inbox review.');
     expect(prompt).toContain('the user must approve each patch');
 
     // The MEMORY.md-as-index discipline: sibling creations should pair with
@@ -155,9 +149,7 @@ describe('SkillExtractionAgent', () => {
     expect(query).toContain('# Pending Memory Inbox');
     expect(query).toContain('extraction.patch');
     expect(query).toContain('previously-extracted fact');
-    expect(query).toContain(
-      'REWRITE that patch (overwrite the same path) with',
-    );
+    expect(query).toContain('REWRITE that patch (overwrite the same path) with');
   });
 
   it('omits the pending inbox section when nothing is pending', () => {

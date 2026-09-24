@@ -13,8 +13,7 @@ import {
 } from './DescriptiveRadioButtonSelect.js';
 
 vi.mock('./BaseSelectionList.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('./BaseSelectionList.js')>();
+  const actual = await importOriginal<typeof import('./BaseSelectionList.js')>();
   return {
     ...actual,
     BaseSelectionList: vi.fn(({ children, ...props }) => (

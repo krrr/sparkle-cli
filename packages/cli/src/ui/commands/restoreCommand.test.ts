@@ -23,9 +23,7 @@ describe('restoreCommand', () => {
   let checkpointsDir: string;
 
   beforeEach(async () => {
-    testRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'restore-command-test-'),
-    );
+    testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'restore-command-test-'));
     geminiTempDir = path.join(testRootDir, SPARKLE_DIR);
     checkpointsDir = path.join(geminiTempDir, 'checkpoints');
     // The command itself creates this, but for tests it's easier to have it ready.
@@ -83,13 +81,9 @@ describe('restoreCommand', () => {
 
   describe('action', () => {
     it('should return an error if temp dir is not found', async () => {
-      vi.mocked(mockConfig.storage.getProjectCheckpointsDir).mockReturnValue(
-        '',
-      );
+      vi.mocked(mockConfig.storage.getProjectCheckpointsDir).mockReturnValue('');
 
-      expect(
-        await restoreCommand(mockConfig)?.action?.(mockContext, ''),
-      ).toEqual({
+      expect(await restoreCommand(mockConfig)?.action?.(mockContext, '')).toEqual({
         type: 'message',
         messageType: 'error',
         content: 'Could not determine the .sparkle directory path.',
@@ -135,10 +129,7 @@ describe('restoreCommand', () => {
 
     it('should handle file read errors gracefully', async () => {
       const checkpointName = 'test1';
-      const checkpointPath = path.join(
-        checkpointsDir,
-        `${checkpointName}.json`,
-      );
+      const checkpointPath = path.join(checkpointsDir, `${checkpointName}.json`);
       // Create a directory instead of a file to cause a read error.
       await fs.mkdir(checkpointPath);
       const command = restoreCommand(mockConfig);
@@ -146,9 +137,7 @@ describe('restoreCommand', () => {
       expect(await command?.action?.(mockContext, checkpointName)).toEqual({
         type: 'message',
         messageType: 'error',
-        content: expect.stringContaining(
-          'Could not read restorable tool calls.',
-        ),
+        content: expect.stringContaining('Could not read restorable tool calls.'),
       });
     });
 
@@ -170,9 +159,7 @@ describe('restoreCommand', () => {
         toolName: 'run_shell_command',
         toolArgs: { command: 'ls' },
       });
-      expect(mockContext.ui.loadHistory).toHaveBeenCalledWith(
-        toolCallData.history,
-      );
+      expect(mockContext.ui.loadHistory).toHaveBeenCalledWith(toolCallData.history);
       expect(mockSetHistory).toHaveBeenCalledWith(toolCallData.clientHistory);
       expect(mockGitService.restoreProjectFromSnapshot).toHaveBeenCalledWith(
         toolCallData.commitHash,
@@ -243,16 +230,10 @@ describe('restoreCommand', () => {
     it('should return a list of checkpoint names', async () => {
       await fs.writeFile(path.join(checkpointsDir, 'test1.json'), '{}');
       await fs.writeFile(path.join(checkpointsDir, 'test2.json'), '{}');
-      await fs.writeFile(
-        path.join(checkpointsDir, 'not-a-checkpoint.txt'),
-        '{}',
-      );
+      await fs.writeFile(path.join(checkpointsDir, 'not-a-checkpoint.txt'), '{}');
       const command = restoreCommand(mockConfig);
 
-      expect(await command?.completion?.(mockContext, '')).toEqual([
-        'test1',
-        'test2',
-      ]);
+      expect(await command?.completion?.(mockContext, '')).toEqual(['test1', 'test2']);
     });
   });
 });

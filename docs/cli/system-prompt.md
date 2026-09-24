@@ -1,18 +1,18 @@
 # System Prompt Override (SPARKLE_SYSTEM_MD)
 
-The core system instructions that guide Sparkle CLI can be completely replaced
-with your own Markdown file. This feature is controlled via the
-`SPARKLE_SYSTEM_MD` environment variable.
+The core system instructions that guide Sparkle CLI can be completely replaced with your
+own Markdown file. This feature is controlled via the `SPARKLE_SYSTEM_MD` environment
+variable.
 
 ## Overview
 
-The `SPARKLE_SYSTEM_MD` variable instructs the CLI to use an external Markdown
-file for its system prompt, completely overriding the built-in default. This is
-a full replacement, not a merge. If you use a custom file, none of the original
-core instructions will apply unless you include them yourself.
+The `SPARKLE_SYSTEM_MD` variable instructs the CLI to use an external Markdown file for
+its system prompt, completely overriding the built-in default. This is a full
+replacement, not a merge. If you use a custom file, none of the original core
+instructions will apply unless you include them yourself.
 
-This feature is intended for advanced users who need to enforce strict,
-project-specific behavior or create a customized persona.
+This feature is intended for advanced users who need to enforce strict, project-specific
+behavior or create a customized persona.
 
 <!-- prettier-ignore -->
 > [!TIP]
@@ -22,28 +22,26 @@ project-specific behavior or create a customized persona.
 
 ## How to enable
 
-You can set the environment variable temporarily in your shell, or persist it
-via a `.sparkle/.env` file. See
+You can set the environment variable temporarily in your shell, or persist it via a
+`.sparkle/.env` file. See
 [Persisting Environment Variables](../get-started/authentication.mdx#persisting-environment-variables).
 
 - Use the project default path (`.sparkle/system.md`):
 
   - `SPARKLE_SYSTEM_MD=true` or `SPARKLE_SYSTEM_MD=1`
-  - The CLI reads `./.sparkle/system.md` (relative to your current project
-    directory).
+  - The CLI reads `./.sparkle/system.md` (relative to your current project directory).
 
 - Use a custom file path:
 
   - `SPARKLE_SYSTEM_MD=/absolute/path/to/my-system.md`
-  - Relative paths are supported and resolved from the current working
-    directory.
+  - Relative paths are supported and resolved from the current working directory.
   - Tilde expansion is supported (for example, `~/my-system.md`).
 
 - Disable the override (use built‑in prompt):
   - `SPARKLE_SYSTEM_MD=false` or `SPARKLE_SYSTEM_MD=0` or unset the variable.
 
-If the override is enabled but the target file does not exist, the CLI will
-error with: `missing system prompt file '<path>'`.
+If the override is enabled but the target file does not exist, the CLI will error with:
+`missing system prompt file '<path>'`.
 
 ## Quick examples
 
@@ -57,20 +55,18 @@ error with: `missing system prompt file '<path>'`.
 
 ## UI indicator
 
-When `SPARKLE_SYSTEM_MD` is active, the CLI shows a `|⌐■_■|` indicator in the UI
-to signal custom system‑prompt mode.
+When `SPARKLE_SYSTEM_MD` is active, the CLI shows a `|⌐■_■|` indicator in the UI to
+signal custom system‑prompt mode.
 
 ## Variable Substitution
 
 When using a custom system prompt file, you can use the following variables to
 dynamically include built-in content:
 
-- `${AgentSkills}`: Injects a complete section (including header) of all
-  available agent skills.
-- `${SubAgents}`: Injects a complete section (including header) of available
-  sub-agents.
-- `${AvailableTools}`: Injects a bulleted list of all currently enabled tool
-  names.
+- `${AgentSkills}`: Injects a complete section (including header) of all available agent
+  skills.
+- `${SubAgents}`: Injects a complete section (including header) of available sub-agents.
+- `${AvailableTools}`: Injects a bulleted list of all currently enabled tool names.
 - Tool Name Variables: Injects the actual name of a tool using the pattern:
   `${toolName}_ToolName` (for example, `${write_file_ToolName}`,
   `${run_shell_command_ToolName}`).
@@ -94,8 +90,8 @@ You can use ${write_file_ToolName} to save logs.
 
 ## Export the default prompt (recommended)
 
-Before overriding, export the current default prompt so you can review required
-safety and workflow rules.
+Before overriding, export the current default prompt so you can review required safety
+and workflow rules.
 
 - Write the built‑in prompt to the project default path:
   - `SPARKLE_WRITE_SYSTEM_MD=1 sparkle`
@@ -114,18 +110,16 @@ This creates the file and writes the current built‑in system prompt to it.
   - Persona, goals, methodologies, and project/domain context.
   - Evolves per task; relies on system.md for safe execution.
 
-Keep system.md minimal but complete for safety and tool operation. Keep
-AGENTS.md focused on high‑level guidance and project specifics.
+Keep system.md minimal but complete for safety and tool operation. Keep AGENTS.md
+focused on high‑level guidance and project specifics.
 
 ## Troubleshooting
 
 - Error: `missing system prompt file '…'`
   - Ensure the referenced path exists and is readable.
-  - For `SPARKLE_SYSTEM_MD=1|true`, create `./.sparkle/system.md` in your
-    project.
+  - For `SPARKLE_SYSTEM_MD=1|true`, create `./.sparkle/system.md` in your project.
 - Override not taking effect
-  - Confirm the variable is loaded (use `.sparkle/.env` or export in your
-    shell).
+  - Confirm the variable is loaded (use `.sparkle/.env` or export in your shell).
   - Paths are resolved from the current working directory; try an absolute path.
 - Restore defaults
   - Unset `SPARKLE_SYSTEM_MD` or set it to `0`/`false`.

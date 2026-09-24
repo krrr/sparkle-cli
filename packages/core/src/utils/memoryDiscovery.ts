@@ -28,14 +28,11 @@ import { getErrorMessage } from './errors.js';
 // TODO: Integrate with a more robust server-side logger if available/appropriate.
 const logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  debug: (...args: any[]) =>
-    debugLogger.debug('[DEBUG] [MemoryDiscovery]', ...args),
+  debug: (...args: any[]) => debugLogger.debug('[DEBUG] [MemoryDiscovery]', ...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  warn: (...args: any[]) =>
-    debugLogger.warn('[WARN] [MemoryDiscovery]', ...args),
+  warn: (...args: any[]) => debugLogger.warn('[WARN] [MemoryDiscovery]', ...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error: (...args: any[]) =>
-    debugLogger.error('[ERROR] [MemoryDiscovery]', ...args),
+  error: (...args: any[]) => debugLogger.error('[ERROR] [MemoryDiscovery]', ...args),
 };
 
 export interface GeminiFileContent {
@@ -51,9 +48,7 @@ export interface GeminiFileContent {
  * @param filePaths Array of file paths to deduplicate
  * @returns Object containing deduplicated file paths and a map of path to identity key
  */
-export async function deduplicatePathsByFileIdentity(
-  filePaths: string[],
-): Promise<{
+export async function deduplicatePathsByFileIdentity(filePaths: string[]): Promise<{
   paths: string[];
   identityMap: Map<string, string>;
 }> {
@@ -180,8 +175,7 @@ async function findProjectRoot(
 
         // Only log unexpected errors in non-test environments
         // process.env['NODE_ENV'] === 'test' or VITEST are common test indicators
-        const isTestEnv =
-          process.env['NODE_ENV'] === 'test' || process.env['VITEST'];
+        const isTestEnv = process.env['NODE_ENV'] === 'test' || process.env['VITEST'];
 
         if (!isENOENT && !isTestEnv) {
           if (typeof error === 'object' && error !== null && 'code' in error) {
@@ -217,61 +211,53 @@ export async function readGeminiMdFiles(
 
   for (let i = 0; i < filePaths.length; i += CONCURRENT_LIMIT) {
     const batch = filePaths.slice(i, i + CONCURRENT_LIMIT);
-    const batchPromises = batch.map(
-      async (filePath): Promise<GeminiFileContent> => {
-        try {
-          const content = await fs.readFile(filePath, 'utf-8');
+    const batchPromises = batch.map(async (filePath): Promise<GeminiFileContent> => {
+      try {
+        const content = await fs.readFile(filePath, 'utf-8');
 
-          // Process imports in the content
-          const processedResult = await processImports(
-            content,
-            path.dirname(filePath),
-            false,
-            undefined,
-            undefined,
-            importFormat,
-            boundaryMarkers,
-          );
+        // Process imports in the content
+        const processedResult = await processImports(
+          content,
+          path.dirname(filePath),
+          false,
+          undefined,
+          undefined,
+          importFormat,
+          boundaryMarkers,
+        );
+        debugLogger.debug(
+          '[DEBUG] [MemoryDiscovery] Successfully read and processed imports:',
+          filePath,
+          `(Length: ${processedResult.content.length})`,
+        );
+
+        return { filePath, content: processedResult.content };
+      } catch (error: unknown) {
+        const isEISDIR =
+          error instanceof Error && (error as NodeJS.ErrnoException).code === 'EISDIR';
+
+        if (isEISDIR) {
+          // A directory exists where a context file is expected.
+          // This is valid in some project structures (e.g. a folder named
+          // AGENTS.md held for organisational purposes) — skip it silently
+          // instead of surfacing a confusing warning to the user.
           debugLogger.debug(
-            '[DEBUG] [MemoryDiscovery] Successfully read and processed imports:',
+            '[DEBUG] [MemoryDiscovery] Skipping directory at context file path:',
             filePath,
-            `(Length: ${processedResult.content.length})`,
           );
-
-          return { filePath, content: processedResult.content };
-        } catch (error: unknown) {
-          const isEISDIR =
-            error instanceof Error &&
-            (error as NodeJS.ErrnoException).code === 'EISDIR';
-
-          if (isEISDIR) {
-            // A directory exists where a context file is expected.
-            // This is valid in some project structures (e.g. a folder named
-            // AGENTS.md held for organisational purposes) — skip it silently
-            // instead of surfacing a confusing warning to the user.
-            debugLogger.debug(
-              '[DEBUG] [MemoryDiscovery] Skipping directory at context file path:',
-              filePath,
-            );
-          } else {
-            const isTestEnv =
-              process.env['NODE_ENV'] === 'test' || process.env['VITEST'];
-            if (!isTestEnv) {
-              const message =
-                error instanceof Error ? error.message : String(error);
-              logger.warn(
-                `Warning: Could not read ${getAllGeminiMdFilenames()} file at ${filePath}. Error: ${message}`,
-              );
-            }
-            debugLogger.debug(
-              '[DEBUG] [MemoryDiscovery] Failed to read:',
-              filePath,
+        } else {
+          const isTestEnv = process.env['NODE_ENV'] === 'test' || process.env['VITEST'];
+          if (!isTestEnv) {
+            const message = error instanceof Error ? error.message : String(error);
+            logger.warn(
+              `Warning: Could not read ${getAllGeminiMdFilenames()} file at ${filePath}. Error: ${message}`,
             );
           }
-          return { filePath, content: null }; // Still include it with null content
+          debugLogger.debug('[DEBUG] [MemoryDiscovery] Failed to read:', filePath);
         }
-      },
-    );
+        return { filePath, content: null }; // Still include it with null content
+      }
+    });
 
     const batchResults = await Promise.allSettled(batchPromises);
 
@@ -319,9 +305,7 @@ export async function getGlobalMemoryPaths(): Promise<string[]> {
   const geminiMdFilenames = getAllGeminiMdFilenames();
 
   const accessChecks = geminiMdFilenames.map(async (filename) => {
-    const globalPath = toAbsolutePath(
-      path.join(userHome, SPARKLE_DIR, filename),
-    );
+    const globalPath = toAbsolutePath(path.join(userHome, SPARKLE_DIR, filename));
     try {
       await fs.access(globalPath, fsSync.constants.R_OK);
       debugLogger.debug(
@@ -334,9 +318,7 @@ export async function getGlobalMemoryPaths(): Promise<string[]> {
     }
   });
 
-  return (await Promise.all(accessChecks)).filter(
-    (p): p is string => p !== null,
-  );
+  return (await Promise.all(accessChecks)).filter((p): p is string => p !== null);
 }
 
 export async function getUserProjectMemoryPaths(
@@ -360,9 +342,7 @@ export async function getUserProjectMemoryPaths(
 
   const geminiMdFilenames = getAllGeminiMdFilenames();
   const accessChecks = geminiMdFilenames.map(async (filename) => {
-    const legacyMemoryPath = toAbsolutePath(
-      path.join(projectMemoryDir, filename),
-    );
+    const legacyMemoryPath = toAbsolutePath(path.join(projectMemoryDir, filename));
     try {
       await fs.access(legacyMemoryPath, fsSync.constants.R_OK);
       debugLogger.debug(
@@ -375,14 +355,10 @@ export async function getUserProjectMemoryPaths(
     }
   });
 
-  return (await Promise.all(accessChecks)).filter(
-    (p): p is string => p !== null,
-  );
+  return (await Promise.all(accessChecks)).filter((p): p is string => p !== null);
 }
 
-export function getExtensionMemoryPaths(
-  extensionLoader: ExtensionLoader,
-): string[] {
+export function getExtensionMemoryPaths(extensionLoader: ExtensionLoader): string[] {
   const extensionPaths = extensionLoader
     .getExtensions()
     .filter((ext) => ext.isActive)
@@ -424,9 +400,7 @@ export async function getEnvironmentMemoryPaths(
 
   const pathArrays = await Promise.all(traversalPromises);
 
-  const { paths: unique } = await deduplicatePathsByFileIdentity(
-    pathArrays.flat(),
-  );
+  const { paths: unique } = await deduplicatePathsByFileIdentity(pathArrays.flat());
   return unique.sort();
 }
 
@@ -441,9 +415,7 @@ export function categorizeAndConcatenate(
 ): HierarchicalMemory {
   const getConcatenated = (pList: string[]) =>
     concatenateInstructions(
-      pList
-        .map((p) => contentsMap.get(p))
-        .filter((c): c is GeminiFileContent => !!c),
+      pList.map((p) => contentsMap.get(p)).filter((c): c is GeminiFileContent => !!c),
     );
 
   return {

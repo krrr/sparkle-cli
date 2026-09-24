@@ -5,18 +5,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {
-  AgentRegistry,
-  getModelConfigAlias,
-  DYNAMIC_RULE_SOURCE,
-} from './registry.js';
+import { AgentRegistry, getModelConfigAlias, DYNAMIC_RULE_SOURCE } from './registry.js';
 import { makeFakeConfig } from '../test-utils/config.js';
 import type { AgentDefinition, LocalAgentDefinition } from './types.js';
-import type {
-  Config,
-  GeminiCLIExtension,
-  ConfigParameters,
-} from '../config/config.js';
+import type { Config, GeminiCLIExtension, ConfigParameters } from '../config/config.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
 import type { A2AClientManager } from './a2a-client-manager.js';
@@ -35,9 +27,7 @@ import { A2AAuthProviderFactory } from './auth-provider/factory.js';
 import type { A2AAuthProvider } from './auth-provider/types.js';
 
 vi.mock('./agentLoader.js', () => ({
-  loadAgentsFromDirectory: vi
-    .fn()
-    .mockResolvedValue({ agents: [], errors: [] }),
+  loadAgentsFromDirectory: vi.fn().mockResolvedValue({ agents: [], errors: [] }),
 }));
 
 vi.mock('./a2a-client-manager.js', () => ({
@@ -131,9 +121,7 @@ describe('AgentRegistry', () => {
         enableAgents: true,
       });
       const debugRegistry = new TestableAgentRegistry(debugConfig);
-      const debugLogSpy = vi
-        .spyOn(debugLogger, 'log')
-        .mockImplementation(() => {});
+      const debugLogSpy = vi.spyOn(debugLogger, 'log').mockImplementation(() => {});
 
       await debugRegistry.initialize();
 
@@ -153,9 +141,7 @@ describe('AgentRegistry', () => {
         'codebase_investigator',
       ) as LocalAgentDefinition;
       expect(investigatorDef).toBeDefined();
-      expect(investigatorDef?.modelConfig.model).toBe(
-        SPARKLE_MODEL_ALIAS_FLASH,
-      );
+      expect(investigatorDef?.modelConfig.model).toBe(SPARKLE_MODEL_ALIAS_FLASH);
       expect(
         investigatorDef?.modelConfig.generateContentConfig?.thinkingConfig,
       ).toStrictEqual({
@@ -184,9 +170,7 @@ describe('AgentRegistry', () => {
         'codebase_investigator',
       ) as LocalAgentDefinition;
       expect(investigatorDef).toBeDefined();
-      expect(investigatorDef?.modelConfig.model).toBe(
-        DEFAULT_GEMINI_FLASH_LITE_MODEL,
-      );
+      expect(investigatorDef?.modelConfig.model).toBe(DEFAULT_GEMINI_FLASH_LITE_MODEL);
     });
 
     it('should load agents from user and project directories with correct precedence', async () => {
@@ -223,9 +207,7 @@ describe('AgentRegistry', () => {
         'Project version',
       );
       expect(registry.getDefinition('project-only')).toBeDefined();
-      expect(
-        vi.mocked(tomlLoader.loadAgentsFromDirectory),
-      ).toHaveBeenCalledTimes(2);
+      expect(vi.mocked(tomlLoader.loadAgentsFromDirectory)).toHaveBeenCalledTimes(2);
     });
 
     it('should NOT load TOML agents when enableAgents is false', async () => {
@@ -244,9 +226,7 @@ describe('AgentRegistry', () => {
       await disabledRegistry.initialize();
 
       expect(disabledRegistry.getAllDefinitions()).toHaveLength(0);
-      expect(
-        vi.mocked(tomlLoader.loadAgentsFromDirectory),
-      ).not.toHaveBeenCalled();
+      expect(vi.mocked(tomlLoader.loadAgentsFromDirectory)).not.toHaveBeenCalled();
     });
 
     it('should register CLI help agent by default', async () => {
@@ -514,8 +494,7 @@ describe('AgentRegistry', () => {
       ).toStrictEqual({
         model: MOCK_AGENT_V1.modelConfig.model,
         generateContentConfig: {
-          temperature:
-            MOCK_AGENT_V1.modelConfig.generateContentConfig?.temperature,
+          temperature: MOCK_AGENT_V1.modelConfig.generateContentConfig?.temperature,
           topP: MOCK_AGENT_V1.modelConfig.generateContentConfig?.topP,
           thinkingConfig: {
             includeThoughts: true,
@@ -558,16 +537,12 @@ describe('AgentRegistry', () => {
 
       const mockHandler = {
         type: 'http' as const,
-        headers: vi
-          .fn()
-          .mockResolvedValue({ Authorization: 'Bearer secret-token' }),
+        headers: vi.fn().mockResolvedValue({ Authorization: 'Bearer secret-token' }),
         shouldRetryWithHeaders: vi.fn(),
       } as unknown as A2AAuthProvider;
       vi.mocked(A2AAuthProviderFactory.create).mockResolvedValue(mockHandler);
 
-      const loadAgentSpy = vi
-        .fn()
-        .mockResolvedValue({ name: 'RemoteAgentWithAuth' });
+      const loadAgentSpy = vi.fn().mockResolvedValue({ name: 'RemoteAgentWithAuth' });
       vi.spyOn(mockConfig, 'getA2AClientManager').mockReturnValue({
         loadAgent: loadAgentSpy,
         clearCache: vi.fn(),
@@ -585,9 +560,7 @@ describe('AgentRegistry', () => {
         { type: 'url', url: 'https://example.com/card' },
         mockHandler,
       );
-      expect(registry.getDefinition('RemoteAgentWithAuth')).toEqual(
-        remoteAgent,
-      );
+      expect(registry.getDefinition('RemoteAgentWithAuth')).toEqual(remoteAgent);
     });
 
     it('should not register remote agent when auth provider factory returns undefined', async () => {
@@ -611,9 +584,7 @@ describe('AgentRegistry', () => {
         clearCache: vi.fn(),
       } as unknown as A2AClientManager);
 
-      const warnSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const warnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       await registry.testRegisterAgent(remoteAgent);
 
@@ -632,9 +603,7 @@ describe('AgentRegistry', () => {
       vi.spyOn(debugConfig, 'getA2AClientManager').mockReturnValue({
         loadAgent: vi.fn().mockResolvedValue({ name: 'RemoteAgent' }),
       } as unknown as A2AClientManager);
-      const debugLogSpy = vi
-        .spyOn(debugLogger, 'log')
-        .mockImplementation(() => {});
+      const debugLogSpy = vi.spyOn(debugLogger, 'log').mockImplementation(() => {});
 
       const remoteAgent: AgentDefinition = {
         kind: 'remote',
@@ -861,9 +830,7 @@ describe('AgentRegistry', () => {
 
       await registry.testRegisterAgent(remoteAgent);
 
-      const registered = registry.getDefinition(
-        'RemoteAgentWithEmptyAgentDescription',
-      );
+      const registered = registry.getDefinition('RemoteAgentWithEmptyAgentDescription');
       // Should only contain user description
       expect(registered?.description).toBe(
         'User Description: User-provided description',
@@ -924,9 +891,7 @@ describe('AgentRegistry', () => {
       await registry.testRegisterAgent(remoteAgent);
 
       const registered = registry.getDefinition('EmptyDescAgent');
-      expect(registered?.description).toBe(
-        'Agent Description: Loaded from card',
-      );
+      expect(registered?.description).toBe('Agent Description: Loaded from card');
     });
 
     it('should provide fallback for skill descriptions if missing in the card', async () => {
@@ -950,9 +915,7 @@ describe('AgentRegistry', () => {
       await registry.testRegisterAgent(remoteAgent);
 
       const registered = registry.getDefinition('SkillFallbackAgent');
-      expect(registered?.description).toContain(
-        'SkillNoDesc: No description provided',
-      );
+      expect(registered?.description).toContain('SkillNoDesc: No description provided');
     });
 
     it('should handle special characters in agent names', async () => {
@@ -961,16 +924,12 @@ describe('AgentRegistry', () => {
         name: 'Agent-123_$pecial.v2',
       };
       await registry.testRegisterAgent(specialAgent);
-      expect(registry.getDefinition('Agent-123_$pecial.v2')).toEqual(
-        specialAgent,
-      );
+      expect(registry.getDefinition('Agent-123_$pecial.v2')).toEqual(specialAgent);
     });
 
     it('should reject an agent definition missing a name', async () => {
       const invalidAgent = { ...MOCK_AGENT_V1, name: '' };
-      const debugWarnSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const debugWarnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       await registry.testRegisterAgent(invalidAgent);
 
@@ -982,9 +941,7 @@ describe('AgentRegistry', () => {
 
     it('should reject an agent definition missing a description', async () => {
       const invalidAgent = { ...MOCK_AGENT_V1, description: '' };
-      const debugWarnSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const debugWarnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       await registry.testRegisterAgent(invalidAgent as AgentDefinition);
 
@@ -1277,9 +1234,7 @@ describe('AgentRegistry', () => {
     it('getAllDefinitions should return all registered definitions', () => {
       const all = registry.getAllDefinitions();
       expect(all).toHaveLength(2);
-      expect(all).toEqual(
-        expect.arrayContaining([MOCK_AGENT_V1, ANOTHER_AGENT]),
-      );
+      expect(all).toEqual(expect.arrayContaining([MOCK_AGENT_V1, ANOTHER_AGENT]));
     });
 
     it('getAllDiscoveredAgentNames should return all names including disabled ones', async () => {
@@ -1290,9 +1245,7 @@ describe('AgentRegistry', () => {
           },
         },
       });
-      const registryWithDisabled = new TestableAgentRegistry(
-        configWithDisabled,
-      );
+      const registryWithDisabled = new TestableAgentRegistry(configWithDisabled);
 
       const enabledAgent = { ...MOCK_AGENT_V1, name: 'EnabledAgent' };
       const disabledAgent = { ...MOCK_AGENT_V1, name: 'DisabledAgent' };
@@ -1319,9 +1272,7 @@ describe('AgentRegistry', () => {
           },
         },
       });
-      const registryWithDisabled = new TestableAgentRegistry(
-        configWithDisabled,
-      );
+      const registryWithDisabled = new TestableAgentRegistry(configWithDisabled);
 
       const disabledAgent = {
         ...MOCK_AGENT_V1,
@@ -1331,12 +1282,9 @@ describe('AgentRegistry', () => {
 
       await registryWithDisabled.testRegisterAgent(disabledAgent);
 
-      expect(
-        registryWithDisabled.getDefinition('DisabledAgent'),
-      ).toBeUndefined();
+      expect(registryWithDisabled.getDefinition('DisabledAgent')).toBeUndefined();
 
-      const discovered =
-        registryWithDisabled.getDiscoveredDefinition('DisabledAgent');
+      const discovered = registryWithDisabled.getDiscoveredDefinition('DisabledAgent');
       expect(discovered).toBeDefined();
       expect(discovered?.description).toBe('I am disabled');
     });
@@ -1397,9 +1345,7 @@ describe('AgentRegistry', () => {
 
       const def = registry.getDefinition('MockAgent') as LocalAgentDefinition;
       expect(def.runConfig.maxTurns).toBe(50);
-      expect(def.runConfig.maxTimeMinutes).toBe(
-        MOCK_AGENT_V1.runConfig.maxTimeMinutes,
-      );
+      expect(def.runConfig.maxTimeMinutes).toBe(MOCK_AGENT_V1.runConfig.maxTimeMinutes);
     });
 
     it('should apply modelConfig overrides', async () => {

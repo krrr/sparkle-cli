@@ -56,11 +56,7 @@ describe('planUtils', () => {
       // Create a symbolic link pointing outside the plans directory
       fs.symlinkSync(outsideFile, fullMaliciousPath);
 
-      const result = await validatePlanPath(
-        maliciousPath,
-        plansDir,
-        tempRootDir,
-      );
+      const result = await validatePlanPath(maliciousPath, plansDir, tempRootDir);
       expect(result).toContain('Access denied');
     });
   });

@@ -36,15 +36,7 @@ vi.mock('./jit-context.js', () => ({
   }),
 }));
 
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  vi,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
 import {
   EditTool,
   type EditToolParams,
@@ -79,9 +71,7 @@ describe('EditTool', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    const rawTempDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'edit-tool-test-'),
-    );
+    const rawTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'edit-tool-test-'));
     tempDir = fs.realpathSync(rawTempDir);
     rootDir = path.join(tempDir, 'root');
     fs.mkdirSync(rootDir);
@@ -223,9 +213,7 @@ describe('EditTool', () => {
     });
 
     it('should return currentContent if oldString is empty and not a new file', () => {
-      expect(applyReplacement('hello world', '', 'new', false)).toBe(
-        'hello world',
-      );
+      expect(applyReplacement('hello world', '', 'new', false)).toBe('hello world');
     });
 
     it.each([
@@ -365,20 +353,16 @@ describe('EditTool', () => {
       });
 
       // The indentation from the original line should be preserved and applied to the new string.
-      const expectedContent =
-        '  const yourFunc = (a, b) => {\n    return a + b;\n  }';
+      const expectedContent = '  const yourFunc = (a, b) => {\n    return a + b;\n  }';
       expect(result.newContent).toBe(expectedContent);
       expect(result.occurrences).toBe(1);
     });
 
     it('should perform a fuzzy replacement when exact match fails but similarity is high', async () => {
-      const content =
-        'const myConfig = {\n  enableFeature: true,\n  retries: 3\n};';
+      const content = 'const myConfig = {\n  enableFeature: true,\n  retries: 3\n};';
       // Typo: missing comma after true
-      const oldString =
-        'const myConfig = {\n  enableFeature: true\n  retries: 3\n};';
-      const newString =
-        'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
+      const oldString = 'const myConfig = {\n  enableFeature: true\n  retries: 3\n};';
+      const newString = 'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
 
       const result = await calculateReplacement(mockConfig, {
         params: {
@@ -395,12 +379,10 @@ describe('EditTool', () => {
     });
 
     it('should NOT perform a fuzzy replacement when similarity is below threshold', async () => {
-      const content =
-        'const myConfig = {\n  enableFeature: true,\n  retries: 3\n};';
+      const content = 'const myConfig = {\n  enableFeature: true,\n  retries: 3\n};';
       // Completely different string
       const oldString = 'function somethingElse() {\n  return false;\n}';
-      const newString =
-        'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
+      const newString = 'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
 
       const result = await calculateReplacement(mockConfig, {
         params: {
@@ -506,9 +488,7 @@ function doIt() {
         abortSignal,
       });
 
-      expect(result.newContent).toBe(
-        '  line1-replaced\n  line2-replaced\n  line3\n',
-      );
+      expect(result.newContent).toBe('  line1-replaced\n  line2-replaced\n  line3\n');
     });
 
     it('should correctly increment loop index in flexible replacement when allow_multiple is true (regression)', async () => {
@@ -558,10 +538,8 @@ function doIt() {
       const content =
         '    const myConfig = {\n      enableFeature: true,\n      retries: 3\n    };';
       // Typo: missing comma. old_string/new_string are unindented.
-      const fuzzyOld =
-        'const myConfig = {\n  enableFeature: true\n  retries: 3\n};';
-      const fuzzyNew =
-        'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
+      const fuzzyOld = 'const myConfig = {\n  enableFeature: true\n  retries: 3\n};';
+      const fuzzyNew = 'const myConfig = {\n  enableFeature: false,\n  retries: 5\n};';
 
       const result = await calculateReplacement(mockConfig, {
         params: {
@@ -694,9 +672,7 @@ function doIt() {
         old_string: 'old',
         new_string: 'new',
       });
-      expect((invocation as any).resolvedPath).toBe(
-        path.resolve(rootDir, 'test.txt'),
-      );
+      expect((invocation as any).resolvedPath).toBe(path.resolve(rootDir, 'test.txt'));
     });
   });
 
@@ -853,20 +829,17 @@ function doIt() {
         params: { old_string: 'one', new_string: 'new' },
         expectedError: ToolErrorType.EDIT_EXPECTED_OCCURRENCE_MISMATCH,
       },
-    ])(
-      'should return $name error',
-      async ({ setup, params, expectedError }) => {
-        setup(filePath);
-        const invocation = tool.build({
-          file_path: filePath,
-          ...params,
-        });
-        const result = await invocation.execute({
-          abortSignal: new AbortController().signal,
-        });
-        expect(result.error?.type).toBe(expectedError);
-      },
-    );
+    ])('should return $name error', async ({ setup, params, expectedError }) => {
+      setup(filePath);
+      const invocation = tool.build({
+        file_path: filePath,
+        ...params,
+      });
+      const result = await invocation.execute({
+        abortSignal: new AbortController().signal,
+      });
+      expect(result.error?.type).toBe(expectedError);
+    });
   });
 
   describe('allow_multiple', () => {
@@ -1095,9 +1068,7 @@ function doIt() {
           'diffStat' in result.returnDisplay &&
           result.returnDisplay.diffStat
         ) {
-          actualLinesRemoved.push(
-            result.returnDisplay.diffStat?.model_removed_lines,
-          );
+          actualLinesRemoved.push(result.returnDisplay.diffStat?.model_removed_lines);
         } else if (result.error) {
           throw result.error;
         }
@@ -1126,9 +1097,7 @@ function doIt() {
 
   describe('JIT context discovery', () => {
     it('should append JIT context to output when enabled and context is found', async () => {
-      const { discoverJitContext, appendJitContext } = await import(
-        './jit-context.js'
-      );
+      const { discoverJitContext, appendJitContext } = await import('./jit-context.js');
       vi.mocked(discoverJitContext).mockResolvedValue('Use the useAuth hook.');
       vi.mocked(appendJitContext).mockImplementation((content, context) => {
         if (!context) return content;
@@ -1156,9 +1125,7 @@ function doIt() {
     });
 
     it('should not append JIT context when disabled', async () => {
-      const { discoverJitContext, appendJitContext } = await import(
-        './jit-context.js'
-      );
+      const { discoverJitContext, appendJitContext } = await import('./jit-context.js');
       vi.mocked(discoverJitContext).mockResolvedValue('');
       vi.mocked(appendJitContext).mockImplementation((content, context) => {
         if (!context) return content;
@@ -1180,9 +1147,7 @@ function doIt() {
         abortSignal: new AbortController().signal,
       });
 
-      expect(result.llmContent).not.toContain(
-        'Newly Discovered Project Context',
-      );
+      expect(result.llmContent).not.toContain('Newly Discovered Project Context');
     });
   });
 

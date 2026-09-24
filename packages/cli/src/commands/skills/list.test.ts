@@ -20,9 +20,7 @@ import { loadCliConfig } from '../../config/config.js';
 import chalk from 'chalk';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const { mockCoreDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { mockCoreDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   return mockCoreDebugLogger(
     await importOriginal<typeof import('sparkle-cli-core')>(),
     {
@@ -47,9 +45,7 @@ describe('skills list command', () => {
     mockLoadSettings.mockReturnValue({
       merged: {},
     } as unknown as LoadedSettings);
-    stdoutWriteSpy = vi
-      .spyOn(process.stdout, 'write')
-      .mockImplementation(() => true);
+    stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
 
   afterEach(() => {
@@ -99,15 +95,11 @@ describe('skills list command', () => {
       expect(stdoutWriteSpy).toHaveBeenCalledWith(
         chalk.bold('Discovered Agent Skills:') + '\n\n',
       );
-      expect(stdoutWriteSpy).toHaveBeenCalledWith(
-        expect.stringContaining('skill1'),
-      );
+      expect(stdoutWriteSpy).toHaveBeenCalledWith(expect.stringContaining('skill1'));
       expect(stdoutWriteSpy).toHaveBeenCalledWith(
         expect.stringContaining(chalk.green('[Enabled]')),
       );
-      expect(stdoutWriteSpy).toHaveBeenCalledWith(
-        expect.stringContaining('skill2'),
-      );
+      expect(stdoutWriteSpy).toHaveBeenCalledWith(expect.stringContaining('skill2'));
       expect(stdoutWriteSpy).toHaveBeenCalledWith(
         expect.stringContaining(chalk.red('[Disabled]')),
       );
@@ -139,9 +131,7 @@ describe('skills list command', () => {
 
       // Default
       await handleList({ all: false });
-      expect(stdoutWriteSpy).toHaveBeenCalledWith(
-        expect.stringContaining('regular'),
-      );
+      expect(stdoutWriteSpy).toHaveBeenCalledWith(expect.stringContaining('regular'));
       expect(stdoutWriteSpy).not.toHaveBeenCalledWith(
         expect.stringContaining('builtin'),
       );
@@ -150,12 +140,8 @@ describe('skills list command', () => {
 
       // With all: true
       await handleList({ all: true });
-      expect(stdoutWriteSpy).toHaveBeenCalledWith(
-        expect.stringContaining('regular'),
-      );
-      expect(stdoutWriteSpy).toHaveBeenCalledWith(
-        expect.stringContaining('builtin'),
-      );
+      expect(stdoutWriteSpy).toHaveBeenCalledWith(expect.stringContaining('regular'));
+      expect(stdoutWriteSpy).toHaveBeenCalledWith(expect.stringContaining('builtin'));
       expect(stdoutWriteSpy).toHaveBeenCalledWith(
         expect.stringContaining(chalk.gray(' [Built-in]')),
       );

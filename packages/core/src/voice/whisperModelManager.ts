@@ -59,9 +59,7 @@ export class WhisperModelManager extends EventEmitter<WhisperModelManagerEvents>
     const destination = path.join(this.modelsDir, modelName);
     const url = `https://huggingface.co/ggerganov/whisper.cpp/resolve/main/${modelName}`;
 
-    debugLogger.debug(
-      `[WhisperModelManager] Downloading ${modelName} from ${url}`,
-    );
+    debugLogger.debug(`[WhisperModelManager] Downloading ${modelName} from ${url}`);
 
     const response = await fetch(url);
     if (!response.ok) {

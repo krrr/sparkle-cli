@@ -99,9 +99,7 @@ describe('textUtils', () => {
 
       it('should preserve emojis', () => {
         const input = '🎉 Celebration! 🚀 Launch! 💯';
-        expect(stripUnsafeCharacters(input)).toBe(
-          '🎉 Celebration! 🚀 Launch! 💯',
-        );
+        expect(stripUnsafeCharacters(input)).toBe('🎉 Celebration! 🚀 Launch! 💯');
       });
 
       it('should preserve complex emoji sequences (ZWJ)', () => {
@@ -279,9 +277,7 @@ describe('textUtils', () => {
       it('should fully strip 8-bit CSI (0x9B) sequences', () => {
         // 0x9B (CSI) is equivalent to ESC[. stripAnsi should handle the
         // whole sequence including parameters.
-        expect(stripUnsafeCharacters('keep\x9B42mthis text')).toBe(
-          'keepthis text',
-        );
+        expect(stripUnsafeCharacters('keep\x9B42mthis text')).toBe('keepthis text');
       });
 
       it('should not lose text when multiple C1 chars precede valid content', () => {
@@ -389,11 +385,8 @@ describe('textUtils', () => {
     describe('performance: regex vs array-based', () => {
       it('should handle real-world terminal output with control chars', () => {
         // Simulate terminal output with various control sequences
-        const terminalOutput =
-          '\x1b[32mSuccess:\x1b[0m File saved\x07\n\x1b[?25hDone';
-        expect(stripUnsafeCharacters(terminalOutput)).toBe(
-          'Success: File saved\nDone',
-        );
+        const terminalOutput = '\x1b[32mSuccess:\x1b[0m File saved\x07\n\x1b[?25hDone';
+        expect(stripUnsafeCharacters(terminalOutput)).toBe('Success: File saved\nDone');
       });
     });
   });
@@ -454,9 +447,7 @@ describe('textUtils', () => {
           if (sanitized.type === 'edit') {
             expect(sanitized.title).toBe('\\u001b[34mEdit File\\u001b[0m');
             expect(sanitized.fileName).toBe('\\u001b[31mfile.txt\\u001b[0m');
-            expect(sanitized.filePath).toBe(
-              '/path/to/\\u001b[32mfile.txt\\u001b[0m',
-            );
+            expect(sanitized.filePath).toBe('/path/to/\\u001b[32mfile.txt\\u001b[0m');
             expect(sanitized.fileDiff).toBe(
               'diff --git a/file.txt b/file.txt\n--- a/\\u001b[33mfile.txt\\u001b[0m\n+++ b/file.txt',
             );
@@ -496,12 +487,8 @@ describe('textUtils', () => {
 
           if (sanitized.type === 'info') {
             expect(sanitized.title).toBe('\\u001b[34mWeb Search\\u001b[0m');
-            expect(sanitized.prompt).toBe(
-              '\\u001b[31mSearch for cats\\u001b[0m',
-            );
-            expect(sanitized.urls?.[0]).toBe(
-              'https://\\u001b[32mgoogle.com\\u001b[0m',
-            );
+            expect(sanitized.prompt).toBe('\\u001b[31mSearch for cats\\u001b[0m');
+            expect(sanitized.urls?.[0]).toBe('https://\\u001b[32mgoogle.com\\u001b[0m');
           }
         });
       });

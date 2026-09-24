@@ -27,13 +27,9 @@ describe('Context Manager Hysteresis Tests', () => {
     },
   });
 
-  const getProjectionTokens = (
-    proj: HistoryTurn[],
-    harness: SimulationHarness,
-  ) =>
+  const getProjectionTokens = (proj: HistoryTurn[], harness: SimulationHarness) =>
     proj.reduce(
-      (sum, c) =>
-        sum + harness.env.tokenCalculator.calculateContentTokens(c.content),
+      (sum, c) => sum + harness.env.tokenCalculator.calculateContentTokens(c.content),
       0,
     );
 
@@ -48,14 +44,10 @@ describe('Context Manager Hysteresis Tests', () => {
     await harness.simulateTurn([{ role: 'user', parts: [{ text: 'INIT' }] }]);
 
     // Turn 1: Add ~500 tokens
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'A'.repeat(500) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'A'.repeat(500) }] }]);
 
     // Turn 2: Add ~1000 tokens. Total ~1500. Deficit ~500 < 1500.
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'B'.repeat(1000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'B'.repeat(1000) }] }]);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
     let state = await harness.getGoldenState();
@@ -68,18 +60,14 @@ describe('Context Manager Hysteresis Tests', () => {
 
     // Turn 3: Add ~3000 tokens. Total ~4500.
     // Deficit ~3500 > 1500. TRIGGER!
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'C'.repeat(3000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'C'.repeat(3000) }] }]);
 
     // Give it a moment for the async task to finish
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Exceed maxTokens to force a render that shows the snapshot
     // Add ~3000 tokens. Total ~7500 > 5000.
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'D'.repeat(3000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'D'.repeat(3000) }] }]);
 
     state = await harness.getGoldenState();
     expect(
@@ -98,16 +86,12 @@ describe('Context Manager Hysteresis Tests', () => {
 
     // 1. Trigger first consolidation
     // Add ~3000 tokens. Total ~3000. Deficit ~2000 > 1000.
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'A'.repeat(3000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'A'.repeat(3000) }] }]);
     await harness.simulateTurn([{ role: 'user', parts: [{ text: 'B' }] }]); // Make eligible
 
     await new Promise((resolve) => setTimeout(resolve, 500));
     // Exceed maxTokens (5000) to see it
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'X'.repeat(3000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'X'.repeat(3000) }] }]);
 
     // Get baseline tokens
     let state = await harness.getGoldenState();
@@ -121,9 +105,7 @@ describe('Context Manager Hysteresis Tests', () => {
 
     // 2. Add nodes again, staying below threshold growth
     // Add ~500 tokens. Growth ~500 < 1000.
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'C'.repeat(500) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'C'.repeat(500) }] }]);
     await harness.simulateTurn([{ role: 'user', parts: [{ text: 'D' }] }]); // Make eligible
 
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -134,9 +116,7 @@ describe('Context Manager Hysteresis Tests', () => {
 
     // 3. Exceed threshold growth
     // Add ~2000 tokens. Growth = ~500 + ~2000 = ~2500 > 1000.
-    await harness.simulateTurn([
-      { role: 'user', parts: [{ text: 'E'.repeat(2000) }] },
-    ]);
+    await harness.simulateTurn([{ role: 'user', parts: [{ text: 'E'.repeat(2000) }] }]);
     await harness.simulateTurn([{ role: 'user', parts: [{ text: 'F' }] }]); // Make eligible
 
     await new Promise((resolve) => setTimeout(resolve, 500));

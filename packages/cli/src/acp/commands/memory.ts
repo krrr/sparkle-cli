@@ -12,11 +12,7 @@ import {
   refreshMemory,
   showMemory,
 } from 'sparkle-cli-core';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 
 export class MemoryCommand implements Command {
   readonly name = 'memory';
@@ -99,11 +95,7 @@ export class InboxMemoryCommand implements Command {
       listInboxMemoryPatches(context.agentContext.config),
     ]);
 
-    if (
-      skills.length === 0 &&
-      patches.length === 0 &&
-      memoryPatches.length === 0
-    ) {
+    if (skills.length === 0 && patches.length === 0 && memoryPatches.length === 0) {
       return { name: this.name, data: 'No items in inbox.' };
     }
 

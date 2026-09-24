@@ -20,23 +20,19 @@ export class OpenFilesManager {
   private openFiles: File[] = [];
 
   constructor(private readonly context: vscode.ExtensionContext) {
-    const editorWatcher = vscode.window.onDidChangeActiveTextEditor(
-      (editor) => {
-        if (editor && this.isFileUri(editor.document.uri)) {
-          this.addOrMoveToFront(editor);
-          this.fireWithDebounce();
-        }
-      },
-    );
+    const editorWatcher = vscode.window.onDidChangeActiveTextEditor((editor) => {
+      if (editor && this.isFileUri(editor.document.uri)) {
+        this.addOrMoveToFront(editor);
+        this.fireWithDebounce();
+      }
+    });
 
-    const selectionWatcher = vscode.window.onDidChangeTextEditorSelection(
-      (event) => {
-        if (this.isFileUri(event.textEditor.document.uri)) {
-          this.updateActiveContext(event.textEditor);
-          this.fireWithDebounce();
-        }
-      },
-    );
+    const selectionWatcher = vscode.window.onDidChangeTextEditorSelection((event) => {
+      if (this.isFileUri(event.textEditor.document.uri)) {
+        this.updateActiveContext(event.textEditor);
+        this.fireWithDebounce();
+      }
+    });
 
     const closeWatcher = vscode.workspace.onDidCloseTextDocument((document) => {
       if (this.isFileUri(document.uri)) {
@@ -136,9 +132,7 @@ export class OpenFilesManager {
   }
 
   private updateActiveContext(editor: vscode.TextEditor) {
-    const file = this.openFiles.find(
-      (f) => f.path === editor.document.uri.fsPath,
-    );
+    const file = this.openFiles.find((f) => f.path === editor.document.uri.fsPath);
     if (!file || !file.isActive) {
       return;
     }

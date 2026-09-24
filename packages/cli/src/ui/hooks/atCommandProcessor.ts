@@ -21,10 +21,7 @@ import {
   resolveAtCommandPath,
 } from 'sparkle-cli-core';
 import { Buffer } from 'node:buffer';
-import type {
-  HistoryItemToolGroup,
-  IndividualToolCallDisplay,
-} from '../types.js';
+import type { HistoryItemToolGroup, IndividualToolCallDisplay } from '../types.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 
 const REF_CONTENT_HEADER = `\n${REFERENCE_CONTENT_START}`;
@@ -94,10 +91,7 @@ function parseAllAtCommands(
   let lastIndex = 0;
 
   // Create a new RegExp instance for each call to avoid shared state/lastIndex issues.
-  const atCommandRegex = new RegExp(
-    `(?<!\\\\)@${AT_COMMAND_PATH_REGEX_SOURCE}`,
-    'g',
-  );
+  const atCommandRegex = new RegExp(`(?<!\\\\)@${AT_COMMAND_PATH_REGEX_SOURCE}`, 'g');
 
   let match: RegExpExecArray | null;
 
@@ -133,9 +127,7 @@ function parseAllAtCommands(
   }
 
   // Filter out empty text parts that might result from consecutive @paths or leading/trailing spaces
-  return parts.filter(
-    (part) => !(part.type === 'text' && part.content.trim() === ''),
-  );
+  return parts.filter((part) => !(part.type === 'text' && part.content.trim() === ''));
 }
 
 function categorizeAtCommands(
@@ -296,18 +288,13 @@ async function resolveFilePaths(
           `Path ${pathName} resolved to file: ${absolutePath}, using relative path: ${relativePath}`,
         );
       }
-    } else if (
-      result.status === 'not_found' ||
-      result.status === 'unauthorized'
-    ) {
+    } else if (result.status === 'not_found' || result.status === 'unauthorized') {
       // If direct resolution fails, we attempt glob search if enabled.
       // We also allow glob fallback for "unauthorized" results from resolveAtCommandPath,
       // as they might represent a relative path that matched an unauthorized file in one directory
       // but might have a valid match (via glob) in another.
       if (config.getEnableRecursiveFileSearch() && globTool) {
-        onDebugMessage(
-          `Path ${pathName} not found directly, attempting glob search.`,
-        );
+        onDebugMessage(`Path ${pathName} not found directly, attempting glob search.`);
 
         for (const dir of config.getWorkspaceContext().getDirectories()) {
           try {
@@ -362,9 +349,7 @@ async function resolveFilePaths(
         }
       } else {
         if (!config.getEnableRecursiveFileSearch() || !globTool) {
-          onDebugMessage(
-            `Glob tool not found. Path ${pathName} will be skipped.`,
-          );
+          onDebugMessage(`Glob tool not found. Path ${pathName} will be skipped.`);
         }
       }
     }
@@ -486,9 +471,7 @@ async function readMcpResources(
   }
 
   if (hasError) {
-    const firstError = displays.find(
-      (d) => d.status === CoreToolCallStatus.Error,
-    );
+    const firstError = displays.find((d) => d.status === CoreToolCallStatus.Error);
     return {
       parts: [],
       displays,
@@ -517,14 +500,9 @@ async function readLocalFiles(
     return { parts: [], displays: [] };
   }
 
-  const readManyFilesTool = new ReadManyFilesTool(
-    config,
-    config.getMessageBus(),
-  );
+  const readManyFilesTool = new ReadManyFilesTool(config, config.getMessageBus());
 
-  const pathSpecsToRead = fileResolvedFiles.map(
-    (rf) => rf.absolutePath ?? rf.pathSpec,
-  );
+  const pathSpecsToRead = fileResolvedFiles.map((rf) => rf.absolutePath ?? rf.pathSpec);
   const fileLabelsForDisplay = fileResolvedFiles.map((rf) => rf.displayLabel);
   const respectFileIgnore = config.getFileFilteringOptions();
 
@@ -547,8 +525,7 @@ async function readLocalFiles(
       status: CoreToolCallStatus.Success,
       isClientInitiated: true,
       resultDisplay:
-        result.returnDisplay ||
-        `Successfully read: ${fileLabelsForDisplay.join(', ')}`,
+        result.returnDisplay || `Successfully read: ${fileLabelsForDisplay.join(', ')}`,
       confirmationDetails: undefined,
     };
 
@@ -789,9 +766,7 @@ export async function handleAtCommand({
     resourceParts.length === 0 &&
     agentParts.length === 0
   ) {
-    onDebugMessage(
-      'No valid file paths, resources, or agents found in @ commands.',
-    );
+    onDebugMessage('No valid file paths, resources, or agents found in @ commands.');
     return { processedQuery: [{ text: query }] };
   }
 

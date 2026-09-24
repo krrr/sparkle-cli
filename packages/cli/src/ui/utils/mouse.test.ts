@@ -74,12 +74,8 @@ describe('mouse utils', () => {
     });
 
     it('parses SGR scroll events', () => {
-      expect(parseSGRMouseEvent(`${ESC}[<64;1;1M`)!.event.name).toBe(
-        'scroll-up',
-      );
-      expect(parseSGRMouseEvent(`${ESC}[<65;1;1M`)!.event.name).toBe(
-        'scroll-down',
-      );
+      expect(parseSGRMouseEvent(`${ESC}[<64;1;1M`)!.event.name).toBe('scroll-up');
+      expect(parseSGRMouseEvent(`${ESC}[<65;1;1M`)!.event.name).toBe('scroll-down');
     });
 
     it('returns null for invalid SGR', () => {

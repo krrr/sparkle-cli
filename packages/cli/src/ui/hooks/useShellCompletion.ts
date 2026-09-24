@@ -56,10 +56,7 @@ export interface TokenInfo {
   commandToken: string;
 }
 
-export function getTokenAtCursor(
-  line: string,
-  cursorCol: number,
-): TokenInfo | null {
+export function getTokenAtCursor(line: string, cursorCol: number): TokenInfo | null {
   const tokensInfo: Array<{ token: string; start: number; end: number }> = [];
   let i = 0;
 
@@ -180,9 +177,7 @@ export function getTokenAtCursor(
   };
 }
 
-export async function scanPathExecutables(
-  signal?: AbortSignal,
-): Promise<string[]> {
+export async function scanPathExecutables(signal?: AbortSignal): Promise<string[]> {
   const pathEnv = process.env['PATH'] ?? '';
   const dirs = pathEnv.split(path.delimiter).filter(Boolean);
   const isWindows = process.platform === 'win32';
@@ -335,8 +330,7 @@ export async function resolvePathCompletions(
   const [expandedPartial, didExpandTilde] = expandTilde(normalizedPartial);
 
   // Directory Detection
-  const endsWithSep =
-    normalizedPartial.endsWith('/') || normalizedPartial === '';
+  const endsWithSep = normalizedPartial.endsWith('/') || normalizedPartial === '';
   const dirToRead = endsWithSep
     ? path.resolve(cwd, expandedPartial)
     : path.resolve(cwd, path.dirname(expandedPartial));
@@ -551,11 +545,7 @@ export function useShellCompletion({
         if (argumentCompletions?.exclusive) {
           results = argumentCompletions.suggestions;
         } else {
-          const pathSuggestions = await resolvePathCompletions(
-            query,
-            cwd,
-            signal,
-          );
+          const pathSuggestions = await resolvePathCompletions(query, cwd, signal);
           if (signal.aborted) return;
 
           results = [
@@ -571,10 +561,7 @@ export function useShellCompletion({
       setActiveStart(completionStart);
     } catch (error) {
       if (
-        !(
-          signal.aborted ||
-          (error instanceof Error && error.name === 'AbortError')
-        )
+        !(signal.aborted || (error instanceof Error && error.name === 'AbortError'))
       ) {
         debugLogger.warn(
           `[WARN] shell completion failed: ${error instanceof Error ? error.message : String(error)}`,

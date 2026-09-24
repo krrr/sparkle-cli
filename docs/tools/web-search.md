@@ -1,12 +1,12 @@
 # Web search tool (`web_search`)
 
-The `web_search` tool allows the Sparkle agent to retrieve up-to-date
-information, news, and facts from the internet via Google Search.
+The `web_search` tool allows the Sparkle agent to retrieve up-to-date information, news,
+and facts from the internet via Google Search.
 
 ## Technical reference
 
-The agent uses this tool when your request requires knowledge of current events
-or specific online documentation not available in its internal training data.
+The agent uses this tool when your request requires knowledge of current events or
+specific online documentation not available in its internal training data.
 
 ### Arguments
 
@@ -21,11 +21,11 @@ or specific online documentation not available in its internal training data.
 
 ## Third-party search fallback
 
-Google Search grounding is only available through the Gemini API. When the
-active provider is an OpenAI-compatible provider (see
-[`security.auth.providers`](../reference/configuration.md)), the tool
-automatically uses a configured third-party search API instead, returning the
-results' highlights (key excerpts) with titles, URLs, and publish dates.
+Google Search grounding is only available through the Gemini API. When the active
+provider is an OpenAI-compatible provider (see
+[`security.auth.providers`](../reference/configuration.md)), the tool automatically uses
+a configured third-party search API instead, returning the results' highlights (key
+excerpts) with titles, URLs, and publish dates.
 
 Configure it in `settings.json`:
 
@@ -42,11 +42,11 @@ Configure it in `settings.json`:
 
 - `thirdPartyProvider`: the search API to fall back to. Supported: `"exa"`.
 - `apiKey`: the provider's API key. Environment variable references such as
-  `${EXA_API_KEY}` are expanded, and the `EXA_API_KEY` environment variable
-  takes precedence over the settings value.
+  `${EXA_API_KEY}` are expanded, and the `EXA_API_KEY` environment variable takes
+  precedence over the settings value.
 
-If no third-party search API is configured, the tool returns a clear error
-instead of ungrounded results.
+If no third-party search API is configured, the tool returns a clear error instead of
+ungrounded results.
 
 ## Use cases
 
@@ -56,6 +56,6 @@ instead of ungrounded results.
 
 ## Next steps
 
-- Follow the [Web tools guide](../cli/tutorials/web-tools.md) for practical
-  usage examples.
+- Follow the [Web tools guide](../cli/tutorials/web-tools.md) for practical usage
+  examples.
 - Explore the [Web fetch tool reference](./web-fetch.md) for direct URL access.

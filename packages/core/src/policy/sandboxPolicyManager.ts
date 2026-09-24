@@ -38,9 +38,7 @@ export const SandboxTomlSchema = z.object({
 });
 
 export type SandboxModeConfig = z.infer<typeof SandboxModeConfigSchema>;
-export type PersistentCommandConfig = z.infer<
-  typeof PersistentCommandConfigSchema
->;
+export type PersistentCommandConfig = z.infer<typeof PersistentCommandConfigSchema>;
 export type SandboxTomlSchemaType = z.infer<typeof SandboxTomlSchema>;
 
 export class SandboxPolicyManager {
@@ -50,11 +48,7 @@ export class SandboxPolicyManager {
     if (!SandboxPolicyManager._DEFAULT_CONFIG) {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
-      const defaultPath = path.join(
-        __dirname,
-        'policies',
-        'sandbox-default.toml',
-      );
+      const defaultPath = path.join(__dirname, 'policies', 'sandbox-default.toml');
       try {
         const content = fs.readFileSync(defaultPath, 'utf8');
         if (typeof content !== 'string') {
@@ -184,10 +178,7 @@ export class SandboxPolicyManager {
     };
   }
 
-  addSessionApproval(
-    commandName: string,
-    permissions: SandboxPermissions,
-  ): void {
+  addSessionApproval(commandName: string, permissions: SandboxPermissions): void {
     const normalized = normalizeCommand(commandName);
     if (this.isProtectedKey(normalized)) {
       return;
@@ -212,10 +203,7 @@ export class SandboxPolicyManager {
     };
   }
 
-  addPersistentApproval(
-    commandName: string,
-    permissions: SandboxPermissions,
-  ): void {
+  addPersistentApproval(commandName: string, permissions: SandboxPermissions): void {
     const normalized = normalizeCommand(commandName);
     if (this.isProtectedKey(normalized)) {
       return;

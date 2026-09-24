@@ -35,9 +35,7 @@ export function keyToAnsi(key: Key): string | null {
   if (key.ctrl) {
     // Ctrl + letter (A-Z maps to 1-26, e.g., Ctrl+C is \x03)
     if (key.name >= 'a' && key.name <= 'z') {
-      return String.fromCharCode(
-        key.name.charCodeAt(0) - 'a'.charCodeAt(0) + 1,
-      );
+      return String.fromCharCode(key.name.charCodeAt(0) - 'a'.charCodeAt(0) + 1);
     }
   }
 

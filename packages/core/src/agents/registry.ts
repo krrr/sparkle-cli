@@ -73,10 +73,7 @@ export class AgentRegistry {
 
   private onModelChanged = () => {
     this.refreshAgents('local').catch((e) => {
-      debugLogger.error(
-        '[AgentRegistry] Failed to refresh agents on model change:',
-        e,
-      );
+      debugLogger.error('[AgentRegistry] Failed to refresh agents on model change:', e);
     });
   };
 
@@ -139,11 +136,7 @@ export class AgentRegistry {
     const ackService = this.config.getAcknowledgedAgentsService();
     const projectRoot = this.config.getProjectRoot();
     if (agent.metadata?.hash) {
-      await ackService.acknowledge(
-        projectRoot,
-        agent.name,
-        agent.metadata.hash,
-      );
+      await ackService.acknowledge(projectRoot, agent.name, agent.metadata.hash);
       await this.registerAgent(agent);
       coreEvents.emitAgentsRefreshed();
     }
@@ -234,9 +227,7 @@ export class AgentRegistry {
     const userAgentsDir = Storage.getUserAgentsDir();
     const userAgents = await loadAgentsFromDirectory(userAgentsDir);
     for (const error of userAgents.errors) {
-      debugLogger.warn(
-        `[AgentRegistry] Error loading user agent: ${error.message}`,
-      );
+      debugLogger.warn(`[AgentRegistry] Error loading user agent: ${error.message}`);
       const msg = `Agent loading error: ${error.message}`;
       errors?.push(msg);
       coreEvents.emitFeedback('error', msg);
@@ -274,9 +265,7 @@ export class AgentRegistry {
     }
 
     if (this.config.getDebugMode()) {
-      debugLogger.log(
-        `[AgentRegistry] Loaded with ${this.agents.size} agents.`,
-      );
+      debugLogger.log(`[AgentRegistry] Loaded with ${this.agents.size} agents.`);
     }
   }
 
@@ -293,10 +282,8 @@ export class AgentRegistry {
       // available inside the container. The browser agent can only work with
       // sessionMode "existing" (connecting to a host Chrome instance).
       const sandboxType = process.env['SANDBOX'];
-      const isContainerSandbox =
-        !!sandboxType && sandboxType !== 'sandbox:none';
-      const sessionMode =
-        browserConfig.customConfig.sessionMode ?? 'persistent';
+      const isContainerSandbox = !!sandboxType && sandboxType !== 'sandbox:none';
+      const sessionMode = browserConfig.customConfig.sessionMode ?? 'persistent';
 
       if (isContainerSandbox && sessionMode !== 'existing') {
         coreEvents.emitFeedback(
@@ -376,9 +363,7 @@ export class AgentRegistry {
 
     if (!this.isAgentEnabled(definition, settingsOverrides)) {
       if (this.config.getDebugMode()) {
-        debugLogger.log(
-          `[AgentRegistry] Skipping disabled agent '${definition.name}'`,
-        );
+        debugLogger.log(`[AgentRegistry] Skipping disabled agent '${definition.name}'`);
       }
       return;
     }
@@ -462,8 +447,7 @@ export class AgentRegistry {
 
     this.allDefinitions.set(definition.name, definition);
 
-    const overrides =
-      this.config.getAgentsSettings().overrides?.[definition.name];
+    const overrides = this.config.getAgentsSettings().overrides?.[definition.name];
 
     if (!this.isAgentEnabled(definition, overrides)) {
       if (this.config.getDebugMode()) {
@@ -637,10 +621,7 @@ export class AgentRegistry {
       },
       get modelConfig() {
         return overrides.modelConfig
-          ? ModelConfigService.merge(
-              definition.modelConfig,
-              overrides.modelConfig,
-            )
+          ? ModelConfigService.merge(definition.modelConfig, overrides.modelConfig)
           : definition.modelConfig;
       },
     };

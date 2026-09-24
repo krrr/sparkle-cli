@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { RemoteSubagentSession } from './remote-subagent-protocol.js';
 
 import { A2AAuthProviderFactory } from './auth-provider/factory.js';
@@ -105,11 +97,7 @@ describe('RemoteSubagentSession (protocol)', () => {
     definition: RemoteAgentDefinition = mockDefinition,
     query = 'test query',
   ) {
-    const session = new RemoteSubagentSession(
-      definition,
-      mockContext,
-      mockMessageBus,
-    );
+    const session = new RemoteSubagentSession(definition, mockContext, mockMessageBus);
     const events: AgentEvent[] = [];
     session.subscribe((e) => events.push(e));
     await session.send({
@@ -199,12 +187,10 @@ describe('RemoteSubagentSession (protocol)', () => {
 
   describe('chunk → AgentEvent translation', () => {
     it('each A2A chunk produces a message event with incremental delta text', async () => {
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield makeChunk('Hello');
-          yield makeChunk(' world');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield makeChunk('Hello');
+        yield makeChunk(' world');
+      });
 
       const { events } = await runSession();
 
@@ -224,11 +210,9 @@ describe('RemoteSubagentSession (protocol)', () => {
     it('getLatestProgress() is updated per chunk with state running', async () => {
       let capturedProgress: SubagentProgress | undefined;
 
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield makeChunk('Partial');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield makeChunk('Partial');
+      });
 
       const session = new RemoteSubagentSession(
         mockDefinition,
@@ -268,11 +252,9 @@ describe('RemoteSubagentSession (protocol)', () => {
 
   describe('getResult()', () => {
     it('resolves with ToolResult containing llmContent and SubagentProgress returnDisplay', async () => {
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          yield makeChunk('Result text');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        yield makeChunk('Result text');
+      });
 
       const { result } = await runSession();
 
@@ -307,11 +289,9 @@ describe('RemoteSubagentSession (protocol)', () => {
     });
 
     it('resolves even with empty stream (empty final output)', async () => {
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          // yield nothing
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        // yield nothing
+      });
 
       const { result } = await runSession();
       expect(result.llmContent).toEqual([{ text: '' }]);
@@ -519,11 +499,7 @@ describe('RemoteSubagentSession (protocol)', () => {
 
       (A2AAuthProviderFactory.create as Mock).mockResolvedValue(undefined);
 
-      const session = new RemoteSubagentSession(
-        authDef,
-        mockContext,
-        mockMessageBus,
-      );
+      const session = new RemoteSubagentSession(authDef, mockContext, mockMessageBus);
       await session.send({
         message: { content: [{ type: 'text', text: 'q' }] },
       });
@@ -747,15 +723,13 @@ describe('RemoteSubagentSession (protocol)', () => {
     it('calling send() while a stream is active throws', async () => {
       let resolveChunk!: () => void;
 
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          // Block until test releases the chunk
-          await new Promise<void>((resolve) => {
-            resolveChunk = resolve;
-          });
-          yield makeChunk('late');
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        // Block until test releases the chunk
+        await new Promise<void>((resolve) => {
+          resolveChunk = resolve;
+        });
+        yield makeChunk('late');
+      });
 
       const session = new RemoteSubagentSession(
         mockDefinition,
@@ -794,12 +768,10 @@ describe('RemoteSubagentSession (protocol)', () => {
   describe('multi-send', () => {
     it('supports sequential sends after stream completion', async () => {
       let callCount = 0;
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          callCount++;
-          yield makeChunk(`Response ${callCount}`);
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        callCount++;
+        yield makeChunk(`Response ${callCount}`);
+      });
 
       const session = new RemoteSubagentSession(
         mockDefinition,
@@ -828,12 +800,10 @@ describe('RemoteSubagentSession (protocol)', () => {
 
     it('getResult() returns the latest stream result', async () => {
       let callCount = 0;
-      mockClientManager.sendMessageStream.mockImplementation(
-        async function* () {
-          callCount++;
-          yield makeChunk(`Result ${callCount}`);
-        },
-      );
+      mockClientManager.sendMessageStream.mockImplementation(async function* () {
+        callCount++;
+        yield makeChunk(`Result ${callCount}`);
+      });
 
       const session = new RemoteSubagentSession(
         mockDefinition,
@@ -894,8 +864,7 @@ describe('RemoteSubagentSession (protocol)', () => {
 
       // Verify the second call received the contextId/taskId from first call
       expect(mockClientManager.sendMessageStream).toHaveBeenCalledTimes(2);
-      const secondCallOpts =
-        mockClientManager.sendMessageStream.mock.calls[1]?.[2];
+      const secondCallOpts = mockClientManager.sendMessageStream.mock.calls[1]?.[2];
       expect(secondCallOpts).toHaveProperty('contextId', 'ctx-1');
       expect(secondCallOpts).toHaveProperty('taskId', 'task-1');
     });

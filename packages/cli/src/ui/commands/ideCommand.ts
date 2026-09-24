@@ -68,9 +68,7 @@ function formatFileList(openFiles: File[]): string {
       const basename = path.basename(file.path);
       const isDuplicate = (basenameCounts.get(basename) || 0) > 1;
       const parentDir = path.basename(path.dirname(file.path));
-      const displayName = isDuplicate
-        ? `${basename} (/${parentDir})`
-        : basename;
+      const displayName = isDuplicate ? `${basename} (/${parentDir})` : basename;
 
       return `  - ${displayName}${file.isActive ? ' (active)' : ''}`;
     })
@@ -165,8 +163,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
     kind: CommandKind.BUILT_IN,
     autoExecute: true,
     action: async (): Promise<SlashCommandActionReturn> => {
-      const { messageType, content } =
-        await getIdeStatusMessageWithFiles(ideClient);
+      const { messageType, content } = await getIdeStatusMessageWithFiles(ideClient);
       return {
         type: 'message',
         messageType,
@@ -210,11 +207,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
         Date.now(),
       );
       if (result.success) {
-        context.services.settings.setValue(
-          SettingScope.User,
-          'ide.enabled',
-          true,
-        );
+        context.services.settings.setValue(SettingScope.User, 'ide.enabled', true);
         // Poll for up to 5 seconds for the extension to activate.
         for (let i = 0; i < 10; i++) {
           await setIdeModeAndSyncConnection(
@@ -225,8 +218,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
             },
           );
           if (
-            ideClient.getConnectionStatus().status ===
-            IDEConnectionStatus.Connected
+            ideClient.getConnectionStatus().status === IDEConnectionStatus.Connected
           ) {
             break;
           }
@@ -261,15 +253,8 @@ export const ideCommand = async (): Promise<SlashCommand> => {
     kind: CommandKind.BUILT_IN,
     autoExecute: true,
     action: async (context: CommandContext) => {
-      context.services.settings.setValue(
-        SettingScope.User,
-        'ide.enabled',
-        true,
-      );
-      await setIdeModeAndSyncConnection(
-        context.services.agentContext!.config,
-        true,
-      );
+      context.services.settings.setValue(SettingScope.User, 'ide.enabled', true);
+      await setIdeModeAndSyncConnection(context.services.agentContext!.config, true);
       const { messageType, content } = getIdeStatusMessage(ideClient);
       context.ui.addItem(
         {
@@ -287,15 +272,8 @@ export const ideCommand = async (): Promise<SlashCommand> => {
     kind: CommandKind.BUILT_IN,
     autoExecute: true,
     action: async (context: CommandContext) => {
-      context.services.settings.setValue(
-        SettingScope.User,
-        'ide.enabled',
-        false,
-      );
-      await setIdeModeAndSyncConnection(
-        context.services.agentContext!.config,
-        false,
-      );
+      context.services.settings.setValue(SettingScope.User, 'ide.enabled', false);
+      await setIdeModeAndSyncConnection(context.services.agentContext!.config, false);
       const { messageType, content } = getIdeStatusMessage(ideClient);
       context.ui.addItem(
         {
@@ -313,11 +291,7 @@ export const ideCommand = async (): Promise<SlashCommand> => {
   if (isConnected) {
     ideSlashCommand.subCommands = [statusCommand, disableCommand];
   } else {
-    ideSlashCommand.subCommands = [
-      enableCommand,
-      statusCommand,
-      installCommand,
-    ];
+    ideSlashCommand.subCommands = [enableCommand, statusCommand, installCommand];
   }
 
   return ideSlashCommand;

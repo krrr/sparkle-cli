@@ -7,10 +7,7 @@
 import process from 'node:process';
 import { monitorEventLoopDelay, type IntervalHistogram } from 'node:perf_hooks';
 import type { Config } from '../config/config.js';
-import {
-  recordEventLoopDelay,
-  isPerformanceMonitoringActive,
-} from './metrics.js';
+import { recordEventLoopDelay, isPerformanceMonitoringActive } from './metrics.js';
 
 export class EventLoopMonitor {
   private eventLoopHistogram: IntervalHistogram | null = null;
@@ -18,8 +15,7 @@ export class EventLoopMonitor {
   private isRunning = false;
 
   start(config: Config, intervalMs: number = 10000): void {
-    const isEnabled =
-      process.env['GEMINI_EVENT_LOOP_MONITOR_ENABLED'] === 'true';
+    const isEnabled = process.env['GEMINI_EVENT_LOOP_MONITOR_ENABLED'] === 'true';
     if (!isEnabled || !isPerformanceMonitoringActive() || this.isRunning) {
       return;
     }

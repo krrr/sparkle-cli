@@ -46,9 +46,7 @@ describe('handleValidate', () => {
     debugLoggerLogSpy = vi.spyOn(debugLogger, 'log');
     debugLoggerWarnSpy = vi.spyOn(debugLogger, 'warn');
     debugLoggerErrorSpy = vi.spyOn(debugLogger, 'error');
-    processSpy = vi
-      .spyOn(process, 'exit')
-      .mockImplementation(() => undefined as never);
+    processSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
     tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-home'));
     tempWorkspaceDir = fs.mkdtempSync(path.join(tempHomeDir, 'test-workspace'));
     vi.spyOn(process, 'cwd').mockReturnValue(tempWorkspaceDir);

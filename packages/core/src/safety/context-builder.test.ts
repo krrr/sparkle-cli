@@ -74,10 +74,7 @@ describe('ContextBuilder', () => {
       { role: 'user', parts: [{ text: 'List files' }] },
       {
         role: 'model',
-        parts: [
-          { text: 'Sure, listing files.' },
-          { functionCall: mockToolCall },
-        ],
+        parts: [{ text: 'Sure, listing files.' }, { functionCall: mockToolCall }],
       },
     ];
 

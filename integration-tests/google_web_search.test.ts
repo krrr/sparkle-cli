@@ -36,10 +36,7 @@ describe('web search tool', () => {
         error instanceof Error &&
         (error.message.includes('network') || error.message.includes('timeout'))
       ) {
-        console.warn(
-          'Skipping test due to network error:',
-          (error as Error).message,
-        );
+        console.warn('Skipping test due to network error:', (error as Error).message);
         return; // Skip the test
       }
       throw error; // Re-throw if not a network error
@@ -53,8 +50,7 @@ describe('web search tool', () => {
 
       // Check if the tool call failed due to network issues
       const failedSearchCalls = allTools.filter(
-        (t) =>
-          t.toolRequest.name === WEB_SEARCH_TOOL_NAME && !t.toolRequest.success,
+        (t) => t.toolRequest.name === WEB_SEARCH_TOOL_NAME && !t.toolRequest.success,
       );
       if (failedSearchCalls.length > 0) {
         console.warn(

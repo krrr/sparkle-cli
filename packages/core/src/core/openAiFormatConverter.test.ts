@@ -38,9 +38,7 @@ describe('extractSystemInstructionText', () => {
   });
 
   it('joins text from part arrays', () => {
-    expect(extractSystemInstructionText([{ text: 'a' }, { text: 'b' }])).toBe(
-      'a\nb',
-    );
+    expect(extractSystemInstructionText([{ text: 'a' }, { text: 'b' }])).toBe('a\nb');
   });
 
   it('extracts text from a Content object', () => {
@@ -502,10 +500,7 @@ describe('geminiContentsToOpenAiMessages', () => {
     const messages = geminiContentsToOpenAiMessages([
       {
         role: 'model',
-        parts: [
-          { text: 'thinking...', thought: true },
-          { text: 'final answer' },
-        ],
+        parts: [{ text: 'thinking...', thought: true }, { text: 'final answer' }],
       },
     ]);
     expect(messages[0].reasoning_content).toBeUndefined();
@@ -550,9 +545,7 @@ describe('geminiContentsToOpenAiMessages', () => {
       [
         {
           role: 'model',
-          parts: [
-            { functionCall: { name: 'custom/tool', args: {}, id: 'c1' } },
-          ],
+          parts: [{ functionCall: { name: 'custom/tool', args: {}, id: 'c1' } }],
         },
       ],
       { nameMapper: mapper },
@@ -567,9 +560,7 @@ describe('openAiFinishReasonToGemini', () => {
     expect(openAiFinishReasonToGemini('tool_calls')).toBe(FinishReason.STOP);
     expect(openAiFinishReasonToGemini('function_call')).toBe(FinishReason.STOP);
     expect(openAiFinishReasonToGemini('length')).toBe(FinishReason.MAX_TOKENS);
-    expect(openAiFinishReasonToGemini('content_filter')).toBe(
-      FinishReason.SAFETY,
-    );
+    expect(openAiFinishReasonToGemini('content_filter')).toBe(FinishReason.SAFETY);
   });
 
   it('returns undefined for missing finish reasons', () => {
@@ -815,9 +806,7 @@ describe('OpenAiChunkConverter', () => {
       usageChunk.candidates?.[0]?.content?.parts?.some((p) => !p.thought),
     ).toBeFalsy();
     const end = converter.toGeminiChunk({
-      choices: [
-        { delta: { reasoning_content: 'part two' }, finish_reason: 'stop' },
-      ],
+      choices: [{ delta: { reasoning_content: 'part two' }, finish_reason: 'stop' }],
     });
     // Exactly one consolidated thought part covers both fragments.
     expect(end.candidates![0].content!.parts).toEqual([
@@ -839,9 +828,7 @@ describe('OpenAiChunkConverter', () => {
     });
     // ...and the finish reason flushes the consolidated part without the
     // partial marker.
-    expect(r2.candidates![0].content!.parts).toEqual([
-      { text: 'deep', thought: true },
-    ]);
+    expect(r2.candidates![0].content!.parts).toEqual([{ text: 'deep', thought: true }]);
     expect(r2.candidates![0].finishReason).toBe(FinishReason.STOP);
   });
 
@@ -934,9 +921,7 @@ describe('OpenAiChunkConverter', () => {
       ],
     });
     const finalChunk = converter.toFinalGeminiChunk();
-    expect(finalChunk?.functionCalls).toEqual([
-      { id: 'c1', name: 'f', args: {} },
-    ]);
+    expect(finalChunk?.functionCalls).toEqual([{ id: 'c1', name: 'f', args: {} }]);
     expect(converter.toFinalGeminiChunk()).toBeUndefined();
   });
 

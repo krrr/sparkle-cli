@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { format } from 'node:util';
 import { type Argv } from 'yargs';
 import { handleUninstall, uninstallCommand } from './uninstall.js';
@@ -111,10 +103,7 @@ describe('extensions uninstall command', () => {
         }),
       );
       expect(mockLoadExtensions).toHaveBeenCalled();
-      expect(mockUninstallExtension).toHaveBeenCalledWith(
-        'my-extension',
-        false,
-      );
+      expect(mockUninstallExtension).toHaveBeenCalledWith('my-extension', false);
       expect(emitConsoleLog).toHaveBeenCalledWith(
         'log',
         'Extension "my-extension" successfully uninstalled.',
@@ -294,12 +283,9 @@ describe('extensions uninstall command', () => {
       });
 
       it('should configure arguments and options', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
         expect(yargsMock.positional).toHaveBeenCalledWith('names', {
-          describe:
-            'The name(s) or source path(s) of the extension(s) to uninstall.',
+          describe: 'The name(s) or source path(s) of the extension(s) to uninstall.',
           type: 'string',
           array: true,
         });
@@ -312,9 +298,7 @@ describe('extensions uninstall command', () => {
       });
 
       it('check function should throw for missing names and no --all flag', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
         const checkCallback = yargsMock.check.mock.calls[0][0];
         expect(() => checkCallback({ names: [], all: false })).toThrow(
           'Please include at least one extension name to uninstall as a positional argument, or use the --all flag.',
@@ -322,9 +306,7 @@ describe('extensions uninstall command', () => {
       });
 
       it('check function should pass if --all flag is used even without names', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
         const checkCallback = yargsMock.check.mock.calls[0][0];
         expect(() => checkCallback({ names: [], all: true })).not.toThrow();
       });
@@ -346,14 +328,9 @@ describe('extensions uninstall command', () => {
         _: [],
         $0: '',
       };
-      await (command.handler as unknown as (args: TestArgv) => Promise<void>)(
-        argv,
-      );
+      await (command.handler as unknown as (args: TestArgv) => Promise<void>)(argv);
 
-      expect(mockUninstallExtension).toHaveBeenCalledWith(
-        'my-extension',
-        false,
-      );
+      expect(mockUninstallExtension).toHaveBeenCalledWith('my-extension', false);
       mockCwd.mockRestore();
     });
   });

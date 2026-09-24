@@ -1,8 +1,7 @@
 # MCP Server Example
 
-This is a basic example of an MCP (Model Context Protocol) server used as a
-Sparkle CLI extension. It demonstrates how to expose tools and prompts to the
-Sparkle CLI.
+This is a basic example of an MCP (Model Context Protocol) server used as a Sparkle CLI
+extension. It demonstrates how to expose tools and prompts to the Sparkle CLI.
 
 ## Description
 
@@ -15,8 +14,8 @@ The contents of this directory are a valid MCP server implementation using the
 ## Structure
 
 - `example.js`: The main server entry point.
-- `sparkle-extension.json`: The configuration file that tells Sparkle CLI how to
-  use this extension.
+- `sparkle-extension.json`: The configuration file that tells Sparkle CLI how to use
+  this extension.
 - `package.json`: Helper for dependencies.
 
 ## How to Use

@@ -82,9 +82,7 @@ export function loadSettings(
     if (fs.existsSync(USER_SETTINGS_PATH)) {
       const userContent = fs.readFileSync(USER_SETTINGS_PATH, 'utf-8');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const parsedUserSettings = JSON.parse(
-        stripJsonComments(userContent),
-      ) as Settings;
+      const parsedUserSettings = JSON.parse(stripJsonComments(userContent)) as Settings;
       userSettings = resolveEnvVarsInObject(parsedUserSettings);
     }
   } catch (error: unknown) {
@@ -104,11 +102,7 @@ export function loadSettings(
     isTrusted = trustResult ?? false;
   }
 
-  const workspaceSettingsPath = path.join(
-    workspaceDir,
-    SPARKLE_DIR,
-    'settings.json',
-  );
+  const workspaceSettingsPath = path.join(workspaceDir, SPARKLE_DIR, 'settings.json');
 
   // Load workspace settings only if trusted
   if (isTrusted) {

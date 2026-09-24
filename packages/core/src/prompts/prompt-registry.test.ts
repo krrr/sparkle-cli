@@ -22,9 +22,7 @@ describe('PromptRegistry', () => {
     name: 'prompt1',
     serverName: 'server1',
     invoke: async () => ({
-      messages: [
-        { role: 'assistant', content: { type: 'text', text: 'response1' } },
-      ],
+      messages: [{ role: 'assistant', content: { type: 'text', text: 'response1' } }],
     }),
   };
 
@@ -32,9 +30,7 @@ describe('PromptRegistry', () => {
     name: 'prompt2',
     serverName: 'server1',
     invoke: async () => ({
-      messages: [
-        { role: 'assistant', content: { type: 'text', text: 'response2' } },
-      ],
+      messages: [{ role: 'assistant', content: { type: 'text', text: 'response2' } }],
     }),
   };
 
@@ -42,9 +38,7 @@ describe('PromptRegistry', () => {
     name: 'prompt1',
     serverName: 'server2',
     invoke: async () => ({
-      messages: [
-        { role: 'assistant', content: { type: 'text', text: 'response3' } },
-      ],
+      messages: [{ role: 'assistant', content: { type: 'text', text: 'response3' } }],
     }),
   };
 

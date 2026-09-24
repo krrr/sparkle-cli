@@ -222,10 +222,7 @@ describe('ScrollableList Demo Behavior', () => {
             renderItem={({ item, index }) => (
               <Box flexDirection="column" height={3}>
                 {index === 0 ? (
-                  <Box
-                    sticky
-                    stickyChildren={<Text>[STICKY] {item.title}</Text>}
-                  >
+                  <Box sticky stickyChildren={<Text>[STICKY] {item.title}</Text>}>
                     <Text>[Normal] {item.title}</Text>
                   </Box>
                 ) : (
@@ -449,8 +446,7 @@ describe('ScrollableList Demo Behavior', () => {
 
   it('regression: remove last item and add 2 items when scrolled to bottom', async () => {
     let listRef: ScrollableListRef<Item> | null = null;
-    let setItemsFunc: React.Dispatch<React.SetStateAction<Item[]>> | null =
-      null;
+    let setItemsFunc: React.Dispatch<React.SetStateAction<Item[]>> | null = null;
 
     const TestComp = () => {
       const [items, setItems] = useState<Item[]>(
@@ -552,13 +548,7 @@ describe('ScrollableList Demo Behavior', () => {
     let listRef: ScrollableListRef<Item> | null = null;
     let expandLastFunc: (() => void) | null = null;
 
-    const ItemWithState = ({
-      item,
-      isLast,
-    }: {
-      item: Item;
-      isLast: boolean;
-    }) => {
+    const ItemWithState = ({ item, isLast }: { item: Item; isLast: boolean }) => {
       const [expanded, setExpanded] = useState(false);
       useEffect(() => {
         if (isLast) {
@@ -635,8 +625,7 @@ describe('ScrollableList Demo Behavior', () => {
 
   it('regression: prepending items does not corrupt heights (total height correct)', async () => {
     let listRef: ScrollableListRef<Item> | null = null;
-    let setItemsFunc: React.Dispatch<React.SetStateAction<Item[]>> | null =
-      null;
+    let setItemsFunc: React.Dispatch<React.SetStateAction<Item[]>> | null = null;
 
     const TestComp = () => {
       // Items 1 to 5. Item 1 is very tall.

@@ -8,11 +8,7 @@ import { type CommandModule } from 'yargs';
 import { loadSettings, SettingScope } from '../../config/settings.js';
 import { requestConsentNonInteractive } from '../../config/extensions/consent.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
-import {
-  debugLogger,
-  FatalConfigError,
-  getErrorMessage,
-} from 'sparkle-cli-core';
+import { debugLogger, FatalConfigError, getErrorMessage } from 'sparkle-cli-core';
 import { promptForSetting } from '../../config/extensions/extensionSettings.js';
 import { exitCli } from '../utils.js';
 import { McpServerEnablementManager } from '../../config/mcp/mcpServerEnablement.js';
@@ -51,9 +47,7 @@ export async function handleEnable(args: EnableArgs) {
       );
 
       for (const serverName of enabledServers) {
-        debugLogger.log(
-          `MCP server '${serverName}' was disabled - now enabled.`,
-        );
+        debugLogger.log(`MCP server '${serverName}' was disabled - now enabled.`);
       }
       // Note: No restartServer() - CLI exits immediately, servers load on next session
     }
@@ -63,9 +57,7 @@ export async function handleEnable(args: EnableArgs) {
         `Extension "${args.name}" successfully enabled for scope "${args.scope}".`,
       );
     } else {
-      debugLogger.log(
-        `Extension "${args.name}" successfully enabled in all scopes.`,
-      );
+      debugLogger.log(`Extension "${args.name}" successfully enabled in all scopes.`);
     }
   } catch (error) {
     throw new FatalConfigError(getErrorMessage(error));

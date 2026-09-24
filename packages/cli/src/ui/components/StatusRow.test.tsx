@@ -229,9 +229,7 @@ describe('<StatusRow />', () => {
     // The tip shares the first line with the status; the tail starts on the
     // line directly below it.
     const lines = output.split('\n');
-    const tipLineIndex = lines.findIndex((line) =>
-      line.includes('Tip: Test Tip'),
-    );
+    const tipLineIndex = lines.findIndex((line) => line.includes('Tip: Test Tip'));
     const firstTailLineIndex = lines.findIndex((line) =>
       line.includes('analyzing the request'),
     );

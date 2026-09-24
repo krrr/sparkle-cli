@@ -61,22 +61,15 @@ export function EnumSelector({
 
   return (
     <Box flexDirection="row" alignItems="center">
-      <Text
-        color={isActive && canScrollLeft ? Colors.AccentGreen : Colors.Gray}
-      >
+      <Text color={isActive && canScrollLeft ? Colors.AccentGreen : Colors.Gray}>
         {canScrollLeft ? '←' : ' '}
       </Text>
       <Text> </Text>
-      <Text
-        color={isActive ? Colors.AccentGreen : Colors.Foreground}
-        bold={isActive}
-      >
+      <Text color={isActive ? Colors.AccentGreen : Colors.Foreground} bold={isActive}>
         {currentOption.label}
       </Text>
       <Text> </Text>
-      <Text
-        color={isActive && canScrollRight ? Colors.AccentGreen : Colors.Gray}
-      >
+      <Text color={isActive && canScrollRight ? Colors.AccentGreen : Colors.Gray}>
         {canScrollRight ? '→' : ' '}
       </Text>
     </Box>

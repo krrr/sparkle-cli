@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { InstallationManager } from './installationManager.js';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
@@ -61,9 +53,7 @@ describe('InstallationManager', () => {
     path.join(tempHomeDir, SPARKLE_DIR, 'installation_id');
 
   beforeEach(() => {
-    tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-cli-test-home-'),
-    );
+    tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-home-'));
     (pathsHomedir as Mock).mockReturnValue(tempHomeDir);
     (os.homedir as Mock).mockReturnValue(tempHomeDir);
     installationManager = new InstallationManager();
@@ -108,9 +98,7 @@ describe('InstallationManager', () => {
       readSpy.mockImplementationOnce(() => {
         throw new Error('Read error');
       });
-      const consoleWarnSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const consoleWarnSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       const id = installationManager.getInstallationId();
 

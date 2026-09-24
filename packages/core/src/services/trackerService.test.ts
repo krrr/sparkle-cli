@@ -16,9 +16,7 @@ describe('TrackerService', () => {
   let service: TrackerService;
 
   beforeEach(async () => {
-    testTrackerDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'tracker-service-test-'),
-    );
+    testTrackerDir = await fs.mkdtemp(path.join(os.tmpdir(), 'tracker-service-test-'));
     service = new TrackerService(testTrackerDir);
   });
 

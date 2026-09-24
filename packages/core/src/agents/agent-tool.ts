@@ -167,9 +167,7 @@ class DelegateInvocation extends BaseToolInvocation<
     }
 
     const useSession = this.context.config.isAgentSessionSubagentEnabled();
-    const options = this.onAgentEvent
-      ? { onAgentEvent: this.onAgentEvent }
-      : undefined;
+    const options = this.onAgentEvent ? { onAgentEvent: this.onAgentEvent } : undefined;
 
     if (this.definition.kind === 'remote') {
       if (useSession) {

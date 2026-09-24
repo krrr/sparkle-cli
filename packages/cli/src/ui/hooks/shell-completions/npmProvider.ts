@@ -31,13 +31,13 @@ export const npmProvider: ShellCompletionProvider = {
     if (cursorIndex === 1) {
       const partial = tokens[1] || '';
       return {
-        suggestions: NPM_SUBCOMMANDS.filter((cmd) =>
-          cmd.startsWith(partial),
-        ).map((cmd) => ({
-          label: cmd,
-          value: cmd,
-          description: 'npm command',
-        })),
+        suggestions: NPM_SUBCOMMANDS.filter((cmd) => cmd.startsWith(partial)).map(
+          (cmd) => ({
+            label: cmd,
+            value: cmd,
+            description: 'npm command',
+          }),
+        ),
         exclusive: true,
       };
     }

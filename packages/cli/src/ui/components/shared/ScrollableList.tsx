@@ -58,10 +58,8 @@ function ScrollableList<T>(
       scrollBy: (delta) => virtualizedListRef.current?.scrollBy(delta),
       scrollTo: (offset) => virtualizedListRef.current?.scrollTo(offset),
       scrollToEnd: () => virtualizedListRef.current?.scrollToEnd(),
-      scrollToIndex: (params) =>
-        virtualizedListRef.current?.scrollToIndex(params),
-      scrollToItem: (params) =>
-        virtualizedListRef.current?.scrollToItem(params),
+      scrollToIndex: (params) => virtualizedListRef.current?.scrollToIndex(params),
+      scrollToItem: (params) => virtualizedListRef.current?.scrollToItem(params),
       getScrollIndex: () => virtualizedListRef.current?.getScrollIndex() ?? 0,
       getScrollState: () =>
         virtualizedListRef.current?.getScrollState() ?? {
@@ -121,33 +119,20 @@ function ScrollableList<T>(
         scrollHeight: 0,
         innerHeight: 0,
       };
-      const {
-        scrollTop: rawStartScrollTop,
-        scrollHeight,
-        innerHeight,
-      } = scrollState;
+      const { scrollTop: rawStartScrollTop, scrollHeight, innerHeight } = scrollState;
 
       const maxScrollTop = Math.max(0, scrollHeight - innerHeight);
       const startScrollTop = Math.min(rawStartScrollTop, maxScrollTop);
 
       let effectiveTarget = targetScrollTop;
-      if (
-        targetScrollTop === SCROLL_TO_ITEM_END ||
-        targetScrollTop >= maxScrollTop
-      ) {
+      if (targetScrollTop === SCROLL_TO_ITEM_END || targetScrollTop >= maxScrollTop) {
         effectiveTarget = maxScrollTop;
       }
 
-      const clampedTarget = Math.max(
-        0,
-        Math.min(maxScrollTop, effectiveTarget),
-      );
+      const clampedTarget = Math.max(0, Math.min(maxScrollTop, effectiveTarget));
 
       if (duration === 0) {
-        if (
-          targetScrollTop === SCROLL_TO_ITEM_END ||
-          targetScrollTop >= maxScrollTop
-        ) {
+        if (targetScrollTop === SCROLL_TO_ITEM_END || targetScrollTop >= maxScrollTop) {
           virtualizedListRef.current?.scrollTo(Number.MAX_SAFE_INTEGER);
         } else {
           virtualizedListRef.current?.scrollTo(Math.round(clampedTarget));
@@ -173,8 +158,7 @@ function ScrollableList<T>(
 
           const current =
             smoothScrollState.current.from +
-            (smoothScrollState.current.to - smoothScrollState.current.from) *
-              ease;
+            (smoothScrollState.current.to - smoothScrollState.current.from) * ease;
 
           if (progress >= 1) {
             if (

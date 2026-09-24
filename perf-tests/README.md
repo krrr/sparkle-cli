@@ -2,12 +2,11 @@
 
 ## Overview
 
-This directory contains performance/CPU integration tests for the Sparkle CLI.
-These tests measure wall-clock time, CPU usage, and event loop responsiveness to
-detect regressions across key scenarios.
+This directory contains performance/CPU integration tests for the Sparkle CLI. These
+tests measure wall-clock time, CPU usage, and event loop responsiveness to detect
+regressions across key scenarios.
 
-CPU performance is inherently noisy, especially in CI. The harness addresses
-this with:
+CPU performance is inherently noisy, especially in CI. The harness addresses this with:
 
 - **IQR outlier filtering** — discards anomalous samples
 - **Median sampling** — takes N runs, reports the median after filtering
@@ -37,8 +36,7 @@ KEEP_OUTPUT=true npm run test:perf
 The `PerfTestHarness` class (in `packages/test-utils`) provides:
 
 - **`performance.now()`** — high-resolution wall-clock timing
-- **`process.cpuUsage()`** — user + system CPU microseconds (delta between
-  start/stop)
+- **`process.cpuUsage()`** — user + system CPU microseconds (delta between start/stop)
 - **`perf_hooks.monitorEventLoopDelay()`** — event loop delay histogram
   (p50/p95/p99/max)
 

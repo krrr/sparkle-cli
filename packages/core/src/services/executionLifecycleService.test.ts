@@ -12,9 +12,7 @@ import {
 } from './executionLifecycleService.js';
 import { InjectionService } from '../config/injectionService.js';
 
-function createResult(
-  overrides: Partial<ExecutionResult> = {},
-): ExecutionResult {
+function createResult(overrides: Partial<ExecutionResult> = {}): ExecutionResult {
   return {
     rawOutput: Buffer.from(''),
     output: '',
@@ -94,10 +92,7 @@ describe('ExecutionLifecycleService', () => {
         }
       },
     );
-    const unsubscribeExit = ExecutionLifecycleService.onExit(
-      handle.pid,
-      onExit,
-    );
+    const unsubscribeExit = ExecutionLifecycleService.onExit(handle.pid, onExit);
 
     ExecutionLifecycleService.appendOutput(handle.pid, 'Chunk 1');
     ExecutionLifecycleService.background(handle.pid);
@@ -159,16 +154,13 @@ describe('ExecutionLifecycleService', () => {
     const chunks: string[] = [];
 
     let output = 'seed';
-    const handle: ExecutionHandle = ExecutionLifecycleService.attachExecution(
-      4321,
-      {
-        executionMethod: 'child_process',
-        getBackgroundOutput: () => output,
-        getSubscriptionSnapshot: () => output,
-        writeInput,
-        isActive,
-      },
-    );
+    const handle: ExecutionHandle = ExecutionLifecycleService.attachExecution(4321, {
+      executionMethod: 'child_process',
+      getBackgroundOutput: () => output,
+      getSubscriptionSnapshot: () => output,
+      writeInput,
+      isActive,
+    });
 
     const unsubscribe = ExecutionLifecycleService.subscribe(4321, (event) => {
       if (event.type === 'data' && typeof event.chunk === 'string') {
@@ -329,11 +321,7 @@ describe('ExecutionLifecycleService', () => {
       const listener = vi.fn();
       ExecutionLifecycleService.onBackground(listener);
 
-      const handle = ExecutionLifecycleService.createExecution(
-        '',
-        undefined,
-        'none',
-      );
+      const handle = ExecutionLifecycleService.createExecution('', undefined, 'none');
       const executionId = handle.pid!;
 
       ExecutionLifecycleService.background(executionId);
@@ -432,9 +420,7 @@ describe('ExecutionLifecycleService', () => {
       expect(listener).toHaveBeenCalledTimes(1);
       const info = listener.mock.calls[0][0];
       expect(info.error?.message).toBe('something broke');
-      expect(info.injectionText).toBe(
-        '<output>\nError: something broke\n</output>',
-      );
+      expect(info.injectionText).toBe('<output>\nError: something broke\n</output>');
 
       ExecutionLifecycleService.offBackgroundComplete(listener);
     });
@@ -443,11 +429,7 @@ describe('ExecutionLifecycleService', () => {
       const listener = vi.fn();
       ExecutionLifecycleService.onBackgroundComplete(listener);
 
-      const handle = ExecutionLifecycleService.createExecution(
-        '',
-        undefined,
-        'none',
-      );
+      const handle = ExecutionLifecycleService.createExecution('', undefined, 'none');
       const executionId = handle.pid!;
 
       ExecutionLifecycleService.appendOutput(executionId, 'output');
@@ -601,9 +583,7 @@ describe('ExecutionLifecycleService', () => {
       await handle.result;
 
       expect(bgStartListener).toHaveBeenCalledTimes(1);
-      expect(bgStartListener.mock.calls[0][0].completionBehavior).toBe(
-        'inject',
-      );
+      expect(bgStartListener.mock.calls[0][0].completionBehavior).toBe('inject');
 
       ExecutionLifecycleService.offBackground(bgStartListener);
     });

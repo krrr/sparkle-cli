@@ -33,13 +33,7 @@ export type SettingsType =
   | 'object'
   | 'enum';
 
-export type SettingsValue =
-  | boolean
-  | string
-  | number
-  | string[]
-  | object
-  | undefined;
+export type SettingsValue = boolean | string | number | string[] | object | undefined;
 
 /**
  * Setting datatypes that "toggle" through a fixed list of options
@@ -205,8 +199,7 @@ const SETTINGS_SCHEMA = {
         category: 'General',
         requiresRestart: false,
         default: false,
-        description:
-          'Open VS Code-family editors in a new window when editing files.',
+        description: 'Open VS Code-family editors in a new window when editing files.',
         showInDialog: false,
       },
       vimMode: {
@@ -324,8 +317,7 @@ const SETTINGS_SCHEMA = {
             category: 'General',
             requiresRestart: true,
             default: true,
-            description:
-              'Enable Plan Mode for read-only safety during planning.',
+            description: 'Enable Plan Mode for read-only safety during planning.',
             showInDialog: true,
           },
           directory: {
@@ -520,8 +512,7 @@ const SETTINGS_SCHEMA = {
         category: 'UI',
         requiresRestart: false,
         default: 60,
-        description:
-          'Interval in seconds to poll the terminal background color.',
+        description: 'Interval in seconds to poll the terminal background color.',
         showInDialog: true,
       },
       customThemes: {
@@ -587,8 +578,7 @@ const SETTINGS_SCHEMA = {
         category: 'UI',
         requiresRestart: true,
         default: true,
-        description:
-          'Show a warning when running Sparkle CLI in the home directory.',
+        description: 'Show a warning when running Sparkle CLI in the home directory.',
         showInDialog: true,
       },
       showCompatibilityWarnings: {
@@ -672,8 +662,7 @@ const SETTINGS_SCHEMA = {
             category: 'UI',
             requiresRestart: false,
             default: undefined as string[] | undefined,
-            description:
-              'List of item IDs to display in the footer. Rendered in order',
+            description: 'List of item IDs to display in the footer. Rendered in order',
             showInDialog: false,
             items: { type: 'string' },
           },
@@ -963,9 +952,7 @@ const SETTINGS_SCHEMA = {
         label: 'Summarize Tool Output',
         category: 'Model',
         requiresRestart: false,
-        default: undefined as
-          | Record<string, { tokenBudget?: number }>
-          | undefined,
+        default: undefined as Record<string, { tokenBudget?: number }> | undefined,
         description: oneLine`
           Enables or disables summarization of tool output.
           Configure per-tool token budgets (for example {"run_shell_command": {"tokenBudget": 2000}}).
@@ -974,8 +961,7 @@ const SETTINGS_SCHEMA = {
         showInDialog: false,
         additionalProperties: {
           type: 'object',
-          description:
-            'Per-tool summarization settings with an optional tokenBudget.',
+          description: 'Per-tool summarization settings with an optional tokenBudget.',
           ref: 'SummarizeToolOutputSettings',
         },
       },
@@ -996,8 +982,7 @@ const SETTINGS_SCHEMA = {
         category: 'Model',
         requiresRestart: true,
         default: false,
-        description:
-          'Disable automatic detection and prevention of infinite loops.',
+        description: 'Disable automatic detection and prevention of infinite loops.',
         showInDialog: true,
       },
     },
@@ -1148,8 +1133,7 @@ const SETTINGS_SCHEMA = {
             category: 'Advanced',
             requiresRestart: true,
             default: 'persistent',
-            description:
-              "Session mode: 'persistent', 'isolated', or 'existing'.",
+            description: "Session mode: 'persistent', 'isolated', or 'existing'.",
             showInDialog: false,
             options: [
               { value: 'persistent', label: 'Persistent' },
@@ -1172,8 +1156,7 @@ const SETTINGS_SCHEMA = {
             category: 'Advanced',
             requiresRestart: true,
             default: undefined as string | undefined,
-            description:
-              'Path to browser profile directory for session persistence.',
+            description: 'Path to browser profile directory for session persistence.',
             showInDialog: false,
           },
           visualModel: {
@@ -1205,8 +1188,7 @@ const SETTINGS_SCHEMA = {
             category: 'Advanced',
             requiresRestart: false,
             default: true,
-            description:
-              'Disable user input on browser window during automation.',
+            description: 'Disable user input on browser window during automation.',
             showInDialog: false,
           },
           maxActionsPerTask: {
@@ -1235,8 +1217,7 @@ const SETTINGS_SCHEMA = {
             category: 'Advanced',
             requiresRestart: true,
             default: false,
-            description:
-              'Hard-block file upload requests from the browser agent.',
+            description: 'Hard-block file upload requests from the browser agent.',
             showInDialog: true,
           },
         },
@@ -1435,8 +1416,7 @@ const SETTINGS_SCHEMA = {
         category: 'Tools',
         requiresRestart: true,
         default: [] as string[],
-        description:
-          'List of additional paths that the sandbox is allowed to access.',
+        description: 'List of additional paths that the sandbox is allowed to access.',
         showInDialog: true,
         items: { type: 'string' },
       },
@@ -1810,8 +1790,7 @@ const SETTINGS_SCHEMA = {
             category: 'Security',
             requiresRestart: true,
             default: [] as string[],
-            description:
-              'Environment variables to always allow (bypass redaction).',
+            description: 'Environment variables to always allow (bypass redaction).',
             showInDialog: false,
             items: { type: 'string' },
           },
@@ -1918,8 +1897,7 @@ const SETTINGS_SCHEMA = {
         category: 'Advanced',
         requiresRestart: true,
         default: false,
-        description:
-          'Whether to ignore generic .env files in the project directory.',
+        description: 'Whether to ignore generic .env files in the project directory.',
         showInDialog: true,
       },
       bugCommand: {
@@ -2084,8 +2062,7 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: false,
-        description:
-          'Enable automated Git worktree management for parallel work.',
+        description: 'Enable automated Git worktree management for parallel work.',
         showInDialog: true,
       },
       extensionManagement: {
@@ -2121,8 +2098,7 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: 'https://geminicli.com/extensions.json',
-        description:
-          'The URI (web URL or local file path) of the extension registry.',
+        description: 'The URI (web URL or local file path) of the extension registry.',
         showInDialog: false,
       },
       extensionReloading: {
@@ -2131,8 +2107,7 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: false,
-        description:
-          'Enables extension loading/unloading within the CLI session.',
+        description: 'Enables extension loading/unloading within the CLI session.',
         showInDialog: false,
       },
       useOSC52Paste: {
@@ -2180,8 +2155,7 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: false,
-        description:
-          'Enable web fetch behavior that bypasses LLM summarization.',
+        description: 'Enable web fetch behavior that bypasses LLM summarization.',
         showInDialog: true,
       },
       stressTestProfile: {
@@ -2211,8 +2185,7 @@ const SETTINGS_SCHEMA = {
         category: 'Experimental',
         requiresRestart: true,
         default: false,
-        description:
-          'Suitable for general coding and software development tasks.',
+        description: 'Suitable for general coding and software development tasks.',
         showInDialog: true,
       },
       powerUserProfile: {
@@ -2261,8 +2234,7 @@ const SETTINGS_SCHEMA = {
         category: 'Extensions',
         requiresRestart: false,
         default: [] as string[],
-        description:
-          'List of workspaces for which the migration nudge has been shown.',
+        description: 'List of workspaces for which the migration nudge has been shown.',
         showInDialog: false,
         items: { type: 'string' },
         mergeStrategy: MergeStrategy.UNION,
@@ -2308,8 +2280,7 @@ const SETTINGS_SCHEMA = {
     category: 'Advanced',
     requiresRestart: false,
     default: {},
-    description:
-      'Hook configurations for intercepting and customizing agent behavior.',
+    description: 'Hook configurations for intercepting and customizing agent behavior.',
     showInDialog: false,
     properties: {
       enabled: {
@@ -2505,8 +2476,7 @@ const SETTINGS_SCHEMA = {
     category: 'Experimental',
     requiresRestart: true,
     default: {},
-    description:
-      'Settings for agent history and tool distillation context management.',
+    description: 'Settings for agent history and tool distillation context management.',
     showInDialog: false,
     properties: {
       historyWindow: {
@@ -2523,8 +2493,7 @@ const SETTINGS_SCHEMA = {
             category: 'Context Management',
             requiresRestart: true,
             default: 150_000,
-            description:
-              'The number of tokens to allow before triggering compression.',
+            description: 'The number of tokens to allow before triggering compression.',
             showInDialog: false,
           },
           retainedTokens: {
@@ -2669,507 +2638,496 @@ export type SettingsSchemaType = typeof SETTINGS_SCHEMA;
 
 export type SettingsJsonSchemaDefinition = Record<string, unknown>;
 
-export const SETTINGS_SCHEMA_DEFINITIONS: Record<
-  string,
-  SettingsJsonSchemaDefinition
-> = {
-  MCPServerConfig: {
-    type: 'object',
-    description:
-      'Definition of a Model Context Protocol (MCP) server configuration.',
-    additionalProperties: false,
-    properties: {
-      command: {
-        type: 'string',
-        description: 'Executable invoked for stdio transport.',
-      },
-      args: {
-        type: 'array',
-        description: 'Command-line arguments for the stdio transport command.',
-        items: { type: 'string' },
-      },
-      env: {
-        type: 'object',
-        description: 'Environment variables to set for the server process.',
-        additionalProperties: { type: 'string' },
-      },
-      cwd: {
-        type: 'string',
-        description: 'Working directory for the server process.',
-      },
-      url: {
-        type: 'string',
-        description:
-          'URL for SSE or HTTP transport. Use with "type" field to specify transport type.',
-      },
-      httpUrl: {
-        type: 'string',
-        description: 'Streaming HTTP transport URL.',
-      },
-      headers: {
-        type: 'object',
-        description: 'Additional HTTP headers sent to the server.',
-        additionalProperties: { type: 'string' },
-      },
-      tcp: {
-        type: 'string',
-        description: 'TCP address for websocket transport.',
-      },
-      type: {
-        type: 'string',
-        description:
-          'Transport type. Use "stdio" for local command, "sse" for Server-Sent Events, or "http" for Streamable HTTP.',
-        enum: ['stdio', 'sse', 'http'],
-      },
-      timeout: {
-        type: 'number',
-        description: 'Timeout in milliseconds for MCP requests.',
-      },
-      trust: {
-        type: 'boolean',
-        description:
-          'Marks the server as trusted. Trusted servers may gain additional capabilities.',
-      },
-      description: {
-        type: 'string',
-        description: 'Human-readable description of the server.',
-      },
-      includeTools: {
-        type: 'array',
-        description:
-          'Subset of tools that should be enabled for this server. When omitted all tools are enabled.',
-        items: { type: 'string' },
-      },
-      excludeTools: {
-        type: 'array',
-        description:
-          'Tools that should be disabled for this server even if exposed.',
-        items: { type: 'string' },
-      },
-      extension: {
-        type: 'object',
-        description:
-          'Metadata describing the Sparkle CLI extension that owns this MCP server.',
-        additionalProperties: { type: ['string', 'boolean', 'number'] },
-      },
-      oauth: {
-        type: 'object',
-        description: 'OAuth configuration for authenticating with the server.',
-        additionalProperties: true,
-      },
-      authProviderType: {
-        type: 'string',
-        description:
-          'Authentication provider used for acquiring credentials (for example `dynamic_discovery`).',
-        enum: Object.values(AuthProviderType),
-      },
-      targetAudience: {
-        type: 'string',
-        description:
-          'OAuth target audience (CLIENT_ID.apps.googleusercontent.com).',
-      },
-      targetServiceAccount: {
-        type: 'string',
-        description:
-          'Service account email to impersonate (name@project.iam.gserviceaccount.com).',
-      },
-    },
-  },
-  TelemetrySettings: {
-    type: 'object',
-    description: 'Telemetry configuration for Sparkle CLI.',
-    additionalProperties: false,
-    properties: {
-      enabled: {
-        type: 'boolean',
-        description: 'Enables telemetry emission.',
-      },
-      traces: {
-        type: 'boolean',
-        description:
-          'Whether detailed traces with large attributes are captured.',
-      },
-      logPrompts: {
-        type: 'boolean',
-        description: 'Whether prompts are logged in telemetry payloads.',
-      },
-      outfile: {
-        type: 'string',
-        description: 'File path for writing telemetry output.',
-      },
-    },
-  },
-  BugCommandSettings: {
-    type: 'object',
-    description: 'Configuration for the bug report helper command.',
-    additionalProperties: false,
-    properties: {
-      urlTemplate: {
-        type: 'string',
-        description:
-          'Template used to open a bug report URL. Variables in the template are populated at runtime.',
-      },
-    },
-    required: ['urlTemplate'],
-  },
-  SummarizeToolOutputSettings: {
-    type: 'object',
-    description:
-      'Controls summarization behavior for individual tools. All properties are optional.',
-    additionalProperties: false,
-    properties: {
-      tokenBudget: {
-        type: 'number',
-        description:
-          'Maximum number of tokens used when summarizing tool output.',
-      },
-    },
-  },
-  AgentOverride: {
-    type: 'object',
-    description: 'Override settings for a specific agent.',
-    additionalProperties: false,
-    properties: {
-      modelConfig: {
-        type: 'object',
-        additionalProperties: true,
-      },
-      runConfig: {
-        type: 'object',
-        description: 'Run configuration for an agent.',
-        additionalProperties: false,
-        properties: {
-          maxTimeMinutes: {
-            type: 'number',
-            description: 'The maximum execution time for the agent in minutes.',
-          },
-          maxTurns: {
-            type: 'number',
-            description: 'The maximum number of conversational turns.',
-          },
-        },
-      },
-      enabled: {
-        type: 'boolean',
-        description: 'Whether to enable the agent.',
-      },
-    },
-  },
-  CustomTheme: {
-    type: 'object',
-    description:
-      'Custom theme definition used for styling Sparkle CLI output. Colors are provided as hex strings or named ANSI colors.',
-    additionalProperties: false,
-    properties: {
-      type: {
-        type: 'string',
-        enum: ['custom'],
-        default: 'custom',
-      },
-      name: {
-        type: 'string',
-        description: 'Theme display name.',
-      },
-      text: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          primary: { type: 'string' },
-          secondary: { type: 'string' },
-          link: { type: 'string' },
-          accent: { type: 'string' },
-          response: { type: 'string' },
-        },
-      },
-      background: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          primary: { type: 'string' },
-          diff: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-              added: { type: 'string' },
-              removed: { type: 'string' },
-            },
-          },
-        },
-      },
-      border: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          default: { type: 'string' },
-          focused: { type: 'string' },
-        },
-      },
-      ui: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          comment: { type: 'string' },
-          symbol: { type: 'string' },
-          gradient: {
-            type: 'array',
-            items: { type: 'string' },
-          },
-        },
-      },
-      status: {
-        type: 'object',
-        additionalProperties: false,
-        properties: {
-          error: { type: 'string' },
-          success: { type: 'string' },
-          warning: { type: 'string' },
-        },
-      },
-      Background: { type: 'string' },
-      Foreground: { type: 'string' },
-      LightBlue: { type: 'string' },
-      AccentBlue: { type: 'string' },
-      AccentPurple: { type: 'string' },
-      AccentCyan: { type: 'string' },
-      AccentGreen: { type: 'string' },
-      AccentYellow: { type: 'string' },
-      AccentRed: { type: 'string' },
-      DiffAdded: { type: 'string' },
-      DiffRemoved: { type: 'string' },
-      Comment: { type: 'string' },
-      Gray: { type: 'string' },
-      DarkGray: { type: 'string' },
-      GradientColors: {
-        type: 'array',
-        items: { type: 'string' },
-      },
-    },
-    required: ['type', 'name'],
-  },
-  StringOrStringArray: {
-    description: 'Accepts either a single string or an array of strings.',
-    anyOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
-  },
-  BooleanOrStringOrObject: {
-    description:
-      'Accepts either a boolean flag, a string command name, or a configuration object.',
-    anyOf: [
-      { type: 'boolean' },
-      { type: 'string' },
-      {
-        type: 'object',
-        description: 'Sandbox configuration object.',
-        additionalProperties: false,
-        properties: {
-          enabled: {
-            type: 'boolean',
-            description: 'Enables or disables the sandbox.',
-          },
-          command: {
-            type: 'string',
-            description:
-              'The sandbox command to use (docker, podman, runsc, lxc).',
-            enum: ['docker', 'podman', 'runsc', 'lxc'],
-          },
-          image: {
-            type: 'string',
-            description: 'The sandbox image to use.',
-          },
-          allowedPaths: {
-            type: 'array',
-            description:
-              'A list of absolute host paths that should be accessible within the sandbox.',
-            items: { type: 'string' },
-          },
-          networkAccess: {
-            type: 'boolean',
-            description: 'Whether the sandbox should have internet access.',
-          },
-        },
-      },
-    ],
-  },
-  HookDefinitionArray: {
-    type: 'array',
-    description: 'Array of hook definition objects for a specific event.',
-    items: {
+export const SETTINGS_SCHEMA_DEFINITIONS: Record<string, SettingsJsonSchemaDefinition> =
+  {
+    MCPServerConfig: {
       type: 'object',
-      description:
-        'Hook definition specifying matcher pattern and hook configurations.',
+      description: 'Definition of a Model Context Protocol (MCP) server configuration.',
+      additionalProperties: false,
       properties: {
-        matcher: {
+        command: {
+          type: 'string',
+          description: 'Executable invoked for stdio transport.',
+        },
+        args: {
+          type: 'array',
+          description: 'Command-line arguments for the stdio transport command.',
+          items: { type: 'string' },
+        },
+        env: {
+          type: 'object',
+          description: 'Environment variables to set for the server process.',
+          additionalProperties: { type: 'string' },
+        },
+        cwd: {
+          type: 'string',
+          description: 'Working directory for the server process.',
+        },
+        url: {
           type: 'string',
           description:
-            'Pattern to match against the event context (tool name, notification type, etc.). Supports exact match, regex (/pattern/), and wildcards (*).',
+            'URL for SSE or HTTP transport. Use with "type" field to specify transport type.',
         },
-        hooks: {
+        httpUrl: {
+          type: 'string',
+          description: 'Streaming HTTP transport URL.',
+        },
+        headers: {
+          type: 'object',
+          description: 'Additional HTTP headers sent to the server.',
+          additionalProperties: { type: 'string' },
+        },
+        tcp: {
+          type: 'string',
+          description: 'TCP address for websocket transport.',
+        },
+        type: {
+          type: 'string',
+          description:
+            'Transport type. Use "stdio" for local command, "sse" for Server-Sent Events, or "http" for Streamable HTTP.',
+          enum: ['stdio', 'sse', 'http'],
+        },
+        timeout: {
+          type: 'number',
+          description: 'Timeout in milliseconds for MCP requests.',
+        },
+        trust: {
+          type: 'boolean',
+          description:
+            'Marks the server as trusted. Trusted servers may gain additional capabilities.',
+        },
+        description: {
+          type: 'string',
+          description: 'Human-readable description of the server.',
+        },
+        includeTools: {
           type: 'array',
-          description: 'Hooks to execute when the matcher matches.',
-          items: {
-            type: 'object',
-            description: 'Individual hook configuration.',
-            properties: {
-              name: {
-                type: 'string',
-                description: 'Unique identifier for the hook.',
-              },
-              type: {
-                type: 'string',
-                description:
-                  'Type of hook (currently only "command" supported).',
-              },
-              command: {
-                type: 'string',
-                description:
-                  'Shell command to execute. Receives JSON input via stdin and returns JSON output via stdout.',
-              },
-              description: {
-                type: 'string',
-                description: 'A description of the hook.',
-              },
-              timeout: {
-                type: 'number',
-                description: 'Timeout in milliseconds for hook execution.',
+          description:
+            'Subset of tools that should be enabled for this server. When omitted all tools are enabled.',
+          items: { type: 'string' },
+        },
+        excludeTools: {
+          type: 'array',
+          description: 'Tools that should be disabled for this server even if exposed.',
+          items: { type: 'string' },
+        },
+        extension: {
+          type: 'object',
+          description:
+            'Metadata describing the Sparkle CLI extension that owns this MCP server.',
+          additionalProperties: { type: ['string', 'boolean', 'number'] },
+        },
+        oauth: {
+          type: 'object',
+          description: 'OAuth configuration for authenticating with the server.',
+          additionalProperties: true,
+        },
+        authProviderType: {
+          type: 'string',
+          description:
+            'Authentication provider used for acquiring credentials (for example `dynamic_discovery`).',
+          enum: Object.values(AuthProviderType),
+        },
+        targetAudience: {
+          type: 'string',
+          description: 'OAuth target audience (CLIENT_ID.apps.googleusercontent.com).',
+        },
+        targetServiceAccount: {
+          type: 'string',
+          description:
+            'Service account email to impersonate (name@project.iam.gserviceaccount.com).',
+        },
+      },
+    },
+    TelemetrySettings: {
+      type: 'object',
+      description: 'Telemetry configuration for Sparkle CLI.',
+      additionalProperties: false,
+      properties: {
+        enabled: {
+          type: 'boolean',
+          description: 'Enables telemetry emission.',
+        },
+        traces: {
+          type: 'boolean',
+          description: 'Whether detailed traces with large attributes are captured.',
+        },
+        logPrompts: {
+          type: 'boolean',
+          description: 'Whether prompts are logged in telemetry payloads.',
+        },
+        outfile: {
+          type: 'string',
+          description: 'File path for writing telemetry output.',
+        },
+      },
+    },
+    BugCommandSettings: {
+      type: 'object',
+      description: 'Configuration for the bug report helper command.',
+      additionalProperties: false,
+      properties: {
+        urlTemplate: {
+          type: 'string',
+          description:
+            'Template used to open a bug report URL. Variables in the template are populated at runtime.',
+        },
+      },
+      required: ['urlTemplate'],
+    },
+    SummarizeToolOutputSettings: {
+      type: 'object',
+      description:
+        'Controls summarization behavior for individual tools. All properties are optional.',
+      additionalProperties: false,
+      properties: {
+        tokenBudget: {
+          type: 'number',
+          description: 'Maximum number of tokens used when summarizing tool output.',
+        },
+      },
+    },
+    AgentOverride: {
+      type: 'object',
+      description: 'Override settings for a specific agent.',
+      additionalProperties: false,
+      properties: {
+        modelConfig: {
+          type: 'object',
+          additionalProperties: true,
+        },
+        runConfig: {
+          type: 'object',
+          description: 'Run configuration for an agent.',
+          additionalProperties: false,
+          properties: {
+            maxTimeMinutes: {
+              type: 'number',
+              description: 'The maximum execution time for the agent in minutes.',
+            },
+            maxTurns: {
+              type: 'number',
+              description: 'The maximum number of conversational turns.',
+            },
+          },
+        },
+        enabled: {
+          type: 'boolean',
+          description: 'Whether to enable the agent.',
+        },
+      },
+    },
+    CustomTheme: {
+      type: 'object',
+      description:
+        'Custom theme definition used for styling Sparkle CLI output. Colors are provided as hex strings or named ANSI colors.',
+      additionalProperties: false,
+      properties: {
+        type: {
+          type: 'string',
+          enum: ['custom'],
+          default: 'custom',
+        },
+        name: {
+          type: 'string',
+          description: 'Theme display name.',
+        },
+        text: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            primary: { type: 'string' },
+            secondary: { type: 'string' },
+            link: { type: 'string' },
+            accent: { type: 'string' },
+            response: { type: 'string' },
+          },
+        },
+        background: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            primary: { type: 'string' },
+            diff: {
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                added: { type: 'string' },
+                removed: { type: 'string' },
               },
             },
           },
         },
-      },
-    },
-  },
-  ModelDefinition: {
-    type: 'object',
-    description: 'Model metadata registry entry.',
-    properties: {
-      displayName: { type: 'string' },
-      tier: { enum: ['pro', 'flash', 'flash-lite', 'custom', 'auto'] },
-      isVisible: { type: 'boolean' },
-      dialogDescription: {
-        type: 'string',
-        description:
-          "A description of the model to display in the model selection dialog. For the 'auto' alias, this value is dynamically generated and any value provided here will be ignored.",
-      },
-      features: {
-        type: 'object',
-        properties: {
-          thinking: { type: 'boolean' },
-          multimodalToolUse: { type: 'boolean' },
+        border: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            default: { type: 'string' },
+            focused: { type: 'string' },
+          },
+        },
+        ui: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            comment: { type: 'string' },
+            symbol: { type: 'string' },
+            gradient: {
+              type: 'array',
+              items: { type: 'string' },
+            },
+          },
+        },
+        status: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            error: { type: 'string' },
+            success: { type: 'string' },
+            warning: { type: 'string' },
+          },
+        },
+        Background: { type: 'string' },
+        Foreground: { type: 'string' },
+        LightBlue: { type: 'string' },
+        AccentBlue: { type: 'string' },
+        AccentPurple: { type: 'string' },
+        AccentCyan: { type: 'string' },
+        AccentGreen: { type: 'string' },
+        AccentYellow: { type: 'string' },
+        AccentRed: { type: 'string' },
+        DiffAdded: { type: 'string' },
+        DiffRemoved: { type: 'string' },
+        Comment: { type: 'string' },
+        Gray: { type: 'string' },
+        DarkGray: { type: 'string' },
+        GradientColors: {
+          type: 'array',
+          items: { type: 'string' },
         },
       },
+      required: ['type', 'name'],
     },
-  },
-  ModelResolution: {
-    type: 'object',
-    description: 'Model resolution rule.',
-    properties: {
-      default: { type: 'string' },
-      contexts: {
-        type: 'array',
-        items: {
+    StringOrStringArray: {
+      description: 'Accepts either a single string or an array of strings.',
+      anyOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
+    },
+    BooleanOrStringOrObject: {
+      description:
+        'Accepts either a boolean flag, a string command name, or a configuration object.',
+      anyOf: [
+        { type: 'boolean' },
+        { type: 'string' },
+        {
           type: 'object',
+          description: 'Sandbox configuration object.',
+          additionalProperties: false,
           properties: {
-            condition: {
+            enabled: {
+              type: 'boolean',
+              description: 'Enables or disables the sandbox.',
+            },
+            command: {
+              type: 'string',
+              description: 'The sandbox command to use (docker, podman, runsc, lxc).',
+              enum: ['docker', 'podman', 'runsc', 'lxc'],
+            },
+            image: {
+              type: 'string',
+              description: 'The sandbox image to use.',
+            },
+            allowedPaths: {
+              type: 'array',
+              description:
+                'A list of absolute host paths that should be accessible within the sandbox.',
+              items: { type: 'string' },
+            },
+            networkAccess: {
+              type: 'boolean',
+              description: 'Whether the sandbox should have internet access.',
+            },
+          },
+        },
+      ],
+    },
+    HookDefinitionArray: {
+      type: 'array',
+      description: 'Array of hook definition objects for a specific event.',
+      items: {
+        type: 'object',
+        description:
+          'Hook definition specifying matcher pattern and hook configurations.',
+        properties: {
+          matcher: {
+            type: 'string',
+            description:
+              'Pattern to match against the event context (tool name, notification type, etc.). Supports exact match, regex (/pattern/), and wildcards (*).',
+          },
+          hooks: {
+            type: 'array',
+            description: 'Hooks to execute when the matcher matches.',
+            items: {
               type: 'object',
+              description: 'Individual hook configuration.',
               properties: {
-                requestedModels: {
-                  type: 'array',
-                  items: { type: 'string' },
+                name: {
+                  type: 'string',
+                  description: 'Unique identifier for the hook.',
+                },
+                type: {
+                  type: 'string',
+                  description: 'Type of hook (currently only "command" supported).',
+                },
+                command: {
+                  type: 'string',
+                  description:
+                    'Shell command to execute. Receives JSON input via stdin and returns JSON output via stdout.',
+                },
+                description: {
+                  type: 'string',
+                  description: 'A description of the hook.',
+                },
+                timeout: {
+                  type: 'number',
+                  description: 'Timeout in milliseconds for hook execution.',
                 },
               },
             },
-            target: { type: 'string' },
           },
         },
       },
     },
-  },
-  ModelPolicyChain: {
-    type: 'array',
-    description: 'A chain of model policies for fallback behavior.',
-    items: {
+    ModelDefinition: {
       type: 'object',
-      ref: 'ModelPolicy',
-    },
-  },
-  ModelPolicy: {
-    type: 'object',
-    description:
-      'Defines the policy for a single model in the availability chain.',
-    properties: {
-      model: { type: 'string' },
-      isLastResort: { type: 'boolean' },
-      actions: {
-        type: 'object',
-        properties: {
-          terminal: { type: 'string', enum: ['silent', 'prompt'] },
-          transient: { type: 'string', enum: ['silent', 'prompt'] },
-          not_found: { type: 'string', enum: ['silent', 'prompt'] },
-          unknown: { type: 'string', enum: ['silent', 'prompt'] },
+      description: 'Model metadata registry entry.',
+      properties: {
+        displayName: { type: 'string' },
+        tier: { enum: ['pro', 'flash', 'flash-lite', 'custom', 'auto'] },
+        isVisible: { type: 'boolean' },
+        dialogDescription: {
+          type: 'string',
+          description:
+            "A description of the model to display in the model selection dialog. For the 'auto' alias, this value is dynamically generated and any value provided here will be ignored.",
         },
-      },
-      stateTransitions: {
-        type: 'object',
-        properties: {
-          terminal: { type: 'string', enum: ['terminal', 'sticky_retry'] },
-          transient: { type: 'string', enum: ['terminal', 'sticky_retry'] },
-          not_found: { type: 'string', enum: ['terminal', 'sticky_retry'] },
-          unknown: { type: 'string', enum: ['terminal', 'sticky_retry'] },
-        },
-      },
-    },
-    required: ['model'],
-  },
-  ProviderModel: {
-    type: 'object',
-    description: 'A model configuration for a provider.',
-    properties: {
-      id: { type: 'string' },
-      displayName: { type: 'string' },
-      tier: {
-        type: 'string',
-        enum: ['pro', 'flash', 'flash-lite'],
-      },
-      contextWindow: { type: 'number' },
-      generateConfig: {
-        type: 'object',
-        description:
-          'Sampling parameters applied to every request using this model.',
-        properties: {
-          temperature: { type: 'number' },
-          topP: { type: 'number' },
-          reasoningEffort: {
-            type: 'string',
-            description:
-              'Thinking effort level. "none" disables thinking; unset uses the provider default.',
-            enum: ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+        features: {
+          type: 'object',
+          properties: {
+            thinking: { type: 'boolean' },
+            multimodalToolUse: { type: 'boolean' },
           },
         },
       },
     },
-    required: ['id'],
-  },
-  ProviderProfile: {
-    type: 'object',
-    description: 'A profile representing an LLM provider configuration.',
-    properties: {
-      id: { type: 'string' },
-      providerType: { type: 'string' },
-      baseUrl: { type: 'string' },
-      customHeaders: {
-        type: 'object',
-      },
-      models: {
-        type: 'array',
-        items: {
-          type: 'object',
-          ref: 'ProviderModel',
+    ModelResolution: {
+      type: 'object',
+      description: 'Model resolution rule.',
+      properties: {
+        default: { type: 'string' },
+        contexts: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              condition: {
+                type: 'object',
+                properties: {
+                  requestedModels: {
+                    type: 'array',
+                    items: { type: 'string' },
+                  },
+                },
+              },
+              target: { type: 'string' },
+            },
+          },
         },
       },
-      defaultModel: { type: 'string' },
     },
-    required: ['id', 'providerType'],
-  },
-};
+    ModelPolicyChain: {
+      type: 'array',
+      description: 'A chain of model policies for fallback behavior.',
+      items: {
+        type: 'object',
+        ref: 'ModelPolicy',
+      },
+    },
+    ModelPolicy: {
+      type: 'object',
+      description: 'Defines the policy for a single model in the availability chain.',
+      properties: {
+        model: { type: 'string' },
+        isLastResort: { type: 'boolean' },
+        actions: {
+          type: 'object',
+          properties: {
+            terminal: { type: 'string', enum: ['silent', 'prompt'] },
+            transient: { type: 'string', enum: ['silent', 'prompt'] },
+            not_found: { type: 'string', enum: ['silent', 'prompt'] },
+            unknown: { type: 'string', enum: ['silent', 'prompt'] },
+          },
+        },
+        stateTransitions: {
+          type: 'object',
+          properties: {
+            terminal: { type: 'string', enum: ['terminal', 'sticky_retry'] },
+            transient: { type: 'string', enum: ['terminal', 'sticky_retry'] },
+            not_found: { type: 'string', enum: ['terminal', 'sticky_retry'] },
+            unknown: { type: 'string', enum: ['terminal', 'sticky_retry'] },
+          },
+        },
+      },
+      required: ['model'],
+    },
+    ProviderModel: {
+      type: 'object',
+      description: 'A model configuration for a provider.',
+      properties: {
+        id: { type: 'string' },
+        displayName: { type: 'string' },
+        tier: {
+          type: 'string',
+          enum: ['pro', 'flash', 'flash-lite'],
+        },
+        contextWindow: { type: 'number' },
+        generateConfig: {
+          type: 'object',
+          description: 'Sampling parameters applied to every request using this model.',
+          properties: {
+            temperature: { type: 'number' },
+            topP: { type: 'number' },
+            reasoningEffort: {
+              type: 'string',
+              description:
+                'Thinking effort level. "none" disables thinking; unset uses the provider default.',
+              enum: ['none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'],
+            },
+          },
+        },
+      },
+      required: ['id'],
+    },
+    ProviderProfile: {
+      type: 'object',
+      description: 'A profile representing an LLM provider configuration.',
+      properties: {
+        id: { type: 'string' },
+        providerType: { type: 'string' },
+        baseUrl: { type: 'string' },
+        customHeaders: {
+          type: 'object',
+        },
+        models: {
+          type: 'array',
+          items: {
+            type: 'object',
+            ref: 'ProviderModel',
+          },
+        },
+        defaultModel: { type: 'string' },
+      },
+      required: ['id', 'providerType'],
+    },
+  };
 
 export function getSettingsSchema(): SettingsSchemaType {
   return SETTINGS_SCHEMA;

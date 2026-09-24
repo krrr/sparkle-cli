@@ -29,9 +29,7 @@ vi.mock('./settings.js', async (importActual) => {
 
 // Mock trustedFolders
 vi.mock('./trustedFolders.js', () => ({
-  isWorkspaceTrusted: vi
-    .fn()
-    .mockReturnValue({ isTrusted: true, source: 'file' }),
+  isWorkspaceTrusted: vi.fn().mockReturnValue({ isTrusted: true, source: 'file' }),
 }));
 
 import {
@@ -121,8 +119,7 @@ describe('Settings Repro', () => {
     const normalizePath = (p: string | fs.PathLike) =>
       p.toString().replace(/\\/g, '/').toLowerCase();
     (mockFsExistsSync as Mock).mockImplementation(
-      (p: fs.PathLike) =>
-        normalizePath(p) === normalizePath(USER_SETTINGS_PATH),
+      (p: fs.PathLike) => normalizePath(p) === normalizePath(USER_SETTINGS_PATH),
     );
     const problemSettingsContent = {
       accessibility: {
@@ -190,13 +187,11 @@ describe('Settings Repro', () => {
       },
     };
 
-    (fs.readFileSync as Mock).mockImplementation(
-      (p: fs.PathOrFileDescriptor) => {
-        if (normalizePath(p as string) === normalizePath(USER_SETTINGS_PATH))
-          return JSON.stringify(problemSettingsContent);
-        return '{}';
-      },
-    );
+    (fs.readFileSync as Mock).mockImplementation((p: fs.PathOrFileDescriptor) => {
+      if (normalizePath(p as string) === normalizePath(USER_SETTINGS_PATH))
+        return JSON.stringify(problemSettingsContent);
+      return '{}';
+    });
 
     const settings = loadSettings(MOCK_WORKSPACE_DIR);
 
@@ -205,9 +200,7 @@ describe('Settings Repro', () => {
     // And model.name should probably be undefined or default, but certainly NOT { compressionThreshold: 0.8 }
     expect(settings.merged.model?.compressionThreshold).toBe(0.8);
     expect(
-      typeof (settings.merged.model as Record<string, unknown> | undefined)?.[
-        'name'
-      ],
+      typeof (settings.merged.model as Record<string, unknown> | undefined)?.['name'],
     ).not.toBe('object');
   });
 });

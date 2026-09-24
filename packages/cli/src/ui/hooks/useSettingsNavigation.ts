@@ -40,10 +40,7 @@ function calculateSlidingWindow(
   return Math.max(0, bounded);
 }
 
-function createNavReducer(
-  items: Array<{ key: string }>,
-  maxItemsToShow: number,
-) {
+function createNavReducer(items: Array<{ key: string }>, maxItemsToShow: number) {
   return function navReducer(state: NavState, action: NavAction): NavState {
     if (items.length === 0) return state;
 

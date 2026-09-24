@@ -16,8 +16,7 @@ import { StatsDisplay } from './StatsDisplay.js';
 
 // Mock the theme module
 vi.mock('../semantic-colors.js', async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import('../semantic-colors.js')>();
+  const original = await importOriginal<typeof import('../semantic-colors.js')>();
   return {
     ...original,
     theme: {

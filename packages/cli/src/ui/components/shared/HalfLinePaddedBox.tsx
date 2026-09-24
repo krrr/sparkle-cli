@@ -53,15 +53,10 @@ const HalfLinePaddedBoxInternal: React.FC<HalfLinePaddedBoxProps> = ({
   const terminalBg = theme.background.primary || 'black';
 
   const backgroundColor = useMemo(() => {
-    const resolvedBase =
-      resolveColor(backgroundBaseColor) || backgroundBaseColor;
+    const resolvedBase = resolveColor(backgroundBaseColor) || backgroundBaseColor;
     const resolvedTerminalBg = resolveColor(terminalBg) || terminalBg;
 
-    return interpolateColor(
-      resolvedTerminalBg,
-      resolvedBase,
-      backgroundOpacity,
-    );
+    return interpolateColor(resolvedTerminalBg, resolvedBase, backgroundOpacity);
   }, [backgroundBaseColor, backgroundOpacity, terminalBg]);
 
   if (!backgroundColor) {

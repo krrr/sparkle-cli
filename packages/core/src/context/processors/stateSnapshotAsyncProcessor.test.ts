@@ -26,20 +26,8 @@ describe('StateSnapshotAsyncProcessor', () => {
       { type: 'point-in-time' },
     );
 
-    const nodeA = createDummyNode(
-      'ep1',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-A',
-    );
-    const nodeB = createDummyNode(
-      'ep1',
-      NodeType.AGENT_THOUGHT,
-      60,
-      {},
-      'node-B',
-    );
+    const nodeA = createDummyNode('ep1', NodeType.USER_PROMPT, 50, {}, 'node-A');
+    const nodeB = createDummyNode('ep1', NodeType.AGENT_THOUGHT, 60, {}, 'node-B');
 
     const targets = [nodeA, nodeB];
     await worker.process(createMockProcessArgs(targets, targets, []));
@@ -70,13 +58,7 @@ describe('StateSnapshotAsyncProcessor', () => {
       { type: 'accumulate' },
     );
 
-    const nodeC = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-C',
-    );
+    const nodeC = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-C');
     const targets = [nodeC];
 
     const inboxMessages: InboxMessage[] = [
@@ -97,9 +79,9 @@ describe('StateSnapshotAsyncProcessor', () => {
     await worker.process(args);
 
     // The old draft should be consumed
-    expect(
-      (args.inbox as InboxSnapshotImpl).getConsumedIds().has('draft-1'),
-    ).toBe(true);
+    expect((args.inbox as InboxSnapshotImpl).getConsumedIds().has('draft-1')).toBe(
+      true,
+    );
     expect(drainSpy).toHaveBeenCalledWith(expect.any(Set));
 
     // The new publish should contain ALL consumed IDs (old + new)
@@ -163,13 +145,7 @@ describe('StateSnapshotAsyncProcessor', () => {
       { payload: { text: oldStateJson } },
       'old-snap',
     );
-    const nodeC = createDummyNode(
-      'ep2',
-      NodeType.USER_PROMPT,
-      50,
-      {},
-      'node-C',
-    );
+    const nodeC = createDummyNode('ep2', NodeType.USER_PROMPT, 50, {}, 'node-C');
 
     const targets = [oldSnapshot, nodeC];
     const args = createMockProcessArgs(targets, targets, []); // Empty inbox!

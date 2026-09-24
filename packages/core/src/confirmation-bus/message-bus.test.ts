@@ -59,10 +59,7 @@ describe('MessageBus', () => {
       });
 
       const responseHandler = vi.fn();
-      messageBus.subscribe(
-        MessageBusType.TOOL_CONFIRMATION_RESPONSE,
-        responseHandler,
-      );
+      messageBus.subscribe(MessageBusType.TOOL_CONFIRMATION_RESPONSE, responseHandler);
 
       const request: ToolConfirmationRequest = {
         type: MessageBusType.TOOL_CONFIRMATION_REQUEST,
@@ -87,14 +84,8 @@ describe('MessageBus', () => {
 
       const responseHandler = vi.fn();
       const rejectionHandler = vi.fn();
-      messageBus.subscribe(
-        MessageBusType.TOOL_CONFIRMATION_RESPONSE,
-        responseHandler,
-      );
-      messageBus.subscribe(
-        MessageBusType.TOOL_POLICY_REJECTION,
-        rejectionHandler,
-      );
+      messageBus.subscribe(MessageBusType.TOOL_CONFIRMATION_RESPONSE, responseHandler);
+      messageBus.subscribe(MessageBusType.TOOL_POLICY_REJECTION, rejectionHandler);
 
       const request: ToolConfirmationRequest = {
         type: MessageBusType.TOOL_CONFIRMATION_REQUEST,
@@ -124,10 +115,7 @@ describe('MessageBus', () => {
       });
 
       const requestHandler = vi.fn();
-      messageBus.subscribe(
-        MessageBusType.TOOL_CONFIRMATION_REQUEST,
-        requestHandler,
-      );
+      messageBus.subscribe(MessageBusType.TOOL_CONFIRMATION_REQUEST, requestHandler);
 
       const request: ToolConfirmationRequest = {
         type: MessageBusType.TOOL_CONFIRMATION_REQUEST,
@@ -166,10 +154,7 @@ describe('MessageBus', () => {
 
     it('should emit other message types directly', async () => {
       const successHandler = vi.fn();
-      messageBus.subscribe(
-        MessageBusType.TOOL_EXECUTION_SUCCESS,
-        successHandler,
-      );
+      messageBus.subscribe(MessageBusType.TOOL_EXECUTION_SUCCESS, successHandler);
 
       const message: ToolExecutionSuccess<string> = {
         type: MessageBusType.TOOL_EXECUTION_SUCCESS as const,

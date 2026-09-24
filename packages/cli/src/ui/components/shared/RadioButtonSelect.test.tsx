@@ -31,9 +31,9 @@ vi.mock('../../semantic-colors.js', () => ({
   },
 }));
 
-const MockedBaseSelectionList = vi.mocked(
-  BaseSelectionList,
-) as unknown as ReturnType<typeof vi.fn>;
+const MockedBaseSelectionList = vi.mocked(BaseSelectionList) as unknown as ReturnType<
+  typeof vi.fn
+>;
 
 type RadioRenderItemFn = (
   item: RadioSelectItem<string>,
@@ -150,9 +150,7 @@ describe('RadioButtonSelect', () => {
       expect(result.type).toBe(Box);
       const props = result.props as { children: React.ReactNode };
       const textComponent = (props.children as React.ReactElement[])[0];
-      const textProps = textComponent?.props as React.ComponentProps<
-        typeof Text
-      >;
+      const textProps = textComponent?.props as React.ComponentProps<typeof Text>;
 
       expect(textProps?.color).toBe(mockContext.titleColor);
       expect(textProps?.children).toBe('Option 1');
@@ -205,9 +203,7 @@ describe('RadioButtonSelect', () => {
       expect(result.type).toBe(Box);
       const props = result.props as { children: React.ReactNode };
       const textComponent = (props.children as React.ReactElement[])[0];
-      const textProps = textComponent?.props as React.ComponentProps<
-        typeof Text
-      >;
+      const textProps = textComponent?.props as React.ComponentProps<typeof Text>;
       expect(textProps?.children).toBe('Incomplete Theme');
     });
   });

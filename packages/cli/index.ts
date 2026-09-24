@@ -39,11 +39,9 @@ if (typeof mod.enableCompileCache === 'function') {
 process.on('uncaughtException', (error) => {
   if (error instanceof Error) {
     const message = error.message || '';
-    const isPtyResizeError =
-      message === 'Cannot resize a pty that has already exited';
+    const isPtyResizeError = message === 'Cannot resize a pty that has already exited';
     const isEbadfError =
-      message.includes('EBADF') ||
-      (error as { code?: string }).code === 'EBADF';
+      message.includes('EBADF') || (error as { code?: string }).code === 'EBADF';
     const isFromNodePty =
       error.stack?.includes('node-pty') || error.stack?.includes('PtyResize');
 
@@ -70,8 +68,7 @@ async function getMemoryNodeArgs(): Promise<string[]> {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     // Respect SPARKLE_CLI_HOME environment variable, falling back to os.homedir()
-    const baseDir =
-      process.env['SPARKLE_CLI_HOME'] || join(os.homedir(), '.sparkle');
+    const baseDir = process.env['SPARKLE_CLI_HOME'] || join(os.homedir(), '.sparkle');
     const settingsPath = join(baseDir, 'settings.json');
     const rawSettings = readFileSync(settingsPath, 'utf8');
     const settings = JSON.parse(rawSettings);

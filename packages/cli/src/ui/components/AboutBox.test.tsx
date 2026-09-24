@@ -46,9 +46,7 @@ describe('AboutBox', () => {
 
   it('renders IDE Client optional prop', async () => {
     const props = { ...defaultProps, ideClient: 'vscode' };
-    const { lastFrame, unmount } = await renderWithProviders(
-      <AboutBox {...props} />,
-    );
+    const { lastFrame, unmount } = await renderWithProviders(<AboutBox {...props} />);
     const output = lastFrame();
     expect(output).toContain('IDE Client');
     expect(output).toContain('vscode');
@@ -57,9 +55,7 @@ describe('AboutBox', () => {
 
   it('renders Auth Method correctly when not oauth', async () => {
     const props = { ...defaultProps, selectedAuthType: 'api-key' };
-    const { lastFrame, unmount } = await renderWithProviders(
-      <AboutBox {...props} />,
-    );
+    const { lastFrame, unmount } = await renderWithProviders(<AboutBox {...props} />);
     const output = lastFrame();
     expect(output).toContain('api-key');
     unmount();

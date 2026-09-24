@@ -153,10 +153,7 @@ export async function canLoadServer(
   }
 
   // 4. File-based enablement check
-  if (
-    config.enablement &&
-    !(await config.enablement.isFileEnabled(normalizedId))
-  ) {
+  if (config.enablement && !(await config.enablement.isFileEnabled(normalizedId))) {
     return {
       allowed: false,
       reason: `Server '${serverId}' is disabled. Run 'sparkle mcp enable ${serverId}' to enable.`,
@@ -296,8 +293,7 @@ export class McpServerEnablementManager {
   ): Promise<Record<string, McpServerDisplayState>> {
     const result: Record<string, McpServerDisplayState> = {};
     for (const serverId of serverIds) {
-      result[normalizeServerId(serverId)] =
-        await this.getDisplayState(serverId);
+      result[normalizeServerId(serverId)] = await this.getDisplayState(serverId);
     }
     return result;
   }
@@ -350,11 +346,7 @@ export class McpServerEnablementManager {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       return JSON.parse(content) as McpServerEnablementConfig;
     } catch (error) {
-      if (
-        error instanceof Error &&
-        'code' in error &&
-        error.code === 'ENOENT'
-      ) {
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
         return {};
       }
       coreEvents.emitFeedback(

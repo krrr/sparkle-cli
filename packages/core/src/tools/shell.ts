@@ -73,10 +73,7 @@ function trimLiveOutputBuffer(output: string): string {
 
   let startIndex = output.length - LIVE_OUTPUT_MAX_BUFFER_CHARS;
   const firstCodeUnit = output.charCodeAt(startIndex);
-  if (
-    firstCodeUnit >= LOW_SURROGATE_START &&
-    firstCodeUnit <= LOW_SURROGATE_END
-  ) {
+  if (firstCodeUnit >= LOW_SURROGATE_START && firstCodeUnit <= LOW_SURROGATE_END) {
     startIndex += 1;
   }
   return output.slice(startIndex);
@@ -158,8 +155,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
   getDescription(): string {
     const descStr = this.params.description?.trim();
     const commandStr = this.params.command;
-    return Array.from(commandStr).length <= SHOW_NL_DESCRIPTION_THRESHOLD ||
-      !descStr
+    return Array.from(commandStr).length <= SHOW_NL_DESCRIPTION_THRESHOLD || !descStr
       ? commandStr
       : descStr;
   }
@@ -228,9 +224,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
     }
 
     // 3. Final redundancy check after consolidation
-    const finalSorted = Array.from(finalPaths).sort(
-      (a, b) => a.length - b.length,
-    );
+    const finalSorted = Array.from(finalPaths).sort((a, b) => a.length - b.length);
     const result: string[] = [];
     for (const p of finalSorted) {
       if (!result.some((s) => isSubpath(s, p))) {
@@ -293,9 +287,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
           const modeConfig =
             this.context.config.sandboxPolicyManager.getModeConfig(mode);
           const approved =
-            this.context.config.sandboxPolicyManager.getCommandPermissions(
-              rootCommand,
-            );
+            this.context.config.sandboxPolicyManager.getCommandPermissions(rootCommand);
 
           const hasNetwork = modeConfig.network || approved.network;
           const missingNetwork = !!proactive.network && !hasNetwork;
@@ -310,8 +302,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
             const isReadonlyMode = modeConfig.readonly ?? false;
 
             if (isReadonlyMode) {
-              const cwd =
-                this.params.dir_path || this.context.config.getTargetDir();
+              const cwd = this.params.dir_path || this.context.config.getTargetDir();
               proactive.fileSystem = proactive.fileSystem || {
                 read: [],
                 write: [],
@@ -331,9 +322,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
               approvedPaths?: string[],
             ): boolean => {
               if (!approvedPaths || approvedPaths.length === 0) return false;
-              const requestedRealIdentity = toPathKey(
-                resolveToRealPath(requestedPath),
-              );
+              const requestedRealIdentity = toPathKey(resolveToRealPath(requestedPath));
 
               // Identity check is fast, subpath check is slower
               return approvedPaths.some((p) => {
@@ -353,20 +342,13 @@ export class ShellToolInvocation extends BaseToolInvocation<
             );
 
             const needsExpansion =
-              missingRead.length > 0 ||
-              missingWrite.length > 0 ||
-              missingNetwork;
+              missingRead.length > 0 || missingWrite.length > 0 || missingNetwork;
 
             if (needsExpansion) {
-              const details = await this.getConfirmationDetails(
-                abortSignal,
-                proactive,
-              );
+              const details = await this.getConfirmationDetails(abortSignal, proactive);
               if (details && details.type === 'sandbox_expansion') {
                 const originalOnConfirm = details.onConfirm;
-                details.onConfirm = async (
-                  outcome: ToolConfirmationOutcome,
-                ) => {
+                details.onConfirm = async (outcome: ToolConfirmationOutcome) => {
                   await originalOnConfirm(outcome);
                   if (outcome !== ToolConfirmationOutcome.Cancel) {
                     this.proactivePermissionsConfirmed = proactive;
@@ -400,9 +382,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
         rootCommandDisplay += ', redirection';
       }
     } else {
-      rootCommandDisplay = parsed.details
-        .map((detail) => detail.name)
-        .join(', ');
+      rootCommandDisplay = parsed.details.map((detail) => detail.name).join(', ');
     }
 
     const rootCommands = [...new Set(getCommandRoots(command))];
@@ -471,8 +451,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
           '($(), backticks, <() or >()) found in command arguments. ' +
           'On PowerShell, @() array subexpressions and $() subexpressions are also blocked. ' +
           'This is a security risk and the command was blocked.',
-        returnDisplay:
-          'Blocked: command substitution detected in shell command.',
+        returnDisplay: 'Blocked: command substitution detected in shell command.',
       };
     }
 
@@ -560,11 +539,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
       };
 
       const scheduleTrailingFlush = () => {
-        if (
-          trailingFlushTimer !== null ||
-          !updateOutput ||
-          this.params.is_background
-        ) {
+        if (trailingFlushTimer !== null || !updateOutput || this.params.is_background) {
           return;
         }
         const elapsedSinceLastUpdate = Date.now() - lastUpdateTime;
@@ -596,96 +571,90 @@ export class ShellToolInvocation extends BaseToolInvocation<
       // Start timeout
       resetTimeout();
 
-      const { result: resultPromise, pid } =
-        await ShellExecutionService.execute(
-          commandToExecute,
-          cwd,
-          (event: ShellOutputEvent) => {
-            resetTimeout(); // Reset timeout on any event
+      const { result: resultPromise, pid } = await ShellExecutionService.execute(
+        commandToExecute,
+        cwd,
+        (event: ShellOutputEvent) => {
+          resetTimeout(); // Reset timeout on any event
 
-            let shouldUpdate = false;
+          let shouldUpdate = false;
 
-            switch (event.type) {
-              case 'data':
-                if (isBinaryStream) break;
-                if (typeof event.chunk === 'string') {
-                  appendToLiveOutputBuffer(event.chunk);
-                  shouldUpdate =
-                    !hasFlushedOutput ||
-                    Date.now() - lastUpdateTime > OUTPUT_UPDATE_INTERVAL_MS;
-                  if (!shouldUpdate) {
-                    scheduleTrailingFlush();
-                  }
-                } else {
-                  cumulativeOutput = event.chunk;
-                  shouldUpdate = true;
+          switch (event.type) {
+            case 'data':
+              if (isBinaryStream) break;
+              if (typeof event.chunk === 'string') {
+                appendToLiveOutputBuffer(event.chunk);
+                shouldUpdate =
+                  !hasFlushedOutput ||
+                  Date.now() - lastUpdateTime > OUTPUT_UPDATE_INTERVAL_MS;
+                if (!shouldUpdate) {
+                  scheduleTrailingFlush();
                 }
-                hasPendingOutput = true;
-                break;
-              case 'binary_detected':
-                isBinaryStream = true;
-                cumulativeOutput =
-                  '[Binary output detected. Halting stream...]';
-                hasPendingOutput = true;
+              } else {
+                cumulativeOutput = event.chunk;
                 shouldUpdate = true;
-                break;
-              case 'binary_progress':
-                isBinaryStream = true;
-                cumulativeOutput = `[Receiving binary output... ${formatBytes(
-                  event.bytesReceived,
-                )} received]`;
-                hasPendingOutput = true;
-                if (Date.now() - lastUpdateTime > OUTPUT_UPDATE_INTERVAL_MS) {
-                  shouldUpdate = true;
-                }
-                break;
-              case 'exit':
-                flushOutput();
-                break;
-              default: {
-                throw new Error('An unhandled ShellOutputEvent was found.');
               }
-            }
-
-            if (shouldUpdate && !this.params.is_background) {
+              hasPendingOutput = true;
+              break;
+            case 'binary_detected':
+              isBinaryStream = true;
+              cumulativeOutput = '[Binary output detected. Halting stream...]';
+              hasPendingOutput = true;
+              shouldUpdate = true;
+              break;
+            case 'binary_progress':
+              isBinaryStream = true;
+              cumulativeOutput = `[Receiving binary output... ${formatBytes(
+                event.bytesReceived,
+              )} received]`;
+              hasPendingOutput = true;
+              if (Date.now() - lastUpdateTime > OUTPUT_UPDATE_INTERVAL_MS) {
+                shouldUpdate = true;
+              }
+              break;
+            case 'exit':
               flushOutput();
+              break;
+            default: {
+              throw new Error('An unhandled ShellOutputEvent was found.');
             }
-          },
-          combinedController.signal,
-          this.context.config.isInteractiveShellEnabled(),
-          {
-            ...shellExecutionConfig,
-            env: this.context.config.env,
-            sessionId: this.context.config?.getSessionId?.() ?? 'default',
-            pager: 'cat',
-            sanitizationConfig:
-              shellExecutionConfig?.sanitizationConfig ??
-              this.context.config.sanitizationConfig,
-            sandboxManager: this.context.config.sandboxManager,
-            additionalPermissions: {
-              network:
-                this.params[PARAM_ADDITIONAL_PERMISSIONS]?.network ||
-                this.proactivePermissionsConfirmed?.network,
-              fileSystem: {
-                read: [
-                  ...(this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem
-                    ?.read || []),
-                  ...(this.proactivePermissionsConfirmed?.fileSystem?.read ||
-                    []),
-                ],
-                write: [
-                  ...(this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem
-                    ?.write || []),
-                  ...(this.proactivePermissionsConfirmed?.fileSystem?.write ||
-                    []),
-                ],
-              },
+          }
+
+          if (shouldUpdate && !this.params.is_background) {
+            flushOutput();
+          }
+        },
+        combinedController.signal,
+        this.context.config.isInteractiveShellEnabled(),
+        {
+          ...shellExecutionConfig,
+          env: this.context.config.env,
+          sessionId: this.context.config?.getSessionId?.() ?? 'default',
+          pager: 'cat',
+          sanitizationConfig:
+            shellExecutionConfig?.sanitizationConfig ??
+            this.context.config.sanitizationConfig,
+          sandboxManager: this.context.config.sandboxManager,
+          additionalPermissions: {
+            network:
+              this.params[PARAM_ADDITIONAL_PERMISSIONS]?.network ||
+              this.proactivePermissionsConfirmed?.network,
+            fileSystem: {
+              read: [
+                ...(this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.read || []),
+                ...(this.proactivePermissionsConfirmed?.fileSystem?.read || []),
+              ],
+              write: [
+                ...(this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.write || []),
+                ...(this.proactivePermissionsConfirmed?.fileSystem?.write || []),
+              ],
             },
-            backgroundCompletionBehavior:
-              this.context.config.getShellBackgroundCompletionBehavior(),
-            originalCommand: strippedCommand,
           },
-        );
+          backgroundCompletionBehavior:
+            this.context.config.getShellBackgroundCompletionBehavior(),
+          originalCommand: strippedCommand,
+        },
+      );
 
       if (pid) {
         if (setExecutionIdCallback) {
@@ -738,10 +707,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
         }
 
         if (tempFileExists) {
-          const backgroundPIDContent = await fsPromises.readFile(
-            tempFilePath,
-            'utf8',
-          );
+          const backgroundPIDContent = await fsPromises.readFile(tempFilePath, 'utf8');
           const backgroundPIDLines = backgroundPIDContent
             .split('\n')
             .map((line) => line.trim())
@@ -780,8 +746,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
           ).toFixed(1)} minutes without output.`;
           llmContent = timeoutMessage;
         } else {
-          llmContent =
-            'Command was cancelled by user before it could complete.';
+          llmContent = 'Command was cancelled by user before it could complete.';
         }
         if (result.output.trim()) {
           llmContent += ` Below is the output before it was cancelled:\n${result.output}`;
@@ -867,8 +832,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
         (result.exitCode !== undefined && result.exitCode !== 0) ||
         result.aborted
       ) {
-        const sandboxDenial =
-          this.context.config.sandboxManager.parseDenials(result);
+        const sandboxDenial = this.context.config.sandboxManager.parseDenials(result);
         if (sandboxDenial) {
           const strippedCommand = stripShellWrapper(this.params.command);
           const rootCommands = getCommandRoots(strippedCommand).filter(
@@ -886,8 +850,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
 
           // Proactive permission suggestions for Node ecosystem tools
           if (this.context.config.getSandboxEnabled()) {
-            const proactive =
-              await getProactiveToolSuggestions(rootCommandDisplay);
+            const proactive = await getProactiveToolSuggestions(rootCommandDisplay);
             if (proactive) {
               if (proactive.network) {
                 sandboxDenial.network = true;
@@ -914,10 +877,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
                   currentPath = path.join(os.homedir(), currentPath.slice(1));
                 }
                 try {
-                  if (
-                    fs.existsSync(currentPath) &&
-                    fs.statSync(currentPath).isFile()
-                  ) {
+                  if (fs.existsSync(currentPath) && fs.statSync(currentPath).isFile()) {
                     currentPath = path.dirname(currentPath);
                   }
                 } catch {
@@ -927,11 +887,9 @@ export class ShellToolInvocation extends BaseToolInvocation<
                   if (fs.existsSync(currentPath)) {
                     const mode = this.context.config.getApprovalMode();
                     const isReadonlyMode =
-                      this.context.config.sandboxPolicyManager.getModeConfig(
-                        mode,
-                      )?.readonly ?? false;
-                    const isAllowed =
-                      this.context.config.isPathAllowed(currentPath);
+                      this.context.config.sandboxPolicyManager.getModeConfig(mode)
+                        ?.readonly ?? false;
+                    const isAllowed = this.context.config.isPathAllowed(currentPath);
 
                     if (!isAllowed || isReadonlyMode) {
                       writePaths.add(currentPath);
@@ -965,18 +923,13 @@ export class ShellToolInvocation extends BaseToolInvocation<
           };
 
           const originalReadSize =
-            this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.read
-              ?.length || 0;
+            this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.read?.length || 0;
           const originalWriteSize =
-            this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.write
-              ?.length || 0;
-          const originalNetwork =
-            !!this.params[PARAM_ADDITIONAL_PERMISSIONS]?.network;
+            this.params[PARAM_ADDITIONAL_PERMISSIONS]?.fileSystem?.write?.length || 0;
+          const originalNetwork = !!this.params[PARAM_ADDITIONAL_PERMISSIONS]?.network;
 
-          const newReadSize =
-            additionalPermissions.fileSystem?.read?.length || 0;
-          const newWriteSize =
-            additionalPermissions.fileSystem?.write?.length || 0;
+          const newReadSize = additionalPermissions.fileSystem?.read?.length || 0;
+          const newWriteSize = additionalPermissions.fileSystem?.write?.length || 0;
           const newNetwork = !!additionalPermissions.network;
 
           const hasNewPermissions =
@@ -1007,8 +960,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
         }
       }
 
-      const summarizeConfig =
-        this.context.config.getSummarizeToolOutputConfig();
+      const summarizeConfig = this.context.config.getSummarizeToolOutputConfig();
       const executionError = result.error
         ? {
             error: {
@@ -1086,10 +1038,7 @@ export class ShellToolInvocation extends BaseToolInvocation<
   }
 }
 
-export class ShellTool extends BaseDeclarativeTool<
-  ShellToolParams,
-  ToolResult
-> {
+export class ShellTool extends BaseDeclarativeTool<ShellToolParams, ToolResult> {
   static readonly Name = SHELL_TOOL_NAME;
 
   constructor(
@@ -1116,9 +1065,7 @@ export class ShellTool extends BaseDeclarativeTool<
     );
   }
 
-  protected override validateToolParamValues(
-    params: ShellToolParams,
-  ): string | null {
+  protected override validateToolParamValues(params: ShellToolParams): string | null {
     if (!params.command.trim()) {
       return 'Command cannot be empty.';
     }

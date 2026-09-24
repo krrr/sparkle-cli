@@ -24,10 +24,7 @@ import {
 } from '../../config/extensions/update.js';
 import { ExtensionUpdateState } from '../state/extensions.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
-import {
-  loadSettings,
-  resetSettingsCacheForTesting,
-} from '../../config/settings.js';
+import { loadSettings, resetSettingsCacheForTesting } from '../../config/settings.js';
 
 vi.mock('os', async (importOriginal) => {
   const mockedOs = await importOriginal<typeof os>();
@@ -42,9 +39,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...actual,
     homedir: () => os.homedir(),
-    loadAgentsFromDirectory: vi
-      .fn()
-      .mockResolvedValue({ agents: [], errors: [] }),
+    loadAgentsFromDirectory: vi.fn().mockResolvedValue({ agents: [], errors: [] }),
     loadSkillsFromDir: vi.fn().mockResolvedValue([]),
   };
 });
@@ -67,9 +62,7 @@ describe('useExtensionUpdates', () => {
       errors: [],
     });
     vi.mocked(loadSkillsFromDir).mockResolvedValue([]);
-    tempHomeDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-cli-test-home-'),
-    );
+    tempHomeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-home-'));
     vi.mocked(os.homedir).mockReturnValue(tempHomeDir);
     tempWorkspaceDir = fs.mkdtempSync(
       path.join(tempHomeDir, 'sparkle-cli-test-workspace-'),

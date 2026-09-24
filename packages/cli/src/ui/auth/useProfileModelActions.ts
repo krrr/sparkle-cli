@@ -61,9 +61,7 @@ export function useProfileModelActions(
       if (!profileService || !profileId) {
         return Promise.resolve();
       }
-      return run(() =>
-        profileService.updateModel(profileId, oldModelId, model),
-      );
+      return run(() => profileService.updateModel(profileId, oldModelId, model));
     },
     [profileService, profileId, run],
   );

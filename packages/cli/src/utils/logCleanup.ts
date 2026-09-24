@@ -16,9 +16,7 @@ const RETENTION_PERIOD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
  *
  * @param debugMode Whether to log detailed debug information.
  */
-export async function cleanupBackgroundLogs(
-  debugMode: boolean = false,
-): Promise<void> {
+export async function cleanupBackgroundLogs(debugMode: boolean = false): Promise<void> {
   try {
     const logDir = ShellExecutionService.getLogDir();
 
@@ -45,10 +43,7 @@ export async function cleanupBackgroundLogs(
           }
         } catch (error) {
           if (debugMode) {
-            debugLogger.debug(
-              `Failed to process log file ${entry.name}:`,
-              error,
-            );
+            debugLogger.debug(`Failed to process log file ${entry.name}:`, error);
           }
         }
       }

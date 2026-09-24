@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import type {
   Counter,
   Meter,
@@ -44,11 +36,9 @@ const mockHistogramRecordFn: Mock<
   (value: number, attributes?: Attributes, context?: Context) => void
 > = vi.fn();
 
-const mockCreateCounterFn: Mock<(name: string, options?: unknown) => Counter> =
+const mockCreateCounterFn: Mock<(name: string, options?: unknown) => Counter> = vi.fn();
+const mockCreateHistogramFn: Mock<(name: string, options?: unknown) => Histogram> =
   vi.fn();
-const mockCreateHistogramFn: Mock<
-  (name: string, options?: unknown) => Histogram
-> = vi.fn();
 
 const mockCounterInstance: Counter = {
   add: mockCounterAddFn,
@@ -139,23 +129,19 @@ describe('Telemetry Metrics', () => {
     initializeMetricsModule = metricsJsModule.initializeMetrics;
     recordTokenUsageMetricsModule = metricsJsModule.recordTokenUsageMetrics;
     recordFileOperationMetricModule = metricsJsModule.recordFileOperationMetric;
-    recordChatCompressionMetricsModule =
-      metricsJsModule.recordChatCompressionMetrics;
+    recordChatCompressionMetricsModule = metricsJsModule.recordChatCompressionMetrics;
     recordModelRoutingMetricsModule = metricsJsModule.recordModelRoutingMetrics;
     recordStartupPerformanceModule = metricsJsModule.recordStartupPerformance;
     recordMemoryUsageModule = metricsJsModule.recordMemoryUsage;
     recordCpuUsageModule = metricsJsModule.recordCpuUsage;
     recordToolQueueDepthModule = metricsJsModule.recordToolQueueDepth;
-    recordToolExecutionBreakdownModule =
-      metricsJsModule.recordToolExecutionBreakdown;
+    recordToolExecutionBreakdownModule = metricsJsModule.recordToolExecutionBreakdown;
     recordTokenEfficiencyModule = metricsJsModule.recordTokenEfficiency;
     recordApiRequestBreakdownModule = metricsJsModule.recordApiRequestBreakdown;
     recordPerformanceScoreModule = metricsJsModule.recordPerformanceScore;
-    recordPerformanceRegressionModule =
-      metricsJsModule.recordPerformanceRegression;
+    recordPerformanceRegressionModule = metricsJsModule.recordPerformanceRegression;
     recordBaselineComparisonModule = metricsJsModule.recordBaselineComparison;
-    recordGenAiClientTokenUsageModule =
-      metricsJsModule.recordGenAiClientTokenUsage;
+    recordGenAiClientTokenUsageModule = metricsJsModule.recordGenAiClientTokenUsage;
     recordGenAiClientOperationDurationModule =
       metricsJsModule.recordGenAiClientOperationDuration;
     recordFlickerFrameModule = metricsJsModule.recordFlickerFrame;
@@ -165,19 +151,16 @@ describe('Telemetry Metrics', () => {
     recordLinesChangedModule = metricsJsModule.recordLinesChanged;
     recordSlowRenderModule = metricsJsModule.recordSlowRender;
     recordPlanExecutionModule = metricsJsModule.recordPlanExecution;
-    recordKeychainAvailabilityModule =
-      metricsJsModule.recordKeychainAvailability;
+    recordKeychainAvailabilityModule = metricsJsModule.recordKeychainAvailability;
     recordTokenStorageInitializationModule =
       metricsJsModule.recordTokenStorageInitialization;
     recordInvalidChunkModule = metricsJsModule.recordInvalidChunk;
-    recordBrowserAgentConnectionModule =
-      metricsJsModule.recordBrowserAgentConnection;
+    recordBrowserAgentConnectionModule = metricsJsModule.recordBrowserAgentConnection;
     recordBrowserAgentToolDiscoveryModule =
       metricsJsModule.recordBrowserAgentToolDiscovery;
     recordBrowserAgentVisionStatusModule =
       metricsJsModule.recordBrowserAgentVisionStatus;
-    recordBrowserAgentTaskOutcomeModule =
-      metricsJsModule.recordBrowserAgentTaskOutcome;
+    recordBrowserAgentTaskOutcomeModule = metricsJsModule.recordBrowserAgentTaskOutcome;
     recordBrowserAgentCleanupModule = metricsJsModule.recordBrowserAgentCleanup;
 
     const otelApiModule = await import('@opentelemetry/api');
@@ -1016,16 +999,13 @@ describe('Telemetry Metrics', () => {
           },
         });
 
-        expect(mockHistogramRecordFn).toHaveBeenCalledWith(
-          floatingPointDuration,
-          {
-            'session.id': 'test-session-id',
-            'installation.id': 'test-installation-id',
-            phase: 'total_startup',
-            is_tty: true,
-            has_question: false,
-          },
-        );
+        expect(mockHistogramRecordFn).toHaveBeenCalledWith(floatingPointDuration, {
+          'session.id': 'test-session-id',
+          'installation.id': 'test-installation-id',
+          phase: 'total_startup',
+          is_tty: true,
+          has_question: false,
+        });
       });
     });
 
@@ -1077,10 +1057,7 @@ describe('Telemetry Metrics', () => {
             expectedAttributes['component'] = component;
           }
 
-          expect(mockHistogramRecordFn).toHaveBeenCalledWith(
-            value,
-            expectedAttributes,
-          );
+          expect(mockHistogramRecordFn).toHaveBeenCalledWith(value, expectedAttributes);
         },
       );
     });
@@ -1504,13 +1481,7 @@ describe('Telemetry Metrics', () => {
         mockCounterAddFn.mockClear();
         mockHistogramRecordFn.mockClear();
 
-        recordHookCallMetricsModule(
-          mockConfig,
-          'BeforeTool',
-          'test-hook',
-          150,
-          true,
-        );
+        recordHookCallMetricsModule(mockConfig, 'BeforeTool', 'test-hook', 150, true);
 
         // Verify counter recorded
         expect(mockCounterAddFn).toHaveBeenCalledWith(1, {
@@ -1559,13 +1530,7 @@ describe('Telemetry Metrics', () => {
         mockCounterAddFn.mockClear();
 
         // Success case
-        recordHookCallMetricsModule(
-          mockConfig,
-          'BeforeTool',
-          'test-hook',
-          100,
-          true,
-        );
+        recordHookCallMetricsModule(mockConfig, 'BeforeTool', 'test-hook', 100, true);
 
         expect(mockCounterAddFn).toHaveBeenNthCalledWith(
           1,
@@ -1578,13 +1543,7 @@ describe('Telemetry Metrics', () => {
         );
 
         // Failure case
-        recordHookCallMetricsModule(
-          mockConfig,
-          'AfterTool',
-          'test-hook',
-          150,
-          false,
-        );
+        recordHookCallMetricsModule(mockConfig, 'AfterTool', 'test-hook', 150, false);
 
         expect(mockCounterAddFn).toHaveBeenNthCalledWith(
           2,

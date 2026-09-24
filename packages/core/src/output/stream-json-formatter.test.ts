@@ -25,9 +25,7 @@ describe('StreamJsonFormatter', () => {
 
   beforeEach(() => {
     formatter = new StreamJsonFormatter();
-    stdoutWriteSpy = vi
-      .spyOn(process.stdout, 'write')
-      .mockImplementation(() => true);
+    stdoutWriteSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   });
 
   afterEach(() => {
@@ -241,14 +239,8 @@ describe('StreamJsonFormatter', () => {
       formatter.emitEvent(event2);
 
       expect(stdoutWriteSpy).toHaveBeenCalledTimes(2);
-      expect(stdoutWriteSpy).toHaveBeenNthCalledWith(
-        1,
-        JSON.stringify(event1) + '\n',
-      );
-      expect(stdoutWriteSpy).toHaveBeenNthCalledWith(
-        2,
-        JSON.stringify(event2) + '\n',
-      );
+      expect(stdoutWriteSpy).toHaveBeenNthCalledWith(1, JSON.stringify(event1) + '\n');
+      expect(stdoutWriteSpy).toHaveBeenNthCalledWith(2, JSON.stringify(event2) + '\n');
     });
   });
 

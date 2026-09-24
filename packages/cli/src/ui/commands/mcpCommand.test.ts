@@ -43,11 +43,7 @@ const mockMessageBus = {
 } as unknown as MessageBus;
 
 // Helper function to create a mock DiscoveredMCPTool
-const createMockMCPTool = (
-  name: string,
-  serverName: string,
-  description?: string,
-) =>
+const createMockMCPTool = (name: string, serverName: string, description?: string) =>
   new DiscoveredMCPTool(
     {
       callTool: vi.fn(),
@@ -88,9 +84,7 @@ describe('mcpCommand', () => {
 
     // Default mock implementations
     vi.mocked(getMCPServerStatus).mockReturnValue(MCPServerStatus.CONNECTED);
-    vi.mocked(getMCPDiscoveryState).mockReturnValue(
-      MCPDiscoveryState.COMPLETED,
-    );
+    vi.mocked(getMCPDiscoveryState).mockReturnValue(MCPDiscoveryState.COMPLETED);
 
     // Create mock config with all necessary methods
     mockConfig = {
@@ -193,24 +187,16 @@ describe('mcpCommand', () => {
       const mockServer2Tools = [createMockMCPTool('server2_tool1', 'server2')];
       const mockServer3Tools = [createMockMCPTool('server3_tool1', 'server3')];
 
-      const allTools = [
-        ...mockServer1Tools,
-        ...mockServer2Tools,
-        ...mockServer3Tools,
-      ];
+      const allTools = [...mockServer1Tools, ...mockServer2Tools, ...mockServer3Tools];
 
       const mockToolRegistry = {
         getAllTools: vi.fn().mockReturnValue(allTools),
       };
       mockConfig.getToolRegistry = vi.fn().mockReturnValue(mockToolRegistry);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (mockContext.services.agentContext as any).toolRegistry =
-        mockToolRegistry;
+      (mockContext.services.agentContext as any).toolRegistry = mockToolRegistry;
 
-      const resourcesByServer: Record<
-        string,
-        Array<{ name: string; uri: string }>
-      > = {
+      const resourcesByServer: Record<string, Array<{ name: string; uri: string }>> = {
         server1: [
           {
             name: 'Server1 Resource',
@@ -253,9 +239,7 @@ describe('mcpCommand', () => {
     });
 
     it('should display tool descriptions when desc argument is used', async () => {
-      const descSubCommand = mcpCommand.subCommands!.find(
-        (c) => c.name === 'desc',
-      );
+      const descSubCommand = mcpCommand.subCommands!.find((c) => c.name === 'desc');
       await descSubCommand!.action!(mockContext, '');
 
       expect(mockContext.ui.addItem).toHaveBeenCalledWith(
@@ -267,9 +251,7 @@ describe('mcpCommand', () => {
     });
 
     it('should not display descriptions when nodesc argument is used', async () => {
-      const listSubCommand = mcpCommand.subCommands!.find(
-        (c) => c.name === 'list',
-      );
+      const listSubCommand = mcpCommand.subCommands!.find((c) => c.name === 'list');
       await listSubCommand!.action!(mockContext, '');
 
       expect(mockContext.ui.addItem).toHaveBeenCalledWith(

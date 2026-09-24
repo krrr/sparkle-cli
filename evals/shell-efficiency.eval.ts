@@ -36,9 +36,7 @@ describe('Shell Efficiency', () => {
         return (
           cmd &&
           cmd.includes('npm install') &&
-          (cmd.includes('--silent') ||
-            cmd.includes('--quiet') ||
-            cmd.includes('-q'))
+          (cmd.includes('--silent') || cmd.includes('--quiet') || cmd.includes('-q'))
         );
       });
 
@@ -101,9 +99,7 @@ describe('Shell Efficiency', () => {
         return (
           cmd &&
           cmd.includes('npm install') &&
-          (cmd.includes('--silent') ||
-            cmd.includes('--quiet') ||
-            cmd.includes('-q'))
+          (cmd.includes('--silent') || cmd.includes('--quiet') || cmd.includes('-q'))
         );
       });
 

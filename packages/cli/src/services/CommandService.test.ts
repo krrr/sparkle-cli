@@ -41,24 +41,16 @@ describe('CommandService', () => {
       );
 
       expect(service.getCommands()).toHaveLength(2);
-      expect(service.getCommands()).toEqual(
-        expect.arrayContaining([cmdA, cmdB]),
-      );
+      expect(service.getCommands()).toEqual(expect.arrayContaining([cmdA, cmdB]));
     });
 
     it('should handle empty loaders and failed loaders gracefully', async () => {
       const cmdA = createMockCommand('a', CommandKind.BUILT_IN);
       const failingLoader = new MockCommandLoader([]);
-      vi.spyOn(failingLoader, 'loadCommands').mockRejectedValue(
-        new Error('fail'),
-      );
+      vi.spyOn(failingLoader, 'loadCommands').mockRejectedValue(new Error('fail'));
 
       const service = await CommandService.create(
-        [
-          new MockCommandLoader([cmdA]),
-          new MockCommandLoader([]),
-          failingLoader,
-        ],
+        [new MockCommandLoader([cmdA]), new MockCommandLoader([]), failingLoader],
         new AbortController().signal,
       );
 

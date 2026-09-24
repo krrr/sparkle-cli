@@ -24,9 +24,7 @@ import {
 
 const requireModule = createModuleRequire(import.meta.url);
 
-export async function readWasmBinaryFromDisk(
-  specifier: string,
-): Promise<Uint8Array> {
+export async function readWasmBinaryFromDisk(specifier: string): Promise<Uint8Array> {
   const resolvedPath = requireModule.resolve(specifier);
   const buffer = await fsPromises.readFile(resolvedPath);
   return new Uint8Array(buffer);
@@ -77,21 +75,11 @@ interface BOMInfo {
 export function detectBOM(buf: Buffer): BOMInfo | null {
   if (buf.length >= 4) {
     // UTF-32 LE: FF FE 00 00
-    if (
-      buf[0] === 0xff &&
-      buf[1] === 0xfe &&
-      buf[2] === 0x00 &&
-      buf[3] === 0x00
-    ) {
+    if (buf[0] === 0xff && buf[1] === 0xfe && buf[2] === 0x00 && buf[3] === 0x00) {
       return { encoding: 'utf32le', bomLength: 4 };
     }
     // UTF-32 BE: 00 00 FE FF
-    if (
-      buf[0] === 0x00 &&
-      buf[1] === 0x00 &&
-      buf[2] === 0xfe &&
-      buf[3] === 0xff
-    ) {
+    if (buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0xfe && buf[3] === 0xff) {
       return { encoding: 'utf32be', bomLength: 4 };
     }
   }
@@ -139,16 +127,8 @@ function decodeUTF32(buf: Buffer, littleEndian: boolean): string {
   let out = '';
   for (let i = 0; i < usable; i += 4) {
     const cp = littleEndian
-      ? (buf[i] |
-          (buf[i + 1] << 8) |
-          (buf[i + 2] << 16) |
-          (buf[i + 3] << 24)) >>>
-        0
-      : (buf[i + 3] |
-          (buf[i + 2] << 8) |
-          (buf[i + 1] << 16) |
-          (buf[i] << 24)) >>>
-        0;
+      ? (buf[i] | (buf[i + 1] << 8) | (buf[i + 2] << 16) | (buf[i + 3] << 24)) >>> 0
+      : (buf[i + 3] | (buf[i + 2] << 8) | (buf[i + 1] << 16) | (buf[i] << 24)) >>> 0;
     // Valid planes: 0x0000..0x10FFFF excluding surrogates
     if (cp <= 0x10ffff && !(cp >= 0xd800 && cp <= 0xdfff)) {
       out += String.fromCodePoint(cp);
@@ -246,12 +226,9 @@ function formatSupportedAudioFormats(): string {
 
 const SUPPORTED_AUDIO_FORMATS_DISPLAY = formatSupportedAudioFormats();
 
-function getSupportedAudioMimeTypeForFile(
-  filePath: string,
-): string | undefined {
+function getSupportedAudioMimeTypeForFile(filePath: string): string | undefined {
   const extension = path.extname(filePath).toLowerCase();
-  const extensionMimeType =
-    SUPPORTED_AUDIO_MIME_TYPES_BY_EXTENSION.get(extension);
+  const extensionMimeType = SUPPORTED_AUDIO_MIME_TYPES_BY_EXTENSION.get(extension);
   const lookedUpMimeType = getSpecificMimeType(filePath)?.toLowerCase();
   const normalizedMimeType = lookedUpMimeType
     ? (AUDIO_MIME_TYPE_NORMALIZATION[lookedUpMimeType] ?? lookedUpMimeType)
@@ -259,9 +236,7 @@ function getSupportedAudioMimeTypeForFile(
 
   if (
     normalizedMimeType &&
-    [...SUPPORTED_AUDIO_MIME_TYPES_BY_EXTENSION.values()].includes(
-      normalizedMimeType,
-    )
+    [...SUPPORTED_AUDIO_MIME_TYPES_BY_EXTENSION.values()].includes(normalizedMimeType)
   ) {
     return normalizedMimeType;
   }
@@ -275,18 +250,14 @@ function getSupportedAudioMimeTypeForFile(
  * @param rootDirectory The absolute root directory.
  * @returns True if the path is within the root directory, false otherwise.
  */
-export function isWithinRoot(
-  pathToCheck: string,
-  rootDirectory: string,
-): boolean {
+export function isWithinRoot(pathToCheck: string, rootDirectory: string): boolean {
   const normalizedPathToCheck = path.resolve(pathToCheck);
   const normalizedRootDirectory = path.resolve(rootDirectory);
 
   // Ensure the rootDirectory path ends with a separator for correct startsWith comparison,
   // unless it's the root path itself (e.g., '/' or 'C:\').
   const rootWithSeparator =
-    normalizedRootDirectory === path.sep ||
-    normalizedRootDirectory.endsWith(path.sep)
+    normalizedRootDirectory === path.sep || normalizedRootDirectory.endsWith(path.sep)
       ? normalizedRootDirectory
       : normalizedRootDirectory + path.sep;
 
@@ -524,10 +495,7 @@ export async function processSingleFileContent(
           sliceStart = startLine ? startLine - 1 : 0;
           sliceEnd = endLine
             ? Math.min(endLine, originalLineCount)
-            : Math.min(
-                sliceStart + DEFAULT_MAX_LINES_TEXT_FILE,
-                originalLineCount,
-              );
+            : Math.min(sliceStart + DEFAULT_MAX_LINES_TEXT_FILE, originalLineCount);
         } else {
           sliceEnd = Math.min(DEFAULT_MAX_LINES_TEXT_FILE, originalLineCount);
         }
@@ -540,17 +508,13 @@ export async function processSingleFileContent(
         const formattedLines = selectedLines.map((line) => {
           if (line.length > MAX_LINE_LENGTH_TEXT_FILE) {
             linesWereTruncatedInLength = true;
-            return (
-              line.substring(0, MAX_LINE_LENGTH_TEXT_FILE) + '... [truncated]'
-            );
+            return line.substring(0, MAX_LINE_LENGTH_TEXT_FILE) + '... [truncated]';
           }
           return line;
         });
 
         const isTruncated =
-          actualStart > 0 ||
-          sliceEnd < originalLineCount ||
-          linesWereTruncatedInLength;
+          actualStart > 0 || sliceEnd < originalLineCount || linesWereTruncatedInLength;
         const llmContent = formattedLines.join('\n');
 
         // By default, return nothing to streamline the common case of a successful read_file.
@@ -599,8 +563,7 @@ export async function processSingleFileContent(
       case 'image':
       case 'pdf':
       case 'video': {
-        const mimeType =
-          getSpecificMimeType(filePath) ?? 'application/octet-stream';
+        const mimeType = getSpecificMimeType(filePath) ?? 'application/octet-stream';
         const contentBuffer = await fs.promises.readFile(filePath);
         const base64Data = contentBuffer.toString('base64');
         return {
@@ -625,9 +588,7 @@ export async function processSingleFileContent(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const displayPath = path
-      .relative(rootDirectory, filePath)
-      .replace(/\\/g, '/');
+    const displayPath = path.relative(rootDirectory, filePath).replace(/\\/g, '/');
     return {
       llmContent: `Error reading file ${displayPath}: ${errorMessage}`,
       returnDisplay: `Error reading file ${displayPath}: ${errorMessage}`,

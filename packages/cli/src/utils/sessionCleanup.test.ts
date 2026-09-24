@@ -9,17 +9,9 @@ import * as fs from 'node:fs/promises';
 import { existsSync, unlinkSync } from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import {
-  type Config,
-  debugLogger,
-  TOOL_OUTPUTS_DIR,
-  Storage,
-} from 'sparkle-cli-core';
+import { type Config, debugLogger, TOOL_OUTPUTS_DIR, Storage } from 'sparkle-cli-core';
 import type { Settings } from '../config/settings.js';
-import {
-  cleanupExpiredSessions,
-  cleanupToolOutputFiles,
-} from './sessionCleanup.js';
+import { cleanupExpiredSessions, cleanupToolOutputFiles } from './sessionCleanup.js';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();
@@ -43,9 +35,7 @@ describe('Session Cleanup (Refactored)', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    testTempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'sparkle-cli-cleanup-test-'),
-    );
+    testTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-cli-cleanup-test-'));
     testDataDir = path.join(testTempDir, 'data');
     chatsDir = path.join(testDataDir, 'chats');
     logsDir = path.join(testTempDir, 'logs');
@@ -103,17 +93,11 @@ describe('Session Cleanup (Refactored)', () => {
 
   async function writeArtifacts(sessionId: string) {
     // Log file
-    await fs.writeFile(
-      path.join(logsDir, `session-${sessionId}.jsonl`),
-      'log content',
-    );
+    await fs.writeFile(path.join(logsDir, `session-${sessionId}.jsonl`), 'log content');
     // Tool output directory
     const sessionOutputDir = path.join(toolOutputsDir, `session-${sessionId}`);
     await fs.mkdir(sessionOutputDir, { recursive: true });
-    await fs.writeFile(
-      path.join(sessionOutputDir, 'output.txt'),
-      'tool output',
-    );
+    await fs.writeFile(path.join(sessionOutputDir, 'output.txt'), 'tool output');
     // Session directory
     await fs.mkdir(path.join(testTempDir, sessionId), { recursive: true });
     // Subagent chats directory
@@ -243,9 +227,7 @@ describe('Session Cleanup (Refactored)', () => {
         general: { sessionRetention: { enabled: true, maxCount: 1 } },
       };
 
-      const debugSpy = vi
-        .spyOn(debugLogger, 'debug')
-        .mockImplementation(() => {});
+      const debugSpy = vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
       await cleanupExpiredSessions(config, settings);
 
       expect(debugSpy).toHaveBeenCalledWith(
@@ -279,12 +261,12 @@ describe('Session Cleanup (Refactored)', () => {
       expect(existsSync(path.join(chatsDir, sessions[2].fileName))).toBe(false);
 
       // Verify artifacts for an old session are gone
-      expect(
-        existsSync(path.join(logsDir, `session-${sessions[1].id}.jsonl`)),
-      ).toBe(false);
-      expect(
-        existsSync(path.join(toolOutputsDir, `session-${sessions[1].id}`)),
-      ).toBe(false);
+      expect(existsSync(path.join(logsDir, `session-${sessions[1].id}.jsonl`))).toBe(
+        false,
+      );
+      expect(existsSync(path.join(toolOutputsDir, `session-${sessions[1].id}`))).toBe(
+        false,
+      );
       expect(existsSync(path.join(testTempDir, sessions[1].id))).toBe(false); // Session directory should be deleted
       expect(existsSync(path.join(chatsDir, sessions[1].id))).toBe(false); // Subagent chats directory should be deleted
     });
@@ -322,9 +304,7 @@ describe('Session Cleanup (Refactored)', () => {
       expect(result.deleted).toBe(1);
       expect(existsSync(filePath)).toBe(false);
       // Artifacts should be gone because we extracted sessionId from JSONL first line
-      expect(
-        existsSync(path.join(toolOutputsDir, `session-${sessionId}`)),
-      ).toBe(false);
+      expect(existsSync(path.join(toolOutputsDir, `session-${sessionId}`))).toBe(false);
     });
 
     it('should delete corrupted session files even if sessionId cannot be extracted', async () => {
@@ -402,12 +382,12 @@ describe('Session Cleanup (Refactored)', () => {
 
       // Verify specifically WHICH files survived
       expect(existsSync(path.join(chatsDir, sessions[0].fileName))).toBe(true); // current
-      expect(
-        existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl')),
-      ).toBe(true); // 3d
-      expect(
-        existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl')),
-      ).toBe(true); // 5d
+      expect(existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl'))).toBe(
+        true,
+      ); // 3d
+      expect(existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl'))).toBe(
+        true,
+      ); // 5d
 
       // Verify the older ones were deleted
       expect(existsSync(path.join(chatsDir, sessions[1].fileName))).toBe(false); // 14d
@@ -442,22 +422,16 @@ describe('Session Cleanup (Refactored)', () => {
       const result = await cleanupExpiredSessions(config, settings);
 
       expect(result.deleted).toBe(2); // Both files should be deleted
+      expect(existsSync(path.join(chatsDir, 'session-20250110-abc12345.jsonl'))).toBe(
+        false,
+      );
       expect(
-        existsSync(path.join(chatsDir, 'session-20250110-abc12345.jsonl')),
-      ).toBe(false);
-      expect(
-        existsSync(
-          path.join(chatsDir, 'session-20250110-subagent-abc12345.jsonl'),
-        ),
+        existsSync(path.join(chatsDir, 'session-20250110-subagent-abc12345.jsonl')),
       ).toBe(false);
 
       // Artifacts for both should be gone
-      expect(existsSync(path.join(logsDir, 'session-parent-uuid.jsonl'))).toBe(
-        false,
-      );
-      expect(existsSync(path.join(logsDir, 'session-sub-uuid.jsonl'))).toBe(
-        false,
-      );
+      expect(existsSync(path.join(logsDir, 'session-parent-uuid.jsonl'))).toBe(false);
+      expect(existsSync(path.join(logsDir, 'session-sub-uuid.jsonl'))).toBe(false);
     });
 
     it('should delete corrupted session files', async () => {
@@ -482,10 +456,7 @@ describe('Session Cleanup (Refactored)', () => {
         general: { sessionRetention: { enabled: true, maxAge: '1d' } },
       };
 
-      const badJsonPath = path.join(
-        chatsDir,
-        'session-20241225-badjson1.jsonl',
-      );
+      const badJsonPath = path.join(chatsDir, 'session-20241225-badjson1.jsonl');
       await fs.writeFile(badJsonPath, 'This is raw text, not JSON');
 
       const result = await cleanupExpiredSessions(config, settings);
@@ -613,14 +584,14 @@ describe('Session Cleanup (Refactored)', () => {
 
       // Assert kept
       expect(existsSync(path.join(chatsDir, sessions[0].fileName))).toBe(true); // current
-      expect(
-        existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl')),
-      ).toBe(true); // 3d
+      expect(existsSync(path.join(chatsDir, 'session-20250117-recent3.jsonl'))).toBe(
+        true,
+      ); // 3d
 
       // Assert deleted
-      expect(
-        existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl')),
-      ).toBe(false); // 5d
+      expect(existsSync(path.join(chatsDir, 'session-20250115-recent5.jsonl'))).toBe(
+        false,
+      ); // 5d
       expect(existsSync(path.join(chatsDir, sessions[1].fileName))).toBe(false); // 14d
       expect(existsSync(path.join(chatsDir, sessions[2].fileName))).toBe(false); // 30d
     });

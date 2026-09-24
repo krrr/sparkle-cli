@@ -14,10 +14,7 @@ import {
 import type { PartListUnion } from '@google/genai';
 import { type GeminiClient } from '../core/client.js';
 import { saveTruncatedToolOutput } from '../utils/fileUtils.js';
-import {
-  READ_FILE_TOOL_NAME,
-  READ_MANY_FILES_TOOL_NAME,
-} from '../tools/tool-names.js';
+import { READ_FILE_TOOL_NAME, READ_MANY_FILES_TOOL_NAME } from '../tools/tool-names.js';
 
 import {
   truncateProportionally,
@@ -81,9 +78,7 @@ export class ToolOutputDistillationService {
   }
 
   private isExemptFromDistillation(toolName: string): boolean {
-    return (
-      toolName === READ_FILE_TOOL_NAME || toolName === READ_MANY_FILES_TOOL_NAME
-    );
+    return toolName === READ_FILE_TOOL_NAME || toolName === READ_MANY_FILES_TOOL_NAME;
   }
 
   private calculateContentLength(content: PartListUnion): number {
@@ -210,11 +205,7 @@ export class ToolOutputDistillationService {
           Math.floor((text.length / 4) * ratio),
         );
         const targetChars = estimateCharsFromTokens(text, targetTokens);
-        return truncateProportionally(
-          text,
-          targetChars,
-          TOOL_TRUNCATION_PREFIX,
-        );
+        return truncateProportionally(text, targetChars, TOOL_TRUNCATION_PREFIX);
       }
 
       if (part.text) {

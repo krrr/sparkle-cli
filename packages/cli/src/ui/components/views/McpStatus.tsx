@@ -49,9 +49,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
 }) => {
   const serverNames = Object.keys(servers).filter(
     (serverName) =>
-      !blockedServers.some(
-        (blockedServer) => blockedServer.name === serverName,
-      ),
+      !blockedServers.some((blockedServer) => blockedServer.name === serverName),
   );
 
   if (serverNames.length === 0 && blockedServers.length === 0) {
@@ -60,10 +58,8 @@ export const McpStatus: React.FC<McpStatusProps> = ({
         <Text>No MCP servers configured.</Text>
         <Text>
           Please view MCP documentation in your browser:{' '}
-          <Text color={theme.text.link}>
-            https://goo.gle/sparkle-cli-docs-mcp
-          </Text>{' '}
-          or use the cli /docs command
+          <Text color={theme.text.link}>https://goo.gle/sparkle-cli-docs-mcp</Text> or
+          use the cli /docs command
         </Text>
       </Box>
     );
@@ -74,8 +70,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
       {discoveryInProgress && (
         <Box flexDirection="column" marginBottom={1}>
           <Text color={theme.status.warning}>
-            ⏳ MCP servers are starting up ({connectingServers.length}{' '}
-            initializing)...
+            ⏳ MCP servers are starting up ({connectingServers.length} initializing)...
           </Text>
           <Text color={theme.text.primary}>
             Note: First startup may take longer. Tool availability will update
@@ -88,9 +83,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
       <Box height={1} />
       {serverNames.map((serverName) => {
         const server = servers[serverName];
-        const serverTools = tools.filter(
-          (tool) => tool.serverName === serverName,
-        );
+        const serverTools = tools.filter((tool) => tool.serverName === serverName);
         const serverPrompts = prompts.filter(
           (prompt) => prompt.serverName === serverName,
         );
@@ -155,9 +148,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
           parts.push(`${toolCount} ${toolCount === 1 ? 'tool' : 'tools'}`);
         }
         if (promptCount > 0) {
-          parts.push(
-            `${promptCount} ${promptCount === 1 ? 'prompt' : 'prompts'}`,
-          );
+          parts.push(`${promptCount} ${promptCount === 1 ? 'prompt' : 'prompts'}`);
         }
         if (resourceCount > 0) {
           parts.push(
@@ -170,9 +161,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
         if (serverAuthStatus === 'authenticated') {
           authStatusNode = <Text> (OAuth)</Text>;
         } else if (serverAuthStatus === 'expired') {
-          authStatusNode = (
-            <Text color={theme.status.error}> (OAuth expired)</Text>
-          );
+          authStatusNode = <Text color={theme.status.error}> (OAuth expired)</Text>;
         } else if (serverAuthStatus === 'unauthenticated') {
           authStatusNode = (
             <Text color={theme.status.warning}> (OAuth not authenticated)</Text>
@@ -202,16 +191,12 @@ export const McpStatus: React.FC<McpStatusProps> = ({
 
             {errors[serverName] && (
               <Box marginLeft={2}>
-                <Text color={theme.status.error}>
-                  Error: {errors[serverName]}
-                </Text>
+                <Text color={theme.status.error}>Error: {errors[serverName]}</Text>
               </Box>
             )}
 
             {showDescriptions && server?.description && (
-              <Text color={theme.text.secondary}>
-                {server.description.trim()}
-              </Text>
+              <Text color={theme.text.secondary}>{server.description.trim()}</Text>
             )}
 
             {serverTools.length > 0 && (
@@ -223,8 +208,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
                     tool.schema &&
                     (tool.schema.parametersJsonSchema || tool.schema.parameters)
                       ? JSON.stringify(
-                          tool.schema.parametersJsonSchema ??
-                            tool.schema.parameters,
+                          tool.schema.parametersJsonSchema ?? tool.schema.parameters,
                           null,
                           2,
                         )
@@ -245,9 +229,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
                       {schemaContent && (
                         <Box flexDirection="column" marginLeft={4}>
                           <Text color={theme.text.secondary}>Parameters:</Text>
-                          <Text color={theme.text.secondary}>
-                            {schemaContent}
-                          </Text>
+                          <Text color={theme.text.secondary}>{schemaContent}</Text>
                         </Box>
                       )}
                     </Box>
@@ -305,8 +287,7 @@ export const McpStatus: React.FC<McpStatusProps> = ({
                   })}
                 {serverResources.length > MAX_MCP_RESOURCES_TO_SHOW && (
                   <Text color={theme.text.secondary}>
-                    {'  '}...{' '}
-                    {serverResources.length - MAX_MCP_RESOURCES_TO_SHOW}{' '}
+                    {'  '}... {serverResources.length - MAX_MCP_RESOURCES_TO_SHOW}{' '}
                     {serverResources.length - MAX_MCP_RESOURCES_TO_SHOW === 1
                       ? 'resource'
                       : 'resources'}{' '}

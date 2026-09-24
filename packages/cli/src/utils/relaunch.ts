@@ -5,11 +5,7 @@
  */
 
 import { spawn } from 'node:child_process';
-import {
-  RELAUNCH_EXIT_CODE,
-  getSpawnConfig,
-  getScriptArgs,
-} from './processUtils.js';
+import { RELAUNCH_EXIT_CODE, getSpawnConfig, getScriptArgs } from './processUtils.js';
 import { writeToStderr } from 'sparkle-cli-core';
 
 export async function relaunchOnExitCode(runner: () => Promise<number>) {

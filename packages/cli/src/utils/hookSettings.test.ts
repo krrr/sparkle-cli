@@ -116,11 +116,7 @@ describe('hookSettings', () => {
 
   describe('disableHook', () => {
     it('should disable hook in the requested scope', () => {
-      const result = disableHook(
-        mockSettings,
-        'test-hook',
-        SettingScope.Workspace,
-      );
+      const result = disableHook(mockSettings, 'test-hook', SettingScope.Workspace);
 
       expect(result.status).toBe('success');
       expect(result.modifiedScopes).toEqual([
@@ -136,11 +132,7 @@ describe('hookSettings', () => {
     it('should return no-op if already disabled in requested scope', () => {
       mockWorkspace.settings.hooksConfig.disabled = ['test-hook'];
 
-      const result = disableHook(
-        mockSettings,
-        'test-hook',
-        SettingScope.Workspace,
-      );
+      const result = disableHook(mockSettings, 'test-hook', SettingScope.Workspace);
 
       expect(result.status).toBe('no-op');
       expect(mockSetValue).not.toHaveBeenCalled();
@@ -151,11 +143,7 @@ describe('hookSettings', () => {
       mockUser.settings.hooksConfig.disabled = ['test-hook'];
 
       // We request disable in Workspace
-      const result = disableHook(
-        mockSettings,
-        'test-hook',
-        SettingScope.Workspace,
-      );
+      const result = disableHook(mockSettings, 'test-hook', SettingScope.Workspace);
 
       expect(result.status).toBe('success');
       expect(result.modifiedScopes).toEqual([

@@ -24,10 +24,7 @@ export interface ThirdPartySearchResult {
  */
 export interface ThirdPartySearchProvider {
   readonly name: string;
-  search(
-    query: string,
-    signal?: AbortSignal,
-  ): Promise<ThirdPartySearchResult[]>;
+  search(query: string, signal?: AbortSignal): Promise<ThirdPartySearchResult[]>;
 }
 
 type ProviderFactory = (apiKey: string) => ThirdPartySearchProvider;
@@ -92,8 +89,7 @@ export function resolveThirdPartySearchProvider(config: Config):
   }
 
   const envVar = API_KEY_ENV_VARS[providerId];
-  const apiKey =
-    config.env?.[envVar] ?? process.env[envVar] ?? webSearchConfig?.apiKey;
+  const apiKey = config.env?.[envVar] ?? process.env[envVar] ?? webSearchConfig?.apiKey;
   if (!apiKey) {
     return {
       reason: `Third-party search provider "${providerId}" is selected but no API key is configured. Set tools.webSearch.apiKey in settings.json or the ${envVar} environment variable.`,

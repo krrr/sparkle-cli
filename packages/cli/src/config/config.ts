@@ -58,10 +58,7 @@ import { isRecord } from '../utils/settingsUtils.js';
 import { RESUME_LATEST } from '../utils/sessionUtils.js';
 
 import { isWorkspaceTrusted } from './trustedFolders.js';
-import {
-  createPolicyEngineConfig,
-  resolveWorkspacePolicyState,
-} from './policy.js';
+import { createPolicyEngineConfig, resolveWorkspacePolicyState } from './policy.js';
 import { ExtensionManager } from './extension-manager.js';
 import { McpServerEnablementManager } from './mcp/mcpServerEnablement.js';
 import type { ExtensionEvents } from 'sparkle-cli-core/src/utils/extensionLoader.js';
@@ -143,18 +140,14 @@ export function getWorktreeArg(argv: string[]): string | undefined {
  * Checks if a worktree is requested via CLI and enabled in settings.
  * Returns the requested name (can be empty string for auto-generated) or undefined.
  */
-export function getRequestedWorktreeName(
-  settings: LoadedSettings,
-): string | undefined {
+export function getRequestedWorktreeName(settings: LoadedSettings): string | undefined {
   if (!isWorktreeEnabled(settings)) {
     return undefined;
   }
   return getWorktreeArg(process.argv);
 }
 
-export async function parseArguments(
-  settings: MergedSettings,
-): Promise<CliArgs> {
+export async function parseArguments(settings: MergedSettings): Promise<CliArgs> {
   const rawArgv = hideBin(process.argv);
   const startupMessages: string[] = [];
   const yargsInstance = yargs(rawArgv)
@@ -225,12 +218,8 @@ export async function parseArguments(
       // This guard safely checks if any positional argument was provided.
       const queryArg = argv['query'];
       const query =
-        typeof queryArg === 'string' || Array.isArray(queryArg)
-          ? queryArg
-          : undefined;
-      const hasPositionalQuery = Array.isArray(query)
-        ? query.length > 0
-        : !!query;
+        typeof queryArg === 'string' || Array.isArray(queryArg) ? queryArg : undefined;
+      const hasPositionalQuery = Array.isArray(query) ? query.length > 0 : !!query;
 
       const sessionFlags = [
         argv['resume'] !== undefined,
@@ -294,8 +283,7 @@ export async function parseArguments(
           alias: 'i',
           type: 'string',
           nargs: 1,
-          description:
-            'Execute the provided prompt and continue in interactive mode',
+          description: 'Execute the provided prompt and continue in interactive mode',
         })
         .option('skip-trust', {
           type: 'boolean',
@@ -350,8 +338,7 @@ export async function parseArguments(
         })
         .option('experimental-acp', {
           type: 'boolean',
-          description:
-            'Starts the agent in ACP mode (deprecated, use --acp instead)',
+          description: 'Starts the agent in ACP mode (deprecated, use --acp instead)',
         })
         .option('allowed-mcp-server-names', {
           type: 'array',
@@ -428,8 +415,7 @@ export async function parseArguments(
         })
         .option('list-sessions', {
           type: 'boolean',
-          description:
-            'List available sessions for the current project and exit.',
+          description: 'List available sessions for the current project and exit.',
         })
         .option('delete-session', {
           type: 'string',
@@ -673,8 +659,7 @@ export async function loadCliConfig(
     );
   }
 
-  const finalExtensionLoader =
-    extensionManager ?? new SimpleExtensionLoader([]);
+  const finalExtensionLoader = extensionManager ?? new SimpleExtensionLoader([]);
 
   const question = argv.promptInteractive || argv.prompt || '';
 
@@ -743,8 +728,7 @@ export async function loadCliConfig(
     !!argv.promptInteractive ||
     !!argv.acp ||
     !!argv.experimentalAcp ||
-    (!isHeadlessMode({ prompt: argv.prompt, query: argv.query }) &&
-      !argv.isCommand);
+    (!isHeadlessMode({ prompt: argv.prompt, query: argv.query }) && !argv.isCommand);
 
   const allowedTools = argv.allowedTools || settings.tools?.allowed || [];
 
@@ -775,9 +759,7 @@ export async function loadCliConfig(
       ...settings.mcp,
       allowed: argv.allowedMcpServerNames ?? settings.mcp?.allowed,
     },
-    policyPaths: (argv.policy ?? settings.policyPaths)?.map((p) =>
-      resolvePath(p),
-    ),
+    policyPaths: (argv.policy ?? settings.policyPaths)?.map((p) => resolvePath(p)),
   };
 
   const { workspacePoliciesDir, policyUpdateConfirmationRequest } =
@@ -852,10 +834,7 @@ export async function loadCliConfig(
   let clientName: string | undefined = undefined;
   if (isAcpMode) {
     const ide = detectIdeFromEnv();
-    if (
-      ide &&
-      (ide.name !== 'vscode' || process.env['TERM_PROGRAM'] === 'vscode')
-    ) {
+    if (ide && (ide.name !== 'vscode' || process.env['TERM_PROGRAM'] === 'vscode')) {
       clientName = `acp-${ide.name}`;
     } else {
       clientName = 'acp';
@@ -1040,11 +1019,7 @@ export async function loadCliConfig(
         selectedProfileId: string | undefined,
       ) => {
         const current = loadedSettings || loadSettings(cwd);
-        current.setValue(
-          SettingScope.User,
-          'security.auth.providers',
-          profiles,
-        );
+        current.setValue(SettingScope.User, 'security.auth.providers', profiles);
         current.setValue(
           SettingScope.User,
           'security.auth.selectedProviderId',

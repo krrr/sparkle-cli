@@ -13,10 +13,7 @@ import {
   InProcessCheckerType,
 } from './types.js';
 import { buildArgsPatterns, isSafeRegExp } from './utils.js';
-import {
-  isValidToolName,
-  ALL_BUILTIN_TOOL_NAMES,
-} from '../tools/tool-names.js';
+import { isValidToolName, ALL_BUILTIN_TOOL_NAMES } from '../tools/tool-names.js';
 import { getToolSuggestion } from '../utils/tool-utils.js';
 import levenshtein from 'fast-levenshtein';
 import fs from 'node:fs/promises';
@@ -159,9 +156,7 @@ export interface PolicyFile {
  * @param policyPath Path to a directory or a .toml file.
  * @returns Array of PolicyFile objects.
  */
-export async function readPolicyFiles(
-  policyPath: string,
-): Promise<PolicyFile[]> {
+export async function readPolicyFiles(policyPath: string): Promise<PolicyFile[]> {
   let filesToLoad: string[] = [];
   let baseDir = '';
 
@@ -196,9 +191,7 @@ export async function readPolicyFiles(
 /**
  * Converts a tier number to a human-readable tier name.
  */
-function getTierName(
-  tier: number,
-): 'default' | 'extension' | 'user' | 'workspace' {
+function getTierName(tier: number): 'default' | 'extension' | 'user' | 'workspace' {
   if (tier === 1) return 'default';
   if (tier === 2) return 'extension';
   if (tier === 3) return 'workspace';
@@ -285,9 +278,7 @@ function validateToolName(name: string, ruleIndex: number): string | null {
   // Names that are very different from all built-in names are likely
   // intentional (dynamic tools, agent tools, etc.).
   const allNames = [...ALL_BUILTIN_TOOL_NAMES];
-  const minDistance = Math.min(
-    ...allNames.map((n) => levenshtein.get(name, n)),
-  );
+  const minDistance = Math.min(...allNames.map((n) => levenshtein.get(name, n)));
 
   if (minDistance > MAX_TYPO_DISTANCE) {
     return null;
@@ -479,10 +470,7 @@ export async function loadPoliciesFromToml(
                   // mcpName and toolName separate here and relying on metadata
                   // during policy evaluation will avoid underscore splitting bugs.
                   // See: https://github.com/google-gemini/gemini-cli/issues/21727
-                  effectiveToolName = formatMcpToolName(
-                    mcpName,
-                    effectiveToolName,
-                  );
+                  effectiveToolName = formatMcpToolName(mcpName, effectiveToolName);
                 }
 
                 const policyRule: PolicyRule = {
@@ -494,8 +482,7 @@ export async function loadPoliciesFromToml(
                   modes: rule.modes,
                   interactive: rule.interactive,
                   toolAnnotations: rule.toolAnnotations,
-                  allowRedirection:
-                    rule.allowRedirection ?? rule.allow_redirection,
+                  allowRedirection: rule.allowRedirection ?? rule.allow_redirection,
                   source: `${tierName.charAt(0).toUpperCase() + tierName.slice(1)}: ${file}`,
                   denyMessage: rule.denyMessage ?? rule.deny_message,
                 };
@@ -528,8 +515,7 @@ export async function loadPoliciesFromToml(
                       errorType: 'regex_compilation',
                       message: 'Unsafe regex pattern (potential ReDoS)',
                       details: `Pattern: ${argsPattern}`,
-                      suggestion:
-                        'Avoid nested quantifiers or extremely long patterns',
+                      suggestion: 'Avoid nested quantifiers or extremely long patterns',
                     });
                     return null;
                   }
@@ -561,8 +547,7 @@ export async function loadPoliciesFromToml(
               tier: tierName,
               ruleIndex: i,
               errorType: 'rule_validation',
-              message:
-                'Invalid safety checker rule: toolName cannot be empty string',
+              message: 'Invalid safety checker rule: toolName cannot be empty string',
               details: `Checker #${i + 1} contains an empty toolName string. Use "*" to match all tools.`,
             });
             continue;

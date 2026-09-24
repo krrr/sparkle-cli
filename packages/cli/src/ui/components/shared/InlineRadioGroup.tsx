@@ -65,13 +65,9 @@ export function InlineRadioGroup<T extends string>({
       if (count === 0) {
         return;
       }
-      const idx = normalizedOptions.findIndex(
-        (option) => option.value === value,
-      );
+      const idx = normalizedOptions.findIndex((option) => option.value === value);
       const current = idx === -1 ? 0 : idx;
-      onChange(
-        normalizedOptions[(current + (forward ? 1 : -1) + count) % count].value,
-      );
+      onChange(normalizedOptions[(current + (forward ? 1 : -1) + count) % count].value);
     },
     [normalizedOptions, value, onChange],
   );

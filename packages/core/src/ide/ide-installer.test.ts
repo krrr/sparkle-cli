@@ -45,15 +45,15 @@ describe('ide-installer', () => {
   });
 
   describe('getIdeInstaller', () => {
-    it.each([
-      { ide: IDE_DEFINITIONS.vscode },
-      { ide: IDE_DEFINITIONS.firebasestudio },
-    ])('returns a VsCodeInstaller for "$ide.name"', ({ ide }) => {
-      const installer = getIdeInstaller(ide);
+    it.each([{ ide: IDE_DEFINITIONS.vscode }, { ide: IDE_DEFINITIONS.firebasestudio }])(
+      'returns a VsCodeInstaller for "$ide.name"',
+      ({ ide }) => {
+        const installer = getIdeInstaller(ide);
 
-      expect(installer).not.toBeNull();
-      expect(installer?.install).toEqual(expect.any(Function));
-    });
+        expect(installer).not.toBeNull();
+        expect(installer?.install).toEqual(expect.any(Function));
+      },
+    );
 
     it('returns an AntigravityInstaller for "antigravity"', () => {
       const installer = getIdeInstaller(IDE_DEFINITIONS.antigravity);
@@ -128,11 +128,7 @@ describe('ide-installer', () => {
         await installer.install();
         expect(child_process.spawnSync).toHaveBeenCalledWith(
           'code',
-          [
-            '--install-extension',
-            'google.sparkle-cli-vscode-ide-companion',
-            '--force',
-          ],
+          ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
           { stdio: 'pipe', shell: false },
         );
       });
@@ -145,11 +141,7 @@ describe('ide-installer', () => {
         await installer.install();
         expect(child_process.spawnSync).toHaveBeenCalledWith(
           'C:\\Program Files\\Microsoft VS Code\\bin\\code.cmd',
-          [
-            '--install-extension',
-            'google.sparkle-cli-vscode-ide-companion',
-            '--force',
-          ],
+          ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
           { stdio: 'pipe', shell: true },
         );
       });
@@ -157,8 +149,7 @@ describe('ide-installer', () => {
       it.each([
         {
           ide: IDE_DEFINITIONS.vscode,
-          expectedMessage:
-            'VS Code companion extension was installed successfully',
+          expectedMessage: 'VS Code companion extension was installed successfully',
         },
         {
           ide: IDE_DEFINITIONS.firebasestudio,
@@ -227,11 +218,7 @@ describe('ide-installer', () => {
       expect(result.success).toBe(true);
       expect(child_process.spawnSync).toHaveBeenCalledWith(
         'positron',
-        [
-          '--install-extension',
-          'google.sparkle-cli-vscode-ide-companion',
-          '--force',
-        ],
+        ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
         { stdio: 'pipe', shell: false },
       );
     });
@@ -272,11 +259,7 @@ describe('AntigravityInstaller', () => {
     expect(result.success).toBe(true);
     expect(child_process.spawnSync).toHaveBeenCalledWith(
       'agy',
-      [
-        '--install-extension',
-        'google.sparkle-cli-vscode-ide-companion',
-        '--force',
-      ],
+      ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
       { stdio: 'pipe', shell: false },
     );
   });
@@ -295,11 +278,7 @@ describe('AntigravityInstaller', () => {
     });
     expect(child_process.spawnSync).toHaveBeenCalledWith(
       'agy',
-      [
-        '--install-extension',
-        'google.sparkle-cli-vscode-ide-companion',
-        '--force',
-      ],
+      ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
       { stdio: 'pipe', shell: false },
     );
   });
@@ -316,13 +295,9 @@ describe('AntigravityInstaller', () => {
     const result = await installer.install();
 
     expect(result.success).toBe(true);
-    expect(child_process.execSync).toHaveBeenNthCalledWith(
-      1,
-      'command -v agy',
-      {
-        stdio: 'ignore',
-      },
-    );
+    expect(child_process.execSync).toHaveBeenNthCalledWith(1, 'command -v agy', {
+      stdio: 'ignore',
+    });
     expect(child_process.execSync).toHaveBeenNthCalledWith(
       2,
       'command -v antigravity',
@@ -330,11 +305,7 @@ describe('AntigravityInstaller', () => {
     );
     expect(child_process.spawnSync).toHaveBeenCalledWith(
       'antigravity',
-      [
-        '--install-extension',
-        'google.sparkle-cli-vscode-ide-companion',
-        '--force',
-      ],
+      ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
       { stdio: 'pipe', shell: false },
     );
   });
@@ -355,21 +326,14 @@ describe('AntigravityInstaller', () => {
     const result = await installer.install();
 
     expect(result.success).toBe(true);
-    expect(child_process.execSync).toHaveBeenNthCalledWith(
-      1,
-      'where.exe agy.cmd',
-    );
+    expect(child_process.execSync).toHaveBeenNthCalledWith(1, 'where.exe agy.cmd');
     expect(child_process.execSync).toHaveBeenNthCalledWith(
       2,
       'where.exe antigravity.cmd',
     );
     expect(child_process.spawnSync).toHaveBeenCalledWith(
       'C:\\Program Files\\Antigravity\\bin\\antigravity.cmd',
-      [
-        '--install-extension',
-        'google.sparkle-cli-vscode-ide-companion',
-        '--force',
-      ],
+      ['--install-extension', 'google.sparkle-cli-vscode-ide-companion', '--force'],
       { stdio: 'pipe', shell: true },
     );
   });

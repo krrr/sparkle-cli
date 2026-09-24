@@ -106,12 +106,10 @@ describe('SettingsSchema', () => {
 
     it('should have checkpointing nested properties', () => {
       expect(
-        getSettingsSchema().general?.properties?.checkpointing.properties
-          ?.enabled,
+        getSettingsSchema().general?.properties?.checkpointing.properties?.enabled,
       ).toBeDefined();
       expect(
-        getSettingsSchema().general?.properties?.checkpointing.properties
-          ?.enabled.type,
+        getSettingsSchema().general?.properties?.checkpointing.properties?.enabled.type,
       ).toBe('boolean');
     });
 
@@ -120,8 +118,7 @@ describe('SettingsSchema', () => {
         getSettingsSchema().general?.properties?.plan?.properties?.directory,
       ).toBeDefined();
       expect(
-        getSettingsSchema().general?.properties?.plan?.properties?.directory
-          .type,
+        getSettingsSchema().general?.properties?.plan?.properties?.directory.type,
       ).toBe('string');
     });
 
@@ -163,14 +160,12 @@ describe('SettingsSchema', () => {
           properties?: Record<string, unknown>;
         };
         if (defWithProps.properties) {
-          Object.values(defWithProps.properties).forEach(
-            (nestedDef: unknown) => {
-              const nestedDefTyped = nestedDef as { category?: string };
-              if (nestedDefTyped.category) {
-                categories.add(nestedDefTyped.category);
-              }
-            },
-          );
+          Object.values(defWithProps.properties).forEach((nestedDef: unknown) => {
+            const nestedDefTyped = nestedDef as { category?: string };
+            if (nestedDefTyped.category) {
+              categories.add(nestedDefTyped.category);
+            }
+          });
         }
       });
 
@@ -199,62 +194,42 @@ describe('SettingsSchema', () => {
 
     it('should have showInDialog property configured', () => {
       // Check that user-facing settings are marked for dialog display
-      expect(getSettingsSchema().general.properties.vimMode.showInDialog).toBe(
+      expect(getSettingsSchema().general.properties.vimMode.showInDialog).toBe(true);
+      expect(getSettingsSchema().ide.properties.enabled.showInDialog).toBe(true);
+      expect(getSettingsSchema().general.properties.enableAutoUpdate.showInDialog).toBe(
         true,
       );
-      expect(getSettingsSchema().ide.properties.enabled.showInDialog).toBe(
+      expect(getSettingsSchema().ui.properties.hideWindowTitle.showInDialog).toBe(true);
+      expect(getSettingsSchema().ui.properties.hideTips.showInDialog).toBe(true);
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.showInDialog).toBe(
         true,
       );
+      expect(getSettingsSchema().ui.properties.hideBanner.showInDialog).toBe(true);
       expect(
-        getSettingsSchema().general.properties.enableAutoUpdate.showInDialog,
-      ).toBe(true);
-      expect(
-        getSettingsSchema().ui.properties.hideWindowTitle.showInDialog,
-      ).toBe(true);
-      expect(getSettingsSchema().ui.properties.hideTips.showInDialog).toBe(
-        true,
-      );
-      expect(
-        getSettingsSchema().ui.properties.showShortcutsHint.showInDialog,
-      ).toBe(true);
-      expect(getSettingsSchema().ui.properties.hideBanner.showInDialog).toBe(
-        true,
-      );
-      expect(
-        getSettingsSchema().privacy.properties.usageStatisticsEnabled
-          .showInDialog,
+        getSettingsSchema().privacy.properties.usageStatisticsEnabled.showInDialog,
       ).toBe(false);
 
       // Check that advanced settings are hidden from dialog
-      expect(getSettingsSchema().security.properties.auth.showInDialog).toBe(
-        false,
-      );
-      expect(getSettingsSchema().tools.properties.core.showInDialog).toBe(
-        false,
-      );
+      expect(getSettingsSchema().security.properties.auth.showInDialog).toBe(false);
+      expect(getSettingsSchema().tools.properties.core.showInDialog).toBe(false);
       expect(getSettingsSchema().mcpServers.showInDialog).toBe(false);
       expect(getSettingsSchema().telemetry.showInDialog).toBe(false);
 
       // Check that some settings are appropriately hidden
       expect(getSettingsSchema().ui.properties.theme.showInDialog).toBe(false); // Changed to false
-      expect(getSettingsSchema().ui.properties.customThemes.showInDialog).toBe(
+      expect(getSettingsSchema().ui.properties.customThemes.showInDialog).toBe(false); // Managed via theme editor
+      expect(getSettingsSchema().general.properties.checkpointing.showInDialog).toBe(
         false,
-      ); // Managed via theme editor
-      expect(
-        getSettingsSchema().general.properties.checkpointing.showInDialog,
-      ).toBe(false); // Experimental feature
-      expect(getSettingsSchema().ui.properties.accessibility.showInDialog).toBe(
+      ); // Experimental feature
+      expect(getSettingsSchema().ui.properties.accessibility.showInDialog).toBe(false); // Changed to false
+      expect(getSettingsSchema().context.properties.fileFiltering.showInDialog).toBe(
+        false,
+      ); // Changed to false
+      expect(getSettingsSchema().general.properties.preferredEditor.showInDialog).toBe(
         false,
       ); // Changed to false
       expect(
-        getSettingsSchema().context.properties.fileFiltering.showInDialog,
-      ).toBe(false); // Changed to false
-      expect(
-        getSettingsSchema().general.properties.preferredEditor.showInDialog,
-      ).toBe(false); // Changed to false
-      expect(
-        getSettingsSchema().advanced.properties.autoConfigureMemory
-          .showInDialog,
+        getSettingsSchema().advanced.properties.autoConfigureMemory.showInDialog,
       ).toBe(true);
     });
 
@@ -277,15 +252,13 @@ describe('SettingsSchema', () => {
     });
 
     it('should have includeDirectories setting in schema', () => {
-      expect(
-        getSettingsSchema().context?.properties.includeDirectories,
-      ).toBeDefined();
-      expect(
-        getSettingsSchema().context?.properties.includeDirectories.type,
-      ).toBe('array');
-      expect(
-        getSettingsSchema().context?.properties.includeDirectories.category,
-      ).toBe('Context');
+      expect(getSettingsSchema().context?.properties.includeDirectories).toBeDefined();
+      expect(getSettingsSchema().context?.properties.includeDirectories.type).toBe(
+        'array',
+      );
+      expect(getSettingsSchema().context?.properties.includeDirectories.category).toBe(
+        'Context',
+      );
       expect(
         getSettingsSchema().context?.properties.includeDirectories.default,
       ).toEqual([]);
@@ -293,12 +266,10 @@ describe('SettingsSchema', () => {
 
     it('should have loadMemoryFromIncludeDirectories setting in schema', () => {
       expect(
-        getSettingsSchema().context?.properties
-          .loadMemoryFromIncludeDirectories,
+        getSettingsSchema().context?.properties.loadMemoryFromIncludeDirectories,
       ).toBeDefined();
       expect(
-        getSettingsSchema().context?.properties.loadMemoryFromIncludeDirectories
-          .type,
+        getSettingsSchema().context?.properties.loadMemoryFromIncludeDirectories.type,
       ).toBe('boolean');
       expect(
         getSettingsSchema().context?.properties.loadMemoryFromIncludeDirectories
@@ -315,16 +286,13 @@ describe('SettingsSchema', () => {
         getSettingsSchema().security.properties.folderTrust.properties.enabled,
       ).toBeDefined();
       expect(
-        getSettingsSchema().security.properties.folderTrust.properties.enabled
-          .type,
+        getSettingsSchema().security.properties.folderTrust.properties.enabled.type,
       ).toBe('boolean');
       expect(
-        getSettingsSchema().security.properties.folderTrust.properties.enabled
-          .category,
+        getSettingsSchema().security.properties.folderTrust.properties.enabled.category,
       ).toBe('Security');
       expect(
-        getSettingsSchema().security.properties.folderTrust.properties.enabled
-          .default,
+        getSettingsSchema().security.properties.folderTrust.properties.enabled.default,
       ).toBe(true);
       expect(
         getSettingsSchema().security.properties.folderTrust.properties.enabled
@@ -336,54 +304,44 @@ describe('SettingsSchema', () => {
       expect(
         getSettingsSchema().general.properties.debugKeystrokeLogging,
       ).toBeDefined();
-      expect(
-        getSettingsSchema().general.properties.debugKeystrokeLogging.type,
-      ).toBe('boolean');
+      expect(getSettingsSchema().general.properties.debugKeystrokeLogging.type).toBe(
+        'boolean',
+      );
       expect(
         getSettingsSchema().general.properties.debugKeystrokeLogging.category,
       ).toBe('General');
+      expect(getSettingsSchema().general.properties.debugKeystrokeLogging.default).toBe(
+        false,
+      );
       expect(
-        getSettingsSchema().general.properties.debugKeystrokeLogging.default,
+        getSettingsSchema().general.properties.debugKeystrokeLogging.requiresRestart,
       ).toBe(false);
       expect(
-        getSettingsSchema().general.properties.debugKeystrokeLogging
-          .requiresRestart,
-      ).toBe(false);
-      expect(
-        getSettingsSchema().general.properties.debugKeystrokeLogging
-          .showInDialog,
+        getSettingsSchema().general.properties.debugKeystrokeLogging.showInDialog,
       ).toBe(true);
       expect(
-        getSettingsSchema().general.properties.debugKeystrokeLogging
-          .description,
+        getSettingsSchema().general.properties.debugKeystrokeLogging.description,
       ).toBe('Enable debug logging of keystrokes to the console.');
     });
 
     it('should have showShortcutsHint setting in schema', () => {
       expect(getSettingsSchema().ui.properties.showShortcutsHint).toBeDefined();
-      expect(getSettingsSchema().ui.properties.showShortcutsHint.type).toBe(
-        'boolean',
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.type).toBe('boolean');
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.category).toBe('UI');
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.default).toBe(true);
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.requiresRestart).toBe(
+        false,
       );
-      expect(getSettingsSchema().ui.properties.showShortcutsHint.category).toBe(
-        'UI',
-      );
-      expect(getSettingsSchema().ui.properties.showShortcutsHint.default).toBe(
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.showInDialog).toBe(
         true,
       );
-      expect(
-        getSettingsSchema().ui.properties.showShortcutsHint.requiresRestart,
-      ).toBe(false);
-      expect(
-        getSettingsSchema().ui.properties.showShortcutsHint.showInDialog,
-      ).toBe(true);
-      expect(
-        getSettingsSchema().ui.properties.showShortcutsHint.description,
-      ).toBe('Show the "? for shortcuts" hint above the input.');
+      expect(getSettingsSchema().ui.properties.showShortcutsHint.description).toBe(
+        'Show the "? for shortcuts" hint above the input.',
+      );
     });
 
     it('should have enableNotifications setting in schema', () => {
-      const setting =
-        getSettingsSchema().general.properties.enableNotifications;
+      const setting = getSettingsSchema().general.properties.enableNotifications;
       expect(setting).toBeDefined();
       expect(setting.type).toBe('boolean');
       expect(setting.category).toBe('General');
@@ -415,8 +373,7 @@ describe('SettingsSchema', () => {
     });
 
     it('should have plan setting in schema', () => {
-      const setting =
-        getSettingsSchema().general.properties.plan.properties.enabled;
+      const setting = getSettingsSchema().general.properties.plan.properties.enabled;
       expect(setting).toBeDefined();
       expect(setting.type).toBe('boolean');
       expect(setting.category).toBe('General');
@@ -457,9 +414,7 @@ describe('SettingsSchema', () => {
       expect(adk.default).toEqual({});
       expect(adk.requiresRestart).toBe(true);
       expect(adk.showInDialog).toBe(false);
-      expect(adk.description).toBe(
-        'Settings for the Agent Development Kit (ADK).',
-      );
+      expect(adk.description).toBe('Settings for the Agent Development Kit (ADK).');
 
       const agentSessionNoninteractiveEnabled =
         adk.properties.agentSessionNoninteractiveEnabled;
@@ -473,8 +428,7 @@ describe('SettingsSchema', () => {
         'Enable non-interactive agent sessions.',
       );
 
-      const agentSessionSubagentEnabled =
-        adk.properties.agentSessionSubagentEnabled;
+      const agentSessionSubagentEnabled = adk.properties.agentSessionSubagentEnabled;
       expect(agentSessionSubagentEnabled).toBeDefined();
       expect(agentSessionSubagentEnabled.type).toBe('boolean');
       expect(agentSessionSubagentEnabled.category).toBe('Experimental');
@@ -527,11 +481,7 @@ describe('SettingsSchema', () => {
         referenced.add(ref);
       }
       const properties = jsonSchema['properties'];
-      if (
-        properties &&
-        typeof properties === 'object' &&
-        !Array.isArray(properties)
-      ) {
+      if (properties && typeof properties === 'object' && !Array.isArray(properties)) {
         Object.values(properties as Record<string, unknown>).forEach((prop) =>
           visitJsonSchema(prop as Record<string, unknown>),
         );

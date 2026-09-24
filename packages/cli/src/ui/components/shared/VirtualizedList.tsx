@@ -274,10 +274,7 @@ function VirtualizedList<T>(
   const scrollableContainerHeight = props.containerHeight ?? containerHeight;
 
   const getAnchorForScrollTop = useCallback(
-    (
-      scrollTop: number,
-      offsets: number[],
-    ): { index: number; offset: number } => {
+    (scrollTop: number, offsets: number[]): { index: number; offset: number } => {
       const index = findLastIndex(offsets, (offset) => offset <= scrollTop);
       if (index === -1) {
         return { index: 0, offset: 0 };
@@ -328,18 +325,9 @@ function VirtualizedList<T>(
     }
 
     return offset + scrollAnchor.offset;
-  }, [
-    scrollAnchor,
-    offsets,
-    heights,
-    scrollableContainerHeight,
-    data,
-    keyExtractor,
-  ]);
+  }, [scrollAnchor, offsets, heights, scrollableContainerHeight, data, keyExtractor]);
 
-  const scrollTop = isStickingToBottom
-    ? Number.MAX_SAFE_INTEGER
-    : actualScrollTop;
+  const scrollTop = isStickingToBottom ? Number.MAX_SAFE_INTEGER : actualScrollTop;
 
   const prevDataLength = useRef(data.length);
   const prevTotalHeight = useRef(totalHeight);
@@ -347,8 +335,7 @@ function VirtualizedList<T>(
   const prevContainerHeight = useRef(scrollableContainerHeight);
 
   useLayoutEffect(() => {
-    const contentPreviouslyFit =
-      prevTotalHeight.current <= prevContainerHeight.current;
+    const contentPreviouslyFit = prevTotalHeight.current <= prevContainerHeight.current;
     const wasScrolledToBottomPixels =
       prevScrollTop.current >=
       prevTotalHeight.current - prevContainerHeight.current - 1;
@@ -361,8 +348,7 @@ function VirtualizedList<T>(
     }
 
     const listGrew = data.length > prevDataLength.current;
-    const containerChanged =
-      prevContainerHeight.current !== scrollableContainerHeight;
+    const containerChanged = prevContainerHeight.current !== scrollableContainerHeight;
 
     // If targetScrollIndex is provided, we NEVER auto-snap to the bottom
     // because the parent is explicitly managing the scroll position.
@@ -489,9 +475,7 @@ function VirtualizedList<T>(
     (offset) => offset > actualScrollTop + viewHeightForEndIndex,
   );
   const endIndex =
-    endIndexOffset === -1
-      ? data.length - 1
-      : Math.min(data.length - 1, endIndexOffset);
+    endIndexOffset === -1 ? data.length - 1 : Math.min(data.length - 1, endIndexOffset);
 
   const topSpacerHeight =
     renderStatic === true || overflowToBackbuffer === true
@@ -532,8 +516,7 @@ function VirtualizedList<T>(
     observedNodes.current = currentNodes;
   });
 
-  const renderRangeStart =
-    renderStatic || overflowToBackbuffer ? 0 : startIndex;
+  const renderRangeStart = renderStatic || overflowToBackbuffer ? 0 : startIndex;
   const renderRangeEnd = renderStatic ? data.length - 1 : endIndex;
 
   // Always evaluate shouldBeStatic, width, etc. if we have a known width from the prop.
@@ -657,10 +640,7 @@ function VirtualizedList<T>(
         setIsStickingToBottom(false);
         const offset = offsets[index];
         if (offset !== undefined) {
-          const maxScroll = Math.max(
-            0,
-            totalHeight - scrollableContainerHeight,
-          );
+          const maxScroll = Math.max(0, totalHeight - scrollableContainerHeight);
           const newScrollTop = Math.max(
             0,
             Math.min(
@@ -686,10 +666,7 @@ function VirtualizedList<T>(
         if (index !== -1) {
           const offset = offsets[index];
           if (offset !== undefined) {
-            const maxScroll = Math.max(
-              0,
-              totalHeight - scrollableContainerHeight,
-            );
+            const maxScroll = Math.max(0, totalHeight - scrollableContainerHeight);
             const newScrollTop = Math.max(
               0,
               Math.min(

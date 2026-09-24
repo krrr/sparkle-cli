@@ -41,8 +41,7 @@ vi.mock('../config/settings.js', async (importOriginal) => {
 
 const startAutoMemoryIfEnabledMock = vi.fn();
 vi.mock('../utils/autoMemory.js', () => ({
-  startAutoMemoryIfEnabled: (config: Config) =>
-    startAutoMemoryIfEnabledMock(config),
+  startAutoMemoryIfEnabled: (config: Config) => startAutoMemoryIfEnabledMock(config),
 }));
 
 describe('AcpSessionManager', () => {
@@ -61,9 +60,7 @@ describe('AcpSessionManager', () => {
       waitForMcpInit: vi.fn(),
       getFileSystemService: vi.fn(),
       setFileSystemService: vi.fn(),
-      getContentGeneratorConfig: vi
-        .fn()
-        .mockReturnValue({ apiKey: 'test-key' }),
+      getContentGeneratorConfig: vi.fn().mockReturnValue({ apiKey: 'test-key' }),
       getProviderProfileService: vi.fn().mockReturnValue({
         getActiveProfile: vi.fn().mockReturnValue({
           id: 'test-profile-1',
@@ -274,8 +271,7 @@ describe('AcpSessionManager', () => {
       {},
     );
 
-    const modelIds =
-      response.models?.availableModels?.map((m) => m.modelId) ?? [];
+    const modelIds = response.models?.availableModels?.map((m) => m.modelId) ?? [];
     expect(modelIds).not.toContain('none');
   });
 

@@ -39,9 +39,7 @@ export class TerminalQuotaError extends Error {
     super(message);
     this.name = 'TerminalQuotaError';
     this.status = cause?.code;
-    this.retryDelayMs = retryDelaySeconds
-      ? retryDelaySeconds * 1000
-      : undefined;
+    this.retryDelayMs = retryDelaySeconds ? retryDelaySeconds * 1000 : undefined;
     this.reason = reason;
   }
 
@@ -65,9 +63,7 @@ export class RetryableQuotaError extends Error {
     super(message);
     this.name = 'RetryableQuotaError';
     this.status = cause?.code;
-    this.retryDelayMs = retryDelaySeconds
-      ? retryDelaySeconds * 1000
-      : undefined;
+    this.retryDelayMs = retryDelaySeconds ? retryDelaySeconds * 1000 : undefined;
   }
 }
 

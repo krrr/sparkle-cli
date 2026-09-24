@@ -217,10 +217,7 @@ export interface SlashCommand {
   action?: (
     context: CommandContext,
     args: string, // TODO: Remove args. CommandContext now contains the complete invocation.
-  ) =>
-    | void
-    | SlashCommandActionReturn
-    | Promise<void | SlashCommandActionReturn>;
+  ) => void | SlashCommandActionReturn | Promise<void | SlashCommandActionReturn>;
 
   // Provides argument completion (e.g., completing a tag for `/resume resume <tag>`).
   completion?: (

@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  expect,
-  describe,
-  it,
-  beforeEach,
-  beforeAll,
-  vi,
-  afterEach,
-} from 'vitest';
+import { expect, describe, it, beforeEach, beforeAll, vi, afterEach } from 'vitest';
 import {
   escapeShellArg,
   getCommandRoots,
@@ -128,9 +120,7 @@ describe('normalizeCommand', () => {
 
   it('should handle absolute paths', () => {
     expect(normalizeCommand('/usr/bin/npm')).toBe('npm');
-    expect(normalizeCommand('C:\\Program Files\\nodejs\\node.exe')).toBe(
-      'node',
-    );
+    expect(normalizeCommand('C:\\Program Files\\nodejs\\node.exe')).toBe('node');
   });
 });
 
@@ -175,9 +165,7 @@ describe('getCommandRoots', () => {
   });
 
   it('should treat parameter expansions with prompt transformations as unsafe', () => {
-    const roots = getCommandRoots(
-      'echo "${var1=aa\\140 env| ls -l\\140}${var1@P}"',
-    );
+    const roots = getCommandRoots('echo "${var1=aa\\140 env| ls -l\\140}${var1@P}"');
     expect(roots).toEqual([]);
   });
 
@@ -193,9 +181,7 @@ describe('getCommandRoots', () => {
 
   it('should correctly identify input redirection with explicit file descriptor', () => {
     const result = parseCommandDetails('ls 2< input.txt');
-    const redirection = result?.details.find((d) =>
-      d.name.startsWith('redirection'),
-    );
+    const redirection = result?.details.find((d) => d.name.startsWith('redirection'));
     expect(redirection?.name).toBe('redirection (<)');
   });
 
@@ -233,8 +219,7 @@ describe('getCommandRoots', () => {
     nowSpy.mockReturnValueOnce(0).mockReturnValue(2000);
 
     // Use a very complex command to ensure progressCallback is triggered at least once
-    const complexCommand =
-      'ls -la && ' + Array(100).fill('echo "hello"').join(' && ');
+    const complexCommand = 'ls -la && ' + Array(100).fill('echo "hello"').join(' && ');
     const roots = getCommandRoots(complexCommand);
     expect(roots).toEqual([]);
     expect(nowSpy).toHaveBeenCalled();
@@ -326,18 +311,13 @@ describeWindowsOnly('PowerShell integration', () => {
 
 describe('splitCommands', () => {
   it('should split chained commands', () => {
-    expect(splitCommands('ls -l && git status')).toEqual([
-      'ls -l',
-      'git status',
-    ]);
+    expect(splitCommands('ls -l && git status')).toEqual(['ls -l', 'git status']);
   });
 
   it('should filter out redirection tokens but keep command parts', () => {
     // Standard redirection
     expect(splitCommands('echo "hello" > file.txt')).toEqual(['echo "hello"']);
-    expect(splitCommands('printf "test" >> log.txt')).toEqual([
-      'printf "test"',
-    ]);
+    expect(splitCommands('printf "test" >> log.txt')).toEqual(['printf "test"']);
     expect(splitCommands('cat < input.txt')).toEqual(['cat']);
 
     // Heredoc/Herestring
@@ -379,15 +359,15 @@ describe('stripShellWrapper', () => {
     expect(
       stripShellWrapper('powershell.exe -NoProfile -Command "Get-ChildItem"'),
     ).toEqual('Get-ChildItem');
-    expect(
-      stripShellWrapper('powershell.exe -Command "Get-ChildItem"'),
-    ).toEqual('Get-ChildItem');
+    expect(stripShellWrapper('powershell.exe -Command "Get-ChildItem"')).toEqual(
+      'Get-ChildItem',
+    );
   });
 
   it('should strip pwsh -Command wrapper', () => {
-    expect(
-      stripShellWrapper('pwsh -NoProfile -Command "Get-ChildItem"'),
-    ).toEqual('Get-ChildItem');
+    expect(stripShellWrapper('pwsh -NoProfile -Command "Get-ChildItem"')).toEqual(
+      'Get-ChildItem',
+    );
   });
 
   it('should not strip anything if no wrapper is present', () => {
@@ -497,11 +477,7 @@ describe('getShellConfiguration', () => {
     it('should return PowerShell configuration by default', () => {
       const config = getShellConfiguration();
       expect(config.executable).toBe('powershell.exe');
-      expect(config.argsPrefix).toEqual([
-        '-NoProfile',
-        '-NonInteractive',
-        '-Command',
-      ]);
+      expect(config.argsPrefix).toEqual(['-NoProfile', '-NonInteractive', '-Command']);
       expect(config.shell).toBe('powershell');
     });
 
@@ -526,25 +502,16 @@ describe('getShellConfiguration', () => {
       vi.stubEnv('ComSpec', 'C:\\WINDOWS\\system32\\cmd.exe');
       const config = getShellConfiguration();
       expect(config.executable).toBe('powershell.exe');
-      expect(config.argsPrefix).toEqual([
-        '-NoProfile',
-        '-NonInteractive',
-        '-Command',
-      ]);
+      expect(config.argsPrefix).toEqual(['-NoProfile', '-NonInteractive', '-Command']);
       expect(config.shell).toBe('powershell');
     });
 
     it('should return PowerShell configuration if ComSpec points to powershell.exe', () => {
-      const psPath =
-        'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe';
+      const psPath = 'C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe';
       vi.stubEnv('ComSpec', psPath);
       const config = getShellConfiguration();
       expect(config.executable).toBe(psPath);
-      expect(config.argsPrefix).toEqual([
-        '-NoProfile',
-        '-NonInteractive',
-        '-Command',
-      ]);
+      expect(config.argsPrefix).toEqual(['-NoProfile', '-NonInteractive', '-Command']);
       expect(config.shell).toBe('powershell');
     });
 
@@ -553,11 +520,7 @@ describe('getShellConfiguration', () => {
       vi.stubEnv('ComSpec', pwshPath);
       const config = getShellConfiguration();
       expect(config.executable).toBe(pwshPath);
-      expect(config.argsPrefix).toEqual([
-        '-NoProfile',
-        '-NonInteractive',
-        '-Command',
-      ]);
+      expect(config.argsPrefix).toEqual(['-NoProfile', '-NonInteractive', '-Command']);
       expect(config.shell).toBe('powershell');
     });
 
@@ -565,11 +528,7 @@ describe('getShellConfiguration', () => {
       vi.stubEnv('ComSpec', 'C:\\Path\\To\\POWERSHELL.EXE');
       const config = getShellConfiguration();
       expect(config.executable).toBe('C:\\Path\\To\\POWERSHELL.EXE');
-      expect(config.argsPrefix).toEqual([
-        '-NoProfile',
-        '-NonInteractive',
-        '-Command',
-      ]);
+      expect(config.argsPrefix).toEqual(['-NoProfile', '-NonInteractive', '-Command']);
       expect(config.shell).toBe('powershell');
     });
   });

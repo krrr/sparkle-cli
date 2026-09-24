@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  runWithToolCallContext,
-  getToolCallContext,
-} from './toolCallContext.js';
+import { runWithToolCallContext, getToolCallContext } from './toolCallContext.js';
 
 describe('toolCallContext', () => {
   it('should store and retrieve tool call context', () => {

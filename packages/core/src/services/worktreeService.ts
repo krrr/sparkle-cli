@@ -63,9 +63,7 @@ export class WorktreeService {
     if (!hasChanges) {
       try {
         await cleanupWorktree(info.path, this.projectRoot);
-        debugLogger.log(
-          `Automatically cleaned up unmodified worktree: ${info.path}`,
-        );
+        debugLogger.log(`Automatically cleaned up unmodified worktree: ${info.path}`);
         return true;
       } catch (error) {
         debugLogger.error(
@@ -73,18 +71,14 @@ export class WorktreeService {
         );
       }
     } else {
-      debugLogger.debug(
-        `Preserving worktree ${info.path} because it has changes.`,
-      );
+      debugLogger.debug(`Preserving worktree ${info.path} because it has changes.`);
     }
 
     return false;
   }
 }
 
-export async function createWorktreeService(
-  cwd: string,
-): Promise<WorktreeService> {
+export async function createWorktreeService(cwd: string): Promise<WorktreeService> {
   const projectRoot = await getProjectRootForWorktree(cwd);
   return new WorktreeService(projectRoot);
 }
@@ -129,18 +123,11 @@ export async function createWorktree(
   return worktreePath;
 }
 
-export function isGeminiWorktree(
-  dirPath: string,
-  projectRoot: string,
-): boolean {
+export function isGeminiWorktree(dirPath: string, projectRoot: string): boolean {
   try {
     const realDirPath = realpathSync(dirPath);
     const realProjectRoot = realpathSync(projectRoot);
-    const worktreesBaseDir = path.join(
-      realProjectRoot,
-      '.sparkle',
-      'worktrees',
-    );
+    const worktreesBaseDir = path.join(realProjectRoot, '.sparkle', 'worktrees');
     const relative = path.relative(worktreesBaseDir, realDirPath);
     return !relative.startsWith('..') && !path.isAbsolute(relative);
   } catch {
@@ -195,13 +182,9 @@ export async function cleanupWorktree(
 
   try {
     // 1. Discover the branch name associated with this worktree path
-    const { stdout } = await execa(
-      'git',
-      ['-C', dirPath, 'branch', '--show-current'],
-      {
-        cwd: projectRoot,
-      },
-    );
+    const { stdout } = await execa('git', ['-C', dirPath, 'branch', '--show-current'], {
+      cwd: projectRoot,
+    });
     branchName = stdout.trim() || undefined;
 
     // 2. Remove the worktree

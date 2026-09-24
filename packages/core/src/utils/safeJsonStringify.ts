@@ -13,10 +13,7 @@
  */
 import type { Config } from '../config/config.js';
 
-export function safeJsonStringify(
-  obj: unknown,
-  space?: string | number,
-): string {
+export function safeJsonStringify(obj: unknown, space?: string | number): string {
   const seen = new WeakSet();
   return JSON.stringify(
     obj,

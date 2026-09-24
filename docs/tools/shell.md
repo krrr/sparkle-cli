@@ -1,8 +1,8 @@
 # Shell tool (`run_shell_command`)
 
-The `run_shell_command` tool allows the Gemini model to execute commands
-directly on your system's shell. It is the primary mechanism for the agent to
-interact with your environment beyond simple file edits.
+The `run_shell_command` tool allows the Gemini model to execute commands directly on
+your system's shell. It is the primary mechanism for the agent to interact with your
+environment beyond simple file edits.
 
 ## Technical reference
 
@@ -14,23 +14,22 @@ platforms, they execute with `bash -c`.
 - `command` (string, required): The exact shell command to execute.
 - `description` (string, optional): A brief description shown to the user for
   confirmation.
-- `dir_path` (string, optional): The absolute path or relative path from
-  workspace root where the command runs.
-- `is_background` (boolean, optional): Whether to move the process to the
-  background immediately after starting.
+- `dir_path` (string, optional): The absolute path or relative path from workspace root
+  where the command runs.
+- `is_background` (boolean, optional): Whether to move the process to the background
+  immediately after starting.
 
 ### Policy engine shorthands
 
-The [policy engine](../reference/policy-engine.md) provides two convenience
-fields for writing rules that target shell commands:
+The [policy engine](../reference/policy-engine.md) provides two convenience fields for
+writing rules that target shell commands:
 
 - `commandPrefix`: Matches if the `command` argument starts with a given string.
-- `commandRegex`: Matches if the `command` argument matches a given regular
-  expression.
+- `commandRegex`: Matches if the `command` argument matches a given regular expression.
 
 These are syntactic sugar for combining `toolName = "run_shell_command"` with an
-`argsPattern` in a policy TOML file. They are **not** arguments of
-`run_shell_command` itself.
+`argsPattern` in a policy TOML file. They are **not** arguments of `run_shell_command`
+itself.
 
 For details on writing shell-specific policy rules, see
 [Special syntax for `run_shell_command`](../reference/policy-engine.md#special-syntax-for-run_shell_command)
@@ -53,11 +52,10 @@ You can configure the behavior of the `run_shell_command` tool by modifying your
 
 ### Enabling interactive commands
 
-To enable interactive commands, you need to set the
-`tools.shell.enableInteractiveShell` setting to `true`. This will use `node-pty`
-for shell command execution, which allows for interactive sessions. If
-`node-pty` is not available, it will fall back to the `child_process`
-implementation, which does not support interactive commands.
+To enable interactive commands, you need to set the `tools.shell.enableInteractiveShell`
+setting to `true`. This will use `node-pty` for shell command execution, which allows
+for interactive sessions. If `node-pty` is not available, it will fall back to the
+`child_process` implementation, which does not support interactive commands.
 
 **Example `settings.json`:**
 
@@ -73,9 +71,9 @@ implementation, which does not support interactive commands.
 
 ### Showing color in output
 
-To show color in the shell output, you need to set the `tools.shell.showColor`
-setting to `true`. This setting only applies when
-`tools.shell.enableInteractiveShell` is enabled.
+To show color in the shell output, you need to set the `tools.shell.showColor` setting
+to `true`. This setting only applies when `tools.shell.enableInteractiveShell` is
+enabled.
 
 **Example `settings.json`:**
 
@@ -91,9 +89,9 @@ setting to `true`. This setting only applies when
 
 ### Setting the pager
 
-You can set a custom pager for the shell output by setting the
-`tools.shell.pager` setting. The default pager is `cat`. This setting only
-applies when `tools.shell.enableInteractiveShell` is enabled.
+You can set a custom pager for the shell output by setting the `tools.shell.pager`
+setting. The default pager is `cat`. This setting only applies when
+`tools.shell.enableInteractiveShell` is enabled.
 
 **Example `settings.json`:**
 
@@ -110,30 +108,29 @@ applies when `tools.shell.enableInteractiveShell` is enabled.
 ## Interactive commands
 
 The `run_shell_command` tool now supports interactive commands by integrating a
-pseudo-terminal (pty). This lets you run commands that require real-time user
-input, such as text editors (`vim`, `nano`), terminal-based UIs (`htop`), and
-interactive version control operations (`git rebase -i`).
+pseudo-terminal (pty). This lets you run commands that require real-time user input,
+such as text editors (`vim`, `nano`), terminal-based UIs (`htop`), and interactive
+version control operations (`git rebase -i`).
 
-When an interactive command is running, you can send input to it from the
-Sparkle CLI. To focus on the interactive shell, press `Tab`. The terminal
-output, including complex TUIs, will be rendered correctly.
+When an interactive command is running, you can send input to it from the Sparkle CLI.
+To focus on the interactive shell, press `Tab`. The terminal output, including complex
+TUIs, will be rendered correctly.
 
 ## Important notes
 
-- **Security:** Be cautious when executing commands, especially those
-  constructed from user input, to prevent security vulnerabilities.
-- **Error handling:** Check the `Stderr`, `Error`, and `Exit Code` fields to
-  determine if a command executed successfully.
-- **Background processes:** When a command is run in the background with `&`,
-  the tool will return immediately and the process will continue to run in the
-  background. The `Background PIDs` field will contain the process ID of the
-  background process.
+- **Security:** Be cautious when executing commands, especially those constructed from
+  user input, to prevent security vulnerabilities.
+- **Error handling:** Check the `Stderr`, `Error`, and `Exit Code` fields to determine
+  if a command executed successfully.
+- **Background processes:** When a command is run in the background with `&`, the tool
+  will return immediately and the process will continue to run in the background. The
+  `Background PIDs` field will contain the process ID of the background process.
 
 ## Environment variables
 
-When `run_shell_command` executes a command, it sets the `SPARKLE_CLI=1`
-environment variable in the subprocess's environment. This allows scripts or
-tools to detect if they are being run from within Sparkle CLI.
+When `run_shell_command` executes a command, it sets the `SPARKLE_CLI=1` environment
+variable in the subprocess's environment. This allows scripts or tools to detect if they
+are being run from within Sparkle CLI.
 
 ## Command restrictions
 
@@ -145,32 +142,31 @@ tools to detect if they are being run from within Sparkle CLI.
 > tools like `read_file`, `write_file`, `glob`, `grep_search`, `list_directory`,
 > `replace`, etc.
 
-You can restrict the commands that can be executed by the `run_shell_command`
-tool by using the `tools.core` and `tools.exclude` settings in your
-configuration file.
+You can restrict the commands that can be executed by the `run_shell_command` tool by
+using the `tools.core` and `tools.exclude` settings in your configuration file.
 
-- `tools.core`: To restrict `run_shell_command` to a specific set of commands,
-  add entries to the `core` list under the `tools` category in the format
+- `tools.core`: To restrict `run_shell_command` to a specific set of commands, add
+  entries to the `core` list under the `tools` category in the format
   `run_shell_command(<command>)`. For example,
-  `"tools": {"core": ["run_shell_command(git)"]}` will only allow `git`
-  commands. Including the generic `run_shell_command` acts as a wildcard,
-  allowing any command not explicitly blocked.
+  `"tools": {"core": ["run_shell_command(git)"]}` will only allow `git` commands.
+  Including the generic `run_shell_command` acts as a wildcard, allowing any command not
+  explicitly blocked.
 - `tools.exclude` [DEPRECATED]: To block specific commands, use the
-  [Policy Engine](../reference/policy-engine.md). Historically, this setting
-  allowed adding entries to the `exclude` list under the `tools` category in the
-  format `run_shell_command(<command>)`. For example,
+  [Policy Engine](../reference/policy-engine.md). Historically, this setting allowed
+  adding entries to the `exclude` list under the `tools` category in the format
+  `run_shell_command(<command>)`. For example,
   `"tools": {"exclude": ["run_shell_command(rm)"]}` will block `rm` commands.
 
 The validation logic is designed to be secure and flexible:
 
-1.  **Command chaining disabled**: The tool automatically splits commands
-    chained with `&&`, `||`, or `;` and validates each part separately. If any
-    part of the chain is disallowed, the entire command is blocked.
-2.  **Prefix matching**: The tool uses prefix matching. For example, if you
-    allow `git`, you can run `git status` or `git log`.
-3.  **Blocklist precedence**: The `tools.exclude` list is always checked first.
-    If a command matches a blocked prefix, it will be denied, even if it also
-    matches an allowed prefix in `tools.core`.
+1.  **Command chaining disabled**: The tool automatically splits commands chained with
+    `&&`, `||`, or `;` and validates each part separately. If any part of the chain is
+    disallowed, the entire command is blocked.
+2.  **Prefix matching**: The tool uses prefix matching. For example, if you allow `git`,
+    you can run `git status` or `git log`.
+3.  **Blocklist precedence**: The `tools.exclude` list is always checked first. If a
+    command matches a blocked prefix, it will be denied, even if it also matches an
+    allowed prefix in `tools.core`.
 
 ### Command restriction examples
 
@@ -209,19 +205,17 @@ To block `rm` and allow all other commands:
 
 **Blocklist takes precedence**
 
-If a command prefix is in both `tools.core` and `tools.exclude`, it will be
-blocked.
+If a command prefix is in both `tools.core` and `tools.exclude`, it will be blocked.
 
-- **`tools.shell.enableInteractiveShell`**: (boolean) Uses `node-pty` for
-  real-time interaction.
+- **`tools.shell.enableInteractiveShell`**: (boolean) Uses `node-pty` for real-time
+  interaction.
 - **`tools.shell.showColor`**: (boolean) Preserves ANSI colors in output.
-- **`tools.shell.inactivityTimeout`**: (number) Seconds to wait for output
-  before killing the process.
+- **`tools.shell.inactivityTimeout`**: (number) Seconds to wait for output before
+  killing the process.
 
 ### Command restrictions
 
-You can limit which commands the agent is allowed to request using these
-settings:
+You can limit which commands the agent is allowed to request using these settings:
 
 - **`tools.core`**: An allowlist of command prefixes (for example,
   `["git", "npm test"]`).
@@ -236,6 +230,6 @@ settings:
 
 ## Next steps
 
-- Follow the [Shell commands tutorial](../cli/tutorials/shell-commands.md) for
-  practical examples.
+- Follow the [Shell commands tutorial](../cli/tutorials/shell-commands.md) for practical
+  examples.
 - Learn about [Sandboxing](../cli/sandbox.md) to isolate command execution.

@@ -35,9 +35,7 @@ export const RESUME_LATEST = 'latest';
 /**
  * Error codes for session-related errors.
  */
-export type SessionErrorCode =
-  | 'NO_SESSIONS_FOUND'
-  | 'INVALID_SESSION_IDENTIFIER';
+export type SessionErrorCode = 'NO_SESSIONS_FOUND' | 'INVALID_SESSION_IDENTIFIER';
 
 /**
  * Error thrown for session-related failures.
@@ -65,10 +63,7 @@ export class SessionError extends Error {
   /**
    * Creates an error for when a session identifier is invalid.
    */
-  static invalidSessionIdentifier(
-    identifier: string,
-    chatsDir?: string,
-  ): SessionError {
+  static invalidSessionIdentifier(identifier: string, chatsDir?: string): SessionError {
     const dirInfo = chatsDir ? ` in ${chatsDir}` : '';
     return new SessionError(
       'INVALID_SESSION_IDENTIFIER',
@@ -216,9 +211,7 @@ export const formatRelativeTime = (
     if (diffHours < 24) return `${diffHours}h`;
     if (diffDays < 30) return `${diffDays}d`;
     const diffMonths = Math.floor(diffDays / 30);
-    return diffMonths < 12
-      ? `${diffMonths}mo`
-      : `${Math.floor(diffMonths / 12)}y`;
+    return diffMonths < 12 ? `${diffMonths}mo` : `${Math.floor(diffMonths / 12)}y`;
   } else {
     if (diffDays > 0) {
       return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
@@ -439,9 +432,7 @@ const scanSessionFile = async (
       : false;
 
     const fullContent = content.messages
-      .map((msg) =>
-        partListUnionToString(stripInternalDisplayParts(msg.content)),
-      )
+      .map((msg) => partListUnionToString(stripInternalDisplayParts(msg.content)))
       .join(' ');
     const messages = content.messages.map((msg) => ({
       role: msg.type === 'user' ? ('user' as const) : ('assistant' as const),
@@ -483,15 +474,12 @@ const mapWithConcurrencyLimit = async <T, R>(
 ): Promise<R[]> => {
   const results = new Array<R>(items.length);
   let nextIndex = 0;
-  const workers = Array.from(
-    { length: Math.min(limit, items.length) },
-    async () => {
-      while (nextIndex < items.length) {
-        const index = nextIndex++;
-        results[index] = await mapper(items[index], index);
-      }
-    },
-  );
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex++;
+      results[index] = await mapper(items[index], index);
+    }
+  });
   await Promise.all(workers);
   return results;
 };
@@ -505,11 +493,7 @@ export const getSessionFiles = async (
   currentSessionId?: string,
   options: GetSessionOptions = {},
 ): Promise<SessionInfo[]> => {
-  const allFiles = await getAllSessionFiles(
-    chatsDir,
-    currentSessionId,
-    options,
-  );
+  const allFiles = await getAllSessionFiles(chatsDir, currentSessionId, options);
 
   // Filter out corrupted files and extract SessionInfo
   const validSessions = allFiles
@@ -562,8 +546,7 @@ export class SessionSelector {
     // The filename format is `session-<TIMESTAMP>-<ID_SLICE(0,8)>.jsonl`
     const shortId = id.slice(0, 8);
     const candidateFiles = files.filter(
-      (f) =>
-        f.startsWith(SESSION_FILE_PREFIX) && f.endsWith(`-${shortId}.jsonl`),
+      (f) => f.startsWith(SESSION_FILE_PREFIX) && f.endsWith(`-${shortId}.jsonl`),
     );
 
     for (const fileName of candidateFiles) {
@@ -606,8 +589,7 @@ export class SessionSelector {
 
     // Sort by startTime (oldest first, so newest sessions get highest numbers)
     const sortedSessions = sessions.sort(
-      (a, b) =>
-        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+      (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
     );
 
     // Try to find by UUID first
@@ -652,8 +634,7 @@ export class SessionSelector {
 
       // Sort by startTime (oldest first, so newest sessions get highest numbers)
       sessions.sort(
-        (a, b) =>
-          new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+        (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
       );
 
       selectedSession = sessions[sessions.length - 1];
@@ -770,9 +751,7 @@ export function convertSessionToHistoryFormats(
     const displayContentString = msg.displayContent
       ? partListUnionToString(stripInternalDisplayParts(msg.displayContent))
       : undefined;
-    const contentString = partListUnionToString(
-      stripInternalDisplayParts(msg.content),
-    );
+    const contentString = partListUnionToString(stripInternalDisplayParts(msg.content));
     const uiText = displayContentString || contentString;
 
     // Skip internal context messages in the UI history

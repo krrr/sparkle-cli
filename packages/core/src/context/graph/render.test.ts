@@ -136,8 +136,7 @@ describe('render', () => {
 
     const mockAdvancedTokenCalculator = {
       calculateTokensAndBaseUnits: vi.fn((nodes: readonly ConcreteNode[]) => {
-        const tokens =
-          nodes.length === 1 ? tokenMap[nodes[0].id] : currentTokens;
+        const tokens = nodes.length === 1 ? tokenMap[nodes[0].id] : currentTokens;
         return { tokens, baseUnits: tokens };
       }),
       getRawBaseUnits: vi.fn((nodes: readonly ConcreteNode[]) => {
@@ -238,8 +237,7 @@ describe('render', () => {
 
     const mockAdvancedTokenCalculator = {
       calculateTokensAndBaseUnits: vi.fn((nodes: readonly ConcreteNode[]) => {
-        const tokens =
-          nodes.length === 1 ? tokenMap[nodes[0].id] : currentTokens;
+        const tokens = nodes.length === 1 ? tokenMap[nodes[0].id] : currentTokens;
         return { tokens, baseUnits: tokens };
       }),
       getRawBaseUnits: vi.fn((nodes: readonly ConcreteNode[]) => {

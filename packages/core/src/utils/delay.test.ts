@@ -80,10 +80,7 @@ describe('abortableDelay', () => {
   // Technically unnecessary due to `onceTrue` but good sanity check
   it('cleans up signal listeners when aborted before completion', async () => {
     const controller = new AbortController();
-    const removeEventListenerSpy = vi.spyOn(
-      controller.signal,
-      'removeEventListener',
-    );
+    const removeEventListenerSpy = vi.spyOn(controller.signal, 'removeEventListener');
 
     const promise = delay(400, controller.signal);
 

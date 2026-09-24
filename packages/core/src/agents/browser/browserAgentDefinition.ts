@@ -27,13 +27,8 @@ export const BROWSER_AGENT_NAME = 'browser_agent';
  */
 export const BrowserTaskResultSchema = z.object({
   success: z.boolean().describe('Whether the task was completed successfully'),
-  summary: z
-    .string()
-    .describe('A summary of what was accomplished or what went wrong'),
-  data: z
-    .unknown()
-    .optional()
-    .describe('Optional extracted data from the task'),
+  summary: z.string().describe('A summary of what was accomplished or what went wrong'),
+  data: z.unknown().optional().describe('Optional extracted data from the task'),
 });
 
 const VISUAL_SECTION = `

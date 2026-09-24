@@ -5,11 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import type {
-  ToolInvocation,
-  ToolResult,
-  ToolResultDisplay,
-} from '../tools/tools.js';
+import type { ToolInvocation, ToolResult, ToolResultDisplay } from '../tools/tools.js';
 import type { DisplayContent } from './types.js';
 import {
   populateToolDisplay,
@@ -96,9 +92,7 @@ describe('tool-display-utils', () => {
     });
 
     it('returns text for text input', () => {
-      expect(displayContentToString({ type: 'text', text: 'hello' })).toBe(
-        'hello',
-      );
+      expect(displayContentToString({ type: 'text', text: 'hello' })).toBe('hello');
     });
 
     it('renders a diff for diff input', () => {

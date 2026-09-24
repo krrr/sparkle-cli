@@ -45,11 +45,9 @@ export const formatToolArgs = (args?: string): string => {
       return parsed.file_path;
     if ('dir_path' in parsed && typeof parsed.dir_path === 'string')
       return parsed.dir_path;
-    if ('query' in parsed && typeof parsed.query === 'string')
-      return parsed.query;
+    if ('query' in parsed && typeof parsed.query === 'string') return parsed.query;
     if ('url' in parsed && typeof parsed.url === 'string') return parsed.url;
-    if ('target' in parsed && typeof parsed.target === 'string')
-      return parsed.target;
+    if ('target' in parsed && typeof parsed.target === 'string') return parsed.target;
 
     return args;
   } catch {
@@ -57,9 +55,11 @@ export const formatToolArgs = (args?: string): string => {
   }
 };
 
-export const SubagentProgressDisplay: React.FC<
-  SubagentProgressDisplayProps
-> = ({ progress, terminalWidth, historyOverrides }) => {
+export const SubagentProgressDisplay: React.FC<SubagentProgressDisplayProps> = ({
+  progress,
+  terminalWidth,
+  historyOverrides,
+}) => {
   let headerText: string | undefined;
   let headerColor = theme.text.secondary;
 
@@ -111,9 +111,7 @@ export const SubagentProgressDisplay: React.FC<
                 item.status === SubagentState.RUNNING ? (
                   <Spinner type="dots" />
                 ) : item.status === SubagentState.COMPLETED ? (
-                  <Text color={theme.status.success}>
-                    {TOOL_STATUS.SUCCESS}
-                  </Text>
+                  <Text color={theme.status.success}>{TOOL_STATUS.SUCCESS}</Text>
                 ) : item.status === SubagentState.CANCELLED ? (
                   <Text color={theme.status.warning} bold>
                     {TOOL_STATUS.CANCELED}
@@ -122,8 +120,7 @@ export const SubagentProgressDisplay: React.FC<
                   <Text color={theme.status.error}>{TOOL_STATUS.ERROR}</Text>
                 );
 
-              const formattedArgs =
-                item.description || formatToolArgs(item.args);
+              const formattedArgs = item.description || formatToolArgs(item.args);
               const displayArgs =
                 formattedArgs.length > 60
                   ? formattedArgs.slice(0, 60) + '...'
@@ -145,9 +142,7 @@ export const SubagentProgressDisplay: React.FC<
                         <Text
                           color={theme.text.secondary}
                           wrap="truncate"
-                          strikethrough={
-                            item.status === SubagentState.CANCELLED
-                          }
+                          strikethrough={item.status === SubagentState.CANCELLED}
                         >
                           {displayArgs}
                         </Text>

@@ -107,9 +107,7 @@ describe('createContentGenerator', () => {
 
   it('should create a FakeContentGenerator', async () => {
     const mockGenerator = {} as unknown as ContentGenerator;
-    vi.mocked(FakeContentGenerator.fromFile).mockResolvedValue(
-      mockGenerator as never,
-    );
+    vi.mocked(FakeContentGenerator.fromFile).mockResolvedValue(mockGenerator as never);
     const fakeResponsesFile = 'fake/responses.yaml';
     const mockConfigWithFake = {
       fakeResponses: fakeResponsesFile,
@@ -121,9 +119,7 @@ describe('createContentGenerator', () => {
       },
       mockConfigWithFake,
     );
-    expect(FakeContentGenerator.fromFile).toHaveBeenCalledWith(
-      fakeResponsesFile,
-    );
+    expect(FakeContentGenerator.fromFile).toHaveBeenCalledWith(fakeResponsesFile);
     expect(generator).toEqual(
       new LoggingContentGenerator(mockGenerator, mockConfigWithFake),
     );
@@ -325,10 +321,7 @@ describe('createContentGenerator', () => {
       models: {},
     } as unknown as GoogleGenAI;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    vi.stubEnv(
-      'SPARKLE_CLI_CUSTOM_HEADERS',
-      'X-Test-Header: test, Another: value',
-    );
+    vi.stubEnv('SPARKLE_CLI_CUSTOM_HEADERS', 'X-Test-Header: test, Another: value');
 
     await createContentGenerator(
       {
@@ -472,10 +465,7 @@ describe('createContentGenerator', () => {
       mockConfig,
     );
 
-    const callArg = vi.mocked(GoogleGenAI).mock.calls[0][0] as Record<
-      string,
-      unknown
-    >;
+    const callArg = vi.mocked(GoogleGenAI).mock.calls[0][0] as Record<string, unknown>;
     expect(callArg).not.toHaveProperty('googleAuthOptions');
   });
 

@@ -5,11 +5,7 @@
  */
 
 import type { CommandModule } from 'yargs';
-import {
-  debugLogger,
-  type SkillDefinition,
-  getErrorMessage,
-} from 'sparkle-cli-core';
+import { debugLogger, type SkillDefinition, getErrorMessage } from 'sparkle-cli-core';
 import { exitCli } from '../utils.js';
 import { installSkill } from '../../utils/skillUtils.js';
 import chalk from 'chalk';
@@ -31,10 +27,7 @@ export async function handleInstall(args: InstallArgs) {
     const scope = args.scope ?? 'user';
     const subpath = args.path;
 
-    const requestConsent = async (
-      skills: SkillDefinition[],
-      targetDir: string,
-    ) => {
+    const requestConsent = async (skills: SkillDefinition[], targetDir: string) => {
       if (consent) {
         debugLogger.log('You have consented to the following:');
         debugLogger.log(await skillsConsentString(skills, source, targetDir));
@@ -70,19 +63,16 @@ export async function handleInstall(args: InstallArgs) {
 
 export const installCommand: CommandModule = {
   command: 'install <source> [--scope] [--path]',
-  describe:
-    'Installs an agent skill from a git repository URL or a local path.',
+  describe: 'Installs an agent skill from a git repository URL or a local path.',
   builder: (yargs) =>
     yargs
       .positional('source', {
-        describe:
-          'The git repository URL or local path of the skill to install.',
+        describe: 'The git repository URL or local path of the skill to install.',
         type: 'string',
         demandOption: true,
       })
       .option('scope', {
-        describe:
-          'The scope to install the skill into. Defaults to "user" (global).',
+        describe: 'The scope to install the skill into. Defaults to "user" (global).',
         choices: ['user', 'workspace'],
         default: 'user',
       })

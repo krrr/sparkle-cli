@@ -46,11 +46,7 @@ describe('FileSearch', () => {
     await fileSearch.initialize();
     const results = await fileSearch.search('');
 
-    expect(results).toEqual([
-      'src/',
-      SPARKLE_IGNORE_FILE_NAME,
-      'src/not-ignored.js',
-    ]);
+    expect(results).toEqual(['src/', SPARKLE_IGNORE_FILE_NAME, 'src/not-ignored.js']);
   });
 
   it('should combine .gitignore and .sparkleignore rules', async () => {
@@ -115,9 +111,7 @@ describe('FileSearch', () => {
   it('should handle negated directories', async () => {
     tmpDir = await createTmpDir({
       '.git': {},
-      '.gitignore': ['build/**', '!build/public', '!build/public/**'].join(
-        '\n',
-      ),
+      '.gitignore': ['build/**', '!build/public', '!build/public/**'].join('\n'),
       build: {
         'private.js': '',
         public: ['index.html'],

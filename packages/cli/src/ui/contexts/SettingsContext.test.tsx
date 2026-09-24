@@ -103,9 +103,7 @@ describe('SettingsContext', () => {
     const userSettings = result.current.settings.forScope(SettingScope.User);
     expect(userSettings).toBe(mockSnapshot.user);
 
-    const workspaceSettings = result.current.settings.forScope(
-      SettingScope.Workspace,
-    );
+    const workspaceSettings = result.current.settings.forScope(SettingScope.Workspace);
     expect(workspaceSettings).toBe(mockSnapshot.workspace);
   });
 
@@ -118,9 +116,9 @@ describe('SettingsContext', () => {
       ...mockSnapshot,
       merged: { ui: { theme: 'new-theme' } },
     };
-    (
-      mockLoadedSettings.getSnapshot as ReturnType<typeof vi.fn>
-    ).mockReturnValue(newSnapshot);
+    (mockLoadedSettings.getSnapshot as ReturnType<typeof vi.fn>).mockReturnValue(
+      newSnapshot,
+    );
 
     // Trigger the listeners (simulate coreEvents emission)
     act(() => {

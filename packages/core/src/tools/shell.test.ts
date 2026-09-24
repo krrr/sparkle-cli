@@ -75,10 +75,7 @@ import {
   createMockMessageBus,
   getMockMessageBusInstance,
 } from '../test-utils/mock-message-bus.js';
-import {
-  MessageBusType,
-  type UpdatePolicy,
-} from '../confirmation-bus/types.js';
+import { MessageBusType, type UpdatePolicy } from '../confirmation-bus/types.js';
 import { type MessageBus } from '../confirmation-bus/message-bus.js';
 import { type SandboxManager } from '../services/sandboxManager.js';
 import type { AnsiOutput } from '../utils/terminalSerializer.js';
@@ -123,9 +120,7 @@ describe('ShellTool', () => {
       getDebugMode: vi.fn().mockReturnValue(false),
       getTargetDir: vi.fn().mockReturnValue(tempRootDir),
       getSummarizeToolOutputConfig: vi.fn().mockReturnValue(undefined),
-      getWorkspaceContext: vi
-        .fn()
-        .mockReturnValue(new WorkspaceContext(tempRootDir)),
+      getWorkspaceContext: vi.fn().mockReturnValue(new WorkspaceContext(tempRootDir)),
       storage: {
         getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
       },
@@ -171,9 +166,7 @@ describe('ShellTool', () => {
     } as unknown as Config;
 
     const bus = createMockMessageBus();
-    const mockBus = getMockMessageBusInstance(
-      bus,
-    ) as unknown as TestableMockMessageBus;
+    const mockBus = getMockMessageBusInstance(bus) as unknown as TestableMockMessageBus;
     mockBus.defaultToolDecision = 'ask_user';
 
     // Simulate policy update
@@ -183,10 +176,7 @@ describe('ShellTool', () => {
           ? msg.commandPrefix
           : [msg.commandPrefix];
         const current = mockConfig.getAllowedTools() || [];
-        (mockConfig.getAllowedTools as Mock).mockReturnValue([
-          ...current,
-          ...prefixes,
-        ]);
+        (mockConfig.getAllowedTools as Mock).mockReturnValue([...current, ...prefixes]);
         // Simulate Policy Engine allowing the tool after update
         mockBus.defaultToolDecision = 'allow';
       }
@@ -206,11 +196,7 @@ describe('ShellTool', () => {
 
     // Capture the output callback to simulate streaming events from the service
     mockShellExecutionService.mockImplementation(
-      (
-        cmd: string,
-        _cwd: string,
-        callback: (event: ShellOutputEvent) => void,
-      ) => {
+      (cmd: string, _cwd: string, callback: (event: ShellOutputEvent) => void) => {
         mockShellOutputCallback = callback;
         const match = cmd.match(/_bgpids_file=([^\r\n]+)/);
         if (match) {
@@ -273,9 +259,9 @@ describe('ShellTool', () => {
 
     it('should throw an error for a directory outside the workspace', () => {
       const outsidePath = path.resolve(tempRootDir, '../outside');
-      expect(() =>
-        shellTool.build({ command: 'ls', dir_path: outsidePath }),
-      ).toThrow(/Path not in workspace/);
+      expect(() => shellTool.build({ command: 'ls', dir_path: outsidePath })).toThrow(
+        /Path not in workspace/,
+      );
     });
 
     it('should return an invocation for a valid absolute directory path', () => {
@@ -290,9 +276,7 @@ describe('ShellTool', () => {
   describe('execute', () => {
     const mockAbortSignal = new AbortController().signal;
 
-    const resolveShellExecution = (
-      result: Partial<ShellExecutionResult> = {},
-    ) => {
+    const resolveShellExecution = (result: Partial<ShellExecutionResult> = {}) => {
       const fullResult: ShellExecutionResult = {
         rawOutput: Buffer.from(result.output || ''),
         output: 'Success',
@@ -355,9 +339,7 @@ describe('ShellTool', () => {
       const result = await promise;
       const wrappedCommand = mockShellExecutionService.mock.calls[0][0];
 
-      expect(wrappedCommand).toContain(
-        'trap \'jobs -p > "$_bgpids_file"\' EXIT',
-      );
+      expect(wrappedCommand).toContain('trap \'jobs -p > "$_bgpids_file"\' EXIT');
       expect(wrappedCommand).toContain('sleep 60 & exit 1');
       expect(result.llmContent).toContain('Exit Code: 1');
       expect(result.llmContent).toContain('Background PIDs: 67890');
@@ -393,9 +375,7 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
-        ),
+        expect.stringMatching(/_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -411,9 +391,7 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
-        ),
+        expect.stringMatching(/_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -433,9 +411,7 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
-        ),
+        expect.stringMatching(/_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/),
         subdir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -458,9 +434,7 @@ describe('ShellTool', () => {
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
-        ),
+        expect.stringMatching(/_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/),
         path.join(tempRootDir, 'subdir'),
         expect.any(Function),
         expect.any(AbortSignal),
@@ -487,11 +461,7 @@ describe('ShellTool', () => {
       // Advance time to trigger the background timeout
       await vi.advanceTimersByTimeAsync(250);
 
-      expect(mockShellBackground).toHaveBeenCalledWith(
-        12345,
-        'default',
-        'sleep 10',
-      );
+      expect(mockShellBackground).toHaveBeenCalledWith(12345, 'default', 'sleep 10');
 
       await promise;
     });
@@ -536,9 +506,7 @@ describe('ShellTool', () => {
       await vi.advanceTimersByTimeAsync(250);
       const result = await promise;
 
-      expect(result.llmContent).toContain(
-        'Command moved to background (PID: 12345)',
-      );
+      expect(result.llmContent).toContain('Command moved to background (PID: 12345)');
       expect(result.llmContent).not.toContain('partial output');
     });
 
@@ -585,9 +553,7 @@ EOF`;
       await promise;
 
       expect(mockShellExecutionService).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/,
-        ),
+        expect.stringMatching(/_bgpids_file=.*sparkle-shell-.*[/\\]bgpids\.tmp/),
         tempRootDir,
         expect.any(Function),
         expect.any(AbortSignal),
@@ -650,9 +616,7 @@ EOF`;
       (mockConfig.getSummarizeToolOutputConfig as Mock).mockReturnValue({
         [SHELL_TOOL_NAME]: { tokenBudget: 1000 },
       });
-      vi.mocked(summarizer.summarizeToolOutput).mockResolvedValue(
-        'summarized output',
-      );
+      vi.mocked(summarizer.summarizeToolOutput).mockResolvedValue('summarized output');
 
       const invocation = shellTool.build({ command: 'ls' });
       const promise = invocation.execute({ abortSignal: mockAbortSignal });
@@ -739,9 +703,7 @@ EOF`;
 
       await promise;
 
-      expect(debugErrorSpy).not.toHaveBeenCalledWith(
-        'missing background pid output',
-      );
+      expect(debugErrorSpy).not.toHaveBeenCalledWith('missing background pid output');
     });
 
     describe('Streaming to `updateOutput`', () => {
@@ -999,11 +961,7 @@ EOF`;
         // Advance time to trigger the background timeout
         await vi.advanceTimersByTimeAsync(250);
 
-        expect(mockShellBackground).toHaveBeenCalledWith(
-          12345,
-          'default',
-          'sleep 10',
-        );
+        expect(mockShellBackground).toHaveBeenCalledWith(12345, 'default', 'sleep 10');
 
         await promise;
       });
@@ -1016,8 +974,7 @@ EOF`;
       const invocation = shellTool.build(params);
 
       // Accessing protected messageBus for testing purposes
-      const bus = (shellTool as unknown as { messageBus: MessageBus })
-        .messageBus;
+      const bus = (shellTool as unknown as { messageBus: MessageBus }).messageBus;
       const mockBus = getMockMessageBusInstance(
         bus,
       ) as unknown as TestableMockMessageBus;
@@ -1049,8 +1006,7 @@ EOF`;
     });
 
     it('should NOT return a sandbox expansion prompt for npm install when sandboxing is disabled', async () => {
-      const bus = (shellTool as unknown as { messageBus: MessageBus })
-        .messageBus;
+      const bus = (shellTool as unknown as { messageBus: MessageBus }).messageBus;
       const mockBus = getMockMessageBusInstance(
         bus,
       ) as unknown as TestableMockMessageBus;
@@ -1097,9 +1053,7 @@ EOF`;
 
     it('should not include efficiency guidelines when disabled', () => {
       mockPlatform.mockReturnValue('linux');
-      vi.mocked(mockConfig.getEnableShellOutputEfficiency).mockReturnValue(
-        false,
-      );
+      vi.mocked(mockConfig.getEnableShellOutputEfficiency).mockReturnValue(false);
       const shellTool = new ShellTool(mockConfig, createMockMessageBus());
       expect(shellTool.description).not.toContain('Efficiency Guidelines:');
     });
@@ -1181,9 +1135,7 @@ EOF`;
   describe('llmContent output format', () => {
     const mockAbortSignal = new AbortController().signal;
 
-    const resolveShellExecution = (
-      result: Partial<ShellExecutionResult> = {},
-    ) => {
+    const resolveShellExecution = (result: Partial<ShellExecutionResult> = {}) => {
       const fullResult: ShellExecutionResult = {
         rawOutput: Buffer.from(result.output || ''),
         output: 'Success',
@@ -1337,9 +1289,7 @@ EOF`;
 
       expect(details).not.toBe(false);
       if (details && details.type === 'exec') {
-        expect(details.rootCommand).toBe(
-          'cat, redirection (<), grep, redirection (>)',
-        );
+        expect(details.rootCommand).toBe('cat, redirection (<), grep, redirection (>)');
       }
     });
 
@@ -1469,9 +1419,7 @@ EOF`;
       const details = JSON.parse(result.error!.message);
 
       // Should NOT contain homeDir as it is a parent of homedir and thus sensitive
-      expect(details.additionalPermissions.fileSystem.read).not.toContain(
-        homeDir,
-      );
+      expect(details.additionalPermissions.fileSystem.read).not.toContain(homeDir);
       // Should contain individual paths instead
       expect(details.additionalPermissions.fileSystem.read).toContain(user1Dir);
       expect(details.additionalPermissions.fileSystem.read).toContain(user2Dir);

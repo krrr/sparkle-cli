@@ -1,15 +1,13 @@
 # Sparkle CLI planning tools
 
-Planning tools let Sparkle CLI switch into a safe, read-only "Plan Mode" for
-researching and planning complex changes, and to signal the finalization of a
-plan to the user.
+Planning tools let Sparkle CLI switch into a safe, read-only "Plan Mode" for researching
+and planning complex changes, and to signal the finalization of a plan to the user.
 
 ## 1. `enter_plan_mode` (EnterPlanMode)
 
-`enter_plan_mode` switches the CLI to Plan Mode. This tool is typically called
-by the agent when you ask it to "start a plan" using natural language. In this
-mode, the agent is restricted to read-only tools to allow for safe exploration
-and planning.
+`enter_plan_mode` switches the CLI to Plan Mode. This tool is typically called by the
+agent when you ask it to "start a plan" using natural language. In this mode, the agent
+is restricted to read-only tools to allow for safe exploration and planning.
 
 <!-- prettier-ignore -->
 > [!NOTE]
@@ -19,9 +17,8 @@ and planning.
 - **Display name:** Enter Plan Mode
 - **File:** `enter-plan-mode.ts`
 - **Parameters:**
-  - `reason` (string, optional): A short reason explaining why the agent is
-    entering plan mode (for example, "Starting a complex feature
-    implementation").
+  - `reason` (string, optional): A short reason explaining why the agent is entering
+    plan mode (for example, "Starting a complex feature implementation").
 - **Behavior:**
   - Switches the CLI's approval mode to `PLAN`.
   - Notifies the user that the agent has entered Plan Mode.
@@ -31,32 +28,31 @@ and planning.
 
 ## 2. `exit_plan_mode` (ExitPlanMode)
 
-`exit_plan_mode` signals that the planning phase is complete. It presents the
-finalized plan to the user and requests formal approval to start the
-implementation. The agent MUST reach an informal agreement with the user in the
-chat regarding the proposed strategy BEFORE calling this tool.
+`exit_plan_mode` signals that the planning phase is complete. It presents the finalized
+plan to the user and requests formal approval to start the implementation. The agent
+MUST reach an informal agreement with the user in the chat regarding the proposed
+strategy BEFORE calling this tool.
 
 - **Tool name:** `exit_plan_mode`
 - **Display name:** Exit Plan Mode
 - **File:** `exit-plan-mode.ts`
 - **Parameters:**
-  - `plan_path` (string, required): The path to the finalized Markdown plan
-    file. This file MUST be located within the project's managed data plans
-    directory (for example, `~/.sparkle/data/<project>/plans/`).
+  - `plan_path` (string, required): The path to the finalized Markdown plan file. This
+    file MUST be located within the project's managed data plans directory (for example,
+    `~/.sparkle/data/<project>/plans/`).
 - **Behavior:**
-  - Validates that the `plan_path` is within the allowed directory and that the
-    file exists and has content.
+  - Validates that the `plan_path` is within the allowed directory and that the file
+    exists and has content.
   - Presents the plan to the user for formal review.
   - If the user approves the plan:
-    - Switches the CLI's approval mode to the user's chosen approval mode (
-      `DEFAULT` or `AUTO_EDIT`).
+    - Switches the CLI's approval mode to the user's chosen approval mode ( `DEFAULT` or
+      `AUTO_EDIT`).
     - Marks the plan as approved for implementation.
   - If the user rejects the plan:
     - Stays in Plan Mode.
     - Returns user feedback to the model to refine the plan.
 - **Output (`llmContent`):**
-  - On approval: A message indicating the plan was approved and the new approval
-    mode.
+  - On approval: A message indicating the plan was approved and the new approval mode.
   - On rejection: A message containing the user's feedback.
-- **Confirmation:** Yes. Shows the finalized plan and asks for user formal
-  approval to proceed with implementation.
+- **Confirmation:** Yes. Shows the finalized plan and asks for user formal approval to
+  proceed with implementation.

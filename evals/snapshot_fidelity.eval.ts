@@ -5,10 +5,7 @@
  */
 
 import { describe, expect } from 'vitest';
-import {
-  componentEvalTest,
-  type ComponentEvalCase,
-} from './component-test-helper.js';
+import { componentEvalTest, type ComponentEvalCase } from './component-test-helper.js';
 import { type EvalPolicy } from './test-helper.js';
 import { SnapshotGenerator } from 'sparkle-cli-core';
 import { NodeType, type ConcreteNode } from 'sparkle-cli-core';

@@ -84,9 +84,7 @@ vi.mock('../../utils/debugLogger.js', () => ({
 }));
 
 // Re-import mocked modules for assertions.
-const { MCPOAuthTokenStorage } = await import(
-  '../../mcp/oauth-token-storage.js'
-);
+const { MCPOAuthTokenStorage } = await import('../../mcp/oauth-token-storage.js');
 const {
   refreshAccessToken,
   exchangeCodeForToken,
@@ -96,9 +94,7 @@ const {
 } = await import('../../utils/oauth-flow.js');
 const { getConsentForOauth } = await import('../../utils/authConsent.js');
 
-function createConfig(
-  overrides: Partial<OAuth2AuthConfig> = {},
-): OAuth2AuthConfig {
+function createConfig(overrides: Partial<OAuth2AuthConfig> = {}): OAuth2AuthConfig {
   return {
     type: 'oauth2',
     client_id: 'test-client-id',
@@ -335,9 +331,7 @@ describe('OAuth2AuthProvider', () => {
         .mockReturnValueOnce(false) // initialize
         .mockReturnValueOnce(true); // headers
 
-      vi.mocked(refreshAccessToken).mockRejectedValueOnce(
-        new Error('Refresh failed'),
-      );
+      vi.mocked(refreshAccessToken).mockRejectedValueOnce(new Error('Refresh failed'));
 
       await provider.initialize();
       const headers = await provider.headers();
@@ -517,9 +511,7 @@ describe('OAuth2AuthProvider', () => {
         },
         updatedAt: Date.now(),
       });
-      storage.isTokenExpired
-        .mockReturnValueOnce(false)
-        .mockReturnValueOnce(true);
+      storage.isTokenExpired.mockReturnValueOnce(false).mockReturnValueOnce(true);
 
       await provider.initialize();
       await provider.headers();

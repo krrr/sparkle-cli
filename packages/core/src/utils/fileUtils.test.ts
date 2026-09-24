@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 
 import fs from 'node:fs';
 import * as actualNodeFs from 'node:fs'; // For setup/teardown
@@ -64,14 +56,11 @@ async function rmWithRetry(target: string): Promise<void> {
       return;
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code;
-      const retryable =
-        code === 'EPERM' || code === 'EBUSY' || code === 'ENOTEMPTY';
+      const retryable = code === 'EPERM' || code === 'EBUSY' || code === 'ENOTEMPTY';
       if (!retryable || attempt === RM_RETRY_MAX_ATTEMPTS) {
         throw error;
       }
-      await new Promise((resolve) =>
-        setTimeout(resolve, RM_RETRY_DELAY_MS * attempt),
-      );
+      await new Promise((resolve) => setTimeout(resolve, RM_RETRY_DELAY_MS * attempt));
     }
   }
 }
@@ -92,9 +81,7 @@ describe('fileUtils', () => {
   beforeEach(() => {
     vi.resetAllMocks(); // Reset all mocks, including mime.getType
 
-    tempRootDir = actualNodeFs.mkdtempSync(
-      path.join(os.tmpdir(), 'fileUtils-test-'),
-    );
+    tempRootDir = actualNodeFs.mkdtempSync(path.join(os.tmpdir(), 'fileUtils-test-'));
     process.cwd = vi.fn(() => tempRootDir); // Mock cwd if necessary for relative path logic within tests
 
     testTextFilePath = path.join(tempRootDir, 'test.txt');
@@ -119,15 +106,10 @@ describe('fileUtils', () => {
 
   describe('readWasmBinaryFromDisk', () => {
     it('loads a WASM binary from disk as a Uint8Array', async () => {
-      const wasmFixtureUrl = new URL(
-        './__fixtures__/dummy.wasm',
-        import.meta.url,
-      );
+      const wasmFixtureUrl = new URL('./__fixtures__/dummy.wasm', import.meta.url);
       const wasmFixturePath = fileURLToPath(wasmFixtureUrl);
       const result = await readWasmBinaryFromDisk(wasmFixturePath);
-      const expectedBytes = new Uint8Array(
-        await fsPromises.readFile(wasmFixturePath),
-      );
+      const expectedBytes = new Uint8Array(await fsPromises.readFile(wasmFixturePath));
 
       expect(result).toBeInstanceOf(Uint8Array);
       expect(result).toStrictEqual(expectedBytes);
@@ -198,12 +180,9 @@ describe('fileUtils', () => {
         root: '/project/root',
         expected: false,
       },
-    ])(
-      'should return $expected for $name',
-      ({ path: testPath, root, expected }) => {
-        expect(isWithinRoot(testPath, root || defaultRoot)).toBe(expected);
-      },
-    );
+    ])('should return $expected for $name', ({ path: testPath, root, expected }) => {
+      expect(isWithinRoot(testPath, root || defaultRoot)).toBe(expected);
+    });
   });
 
   describe('getRealPath', () => {
@@ -341,10 +320,7 @@ describe('fileUtils', () => {
 
     beforeEach(async () => {
       testDir = await fsPromises.mkdtemp(
-        path.join(
-          await fsPromises.realpath(os.tmpdir()),
-          'fileUtils-bom-test-',
-        ),
+        path.join(await fsPromises.realpath(os.tmpdir()), 'fileUtils-bom-test-'),
       );
     });
 
@@ -356,9 +332,7 @@ describe('fileUtils', () => {
 
     describe('detectBOM', () => {
       it('should detect UTF-8 BOM', () => {
-        const buf = Buffer.from([
-          0xef, 0xbb, 0xbf, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
-        ]);
+        const buf = Buffer.from([0xef, 0xbb, 0xbf, 0x48, 0x65, 0x6c, 0x6c, 0x6f]);
         const result = detectBOM(buf);
         expect(result).toEqual({ encoding: 'utf8', bomLength: 3 });
       });
@@ -376,17 +350,13 @@ describe('fileUtils', () => {
       });
 
       it('should detect UTF-32 LE BOM', () => {
-        const buf = Buffer.from([
-          0xff, 0xfe, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00,
-        ]);
+        const buf = Buffer.from([0xff, 0xfe, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00]);
         const result = detectBOM(buf);
         expect(result).toEqual({ encoding: 'utf32le', bomLength: 4 });
       });
 
       it('should detect UTF-32 BE BOM', () => {
-        const buf = Buffer.from([
-          0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x48,
-        ]);
+        const buf = Buffer.from([0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0x00, 0x48]);
         const result = detectBOM(buf);
         expect(result).toEqual({ encoding: 'utf32be', bomLength: 4 });
       });
@@ -670,9 +640,7 @@ describe('fileUtils', () => {
 
       it('should still treat actual binary file as binary', async () => {
         // PNG header + some binary data with null bytes
-        const pngHeader = Buffer.from([
-          0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-        ]);
+        const pngHeader = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
         const binaryData = Buffer.from([
           0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
         ]); // IHDR chunk with nulls
@@ -886,12 +854,9 @@ describe('fileUtils', () => {
         tempRootDir,
         new StandardFileSystemService(),
       );
+      expect((result.llmContent as { inlineData: unknown }).inlineData).toBeDefined();
       expect(
-        (result.llmContent as { inlineData: unknown }).inlineData,
-      ).toBeDefined();
-      expect(
-        (result.llmContent as { inlineData: { mimeType: string } }).inlineData
-          .mimeType,
+        (result.llmContent as { inlineData: { mimeType: string } }).inlineData.mimeType,
       ).toBe('image/png');
       expect(
         (result.llmContent as { inlineData: { data: string } }).inlineData.data,
@@ -908,12 +873,9 @@ describe('fileUtils', () => {
         tempRootDir,
         new StandardFileSystemService(),
       );
+      expect((result.llmContent as { inlineData: unknown }).inlineData).toBeDefined();
       expect(
-        (result.llmContent as { inlineData: unknown }).inlineData,
-      ).toBeDefined();
-      expect(
-        (result.llmContent as { inlineData: { mimeType: string } }).inlineData
-          .mimeType,
+        (result.llmContent as { inlineData: { mimeType: string } }).inlineData.mimeType,
       ).toBe('application/pdf');
       expect(
         (result.llmContent as { inlineData: { data: string } }).inlineData.data,
@@ -923,8 +885,8 @@ describe('fileUtils', () => {
 
     it('should process an audio file', async () => {
       const fakeMp3Data = Buffer.from([
-        0x49, 0x44, 0x33, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00,
+        0x49, 0x44, 0x33, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00,
       ]);
       actualNodeFs.writeFileSync(testAudioFilePath, fakeMp3Data);
       mockMimeGetType.mockReturnValue('audio/mpeg');
@@ -933,12 +895,9 @@ describe('fileUtils', () => {
         tempRootDir,
         new StandardFileSystemService(),
       );
+      expect((result.llmContent as { inlineData: unknown }).inlineData).toBeDefined();
       expect(
-        (result.llmContent as { inlineData: unknown }).inlineData,
-      ).toBeDefined();
-      expect(
-        (result.llmContent as { inlineData: { mimeType: string } }).inlineData
-          .mimeType,
+        (result.llmContent as { inlineData: { mimeType: string } }).inlineData.mimeType,
       ).toBe('audio/mpeg');
       expect(
         (result.llmContent as { inlineData: { data: string } }).inlineData.data,
@@ -947,9 +906,7 @@ describe('fileUtils', () => {
     });
 
     it('should normalize supported audio mime types before returning inline data', async () => {
-      const fakeWavData = Buffer.from([
-        0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00,
-      ]);
+      const fakeWavData = Buffer.from([0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00]);
       const wavFilePath = path.join(tempRootDir, 'voice.wav');
       actualNodeFs.writeFileSync(wavFilePath, fakeWavData);
       mockMimeGetType.mockReturnValue('audio/x-wav');
@@ -961,8 +918,7 @@ describe('fileUtils', () => {
       );
 
       expect(
-        (result.llmContent as { inlineData: { mimeType: string } }).inlineData
-          .mimeType,
+        (result.llmContent as { inlineData: { mimeType: string } }).inlineData.mimeType,
       ).toBe('audio/wav');
     });
 
@@ -987,8 +943,8 @@ describe('fileUtils', () => {
 
     it('should process a video file', async () => {
       const fakeMp4Data = Buffer.from([
-        0x00, 0x00, 0x00, 0x1c, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d,
-        0x00, 0x00, 0x02, 0x00,
+        0x00, 0x00, 0x00, 0x1c, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f, 0x6d, 0x00,
+        0x00, 0x02, 0x00,
       ]);
       actualNodeFs.writeFileSync(testVideoFilePath, fakeMp4Data);
       mockMimeGetType.mockReturnValue('video/mp4');
@@ -997,12 +953,9 @@ describe('fileUtils', () => {
         tempRootDir,
         new StandardFileSystemService(),
       );
+      expect((result.llmContent as { inlineData: unknown }).inlineData).toBeDefined();
       expect(
-        (result.llmContent as { inlineData: unknown }).inlineData,
-      ).toBeDefined();
-      expect(
-        (result.llmContent as { inlineData: { mimeType: string } }).inlineData
-          .mimeType,
+        (result.llmContent as { inlineData: { mimeType: string } }).inlineData.mimeType,
       ).toBe('video/mp4');
       expect(
         (result.llmContent as { inlineData: { data: string } }).inlineData.data,
@@ -1032,10 +985,7 @@ describe('fileUtils', () => {
     });
 
     it('should skip binary files', async () => {
-      actualNodeFs.writeFileSync(
-        testBinaryFilePath,
-        Buffer.from([0x00, 0x01, 0x02]),
-      );
+      actualNodeFs.writeFileSync(testBinaryFilePath, Buffer.from([0x00, 0x01, 0x02]));
       mockMimeGetType.mockReturnValueOnce('application/octet-stream');
       // isBinaryFile will operate on the real file.
 
@@ -1044,9 +994,7 @@ describe('fileUtils', () => {
         tempRootDir,
         new StandardFileSystemService(),
       );
-      expect(result.llmContent).toContain(
-        'Cannot display content of binary file',
-      );
+      expect(result.llmContent).toContain('Cannot display content of binary file');
       expect(result.returnDisplay).toContain('Skipped binary file: app.exe');
     });
 
@@ -1157,9 +1105,7 @@ describe('fileUtils', () => {
       );
 
       expect(result.isTruncated).toBe(true);
-      expect(result.returnDisplay).toBe(
-        'Read lines 1-2000 of 2500 from test.txt',
-      );
+      expect(result.returnDisplay).toBe('Read lines 1-2000 of 2500 from test.txt');
       expect(result.linesShown).toEqual([1, 2000]);
     });
 
@@ -1190,10 +1136,7 @@ describe('fileUtils', () => {
         (_, i) => `Line ${i + 1}`,
       );
       linesWithLongInMiddle[4] = 'c'.repeat(2500);
-      actualNodeFs.writeFileSync(
-        testTextFilePath,
-        linesWithLongInMiddle.join('\n'),
-      );
+      actualNodeFs.writeFileSync(testTextFilePath, linesWithLongInMiddle.join('\n'));
 
       // Read 10 lines out of 20, including the long line
       const result = await processSingleFileContent(
@@ -1227,9 +1170,7 @@ describe('fileUtils', () => {
         );
 
         expect(result.error).toContain('File size exceeds the 20MB limit');
-        expect(result.returnDisplay).toContain(
-          'File size exceeds the 20MB limit',
-        );
+        expect(result.returnDisplay).toContain('File size exceeds the 20MB limit');
         expect(result.llmContent).toContain('File size exceeds the 20MB limit');
       } finally {
         statSpy.mockRestore();
@@ -1243,12 +1184,7 @@ describe('fileUtils', () => {
       const toolName = 'shell';
       const id = 'shell_123';
 
-      const result = await saveTruncatedToolOutput(
-        content,
-        toolName,
-        id,
-        tempRootDir,
-      );
+      const result = await saveTruncatedToolOutput(content, toolName, id, tempRootDir);
 
       const expectedOutputFile = path.join(
         tempRootDir,
@@ -1257,10 +1193,7 @@ describe('fileUtils', () => {
       );
       expect(result.outputFile).toBe(expectedOutputFile);
 
-      const savedContent = await fsPromises.readFile(
-        expectedOutputFile,
-        'utf-8',
-      );
+      const savedContent = await fsPromises.readFile(expectedOutputFile, 'utf-8');
       expect(savedContent).toBe(content);
     });
 
@@ -1269,12 +1202,7 @@ describe('fileUtils', () => {
       const toolName = '../../dangerous/tool';
       const id = 1;
 
-      const result = await saveTruncatedToolOutput(
-        content,
-        toolName,
-        id,
-        tempRootDir,
-      );
+      const result = await saveTruncatedToolOutput(content, toolName, id, tempRootDir);
 
       // ../../dangerous/tool -> ______dangerous_tool
       const expectedOutputFile = path.join(
@@ -1290,12 +1218,7 @@ describe('fileUtils', () => {
       const toolName = 'run_shell_command';
       const id = 'run_shell_command_1707400000000_0';
 
-      const result = await saveTruncatedToolOutput(
-        content,
-        toolName,
-        id,
-        tempRootDir,
-      );
+      const result = await saveTruncatedToolOutput(content, toolName, id, tempRootDir);
 
       const expectedOutputFile = path.join(
         tempRootDir,
@@ -1310,12 +1233,7 @@ describe('fileUtils', () => {
       const toolName = 'shell';
       const id = '../../etc/passwd';
 
-      const result = await saveTruncatedToolOutput(
-        content,
-        toolName,
-        id,
-        tempRootDir,
-      );
+      const result = await saveTruncatedToolOutput(content, toolName, id, tempRootDir);
 
       // ../../etc/passwd -> ______etc_passwd
       const expectedOutputFile = path.join(
@@ -1371,9 +1289,7 @@ describe('fileUtils', () => {
       // maxChars=4000 -> head=800 (20%), tail=3200 (80%)
       const formatted = formatTruncatedToolOutput(content, outputFile, 4000);
 
-      expect(formatted).toContain(
-        'Showing first 800 and last 3,200 characters',
-      );
+      expect(formatted).toContain('Showing first 800 and last 3,200 characters');
       expect(formatted).toContain('For full output see: /tmp/out.txt');
       expect(formatted).toContain('[46,000 characters omitted]'); // 50000 - 800 - 3200
     });

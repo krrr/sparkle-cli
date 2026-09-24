@@ -30,11 +30,7 @@ export const ConsentPrompt = (props: ConsentPromptProps) => {
       paddingX={2}
     >
       {typeof prompt === 'string' ? (
-        <MarkdownDisplay
-          isPending={true}
-          text={prompt}
-          terminalWidth={terminalWidth}
-        />
+        <MarkdownDisplay isPending={true} text={prompt} terminalWidth={terminalWidth} />
       ) : (
         prompt
       )}

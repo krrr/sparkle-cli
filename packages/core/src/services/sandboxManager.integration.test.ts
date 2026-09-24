@@ -39,10 +39,7 @@ const Platform = {
   touch(filePath: string) {
     return {
       command: process.execPath,
-      args: [
-        '-e',
-        `require("node:fs").writeFileSync(${JSON.stringify(filePath)}, "")`,
-      ],
+      args: ['-e', `require("node:fs").writeFileSync(${JSON.stringify(filePath)}, "")`],
     };
   },
 
@@ -134,9 +131,7 @@ function assertResult(
   }
 
   const commandLine = `${command.program} ${command.args.join(' ')}`;
-  const message = `Command ${
-    shouldBeSuccess ? 'failed' : 'succeeded'
-  } unexpectedly.
+  const message = `Command ${shouldBeSuccess ? 'failed' : 'succeeded'} unexpectedly.
 Command: ${commandLine}
 CWD: ${command.cwd || 'N/A'}
 Status: ${result.status} (expected ${expected})${
@@ -201,26 +196,23 @@ describe('SandboxManager Integration', () => {
 
       // The Windows sandbox wrapper (GeminiSandbox.exe) uses standard pipes
       // for I/O interception, which breaks ConPTY pseudo-terminal inheritance.
-      it.skipIf(Platform.isWindows)(
-        'supports interactive terminals',
-        async () => {
-          const handle = await ShellExecutionService.execute(
-            Platform.isPty(),
-            workspace,
-            () => {},
-            new AbortController().signal,
-            true,
-            {
-              sanitizationConfig: getSecureSanitizationConfig(),
-              sandboxManager: manager,
-            },
-          );
+      it.skipIf(Platform.isWindows)('supports interactive terminals', async () => {
+        const handle = await ShellExecutionService.execute(
+          Platform.isPty(),
+          workspace,
+          () => {},
+          new AbortController().signal,
+          true,
+          {
+            sanitizationConfig: getSecureSanitizationConfig(),
+            sandboxManager: manager,
+          },
+        );
 
-          const result = await handle.result;
-          expect(result.exitCode).toBe(0);
-          expect(result.output).toContain('True');
-        },
-      );
+        const result = await handle.result;
+        expect(result.exitCode).toBe(0);
+        expect(result.output).toContain('True');
+      });
     });
 
     describe('Virtual Commands', () => {
@@ -266,10 +258,7 @@ describe('SandboxManager Integration', () => {
       it('scrubs sensitive environment variables', async () => {
         const checkEnvCmd = {
           command: process.execPath,
-          args: [
-            '-e',
-            'console.log(process.env.TEST_SECRET_TOKEN || "MISSING")',
-          ],
+          args: ['-e', 'console.log(process.env.TEST_SECRET_TOKEN || "MISSING")'],
         };
 
         const sandboxed = await manager.prepareCommand({
@@ -302,10 +291,7 @@ describe('SandboxManager Integration', () => {
           { workspace, modeConfig: { readonly: true, allowOverrides: true } },
         );
 
-        const plansDir = path.join(
-          workspace,
-          '.sparkle/data/session-123/plans',
-        );
+        const plansDir = path.join(workspace, '.sparkle/data/session-123/plans');
         fs.mkdirSync(plansDir, { recursive: true });
         const planFile = path.join(plansDir, 'feature-plan.md');
 
@@ -531,36 +517,33 @@ describe('SandboxManager Integration', () => {
       // Windows icacls does not reliably block read-up access for Low Integrity
       // processes, so we skip read-specific assertions on Windows. The internal
       // tool architecture prevents read bypasses via the C# wrapper and __read.
-      it.skipIf(Platform.isWindows)(
-        'protects forbidden paths from reads',
-        async () => {
-          const tempWorkspace = createTempDir('workspace-');
-          const forbiddenDir = path.join(tempWorkspace, 'forbidden');
-          const testFile = path.join(forbiddenDir, 'test.txt');
-          fs.mkdirSync(forbiddenDir);
-          fs.writeFileSync(testFile, 'secret data');
+      it.skipIf(Platform.isWindows)('protects forbidden paths from reads', async () => {
+        const tempWorkspace = createTempDir('workspace-');
+        const forbiddenDir = path.join(tempWorkspace, 'forbidden');
+        const testFile = path.join(forbiddenDir, 'test.txt');
+        fs.mkdirSync(forbiddenDir);
+        fs.writeFileSync(testFile, 'secret data');
 
-          const osManager = createSandboxManager(
-            { enabled: true },
-            {
-              workspace: tempWorkspace,
-              forbiddenPaths: async () => [forbiddenDir],
-            },
-          );
+        const osManager = createSandboxManager(
+          { enabled: true },
+          {
+            workspace: tempWorkspace,
+            forbiddenPaths: async () => [forbiddenDir],
+          },
+        );
 
-          const { command, args } = Platform.cat(testFile);
+        const { command, args } = Platform.cat(testFile);
 
-          const sandboxed = await osManager.prepareCommand({
-            command,
-            args,
-            cwd: tempWorkspace,
-            env: process.env,
-          });
+        const sandboxed = await osManager.prepareCommand({
+          command,
+          args,
+          cwd: tempWorkspace,
+          env: process.env,
+        });
 
-          const result = await runCommand(sandboxed);
-          assertResult(result, sandboxed, 'failure');
-        },
-      );
+        const result = await runCommand(sandboxed);
+        assertResult(result, sandboxed, 'failure');
+      });
 
       it('protects forbidden directories recursively', async () => {
         const tempWorkspace = createTempDir('workspace-');
@@ -673,8 +656,7 @@ describe('SandboxManager Integration', () => {
         );
 
         // We use touch to attempt creation of the file
-        const { command: cmdTouch, args: argsTouch } =
-          Platform.touch(nonExistentFile);
+        const { command: cmdTouch, args: argsTouch } = Platform.touch(nonExistentFile);
 
         const sandboxedCmd = await osManager.prepareCommand({
           command: cmdTouch,
@@ -707,8 +689,7 @@ describe('SandboxManager Integration', () => {
         );
 
         // Attempt to write to the target file directly
-        const { command: cmdTarget, args: argsTarget } =
-          Platform.touch(targetFile);
+        const { command: cmdTarget, args: argsTarget } = Platform.touch(targetFile);
         const commandTarget = await osManager.prepareCommand({
           command: cmdTarget,
           args: argsTarget,
@@ -720,8 +701,7 @@ describe('SandboxManager Integration', () => {
         assertResult(resultTarget, commandTarget, 'failure');
 
         // Attempt to write via the symlink
-        const { command: cmdLink, args: argsLink } =
-          Platform.touch(symlinkFile);
+        const { command: cmdLink, args: argsLink } = Platform.touch(symlinkFile);
         const commandLink = await osManager.prepareCommand({
           command: cmdLink,
           args: argsLink,
@@ -779,18 +759,11 @@ describe('SandboxManager Integration', () => {
           '[core]\n\trepositoryformatversion = 0\n',
         );
 
-        const worktreeGitDir = path.join(
-          mainGitDir,
-          'worktrees',
-          'test-worktree',
-        );
+        const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
         fs.mkdirSync(worktreeGitDir, { recursive: true });
 
         // Create the .git file in the worktree directory pointing to the worktree git dir
-        fs.writeFileSync(
-          path.join(worktreeDir, '.git'),
-          `gitdir: ${worktreeGitDir}\n`,
-        );
+        fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
 
         // Create the backlink from worktree git dir to the worktree's .git file
         const backlinkPath = path.join(worktreeGitDir, 'gitdir');
@@ -825,17 +798,10 @@ describe('SandboxManager Integration', () => {
         const mainGitDir = path.join(mainRepo, '.git');
         fs.mkdirSync(mainGitDir, { recursive: true });
 
-        const worktreeGitDir = path.join(
-          mainGitDir,
-          'worktrees',
-          'test-worktree',
-        );
+        const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
         fs.mkdirSync(worktreeGitDir, { recursive: true });
 
-        fs.writeFileSync(
-          path.join(worktreeDir, '.git'),
-          `gitdir: ${worktreeGitDir}\n`,
-        );
+        fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
         fs.writeFileSync(
           path.join(worktreeGitDir, 'gitdir'),
           path.join(worktreeDir, '.git'),
@@ -929,18 +895,11 @@ describe('SandboxManager Integration', () => {
         '[core]\n\trepositoryformatversion = 0\n',
       );
 
-      const worktreeGitDir = path.join(
-        mainGitDir,
-        'worktrees',
-        'test-worktree',
-      );
+      const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
       fs.mkdirSync(worktreeGitDir, { recursive: true });
 
       // Create the .git file in the worktree directory pointing to the worktree git dir
-      fs.writeFileSync(
-        path.join(worktreeDir, '.git'),
-        `gitdir: ${worktreeGitDir}\n`,
-      );
+      fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
 
       // Create the backlink from worktree git dir to the worktree's .git file
       const backlinkPath = path.join(worktreeGitDir, 'gitdir');
@@ -975,17 +934,10 @@ describe('SandboxManager Integration', () => {
       const mainGitDir = path.join(mainRepo, '.git');
       fs.mkdirSync(mainGitDir, { recursive: true });
 
-      const worktreeGitDir = path.join(
-        mainGitDir,
-        'worktrees',
-        'test-worktree',
-      );
+      const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
       fs.mkdirSync(worktreeGitDir, { recursive: true });
 
-      fs.writeFileSync(
-        path.join(worktreeDir, '.git'),
-        `gitdir: ${worktreeGitDir}\n`,
-      );
+      fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
       fs.writeFileSync(
         path.join(worktreeGitDir, 'gitdir'),
         path.join(worktreeDir, '.git'),
@@ -1019,17 +971,10 @@ describe('SandboxManager Integration', () => {
       const mainGitDir = path.join(mainRepo, '.git');
       fs.mkdirSync(mainGitDir, { recursive: true });
 
-      const worktreeGitDir = path.join(
-        mainGitDir,
-        'worktrees',
-        'test-worktree',
-      );
+      const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
       fs.mkdirSync(worktreeGitDir, { recursive: true });
 
-      fs.writeFileSync(
-        path.join(worktreeDir, '.git'),
-        `gitdir: ${worktreeGitDir}\n`,
-      );
+      fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
       fs.writeFileSync(
         path.join(worktreeGitDir, 'gitdir'),
         path.join(worktreeDir, '.git'),
@@ -1062,17 +1007,10 @@ describe('SandboxManager Integration', () => {
       const mainGitDir = path.join(mainRepo, '.git');
       fs.mkdirSync(mainGitDir, { recursive: true });
 
-      const worktreeGitDir = path.join(
-        mainGitDir,
-        'worktrees',
-        'test-worktree',
-      );
+      const worktreeGitDir = path.join(mainGitDir, 'worktrees', 'test-worktree');
       fs.mkdirSync(worktreeGitDir, { recursive: true });
 
-      fs.writeFileSync(
-        path.join(worktreeDir, '.git'),
-        `gitdir: ${worktreeGitDir}\n`,
-      );
+      fs.writeFileSync(path.join(worktreeDir, '.git'), `gitdir: ${worktreeGitDir}\n`);
       fs.writeFileSync(
         path.join(worktreeGitDir, 'gitdir'),
         path.join(worktreeDir, '.git'),
@@ -1107,10 +1045,7 @@ describe('SandboxManager Integration', () => {
 
       fs.mkdirSync(externalGitDir, { recursive: true });
 
-      fs.writeFileSync(
-        path.join(workspaceDir, '.git'),
-        `gitdir: ${externalGitDir}\n`,
-      );
+      fs.writeFileSync(path.join(workspaceDir, '.git'), `gitdir: ${externalGitDir}\n`);
 
       const targetFile = path.join(externalGitDir, 'secret.txt');
 

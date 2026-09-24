@@ -78,12 +78,10 @@ export class ToolModificationHandler {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const modifyContext = toolCall.tool.getModifyContext(
-      signal,
-    ) as ModifyContext<typeof toolCall.request.args>;
-    const currentContent = await modifyContext.getCurrentContent(
-      toolCall.request.args,
-    );
+    const modifyContext = toolCall.tool.getModifyContext(signal) as ModifyContext<
+      typeof toolCall.request.args
+    >;
+    const currentContent = await modifyContext.getCurrentContent(toolCall.request.args);
 
     const updatedParams = modifyContext.createUpdatedParams(
       currentContent,

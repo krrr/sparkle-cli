@@ -44,15 +44,11 @@ describe('formatForSpeech', () => {
     });
 
     it('should strip italic markers *text*', () => {
-      expect(formatForSpeech('*note*: pay attention')).toBe(
-        'note: pay attention',
-      );
+      expect(formatForSpeech('*note*: pay attention')).toBe('note: pay attention');
     });
 
     it('should strip inline code backticks', () => {
-      expect(formatForSpeech('Run `npm install` first')).toBe(
-        'Run npm install first',
-      );
+      expect(formatForSpeech('Run `npm install` first')).toBe('Run npm install first');
     });
 
     it('should strip blockquote prefix', () => {
@@ -64,15 +60,11 @@ describe('formatForSpeech', () => {
     });
 
     it('should replace markdown links with link text', () => {
-      expect(formatForSpeech('[Gemini API](https://ai.google.dev)')).toBe(
-        'Gemini API',
-      );
+      expect(formatForSpeech('[Gemini API](https://ai.google.dev)')).toBe('Gemini API');
     });
 
     it('should strip unordered list markers', () => {
-      expect(formatForSpeech('- item one\n- item two')).toBe(
-        'item one\nitem two',
-      );
+      expect(formatForSpeech('- item one\n- item two')).toBe('item one\nitem two');
     });
 
     it('should strip ordered list markers', () => {
@@ -82,15 +74,11 @@ describe('formatForSpeech', () => {
 
   describe('fenced code blocks', () => {
     it('should unwrap a plain code block', () => {
-      expect(formatForSpeech('```\nconsole.log("hi")\n```')).toBe(
-        'console.log("hi")',
-      );
+      expect(formatForSpeech('```\nconsole.log("hi")\n```')).toBe('console.log("hi")');
     });
 
     it('should unwrap a language-tagged code block', () => {
-      expect(formatForSpeech('```typescript\nconst x = 1;\n```')).toBe(
-        'const x = 1;',
-      );
+      expect(formatForSpeech('```typescript\nconst x = 1;\n```')).toBe('const x = 1;');
     });
 
     it('should summarise a JSON object code block above threshold', () => {
@@ -160,10 +148,9 @@ describe('formatForSpeech', () => {
     });
 
     it('should respect custom pathDepth option', () => {
-      const result = formatForSpeech(
-        '/home/user/project/packages/core/src/file.ts',
-        { pathDepth: 2 },
-      );
+      const result = formatForSpeech('/home/user/project/packages/core/src/file.ts', {
+        pathDepth: 2,
+      });
       expect(result).toContain('\u2026/src/file.ts');
     });
 
@@ -216,8 +203,7 @@ describe('formatForSpeech', () => {
     });
 
     it('should not collapse a single stack frame', () => {
-      const trace =
-        'Error: ENOENT\n    at Object.open (/project/src/file.ts:10:5)';
+      const trace = 'Error: ENOENT\n    at Object.open (/project/src/file.ts:10:5)';
       const result = formatForSpeech(trace);
       expect(result).not.toContain('more frames');
     });

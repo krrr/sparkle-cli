@@ -8,11 +8,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import type {
-  ModelTier,
-  ProviderModel,
-  ReasoningEffort,
-} from 'sparkle-cli-core';
+import type { ModelTier, ProviderModel, ReasoningEffort } from 'sparkle-cli-core';
 import { TextInput } from '../components/shared/TextInput.js';
 import { InlineRadioGroup } from '../components/shared/InlineRadioGroup.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
@@ -147,9 +143,7 @@ export function ProviderModelEditorView({
         </Text>
         <Box
           borderStyle="round"
-          borderColor={
-            focusField === 'id' ? theme.ui.focus : theme.border.default
-          }
+          borderColor={focusField === 'id' ? theme.ui.focus : theme.border.default}
           paddingX={1}
         >
           <TextInput
@@ -191,8 +185,7 @@ export function ProviderModelEditorView({
 
       <Box marginTop={1}>
         <Text color={theme.text.secondary}>
-          (↑/↓ or Tab to switch fields, ←/→ to toggle radio, Esc to save &
-          return)
+          (↑/↓ or Tab to switch fields, ←/→ to toggle radio, Esc to save & return)
         </Text>
       </Box>
     </Box>

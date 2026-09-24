@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { renderHook, mockSettings } from '../../test-utils/render.js';
 import {
   type Config,
@@ -90,8 +82,7 @@ describe('useQuotaAndFallback', () => {
 
       void result;
 
-      const handler = setFallbackHandlerSpy.mock
-        .calls[0][0] as FallbackModelHandler;
+      const handler = setFallbackHandlerSpy.mock.calls[0][0] as FallbackModelHandler;
 
       const error = new TerminalQuotaError(
         'pro quota',
@@ -121,15 +112,10 @@ describe('useQuotaAndFallback', () => {
         }),
       );
 
-      const handler = setFallbackHandlerSpy.mock
-        .calls[0][0] as FallbackModelHandler;
+      const handler = setFallbackHandlerSpy.mock.calls[0][0] as FallbackModelHandler;
 
       const error = new ModelNotFoundError('No model found');
-      const intent = await handler(
-        'some-unknown-model',
-        'gemini-2.5-flash',
-        error,
-      );
+      const intent = await handler('some-unknown-model', 'gemini-2.5-flash', error);
 
       expect(intent).toBe('retry_later');
       expect(mockHistoryManager.addItem).toHaveBeenCalledWith(
@@ -152,8 +138,7 @@ describe('useQuotaAndFallback', () => {
         }),
       );
 
-      const handler = setFallbackHandlerSpy.mock
-        .calls[0][0] as FallbackModelHandler;
+      const handler = setFallbackHandlerSpy.mock.calls[0][0] as FallbackModelHandler;
 
       const error = new RetryableQuotaError('rate limited', {
         code: 429,
@@ -175,8 +160,7 @@ describe('useQuotaAndFallback', () => {
         }),
       );
 
-      const handler = setFallbackHandlerSpy.mock
-        .calls[0][0] as FallbackModelHandler;
+      const handler = setFallbackHandlerSpy.mock.calls[0][0] as FallbackModelHandler;
 
       const error = new RetryableQuotaError('rate limited', {
         code: 429,

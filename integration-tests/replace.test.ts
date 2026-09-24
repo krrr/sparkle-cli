@@ -37,10 +37,9 @@ describe('replace', () => {
   });
 
   it.skip('should handle $ literally when replacing text ending with $', async () => {
-    await rig.setup(
-      'should handle $ literally when replacing text ending with $',
-      { settings: { tools: { core: ['replace', 'read_file'] } } },
-    );
+    await rig.setup('should handle $ literally when replacing text ending with $', {
+      settings: { tools: { core: ['replace', 'read_file'] } },
+    });
 
     const fileName = 'regex.yml';
     const originalContent = "| select('match', '^[sv]d[a-z]$')\n";
@@ -65,8 +64,7 @@ describe('replace', () => {
     const fileName = 'insert_block.txt';
     const originalContent = 'Line A\n<INSERT_TEXT_HERE>\nLine C';
     const newBlock = 'First line\nSecond line\nThird line';
-    const expectedContent =
-      'Line A\nFirst line\nSecond line\nThird line\nLine C';
+    const expectedContent = 'Line A\nFirst line\nSecond line\nThird line\nLine C';
     rig.createFile(fileName, originalContent);
 
     const prompt = `In ${fileName}, replace "<INSERT_TEXT_HERE>" with:\n${newBlock}. Use unix style line endings.`;

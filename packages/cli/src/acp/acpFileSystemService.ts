@@ -28,8 +28,7 @@ export class AcpFileSystemService implements FileSystemService {
     // even if the user runs the CLI directly from their home directory (which
     // would make the IDE's project root overlap with the global directory).
     return (
-      !isWithinRoot(filePath, this.root) ||
-      isWithinRoot(filePath, this.sparkleDir)
+      !isWithinRoot(filePath, this.root) || isWithinRoot(filePath, this.sparkleDir)
     );
   }
 

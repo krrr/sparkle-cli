@@ -54,10 +54,7 @@ export class RateLimiter {
   /**
    * Get time until next allowed recording for a metric
    */
-  getTimeUntilNextAllowed(
-    metricKey: string,
-    isHighPriority: boolean = false,
-  ): number {
+  getTimeUntilNextAllowed(metricKey: string, isHighPriority: boolean = false): number {
     const now = Date.now();
     const lastRecordTime = this.lastRecordTimes.get(metricKey) || 0;
     const interval = isHighPriority

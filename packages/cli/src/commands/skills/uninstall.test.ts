@@ -13,17 +13,13 @@ vi.mock('../../utils/skillUtils.js', () => ({
 }));
 
 const { debugLogger, emitConsoleLog } = await vi.hoisted(async () => {
-  const { createMockDebugLogger } = await import(
-    '../../test-utils/mockDebugLogger.js'
-  );
+  const { createMockDebugLogger } = await import('../../test-utils/mockDebugLogger.js');
   return createMockDebugLogger({ stripAnsi: true });
 });
 
 vi.mock('sparkle-cli-core', () => ({
   debugLogger,
-  getErrorMessage: vi.fn((e: unknown) =>
-    e instanceof Error ? e.message : String(e),
-  ),
+  getErrorMessage: vi.fn((e: unknown) => (e instanceof Error ? e.message : String(e))),
 }));
 
 import { handleUninstall, uninstallCommand } from './uninstall.js';
@@ -37,9 +33,7 @@ describe('skill uninstall command', () => {
   describe('uninstallCommand', () => {
     it('should have correct command and describe', () => {
       expect(uninstallCommand.command).toBe('uninstall <name> [--scope]');
-      expect(uninstallCommand.describe).toBe(
-        'Uninstalls an agent skill by name.',
-      );
+      expect(uninstallCommand.describe).toBe('Uninstalls an agent skill by name.');
     });
   });
 

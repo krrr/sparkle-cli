@@ -156,11 +156,7 @@ export class TerminalCapabilityManager {
           const match = buffer.match(TerminalCapabilityManager.OSC_11_REGEX);
           if (match) {
             bgReceived = true;
-            this.terminalBackgroundColor = parseColor(
-              match[1],
-              match[2],
-              match[3],
-            );
+            this.terminalBackgroundColor = parseColor(match[1], match[2], match[3]);
 
             // Heuristic: tmux 3.5+ may report #ffffff when it doesn't know the
             // actual host terminal color (e.g. over mosh). We ignore this specific
@@ -189,9 +185,7 @@ export class TerminalCapabilityManager {
 
         // check for modifyOtherKeys support
         if (!modifyOtherKeysReceived) {
-          const match = buffer.match(
-            TerminalCapabilityManager.MODIFY_OTHER_KEYS_REGEX,
-          );
+          const match = buffer.match(TerminalCapabilityManager.MODIFY_OTHER_KEYS_REGEX);
           if (match) {
             modifyOtherKeysReceived = true;
             const level = parseInt(match[1], 10);
@@ -204,9 +198,7 @@ export class TerminalCapabilityManager {
 
         // Check for Terminal Name/Version response.
         if (!terminalNameReceived) {
-          const match = buffer.match(
-            TerminalCapabilityManager.TERMINAL_NAME_REGEX,
-          );
+          const match = buffer.match(TerminalCapabilityManager.TERMINAL_NAME_REGEX);
           if (match) {
             terminalNameReceived = true;
             this.terminalName = match[1];
@@ -219,9 +211,7 @@ export class TerminalCapabilityManager {
         // that the terminal has processed all our queries. Since we send it
         // last, receiving it means we can stop waiting.
         if (!deviceAttributesReceived) {
-          const match = buffer.match(
-            TerminalCapabilityManager.DEVICE_ATTRIBUTES_REGEX,
-          );
+          const match = buffer.match(TerminalCapabilityManager.DEVICE_ATTRIBUTES_REGEX);
           if (match) {
             deviceAttributesReceived = true;
             cleanup();
@@ -335,5 +325,4 @@ export class TerminalCapabilityManager {
   }
 }
 
-export const terminalCapabilityManager =
-  TerminalCapabilityManager.getInstance();
+export const terminalCapabilityManager = TerminalCapabilityManager.getInstance();

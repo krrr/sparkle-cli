@@ -6,10 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { renderWithProviders } from '../../test-utils/render.js';
-import {
-  LiveThinkingTail,
-  getLiveThinkingTailLines,
-} from './LiveThinkingTail.js';
+import { LiveThinkingTail, getLiveThinkingTailLines } from './LiveThinkingTail.js';
 
 describe('LiveThinkingTail', () => {
   it('renders only the trailing lines of the accumulated reasoning', async () => {
@@ -66,11 +63,7 @@ describe('LiveThinkingTail', () => {
         '    indented detail stays   \n\ttab-indented line\t\n  \n...\nplain line',
         5,
       ),
-    ).toEqual([
-      '    indented detail stays',
-      '\ttab-indented line',
-      'plain line',
-    ]);
+    ).toEqual(['    indented detail stays', '\ttab-indented line', 'plain line']);
   });
 
   it('renders nothing for null or empty text', async () => {

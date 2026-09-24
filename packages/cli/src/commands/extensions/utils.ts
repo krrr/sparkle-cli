@@ -35,9 +35,7 @@ const defaultLogger: ConfigLogger = {
 const defaultRequestSetting: RequestSettingCallback = async (setting) =>
   promptForSetting(setting);
 
-const defaultRequestConfirmation: RequestConfirmationCallback = async (
-  message,
-) => {
+const defaultRequestConfirmation: RequestConfirmationCallback = async (message) => {
   const response = await prompts({
     type: 'confirm',
     name: 'confirm',
@@ -64,9 +62,7 @@ export async function getExtensionAndManager(
   name: string,
   logger: ConfigLogger = defaultLogger,
 ) {
-  const extension = extensionManager
-    .getExtensions()
-    .find((ext) => ext.name === name);
+  const extension = extensionManager.getExtensions().find((ext) => ext.name === name);
 
   if (!extension) {
     logger.error(`Extension "${name}" is not installed.`);
@@ -92,13 +88,9 @@ export async function configureSpecificSetting(
   if (!extension) {
     return;
   }
-  const extensionConfig = await extensionManager.loadExtensionConfig(
-    extension.path,
-  );
+  const extensionConfig = await extensionManager.loadExtensionConfig(extension.path);
   if (!extensionConfig) {
-    logger.error(
-      `Could not find configuration for extension "${extensionName}".`,
-    );
+    logger.error(`Could not find configuration for extension "${extensionName}".`);
     return;
   }
 
@@ -130,9 +122,7 @@ export async function configureExtension(
   if (!extension) {
     return;
   }
-  const extensionConfig = await extensionManager.loadExtensionConfig(
-    extension.path,
-  );
+  const extensionConfig = await extensionManager.loadExtensionConfig(extension.path);
   if (
     !extensionConfig ||
     !extensionConfig.settings ||
@@ -168,9 +158,7 @@ export async function configureAllExtensions(
   }
 
   for (const extension of extensions) {
-    const extensionConfig = await extensionManager.loadExtensionConfig(
-      extension.path,
-    );
+    const extensionConfig = await extensionManager.loadExtensionConfig(extension.path);
     if (
       extensionConfig &&
       extensionConfig.settings &&
@@ -247,9 +235,7 @@ export async function configureExtensionSettings(
   }
 }
 
-export function getFormattedSettingValue(
-  setting: ResolvedExtensionSetting,
-): string {
+export function getFormattedSettingValue(setting: ResolvedExtensionSetting): string {
   if (!setting.value) {
     return '[not set]';
   }

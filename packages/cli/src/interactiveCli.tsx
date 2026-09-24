@@ -9,11 +9,7 @@ import { render } from 'ink';
 import { basename } from 'node:path';
 import { AppContainer } from './ui/AppContainer.js';
 import { ConsolePatcher } from './ui/utils/ConsolePatcher.js';
-import {
-  registerCleanup,
-  removeCleanup,
-  setupTtyCheck,
-} from './utils/cleanup.js';
+import { registerCleanup, removeCleanup, setupTtyCheck } from './utils/cleanup.js';
 import {
   type StartupWarning,
   type Config,
@@ -146,13 +142,11 @@ export async function startInteractiveUI(
         }
         profiler.reportFrameRendered();
       },
-      standardReactLayoutTiming:
-        useAlternateBuffer || config.getUseTerminalBuffer(),
+      standardReactLayoutTiming: useAlternateBuffer || config.getUseTerminalBuffer(),
       patchConsole: false,
       alternateBuffer: useAlternateBuffer,
       terminalBuffer: config.getUseTerminalBuffer(),
-      renderProcess:
-        config.getUseRenderProcess() && config.getUseTerminalBuffer(),
+      renderProcess: config.getUseRenderProcess() && config.getUseTerminalBuffer(),
       incrementalRendering:
         settings.merged.ui.incrementalRendering !== false &&
         useAlternateBuffer &&

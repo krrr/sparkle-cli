@@ -26,11 +26,10 @@ export function useBackgroundTaskManager({
   setEmbeddedShellFocused,
   terminalHeight,
 }: BackgroundTaskManagerProps) {
-  const [isBackgroundTaskListOpen, setIsBackgroundTaskListOpen] =
-    useState(false);
-  const [activeBackgroundTaskPid, setActiveBackgroundTaskPid] = useState<
-    number | null
-  >(null);
+  const [isBackgroundTaskListOpen, setIsBackgroundTaskListOpen] = useState(false);
+  const [activeBackgroundTaskPid, setActiveBackgroundTaskPid] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (backgroundTasks.size === 0) {

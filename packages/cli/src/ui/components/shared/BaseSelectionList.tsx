@@ -107,9 +107,7 @@ function SelectionListItemRow<
     numberColor = theme.text.secondary;
   }
 
-  const itemNumberText = `${String(itemIndex + 1).padStart(
-    numberColumnWidth,
-  )}.`;
+  const itemNumberText = `${String(itemIndex + 1).padStart(numberColumnWidth)}.`;
 
   return (
     <Box
@@ -120,10 +118,7 @@ function SelectionListItemRow<
     >
       {/* Radio button indicator */}
       <Box minWidth={2} flexShrink={0}>
-        <Text
-          color={isSelected ? theme.ui.focus : theme.text.primary}
-          aria-hidden
-        >
+        <Text color={isSelected ? theme.ui.focus : theme.text.primary} aria-hidden>
           {isSelected ? selectedIndicator : ' '}
         </Text>
       </Box>
@@ -228,11 +223,7 @@ export function BaseSelectionList<
       {/* Use conditional coloring instead of conditional rendering */}
       {showArrows && (
         <Text
-          color={
-            effectiveScrollOffset > 0
-              ? theme.text.primary
-              : theme.text.secondary
-          }
+          color={effectiveScrollOffset > 0 ? theme.text.primary : theme.text.secondary}
         >
           ▲
         </Text>

@@ -58,9 +58,7 @@ function verifyIntegrity(dir, manifest, fsMod = fs, cryptoMod = crypto) {
       const buffer = new Uint8Array(65536); // 64KB
       try {
         let bytesRead = 0;
-        while (
-          (bytesRead = fsMod.readSync(fd, buffer, 0, buffer.length, null)) !== 0
-        ) {
+        while ((bytesRead = fsMod.readSync(fd, buffer, 0, buffer.length, null)) !== 0) {
           hash.update(buffer.subarray(0, bytesRead));
         }
       } finally {
@@ -73,8 +71,7 @@ function verifyIntegrity(dir, manifest, fsMod = fs, cryptoMod = crypto) {
       return false;
     if (manifest.files) {
       for (const file of manifest.files) {
-        if (calculateHash(path.join(dir, file.path)) !== file.hash)
-          return false;
+        if (calculateHash(path.join(dir, file.path)) !== file.hash) return false;
       }
     }
     return true;
@@ -96,14 +93,12 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
   const pathMod = deps.path || path;
   const processEnv = deps.processEnv || process.env;
   const processPid = deps.processPid || process.pid;
-  const processUid =
-    deps.processUid || (process.getuid ? process.getuid() : 'unknown');
+  const processUid = deps.processUid || (process.getuid ? process.getuid() : 'unknown');
 
   const version = manifest.version || '0.0.0';
   const safeVersion = getSafeName(version);
   const userInfo = osMod.userInfo();
-  const username =
-    userInfo.username || processEnv.USER || processUid || 'unknown';
+  const username = userInfo.username || processEnv.USER || processUid || 'unknown';
   const safeUsername = getSafeName(username);
 
   let tempBase = osMod.tmpdir();
@@ -134,8 +129,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
       if (!stat.isDirectory()) return false;
       if (processUid !== 'unknown' && stat.uid !== processUid) return false;
       // Skip strict permission check on Windows as it's unreliable with standard fs.stat
-      if (process.platform !== 'win32' && (stat.mode & 0o777) !== 0o700)
-        return false;
+      if (process.platform !== 'win32' && (stat.mode & 0o777) !== 0o700) return false;
       return true;
     } catch {
       return false;
@@ -143,9 +137,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
   };
   if (fsMod.existsSync(finalRuntimeDir)) {
     if (isSecure(finalRuntimeDir)) {
-      if (
-        verifyIntegrity(finalRuntimeDir, manifest, fsMod, deps.crypto || crypto)
-      ) {
+      if (verifyIntegrity(finalRuntimeDir, manifest, fsMod, deps.crypto || crypto)) {
         runtimeDir = finalRuntimeDir;
         useExisting = true;
       } else {
@@ -192,12 +184,7 @@ function prepareRuntime(manifest, getAssetFn, deps = {}) {
         if (
           fsMod.existsSync(finalRuntimeDir) &&
           isSecure(finalRuntimeDir) &&
-          verifyIntegrity(
-            finalRuntimeDir,
-            manifest,
-            fsMod,
-            deps.crypto || crypto,
-          )
+          verifyIntegrity(finalRuntimeDir, manifest, fsMod, deps.crypto || crypto)
         ) {
           runtimeDir = finalRuntimeDir;
           try {

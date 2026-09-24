@@ -67,8 +67,7 @@ describe('stableStringify', () => {
     //       "b": stringify({parent: ...}, {obj, obj.a}, false)
     //         ancestors: {obj, obj.a, obj.a.b}
     //           "parent": ancestors.has(obj.a) -> "[Circular]"
-    const expected =
-      '{\0"a":{"b":{"parent":"[Circular]"}}\0,\0"root":"[Circular]"\0}';
+    const expected = '{\0"a":{"b":{"parent":"[Circular]"}}\0,\0"root":"[Circular]"\0}';
     expect(stableStringify(obj)).toBe(expected);
   });
 

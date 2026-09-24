@@ -32,8 +32,7 @@ describe('parseWindowsSandboxDenials', () => {
   it('should detect Node.js EPERM on Windows', () => {
     const parsed = parseWindowsSandboxDenials({
       error: {
-        message:
-          "Error: EPERM: operation not permitted, open 'D:\\project\\file.ts'",
+        message: "Error: EPERM: operation not permitted, open 'D:\\project\\file.ts'",
       },
     } as unknown as ShellExecutionResult);
 
@@ -65,15 +64,12 @@ describe('parseWindowsSandboxDenials', () => {
     } as unknown as ShellExecutionResult);
 
     expect(parsed).toBeDefined();
-    expect(parsed?.filePaths).toContain(
-      '\\\\?\\C:\\Very\\Long\\Path\\file.txt',
-    );
+    expect(parsed?.filePaths).toContain('\\\\?\\C:\\Very\\Long\\Path\\file.txt');
   });
 
   it('should detect Windows paths with forward slashes', () => {
     const parsed = parseWindowsSandboxDenials({
-      output:
-        "Error: EPERM: operation not permitted, open 'C:/project/file.ts'",
+      output: "Error: EPERM: operation not permitted, open 'C:/project/file.ts'",
     } as unknown as ShellExecutionResult);
 
     expect(parsed).toBeDefined();
@@ -82,8 +78,7 @@ describe('parseWindowsSandboxDenials', () => {
 
   it('should return undefined if no denial detected', () => {
     const parsed = parseWindowsSandboxDenials({
-      output:
-        'Directory of C:\\Users\r\n03/26/2026  11:40 AM    <DIR>          .',
+      output: 'Directory of C:\\Users\r\n03/26/2026  11:40 AM    <DIR>          .',
     } as unknown as ShellExecutionResult);
 
     expect(parsed).toBeUndefined();

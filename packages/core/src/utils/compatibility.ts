@@ -28,9 +28,7 @@ export function isWindows10(): boolean {
  */
 export function isJetBrainsTerminal(): boolean {
   const env = process.env;
-  return !!(
-    env['TERMINAL_EMULATOR']?.startsWith('JetBrains') || env['JETBRAINS_IDE']
-  );
+  return !!(env['TERMINAL_EMULATOR']?.startsWith('JetBrains') || env['JETBRAINS_IDE']);
 }
 
 /**

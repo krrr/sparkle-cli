@@ -5,11 +5,7 @@
  */
 
 import type { HookRegistry, HookRegistryEntry } from './hookRegistry.js';
-import {
-  getHookKey,
-  type HookExecutionPlan,
-  type HookEventName,
-} from './types.js';
+import { getHookKey, type HookExecutionPlan, type HookEventName } from './types.js';
 import { debugLogger } from '../utils/debugLogger.js';
 
 /**
@@ -51,9 +47,7 @@ export class HookPlanner {
     const hookConfigs = deduplicatedEntries.map((entry) => entry.config);
 
     // Determine execution strategy - if ANY hook definition has sequential=true, run all sequentially
-    const sequential = deduplicatedEntries.some(
-      (entry) => entry.sequential === true,
-    );
+    const sequential = deduplicatedEntries.some((entry) => entry.sequential === true);
 
     const plan: HookExecutionPlan = {
       eventName,

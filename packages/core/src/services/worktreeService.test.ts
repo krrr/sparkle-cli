@@ -31,12 +31,7 @@ vi.mock('node:fs', async (importOriginal) => {
 describe('worktree utilities', () => {
   const projectRoot = path.resolve('/mock/project');
   const worktreeName = 'test-feature';
-  const expectedPath = path.join(
-    projectRoot,
-    '.sparkle',
-    'worktrees',
-    worktreeName,
-  );
+  const expectedPath = path.join(projectRoot, '.sparkle', 'worktrees', worktreeName);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,11 +46,9 @@ describe('worktree utilities', () => {
 
       const result = await getProjectRootForWorktree(projectRoot);
       expect(result).toBe(projectRoot);
-      expect(execa).toHaveBeenCalledWith(
-        'git',
-        ['rev-parse', '--git-common-dir'],
-        { cwd: projectRoot },
-      );
+      expect(execa).toHaveBeenCalledWith('git', ['rev-parse', '--git-common-dir'], {
+        cwd: projectRoot,
+      });
     });
 
     it('should resolve absolute git common dir paths (as seen in worktrees)', async () => {
@@ -110,18 +103,14 @@ describe('worktree utilities', () => {
   describe('isGeminiWorktree', () => {
     it('should return true for a valid gemini worktree path', () => {
       expect(isGeminiWorktree(expectedPath, projectRoot)).toBe(true);
-      expect(
-        isGeminiWorktree(path.join(expectedPath, 'src'), projectRoot),
-      ).toBe(true);
+      expect(isGeminiWorktree(path.join(expectedPath, 'src'), projectRoot)).toBe(true);
     });
 
     it('should return false for a path outside gemini worktrees', () => {
-      expect(isGeminiWorktree(path.join(projectRoot, 'src'), projectRoot)).toBe(
+      expect(isGeminiWorktree(path.join(projectRoot, 'src'), projectRoot)).toBe(false);
+      expect(isGeminiWorktree(path.resolve('/some/other/path'), projectRoot)).toBe(
         false,
       );
-      expect(
-        isGeminiWorktree(path.resolve('/some/other/path'), projectRoot),
-      ).toBe(false);
     });
   });
 

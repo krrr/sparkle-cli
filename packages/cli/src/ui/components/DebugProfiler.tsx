@@ -31,10 +31,7 @@ export const profiler = {
   openedDebugConsole: false,
   lastActionTimestamp: 0,
 
-  possiblyIdleFrameTimestamps: new FixedDeque<number>(
-    Array,
-    FRAME_TIMESTAMP_CAPACITY,
-  ),
+  possiblyIdleFrameTimestamps: new FixedDeque<number>(Array, FRAME_TIMESTAMP_CAPACITY),
   actionTimestamps: new FixedDeque<number>(Array, ACTION_TIMESTAMP_CAPACITY),
 
   reportAction() {
@@ -94,8 +91,7 @@ export const profiler = {
       }
 
       const hasAction =
-        this.actionTimestamps.size > 0 &&
-        this.actionTimestamps.peekFirst()! <= end;
+        this.actionTimestamps.size > 0 && this.actionTimestamps.peekFirst()! <= end;
 
       if (!hasAction) {
         if (frameTime >= oneSecondIntervalFromJudgementCutoff) {
@@ -173,10 +169,7 @@ export const DebugProfiler = () => {
 
     // Register handlers for extension lifecycle events emitted on coreEvents
     // but not part of the CoreEvent enum, to prevent false-positive idle warnings.
-    const extensionEvents = [
-      'extensionsStarting',
-      'extensionsStopping',
-    ] as const;
+    const extensionEvents = ['extensionsStarting', 'extensionsStopping'] as const;
     for (const eventName of extensionEvents) {
       coreEvents.on(eventName, handler);
     }
@@ -208,10 +201,7 @@ export const DebugProfiler = () => {
     return () => clearInterval(updateInterval);
   }, []);
 
-  useEffect(
-    () => profiler.registerFlickerHandler(constrainHeight),
-    [constrainHeight],
-  );
+  useEffect(() => profiler.registerFlickerHandler(constrainHeight), [constrainHeight]);
 
   // Effect for updating stats
   useEffect(() => {
@@ -235,9 +225,7 @@ export const DebugProfiler = () => {
     <Text color={theme.status.warning} key={forceRefresh}>
       Renders: {profiler.numFrames} (total),{' '}
       <Text color={theme.status.error}>{profiler.totalIdleFrames} (idle)</Text>,{' '}
-      <Text color={theme.status.error}>
-        {profiler.totalFlickerFrames} (flicker)
-      </Text>
+      <Text color={theme.status.error}>{profiler.totalFlickerFrames} (flicker)</Text>
     </Text>
   );
 };

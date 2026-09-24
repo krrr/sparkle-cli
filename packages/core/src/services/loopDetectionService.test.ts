@@ -254,15 +254,11 @@ describe('LoopDetectionService', () => {
 
       // Run some alternating calls, then break the pattern with eventC
       for (let i = 0; i < 4; i++) {
-        expect(service.addAndCheck(i % 2 === 0 ? eventA : eventB).count).toBe(
-          0,
-        );
+        expect(service.addAndCheck(i % 2 === 0 ? eventA : eventB).count).toBe(0);
       }
       expect(service.addAndCheck(eventC).count).toBe(0);
       for (let i = 0; i < 4; i++) {
-        expect(service.addAndCheck(i % 2 === 0 ? eventA : eventB).count).toBe(
-          0,
-        );
+        expect(service.addAndCheck(i % 2 === 0 ? eventA : eventB).count).toBe(0);
       }
     });
   });
@@ -274,9 +270,7 @@ describe('LoopDetectionService', () => {
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
       const charactersLength = characters.length;
       for (let i = 0; i < length; i++) {
-        result += characters.charAt(
-          Math.floor(Math.random() * charactersLength),
-        );
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
       }
       return result;
     };
@@ -447,9 +441,7 @@ describe('LoopDetectionService', () => {
 
       // Continue adding repetitive content inside the code block - should not trigger loop
       for (let i = 0; i < CONTENT_LOOP_THRESHOLD; i++) {
-        const resultInside = service.addAndCheck(
-          createContentEvent(repeatedContent),
-        );
+        const resultInside = service.addAndCheck(createContentEvent(repeatedContent));
         expect(resultInside.count).toBe(0);
       }
 
@@ -485,9 +477,7 @@ describe('LoopDetectionService', () => {
 
       // Inside code block - should not track loops
       for (let i = 0; i < 5; i++) {
-        const insideResult = service.addAndCheck(
-          createContentEvent(repeatedContent),
-        );
+        const insideResult = service.addAndCheck(createContentEvent(repeatedContent));
         expect(insideResult.count).toBe(0);
       }
 
@@ -496,9 +486,7 @@ describe('LoopDetectionService', () => {
       expect(exitResult.count).toBe(0);
 
       // Enter code block again (3rd fence) - should stop tracking again
-      const reenterResult = service.addAndCheck(
-        createContentEvent('```python\n'),
-      );
+      const reenterResult = service.addAndCheck(createContentEvent('```python\n'));
       expect(reenterResult.count).toBe(0);
 
       expect(loggers.logLoopDetected).not.toHaveBeenCalled();
@@ -549,8 +537,7 @@ describe('LoopDetectionService', () => {
 
     it('should not detect a loop for a long code block with some repeating tokens', () => {
       service.reset('');
-      const repeatingTokens =
-        'for (let i = 0; i < 10; i++) { console.log(i); }';
+      const repeatingTokens = 'for (let i = 0; i < 10; i++) { console.log(i); }';
 
       service.addAndCheck(createContentEvent('```\n'));
 
@@ -694,9 +681,7 @@ describe('LoopDetectionService', () => {
           CONTENT_CHUNK_SIZE,
         );
         for (let i = 0; i < CONTENT_LOOP_THRESHOLD - 1; i++) {
-          const result = service.addAndCheck(
-            createContentEvent(newRepeatedContent),
-          );
+          const result = service.addAndCheck(createContentEvent(newRepeatedContent));
           expect(result.count).toBe(0);
         }
       });
@@ -731,9 +716,7 @@ describe('LoopDetectionService', () => {
           CONTENT_CHUNK_SIZE,
         );
         for (let i = 0; i < CONTENT_LOOP_THRESHOLD - 1; i++) {
-          const result = service.addAndCheck(
-            createContentEvent(newRepeatedContent),
-          );
+          const result = service.addAndCheck(createContentEvent(newRepeatedContent));
           expect(result.count).toBe(0);
         }
       });
@@ -770,9 +753,7 @@ describe('LoopDetectionService', () => {
           CONTENT_CHUNK_SIZE,
         );
         for (let i = 0; i < CONTENT_LOOP_THRESHOLD - 1; i++) {
-          const result = service.addAndCheck(
-            createContentEvent(newRepeatedContent),
-          );
+          const result = service.addAndCheck(createContentEvent(newRepeatedContent));
           expect(result.count).toBe(0);
         }
       });
@@ -862,9 +843,7 @@ describe('LoopDetectionService', () => {
       service.addAndCheck(toolEvent);
 
       // Should start fresh
-      expect(
-        service.addAndCheck(createContentEvent('Fresh content.')).count,
-      ).toBe(0);
+      expect(service.addAndCheck(createContentEvent('Fresh content.')).count).toBe(0);
     });
   });
 
@@ -1028,9 +1007,7 @@ describe('LoopDetectionService LLM Checks', () => {
   });
 
   it('should handle errors from generateJson gracefully', async () => {
-    mockBaseLlmClient.generateJson = vi
-      .fn()
-      .mockRejectedValue(new Error('API error'));
+    mockBaseLlmClient.generateJson = vi.fn().mockRejectedValue(new Error('API error'));
     await advanceTurns(30);
     const result = await service.turnStarted(abortController.signal);
     expect(result.count).toBe(0);
@@ -1066,8 +1043,7 @@ describe('LoopDetectionService LLM Checks', () => {
     await advanceTurns(30);
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
-    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock
-      .calls[0][0];
+    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock.calls[0][0];
     expect(calledArg.contents[0]).toEqual({
       role: 'user',
       parts: [{ text: 'Recent conversation history:' }],
@@ -1109,8 +1085,7 @@ describe('LoopDetectionService LLM Checks', () => {
     await advanceTurns(30);
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
-    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock
-      .calls[0][0];
+    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock.calls[0][0];
     const contents = calledArg.contents;
     // The dangling model turn (text + functionCall) must be trimmed away.
     expect(
@@ -1123,9 +1098,7 @@ describe('LoopDetectionService LLM Checks', () => {
     // The last content is the loop-detection task prompt.
     expect(contents[contents.length - 1]).toEqual({
       role: 'user',
-      parts: [
-        { text: expect.stringContaining('analyze the conversation history') },
-      ],
+      parts: [{ text: expect.stringContaining('analyze the conversation history') }],
     });
   });
 
@@ -1253,8 +1226,7 @@ describe('LoopDetectionService LLM Checks', () => {
     await advanceTurns(30);
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
-    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock
-      .calls[0][0];
+    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock.calls[0][0];
     // First content should be the user prompt context wrapped in XML
     expect(calledArg.contents[0]).toEqual({
       role: 'user',
@@ -1283,8 +1255,7 @@ describe('LoopDetectionService LLM Checks', () => {
     await advanceTurns(30);
 
     expect(mockBaseLlmClient.generateJson).toHaveBeenCalledTimes(1);
-    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock
-      .calls[0][0];
+    const calledArg = vi.mocked(mockBaseLlmClient.generateJson).mock.calls[0][0];
     // First content should be the history, not a user prompt message
     expect(calledArg.contents[0]).toEqual({
       role: 'model',

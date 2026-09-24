@@ -28,10 +28,7 @@ export interface Command {
   readonly subCommands?: Command[];
   readonly requiresWorkspace?: boolean;
 
-  execute(
-    context: CommandContext,
-    args: string[],
-  ): Promise<CommandExecutionResponse>;
+  execute(context: CommandContext, args: string[]): Promise<CommandExecutionResponse>;
 }
 
 export interface CommandExecutionResponse {

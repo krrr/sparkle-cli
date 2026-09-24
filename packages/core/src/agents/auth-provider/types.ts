@@ -12,11 +12,7 @@
 
 import type { AuthenticationHandler } from '@a2a-js/sdk/client';
 
-export type A2AAuthProviderType =
-  | 'apiKey'
-  | 'http'
-  | 'oauth2'
-  | 'openIdConnect';
+export type A2AAuthProviderType = 'apiKey' | 'http' | 'oauth2' | 'openIdConnect';
 
 export interface A2AAuthProvider extends AuthenticationHandler {
   readonly type: A2AAuthProviderType;

@@ -169,10 +169,7 @@ interface ActiveChildProcess {
   sessionId?: string;
 }
 
-const findLastContentLine = (
-  buffer: pkg.IBuffer,
-  startLine: number,
-): number => {
+const findLastContentLine = (buffer: pkg.IBuffer, startLine: number): number => {
   const lineCount = buffer.length;
   for (let i = lineCount - 1; i >= startLine; i--) {
     const line = buffer.getLine(i);
@@ -489,8 +486,7 @@ export class ShellExecutionService {
     const sanitizationConfig = {
       ...shellExecutionConfig.sanitizationConfig,
       allowedEnvironmentVariables: [
-        ...(shellExecutionConfig.sanitizationConfig
-          .allowedEnvironmentVariables || []),
+        ...(shellExecutionConfig.sanitizationConfig.allowedEnvironmentVariables || []),
         ...gitConfigKeys,
       ],
     };
@@ -499,8 +495,7 @@ export class ShellExecutionService {
 
     const baseEnv: Record<string, string | undefined> = {
       ...sanitizedEnv,
-      [SPARKLE_CLI_IDENTIFICATION_ENV_VAR]:
-        SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
+      [SPARKLE_CLI_IDENTIFICATION_ENV_VAR]: SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
       TERM: 'xterm-256color',
       PAGER: shellExecutionConfig.pager ?? 'cat',
       GIT_PAGER: shellExecutionConfig.pager ?? 'cat',
@@ -659,9 +654,7 @@ export class ShellExecutionService {
           })
         : undefined;
 
-      let resolveWithoutPid:
-        | ((result: ShellExecutionResult) => void)
-        | undefined;
+      let resolveWithoutPid: ((result: ShellExecutionResult) => void) | undefined;
       const result =
         lifecycleHandle?.result ??
         new Promise<ShellExecutionResult>((resolve) => {
@@ -727,10 +720,7 @@ export class ShellExecutionService {
             if (child.pid) {
               ExecutionLifecycleService.emitEvent(child.pid, event);
               if (ShellExecutionService.backgroundLogPids.has(child.pid)) {
-                ShellExecutionService.syncBackgroundLog(
-                  child.pid,
-                  decodedChunk,
-                );
+                ShellExecutionService.syncBackgroundLog(child.pid, decodedChunk);
               }
             }
           }
@@ -747,10 +737,7 @@ export class ShellExecutionService {
         }
       };
 
-      const handleExit = (
-        code: number | null,
-        signal: NodeJS.Signals | null,
-      ) => {
+      const handleExit = (code: number | null, signal: NodeJS.Signals | null) => {
         cleanup();
         cmdCleanup?.();
 
@@ -789,8 +776,7 @@ export class ShellExecutionService {
           };
 
           const sessionId = shellExecutionConfig.sessionId ?? 'default';
-          const history =
-            ShellExecutionService.backgroundProcessHistory.get(sessionId);
+          const history = ShellExecutionService.backgroundProcessHistory.get(sessionId);
           const historyItem = history?.get(pid);
           if (historyItem) {
             historyItem.status = 'exited';
@@ -819,10 +805,7 @@ export class ShellExecutionService {
       // hang the result promise forever. Make handling idempotent and settle
       // shortly after 'exit' if 'close' never arrives.
       let exitHandled = false;
-      const handleExitOnce = (
-        code: number | null,
-        signal: NodeJS.Signals | null,
-      ) => {
+      const handleExitOnce = (code: number | null, signal: NodeJS.Signals | null) => {
         if (exitHandled) {
           return;
         }
@@ -1131,15 +1114,10 @@ export class ShellExecutionService {
 
         let newOutput: AnsiOutput;
         if (shellExecutionConfig.showColor) {
-          newOutput = serializeTerminalToObject(
-            headlessTerminal,
-            startLine,
-            endLine,
-          );
+          newOutput = serializeTerminalToObject(headlessTerminal, startLine, endLine);
         } else {
           newOutput = (
-            serializeTerminalToObject(headlessTerminal, startLine, endLine) ||
-            []
+            serializeTerminalToObject(headlessTerminal, startLine, endLine) || []
           ).map((line) =>
             line.map((token) => {
               token.fg = '';
@@ -1479,10 +1457,7 @@ export class ShellExecutionService {
     const resolvedSessionId =
       sessionId ?? activePty?.sessionId ?? activeChild?.sessionId;
     const resolvedCommand =
-      command ??
-      activePty?.command ??
-      activeChild?.command ??
-      'unknown command';
+      command ?? activePty?.command ?? activeChild?.command ?? 'unknown command';
 
     if (!resolvedSessionId) {
       throw new Error('Session ID is required for background operations');
@@ -1607,10 +1582,7 @@ export class ShellExecutionService {
     // Force emit the new state after resize
     if (activePty) {
       const endLine = activePty.headlessTerminal.buffer.active.length;
-      const startLine = Math.max(
-        0,
-        endLine - (activePty.maxSerializedLines ?? 2000),
-      );
+      const startLine = Math.max(0, endLine - (activePty.maxSerializedLines ?? 2000));
       const bufferData = serializeTerminalToObject(
         activePty.headlessTerminal,
         startLine,

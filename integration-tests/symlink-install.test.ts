@@ -33,107 +33,92 @@ const otherExtension = `{
   "version": "6.6.6"
 }`;
 
-describe.skipIf(skipFlaky)(
-  'extension symlink install spoofing protection',
-  () => {
-    let rig: TestRig;
+describe.skipIf(skipFlaky)('extension symlink install spoofing protection', () => {
+  let rig: TestRig;
 
-    beforeEach(() => {
-      rig = new TestRig();
-    });
+  beforeEach(() => {
+    rig = new TestRig();
+  });
 
-    afterEach(async () => await rig.cleanup());
+  afterEach(async () => await rig.cleanup());
 
-    it('canonicalizes the trust path and prevents symlink spoofing', async () => {
-      // Enable folder trust for this test
-      rig.setup('symlink spoofing test', {
-        settings: {
-          security: {
-            folderTrust: {
-              enabled: true,
-            },
+  it('canonicalizes the trust path and prevents symlink spoofing', async () => {
+    // Enable folder trust for this test
+    rig.setup('symlink spoofing test', {
+      settings: {
+        security: {
+          folderTrust: {
+            enabled: true,
           },
         },
+      },
+    });
+
+    const realExtPath = join(rig.testDir!, 'real-extension');
+    mkdirSync(realExtPath);
+    writeFileSync(join(realExtPath, 'sparkle-extension.json'), extension);
+
+    const maliciousExtPath = join(os.tmpdir(), `malicious-extension-${Date.now()}`);
+    mkdirSync(maliciousExtPath);
+    writeFileSync(join(maliciousExtPath, 'sparkle-extension.json'), otherExtension);
+
+    const symlinkPath = join(rig.testDir!, 'symlink-extension');
+    symlinkSync(realExtPath, symlinkPath);
+
+    // Function to run a command with a PTY to avoid headless mode
+    const runPty = (args: string[]) => {
+      const ptyProcess = pty.spawn(process.execPath, [BUNDLE_PATH, ...args], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 80,
+        cwd: rig.testDir!,
+        env: {
+          ...process.env,
+          SPARKLE_CLI_HOME: rig.homeDir!,
+          SPARKLE_CLI_INTEGRATION_TEST: 'true',
+          SPARKLE_PTY_INFO: 'node-pty',
+        },
       });
+      return new InteractiveRun(ptyProcess);
+    };
 
-      const realExtPath = join(rig.testDir!, 'real-extension');
-      mkdirSync(realExtPath);
-      writeFileSync(join(realExtPath, 'sparkle-extension.json'), extension);
+    // 1. Install via symlink, trust it
+    const run1 = runPty(['extensions', 'install', symlinkPath]);
+    await run1.expectText('Do you want to trust this folder', 30000);
+    await run1.type('y\r');
+    await run1.expectText('trust this workspace', 30000);
+    await run1.type('y\r');
+    await run1.expectText('Do you want to continue', 30000);
+    await run1.type('y\r');
+    await run1.expectText('installed successfully', 30000);
+    await run1.kill();
 
-      const maliciousExtPath = join(
-        os.tmpdir(),
-        `malicious-extension-${Date.now()}`,
-      );
-      mkdirSync(maliciousExtPath);
-      writeFileSync(
-        join(maliciousExtPath, 'sparkle-extension.json'),
-        otherExtension,
-      );
+    // 2. Verify trustedFolders.json contains the REAL path, not the symlink path
+    const trustedFoldersPath = join(rig.homeDir!, SPARKLE_DIR, 'trustedFolders.json');
+    // Wait for file to be written
+    let attempts = 0;
+    while (!fs.existsSync(trustedFoldersPath) && attempts < 50) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      attempts++;
+    }
 
-      const symlinkPath = join(rig.testDir!, 'symlink-extension');
-      symlinkSync(realExtPath, symlinkPath);
+    const trustedFolders = JSON.parse(readFileSync(trustedFoldersPath, 'utf-8'));
+    const trustedPaths = Object.keys(trustedFolders);
+    const canonicalRealExtPath = fs.realpathSync(realExtPath);
 
-      // Function to run a command with a PTY to avoid headless mode
-      const runPty = (args: string[]) => {
-        const ptyProcess = pty.spawn(process.execPath, [BUNDLE_PATH, ...args], {
-          name: 'xterm-color',
-          cols: 80,
-          rows: 80,
-          cwd: rig.testDir!,
-          env: {
-            ...process.env,
-            SPARKLE_CLI_HOME: rig.homeDir!,
-            SPARKLE_CLI_INTEGRATION_TEST: 'true',
-            SPARKLE_PTY_INFO: 'node-pty',
-          },
-        });
-        return new InteractiveRun(ptyProcess);
-      };
+    expect(trustedPaths).toContain(canonicalRealExtPath);
+    expect(trustedPaths).not.toContain(symlinkPath);
 
-      // 1. Install via symlink, trust it
-      const run1 = runPty(['extensions', 'install', symlinkPath]);
-      await run1.expectText('Do you want to trust this folder', 30000);
-      await run1.type('y\r');
-      await run1.expectText('trust this workspace', 30000);
-      await run1.type('y\r');
-      await run1.expectText('Do you want to continue', 30000);
-      await run1.type('y\r');
-      await run1.expectText('installed successfully', 30000);
-      await run1.kill();
+    // 3. Swap the symlink to point to the malicious extension
+    unlinkSync(symlinkPath);
+    symlinkSync(maliciousExtPath, symlinkPath);
 
-      // 2. Verify trustedFolders.json contains the REAL path, not the symlink path
-      const trustedFoldersPath = join(
-        rig.homeDir!,
-        SPARKLE_DIR,
-        'trustedFolders.json',
-      );
-      // Wait for file to be written
-      let attempts = 0;
-      while (!fs.existsSync(trustedFoldersPath) && attempts < 50) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        attempts++;
-      }
-
-      const trustedFolders = JSON.parse(
-        readFileSync(trustedFoldersPath, 'utf-8'),
-      );
-      const trustedPaths = Object.keys(trustedFolders);
-      const canonicalRealExtPath = fs.realpathSync(realExtPath);
-
-      expect(trustedPaths).toContain(canonicalRealExtPath);
-      expect(trustedPaths).not.toContain(symlinkPath);
-
-      // 3. Swap the symlink to point to the malicious extension
-      unlinkSync(symlinkPath);
-      symlinkSync(maliciousExtPath, symlinkPath);
-
-      // 4. Try to install again via the same symlink path.
-      // It should NOT be trusted because the real path changed.
-      const run2 = runPty(['extensions', 'install', symlinkPath]);
-      await run2.expectText('Do you want to trust this folder', 30000);
-      await run2.type('n\r');
-      await run2.expectText('Installation aborted', 30000);
-      await run2.kill();
-    }, 60000);
-  },
-);
+    // 4. Try to install again via the same symlink path.
+    // It should NOT be trusted because the real path changed.
+    const run2 = runPty(['extensions', 'install', symlinkPath]);
+    await run2.expectText('Do you want to trust this folder', 30000);
+    await run2.type('n\r');
+    await run2.expectText('Installation aborted', 30000);
+    await run2.kill();
+  }, 60000);
+});

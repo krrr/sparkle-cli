@@ -101,12 +101,12 @@ describe('McpServerEnablementManager', () => {
       isSessionDisabled: false,
       isPersistentDisabled: false,
     });
-    expect(
-      (await manager.getDisplayState('file-disabled')).isPersistentDisabled,
-    ).toBe(true);
-    expect(
-      (await manager.getDisplayState('session-disabled')).isSessionDisabled,
-    ).toBe(true);
+    expect((await manager.getDisplayState('file-disabled')).isPersistentDisabled).toBe(
+      true,
+    );
+    expect((await manager.getDisplayState('session-disabled')).isSessionDisabled).toBe(
+      true,
+    );
   });
 
   it('should share session state across getInstance calls', () => {
@@ -171,8 +171,6 @@ describe('helper functions', () => {
   it('isInSettingsList supports ext: backward compat', () => {
     expect(isInSettingsList('playwright', ['playwright']).found).toBe(true);
     expect(isInSettingsList('ext:github:mcp', ['mcp']).found).toBe(true);
-    expect(
-      isInSettingsList('ext:github:mcp', ['mcp']).deprecationWarning,
-    ).toBeTruthy();
+    expect(isInSettingsList('ext:github:mcp', ['mcp']).deprecationWarning).toBeTruthy();
   });
 });

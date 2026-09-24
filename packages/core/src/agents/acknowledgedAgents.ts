@@ -53,10 +53,7 @@ export class AcknowledgedAgentsService {
         'utf-8',
       );
     } catch (error) {
-      debugLogger.error(
-        'Failed to save acknowledged agents:',
-        getErrorMessage(error),
-      );
+      debugLogger.error('Failed to save acknowledged agents:', getErrorMessage(error));
     }
   }
 

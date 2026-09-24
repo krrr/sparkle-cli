@@ -34,11 +34,7 @@ describe('ToolResultDisplay', () => {
       ],
     ];
     const { lastFrame, waitUntilReady, unmount } = await renderWithProviders(
-      <ToolResultDisplay
-        resultDisplay={ansiResult}
-        terminalWidth={80}
-        maxLines={10}
-      />,
+      <ToolResultDisplay resultDisplay={ansiResult} terminalWidth={80} maxLines={10} />,
       {
         config: makeFakeConfig({ useAlternateBuffer: true }),
         settings: createMockSettings({ ui: { useAlternateBuffer: true } }),

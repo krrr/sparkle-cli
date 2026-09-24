@@ -367,9 +367,7 @@ function gitSubcommandArgsAreReadOnly(args: string[]): boolean {
 
   return !args.some(
     (arg) =>
-      unsafeFlags.has(arg) ||
-      arg.startsWith('--output=') ||
-      arg.startsWith('--exec='),
+      unsafeFlags.has(arg) || arg.startsWith('--output=') || arg.startsWith('--exec='),
   );
 }
 

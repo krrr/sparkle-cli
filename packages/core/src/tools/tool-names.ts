@@ -237,11 +237,7 @@ export const DISCOVERED_TOOL_PREFIX = 'discovered_tool_';
 /**
  * List of all built-in tool names.
  */
-import {
-  isMcpToolName,
-  parseMcpToolName,
-  MCP_TOOL_PREFIX,
-} from './mcp-tool.js';
+import { isMcpToolName, parseMcpToolName, MCP_TOOL_PREFIX } from './mcp-tool.js';
 
 export const ALL_BUILTIN_TOOL_NAMES = [
   GLOB_TOOL_NAME,

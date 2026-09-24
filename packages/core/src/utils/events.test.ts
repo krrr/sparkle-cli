@@ -284,9 +284,7 @@ describe('CoreEventEmitter', () => {
             const payload = args[0] as { isStderr: boolean; chunk: string };
             return {
               event,
-              args: [
-                { ...payload, isStderr: true },
-              ] as unknown as CoreEvents[K],
+              args: [{ ...payload, isStderr: true }] as unknown as CoreEvents[K],
             };
           }
           return { event, args };

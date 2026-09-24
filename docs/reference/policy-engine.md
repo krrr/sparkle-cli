@@ -1,9 +1,8 @@
 # Policy engine
 
-Sparkle CLI includes a powerful policy engine that provides fine-grained control
-over tool execution. It allows users and administrators to define rules that
-determine whether a tool call should be allowed, denied, or require user
-confirmation.
+Sparkle CLI includes a powerful policy engine that provides fine-grained control over
+tool execution. It allows users and administrators to define rules that determine
+whether a tool call should be allowed, denied, or require user confirmation.
 
 ## Quick start
 
@@ -23,9 +22,9 @@ To create your first policy:
     New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.sparkle\policies"
     ```
 
-2.  **Create a new policy file** (for example,
-    `~/.sparkle/policies/my-rules.toml`). You can use any filename ending in
-    `.toml`; all such files in this directory will be loaded and combined:
+2.  **Create a new policy file** (for example, `~/.sparkle/policies/my-rules.toml`). You
+    can use any filename ending in `.toml`; all such files in this directory will be
+    loaded and combined:
     ```toml
     [[rule]]
     toolName = "run_shell_command"
@@ -38,20 +37,17 @@ To create your first policy:
 
 ## Core concepts
 
-The policy engine operates on a set of rules. Each rule is a combination of
-conditions and a resulting decision. When a large language model wants to
-execute a tool, the policy engine evaluates all rules to find the
-highest-priority rule that matches the tool call.
+The policy engine operates on a set of rules. Each rule is a combination of conditions
+and a resulting decision. When a large language model wants to execute a tool, the
+policy engine evaluates all rules to find the highest-priority rule that matches the
+tool call.
 
 A rule consists of the following main components:
 
-- **Conditions**: Criteria that a tool call must meet for the rule to apply.
-  This can include the tool's name, the arguments provided to it, or the current
-  approval mode.
-- **Decision**: The action to take if the rule matches (`allow`, `deny`, or
-  `ask_user`).
-- **Priority**: A number that determines the rule's precedence. Higher numbers
-  win.
+- **Conditions**: Criteria that a tool call must meet for the rule to apply. This can
+  include the tool's name, the arguments provided to it, or the current approval mode.
+- **Decision**: The action to take if the rule matches (`allow`, `deny`, or `ask_user`).
+- **Priority**: A number that determines the rule's precedence. Higher numbers win.
 
 For example, this rule will ask for user confirmation before executing any `git`
 command.
@@ -66,13 +62,13 @@ priority = 100
 
 ### Conditions
 
-Conditions are the criteria that a tool call must meet for a rule to apply. The
-primary conditions are the tool's name and its arguments.
+Conditions are the criteria that a tool call must meet for a rule to apply. The primary
+conditions are the tool's name and its arguments.
 
 #### Tool Name
 
-The `toolName` in the rule must match the name of the tool being called. For a
-complete list of built-in tool names, see the
+The `toolName` in the rule must match the name of the tool being called. For a complete
+list of built-in tool names, see the
 [Tools reference](/docs/reference/tools#available-tools).
 
 - **Wildcards**: You can use wildcards to match multiple tools.
@@ -81,16 +77,16 @@ complete list of built-in tool names, see the
   - `mcp_*_toolName`: Matches a specific tool name across **all** MCP servers.
   - `mcp_*`: Matches **any tool from any MCP server**.
 
-> **Recommendation:** While FQN wildcards are supported, the recommended
-> approach for MCP tools is to use the `mcpName` field in your TOML rules. See
+> **Recommendation:** While FQN wildcards are supported, the recommended approach for
+> MCP tools is to use the `mcpName` field in your TOML rules. See
 > [Special syntax for MCP tools](#special-syntax-for-mcp-tools).
 
 #### Arguments pattern
 
-If `argsPattern` is specified, the tool's arguments are converted to a stable
-JSON string, which is then tested against the provided regular expression. If
-the arguments don't match the pattern, the rule does not apply. For a list of
-argument keys available for each tool, see the **Parameters** in the
+If `argsPattern` is specified, the tool's arguments are converted to a stable JSON
+string, which is then tested against the provided regular expression. If the arguments
+don't match the pattern, the rule does not apply. For a list of argument keys available
+for each tool, see the **Parameters** in the
 [Tools reference](/docs/reference/tools#available-tools).
 
 #### Execution environment
@@ -101,20 +97,19 @@ environment matches the specified boolean value:
 - `true`: The rule applies only in interactive mode.
 - `false`: The rule applies only in non-interactive (headless) mode.
 
-If omitted, the rule applies to both interactive and non-interactive
-environments.
+If omitted, the rule applies to both interactive and non-interactive environments.
 
 ### Decisions
 
 There are three possible decisions a rule can enforce:
 
 - `allow`: The tool call is executed automatically without user interaction.
-- `deny`: The tool call is blocked and is not executed. For global rules (those
-  without an `argsPattern`), tools that are denied are **completely excluded
-  from the model's memory**. This means the model will not even see the tool as
-  an option, which is more secure and saves context window space.
-- `ask_user`: The user is prompted to approve or deny the tool call. (In
-  non-interactive mode, this is treated as `deny`.)
+- `deny`: The tool call is blocked and is not executed. For global rules (those without
+  an `argsPattern`), tools that are denied are **completely excluded from the model's
+  memory**. This means the model will not even see the tool as an option, which is more
+  secure and saves context window space.
+- `ask_user`: The user is prompted to approve or deny the tool call. (In non-interactive
+  mode, this is treated as `deny`.)
 
 <!-- prettier-ignore -->
 > [!NOTE]
@@ -125,17 +120,17 @@ There are three possible decisions a rule can enforce:
 ### Priority system and tiers
 
 > [!WARNING] The **Workspace** tier (project-level policies) is currently
-> non-functional. Defining policies in a workspace's `.sparkle/policies`
-> directory will not have any effect. See
-> [issue #18186](https://github.com/google-gemini/gemini-cli/issues/18186). Use
-> User policies instead.
+> non-functional. Defining policies in a workspace's `.sparkle/policies` directory will
+> not have any effect. See
+> [issue #18186](https://github.com/google-gemini/gemini-cli/issues/18186). Use User
+> policies instead.
 
 The policy engine uses a sophisticated priority system to resolve conflicts when
-multiple rules match a single tool call. The core principle is simple: **the
-rule with the highest priority wins**.
+multiple rules match a single tool call. The core principle is simple: **the rule with
+the highest priority wins**.
 
-To provide a clear hierarchy, policies are organized into four tiers. Each tier
-has a designated number that forms the base of the final priority calculation.
+To provide a clear hierarchy, policies are organized into four tiers. Each tier has a
+designated number that forms the base of the final priority calculation.
 
 | Tier      | Base | Description                                                                                   |
 | :-------- | :--- | :-------------------------------------------------------------------------------------------- |
@@ -144,8 +139,8 @@ has a designated number that forms the base of the final priority calculation.
 | Workspace | 3    | **(Currently disabled)** Policies defined in the current workspace's configuration directory. |
 | User      | 4    | Custom policies defined by the user.                                                          |
 
-Within a TOML policy file, you assign a priority value from **0 to 999**. The
-engine transforms this into a final priority using the following formula:
+Within a TOML policy file, you assign a priority value from **0 to 999**. The engine
+transforms this into a final priority using the following formula:
 
 `final_priority = tier_base + (toml_priority / 1000)`
 
@@ -163,60 +158,55 @@ For example:
 
 ### Approval modes
 
-Approval modes allow the policy engine to apply different sets of rules based on
-the CLI's operational mode. A rule in a TOML policy file can be associated with
-one or more modes (for example, `yolo`, `autoEdit`, `plan`). The rule will only
-be active if the CLI is running in one of its specified modes. If a rule has no
-modes specified, it is always active.
+Approval modes allow the policy engine to apply different sets of rules based on the
+CLI's operational mode. A rule in a TOML policy file can be associated with one or more
+modes (for example, `yolo`, `autoEdit`, `plan`). The rule will only be active if the CLI
+is running in one of its specified modes. If a rule has no modes specified, it is always
+active.
 
-- `default`: The standard interactive mode where most write tools require
-  confirmation.
+- `default`: The standard interactive mode where most write tools require confirmation.
 - `autoEdit`: Optimized for automated code editing; some write tools may be
   auto-approved.
 - `plan`: A strict, read-only mode for research and design. See
   [Customizing Plan Mode Policies](../cli/plan-mode.md#customizing-policies).
 - `yolo`: A mode where all tools are auto-approved (use with extreme caution).
 
-To maintain the integrity of Plan Mode as a safe research environment,
-persistent tool approvals are context-aware. When you select **"Allow for all
-future sessions"**, the policy engine explicitly includes the current mode and
-all more permissive modes in the hierarchy (`plan` < `default` < `autoEdit` <
-`yolo`).
+To maintain the integrity of Plan Mode as a safe research environment, persistent tool
+approvals are context-aware. When you select **"Allow for all future sessions"**, the
+policy engine explicitly includes the current mode and all more permissive modes in the
+hierarchy (`plan` < `default` < `autoEdit` < `yolo`).
 
-- **Approvals in `plan` mode**: These represent an intentional choice to trust a
-  tool globally. The resulting rule explicitly includes all modes (`plan`,
-  `default`, `autoEdit`, and `yolo`).
-- **Approvals in other modes**: These only apply to the current mode and those
-  more permissive. For example:
-  - An approval granted in **`default`** mode applies to `default`, `autoEdit`,
-    and `yolo`.
+- **Approvals in `plan` mode**: These represent an intentional choice to trust a tool
+  globally. The resulting rule explicitly includes all modes (`plan`, `default`,
+  `autoEdit`, and `yolo`).
+- **Approvals in other modes**: These only apply to the current mode and those more
+  permissive. For example:
+  - An approval granted in **`default`** mode applies to `default`, `autoEdit`, and
+    `yolo`.
   - An approval granted in **`autoEdit`** mode applies to `autoEdit` and `yolo`.
-  - An approval granted in **`yolo`** mode applies only to `yolo`. This ensures
-    that trust flows correctly to more permissive environments while maintaining
-    the safety of more restricted modes like `plan`.
+  - An approval granted in **`yolo`** mode applies only to `yolo`. This ensures that
+    trust flows correctly to more permissive environments while maintaining the safety
+    of more restricted modes like `plan`.
 
 ## Rule matching
 
-When a tool call is made, the engine checks it against all active rules,
-starting from the highest priority. The first rule that matches determines the
-outcome.
+When a tool call is made, the engine checks it against all active rules, starting from
+the highest priority. The first rule that matches determines the outcome.
 
 A rule matches a tool call if all of its conditions are met:
 
-1.  **Tool name**: The `toolName` in the TOML rule must match the name of the
-    tool being called.
-    - **Wildcards**: You can use wildcards like `*`, `mcp_server_*`, or
-      `mcp_*_toolName` to match multiple tools. See [Tool Name](#tool-name) for
-      details.
-2.  **Arguments pattern**: If `argsPattern` is specified, the tool's arguments
-    are converted to a stable JSON string, which is then tested against the
-    provided regular expression. If the arguments don't match the pattern, the
-    rule does not apply.
+1.  **Tool name**: The `toolName` in the TOML rule must match the name of the tool being
+    called.
+    - **Wildcards**: You can use wildcards like `*`, `mcp_server_*`, or `mcp_*_toolName`
+      to match multiple tools. See [Tool Name](#tool-name) for details.
+2.  **Arguments pattern**: If `argsPattern` is specified, the tool's arguments are
+    converted to a stable JSON string, which is then tested against the provided regular
+    expression. If the arguments don't match the pattern, the rule does not apply.
 
 ## Configuration
 
-Policies are defined in `.toml` files. The CLI loads these files from Default,
-User directories.
+Policies are defined in `.toml` files. The CLI loads these files from Default, User
+directories.
 
 ### Policy locations
 
@@ -230,8 +220,7 @@ User directories.
 This section describes the fields available in a TOML policy rule.
 
 For valid built-in `toolName` values and their argument structures (used by
-`argsPattern`), see the
-[Tools reference](/docs/reference/tools#available-tools).
+`argsPattern`), see the [Tools reference](/docs/reference/tools#available-tools).
 
 ```toml
 [[rule]]
@@ -299,8 +288,8 @@ allowRedirection = true
 
 ### Using arrays (lists)
 
-To apply the same rule to multiple tools or command prefixes, you can provide an
-array of strings for the `toolName` and `commandPrefix` fields.
+To apply the same rule to multiple tools or command prefixes, you can provide an array
+of strings for the `toolName` and `commandPrefix` fields.
 
 **Example:**
 
@@ -315,14 +304,13 @@ priority = 10
 
 ### Special syntax for `run_shell_command`
 
-To simplify writing policies for `run_shell_command`, you can use
-`commandPrefix` or `commandRegex` instead of the more complex `argsPattern`.
-These are policy-rule shorthands, not arguments of the `run_shell_command` tool
-itself. For the tool's invocation arguments, see [Shell tool](/docs/tools/shell)
-and [Tools reference](/docs/reference/tools#available-tools).
+To simplify writing policies for `run_shell_command`, you can use `commandPrefix` or
+`commandRegex` instead of the more complex `argsPattern`. These are policy-rule
+shorthands, not arguments of the `run_shell_command` tool itself. For the tool's
+invocation arguments, see [Shell tool](/docs/tools/shell) and
+[Tools reference](/docs/reference/tools#available-tools).
 
-- `commandPrefix`: Matches if the `command` argument starts with the given
-  string.
+- `commandPrefix`: Matches if the `command` argument starts with the given string.
 - `commandRegex`: Matches if the `command` argument matches the given regular
   expression.
 
@@ -340,10 +328,10 @@ priority = 100
 
 ### Special syntax for MCP tools
 
-You can create rules that target tools from Model Context Protocol (MCP) servers
-using the `mcpName` field. **This is the recommended approach** for defining MCP
-policies, as it is much more robust than manually writing Fully Qualified Names
-(FQNs) or string wildcards.
+You can create rules that target tools from Model Context Protocol (MCP) servers using
+the `mcpName` field. **This is the recommended approach** for defining MCP policies, as
+it is much more robust than manually writing Fully Qualified Names (FQNs) or string
+wildcards.
 
 <!-- prettier-ignore -->
 > [!WARNING]
@@ -356,10 +344,9 @@ policies, as it is much more robust than manually writing Fully Qualified Names
 
 **1. Targeting a specific tool on a server**
 
-Combine `mcpName` and `toolName` to target a single operation. When using
-`mcpName`, the `toolName` field should strictly be the simple name of the tool
-(for example, `search`), **not** the Fully Qualified Name (for example,
-`mcp_server_search`).
+Combine `mcpName` and `toolName` to target a single operation. When using `mcpName`, the
+`toolName` field should strictly be the simple name of the tool (for example, `search`),
+**not** the Fully Qualified Name (for example, `mcp_server_search`).
 
 ```toml
 # Allows the `search` tool on the `my-jira-server` MCP
@@ -372,8 +359,7 @@ priority = 200
 
 **2. Targeting all tools on a specific server**
 
-Specify only the `mcpName` to apply a rule to every tool provided by that
-server.
+Specify only the `mcpName` to apply a rule to every tool provided by that server.
 
 **Note:** This applies to all decision types (`allow`, `deny`, `ask_user`).
 
@@ -405,9 +391,9 @@ priority = 10
 You can secure and govern subagents using standard policy rules by treating the
 subagent's name as the `toolName`.
 
-When the main agent invokes a subagent (e.g., using the unified `invoke_agent`
-tool), the Policy Engine automatically treats the target `agent_name` as a
-virtual tool alias for rule matching.
+When the main agent invokes a subagent (e.g., using the unified `invoke_agent` tool),
+the Policy Engine automatically treats the target `agent_name` as a virtual tool alias
+for rule matching.
 
 **Example:**
 
@@ -421,23 +407,21 @@ priority = 500
 deny_message = "Deep codebase analysis is restricted for this session."
 ```
 
-- **Backward Compatibility**: Any rules written targeting historical 1:1
-  subagent tool names will continue to match transparently.
-- **Context differentiation**: To create rules based on **who** is calling a
-  tool, use the `subagent` field instead. See
-  [TOML rule schema](#toml-rule-schema).
+- **Backward Compatibility**: Any rules written targeting historical 1:1 subagent tool
+  names will continue to match transparently.
+- **Context differentiation**: To create rules based on **who** is calling a tool, use
+  the `subagent` field instead. See [TOML rule schema](#toml-rule-schema).
 
 ## Default policies
 
-Sparkle CLI ships with a set of default policies to provide a safe
-out-of-the-box experience.
+Sparkle CLI ships with a set of default policies to provide a safe out-of-the-box
+experience.
 
 - **Read-only tools** (like `read_file`, `glob`) are generally **allowed**.
-- **Agent delegation** defaults to **`ask_user`** to ensure remote agents can
-  prompt for confirmation, but local sub-agent actions are executed silently and
-  checked individually.
-- **Write tools** (like `write_file`, `run_shell_command`) default to
-  **`ask_user`**.
+- **Agent delegation** defaults to **`ask_user`** to ensure remote agents can prompt for
+  confirmation, but local sub-agent actions are executed silently and checked
+  individually.
+- **Write tools** (like `write_file`, `run_shell_command`) default to **`ask_user`**.
 - In **`yolo`** mode, a high-priority rule allows all tools.
 - In **`autoEdit`** mode, rules allow certain write operations to happen without
   prompting.

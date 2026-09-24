@@ -24,11 +24,7 @@ describe('RewindConfirmation', () => {
     };
     const onConfirm = vi.fn();
     const { lastFrame, unmount } = await renderWithProviders(
-      <RewindConfirmation
-        stats={stats}
-        onConfirm={onConfirm}
-        terminalWidth={80}
-      />,
+      <RewindConfirmation stats={stats} onConfirm={onConfirm} terminalWidth={80} />,
       { width: 80 },
     );
 
@@ -40,11 +36,7 @@ describe('RewindConfirmation', () => {
   it('renders correctly without stats', async () => {
     const onConfirm = vi.fn();
     const { lastFrame, unmount } = await renderWithProviders(
-      <RewindConfirmation
-        stats={null}
-        onConfirm={onConfirm}
-        terminalWidth={80}
-      />,
+      <RewindConfirmation stats={null} onConfirm={onConfirm} terminalWidth={80} />,
       { width: 80 },
     );
 
@@ -57,11 +49,7 @@ describe('RewindConfirmation', () => {
   it('calls onConfirm with Cancel on Escape', async () => {
     const onConfirm = vi.fn();
     const { stdin, unmount } = await renderWithProviders(
-      <RewindConfirmation
-        stats={null}
-        onConfirm={onConfirm}
-        terminalWidth={80}
-      />,
+      <RewindConfirmation stats={null} onConfirm={onConfirm} terminalWidth={80} />,
       { width: 80 },
     );
 

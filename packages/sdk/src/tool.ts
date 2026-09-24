@@ -119,8 +119,7 @@ class SdkToolInvocation<T extends z.ZodType<object>> extends BaseToolInvocation<
       };
     } catch (error) {
       if (this.sendErrorsToModel || error instanceof ModelVisibleError) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         return {
           llmContent: `Error: ${errorMessage}`,
           returnDisplay: `Error: ${errorMessage}`,

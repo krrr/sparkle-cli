@@ -5,11 +5,7 @@
  */
 
 import { useEffect } from 'react';
-import {
-  getLuminance,
-  parseColor,
-  shouldSwitchTheme,
-} from '../themes/color-utils.js';
+import { getLuminance, parseColor, shouldSwitchTheme } from '../themes/color-utils.js';
 import { themeManager, DEFAULT_THEME } from '../themes/theme-manager.js';
 import { DefaultLight } from '../themes/builtin/light/default-light.js';
 import { useSettings } from '../contexts/SettingsContext.js';
@@ -24,8 +20,7 @@ export function useTerminalTheme(
   refreshStatic: () => void,
 ) {
   const settings = useSettings();
-  const { subscribe, unsubscribe, queryTerminalBackground } =
-    useTerminalContext();
+  const { subscribe, unsubscribe, queryTerminalBackground } = useTerminalContext();
 
   useEffect(() => {
     if (settings.merged.ui.autoThemeSwitching === false) {

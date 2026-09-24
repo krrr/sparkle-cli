@@ -29,9 +29,7 @@ describe('copyExtension permissions', () => {
         const stats = fs.lstatSync(p);
         fs.chmodSync(p, stats.mode | 0o700);
         if (stats.isDirectory()) {
-          fs.readdirSync(p).forEach((child) =>
-            makeWritableSync(path.join(p, child)),
-          );
+          fs.readdirSync(p).forEach((child) => makeWritableSync(path.join(p, child)));
         }
       } catch {
         // Ignore errors during cleanup

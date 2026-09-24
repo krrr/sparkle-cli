@@ -21,9 +21,7 @@ describe('ErrorMessage', () => {
 
   it('renders multiline error messages', async () => {
     const message = 'Error line 1\nError line 2';
-    const { lastFrame, unmount } = await render(
-      <ErrorMessage text={message} />,
-    );
+    const { lastFrame, unmount } = await render(<ErrorMessage text={message} />);
     const output = lastFrame();
 
     expect(output).toMatchSnapshot();

@@ -35,15 +35,9 @@ describe('sessionOperations', () => {
 
   describe('validateAndSanitizeSessionId', () => {
     it('should throw for empty or dangerous IDs', () => {
-      expect(() => validateAndSanitizeSessionId('')).toThrow(
-        'Invalid sessionId',
-      );
-      expect(() => validateAndSanitizeSessionId('.')).toThrow(
-        'Invalid sessionId',
-      );
-      expect(() => validateAndSanitizeSessionId('..')).toThrow(
-        'Invalid sessionId',
-      );
+      expect(() => validateAndSanitizeSessionId('')).toThrow('Invalid sessionId');
+      expect(() => validateAndSanitizeSessionId('.')).toThrow('Invalid sessionId');
+      expect(() => validateAndSanitizeSessionId('..')).toThrow('Invalid sessionId');
     });
 
     it('should sanitize valid IDs', () => {
@@ -56,11 +50,7 @@ describe('sessionOperations', () => {
     it('should delete logs and tool outputs', async () => {
       const sessionId = 'test-session';
       const logsDir = path.join(tempDir, 'logs');
-      const toolOutputsDir = path.join(
-        tempDir,
-        'tool-outputs',
-        `session-${sessionId}`,
-      );
+      const toolOutputsDir = path.join(tempDir, 'tool-outputs', `session-${sessionId}`);
       const sessionDir = path.join(tempDir, sessionId);
 
       await fs.mkdir(logsDir, { recursive: true });
@@ -115,22 +105,14 @@ describe('sessionOperations', () => {
       await expect(fs.stat(subDir)).rejects.toThrow();
 
       // Verify artifacts are deleted
-      await expect(
-        fs.stat(path.join(logsDir, 'session-sub1.jsonl')),
-      ).rejects.toThrow();
-      await expect(
-        fs.stat(path.join(logsDir, 'session-sub2.jsonl')),
-      ).rejects.toThrow();
+      await expect(fs.stat(path.join(logsDir, 'session-sub1.jsonl'))).rejects.toThrow();
+      await expect(fs.stat(path.join(logsDir, 'session-sub2.jsonl'))).rejects.toThrow();
     });
 
     it('should resolve for safe path even if input contains traversals (due to sanitization)', async () => {
       // Should sanitize '../unsafe' to '.._unsafe' and resolve (directory won't exist, so readdir returns [] naturally)
       await expect(
-        deleteSubagentSessionDirAndArtifactsAsync(
-          '../unsafe',
-          chatsDir,
-          tempDir,
-        ),
+        deleteSubagentSessionDirAndArtifactsAsync('../unsafe', chatsDir, tempDir),
       ).resolves.toBeUndefined();
     });
 

@@ -8,10 +8,7 @@
 
 import { collectInventory } from './utils/eval-inventory.js';
 import { buildToolRegistry } from './utils/tool-registry.js';
-import {
-  computeCoverage,
-  formatCoverageReport,
-} from './utils/eval-coverage.js';
+import { computeCoverage, formatCoverageReport } from './utils/eval-coverage.js';
 
 async function main() {
   const rootFlagIndex = process.argv.indexOf('--root');

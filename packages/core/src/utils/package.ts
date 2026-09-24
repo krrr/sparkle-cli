@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  readPackageUp,
-  type PackageJson as BasePackageJson,
-} from 'read-package-up';
+import { readPackageUp, type PackageJson as BasePackageJson } from 'read-package-up';
 import { debugLogger } from './debugLogger.js';
 
 export type PackageJson = BasePackageJson & {
@@ -30,9 +27,7 @@ export type PackageJson = BasePackageJson & {
  * const version = pkg?.version ?? 'unknown';
  * ```
  */
-export async function getPackageJson(
-  cwd: string,
-): Promise<PackageJson | undefined> {
+export async function getPackageJson(cwd: string): Promise<PackageJson | undefined> {
   try {
     const result = await readPackageUp({ cwd, normalize: false });
     if (!result) {

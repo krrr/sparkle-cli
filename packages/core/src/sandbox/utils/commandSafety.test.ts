@@ -32,9 +32,7 @@ describe('commandSafety', () => {
       vi.mocked(paths.isTrustedSystemPath).mockReturnValue(true);
 
       // Using isKnownSafeCommand which calls isSafeToCallWithExec under the hood
-      expect(isKnownSafeCommand(['/usr/bin/rg', 'pattern', 'file.txt'])).toBe(
-        true,
-      );
+      expect(isKnownSafeCommand(['/usr/bin/rg', 'pattern', 'file.txt'])).toBe(true);
       expect(paths.resolveToRealPath).toHaveBeenCalledWith('/usr/bin/rg');
       expect(paths.isTrustedSystemPath).toHaveBeenCalledWith('/usr/bin/rg');
     });
@@ -48,25 +46,19 @@ describe('commandSafety', () => {
       vi.mocked(paths.resolveToRealPath).mockReturnValue('/usr/bin/rg');
       vi.mocked(paths.isTrustedSystemPath).mockReturnValue(true);
 
-      expect(
-        isKnownSafeCommand(['/usr/bin/rg', '--search-zip', 'pattern']),
-      ).toBe(false);
-      expect(isKnownSafeCommand(['/usr/bin/rg', '-z', 'pattern'])).toBe(false);
-      expect(isKnownSafeCommand(['/usr/bin/rg', '--pre=cat', 'pattern'])).toBe(
+      expect(isKnownSafeCommand(['/usr/bin/rg', '--search-zip', 'pattern'])).toBe(
         false,
       );
+      expect(isKnownSafeCommand(['/usr/bin/rg', '-z', 'pattern'])).toBe(false);
+      expect(isKnownSafeCommand(['/usr/bin/rg', '--pre=cat', 'pattern'])).toBe(false);
     });
 
     it('should consider rg dangerous with unsafe args', () => {
       vi.mocked(paths.resolveToRealPath).mockReturnValue('/usr/bin/rg');
       vi.mocked(paths.isTrustedSystemPath).mockReturnValue(true);
 
-      expect(
-        isDangerousCommand(['/usr/bin/rg', '--search-zip', 'pattern']),
-      ).toBe(true);
-      expect(isDangerousCommand(['/usr/bin/rg', '--pre=cat', 'pattern'])).toBe(
-        true,
-      );
+      expect(isDangerousCommand(['/usr/bin/rg', '--search-zip', 'pattern'])).toBe(true);
+      expect(isDangerousCommand(['/usr/bin/rg', '--pre=cat', 'pattern'])).toBe(true);
     });
 
     it('should not consider rg safe if path is untrusted', () => {
@@ -92,9 +84,7 @@ describe('commandSafety', () => {
 
       // isDangerousCommand relies on isRipgrepCommand, which strictly identifies intent (name)
       // and doesn't care about path safety. So even an untrusted rg will be flagged if it has unsafe args.
-      expect(isDangerousCommand(['/tmp/malicious/rg', '--search-zip'])).toBe(
-        true,
-      );
+      expect(isDangerousCommand(['/tmp/malicious/rg', '--search-zip'])).toBe(true);
     });
   });
 
@@ -121,9 +111,7 @@ describe('commandSafety', () => {
       vi.mocked(paths.resolveToRealPath).mockReturnValue('/tmp/malicious/rg');
       vi.mocked(paths.isTrustedSystemPath).mockReturnValue(false);
 
-      expect(await isStrictlyApproved('/tmp/malicious/rg', ['pattern'])).toBe(
-        false,
-      );
+      expect(await isStrictlyApproved('/tmp/malicious/rg', ['pattern'])).toBe(false);
     });
   });
 });

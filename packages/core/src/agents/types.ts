@@ -154,9 +154,7 @@ interface RemoteAgentRef {
  * Derives the AgentCardLoadOptions from a RemoteAgentDefinition.
  * Throws if neither agentCardUrl nor agentCardJson is present.
  */
-export function getAgentCardLoadOptions(
-  def: RemoteAgentRef,
-): AgentCardLoadOptions {
+export function getAgentCardLoadOptions(def: RemoteAgentRef): AgentCardLoadOptions {
   if (def.agentCardJson) {
     return { type: 'json', json: def.agentCardJson };
   }
@@ -174,9 +172,7 @@ export function getAgentCardLoadOptions(
  * For JSON-based agents, attempts to parse the URL from the inline card JSON.
  * Returns undefined if no URL can be determined.
  */
-export function getRemoteAgentTargetUrl(
-  def: RemoteAgentRef,
-): string | undefined {
+export function getRemoteAgentTargetUrl(def: RemoteAgentRef): string | undefined {
   if (def.agentCardUrl) {
     return def.agentCardUrl;
   }
@@ -195,9 +191,7 @@ export function getRemoteAgentTargetUrl(
   return undefined;
 }
 
-export interface BaseAgentDefinition<
-  TOutput extends z.ZodTypeAny = z.ZodUnknown,
-> {
+export interface BaseAgentDefinition<TOutput extends z.ZodTypeAny = z.ZodUnknown> {
   /** Unique identifier for the agent. */
   name: string;
   displayName?: string;
@@ -211,9 +205,8 @@ export interface BaseAgentDefinition<
   };
 }
 
-export interface LocalAgentDefinition<
-  TOutput extends z.ZodTypeAny = z.ZodUnknown,
-> extends BaseAgentDefinition<TOutput> {
+export interface LocalAgentDefinition<TOutput extends z.ZodTypeAny = z.ZodUnknown>
+  extends BaseAgentDefinition<TOutput> {
   kind: 'local';
 
   // Local agent required configs
@@ -278,15 +271,11 @@ export interface LocalAgentDefinition<
    *
    * Runs immediately after chat compression in the agent loop.
    */
-  onBeforeTurn?: (
-    chat: GeminiChat,
-    signal?: AbortSignal,
-  ) => Promise<void> | void;
+  onBeforeTurn?: (chat: GeminiChat, signal?: AbortSignal) => Promise<void> | void;
 }
 
-export interface BaseRemoteAgentDefinition<
-  TOutput extends z.ZodTypeAny = z.ZodUnknown,
-> extends BaseAgentDefinition<TOutput> {
+export interface BaseRemoteAgentDefinition<TOutput extends z.ZodTypeAny = z.ZodUnknown>
+  extends BaseAgentDefinition<TOutput> {
   kind: 'remote';
   /** The user-provided description, before any remote card merging. */
   originalDescription?: string;
@@ -298,9 +287,8 @@ export interface BaseRemoteAgentDefinition<
   auth?: A2AAuthConfig;
 }
 
-export interface RemoteAgentDefinition<
-  TOutput extends z.ZodTypeAny = z.ZodUnknown,
-> extends BaseRemoteAgentDefinition<TOutput> {
+export interface RemoteAgentDefinition<TOutput extends z.ZodTypeAny = z.ZodUnknown>
+  extends BaseRemoteAgentDefinition<TOutput> {
   agentCardUrl?: string;
   agentCardJson?: string;
 }

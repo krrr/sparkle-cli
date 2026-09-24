@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { getInstallationInfo, PackageManager } from './installationInfo.js';
 import { updateEventEmitter } from './updateEventEmitter.js';
 import type { UpdateObject } from '../ui/utils/updateCheck.js';
@@ -209,22 +201,19 @@ describe('handleAutoUpdate', () => {
     PackageManager.PNPX,
     PackageManager.BUNX,
     PackageManager.BINARY,
-  ])(
-    'should suppress update notifications when running via %s',
-    (packageManager) => {
-      mockGetInstallationInfo.mockReturnValue({
-        updateCommand: undefined,
-        updateMessage: `Running via ${packageManager}, update not applicable.`,
-        isGlobal: false,
-        packageManager,
-      });
+  ])('should suppress update notifications when running via %s', (packageManager) => {
+    mockGetInstallationInfo.mockReturnValue({
+      updateCommand: undefined,
+      updateMessage: `Running via ${packageManager}, update not applicable.`,
+      isGlobal: false,
+      packageManager,
+    });
 
-      handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', false, mockSpawn);
+    handleAutoUpdate(mockUpdateInfo, mockSettings, '/root', false, mockSpawn);
 
-      expect(updateEventEmitter.emit).not.toHaveBeenCalled();
-      expect(mockSpawn).not.toHaveBeenCalled();
-    },
-  );
+    expect(updateEventEmitter.emit).not.toHaveBeenCalled();
+    expect(mockSpawn).not.toHaveBeenCalled();
+  });
 
   it('should emit "update-received" but not update if no update command is found', () => {
     mockGetInstallationInfo.mockReturnValue({
@@ -348,8 +337,7 @@ describe('handleAutoUpdate', () => {
     });
 
     expect(updateEventEmitter.emit).toHaveBeenCalledWith('update-success', {
-      message:
-        'Update successful! The new version will be used on your next run.',
+      message: 'Update successful! The new version will be used on your next run.',
     });
   });
 

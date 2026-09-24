@@ -94,14 +94,10 @@ describe('ProviderManagerDialog', () => {
       listProfiles: vi.fn().mockImplementation(() => [...mockProfiles]),
       getActiveProfile: vi
         .fn()
-        .mockImplementation(() =>
-          mockProfiles.find((p) => p.id === activeProfileId),
-        ),
+        .mockImplementation(() => mockProfiles.find((p) => p.id === activeProfileId)),
       getProfile: vi
         .fn()
-        .mockImplementation((id: string) =>
-          mockProfiles.find((p) => p.id === id),
-        ),
+        .mockImplementation((id: string) => mockProfiles.find((p) => p.id === id)),
       createProfile: vi.fn().mockImplementation(async (data) => {
         const newProfile: ProviderProfile = {
           id: data.id,
@@ -136,22 +132,19 @@ describe('ProviderManagerDialog', () => {
 
     mockConfig = makeFakeConfig();
     vi.spyOn(mockConfig, 'getProviderProfileService').mockReturnValue(
-      mockProfileService as unknown as ReturnType<
-        Config['getProviderProfileService']
-      >,
+      mockProfileService as unknown as ReturnType<Config['getProviderProfileService']>,
     );
   });
 
   it('renders provider list from state and refreshes upon adding a new provider', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderManagerDialog
-          setAuthState={setAuthState}
-          authError={null}
-          onAuthError={onAuthError}
-        />,
-        { config: mockConfig },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderManagerDialog
+        setAuthState={setAuthState}
+        authError={null}
+        onAuthError={onAuthError}
+      />,
+      { config: mockConfig },
+    );
 
     expect(lastFrame()).toContain('default-gemini');
     expect(lastFrame()).toContain('Provider Manager');
@@ -192,15 +185,14 @@ describe('ProviderManagerDialog', () => {
   });
 
   it('returns to the provider list when leaving the models view of a new provider', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderManagerDialog
-          setAuthState={setAuthState}
-          authError={null}
-          onAuthError={onAuthError}
-        />,
-        { config: mockConfig },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderManagerDialog
+        setAuthState={setAuthState}
+        authError={null}
+        onAuthError={onAuthError}
+      />,
+      { config: mockConfig },
+    );
 
     expect(lastFrame()).toContain('Provider Manager');
 
@@ -248,15 +240,14 @@ describe('ProviderManagerDialog', () => {
     mockProfiles = [];
     activeProfileId = undefined;
 
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderManagerDialog
-          setAuthState={setAuthState}
-          authError={null}
-          onAuthError={onAuthError}
-        />,
-        { config: mockConfig },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderManagerDialog
+        setAuthState={setAuthState}
+        authError={null}
+        onAuthError={onAuthError}
+      />,
+      { config: mockConfig },
+    );
 
     expect(lastFrame()).toContain('No providers configured.');
 
@@ -285,9 +276,7 @@ describe('ProviderManagerDialog', () => {
     // First provider is auto-activated without closing the dialog, which
     // then lands in the model management view
     await waitFor(() => {
-      expect(mockProfileService.activateProfile).toHaveBeenCalledWith(
-        'gemini-first',
-      );
+      expect(mockProfileService.activateProfile).toHaveBeenCalledWith('gemini-first');
       expect(lastFrame()).toContain('Models for: gemini-first');
     });
     expect(setAuthState).not.toHaveBeenCalled();
@@ -296,15 +285,14 @@ describe('ProviderManagerDialog', () => {
   });
 
   it('allows editing and renaming an existing provider', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderManagerDialog
-          setAuthState={setAuthState}
-          authError={null}
-          onAuthError={onAuthError}
-        />,
-        { config: mockConfig },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderManagerDialog
+        setAuthState={setAuthState}
+        authError={null}
+        onAuthError={onAuthError}
+      />,
+      { config: mockConfig },
+    );
 
     expect(lastFrame()).toContain('default-gemini');
 
@@ -352,15 +340,14 @@ describe('ProviderManagerDialog', () => {
       models: [{ id: DEFAULT_OPENAI_MODEL }],
     });
 
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderManagerDialog
-          setAuthState={setAuthState}
-          authError={null}
-          onAuthError={onAuthError}
-        />,
-        { config: mockConfig },
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderManagerDialog
+        setAuthState={setAuthState}
+        authError={null}
+        onAuthError={onAuthError}
+      />,
+      { config: mockConfig },
+    );
 
     // First press 'd' to enter delete confirmation
     await act(async () => {
@@ -378,9 +365,7 @@ describe('ProviderManagerDialog', () => {
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(mockProfileService.deleteProfile).toHaveBeenCalledWith(
-        'default-gemini',
-      );
+      expect(mockProfileService.deleteProfile).toHaveBeenCalledWith('default-gemini');
       expect(lastFrame()).not.toContain('default-gemini');
       expect(lastFrame()).toContain('p2');
     });

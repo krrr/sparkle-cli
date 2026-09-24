@@ -104,11 +104,7 @@ export function parseInputForHighlighting(
     .sort((a, b) => a.logStart - b.logStart);
 
   for (const transformation of sortedTransformations) {
-    const textBeforeTransformation = cpSlice(
-      text,
-      column,
-      transformation.logStart,
-    );
+    const textBeforeTransformation = cpSlice(text, column, transformation.logStart);
     tokens.push(...parseUntransformedInput(textBeforeTransformation));
 
     const isCursorInside =

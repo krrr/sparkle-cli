@@ -117,12 +117,8 @@ Output too large. Full output available at: ${outputFilePath}
       futureDate.setFullYear(futureDate.getFullYear() + 1);
       conversation.startTime = futureDate.toISOString();
       conversation.lastUpdated = futureDate.toISOString();
-      const timestamp = futureDate
-        .toISOString()
-        .slice(0, 16)
-        .replace(/:/g, '-');
-      const { messages: conversationMessages, ...conversationMetadata } =
-        conversation;
+      const timestamp = futureDate.toISOString().slice(0, 16).replace(/:/g, '-');
+      const { messages: conversationMessages, ...conversationMetadata } = conversation;
       const sessionFile = path.join(
         chatsDir,
         `session-${timestamp}-${sessionId.slice(0, 8)}.jsonl`,
@@ -206,10 +202,7 @@ Output too large. Full output available at: ${outputFilePath}
       const secretValue = 'PREVIEW_SECRET_123';
       const outputFileName = `masked_output_${crypto.randomUUID()}.txt`;
       const outputFilePath = path.join(toolOutputsDir, outputFileName);
-      fs.writeFileSync(
-        outputFilePath,
-        `Full content containing ${secretValue}`,
-      );
+      fs.writeFileSync(outputFilePath, `Full content containing ${secretValue}`);
 
       const maskedSnippet = `<tool_output_masked>
 Output: The secret key is: ${secretValue}
@@ -262,12 +255,8 @@ Output too large. Full output available at: ${outputFilePath}
       futureDate.setFullYear(futureDate.getFullYear() + 1);
       conversation.startTime = futureDate.toISOString();
       conversation.lastUpdated = futureDate.toISOString();
-      const timestamp = futureDate
-        .toISOString()
-        .slice(0, 16)
-        .replace(/:/g, '-');
-      const { messages: conversationMessages, ...conversationMetadata } =
-        conversation;
+      const timestamp = futureDate.toISOString().slice(0, 16).replace(/:/g, '-');
+      const { messages: conversationMessages, ...conversationMetadata } = conversation;
       const sessionFile = path.join(
         chatsDir,
         `session-${timestamp}-${sessionId.slice(0, 8)}.jsonl`,

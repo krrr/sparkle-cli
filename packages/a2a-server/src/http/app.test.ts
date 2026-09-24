@@ -42,16 +42,12 @@ import type { Command, CommandContext } from '../commands/types.js';
 const mockToolConfirmationFn = async () =>
   ({}) as unknown as ToolCallConfirmationDetails;
 
-const streamToSSEEvents = (
-  stream: string,
-): SendStreamingMessageSuccessResponse[] =>
+const streamToSSEEvents = (stream: string): SendStreamingMessageSuccessResponse[] =>
   stream
     .split('\n\n')
     .filter(Boolean) // Remove empty strings from trailing newlines
     .map((chunk) => {
-      const dataLine = chunk
-        .split('\n')
-        .find((line) => line.startsWith('data: '));
+      const dataLine = chunk.split('\n').find((line) => line.startsWith('data: '));
       if (!dataLine) {
         throw new Error(`Invalid SSE chunk found: "${chunk}"`);
       }
@@ -304,12 +300,7 @@ describe('E2E Tests', () => {
     const agent = request.agent(app);
     const res = await agent
       .post('/')
-      .send(
-        createStreamMessageRequest(
-          'run two tools',
-          'a2a-multi-tool-test-message',
-        ),
-      )
+      .send(createStreamMessageRequest('run two tools', 'a2a-multi-tool-test-message'))
       .set('Content-Type', 'application/json')
       .expect(200);
 
@@ -337,14 +328,10 @@ describe('E2E Tests', () => {
 
     // --- Assert the event stream ---
     // 1. Initial "submitted" status.
-    expect((events[0].result as TaskStatusUpdateEvent).status.state).toBe(
-      'submitted',
-    );
+    expect((events[0].result as TaskStatusUpdateEvent).status.state).toBe('submitted');
 
     // 2. "working" status after receiving the user prompt.
-    expect((events[1].result as TaskStatusUpdateEvent).status.state).toBe(
-      'working',
-    );
+    expect((events[1].result as TaskStatusUpdateEvent).status.state).toBe('working');
 
     // 3. A "state-change" event from the agent.
     expect(events[2].result.metadata?.['coderAgent']).toMatchObject({
@@ -477,12 +464,7 @@ describe('E2E Tests', () => {
     const agent = request.agent(app);
     const res = await agent
       .post('/')
-      .send(
-        createStreamMessageRequest(
-          'run two tools',
-          'a2a-multi-tool-test-message',
-        ),
-      )
+      .send(createStreamMessageRequest('run two tools', 'a2a-multi-tool-test-message'))
       .set('Content-Type', 'application/json')
       .expect(200);
 
@@ -1052,9 +1034,7 @@ describe('E2E Tests', () => {
       const mockCommand = {
         name: 'test-command',
         description: 'a mock command',
-        execute: vi
-          .fn()
-          .mockResolvedValue({ name: 'test-command', data: 'success' }),
+        execute: vi.fn().mockResolvedValue({ name: 'test-command', data: 'success' }),
       };
       vi.spyOn(commandRegistry, 'get').mockReturnValue(mockCommand);
 
@@ -1205,9 +1185,7 @@ describe('E2E Tests', () => {
         const mockNonStreamCommand = {
           name: 'non-stream-test',
           description: 'A test non-streaming command',
-          execute: vi
-            .fn()
-            .mockResolvedValue({ name: 'non-stream-test', data: 'done' }),
+          execute: vi.fn().mockResolvedValue({ name: 'non-stream-test', data: 'done' }),
         };
         vi.spyOn(commandRegistry, 'get').mockReturnValue(mockNonStreamCommand);
 

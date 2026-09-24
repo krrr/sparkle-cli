@@ -91,9 +91,7 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
           mode={inlineThinkingMode}
         />
       )}
-      {itemForDisplay.type === 'hint' && (
-        <HintMessage text={itemForDisplay.text} />
-      )}
+      {itemForDisplay.type === 'hint' && <HintMessage text={itemForDisplay.text} />}
       {itemForDisplay.type === 'user' && (
         <UserMessage text={itemForDisplay.text} width={terminalWidth} />
       )}
@@ -133,15 +131,9 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
       {itemForDisplay.type === 'warning' && (
         <WarningMessage text={itemForDisplay.text} />
       )}
-      {itemForDisplay.type === 'error' && (
-        <ErrorMessage text={itemForDisplay.text} />
-      )}
-      {itemForDisplay.type === 'about' && (
-        <AboutBox {...itemForDisplay.about} />
-      )}
-      {itemForDisplay.type === 'help' && commands && (
-        <Help commands={commands} />
-      )}
+      {itemForDisplay.type === 'error' && <ErrorMessage text={itemForDisplay.text} />}
+      {itemForDisplay.type === 'about' && <AboutBox {...itemForDisplay.about} />}
+      {itemForDisplay.type === 'help' && commands && <Help commands={commands} />}
       {itemForDisplay.type === 'stats' && (
         <StatsDisplay
           duration={itemForDisplay.duration}
@@ -155,9 +147,7 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
         />
       )}
       {itemForDisplay.type === 'tool_stats' && <ToolStatsDisplay />}
-      {itemForDisplay.type === 'model' && (
-        <ModelMessage model={itemForDisplay.model} />
-      )}
+      {itemForDisplay.type === 'model' && <ModelMessage model={itemForDisplay.model} />}
       {itemForDisplay.type === 'quit' && (
         <SessionSummaryDisplay duration={itemForDisplay.duration} />
       )}
@@ -179,10 +169,7 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
         />
       )}
       {itemForDisplay.type === 'subagent' && (
-        <SubagentHistoryMessage
-          item={itemForDisplay}
-          terminalWidth={terminalWidth}
-        />
+        <SubagentHistoryMessage item={itemForDisplay} terminalWidth={terminalWidth} />
       )}
       {itemForDisplay.type === 'compression' && (
         <CompressionMessage compression={itemForDisplay.compression} />
@@ -207,17 +194,12 @@ export const HistoryItemDisplay: React.FC<HistoryItemDisplayProps> = ({
         />
       )}
       {itemForDisplay.type === 'agents_list' && (
-        <AgentsStatus
-          agents={itemForDisplay.agents}
-          terminalWidth={terminalWidth}
-        />
+        <AgentsStatus agents={itemForDisplay.agents} terminalWidth={terminalWidth} />
       )}
       {itemForDisplay.type === 'mcp_status' && (
         <McpStatus {...itemForDisplay} serverStatus={getMCPServerStatus} />
       )}
-      {itemForDisplay.type === 'chat_list' && (
-        <ChatList chats={itemForDisplay.chats} />
-      )}
+      {itemForDisplay.type === 'chat_list' && <ChatList chats={itemForDisplay.chats} />}
     </Box>
   );
 };

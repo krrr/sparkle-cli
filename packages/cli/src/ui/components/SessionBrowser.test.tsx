@@ -23,10 +23,7 @@ vi.mock('../hooks/useTerminalSize.js', () => ({
 vi.mock('../hooks/useKeypress.js', () => ({
   // The real hook subscribes to the KeypressContext. Here we just
   // capture the handler so tests can call it directly.
-  useKeypress: (
-    handler: (key: unknown) => void,
-    options: { isActive: boolean },
-  ) => {
+  useKeypress: (handler: (key: unknown) => void, options: { isActive: boolean }) => {
     if (options?.isActive) {
       keypressHandlers.push(handler);
     }

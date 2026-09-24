@@ -17,9 +17,7 @@ export const INITIAL_HISTORY_LENGTH = 1;
  * @param {Config} config - The runtime configuration and services.
  * @returns {Promise<string>} A promise that resolves to the directory context string.
  */
-export async function getDirectoryContextString(
-  config: Config,
-): Promise<string> {
+export async function getDirectoryContextString(config: Config): Promise<string> {
   const workspaceContext = config.getWorkspaceContext();
   const workspaceDirectories = workspaceContext.getDirectories();
 

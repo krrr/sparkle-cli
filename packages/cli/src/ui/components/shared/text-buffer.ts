@@ -63,8 +63,7 @@ export type Direction =
   | 'end';
 
 // Helper functions for line-based word navigation
-export const isWordCharStrict = (char: string): boolean =>
-  /[\w\p{L}\p{N}]/u.test(char); // Matches a single character that is any Unicode letter, any Unicode number, or an underscore
+export const isWordCharStrict = (char: string): boolean => /[\w\p{L}\p{N}]/u.test(char); // Matches a single character that is any Unicode letter, any Unicode number, or an underscore
 
 export const isWhitespace = (char: string): boolean => /\s/.test(char);
 
@@ -93,10 +92,7 @@ export const isDifferentScript = (char1: string, char2: string): boolean => {
 };
 
 // Find next word start within a line, starting from col
-export const findNextWordStartInLine = (
-  line: string,
-  col: number,
-): number | null => {
+export const findNextWordStartInLine = (line: string, col: number): number | null => {
   const chars = toCodePoints(line);
   let i = col;
 
@@ -119,11 +115,7 @@ export const findNextWordStartInLine = (
       i++;
     }
   } else if (!isWhitespace(currentChar)) {
-    while (
-      i < chars.length &&
-      !isWordCharStrict(chars[i]) &&
-      !isWhitespace(chars[i])
-    ) {
+    while (i < chars.length && !isWordCharStrict(chars[i]) && !isWhitespace(chars[i])) {
       i++;
     }
   }
@@ -137,10 +129,7 @@ export const findNextWordStartInLine = (
 };
 
 // Find previous word start within a line
-export const findPrevWordStartInLine = (
-  line: string,
-  col: number,
-): number | null => {
+export const findPrevWordStartInLine = (line: string, col: number): number | null => {
   const chars = toCodePoints(line);
   let i = col;
 
@@ -186,10 +175,7 @@ export const findWordEndInLine = (line: string, col: number): number | null => {
   // If we're already at the end of a word (including punctuation sequences), advance to next word
   // This includes both regular word endings and script boundaries
   let nextBaseCharIdx = i + 1;
-  while (
-    nextBaseCharIdx < chars.length &&
-    isCombiningMark(chars[nextBaseCharIdx])
-  ) {
+  while (nextBaseCharIdx < chars.length && isCombiningMark(chars[nextBaseCharIdx])) {
     nextBaseCharIdx++;
   }
 
@@ -261,11 +247,7 @@ export const findWordEndInLine = (line: string, col: number): number | null => {
     }
   } else if (i < chars.length && !isWhitespace(chars[i])) {
     // Handle punctuation sequences (like ████)
-    while (
-      i < chars.length &&
-      !isWordCharStrict(chars[i]) &&
-      !isWhitespace(chars[i])
-    ) {
+    while (i < chars.length && !isWordCharStrict(chars[i]) && !isWhitespace(chars[i])) {
       foundWord = true;
       lastBaseCharPos = i;
       i++;
@@ -333,10 +315,7 @@ export const findPrevBigWordStartInLine = (
 };
 
 // Find big word end within a line (E)
-export const findBigWordEndInLine = (
-  line: string,
-  col: number,
-): number | null => {
+export const findBigWordEndInLine = (line: string, col: number): number | null => {
   const chars = toCodePoints(line);
   let i = col;
 
@@ -709,9 +688,7 @@ export const replaceRangeInternal = (
   const prefix = cpSlice(currentLine(startRow), 0, sCol);
   const suffix = cpSlice(currentLine(endRow), eCol);
 
-  const normalisedReplacement = text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n');
+  const normalisedReplacement = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const replacementParts = normalisedReplacement.split('\n');
 
   // The combined first line of the new text
@@ -810,10 +787,7 @@ function calculateInitialCursorPosition(
   return [0, 0]; // Default for empty text
 }
 
-export function offsetToLogicalPos(
-  text: string,
-  offset: number,
-): [number, number] {
+export function offsetToLogicalPos(text: string, offset: number): [number, number] {
   let row = 0;
   let col = 0;
   let currentOffset = 0;
@@ -836,10 +810,7 @@ export function offsetToLogicalPos(
       row = i;
       col = lineLength; // Position cursor at the end of the current line content
       // If the offset IS the newline, and it's not the last line, advance to next line, col 0
-      if (
-        offset === currentOffset + lineLengthWithNewline &&
-        i < lines.length - 1
-      ) {
+      if (offset === currentOffset + lineLengthWithNewline && i < lines.length - 1) {
         return [i + 1, 0];
       }
       return [row, col]; // Otherwise, it's at the end of the current line content
@@ -863,11 +834,7 @@ export function offsetToLogicalPos(
  * Converts logical row/col position to absolute text offset
  * Inverse operation of offsetToLogicalPos
  */
-export function logicalPosToOffset(
-  lines: string[],
-  row: number,
-  col: number,
-): number {
+export function logicalPosToOffset(lines: string[], row: number, col: number): number {
   let offset = 0;
 
   // Clamp row to valid range
@@ -918,17 +885,14 @@ export function getTransformedImagePath(filePath: string): string {
   );
 
   // If we saw a separator, take the segment after it; otherwise fall back to the unescaped string
-  const fileName =
-    lastSepIndex >= 0 ? unescaped.slice(lastSepIndex + 1) : unescaped;
+  const fileName = lastSepIndex >= 0 ? unescaped.slice(lastSepIndex + 1) : unescaped;
 
   const extension = path.extname(fileName);
   const baseName = path.basename(fileName, extension);
   const maxBaseLength = 10;
 
   const truncatedBase =
-    baseName.length > maxBaseLength
-      ? `...${baseName.slice(-maxBaseLength)}`
-      : baseName;
+    baseName.length > maxBaseLength ? `...${baseName.slice(-maxBaseLength)}` : baseName;
 
   return `[Image ${truncatedBase}${extension}]`;
 }
@@ -937,9 +901,7 @@ const transformationsCache = new LRUCache<string, Transformation[]>(
   LRU_BUFFER_PERF_CACHE_LIMIT,
 );
 
-export function calculateTransformationsForLine(
-  line: string,
-): Transformation[] {
+export function calculateTransformationsForLine(line: string): Transformation[] {
   const cached = transformationsCache.get(line);
   if (cached) {
     return cached;
@@ -1059,8 +1021,7 @@ export function shiftExpandedRegions(
 
   // 1. Check for overlap/intersection with the changed range
   const isOverlapping =
-    changeStartLine <= infoEndLine &&
-    effectiveEndLine >= expandedPaste.startLine;
+    changeStartLine <= infoEndLine && effectiveEndLine >= expandedPaste.startLine;
 
   if (isOverlapping) {
     // If the change is a deletion (lineDelta < 0) that touches this region, we detach.
@@ -1097,10 +1058,7 @@ export function shiftExpandedRegions(
  * Returns the state unchanged if cursor is not in an expanded region.
  */
 export function detachExpandedPaste(state: TextBufferState): TextBufferState {
-  const expandedId = getExpandedPasteAtLine(
-    state.cursorRow,
-    state.expandedPaste,
-  );
+  const expandedId = getExpandedPasteAtLine(state.cursorRow, state.expandedPaste);
   if (!expandedId) return state;
 
   const { [expandedId]: _, ...newPastedContent } = state.pastedContent;
@@ -1181,11 +1139,7 @@ export function calculateTransformedLine(
   const cursorCol = logicalCursor[1];
 
   for (const transform of transformations) {
-    const textBeforeTransformation = cpSlice(
-      logLine,
-      lastLogPos,
-      transform.logStart,
-    );
+    const textBeforeTransformation = cpSlice(logLine, lastLogPos, transform.logStart);
     transformedLine += textBeforeTransformation;
     for (let i = 0; i < cpLen(textBeforeTransformation); i++) {
       transformedToLogMap.push(lastLogPos + i);
@@ -1215,15 +1169,10 @@ export function calculateTransformedLine(
       for (let i = 0; i < transformedLen; i++) {
         // Map the i-th transformed code point into [logStart, logEnd)
         const transformationToLogicalOffset =
-          logicalLength === 0
-            ? 0
-            : Math.floor((i * logicalLength) / transformedLen);
+          logicalLength === 0 ? 0 : Math.floor((i * logicalLength) / transformedLen);
         const transformationToLogicalIndex =
           transform.logStart +
-          Math.min(
-            transformationToLogicalOffset,
-            Math.max(logicalLength - 1, 0),
-          );
+          Math.min(transformationToLogicalOffset, Math.max(logicalLength - 1, 0));
         transformedToLogMap.push(transformationToLogicalIndex);
       }
     }
@@ -1312,10 +1261,7 @@ function calculateLayout(
       const visualLineOffset = visualLines.length;
       visualLines.push(...cached.visualLines);
       cached.logicalToVisualMap.forEach(([relVisualIdx, logCol]) => {
-        logicalToVisualMap[logIndex].push([
-          visualLineOffset + relVisualIdx,
-          logCol,
-        ]);
+        logicalToVisualMap[logIndex].push([visualLineOffset + relVisualIdx, logCol]);
       });
       cached.visualToLogicalMap.forEach(([, logCol]) => {
         visualToLogicalMap.push([logIndex, logCol]);
@@ -1380,10 +1326,7 @@ function calculateLayout(
             } else {
               // No word break, or word break is at the start of this potential chunk, or word break leads to empty chunk.
               // Hard break: take characters up to viewportWidth, or just the current char if it alone is too wide.
-              if (
-                numCodePointsInChunk === 0 &&
-                charVisualWidth > viewportWidth
-              ) {
+              if (numCodePointsInChunk === 0 && charVisualWidth > viewportWidth) {
                 // Single character is wider than viewport, take it anyway
                 currentChunk = char;
                 numCodePointsInChunk = 1;
@@ -1423,8 +1366,7 @@ function calculateLayout(
         currentPosInLogLine += numCodePointsInChunk;
 
         if (
-          logicalStartOfThisChunk + numCodePointsInChunk <
-            codePointsInLogLine.length &&
+          logicalStartOfThisChunk + numCodePointsInChunk < codePointsInLogLine.length &&
           currentPosInLogLine < codePointsInLogLine.length &&
           codePointsInLogLine[currentPosInLogLine] === ' '
         ) {
@@ -1445,10 +1387,7 @@ function calculateLayout(
     const visualLineOffset = visualLines.length;
     visualLines.push(...lineVisualLines);
     lineLogicalToVisualMap.forEach(([relVisualIdx, logCol]) => {
-      logicalToVisualMap[logIndex].push([
-        visualLineOffset + relVisualIdx,
-        logCol,
-      ]);
+      logicalToVisualMap[logIndex].push([visualLineOffset + relVisualIdx, logCol]);
     });
     lineVisualToLogicalMap.forEach(([, logCol]) => {
       visualToLogicalMap.push([logIndex, logCol]);
@@ -1504,9 +1443,7 @@ function calculateVisualCursorFromLayout(
         index + 1 < segmentsForLogicalLine.length
           ? segmentsForLogicalLine[index + 1][1]
           : Infinity;
-      return (
-        logicalCol >= startColInLogical && logicalCol < nextStartColInLogical
-      );
+      return logicalCol >= startColInLogical && logicalCol < nextStartColInLogical;
     },
   );
 
@@ -1519,8 +1456,7 @@ function calculateVisualCursorFromLayout(
     }
   }
 
-  const [visualRow, startColInLogical] =
-    segmentsForLogicalLine[targetSegmentIndex];
+  const [visualRow, startColInLogical] = segmentsForLogicalLine[targetSegmentIndex];
 
   // Find the coordinates in transformed space in order to conver to visual
   const transformedToLogicalMap = transformedToLogicalMaps[logicalRow] ?? [];
@@ -1800,9 +1736,7 @@ function textBufferReducerLogic(
       if (action.pushToUndo !== false) {
         nextState = pushUndoLocal(state);
       }
-      const newContentLines = action.payload
-        .replace(/\r\n?/g, '\n')
-        .split('\n');
+      const newContentLines = action.payload.replace(/\r\n?/g, '\n').split('\n');
       const lines = newContentLines.length === 0 ? [''] : newContentLines;
 
       let newCursorRow: number;
@@ -1885,11 +1819,7 @@ function textBufferReducerLogic(
         const remainingParts = parts.slice(1);
         const lastPartOriginal = remainingParts.pop() ?? '';
         newLines.splice(newCursorRow + 1, 0, ...remainingParts);
-        newLines.splice(
-          newCursorRow + parts.length - 1,
-          0,
-          lastPartOriginal + after,
-        );
+        newLines.splice(newCursorRow + parts.length - 1, 0, lastPartOriginal + after);
         lineDelta = parts.length - 1;
         newCursorRow = newCursorRow + parts.length - 1;
         newCursorCol = cpLen(lastPartOriginal);
@@ -1933,8 +1863,7 @@ function textBufferReducerLogic(
     case 'backspace': {
       const stateWithUndo = pushUndoLocal(state);
       const currentState = detachExpandedPaste(stateWithUndo);
-      const { cursorRow, cursorCol, lines, transformationsByLine } =
-        currentState;
+      const { cursorRow, cursorCol, lines, transformationsByLine } = currentState;
 
       // Early return if at start of buffer
       if (cursorCol === 0 && cursorRow === 0) return currentState;
@@ -2114,9 +2043,7 @@ function textBufferReducerLogic(
             break;
           default: {
             const exhaustiveCheck: never = dir;
-            debugLogger.error(
-              `Unknown visual movement direction: ${exhaustiveCheck}`,
-            );
+            debugLogger.error(`Unknown visual movement direction: ${exhaustiveCheck}`);
             return state;
           }
         }
@@ -2173,10 +2100,7 @@ function textBufferReducerLogic(
         }
         case 'wordRight': {
           const lineContent = lines[cursorRow] ?? '';
-          if (
-            cursorRow === lines.length - 1 &&
-            cursorCol === cpLen(lineContent)
-          ) {
+          if (cursorRow === lines.length - 1 && cursorCol === cpLen(lineContent)) {
             return state;
           }
 
@@ -2212,8 +2136,7 @@ function textBufferReducerLogic(
     case 'delete': {
       const stateWithUndo = pushUndoLocal(state);
       const currentState = detachExpandedPaste(stateWithUndo);
-      const { cursorRow, cursorCol, lines, transformationsByLine } =
-        currentState;
+      const { cursorRow, cursorCol, lines, transformationsByLine } = currentState;
 
       // Check if cursor is at start of an atomic placeholder
       const transformations = transformationsByLine[cursorRow] ?? [];
@@ -2261,8 +2184,7 @@ function textBufferReducerLogic(
 
       if (cursorCol < currentLineLen(cursorRow)) {
         newLines[cursorRow] =
-          cpSlice(lineContent, 0, cursorCol) +
-          cpSlice(lineContent, cursorCol + 1);
+          cpSlice(lineContent, 0, cursorCol) + cpSlice(lineContent, cursorCol + 1);
       } else if (cursorRow < lines.length - 1) {
         const nextLineContent = currentLine(cursorRow + 1);
         newLines[cursorRow] = lineContent + nextLineContent;
@@ -2308,10 +2230,7 @@ function textBufferReducerLogic(
       if (newCursorCol > 0) {
         const lineContent = currentLine(newCursorRow);
         beforeChangedLines = [lineContent];
-        const prevWordStart = findPrevWordStartInLine(
-          lineContent,
-          newCursorCol,
-        );
+        const prevWordStart = findPrevWordStartInLine(lineContent, newCursorCol);
         const start = prevWordStart === null ? 0 : prevWordStart;
         newLines[newCursorRow] =
           cpSlice(lineContent, 0, start) + cpSlice(lineContent, newCursorCol);
@@ -2538,10 +2457,7 @@ function textBufferReducerLogic(
 
     case 'move_to_offset': {
       const { offset } = action.payload;
-      const [newRow, newCol] = offsetToLogicalPos(
-        state.lines.join('\n'),
-        offset,
-      );
+      const [newRow, newCol] = offsetToLogicalPos(state.lines.join('\n'), offset);
       return {
         ...state,
         cursorRow: newRow,
@@ -2687,17 +2603,12 @@ function textBufferReducerLogic(
           // Precise match by col
           let transform = transforms.find(
             (t) =>
-              t.type === 'paste' &&
-              t.id === id &&
-              col >= t.logStart &&
-              col <= t.logEnd,
+              t.type === 'paste' && t.id === id && col >= t.logStart && col <= t.logEnd,
           );
 
           if (!transform) {
             // Fallback to first match on line
-            transform = transforms.find(
-              (t) => t.type === 'paste' && t.id === id,
-            );
+            transform = transforms.find((t) => t.type === 'paste' && t.id === id);
           }
 
           if (transform) {
@@ -2801,8 +2712,7 @@ export function textBufferReducer(
   const oldInside = oldTransform !== null;
   const newInside = newTransform !== null;
   const movedBetweenTransforms =
-    oldTransform !== newTransform &&
-    (oldTransform !== null || newTransform !== null);
+    oldTransform !== newTransform && (oldTransform !== null || newTransform !== null);
 
   if (
     newState.lines !== state.lines ||
@@ -2810,8 +2720,7 @@ export function textBufferReducer(
     oldInside !== newInside ||
     movedBetweenTransforms
   ) {
-    const shouldResetPreferred =
-      oldInside !== newInside || movedBetweenTransforms;
+    const shouldResetPreferred = oldInside !== newInside || movedBetweenTransforms;
 
     return {
       ...newState,
@@ -3557,20 +3466,15 @@ export function useTextBuffer({
         visualToTransformedMap,
       } = visualLayout;
       // Clamp visRow to valid range
-      const clampedVisRow = Math.max(
-        0,
-        Math.min(visRow, visualLines.length - 1),
-      );
+      const clampedVisRow = Math.max(0, Math.min(visRow, visualLines.length - 1));
       const visualLine = visualLines[clampedVisRow] || '';
 
       if (visualToLogicalMap[clampedVisRow]) {
         const [logRow] = visualToLogicalMap[clampedVisRow];
-        const transformedToLogicalMap =
-          transformedToLogicalMaps?.[logRow] ?? [];
+        const transformedToLogicalMap = transformedToLogicalMaps?.[logRow] ?? [];
 
         // Where does this visual line begin within the transformed line?
-        const startColInTransformed =
-          visualToTransformedMap?.[clampedVisRow] ?? 0;
+        const startColInTransformed = visualToTransformedMap?.[clampedVisRow] ?? 0;
 
         // Handle wide characters: convert visual X position to character offset
         const codePoints = toCodePoints(visualLine);
@@ -3627,10 +3531,7 @@ export function useTextBuffer({
       } = visualLayout;
 
       // Clamp visRow to valid range
-      const clampedVisRow = Math.max(
-        0,
-        Math.min(visRow, visualLines.length - 1),
-      );
+      const clampedVisRow = Math.max(0, Math.min(visRow, visualLines.length - 1));
       const visualLine = visualLines[clampedVisRow] || '';
 
       if (!visualToLogicalMap[clampedVisRow]) {
@@ -3641,8 +3542,7 @@ export function useTextBuffer({
       const transformedToLogicalMap = transformedToLogicalMaps?.[logRow] ?? [];
 
       // Where does this visual line begin within the transformed line?
-      const startColInTransformed =
-        visualToTransformedMap?.[clampedVisRow] ?? 0;
+      const startColInTransformed = visualToTransformedMap?.[clampedVisRow] ?? 0;
 
       // Handle wide characters: convert visual X position to character offset
       const codePoints = toCodePoints(visualLine);
@@ -3669,8 +3569,7 @@ export function useTextBuffer({
       );
 
       const row = logRow;
-      const col =
-        transformedToLogicalMap[transformedCol] ?? cpLen(lines[logRow] ?? '');
+      const col = transformedToLogicalMap[transformedCol] ?? cpLen(lines[logRow] ?? '');
 
       return { row, col };
     },

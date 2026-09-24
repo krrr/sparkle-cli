@@ -12,11 +12,7 @@ import {
 } from 'sparkle-cli-core';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import type {
-  Command,
-  CommandContext,
-  CommandExecutionResponse,
-} from './types.js';
+import type { Command, CommandContext, CommandExecutionResponse } from './types.js';
 
 export class RestoreCommand implements Command {
   readonly name = 'restore';
@@ -45,9 +41,7 @@ export class RestoreCommand implements Command {
         };
       }
 
-      const selectedFile = argsStr.endsWith('.json')
-        ? argsStr
-        : `${argsStr}.json`;
+      const selectedFile = argsStr.endsWith('.json') ? argsStr : `${argsStr}.json`;
 
       const checkpointDir = config.storage.getProjectCheckpointsDir();
       const filePath = path.join(checkpointDir, selectedFile);
@@ -77,10 +71,7 @@ export class RestoreCommand implements Command {
         };
       }
 
-      const restoreResultGenerator = performRestore(
-        parseResult.data,
-        gitService,
-      );
+      const restoreResultGenerator = performRestore(parseResult.data, gitService);
 
       const restoreResult = [];
       for await (const result of restoreResultGenerator) {
@@ -157,9 +148,7 @@ export class ListCheckpointsCommand implements Command {
           const fileName = String(i['fileName'] || 'Unknown');
           const toolName = String(i['toolName'] || 'Unknown');
           const status = String(i['status'] || 'Unknown');
-          const timestamp = new Date(
-            Number(i['timestamp']) || 0,
-          ).toLocaleString();
+          const timestamp = new Date(Number(i['timestamp']) || 0).toLocaleString();
 
           return `- **${fileName}**: ${toolName} (Status: ${status}) [${timestamp}]`;
         })

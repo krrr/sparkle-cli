@@ -24,9 +24,7 @@ export function templateString(template: string, inputs: AgentInputs): string {
 
   // Check if all required keys exist in the inputs.
   const inputKeys = new Set(Object.keys(inputs));
-  const missingKeys = Array.from(requiredKeys).filter(
-    (key) => !inputKeys.has(key),
-  );
+  const missingKeys = Array.from(requiredKeys).filter((key) => !inputKeys.has(key));
 
   if (missingKeys.length > 0) {
     // Enhanced error message showing both missing and available keys
@@ -37,7 +35,5 @@ export function templateString(template: string, inputs: AgentInputs): string {
   }
 
   // Perform the replacement using a replacer function.
-  return template.replace(placeholderRegex, (_match, key) =>
-    String(inputs[key]),
-  );
+  return template.replace(placeholderRegex, (_match, key) => String(inputs[key]));
 }

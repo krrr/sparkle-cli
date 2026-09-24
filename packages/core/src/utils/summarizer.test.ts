@@ -4,22 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { GeminiClient } from '../core/client.js';
 import { Config } from '../config/config.js';
-import {
-  summarizeToolOutput,
-  llmSummarizer,
-  defaultSummarizer,
-} from './summarizer.js';
+import { summarizeToolOutput, llmSummarizer, defaultSummarizer } from './summarizer.js';
 import type { ToolResult } from '../tools/tools.js';
 import type {
   ModelConfigService,
@@ -179,8 +167,7 @@ Text to summarize:
 
 Return the summary string which should first contain an overall summarization of text followed by the full stack trace of errors and warnings in the tool output.
 `;
-      const calledWith = (mockGeminiClient.generateContent as Mock).mock
-        .calls[0];
+      const calledWith = (mockGeminiClient.generateContent as Mock).mock.calls[0];
       const contents = calledWith[1];
       expect(contents[0].parts[0].text).toBe(expectedPrompt);
     });
@@ -227,8 +214,7 @@ Return the summary string which should first contain an overall summarization of
       );
 
       expect(mockGeminiClient.generateContent).toHaveBeenCalledTimes(1);
-      const calledWith = (mockGeminiClient.generateContent as Mock).mock
-        .calls[0];
+      const calledWith = (mockGeminiClient.generateContent as Mock).mock.calls[0];
       const contents = calledWith[1];
       expect(contents[0].parts[0].text).toContain(`"${longText}"`);
       expect(result).toBe(summary);

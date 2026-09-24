@@ -73,9 +73,7 @@ describe('Frugal reads eval', () => {
       const firstPromptId = targetFileReads[0].toolRequest.prompt_id;
       expect(firstPromptId, 'Prompt ID should be defined').toBeDefined();
       expect(
-        targetFileReads.every(
-          (call) => call.toolRequest.prompt_id === firstPromptId,
-        ),
+        targetFileReads.every((call) => call.toolRequest.prompt_id === firstPromptId),
         'All reads should have happened in the same turn',
       ).toBe(true);
 
@@ -96,16 +94,13 @@ describe('Frugal reads eval', () => {
         totalLinesRead += linesRead;
         readRanges.push({ start_line, end_line });
 
-        expect(linesRead, 'Agent read too many lines at once').toBeLessThan(
-          1001,
-        );
+        expect(linesRead, 'Agent read too many lines at once').toBeLessThan(1001);
       }
 
       // Ranged read shoud be frugal and just enough to satisfy the task at hand.
-      expect(
-        totalLinesRead,
-        'Agent read more of the file than expected',
-      ).toBeLessThan(1000);
+      expect(totalLinesRead, 'Agent read more of the file than expected').toBeLessThan(
+        1000,
+      );
 
       // Check that we read around the error lines
       const errorLines = [500, 510, 520];
@@ -113,14 +108,10 @@ describe('Frugal reads eval', () => {
         const covered = readRanges.some(
           (range) => line >= range.start_line && line <= range.end_line,
         );
-        expect(covered, `Agent should have read around line ${line}`).toBe(
-          true,
-        );
+        expect(covered, `Agent should have read around line ${line}`).toBe(true);
       }
 
-      const editCalls = logs.filter(
-        (log) => log.toolRequest?.name === EDIT_TOOL_NAME,
-      );
+      const editCalls = logs.filter((log) => log.toolRequest?.name === EDIT_TOOL_NAME);
       const targetEditCalls = editCalls.filter((call) => {
         const args = JSON.parse(call.toolRequest.args);
         return args.file_path.includes('linter_mess.ts');
@@ -269,9 +260,7 @@ describe('Frugal reads eval', () => {
       ).toBe(true);
 
       // Check that the agent actually fixed the errors
-      const editCalls = logs.filter(
-        (log) => log.toolRequest?.name === EDIT_TOOL_NAME,
-      );
+      const editCalls = logs.filter((log) => log.toolRequest?.name === EDIT_TOOL_NAME);
       const targetEditCalls = editCalls.filter((call) => {
         const args = JSON.parse(call.toolRequest.args);
         return args.file_path.includes('many_mess.ts');

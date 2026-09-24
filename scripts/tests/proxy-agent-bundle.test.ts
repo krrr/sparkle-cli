@@ -59,9 +59,7 @@ describe('proxy-agent bundle shape', () => {
     });
 
     // Import the bundled chunk
-    const bundledEntryUrl = pathToFileURL(
-      path.join(tmpDir, 'bundle/sparkle.mjs'),
-    ).href;
+    const bundledEntryUrl = pathToFileURL(path.join(tmpDir, 'bundle/sparkle.mjs')).href;
     const { getAgents } = await import(bundledEntryUrl);
 
     const { https, http } = await getAgents();

@@ -79,10 +79,7 @@ export class ToolOutputMaskingService {
    * guarantees that the masked result can be written back via setHistory()
    * without regenerating ids, re-merging turns, or losing per-turn metadata.
    */
-  async mask(
-    history: readonly HistoryTurn[],
-    config: Config,
-  ): Promise<MaskingResult> {
+  async mask(history: readonly HistoryTurn[], config: Config): Promise<MaskingResult> {
     if (history.length === 0) {
       return { newHistory: history, maskedCount: 0, tokensSaved: 0 };
     }
@@ -209,11 +206,7 @@ export class ToolOutputMaskingService {
         (part.functionResponse.response as Record<string, unknown>) || {};
 
       const totalLines = content.split('\n').length;
-      const fileSizeMB = (
-        Buffer.byteLength(content, 'utf8') /
-        1024 /
-        1024
-      ).toFixed(2);
+      const fileSizeMB = (Buffer.byteLength(content, 'utf8') / 1024 / 1024).toFixed(2);
 
       let preview = '';
       if (toolName === SHELL_TOOL_NAME) {
@@ -312,9 +305,7 @@ export class ToolOutputMaskingService {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const content = (response['output'] || response['stdout'] || '') as string;
     if (typeof content !== 'string') {
-      return typeof content === 'object'
-        ? JSON.stringify(content)
-        : String(content);
+      return typeof content === 'object' ? JSON.stringify(content) : String(content);
     }
 
     // The shell tool output is structured in shell.ts with specific section prefixes:
@@ -337,9 +328,7 @@ export class ToolOutputMaskingService {
       const sectionContent = parts[i + 1]?.trim() || '';
 
       if (name === 'Output') {
-        previewParts.push(
-          `Output: ${this.formatSimplePreview(sectionContent)}`,
-        );
+        previewParts.push(`Output: ${this.formatSimplePreview(sectionContent)}`);
       } else {
         // Keep other sections (Error, Exit Code, etc.) in full as they are usually high-signal and small
         previewParts.push(`${name}: ${sectionContent}`);

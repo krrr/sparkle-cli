@@ -47,9 +47,7 @@ describe('RecordingContentGenerator', () => {
 
   it('should record generateContent responses', async () => {
     const mockResponse = {
-      candidates: [
-        { content: { parts: [{ text: 'response' }], role: 'model' } },
-      ],
+      candidates: [{ content: { parts: [{ text: 'response' }], role: 'model' } }],
       usageMetadata: { totalTokenCount: 10 },
     } as GenerateContentResponse;
     (mockRealGenerator.generateContent as Mock).mockResolvedValue(mockResponse);
@@ -77,15 +75,11 @@ describe('RecordingContentGenerator', () => {
 
   it('should record generateContentStream responses', async () => {
     const mockResponse1 = {
-      candidates: [
-        { content: { parts: [{ text: 'response1' }], role: 'model' } },
-      ],
+      candidates: [{ content: { parts: [{ text: 'response1' }], role: 'model' } }],
       usageMetadata: { totalTokenCount: 10 },
     } as GenerateContentResponse;
     const mockResponse2 = {
-      candidates: [
-        { content: { parts: [{ text: 'response2' }], role: 'model' } },
-      ],
+      candidates: [{ content: { parts: [{ text: 'response2' }], role: 'model' } }],
       usageMetadata: { totalTokenCount: 20 },
     } as GenerateContentResponse;
 
@@ -94,9 +88,7 @@ describe('RecordingContentGenerator', () => {
       yield mockResponse2;
     }
 
-    (mockRealGenerator.generateContentStream as Mock).mockResolvedValue(
-      mockStream(),
-    );
+    (mockRealGenerator.generateContentStream as Mock).mockResolvedValue(mockStream());
 
     const stream = await recorder.generateContentStream(
       {} as GenerateContentParameters,

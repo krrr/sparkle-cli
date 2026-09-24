@@ -82,9 +82,7 @@ describe('shell-background-tools', () => {
 
     // 1. Start a background process
     // We use a command that stays alive for a bit to ensure it shows up in lists
-    await run.type(
-      "Run 'sleep 10 && echo hello-from-background' in the background.",
-    );
+    await run.type("Run 'sleep 10 && echo hello-from-background' in the background.");
     await run.type('\r');
 
     // Wait for the model's canned response acknowledging the start

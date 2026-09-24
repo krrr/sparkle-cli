@@ -162,9 +162,7 @@ async function patchTargetsProjectSkills(
   config: Config,
 ): Promise<boolean> {
   const entryTargetsProjectSkills = await Promise.all(
-    patch.entries.map((entry) =>
-      isProjectSkillPatchTarget(entry.targetPath, config),
-    ),
+    patch.entries.map((entry) => isProjectSkillPatchTarget(entry.targetPath, config)),
   );
   return entryTargetsProjectSkills.some(Boolean);
 }
@@ -365,10 +363,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
           patches.map(async (patch): Promise<InboxItem> => {
             let targetsProjectSkills = false;
             try {
-              targetsProjectSkills = await patchTargetsProjectSkills(
-                patch,
-                config,
-              );
+              targetsProjectSkills = await patchTargetsProjectSkills(patch, config);
             } catch {
               targetsProjectSkills = false;
             }
@@ -507,25 +502,23 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
     [isTrustedFolder, selectedPatchTargetsProjectSkills],
   );
 
-  const skillPreviewItems: Array<SelectionListItem<SkillPreviewAction>> =
-    useMemo(
-      () =>
-        SKILL_PREVIEW_CHOICES.map((choice) => ({
-          key: choice.action,
-          value: choice,
-        })),
-      [],
-    );
+  const skillPreviewItems: Array<SelectionListItem<SkillPreviewAction>> = useMemo(
+    () =>
+      SKILL_PREVIEW_CHOICES.map((choice) => ({
+        key: choice.action,
+        value: choice,
+      })),
+    [],
+  );
 
-  const memoryPatchActionItems: Array<SelectionListItem<MemoryPatchAction>> =
-    useMemo(
-      () =>
-        MEMORY_PATCH_ACTION_CHOICES.map((choice) => ({
-          key: choice.action,
-          value: choice,
-        })),
-      [],
-    );
+  const memoryPatchActionItems: Array<SelectionListItem<MemoryPatchAction>> = useMemo(
+    () =>
+      MEMORY_PATCH_ACTION_CHOICES.map((choice) => ({
+        key: choice.action,
+        value: choice,
+      })),
+    [],
+  );
 
   const handleSelectItem = useCallback(
     (item: InboxItem) => {
@@ -550,9 +543,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
 
   const removeItem = useCallback(
     (item: InboxItem) => {
-      setItems((prev) =>
-        prev.filter((i) => getItemKey(i) !== getItemKey(item)),
-      );
+      setItems((prev) => prev.filter((i) => getItemKey(i) !== getItemKey(item)));
     },
     [getItemKey],
   );
@@ -691,8 +682,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
             }
           }
         } catch (error) {
-          const operation =
-            choice.action === 'apply' ? 'apply patch' : 'dismiss patch';
+          const operation = choice.action === 'apply' ? 'apply patch' : 'dismiss patch';
           setFeedback({
             text: `Failed to ${operation}: ${getErrorMessage(error)}`,
             isError: true,
@@ -749,9 +739,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
           }
         } catch (error) {
           const operation =
-            choice.action === 'apply'
-              ? 'apply memory patch'
-              : 'dismiss memory patch';
+            choice.action === 'apply' ? 'apply memory patch' : 'dismiss memory patch';
           setFeedback({
             text: `Failed to ${operation}: ${getErrorMessage(error)}`,
             isError: true,
@@ -863,15 +851,12 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
       const memorySections: DiffSection[] = [];
       memoryGroups.forEach(([targetPath, { isNewFile, diffs }], groupIndex) => {
         const headerAnnotation = `${isNewFile ? ' (new file)' : ''}${
-          diffs.length > 1
-            ? ` · ${diffs.length} changes from different patches`
-            : ''
+          diffs.length > 1 ? ` · ${diffs.length} changes from different patches` : ''
         }`;
         diffs.forEach((diff, hunkIndex) => {
           memorySections.push({
             key: `${targetPath}:${groupIndex}:${hunkIndex}`,
-            header:
-              hunkIndex === 0 ? `${targetPath}${headerAnnotation}` : targetPath,
+            header: hunkIndex === 0 ? `${targetPath}${headerAnnotation}` : targetPath,
             diffContent: diff,
           });
         });
@@ -952,9 +937,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
 
   // For the non-alt-buffer DiffRenderer path, mirror MainContent /
   // DialogManager and drop the clamp when the user has pressed Ctrl+O.
-  const availableContentHeight = constrainHeight
-    ? diffViewportHeight
-    : undefined;
+  const availableContentHeight = constrainHeight ? diffViewportHeight : undefined;
   const PATCH_ENTRY_OVERHEAD = 2; // target-path label + marginBottom
   const patchEntryCount =
     selectedItem?.type === 'patch'
@@ -973,9 +956,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
           ),
         );
 
-  const previewNavigationHint = isAlternateBuffer
-    ? 'PgUp/PgDn to scroll'
-    : undefined;
+  const previewNavigationHint = isAlternateBuffer ? 'PgUp/PgDn to scroll' : undefined;
 
   // Budget the list phase so the dialog footer never clips on shorter
   // terminals. Every visible row — skill items, patch items, memory-patch
@@ -1001,8 +982,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
     Math.min(
       8,
       Math.floor(
-        (terminalHeight - LIST_PHASE_CHROME_HEIGHT - feedbackHeight) /
-          LIST_ROW_HEIGHT,
+        (terminalHeight - LIST_PHASE_CHROME_HEIGHT - feedbackHeight) / LIST_ROW_HEIGHT,
       ),
     ),
   );
@@ -1085,12 +1065,8 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
                   const fileNames = patch.entries.map((e) =>
                     getPathBasename(e.targetPath),
                   );
-                  const origin = getSkillOriginTag(
-                    patch.entries[0]?.targetPath ?? '',
-                  );
-                  const titleLine = origin
-                    ? `${patch.name} [${origin}]`
-                    : patch.name;
+                  const origin = getSkillOriginTag(patch.entries[0]?.targetPath ?? '');
+                  const titleLine = origin ? `${patch.name} [${origin}]` : patch.name;
                   const subtitle = patch.extractedAt
                     ? `${fileNames.join(', ')} · ${formatDate(patch.extractedAt)}`
                     : fileNames.join(', ');
@@ -1111,9 +1087,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
             {feedback && (
               <Box marginTop={1}>
                 <Text
-                  color={
-                    feedback.isError ? theme.status.error : theme.status.success
-                  }
+                  color={feedback.isError ? theme.status.error : theme.status.success}
                 >
                   {feedback.isError ? '✗ ' : '✓ '}
                   {feedback.text}
@@ -1121,10 +1095,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
               </Box>
             )}
 
-            <DialogFooter
-              primaryAction="Enter to select"
-              cancelAction="Esc to close"
-            />
+            <DialogFooter primaryAction="Enter to select" cancelAction="Esc to close" />
           </>
         )}
 
@@ -1151,10 +1122,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
                     SKILL.md
                   </Text>
                   <DiffRenderer
-                    diffContent={newFileDiff(
-                      'SKILL.md',
-                      selectedItem.skill.content,
-                    )}
+                    diffContent={newFileDiff('SKILL.md', selectedItem.skill.content)}
                     filename="SKILL.md"
                     terminalWidth={contentWidth}
                     availableTerminalHeight={availableContentHeight}
@@ -1173,9 +1141,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
                     <Text color={titleColor} bold>
                       {item.value.label}
                     </Text>
-                    <Text color={theme.text.secondary}>
-                      {item.value.description}
-                    </Text>
+                    <Text color={theme.text.secondary}>{item.value.description}</Text>
                   </Box>
                 )}
               />
@@ -1184,9 +1150,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
             {feedback && (
               <Box marginTop={1}>
                 <Text
-                  color={
-                    feedback.isError ? theme.status.error : theme.status.success
-                  }
+                  color={feedback.isError ? theme.status.error : theme.status.success}
                 >
                   {feedback.isError ? '✗ ' : '✓ '}
                   {feedback.text}
@@ -1194,9 +1158,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
               </Box>
             )}
 
-            {!isAlternateBuffer && (
-              <ShowMoreLines constrainHeight={constrainHeight} />
-            )}
+            {!isAlternateBuffer && <ShowMoreLines constrainHeight={constrainHeight} />}
 
             <DialogFooter
               primaryAction="Enter to confirm"
@@ -1224,9 +1186,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
                     <Text color={titleColor} bold>
                       {item.value.label}
                     </Text>
-                    <Text color={theme.text.secondary}>
-                      {item.value.description}
-                    </Text>
+                    <Text color={theme.text.secondary}>{item.value.description}</Text>
                   </Box>
                 )}
               />
@@ -1235,9 +1195,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
             {feedback && (
               <Box marginTop={1}>
                 <Text
-                  color={
-                    feedback.isError ? theme.status.error : theme.status.success
-                  }
+                  color={feedback.isError ? theme.status.error : theme.status.success}
                 >
                   {feedback.isError ? '✗ ' : '✓ '}
                   {feedback.text}
@@ -1256,9 +1214,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
           <>
             <Text bold>{selectedItem.patch.name}</Text>
             <Box flexDirection="row">
-              <Text color={theme.text.secondary}>
-                Review changes before applying.
-              </Text>
+              <Text color={theme.text.secondary}>Review changes before applying.</Text>
               {(() => {
                 const origin = getSkillOriginTag(
                   selectedItem.patch.entries[0]?.targetPath ?? '',
@@ -1309,9 +1265,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
                     <Text color={titleColor} bold>
                       {item.value.label}
                     </Text>
-                    <Text color={theme.text.secondary}>
-                      {item.value.description}
-                    </Text>
+                    <Text color={theme.text.secondary}>{item.value.description}</Text>
                   </Box>
                 )}
               />
@@ -1320,9 +1274,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
             {feedback && (
               <Box marginTop={1}>
                 <Text
-                  color={
-                    feedback.isError ? theme.status.error : theme.status.success
-                  }
+                  color={feedback.isError ? theme.status.error : theme.status.success}
                 >
                   {feedback.isError ? '✗ ' : '✓ '}
                   {feedback.text}
@@ -1330,9 +1282,7 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
               </Box>
             )}
 
-            {!isAlternateBuffer && (
-              <ShowMoreLines constrainHeight={constrainHeight} />
-            )}
+            {!isAlternateBuffer && <ShowMoreLines constrainHeight={constrainHeight} />}
 
             <DialogFooter
               primaryAction="Enter to confirm"
@@ -1342,104 +1292,93 @@ export const InboxDialog: React.FC<InboxDialogProps> = ({
           </>
         )}
 
-        {phase === 'memory-preview' &&
-          selectedItem?.type === 'memory-patch' && (
-            <>
-              <Text bold>{selectedItem.memoryPatch.name}</Text>
-              <Text color={theme.text.secondary}>
-                Review {formatMemoryPatchSummary(selectedItem.memoryPatch)}{' '}
-                before applying. Apply runs each source patch atomically;
-                Dismiss removes them all.
-              </Text>
+        {phase === 'memory-preview' && selectedItem?.type === 'memory-patch' && (
+          <>
+            <Text bold>{selectedItem.memoryPatch.name}</Text>
+            <Text color={theme.text.secondary}>
+              Review {formatMemoryPatchSummary(selectedItem.memoryPatch)} before
+              applying. Apply runs each source patch atomically; Dismiss removes them
+              all.
+            </Text>
 
-              {(() => {
-                // Grouping + section flattening were hoisted into the
-                // `previewData` useMemo so the array identities passed into
-                // ScrollableDiffViewport stay stable across re-renders.
-                const groupEntries = previewData.memoryGroups ?? [];
+            {(() => {
+              // Grouping + section flattening were hoisted into the
+              // `previewData` useMemo so the array identities passed into
+              // ScrollableDiffViewport stay stable across re-renders.
+              const groupEntries = previewData.memoryGroups ?? [];
 
-                if (isAlternateBuffer) {
-                  return (
-                    <Box flexDirection="column" marginTop={1}>
-                      <ScrollableDiffViewport
-                        sections={previewData.memorySections ?? []}
-                        width={contentWidth}
-                        height={diffViewportHeight}
-                        hasFocus={true}
-                      />
-                    </Box>
-                  );
-                }
-
-                return groupEntries.map(
-                  ([targetPath, { isNewFile, diffs }]) => (
-                    <Box key={targetPath} flexDirection="column" marginTop={1}>
-                      <Text color={theme.text.secondary} bold>
-                        {targetPath}
-                        {isNewFile ? ' (new file)' : ''}
-                        {diffs.length > 1
-                          ? ` · ${diffs.length} changes from different patches`
-                          : ''}
-                      </Text>
-                      {diffs.map((diff, hunkIndex) => (
-                        <DiffRenderer
-                          key={`${targetPath}:${hunkIndex}`}
-                          diffContent={diff}
-                          filename={targetPath}
-                          terminalWidth={contentWidth}
-                          availableTerminalHeight={availablePatchEntryHeight}
-                        />
-                      ))}
-                    </Box>
-                  ),
+              if (isAlternateBuffer) {
+                return (
+                  <Box flexDirection="column" marginTop={1}>
+                    <ScrollableDiffViewport
+                      sections={previewData.memorySections ?? []}
+                      width={contentWidth}
+                      height={diffViewportHeight}
+                      hasFocus={true}
+                    />
+                  </Box>
                 );
-              })()}
+              }
 
-              <Box flexDirection="column" marginTop={1}>
-                <BaseSelectionList<MemoryPatchAction>
-                  items={memoryPatchActionItems}
-                  onSelect={handleSelectMemoryPatchAction}
-                  isFocused={true}
-                  showNumbers={true}
-                  renderItem={(item, { titleColor }) => (
-                    <Box flexDirection="column" minHeight={2}>
-                      <Text color={titleColor} bold>
-                        {item.value.label}
-                      </Text>
-                      <Text color={theme.text.secondary}>
-                        {item.value.description}
-                      </Text>
-                    </Box>
-                  )}
-                />
-              </Box>
-
-              {feedback && (
-                <Box marginTop={1}>
-                  <Text
-                    color={
-                      feedback.isError
-                        ? theme.status.error
-                        : theme.status.success
-                    }
-                  >
-                    {feedback.isError ? '✗ ' : '✓ '}
-                    {feedback.text}
+              return groupEntries.map(([targetPath, { isNewFile, diffs }]) => (
+                <Box key={targetPath} flexDirection="column" marginTop={1}>
+                  <Text color={theme.text.secondary} bold>
+                    {targetPath}
+                    {isNewFile ? ' (new file)' : ''}
+                    {diffs.length > 1
+                      ? ` · ${diffs.length} changes from different patches`
+                      : ''}
                   </Text>
+                  {diffs.map((diff, hunkIndex) => (
+                    <DiffRenderer
+                      key={`${targetPath}:${hunkIndex}`}
+                      diffContent={diff}
+                      filename={targetPath}
+                      terminalWidth={contentWidth}
+                      availableTerminalHeight={availablePatchEntryHeight}
+                    />
+                  ))}
                 </Box>
-              )}
+              ));
+            })()}
 
-              {!isAlternateBuffer && (
-                <ShowMoreLines constrainHeight={constrainHeight} />
-              )}
-
-              <DialogFooter
-                primaryAction="Enter to confirm"
-                navigationActions={previewNavigationHint}
-                cancelAction="Esc to go back"
+            <Box flexDirection="column" marginTop={1}>
+              <BaseSelectionList<MemoryPatchAction>
+                items={memoryPatchActionItems}
+                onSelect={handleSelectMemoryPatchAction}
+                isFocused={true}
+                showNumbers={true}
+                renderItem={(item, { titleColor }) => (
+                  <Box flexDirection="column" minHeight={2}>
+                    <Text color={titleColor} bold>
+                      {item.value.label}
+                    </Text>
+                    <Text color={theme.text.secondary}>{item.value.description}</Text>
+                  </Box>
+                )}
               />
-            </>
-          )}
+            </Box>
+
+            {feedback && (
+              <Box marginTop={1}>
+                <Text
+                  color={feedback.isError ? theme.status.error : theme.status.success}
+                >
+                  {feedback.isError ? '✗ ' : '✓ '}
+                  {feedback.text}
+                </Text>
+              </Box>
+            )}
+
+            {!isAlternateBuffer && <ShowMoreLines constrainHeight={constrainHeight} />}
+
+            <DialogFooter
+              primaryAction="Enter to confirm"
+              navigationActions={previewNavigationHint}
+              cancelAction="Esc to go back"
+            />
+          </>
+        )}
       </Box>
     </OverflowProvider>
   );

@@ -13,10 +13,7 @@ import { pickDefaultThemeName, type Theme } from '../themes/theme.js';
 import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { DiffRenderer } from './messages/DiffRenderer.js';
 import { colorizeCode } from '../utils/CodeColorizer.js';
-import type {
-  LoadableSettingScope,
-  LoadedSettings,
-} from '../../config/settings.js';
+import type { LoadableSettingScope, LoadedSettings } from '../../config/settings.js';
 import { SettingScope } from '../../config/settings.js';
 import { getScopeMessageForSetting } from '../../utils/dialogScopeUtils.js';
 import { useKeypress } from '../hooks/useKeypress.js';
@@ -28,10 +25,7 @@ import { isDevelopment } from '../../utils/installationInfo.js';
 
 interface ThemeDialogProps {
   /** Callback function when a theme is selected */
-  onSelect: (
-    themeName: string,
-    scope: LoadableSettingScope,
-  ) => void | Promise<void>;
+  onSelect: (themeName: string, scope: LoadableSettingScope) => void | Promise<void>;
 
   /** Callback function when the dialog is cancelled */
   onCancel: () => void;
@@ -102,22 +96,20 @@ export function ThemeDialog({
   );
 
   // Track the currently highlighted theme name
-  const [highlightedThemeName, setHighlightedThemeName] = useState<string>(
-    () => {
-      // If a theme is already set, use it.
-      if (settings.merged.ui.theme) {
-        return settings.merged.ui.theme;
-      }
+  const [highlightedThemeName, setHighlightedThemeName] = useState<string>(() => {
+    // If a theme is already set, use it.
+    if (settings.merged.ui.theme) {
+      return settings.merged.ui.theme;
+    }
 
-      // Otherwise, try to pick a theme that matches the terminal background.
-      return pickDefaultThemeName(
-        terminalBackgroundColor,
-        themeManager.getAllThemes(),
-        DEFAULT_THEME.name,
-        'Default Light',
-      );
-    },
-  );
+    // Otherwise, try to pick a theme that matches the terminal background.
+    return pickDefaultThemeName(
+      terminalBackgroundColor,
+      themeManager.getAllThemes(),
+      DEFAULT_THEME.name,
+      'Default Light',
+    );
+  });
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -127,9 +119,7 @@ export function ThemeDialog({
     .map((theme) => {
       const fullTheme = themeManager.getTheme(theme.name);
       const capitalizedType = capitalize(theme.type);
-      const typeDisplay = theme.name.endsWith(capitalizedType)
-        ? ''
-        : capitalizedType;
+      const typeDisplay = theme.name.endsWith(capitalizedType) ? '' : capitalizedType;
 
       return generateThemeItem(
         theme.name,
@@ -225,28 +215,21 @@ export function ThemeDialog({
   }
 
   // The right column doesn't need to ever be shorter than the left column.
-  availableTerminalHeight = Math.max(
-    availableTerminalHeight,
-    totalLeftHandSideHeight,
-  );
+  availableTerminalHeight = Math.max(availableTerminalHeight, totalLeftHandSideHeight);
   const availableTerminalHeightCodeBlock =
     availableTerminalHeight -
     PREVIEW_PANE_FIXED_VERTICAL_SPACE -
     (includePadding ? 2 : 0) * 2;
 
   // Subtract margin between code blocks from available height.
-  const availableHeightForPanes = Math.max(
-    0,
-    availableTerminalHeightCodeBlock - 1,
-  );
+  const availableHeightForPanes = Math.max(0, availableTerminalHeightCodeBlock - 1);
 
   // The code block is slightly longer than the diff, so give it more space.
   const codeBlockHeight = Math.ceil(availableHeightForPanes * 0.6);
   const diffHeight = Math.floor(availableHeightForPanes * 0.4);
 
   const previewTheme =
-    themeManager.getTheme(highlightedThemeName || DEFAULT_THEME.name) ||
-    DEFAULT_THEME;
+    themeManager.getTheme(highlightedThemeName || DEFAULT_THEME.name) || DEFAULT_THEME;
 
   const leftColumnWidth = `${SELECTION_PANE_WIDTH_PERCENTAGE * 100}%`;
   const rightColumnWidth = `${PREVIEW_PANE_WIDTH_PERCENTAGE * 100}%`;
@@ -268,9 +251,7 @@ export function ThemeDialog({
           <Box flexDirection="column" width={leftColumnWidth} paddingRight={2}>
             <Text bold={mode === 'theme'} wrap="truncate">
               {mode === 'theme' ? '> ' : '  '}Select Theme{' '}
-              <Text color={theme.text.secondary}>
-                {otherScopeModifiedMessage}
-              </Text>
+              <Text color={theme.text.secondary}>{otherScopeModifiedMessage}</Text>
             </Text>
             <RadioButtonSelect
               items={themeItems}
@@ -293,8 +274,7 @@ export function ThemeDialog({
                 if (itemWithExtras.themeNameDisplay) {
                   const match =
                     itemWithExtras.themeNameDisplay.match(/^(.*) \((.*)\)$/);
-                  let themeNamePart: React.ReactNode =
-                    itemWithExtras.themeNameDisplay;
+                  let themeNamePart: React.ReactNode = itemWithExtras.themeNameDisplay;
                   if (match) {
                     themeNamePart = (
                       <>

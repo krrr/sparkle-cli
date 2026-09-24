@@ -49,11 +49,7 @@ describe('settings-validation', () => {
       if (result.error) {
         const issues = result.error.issues;
         expect(issues.length).toBeGreaterThan(0);
-        expect(issues[0]?.path).toEqual([
-          'security',
-          'auth',
-          'selectedProviderId',
-        ]);
+        expect(issues[0]?.path).toEqual(['security', 'auth', 'selectedProviderId']);
         expect(issues[0]?.code).toBe('invalid_type');
       }
     });
@@ -215,9 +211,7 @@ describe('settings-validation', () => {
       if (result.error) {
         expect(result.error.issues.length).toBeGreaterThan(0);
         // Path should be mcpServers.my-server.command
-        const issue = result.error.issues.find((i) =>
-          i.path.includes('command'),
-        );
+        const issue = result.error.issues.find((i) => i.path.includes('command'));
         expect(issue).toBeDefined();
         expect(issue?.code).toBe('invalid_type');
       }
@@ -298,9 +292,7 @@ describe('settings-validation', () => {
         expect(result.error.issues.length).toBeGreaterThan(0);
         // Should complain about missing 'name'
         const issue = result.error.issues.find(
-          (i) =>
-            i.code === 'invalid_type' &&
-            i.message.includes('received undefined'),
+          (i) => i.code === 'invalid_type' && i.message.includes('received undefined'),
         );
         expect(issue).toBeDefined();
       }
@@ -434,16 +426,11 @@ describe('settings-validation', () => {
       expect(result.success).toBe(false);
 
       if (result.error) {
-        const formatted = formatValidationError(
-          result.error,
-          '/path/to/settings.json',
-        );
+        const formatted = formatValidationError(result.error, '/path/to/settings.json');
 
         expect(formatted).toContain('/path/to/settings.json');
         expect(formatted).toContain('security.auth.selectedProviderId');
-        expect(formatted).toContain(
-          'Invalid input: expected string, received object',
-        );
+        expect(formatted).toContain('Invalid input: expected string, received object');
         expect(formatted).toContain('Please fix the configuration.');
         expect(formatted).toContain(
           'https://geminicli.com/docs/reference/configuration/',

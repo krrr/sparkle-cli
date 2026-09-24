@@ -1,8 +1,8 @@
 # Automate tasks with headless mode
 
-Automate tasks with Sparkle CLI. Learn how to use headless mode, pipe data into
-Sparkle CLI, automate workflows with shell scripts, and generate structured JSON
-output for other applications.
+Automate tasks with Sparkle CLI. Learn how to use headless mode, pipe data into Sparkle
+CLI, automate workflows with shell scripts, and generate structured JSON output for
+other applications.
 
 ## Prerequisites
 
@@ -19,10 +19,10 @@ Headless mode runs Sparkle CLI once and exits. It's perfect for:
 
 ## How to use headless mode
 
-Run Sparkle CLI in headless mode by providing a prompt with the `-p` (or
-`--prompt`) flag. This bypasses the interactive chat interface and prints the
-response to standard output (stdout). Positional arguments without the flag
-default to interactive mode, unless the input or output is piped or redirected.
+Run Sparkle CLI in headless mode by providing a prompt with the `-p` (or `--prompt`)
+flag. This bypasses the interactive chat interface and prints the response to standard
+output (stdout). Positional arguments without the flag default to interactive mode,
+unless the input or output is piped or redirected.
 
 Run a single command:
 
@@ -32,9 +32,8 @@ sparkle -p "Write a poem about TypeScript"
 
 ## How to pipe input to Sparkle CLI
 
-Feed data into Sparkle using the standard Unix pipe `|`. Sparkle reads the
-standard input (stdin) as context and answers your question using standard
-output.
+Feed data into Sparkle using the standard Unix pipe `|`. Sparkle reads the standard
+input (stdin) as context and answers your question using standard output.
 
 Pipe a file:
 
@@ -58,16 +57,14 @@ git diff | sparkle -p "Write a commit message for these changes"
 
 ## Use Sparkle CLI output in scripts
 
-Because Sparkle prints to stdout, you can chain it with other tools or save the
-results to a file.
+Because Sparkle prints to stdout, you can chain it with other tools or save the results
+to a file.
 
 ### Scenario: Bulk documentation generator
 
-You have a folder of Python scripts and want to generate a `README.md` for each
-one.
+You have a folder of Python scripts and want to generate a `README.md` for each one.
 
-1.  Save the following code as `generate_docs.sh` (or `generate_docs.ps1` for
-    Windows):
+1.  Save the following code as `generate_docs.sh` (or `generate_docs.ps1` for Windows):
 
     **macOS/Linux (`generate_docs.sh`)**
 
@@ -112,14 +109,13 @@ one.
     .\generate_docs.ps1
     ```
 
-    This creates a corresponding Markdown file for every Python file in the
-    folder.
+    This creates a corresponding Markdown file for every Python file in the folder.
 
 ## Extract structured JSON data
 
-When writing a script, you often need structured data (JSON) to pass to tools
-like `jq`. To get pure JSON data from the model, combine the
-`--output-format json` flag with `jq` to parse the response field.
+When writing a script, you often need structured data (JSON) to pass to tools like `jq`.
+To get pure JSON data from the model, combine the `--output-format json` flag with `jq`
+to parse the response field.
 
 ### Scenario: Extract and return structured data
 
@@ -187,13 +183,13 @@ Use headless mode to perform custom, automated AI tasks.
 
 ### Scenario: Create a "Smart Commit" alias
 
-You can add a function to your shell configuration to create a `git commit`
-wrapper that writes the message for you.
+You can add a function to your shell configuration to create a `git commit` wrapper that
+writes the message for you.
 
 **macOS/Linux (Bash/Zsh)**
 
-1.  Open your `.zshrc` file (or `.bashrc` if you use Bash) in your preferred
-    text editor.
+1.  Open your `.zshrc` file (or `.bashrc` if you use Bash) in your preferred text
+    editor.
 
     ```bash
     nano ~/.zshrc
@@ -273,12 +269,12 @@ wrapper that writes the message for you.
     gcommit
     ```
 
-    Sparkle CLI will analyze your staged changes and commit them with a
-    generated message.
+    Sparkle CLI will analyze your staged changes and commit them with a generated
+    message.
 
 ## Next steps
 
-- Explore the [Headless mode reference](../../cli/headless.md) for full JSON
-  schema details.
-- Learn about [Shell commands](shell-commands.md) to let the agent run scripts
-  instead of just writing them.
+- Explore the [Headless mode reference](../../cli/headless.md) for full JSON schema
+  details.
+- Learn about [Shell commands](shell-commands.md) to let the agent run scripts instead
+  of just writing them.

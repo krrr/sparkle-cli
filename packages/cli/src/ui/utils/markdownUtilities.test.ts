@@ -30,8 +30,7 @@ describe('markdownUtilities', () => {
     });
 
     it('should correctly identify the last \n\n even if it is followed by text not in a code block', () => {
-      const content =
-        'First part.\n\nSecond part.\n\nThird part, then some more text.';
+      const content = 'First part.\n\nSecond part.\n\nThird part, then some more text.';
       // Split should be after "Second part.\n\n"
       // "First part.\n\n" is 13 chars. "Second part.\n\n" is 14 chars. Total 27.
       expect(findLastSafeSplitPoint(content)).toBe(27);

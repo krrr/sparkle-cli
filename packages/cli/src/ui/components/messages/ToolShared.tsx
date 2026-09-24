@@ -106,8 +106,7 @@ export function useFocusHint(
     }
   }, [isThisShellFocused]);
 
-  const shouldShowFocusHint =
-    isThisShellFocusable && (showFocusHint || userHasFocused);
+  const shouldShowFocusHint = isThisShellFocusable && (showFocusHint || userHasFocused);
 
   return { shouldShowFocusHint };
 }
@@ -272,9 +271,7 @@ export const McpProgressIndicator: React.FC<McpProgressIndicatorProps> = ({
   barWidth,
 }) => {
   const percentage =
-    total && total > 0
-      ? Math.min(100, Math.round((progress / total) * 100))
-      : null;
+    total && total > 0 ? Math.min(100, Math.round((progress / total) * 100)) : null;
 
   let rawFilled: number;
   if (total && total > 0) {

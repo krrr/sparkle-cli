@@ -45,10 +45,7 @@ export class CompositeStrategy implements TerminalStrategy {
 
     // Separate non-terminal strategies from the terminal one.
     // This separation allows TypeScript to understand the control flow guarantees.
-    const nonTerminalStrategies = this.strategies.slice(
-      0,
-      -1,
-    ) as RoutingStrategy[];
+    const nonTerminalStrategies = this.strategies.slice(0, -1) as RoutingStrategy[];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const terminalStrategy = this.strategies[
       this.strategies.length - 1
@@ -71,11 +68,7 @@ export class CompositeStrategy implements TerminalStrategy {
 
     // If no other strategy matched, execute the terminal strategy.
     try {
-      const decision = await terminalStrategy.route(
-        context,
-        config,
-        baseLlmClient,
-      );
+      const decision = await terminalStrategy.route(context, config, baseLlmClient);
 
       return this.finalizeDecision(decision, startTime);
     } catch (error) {

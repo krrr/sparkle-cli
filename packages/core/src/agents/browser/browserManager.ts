@@ -183,9 +183,7 @@ export class BrowserManager {
       if (!parallel) {
         parallel = new BrowserManager(config);
         BrowserManager.instances.set(parallelKey, parallel);
-        debugLogger.log(
-          `Created parallel BrowserManager (key: ${parallelKey})`,
-        );
+        debugLogger.log(`Created parallel BrowserManager (key: ${parallelKey})`);
       } else {
         debugLogger.log(
           `Reusing released parallel BrowserManager (key: ${parallelKey})`,
@@ -193,9 +191,7 @@ export class BrowserManager {
       }
       instance = parallel;
     } else {
-      debugLogger.log(
-        `Reusing existing BrowserManager singleton (key: ${key})`,
-      );
+      debugLogger.log(`Reusing existing BrowserManager singleton (key: ${key})`);
     }
     return instance;
   }
@@ -206,9 +202,7 @@ export class BrowserManager {
    */
   static async resetAll(): Promise<void> {
     const results = await Promise.allSettled(
-      Array.from(BrowserManager.instances.values()).map((instance) =>
-        instance.close(),
-      ),
+      Array.from(BrowserManager.instances.values()).map((instance) => instance.close()),
     );
     for (const result of results) {
       if (result.status === 'rejected') {
@@ -281,8 +275,7 @@ export class BrowserManager {
     const browserConfig = config.getBrowserAgentConfig();
     this.shouldInjectOverlay = !browserConfig?.customConfig?.headless;
     this.shouldDisableInput = config.shouldDisableBrowserUserInput();
-    this.maxActionsPerTask =
-      browserConfig?.customConfig.maxActionsPerTask ?? 100;
+    this.maxActionsPerTask = browserConfig?.customConfig.maxActionsPerTask ?? 100;
   }
 
   /**
@@ -364,8 +357,7 @@ export class BrowserManager {
         const raw = await Promise.race([
           callPromise,
           new Promise<never>((_resolve, reject) => {
-            onAbort = () =>
-              reject(signal.reason ?? new Error('Operation cancelled'));
+            onAbort = () => reject(signal.reason ?? new Error('Operation cancelled'));
             signal.addEventListener('abort', onAbort, { once: true });
           }),
         ]);
@@ -413,9 +405,7 @@ export class BrowserManager {
    * Safely maps a raw MCP SDK callTool response to our typed McpToolCallResult
    * without using unsafe type assertions.
    */
-  private toResult(
-    raw: Awaited<ReturnType<Client['callTool']>>,
-  ): McpToolCallResult {
+  private toResult(raw: Awaited<ReturnType<Client['callTool']>>): McpToolCallResult {
     return {
       content: Array.isArray(raw.content)
         ? raw.content.map(
@@ -661,9 +651,7 @@ export class BrowserManager {
           return `EXCLUDE ${domain}`;
         })
         .join(', ');
-      mcpArgs.push(
-        `--chromeArg="--host-rules=MAP * ~NOTFOUND, ${exclusionRules}"`,
-      );
+      mcpArgs.push(`--chromeArg="--host-rules=MAP * ~NOTFOUND, ${exclusionRules}"`);
     }
 
     debugLogger.log(
@@ -673,10 +661,7 @@ export class BrowserManager {
     // Create stdio transport to the bundled chrome-devtools-mcp.
     // stderr is piped (not inherited) to prevent MCP server banners and
     // warnings from corrupting the UI in alternate buffer mode.
-    let bundleMcpPath = path.resolve(
-      __dirname,
-      'bundled/chrome-devtools-mcp.mjs',
-    );
+    let bundleMcpPath = path.resolve(__dirname, 'bundled/chrome-devtools-mcp.mjs');
     if (!fs.existsSync(bundleMcpPath)) {
       bundleMcpPath = path.resolve(
         __dirname,
@@ -696,9 +681,7 @@ export class BrowserManager {
     const stderrStream = this.mcpTransport.stderr;
     if (stderrStream) {
       stderrStream.on('data', (chunk: Buffer) => {
-        debugLogger.log(
-          `[chrome-devtools-mcp stderr] ${chunk.toString().trimEnd()}`,
-        );
+        debugLogger.log(`[chrome-devtools-mcp stderr] ${chunk.toString().trimEnd()}`);
       });
     }
 
@@ -713,15 +696,12 @@ export class BrowserManager {
       );
     };
     this.mcpTransport.onerror = (error: Error) => {
-      debugLogger.error(
-        `chrome-devtools-mcp transport error: ${error.message}`,
-      );
+      debugLogger.error(`chrome-devtools-mcp transport error: ${error.message}`);
     };
 
     // Connect to MCP server — use a shorter timeout for 'existing' mode
     // since it should connect quickly if remote debugging is enabled.
-    const connectTimeoutMs =
-      sessionMode === 'existing' ? 15_000 : MCP_TIMEOUT_MS;
+    const connectTimeoutMs = sessionMode === 'existing' ? 15_000 : MCP_TIMEOUT_MS;
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const connectStartMs = Date.now();
@@ -756,8 +736,7 @@ export class BrowserManager {
     } catch (error) {
       await this.close();
 
-      const rawErrorMessage =
-        error instanceof Error ? error.message : String(error);
+      const rawErrorMessage = error instanceof Error ? error.message : String(error);
       const errorType = BrowserManager.classifyConnectionError(rawErrorMessage);
 
       logBrowserAgentConnection(this.config, Date.now() - connectStartMs, {
@@ -925,10 +904,7 @@ export class BrowserManager {
       for (const paramValue of paramsToCheck) {
         try {
           const embeddedUrl = new URL(paramValue);
-          if (
-            embeddedUrl.protocol === 'http:' ||
-            embeddedUrl.protocol === 'https:'
-          ) {
+          if (embeddedUrl.protocol === 'http:' || embeddedUrl.protocol === 'https:') {
             const embeddedHostname = embeddedUrl.hostname.replace(/\.$/, '');
             if (!this.isDomainAllowed(embeddedHostname, allowedDomains)) {
               return 'Domain not allowed: Embedded URL targets a disallowed domain.';
@@ -953,10 +929,7 @@ export class BrowserManager {
     for (const domainPattern of allowedDomains) {
       if (domainPattern.startsWith('*.')) {
         const baseDomain = domainPattern.substring(2);
-        if (
-          normalized === baseDomain ||
-          normalized.endsWith(`.${baseDomain}`)
-        ) {
+        if (normalized === baseDomain || normalized.endsWith(`.${baseDomain}`)) {
           return true;
         }
       } else {

@@ -1,44 +1,43 @@
 # MCP servers with Sparkle CLI
 
-This document provides a guide to configuring and using Model Context Protocol
-(MCP) servers with Sparkle CLI.
+This document provides a guide to configuring and using Model Context Protocol (MCP)
+servers with Sparkle CLI.
 
 ## What is an MCP server?
 
-An MCP server is an application that exposes tools and resources to the Sparkle
-CLI through the Model Context Protocol, allowing it to interact with external
-systems and data sources. MCP servers act as a bridge between the Gemini model
-and your local environment or other services like APIs.
+An MCP server is an application that exposes tools and resources to the Sparkle CLI
+through the Model Context Protocol, allowing it to interact with external systems and
+data sources. MCP servers act as a bridge between the Gemini model and your local
+environment or other services like APIs.
 
 An MCP server enables Sparkle CLI to:
 
-- **Discover tools:** List available tools, their descriptions, and parameters
-  through standardized schema definitions.
-- **Execute tools:** Call specific tools with defined arguments and receive
-  structured responses.
-- **Access resources:** Read data from specific resources that the server
-  exposes (files, API payloads, reports, etc.).
+- **Discover tools:** List available tools, their descriptions, and parameters through
+  standardized schema definitions.
+- **Execute tools:** Call specific tools with defined arguments and receive structured
+  responses.
+- **Access resources:** Read data from specific resources that the server exposes
+  (files, API payloads, reports, etc.).
 
-With an MCP server, you can extend Sparkle CLI's capabilities to perform actions
-beyond its built-in features, such as interacting with databases, APIs, custom
-scripts, or specialized workflows.
+With an MCP server, you can extend Sparkle CLI's capabilities to perform actions beyond
+its built-in features, such as interacting with databases, APIs, custom scripts, or
+specialized workflows.
 
 ## Core integration architecture
 
-Sparkle CLI integrates with MCP servers through a sophisticated discovery and
-execution system built into the core package (`packages/core/src/tools/`):
+Sparkle CLI integrates with MCP servers through a sophisticated discovery and execution
+system built into the core package (`packages/core/src/tools/`):
 
 ### Discovery Layer (`mcp-client.ts`)
 
 The discovery process is orchestrated by `discoverMcpTools()`, which:
 
-1. **Iterates through configured servers** from your `settings.json`
-   `mcpServers` configuration
-2. **Establishes connections** using appropriate transport mechanisms (Stdio,
-   SSE, or Streamable HTTP)
+1. **Iterates through configured servers** from your `settings.json` `mcpServers`
+   configuration
+2. **Establishes connections** using appropriate transport mechanisms (Stdio, SSE, or
+   Streamable HTTP)
 3. **Fetches tool definitions** from each server using the MCP protocol
-4. **Sanitizes and validates** tool schemas for compatibility with the Gemini
-   API
+4. **Sanitizes and validates** tool schemas for compatibility with the Gemini API
 5. **Registers tools** in the global tool registry with conflict resolution
 6. **Fetches and registers resources** if the server exposes any
 
@@ -46,8 +45,7 @@ The discovery process is orchestrated by `discoverMcpTools()`, which:
 
 Each discovered MCP tool is wrapped in a `DiscoveredMCPTool` instance that:
 
-- **Handles confirmation logic** based on server trust settings and user
-  preferences
+- **Handles confirmation logic** based on server trust settings and user preferences
 - **Manages tool execution** by calling the MCP server with proper parameters
 - **Processes responses** for both the LLM context and user display
 - **Maintains connection state** and handles timeouts
@@ -62,16 +60,16 @@ Sparkle CLI supports three MCP transport types:
 
 ## Working with MCP resources
 
-Some MCP servers expose contextual “resources” in addition to the tools and
-prompts. Sparkle CLI discovers these automatically and gives you the possibility
-to reference them in the chat. For more information on the tools used to
-interact with these resources, see [MCP resource tools](mcp-resources.md).
+Some MCP servers expose contextual “resources” in addition to the tools and prompts.
+Sparkle CLI discovers these automatically and gives you the possibility to reference
+them in the chat. For more information on the tools used to interact with these
+resources, see [MCP resource tools](mcp-resources.md).
 
 ### Discovery and listing
 
 - When discovery runs, the CLI fetches each server’s `resources/list` results.
-- The `/mcp` command displays a Resources section alongside Tools and Prompts
-  for every connected server.
+- The `/mcp` command displays a Resources section alongside Tools and Prompts for every
+  connected server.
 
 This returns a concise, plain-text list of URIs plus metadata.
 
@@ -83,34 +81,33 @@ You can use the same `@` syntax already known for referencing local files:
 @server://resource/path
 ```
 
-Resource URIs appear in the completion menu together with filesystem paths. When
-you submit the message, the CLI calls `resources/read` and injects the content
-in the conversation.
+Resource URIs appear in the completion menu together with filesystem paths. When you
+submit the message, the CLI calls `resources/read` and injects the content in the
+conversation.
 
 ## How to set up your MCP server
 
-Sparkle CLI uses the `mcpServers` configuration in your `settings.json` file to
-locate and connect to MCP servers. This configuration supports multiple servers
-with different transport mechanisms.
+Sparkle CLI uses the `mcpServers` configuration in your `settings.json` file to locate
+and connect to MCP servers. This configuration supports multiple servers with different
+transport mechanisms.
 
 ### Configure the MCP server in settings.json
 
-You can configure MCP servers in your `settings.json` file in two main ways:
-through the top-level `mcpServers` object for specific server definitions, and
-through the `mcp` object for global settings that control server discovery and
-execution.
+You can configure MCP servers in your `settings.json` file in two main ways: through the
+top-level `mcpServers` object for specific server definitions, and through the `mcp`
+object for global settings that control server discovery and execution.
 
 #### Global MCP settings (`mcp`)
 
-The `mcp` object in your `settings.json` lets you define global rules for all
-MCP servers.
+The `mcp` object in your `settings.json` lets you define global rules for all MCP
+servers.
 
 - **`mcp.serverCommand`** (string): A global command to start an MCP server.
-- **`mcp.allowed`** (array of strings): A list of MCP server names to allow. If
-  this is set, only servers from this list (matching the keys in the
-  `mcpServers` object) will be connected to.
-- **`mcp.excluded`** (array of strings): A list of MCP server names to exclude.
-  Servers in this list will not be connected to.
+- **`mcp.allowed`** (array of strings): A list of MCP server names to allow. If this is
+  set, only servers from this list (matching the keys in the `mcpServers` object) will
+  be connected to.
+- **`mcp.excluded`** (array of strings): A list of MCP server names to exclude. Servers
+  in this list will not be connected to.
 
 **Example:**
 
@@ -125,8 +122,8 @@ MCP servers.
 
 #### Server-specific configuration (`mcpServers`)
 
-The `mcpServers` object is where you define each individual MCP server you want
-the CLI to connect to.
+The `mcpServers` object is where you define each individual MCP server you want the CLI
+to connect to.
 
 ### Configuration structure
 
@@ -156,46 +153,44 @@ Each server configuration supports the following properties:
 #### Required (one of the following)
 
 - **`command`** (string): Path to the executable for Stdio transport
-- **`url`** (string): SSE endpoint URL (for example,
-  `"http://localhost:8080/sse"`)
+- **`url`** (string): SSE endpoint URL (for example, `"http://localhost:8080/sse"`)
 - **`httpUrl`** (string): HTTP streaming endpoint URL
 
 #### Optional
 
 - **`args`** (string[]): Command-line arguments for Stdio transport
 - **`headers`** (object): Custom HTTP headers when using `url` or `httpUrl`
-- **`env`** (object): Environment variables for the server process. Values can
-  reference environment variables using `$VAR_NAME` or `${VAR_NAME}` syntax (all
-  platforms), or `%VAR_NAME%` (Windows only).
+- **`env`** (object): Environment variables for the server process. Values can reference
+  environment variables using `$VAR_NAME` or `${VAR_NAME}` syntax (all platforms), or
+  `%VAR_NAME%` (Windows only).
 - **`cwd`** (string): Working directory for Stdio transport
-- **`timeout`** (number): Request timeout in milliseconds (default: 600,000ms =
-  10 minutes)
-- **`trust`** (boolean): When `true`, bypasses all tool call confirmations for
-  this server (default: `false`)
-- **`includeTools`** (string[]): List of tool names to include from this MCP
-  server. When specified, only the tools listed here will be available from this
-  server (allowlist behavior). If not specified, all tools from the server are
-  enabled by default.
-- **`excludeTools`** (string[]): List of tool names to exclude from this MCP
-  server. Tools listed here will not be available to the model, even if they are
-  exposed by the server. `excludeTools` takes precedence over `includeTools`. If
-  a tool is in both lists, it will be excluded.
+- **`timeout`** (number): Request timeout in milliseconds (default: 600,000ms = 10
+  minutes)
+- **`trust`** (boolean): When `true`, bypasses all tool call confirmations for this
+  server (default: `false`)
+- **`includeTools`** (string[]): List of tool names to include from this MCP server.
+  When specified, only the tools listed here will be available from this server
+  (allowlist behavior). If not specified, all tools from the server are enabled by
+  default.
+- **`excludeTools`** (string[]): List of tool names to exclude from this MCP server.
+  Tools listed here will not be available to the model, even if they are exposed by the
+  server. `excludeTools` takes precedence over `includeTools`. If a tool is in both
+  lists, it will be excluded.
 
 ### Environment variable expansion
 
-Sparkle CLI automatically expands environment variables in the `env` block of
-your MCP server configuration. This lets you securely reference variables
-defined in your shell or environment without hardcoding sensitive information
-directly in your `settings.json` file.
+Sparkle CLI automatically expands environment variables in the `env` block of your MCP
+server configuration. This lets you securely reference variables defined in your shell
+or environment without hardcoding sensitive information directly in your `settings.json`
+file.
 
 The expansion utility supports:
 
-- **POSIX/Bash syntax:** `$VARIABLE_NAME` or `${VARIABLE_NAME}` (supported on
-  all platforms)
+- **POSIX/Bash syntax:** `$VARIABLE_NAME` or `${VARIABLE_NAME}` (supported on all
+  platforms)
 - **Windows syntax:** `%VARIABLE_NAME%` (supported only when running on Windows)
 
-If a variable is not defined in the current environment, it resolves to an empty
-string.
+If a variable is not defined in the current environment, it resolves to an empty string.
 
 **Example:**
 
@@ -209,33 +204,32 @@ string.
 
 ### Security and environment sanitization
 
-To protect your credentials, Sparkle CLI performs environment sanitization when
-spawning MCP server processes.
+To protect your credentials, Sparkle CLI performs environment sanitization when spawning
+MCP server processes.
 
 #### Automatic redaction
 
-By default, the CLI redacts sensitive environment variables from the base
-environment (inherited from the host process). This prevents the accidental
-leakage of sensitive host environment variables (like AWS keys or GitHub tokens)
-to arbitrary third-party MCP servers that might execute malicious code or log
-your environment. This includes:
+By default, the CLI redacts sensitive environment variables from the base environment
+(inherited from the host process). This prevents the accidental leakage of sensitive
+host environment variables (like AWS keys or GitHub tokens) to arbitrary third-party MCP
+servers that might execute malicious code or log your environment. This includes:
 
 - Core project keys: `GEMINI_API_KEY`, etc.
-- Variables matching sensitive patterns: `*TOKEN*`, `*SECRET*`, `*PASSWORD*`,
-  `*KEY*`, `*AUTH*`, `*CREDENTIAL*`.
+- Variables matching sensitive patterns: `*TOKEN*`, `*SECRET*`, `*PASSWORD*`, `*KEY*`,
+  `*AUTH*`, `*CREDENTIAL*`.
 - Certificates and private key patterns.
 
 #### Explicit overrides
 
-If an environment variable must be passed to an MCP server, you must explicitly
-state it in the `env` property of the server configuration in `settings.json`
-(or `mcp_config.json` if configuring standard MCP clients or remote skills).
-Explicitly defined variables (including those from extensions) are trusted and
-are **not** subjected to the automatic redaction process.
+If an environment variable must be passed to an MCP server, you must explicitly state it
+in the `env` property of the server configuration in `settings.json` (or
+`mcp_config.json` if configuring standard MCP clients or remote skills). Explicitly
+defined variables (including those from extensions) are trusted and are **not**
+subjected to the automatic redaction process.
 
-This follows the security principle that if a variable is explicitly configured
-by the user for a specific server, it constitutes informed consent to share that
-specific data with that server.
+This follows the security principle that if a variable is explicitly configured by the
+user for a specific server, it constitutes informed consent to share that specific data
+with that server.
 
 <!-- prettier-ignore -->
 > [!NOTE]
@@ -264,14 +258,13 @@ specific data with that server.
 
 ### OAuth support for remote MCP servers
 
-Sparkle CLI supports OAuth 2.0 authentication for remote MCP servers using SSE
-or HTTP transports. This enables secure access to MCP servers that require
-authentication.
+Sparkle CLI supports OAuth 2.0 authentication for remote MCP servers using SSE or HTTP
+transports. This enables secure access to MCP servers that require authentication.
 
 #### Automatic OAuth discovery
 
-For servers that support OAuth discovery, you can omit the OAuth configuration
-and let the CLI discover it automatically:
+For servers that support OAuth discovery, you can omit the OAuth configuration and let
+the CLI discover it automatically:
 
 ```json
 {
@@ -334,15 +327,14 @@ Use the `/mcp auth` command to manage OAuth authentication:
 #### OAuth configuration properties
 
 - **`enabled`** (boolean): Enable OAuth for this server
-- **`clientId`** (string): OAuth client identifier (optional with dynamic
-  registration)
+- **`clientId`** (string): OAuth client identifier (optional with dynamic registration)
 - **`clientSecret`** (string): OAuth client secret (optional for public clients)
-- **`authorizationUrl`** (string): OAuth authorization endpoint (auto-discovered
-  if omitted)
+- **`authorizationUrl`** (string): OAuth authorization endpoint (auto-discovered if
+  omitted)
 - **`tokenUrl`** (string): OAuth token endpoint (auto-discovered if omitted)
 - **`scopes`** (string[]): Required OAuth scopes
-- **`redirectUri`** (string): Custom redirect URI (defaults to an OS-assigned
-  random port, e.g., `http://localhost:<random-port>/oauth/callback`)
+- **`redirectUri`** (string): Custom redirect URI (defaults to an OS-assigned random
+  port, e.g., `http://localhost:<random-port>/oauth/callback`)
 - **`tokenParamName`** (string): Query parameter name for tokens in SSE URLs
 - **`audiences`** (string[]): Audiences the token is valid for
 
@@ -357,13 +349,12 @@ OAuth tokens are automatically:
 
 #### Authentication provider type
 
-You can specify the authentication provider type using the `authProviderType`
-property:
+You can specify the authentication provider type using the `authProviderType` property:
 
-- **`authProviderType`** (string): Specifies the authentication provider. Can be
-  one of the following:
-  - **`dynamic_discovery`** (default): The CLI will automatically discover the
-    OAuth configuration from the server.
+- **`authProviderType`** (string): Specifies the authentication provider. Can be one of
+  the following:
+  - **`dynamic_discovery`** (default): The CLI will automatically discover the OAuth
+    configuration from the server.
 
 ### Example configurations
 
@@ -488,8 +479,8 @@ property:
 
 ## Discovery process deep dive
 
-When Sparkle CLI starts, it performs MCP server discovery through the following
-detailed process:
+When Sparkle CLI starts, it performs MCP server discovery through the following detailed
+process:
 
 ### 1. Server iteration and connection
 
@@ -500,10 +491,10 @@ For each configured server in `mcpServers`:
    - `httpUrl` → `StreamableHTTPClientTransport`
    - `url` → `SSEClientTransport`
    - `command` → `StdioClientTransport`
-3. **Connection establishment:** The MCP client attempts to connect with the
-   configured timeout
-4. **Error handling:** Connection failures are logged and the server status is
-   set to `DISCONNECTED`
+3. **Connection establishment:** The MCP client attempts to connect with the configured
+   timeout
+4. **Error handling:** Connection failures are logged and the server status is set to
+   `DISCONNECTED`
 
 ### 2. Tool discovery
 
@@ -511,29 +502,27 @@ Upon successful connection:
 
 1. **Tool listing:** The client calls the MCP server's tool listing endpoint
 2. **Schema validation:** Each tool's function declaration is validated
-3. **Tool filtering:** Tools are filtered based on `includeTools` and
-   `excludeTools` configuration
-4. **Name sanitization:** Tool names are cleaned to meet Gemini API
-   requirements:
-   - Characters other than letters, numbers, underscore (`_`), hyphen (`-`), dot
-     (`.`), and colon (`:`) are replaced with underscores
-   - Names longer than 63 characters are truncated with middle replacement
-     (`...`)
+3. **Tool filtering:** Tools are filtered based on `includeTools` and `excludeTools`
+   configuration
+4. **Name sanitization:** Tool names are cleaned to meet Gemini API requirements:
+   - Characters other than letters, numbers, underscore (`_`), hyphen (`-`), dot (`.`),
+     and colon (`:`) are replaced with underscores
+   - Names longer than 63 characters are truncated with middle replacement (`...`)
 
 ### 3. Tool naming and namespaces
 
-To prevent collisions across multiple servers or conflicting built-in tools,
-every discovered MCP tool is assigned a strict namespace.
+To prevent collisions across multiple servers or conflicting built-in tools, every
+discovered MCP tool is assigned a strict namespace.
 
-1. **Automatic FQN:** All MCP tools are unconditionally assigned a fully
-   qualified name (FQN) using the format `mcp_{serverName}_{toolName}`.
-2. **Registry tracking:** The tool registry maintains metadata mappings between
-   these FQNs and their original server identities.
-3. **Overwrites:** If two servers share the exact same alias in your
-   configuration and provide tools with the exact same name, the last registered
-   tool overwrites the previous one.
-4. **Policies:** To configure permissions (like auto-approval or denial) for MCP
-   tools, see
+1. **Automatic FQN:** All MCP tools are unconditionally assigned a fully qualified name
+   (FQN) using the format `mcp_{serverName}_{toolName}`.
+2. **Registry tracking:** The tool registry maintains metadata mappings between these
+   FQNs and their original server identities.
+3. **Overwrites:** If two servers share the exact same alias in your configuration and
+   provide tools with the exact same name, the last registered tool overwrites the
+   previous one.
+4. **Policies:** To configure permissions (like auto-approval or denial) for MCP tools,
+   see
    [Special syntax for MCP tools](../reference/policy-engine.md#special-syntax-for-mcp-tools)
    in the Policy Engine documentation.
 
@@ -559,17 +548,14 @@ Tool parameter schemas undergo sanitization for Gemini API compatibility:
 
 After discovery:
 
-- **Persistent connections:** Servers that successfully register tools maintain
-  their connections
-- **Cleanup:** Servers that provide no usable tools have their connections
-  closed
-- **Status updates:** Final server statuses are set to `CONNECTED` or
-  `DISCONNECTED`
+- **Persistent connections:** Servers that successfully register tools maintain their
+  connections
+- **Cleanup:** Servers that provide no usable tools have their connections closed
+- **Status updates:** Final server statuses are set to `CONNECTED` or `DISCONNECTED`
 
 ## Tool execution flow
 
-When the Gemini model decides to use an MCP tool, the following execution flow
-occurs:
+When the Gemini model decides to use an MCP tool, the following execution flow occurs:
 
 ### 1. Tool invocation
 
@@ -622,23 +608,21 @@ Upon confirmation (or trust bypass):
    ];
    ```
 
-3. **Response processing:** Results are formatted for both LLM context and user
-   display
+3. **Response processing:** Results are formatted for both LLM context and user display
 
 ### 4. Response handling
 
 The execution result contains:
 
 - **`llmContent`:** Raw response parts for the language model's context
-- **`returnDisplay`:** Formatted output for user display (often JSON in markdown
-  code blocks)
+- **`returnDisplay`:** Formatted output for user display (often JSON in markdown code
+  blocks)
 
 ## How to interact with your MCP server
 
 ### Using the `/mcp` command
 
-The `/mcp` command provides comprehensive information about your MCP server
-setup:
+The `/mcp` command provides comprehensive information about your MCP server setup:
 
 ```bash
 /mcp
@@ -676,8 +660,8 @@ Discovery State: COMPLETED
 
 ### Tool usage
 
-Once discovered, MCP tools are available to the Gemini model like built-in
-tools. The model will automatically:
+Once discovered, MCP tools are available to the Gemini model like built-in tools. The
+model will automatically:
 
 1. **Select appropriate tools** based on your requests
 2. **Present confirmation dialogs** (unless the server is trusted)
@@ -692,29 +676,27 @@ The MCP integration tracks several states:
 
 #### Overriding extension configurations
 
-If an MCP server is provided by an extension (for example, the
-`google-workspace` extension), you can still override its settings in your local
-`settings.json`. Sparkle CLI merges your local configuration with the
-extension's defaults:
+If an MCP server is provided by an extension (for example, the `google-workspace`
+extension), you can still override its settings in your local `settings.json`. Sparkle
+CLI merges your local configuration with the extension's defaults:
 
-- **Tool lists:** Tool lists are merged securely to ensure the most restrictive
-  policy wins:
+- **Tool lists:** Tool lists are merged securely to ensure the most restrictive policy
+  wins:
 
-  - **Exclusions (`excludeTools`):** Arrays are combined (unioned). If either
-    source blocks a tool, it remains disabled.
-  - **Inclusions (`includeTools`):** Arrays are intersected. If both sources
-    provide an allowlist, only tools present in **both** lists are enabled. If
-    only one source provides an allowlist, that list is respected.
+  - **Exclusions (`excludeTools`):** Arrays are combined (unioned). If either source
+    blocks a tool, it remains disabled.
+  - **Inclusions (`includeTools`):** Arrays are intersected. If both sources provide an
+    allowlist, only tools present in **both** lists are enabled. If only one source
+    provides an allowlist, that list is respected.
   - **Precedence:** `excludeTools` always takes precedence over `includeTools`.
 
-  This ensures you always have veto power over tools provided by an extension
-  and that an extension cannot re-enable tools you have omitted from your
-  personal allowlist.
+  This ensures you always have veto power over tools provided by an extension and that
+  an extension cannot re-enable tools you have omitted from your personal allowlist.
 
-- **Environment variables:** The `env` objects are merged. If the same variable
-  is defined in both places, your local value takes precedence.
-- **Scalar properties:** Properties like `command`, `url`, and `timeout` are
-  replaced by your local values if provided.
+- **Environment variables:** The `env` objects are merged. If the same variable is
+  defined in both places, your local value takes precedence.
+- **Scalar properties:** Properties like `command`, `url`, and `timeout` are replaced by
+  your local values if provided.
 
 **Example override:**
 
@@ -761,8 +743,7 @@ extension's defaults:
 **Troubleshooting:**
 
 1. **Verify tool registration:** Ensure your server actually registers tools
-2. **Check MCP protocol:** Confirm your server implements the MCP tool listing
-   correctly
+2. **Check MCP protocol:** Confirm your server implements the MCP tool listing correctly
 3. **Review server logs:** Check stderr output for server-side errors
 4. **Test tool listing:** Manually test your server's tool discovery endpoint
 
@@ -784,21 +765,17 @@ extension's defaults:
 **Solutions:**
 
 1. **Docker-based servers:** Use Docker containers that include all dependencies
-2. **Path accessibility:** Ensure server executables are available in the
-   sandbox
+2. **Path accessibility:** Ensure server executables are available in the sandbox
 3. **Network access:** Configure sandbox to allow necessary network connections
-4. **Environment variables:** Verify required environment variables are passed
-   through
+4. **Environment variables:** Verify required environment variables are passed through
 
 ### Debugging tips
 
-1. **Enable debug mode:** Run the CLI with `--debug` for verbose output (use F12
-   to open debug console in interactive mode)
-2. **Check stderr:** MCP server stderr is captured and logged (INFO messages
-   filtered)
+1. **Enable debug mode:** Run the CLI with `--debug` for verbose output (use F12 to open
+   debug console in interactive mode)
+2. **Check stderr:** MCP server stderr is captured and logged (INFO messages filtered)
 3. **Test isolation:** Test your MCP server independently before integrating
-4. **Incremental setup:** Start with simple tools before adding complex
-   functionality
+4. **Incremental setup:** Start with simple tools before adding complex functionality
 5. **Use `/mcp` frequently:** Monitor server status during development
 
 ## Important notes
@@ -807,58 +784,54 @@ extension's defaults:
 
 - **Trust settings:** The `trust` option bypasses all confirmation dialogs. Use
   cautiously and only for servers you completely control
-- **Access tokens:** Be security-aware when configuring environment variables
-  containing API keys or tokens. See
-  [Security and environment sanitization](#security-and-environment-sanitization)
-  for details on how Sparkle CLI protects your credentials.
-- **Sandbox compatibility:** When using sandboxing, ensure MCP servers are
-  available within the sandbox environment
-- **Private data:** Using broadly scoped personal access tokens can lead to
-  information leakage between repositories.
+- **Access tokens:** Be security-aware when configuring environment variables containing
+  API keys or tokens. See
+  [Security and environment sanitization](#security-and-environment-sanitization) for
+  details on how Sparkle CLI protects your credentials.
+- **Sandbox compatibility:** When using sandboxing, ensure MCP servers are available
+  within the sandbox environment
+- **Private data:** Using broadly scoped personal access tokens can lead to information
+  leakage between repositories.
 
 ### Performance and resource management
 
-- **Connection persistence:** The CLI maintains persistent connections to
-  servers that successfully register tools
-- **Automatic cleanup:** Connections to servers providing no tools are
-  automatically closed
-- **Timeout management:** Configure appropriate timeouts based on your server's
-  response characteristics
-- **Resource monitoring:** MCP servers run as separate processes and consume
-  system resources
+- **Connection persistence:** The CLI maintains persistent connections to servers that
+  successfully register tools
+- **Automatic cleanup:** Connections to servers providing no tools are automatically
+  closed
+- **Timeout management:** Configure appropriate timeouts based on your server's response
+  characteristics
+- **Resource monitoring:** MCP servers run as separate processes and consume system
+  resources
 
 ### Schema compatibility
 
-- **Property stripping:** The system automatically removes certain schema
-  properties (`$schema`, `additionalProperties`) for Gemini API compatibility
-- **Name sanitization:** Tool names are automatically sanitized to meet API
-  requirements
-- **Conflict resolution:** Tool name conflicts between servers are resolved
-  through automatic prefixing
+- **Property stripping:** The system automatically removes certain schema properties
+  (`$schema`, `additionalProperties`) for Gemini API compatibility
+- **Name sanitization:** Tool names are automatically sanitized to meet API requirements
+- **Conflict resolution:** Tool name conflicts between servers are resolved through
+  automatic prefixing
 
-This comprehensive integration makes MCP servers a powerful way to extend the
-Sparkle CLI's capabilities while maintaining security, reliability, and ease of
-use.
+This comprehensive integration makes MCP servers a powerful way to extend the Sparkle
+CLI's capabilities while maintaining security, reliability, and ease of use.
 
 ## Returning rich content from tools
 
-MCP tools are not limited to returning simple text. You can return rich,
-multi-part content, including text, images, audio, and other binary data in a
-single tool response. This lets you build powerful tools that can provide
-diverse information to the model in a single turn.
+MCP tools are not limited to returning simple text. You can return rich, multi-part
+content, including text, images, audio, and other binary data in a single tool response.
+This lets you build powerful tools that can provide diverse information to the model in
+a single turn.
 
-All data returned from the tool is processed and sent to the model as context
-for its next generation, enabling it to reason about or summarize the provided
-information.
+All data returned from the tool is processed and sent to the model as context for its
+next generation, enabling it to reason about or summarize the provided information.
 
 ### How it works
 
-To return rich content, your tool's response must adhere to the MCP
-specification for a
+To return rich content, your tool's response must adhere to the MCP specification for a
 [`CallToolResult`](https://modelcontextprotocol.io/specification/2025-06-18/server/tools#tool-result).
-The `content` field of the result should be an array of `ContentBlock` objects.
-Sparkle CLI will correctly process this array, separating text from binary data
-and packaging it for the model.
+The `content` field of the result should be an array of `ContentBlock` objects. Sparkle
+CLI will correctly process this array, separating text from binary data and packaging it
+for the model.
 
 You can mix and match different content block types in the `content` array. The
 supported block types include:
@@ -871,8 +844,8 @@ supported block types include:
 
 ### Example: Returning text and an image
 
-Here is an example of a valid JSON response from an MCP tool that returns both a
-text description and an image:
+Here is an example of a valid JSON response from an MCP tool that returns both a text
+description and an image:
 
 ```json
 {
@@ -896,20 +869,20 @@ text description and an image:
 
 When Sparkle CLI receives this response, it will:
 
-1.  Extract all the text and combine it into a single `functionResponse` part
-    for the model.
+1.  Extract all the text and combine it into a single `functionResponse` part for the
+    model.
 2.  Present the image data as a separate `inlineData` part.
-3.  Provide a clean, user-friendly summary in the CLI, indicating that both text
-    and an image were received.
+3.  Provide a clean, user-friendly summary in the CLI, indicating that both text and an
+    image were received.
 
-This enables you to build sophisticated tools that can provide rich, multi-modal
-context to the Gemini model.
+This enables you to build sophisticated tools that can provide rich, multi-modal context
+to the Gemini model.
 
 ## MCP prompts as slash commands
 
-In addition to tools, MCP servers can expose predefined prompts that can be
-executed as slash commands within Sparkle CLI. This lets you create shortcuts
-for common or complex queries that can be easily invoked by name.
+In addition to tools, MCP servers can expose predefined prompts that can be executed as
+slash commands within Sparkle CLI. This lets you create shortcuts for common or complex
+queries that can be easily invoked by name.
 
 ### Defining prompts on the server
 
@@ -964,8 +937,8 @@ This can be included in `settings.json` under `mcpServers` with:
 
 ### Invoking prompts
 
-Once a prompt is discovered, you can invoke it using its name as a slash
-command. The CLI will automatically handle parsing arguments.
+Once a prompt is discovered, you can invoke it using its name as a slash command. The
+CLI will automatically handle parsing arguments.
 
 ```bash
 /poem-writer --title="Sparkle CLI" --mood="reverent"
@@ -977,24 +950,23 @@ or, using positional arguments:
 /poem-writer "Sparkle CLI" reverent
 ```
 
-When you run this command, Sparkle CLI executes the `prompts/get` method on the
-MCP server with the provided arguments. The server is responsible for
-substituting the arguments into the prompt template and returning the final
-prompt text. The CLI then sends this prompt to the model for execution. This
-provides a convenient way to automate and share common workflows.
+When you run this command, Sparkle CLI executes the `prompts/get` method on the MCP
+server with the provided arguments. The server is responsible for substituting the
+arguments into the prompt template and returning the final prompt text. The CLI then
+sends this prompt to the model for execution. This provides a convenient way to automate
+and share common workflows.
 
 ## Managing MCP servers with `sparkle mcp`
 
-While you can always configure MCP servers by manually editing your
-`settings.json` file, Sparkle CLI provides a convenient set of commands to
-manage your server configurations programmatically. These commands streamline
-the process of adding, listing, and removing MCP servers without needing to
-directly edit JSON files.
+While you can always configure MCP servers by manually editing your `settings.json`
+file, Sparkle CLI provides a convenient set of commands to manage your server
+configurations programmatically. These commands streamline the process of adding,
+listing, and removing MCP servers without needing to directly edit JSON files.
 
 ### Adding a server (`sparkle mcp add`)
 
-The `add` command configures a new MCP server in your `settings.json`. Based on
-the scope (`-s, --scope`), it will be added to either the user config
+The `add` command configures a new MCP server in your `settings.json`. Based on the
+scope (`-s, --scope`), it will be added to either the user config
 `~/.sparkle/settings.json` or the project config `.sparkle/settings.json` file.
 
 **Command:**
@@ -1004,8 +976,7 @@ sparkle mcp add [options] <name> <commandOrUrl> [args...]
 ```
 
 - `<name>`: A unique name for the server.
-- `<commandOrUrl>`: The command to execute (for `stdio`) or the URL (for
-  `http`/`sse`).
+- `<commandOrUrl>`: The command to execute (for `stdio`) or the URL (for `http`/`sse`).
 - `[args...]`: Optional arguments for a `stdio` command.
 
 **Options (flags):**
@@ -1068,9 +1039,8 @@ sparkle mcp add --transport sse --header "Authorization: Bearer abc123" secure-s
 
 ### Listing servers (`sparkle mcp list`)
 
-To view all MCP servers currently configured, use the `list` command. It
-displays each server's name, configuration details, and connection status. This
-command has no flags.
+To view all MCP servers currently configured, use the `list` command. It displays each
+server's name, configuration details, and connection status. This command has no flags.
 
 **Command:**
 
@@ -1095,25 +1065,24 @@ sparkle mcp list
 
 ## Troubleshooting and Diagnostics
 
-To minimize noise during startup, MCP connection errors for background servers
-are "silent by default." If issues are detected during startup, a single
-informational hint will be shown: _"MCP issues detected. Run /mcp list for
-status."_
+To minimize noise during startup, MCP connection errors for background servers are
+"silent by default." If issues are detected during startup, a single informational hint
+will be shown: _"MCP issues detected. Run /mcp list for status."_
 
-Detailed, actionable diagnostics for a specific server are automatically
-re-enabled when:
+Detailed, actionable diagnostics for a specific server are automatically re-enabled
+when:
 
 1.  You run an interactive command like `/mcp list`, `/mcp auth`, etc.
 2.  The model attempts to execute a tool from that server.
 3.  You invoke an MCP prompt from that server.
 
-You can also use `sparkle mcp list` from your shell to see connection errors for
-all configured servers.
+You can also use `sparkle mcp list` from your shell to see connection errors for all
+configured servers.
 
 ### Removing a server (`sparkle mcp remove`)
 
-To delete a server from your configuration, use the `remove` command with the
-server's name.
+To delete a server from your configuration, use the `remove` command with the server's
+name.
 
 **Command:**
 
@@ -1131,13 +1100,13 @@ sparkle mcp remove <name>
 sparkle mcp remove my-server
 ```
 
-This will find and delete the "my-server" entry from the `mcpServers` object in
-the appropriate `settings.json` file based on the scope (`-s, --scope`).
+This will find and delete the "my-server" entry from the `mcpServers` object in the
+appropriate `settings.json` file based on the scope (`-s, --scope`).
 
 ### Enabling/disabling a server (`sparkle mcp enable`, `sparkle mcp disable`)
 
-Temporarily disable an MCP server without removing its configuration, or
-re-enable a previously disabled server.
+Temporarily disable an MCP server without removing its configuration, or re-enable a
+previously disabled server.
 
 **Commands:**
 
@@ -1150,9 +1119,8 @@ sparkle mcp disable <name> [--session]
 
 - `--session`: Apply change only for this session (not persisted to file).
 
-Disabled servers appear in `/mcp` status as "Disabled" but won't connect or
-provide tools. Enablement state is stored in
-`~/.sparkle/mcp-server-enablement.json`.
+Disabled servers appear in `/mcp` status as "Disabled" but won't connect or provide
+tools. Enablement state is stored in `~/.sparkle/mcp-server-enablement.json`.
 
 The same commands are available as slash commands during an active session:
 `/mcp enable <name>` and `/mcp disable <name>`.

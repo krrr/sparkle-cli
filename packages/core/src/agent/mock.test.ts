@@ -141,10 +141,7 @@ describe('MockAgentProtocol', () => {
 
     const { streamId } = await session.send({ update: { title: 't' } });
 
-    expect(events.map((e) => e.type)).toEqual([
-      'session_update',
-      'agent_start',
-    ]);
+    expect(events.map((e) => e.type)).toEqual(['session_update', 'agent_start']);
 
     // Push new event to active stream
     session.pushToStream(streamId!, [{ type: 'message' }]);
@@ -198,16 +195,12 @@ describe('MockAgentProtocol', () => {
 
     const streamPromise = waitForStreamEnd(session);
     await session.send({
-      elicitations: [
-        { requestId: 'r1', action: 'accept', content: { foo: 'bar' } },
-      ],
+      elicitations: [{ requestId: 'r1', action: 'accept', content: { foo: 'bar' } }],
     });
 
     const events = await streamPromise;
     expect(events[0].type).toBe('elicitation_response');
-    expect((events[0] as AgentEvent<'elicitation_response'>).requestId).toBe(
-      'r1',
-    );
+    expect((events[0] as AgentEvent<'elicitation_response'>).requestId).toBe('r1');
     expect(events[1].type).toBe('agent_start');
   });
 
@@ -240,8 +233,8 @@ describe('MockAgentProtocol', () => {
 
   it('should throw on action', async () => {
     const session = new MockAgentProtocol();
-    await expect(
-      session.send({ action: { type: 'foo', data: {} } }),
-    ).rejects.toThrow('Actions not supported in MockAgentProtocol: foo');
+    await expect(session.send({ action: { type: 'foo', data: {} } })).rejects.toThrow(
+      'Actions not supported in MockAgentProtocol: foo',
+    );
   });
 });

@@ -119,8 +119,7 @@ export function extractSystemInstructionText(
       .join('\n');
     return text || undefined;
   }
-  const text =
-    'text' in systemInstruction ? (systemInstruction.text ?? '') : '';
+  const text = 'text' in systemInstruction ? (systemInstruction.text ?? '') : '';
   return text || undefined;
 }
 
@@ -396,9 +395,7 @@ export function geminiContentsToOpenAiMessages(
           role: 'tool',
           content: functionResponseToContent(part.functionResponse!.response),
           tool_call_id:
-            toolCallId ??
-            nameToToolCallId.get(mappedName) ??
-            `call_${messages.length}`,
+            toolCallId ?? nameToToolCallId.get(mappedName) ?? `call_${messages.length}`,
         });
       }
       if (otherParts.length > 0) {
@@ -419,8 +416,7 @@ function modelContentToOpenAiMessage(
   const functionCalls = parts.filter((part) => part.functionCall);
   const text = parts
     .filter(
-      (part) =>
-        !part.functionCall && !part.thought && typeof part.text === 'string',
+      (part) => !part.functionCall && !part.thought && typeof part.text === 'string',
     )
     .map((part) => part.text)
     .join('');
@@ -495,10 +491,7 @@ function partsToUserMessage(parts: Part[]): OpenAiMessage {
           url: `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`,
         },
       });
-    } else if (
-      part.fileData?.fileUri &&
-      /^https?:\/\//.test(part.fileData.fileUri)
-    ) {
+    } else if (part.fileData?.fileUri && /^https?:\/\//.test(part.fileData.fileUri)) {
       contentParts.push({
         type: 'image_url',
         image_url: { url: part.fileData.fileUri },
@@ -830,8 +823,7 @@ export function openAiChatCompletionToGeminiResponse(
   for (const call of choice?.message?.tool_calls ?? []) {
     parts.push({
       functionCall: {
-        name:
-          nameMapper?.toOriginalName(call.function.name) ?? call.function.name,
+        name: nameMapper?.toOriginalName(call.function.name) ?? call.function.name,
         args: parseArgs(call.function.arguments),
         id: call.id,
       },

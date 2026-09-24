@@ -46,8 +46,7 @@ export function convertToRestPayload(
   }
 
   // Assign extracted capabilities to the root level.
-  if (restSystemInstruction)
-    restPayload['systemInstruction'] = restSystemInstruction;
+  if (restSystemInstruction) restPayload['systemInstruction'] = restSystemInstruction;
   if (sdkTools) restPayload['tools'] = sdkTools;
   if (sdkToolConfig) restPayload['toolConfig'] = sdkToolConfig;
   if (sdkSafetySettings) restPayload['safetySettings'] = sdkSafetySettings;

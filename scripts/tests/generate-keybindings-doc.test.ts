@@ -17,9 +17,7 @@ describe('generate-keybindings-doc', () => {
     const previousExitCode = process.exitCode;
     try {
       process.exitCode = 0;
-      await expect(
-        generateKeybindingDocs(['--check']),
-      ).resolves.toBeUndefined();
+      await expect(generateKeybindingDocs(['--check'])).resolves.toBeUndefined();
       expect(process.exitCode).toBe(0);
     } finally {
       process.exitCode = previousExitCode;

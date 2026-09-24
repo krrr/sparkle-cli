@@ -84,10 +84,7 @@ function buildMessages(userTurns: string[]): MessageRecord[] {
   ]);
 }
 
-async function seedSessions(
-  config: Config,
-  sessions: SeedSession[],
-): Promise<void> {
+async function seedSessions(config: Config, sessions: SeedSession[]): Promise<void> {
   const chatsDir = path.join(config.storage.getProjectTempDir(), 'chats');
   await fsp.mkdir(chatsDir, { recursive: true });
   const projectRoot = config.storage.getProjectRoot();
@@ -96,10 +93,7 @@ async function seedSessions(
     const sessionTimestamp = new Date(
       Date.now() - session.timestampOffsetMinutes * 60 * 1000,
     );
-    const timestamp = sessionTimestamp
-      .toISOString()
-      .slice(0, 16)
-      .replace(/:/g, '-');
+    const timestamp = sessionTimestamp.toISOString().slice(0, 16).replace(/:/g, '-');
     const filename = `${SESSION_FILE_PREFIX}${timestamp}-${session.sessionId.slice(0, 8)}.jsonl`;
     const conversation = {
       sessionId: session.sessionId,
@@ -261,8 +255,7 @@ describe('Auto Memory Contract', () => {
       await seedSessions(config, [
         {
           sessionId: 'incremental-typecheck-cmd',
-          summary:
-            'Confirm that typecheck for memory edits uses `npm run typecheck`',
+          summary: 'Confirm that typecheck for memory edits uses `npm run typecheck`',
           timestampOffsetMinutes: 420,
           userTurns: [
             'Always run `npm run typecheck` after editing any *.ts file in this repo.',
@@ -388,12 +381,8 @@ describe('Auto Memory Contract', () => {
       for (const sibling of siblingTargets) {
         const absolutePath = path.join(memoryDir, sibling);
         // Look for an added line referencing the sibling.
-        const addedLines = patch
-          .split('\n')
-          .filter((line) => line.startsWith('+'));
-        const referencingLines = addedLines.filter((line) =>
-          line.includes(sibling),
-        );
+        const addedLines = patch.split('\n').filter((line) => line.startsWith('+'));
+        const referencingLines = addedLines.filter((line) => line.includes(sibling));
         expect(
           referencingLines.length,
           `Expected a MEMORY.md pointer for ${sibling} (auto-bundle would also add one).`,

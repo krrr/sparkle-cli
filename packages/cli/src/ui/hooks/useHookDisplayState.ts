@@ -68,8 +68,7 @@ export const useHookDisplayState = () => {
       const removeHook = () => {
         setActiveHooks((prev) => {
           const index = prev.findIndex(
-            (h) =>
-              h.name === payload.hookName && h.eventName === payload.eventName,
+            (h) => h.name === payload.hookName && h.eventName === payload.eventName,
           );
           if (index === -1) return prev;
           const newHooks = [...prev];

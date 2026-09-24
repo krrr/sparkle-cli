@@ -113,9 +113,7 @@ System prompt content.`);
 
     it('should throw AgentLoadError if frontmatter is missing', async () => {
       const filePath = await writeAgentMarkdown(`Just some markdown content.`);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
-        AgentLoadError,
-      );
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(AgentLoadError);
       await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
         'Missing mandatory YAML frontmatter',
       );
@@ -126,9 +124,7 @@ System prompt content.`);
 name: [invalid yaml
 ---
 Body`);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
-        AgentLoadError,
-      );
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(AgentLoadError);
       await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
         'YAML frontmatter parsing failed',
       );
@@ -140,9 +136,7 @@ name: test-agent
 # missing description
 ---
 Body`);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
-        /Validation failed/,
-      );
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Validation failed/);
     });
 
     it('should parse a valid remote agent markdown file', async () => {
@@ -280,9 +274,7 @@ agent_card_url: https://example.com/card
 agent_card_json: '{"name":"test"}'
 ---
 `);
-      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(
-        /Validation failed/,
-      );
+      await expect(parseAgentMarkdown(filePath)).rejects.toThrow(/Validation failed/);
     });
 
     it('should infer remote kind from agent_card_json', async () => {
@@ -470,9 +462,7 @@ Body`);
         system_prompt: 'You are a test agent.',
       };
 
-      const result = markdownToAgentDefinition(
-        markdown,
-      ) as LocalAgentDefinition;
+      const result = markdownToAgentDefinition(markdown) as LocalAgentDefinition;
       expect(result.modelConfig.model).toBe(SPARKLE_MODEL_ALIAS_PRO);
     });
 
@@ -491,9 +481,7 @@ Body`);
         system_prompt: 'prompt',
       };
 
-      const result = markdownToAgentDefinition(
-        markdown,
-      ) as LocalAgentDefinition;
+      const result = markdownToAgentDefinition(markdown) as LocalAgentDefinition;
       expect(result.kind).toBe('local');
       expect(result.mcpServers).toBeDefined();
       expect(result.mcpServers!['test-server']).toMatchObject({
@@ -531,9 +519,7 @@ Body`);
         system_prompt: 'You are a test agent.',
       };
 
-      const result = markdownToAgentDefinition(
-        markdown,
-      ) as LocalAgentDefinition;
+      const result = markdownToAgentDefinition(markdown) as LocalAgentDefinition;
       expect(result.kind).toBe('local');
       expect(result.mcpServers).toBeDefined();
       expect(result.mcpServers!['test-server']).toMatchObject({
@@ -565,9 +551,7 @@ Body`);
         system_prompt: 'You are a test agent.',
       };
 
-      const result = markdownToAgentDefinition(
-        markdown,
-      ) as LocalAgentDefinition;
+      const result = markdownToAgentDefinition(markdown) as LocalAgentDefinition;
       expect(result.modelConfig.model).toBe('auto');
     });
 
@@ -613,9 +597,7 @@ Body`);
         agent_card_json: cardJson,
       };
 
-      const result = markdownToAgentDefinition(
-        markdown,
-      ) as RemoteAgentDefinition;
+      const result = markdownToAgentDefinition(markdown) as RemoteAgentDefinition;
       expect(result.kind).toBe('remote');
       expect(result.name).toBe('json-remote');
       expect(result.agentCardJson).toBe(cardJson);

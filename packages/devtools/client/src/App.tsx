@@ -28,16 +28,12 @@ interface ThemeColors {
 export default function App() {
   const [activeTab, setActiveTab] = useState<'console' | 'network'>('console');
   const { networkLogs, consoleLogs, connectedSessions } = useDevToolsData();
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null,
-  );
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [importedLogs, setImportedLogs] = useState<{
     network: NetworkLog[];
     console: ConsoleLog[];
   } | null>(null);
-  const [importedSessionId, setImportedSessionId] = useState<string | null>(
-    null,
-  );
+  const [importedSessionId, setImportedSessionId] = useState<string | null>(null);
 
   // --- Toast Logic ---
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -269,8 +265,7 @@ export default function App() {
         background: t.bg,
         color: t.text,
         transition: 'background 0.2s, color 0.2s',
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       }}
     >
       <style>{`
@@ -319,55 +314,54 @@ export default function App() {
             gap: '12px',
           }}
         >
-          {selectedSessionId &&
-            connectedSessions.includes(selectedSessionId) && (
-              <>
-                <button
-                  onClick={async () => {
-                    try {
-                      await fetch('/api/trigger-debugger', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ sessionId: selectedSessionId }),
-                      });
-                      showToast(
-                        'Node debugger attached. Open chrome://inspect in Chrome to start debugging.',
-                      );
-                    } catch (e) {
-                      console.error('Failed to trigger debugger:', e);
-                    }
-                  }}
-                  style={{
-                    fontSize: '11px',
-                    padding: '4px 8px',
-                    border: `1px solid ${t.border}`,
-                    background: t.bg,
-                    color: t.text,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                  }}
-                  title="Attach Node Debugger and open chrome://inspect"
-                >
-                  🐞 Debug Node
-                </button>
-                <button
-                  onClick={handleExport}
-                  style={{
-                    fontSize: '11px',
-                    padding: '4px 8px',
-                    border: `1px solid ${t.border}`,
-                    background: t.bg,
-                    color: t.text,
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                  }}
-                >
-                  📤 Export
-                </button>
-              </>
-            )}
+          {selectedSessionId && connectedSessions.includes(selectedSessionId) && (
+            <>
+              <button
+                onClick={async () => {
+                  try {
+                    await fetch('/api/trigger-debugger', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ sessionId: selectedSessionId }),
+                    });
+                    showToast(
+                      'Node debugger attached. Open chrome://inspect in Chrome to start debugging.',
+                    );
+                  } catch (e) {
+                    console.error('Failed to trigger debugger:', e);
+                  }
+                }}
+                style={{
+                  fontSize: '11px',
+                  padding: '4px 8px',
+                  border: `1px solid ${t.border}`,
+                  background: t.bg,
+                  color: t.text,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+                title="Attach Node Debugger and open chrome://inspect"
+              >
+                🐞 Debug Node
+              </button>
+              <button
+                onClick={handleExport}
+                style={{
+                  fontSize: '11px',
+                  padding: '4px 8px',
+                  border: `1px solid ${t.border}`,
+                  background: t.bg,
+                  color: t.text,
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                }}
+              >
+                📤 Export
+              </button>
+            </>
+          )}
 
           <label
             style={{
@@ -399,9 +393,7 @@ export default function App() {
               gap: '6px',
             }}
           >
-            <span style={{ fontSize: '11px', color: t.textSecondary }}>
-              Session:
-            </span>
+            <span style={{ fontSize: '11px', color: t.textSecondary }}>Session:</span>
             {sessions.length > 0 ? (
               <select
                 value={selectedSessionId || ''}
@@ -437,34 +429,33 @@ export default function App() {
                 No Sessions
               </span>
             )}
-            {selectedSessionId &&
-              !selectedSessionId.startsWith('[Imported]') && (
+            {selectedSessionId && !selectedSessionId.startsWith('[Imported]') && (
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '11px',
+                  marginLeft: '8px',
+                }}
+              >
                 <span
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '11px',
-                    marginLeft: '8px',
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: connectedSessions.includes(selectedSessionId)
+                      ? '#34a853'
+                      : '#ea4335',
                   }}
-                >
-                  <span
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: connectedSessions.includes(selectedSessionId)
-                        ? '#34a853'
-                        : '#ea4335',
-                    }}
-                  />
-                  <span style={{ color: t.textSecondary }}>
-                    {connectedSessions.includes(selectedSessionId)
-                      ? 'Connected'
-                      : 'Disconnected'}
-                  </span>
+                />
+                <span style={{ color: t.textSecondary }}>
+                  {connectedSessions.includes(selectedSessionId)
+                    ? 'Connected'
+                    : 'Disconnected'}
                 </span>
-              )}
+              </span>
+            )}
           </div>
 
           <button
@@ -590,9 +581,7 @@ function TabButton({
         fontWeight: 600,
         fontSize: '12px',
         userSelect: 'none',
-        borderBottom: active
-          ? `2px solid ${t.accent}`
-          : '2px solid transparent',
+        borderBottom: active ? `2px solid ${t.accent}` : '2px solid transparent',
         height: '100%',
         boxSizing: 'border-box',
         display: 'flex',
@@ -738,8 +727,7 @@ function ConsoleLogEntry({ log, t }: { log: ConsoleLog; t: ThemeColors }) {
               (e.currentTarget as HTMLDivElement).style.background = t.bgHover;
             }}
             onMouseOut={(e) => {
-              (e.currentTarget as HTMLDivElement).style.background =
-                t.bgSecondary;
+              (e.currentTarget as HTMLDivElement).style.background = t.bgSecondary;
             }}
             title={isExpanded ? 'Collapse' : 'Expand'}
           >
@@ -809,8 +797,7 @@ function ConsoleView({ logs, t }: { logs: ConsoleLog[]; t: ThemeColors }) {
 
         overflowY: 'auto',
 
-        fontFamily:
-          'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+        fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
 
         background: t.consoleBg,
 
@@ -840,19 +827,14 @@ function NetworkView({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState('');
   const [groupByDomain, setGroupByDomain] = useState(true);
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    {},
-  );
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [sidebarWidth, setSidebarWidth] = useState(400);
   const isResizing = useRef(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing.current) return;
-      const newWidth = Math.max(
-        200,
-        Math.min(e.clientX, window.innerWidth - 200),
-      );
+      const newWidth = Math.max(200, Math.min(e.clientX, window.innerWidth - 200));
       setSidebarWidth(newWidth);
     };
     const handleMouseUp = () => {
@@ -892,9 +874,7 @@ function NetworkView({
         const url = new URL(log.url);
         const lastSlashIndex = url.pathname.lastIndexOf('/');
         const basePath =
-          lastSlashIndex !== -1
-            ? url.pathname.substring(0, lastSlashIndex + 1)
-            : '/';
+          lastSlashIndex !== -1 ? url.pathname.substring(0, lastSlashIndex + 1) : '/';
         groupKey = url.hostname + basePath;
       } catch {
         /* ignore */
@@ -930,11 +910,7 @@ function NetworkView({
 
   const renderLogItem = (log: NetworkLog, nameOverride?: string) => {
     const isPending = log.pending;
-    const status = log.response
-      ? log.response.status
-      : log.error
-        ? 'ERR'
-        : '...';
+    const status = log.response ? log.response.status : log.error ? 'ERR' : '...';
     const isError = log.error || (log.response && log.response.status >= 400);
 
     let name = nameOverride || log.url;
@@ -1125,9 +1101,7 @@ function NetworkView({
                       try {
                         const url = new URL(log.url);
                         const lastSlashIndex = url.pathname.lastIndexOf('/');
-                        const suffix = url.pathname.substring(
-                          lastSlashIndex + 1,
-                        );
+                        const suffix = url.pathname.substring(lastSlashIndex + 1);
                         displayName = (suffix || '/') + url.search;
                       } catch {
                         /* ignore */
@@ -1239,17 +1213,13 @@ function NetworkDetail({ log, t }: { log: NetworkLog; t: ThemeColors }) {
             {log.method}
           </span>
           <span>•</span>
-          <span style={{ color: log.error ? '#f28b82' : '#81c995' }}>
-            {status}
-          </span>
+          <span style={{ color: log.error ? '#f28b82' : '#81c995' }}>{status}</span>
           <span>•</span>
           <span>{new Date(log.timestamp).toLocaleTimeString()}</span>
           {log.response && (
             <>
               <span>•</span>
-              <span style={{ color: t.accent }}>
-                {log.response.durationMs}ms
-              </span>
+              <span style={{ color: t.accent }}>{log.response.durationMs}ms</span>
             </>
           )}
         </div>
@@ -1273,9 +1243,7 @@ function NetworkDetail({ log, t }: { log: NetworkLog; t: ThemeColors }) {
               fontSize: '12px',
               textTransform: 'capitalize',
               borderBottom:
-                activeTab === tab
-                  ? `2px solid ${t.accent}`
-                  : '2px solid transparent',
+                activeTab === tab ? `2px solid ${t.accent}` : '2px solid transparent',
               color: activeTab === tab ? t.accent : t.textSecondary,
               transition: 'all 0.2s',
             }}
@@ -1296,9 +1264,7 @@ function NetworkDetail({ log, t }: { log: NetworkLog; t: ThemeColors }) {
                 t={t}
                 color={log.error ? '#f28b82' : '#81c995'}
               />
-              {log.error && (
-                <Pair k="Error" v={log.error} t={t} color="#f28b82" />
-              )}
+              {log.error && <Pair k="Error" v={log.error} t={t} color="#f28b82" />}
             </Section>
             <Section title="Response Headers" t={t}>
               {log.response ? (
@@ -1399,9 +1365,7 @@ function Pair({
       >
         {k}:
       </div>
-      <div style={{ flex: 1, wordBreak: 'break-all', color: color || t.text }}>
-        {v}
-      </div>
+      <div style={{ flex: 1, wordBreak: 'break-all', color: color || t.text }}>{v}</div>
     </div>
   );
 }
@@ -1434,9 +1398,7 @@ function BodyView({
 }) {
   const [mode, setMode] = useState<'json' | 'raw'>('json');
   const hasChunks = chunks && chunks.length > 0;
-  const safeContent = hasChunks
-    ? chunks.map((c) => c.data).join('')
-    : content || '';
+  const safeContent = hasChunks ? chunks.map((c) => c.data).join('') : content || '';
   const getFormattedJson = () => {
     try {
       return JSON.stringify(JSON.parse(safeContent), null, 2);
@@ -1463,9 +1425,7 @@ function BodyView({
 
   if (!safeContent && !hasChunks)
     return (
-      <div
-        style={{ padding: '40px', color: t.textSecondary, textAlign: 'center' }}
-      >
+      <div style={{ padding: '40px', color: t.textSecondary, textAlign: 'center' }}>
         (No content)
       </div>
     );
@@ -1658,9 +1618,7 @@ function jsonToLines(data: unknown): JsonLine[] {
       ? data
       : JSON.stringify(data, null, 2);
   if (str == null)
-    return [
-      { text: 'undefined', foldStart: false, foldEnd: -1, closingBracket: '' },
-    ];
+    return [{ text: 'undefined', foldStart: false, foldEnd: -1, closingBracket: '' }];
   const raw = str.split('\n');
   const lines: JsonLine[] = raw.map((text) => ({
     text,
@@ -1735,12 +1693,7 @@ function highlightLine(text: string, t: ThemeColors): React.ReactNode {
       } else {
         const indent = ' '.repeat(match.index + 1);
         parts.push(
-          <CollapsibleString
-            key={lastIndex}
-            lines={strLines}
-            indent={indent}
-            t={t}
-          />,
+          <CollapsibleString key={lastIndex} lines={strLines} indent={indent} t={t} />,
         );
       }
     } else if (num) {
@@ -1788,9 +1741,7 @@ function CollapsibleString({
   const [expanded, setExpanded] = useState(false);
   const needsTruncation = lines.length > STRING_LINE_THRESHOLD;
   const displayLines =
-    needsTruncation && !expanded
-      ? lines.slice(0, STRING_LINE_THRESHOLD)
-      : lines;
+    needsTruncation && !expanded ? lines.slice(0, STRING_LINE_THRESHOLD) : lines;
 
   return (
     <span style={{ color: '#81c995' }}>
@@ -1909,8 +1860,7 @@ function CodeView({ data, t }: { data: unknown; t: ThemeColors }) {
       style={{
         display: 'grid',
         gridTemplateColumns: '20px 1fr',
-        fontFamily:
-          'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
+        fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace',
         fontSize: '12px',
         lineHeight: '1.5',
         outline: 'none',

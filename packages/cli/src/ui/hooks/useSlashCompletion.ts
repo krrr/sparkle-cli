@@ -113,8 +113,7 @@ function useCommandParser(
     const depth = commandPathParts.length;
     const isArgumentCompletion = !!(
       leafCommand?.completion &&
-      (hasTrailingSpace ||
-        (rawParts.length > depth && depth > 0 && partial !== ''))
+      (hasTrailingSpace || (rawParts.length > depth && depth > 0 && partial !== ''))
     );
 
     return {
@@ -146,9 +145,7 @@ function useCommandSuggestions(
   query: string | null,
   parserResult: CommandParserResult,
   commandContext: CommandContext,
-  getFzfForCommands: (
-    commands: readonly SlashCommand[],
-  ) => FzfCommandCacheEntry | null,
+  getFzfForCommands: (commands: readonly SlashCommand[]) => FzfCommandCacheEntry | null,
   getPrefixSuggestions: (
     commands: readonly SlashCommand[],
     partial: string,
@@ -175,9 +172,7 @@ function useCommandSuggestions(
 
         // Safety check: ensure leafCommand and completion exist
         if (!leafCommand?.completion) {
-          debugLogger.warn(
-            'Attempted argument completion without completion function',
-          );
+          debugLogger.warn('Attempted argument completion without completion function');
           return;
         }
 
@@ -252,22 +247,13 @@ function useCommandSuggestions(
               });
               potentialSuggestions = Array.from(uniqueCommands);
             } catch (error) {
-              logErrorSafely(
-                error,
-                'Fuzzy search - falling back to prefix matching',
-              );
+              logErrorSafely(error, 'Fuzzy search - falling back to prefix matching');
               // Fallback to prefix-based filtering
-              potentialSuggestions = getPrefixSuggestions(
-                commandsToSearch,
-                partial,
-              );
+              potentialSuggestions = getPrefixSuggestions(commandsToSearch, partial);
             }
           } else {
             // Fallback to prefix-based filtering when fzf instance creation fails
-            potentialSuggestions = getPrefixSuggestions(
-              commandsToSearch,
-              partial,
-            );
+            potentialSuggestions = getPrefixSuggestions(commandsToSearch, partial);
           }
         }
 
@@ -284,11 +270,9 @@ function useCommandSuggestions(
 
             // 2. Exact altName match
             const aAltExact =
-              a.altNames?.some((alt) => alt.toLowerCase() === lowerPartial) ||
-              false;
+              a.altNames?.some((alt) => alt.toLowerCase() === lowerPartial) || false;
             const bAltExact =
-              b.altNames?.some((alt) => alt.toLowerCase() === lowerPartial) ||
-              false;
+              b.altNames?.some((alt) => alt.toLowerCase() === lowerPartial) || false;
             if (aAltExact && !bAltExact) return -1;
             if (!aAltExact && bAltExact) return 1;
 
@@ -300,13 +284,11 @@ function useCommandSuggestions(
 
             // 4. Prefix altName match
             const aAltPrefix =
-              a.altNames?.some((alt) =>
-                alt.toLowerCase().startsWith(lowerPartial),
-              ) || false;
+              a.altNames?.some((alt) => alt.toLowerCase().startsWith(lowerPartial)) ||
+              false;
             const bAltPrefix =
-              b.altNames?.some((alt) =>
-                alt.toLowerCase().startsWith(lowerPartial),
-              ) || false;
+              b.altNames?.some((alt) => alt.toLowerCase().startsWith(lowerPartial)) ||
+              false;
             if (aAltPrefix && !bAltPrefix) return -1;
             if (!aAltPrefix && bAltPrefix) return 1;
 
@@ -374,13 +356,7 @@ function useCommandSuggestions(
 
     setSuggestions([]);
     return () => abortController.abort();
-  }, [
-    query,
-    parserResult,
-    commandContext,
-    getFzfForCommands,
-    getPrefixSuggestions,
-  ]);
+  }, [query, parserResult, commandContext, getFzfForCommands, getPrefixSuggestions]);
 
   return { suggestions, isLoading };
 }
@@ -403,8 +379,7 @@ function useCompletionPositions(
       if (parserResult.isArgumentCompletion) {
         const commandSoFar = `/${parserResult.commandPathParts.join(' ')}`;
         const argStartIndex =
-          commandSoFar.length +
-          (parserResult.commandPathParts.length > 0 ? 1 : 0);
+          commandSoFar.length + (parserResult.commandPathParts.length > 0 ? 1 : 0);
         return { start: argStartIndex, end: query.length };
       } else {
         return { start: query.length - partial.length, end: query.length };
@@ -415,12 +390,9 @@ function useCompletionPositions(
   }, [query, parserResult]);
 }
 
-function usePerfectMatch(
-  parserResult: CommandParserResult,
-): PerfectMatchResult {
+function usePerfectMatch(parserResult: CommandParserResult): PerfectMatchResult {
   return useMemo(() => {
-    const { hasTrailingSpace, partial, leafCommand, currentLevel } =
-      parserResult;
+    const { hasTrailingSpace, partial, leafCommand, currentLevel } = parserResult;
 
     if (hasTrailingSpace) {
       return { isPerfectMatch: false };
@@ -462,9 +434,7 @@ function getCommandFromSuggestion(
 
   // suggestion.value is just the command name at the current level (e.g., "list")
   // Find it in the current level's commands
-  const command = currentLevel.find((cmd) =>
-    matchesCommand(cmd, suggestion.value),
-  );
+  const command = currentLevel.find((cmd) => matchesCommand(cmd, suggestion.value));
 
   return command;
 }
@@ -482,9 +452,7 @@ export interface UseSlashCompletionProps {
 export function useSlashCompletion(props: UseSlashCompletionProps): {
   completionStart: number;
   completionEnd: number;
-  getCommandFromSuggestion: (
-    suggestion: Suggestion,
-  ) => SlashCommand | undefined;
+  getCommandFromSuggestion: (suggestion: Suggestion) => SlashCommand | undefined;
   isArgumentCompletion: boolean;
   leafCommand: SlashCommand | null;
 } {

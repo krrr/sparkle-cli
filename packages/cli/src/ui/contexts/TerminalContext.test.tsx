@@ -11,8 +11,7 @@ import { useEffect, act } from 'react';
 import { EventEmitter } from 'node:events';
 import { waitFor } from '../../test-utils/async.js';
 
-const mockStdin = new EventEmitter() as unknown as NodeJS.ReadStream &
-  EventEmitter;
+const mockStdin = new EventEmitter() as unknown as NodeJS.ReadStream & EventEmitter;
 // Add required properties for Ink's StdinProps
 (mockStdin as unknown as { write: Mock }).write = vi.fn();
 (mockStdin as unknown as { setEncoding: Mock }).setEncoding = vi.fn();

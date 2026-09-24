@@ -43,18 +43,17 @@ describe('ProviderListView', () => {
   });
 
   it('renders empty message when no profiles configured', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderListView
-          profiles={[]}
-          onActivate={onActivate}
-          onAdd={onAdd}
-          onEdit={onEdit}
-          onManageModels={onManageModels}
-          onDelete={onDelete}
-          onClose={onClose}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderListView
+        profiles={[]}
+        onActivate={onActivate}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onManageModels={onManageModels}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
 
     expect(lastFrame()).toContain('No providers configured.');
     expect(lastFrame()).toContain('[Enter] Add provider');
@@ -104,19 +103,18 @@ describe('ProviderListView', () => {
   });
 
   it('arms delete confirmation on first d press and deletes on second d press', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderListView
-          profiles={mockProfiles}
-          activeProfileId="profile-1"
-          onActivate={onActivate}
-          onAdd={onAdd}
-          onEdit={onEdit}
-          onManageModels={onManageModels}
-          onDelete={onDelete}
-          onClose={onClose}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderListView
+        profiles={mockProfiles}
+        activeProfileId="profile-1"
+        onActivate={onActivate}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onManageModels={onManageModels}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
 
     // First 'd' press: arm confirmation
     await act(async () => {
@@ -140,19 +138,18 @@ describe('ProviderListView', () => {
   });
 
   it('cancels delete confirmation when pressing escape without closing view', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderListView
-          profiles={mockProfiles}
-          activeProfileId="profile-1"
-          onActivate={onActivate}
-          onAdd={onAdd}
-          onEdit={onEdit}
-          onManageModels={onManageModels}
-          onDelete={onDelete}
-          onClose={onClose}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderListView
+        profiles={mockProfiles}
+        activeProfileId="profile-1"
+        onActivate={onActivate}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onManageModels={onManageModels}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
 
     // Arm confirmation
     await act(async () => {
@@ -183,19 +180,18 @@ describe('ProviderListView', () => {
   });
 
   it('cancels delete confirmation when pressing other keys like navigation', async () => {
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <ProviderListView
-          profiles={mockProfiles}
-          activeProfileId="profile-1"
-          onActivate={onActivate}
-          onAdd={onAdd}
-          onEdit={onEdit}
-          onManageModels={onManageModels}
-          onDelete={onDelete}
-          onClose={onClose}
-        />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderListView
+        profiles={mockProfiles}
+        activeProfileId="profile-1"
+        onActivate={onActivate}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onManageModels={onManageModels}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
 
     // Arm confirmation
     await act(async () => {

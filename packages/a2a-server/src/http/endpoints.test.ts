@@ -31,9 +31,7 @@ vi.mock('../agent/task.js', () => {
     contextId: string;
     taskState = 'submitted';
     config = {
-      getContentGeneratorConfig: vi
-        .fn()
-        .mockReturnValue({ model: 'gemini-pro' }),
+      getContentGeneratorConfig: vi.fn().mockReturnValue({ model: 'gemini-pro' }),
     };
     geminiClient = {
       initialize: vi.fn().mockResolvedValue(undefined),
@@ -63,9 +61,7 @@ vi.mock('../config/config.js', async () => {
   const actual = await vi.importActual('../config/config.js');
   return {
     ...actual,
-    loadConfig: vi
-      .fn()
-      .mockImplementation(async () => createMockConfig({}) as Config),
+    loadConfig: vi.fn().mockImplementation(async () => createMockConfig({}) as Config),
   };
 });
 
@@ -88,9 +84,7 @@ describe('Agent Server Endpoints', () => {
 
   beforeAll(async () => {
     // Create a unique temporary directory for the workspace to avoid conflicts
-    testWorkspace = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-agent-test-'),
-    );
+    testWorkspace = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-agent-test-'));
     app = await createApp();
     await new Promise<void>((resolve) => {
       server = app.listen(0, () => {
@@ -141,9 +135,7 @@ describe('Agent Server Endpoints', () => {
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
     expect(response.body.length).toBeGreaterThan(0);
-    const taskMetadata = response.body.find(
-      (m: TaskMetadata) => m.id === taskId,
-    );
+    const taskMetadata = response.body.find((m: TaskMetadata) => m.id === taskId);
     expect(taskMetadata).toBeDefined();
   });
 

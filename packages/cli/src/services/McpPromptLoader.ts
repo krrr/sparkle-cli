@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  getErrorMessage,
-  getMCPServerPrompts,
-  type Config,
-} from 'sparkle-cli-core';
+import { getErrorMessage, getMCPServerPrompts, type Config } from 'sparkle-cli-core';
 import {
   CommandKind,
   type CommandContext,
@@ -73,9 +69,7 @@ export class McpPromptLoader implements ICommandLoader {
                   if (arg.description) {
                     helpMessage += `    ${arg.description}\n`;
                   }
-                  helpMessage += `    (required: ${
-                    arg.required ? 'yes' : 'no'
-                  })\n\n`;
+                  helpMessage += `    (required: ${arg.required ? 'yes' : 'no'})\n\n`;
                 }
                 return {
                   type: 'message',
@@ -149,10 +143,7 @@ export class McpPromptLoader implements ICommandLoader {
               };
             }
           },
-          completion: async (
-            commandContext: CommandContext,
-            partialArg: string,
-          ) => {
+          completion: async (commandContext: CommandContext, partialArg: string) => {
             const invocation = commandContext.invocation;
             if (!prompt || !prompt.arguments || !invocation) {
               return [];
@@ -165,8 +156,7 @@ export class McpPromptLoader implements ICommandLoader {
                     invocation.raw.substring(indexOfFirstSpace),
                     prompt.arguments,
                   );
-            const promptInputs =
-              parsedInputs instanceof Error ? {} : parsedInputs;
+            const promptInputs = parsedInputs instanceof Error ? {} : parsedInputs;
 
             const providedArgNames = Object.keys(promptInputs);
             const unusedArguments =
@@ -294,9 +284,7 @@ export class McpPromptLoader implements ICommandLoader {
         }
       }
       if (missingArgs.length > 0) {
-        const missingArgNames = missingArgs
-          .map((name) => `--${name}`)
-          .join(', ');
+        const missingArgNames = missingArgs.map((name) => `--${name}`).join(', ');
         return new Error(`Missing required argument(s): ${missingArgNames}`);
       }
     }

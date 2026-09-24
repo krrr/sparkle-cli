@@ -112,11 +112,7 @@ export class Storage {
   }
 
   static getAcknowledgedAgentsPath(): string {
-    return path.join(
-      Storage.getGlobalGeminiDir(),
-      'acknowledgments',
-      'agents.json',
-    );
+    return path.join(Storage.getGlobalGeminiDir(), 'acknowledgments', 'agents.json');
   }
 
   static getPolicyIntegrityStoragePath(): string {
@@ -184,10 +180,7 @@ export class Storage {
   }
 
   getWorkspaceAutoSavedPolicyPath(): string {
-    return path.join(
-      this.getWorkspacePoliciesDir(),
-      AUTO_SAVED_POLICY_FILENAME,
-    );
+    return path.join(this.getWorkspacePoliciesDir(), AUTO_SAVED_POLICY_FILENAME);
   }
 
   getAutoSavedPolicyPath(): string {
@@ -226,10 +219,7 @@ export class Storage {
         return;
       }
 
-      const registryPath = path.join(
-        Storage.getGlobalGeminiDir(),
-        'projects.json',
-      );
+      const registryPath = path.join(Storage.getGlobalGeminiDir(), 'projects.json');
       const registry = new ProjectRegistry(registryPath, [
         Storage.getGlobalTempDir(),
         Storage.getGlobalDataDir(),
@@ -298,10 +288,7 @@ export class Storage {
 
   getPlansDir(): string {
     if (this.customPlansDir) {
-      const resolvedPath = path.resolve(
-        this.getProjectRoot(),
-        this.customPlansDir,
-      );
+      const resolvedPath = path.resolve(this.getProjectRoot(), this.customPlansDir);
       const realProjectRoot = resolveToRealPath(this.getProjectRoot());
       const realResolvedPath = resolveToRealPath(resolvedPath);
 

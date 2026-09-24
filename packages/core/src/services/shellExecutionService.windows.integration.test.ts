@@ -49,9 +49,7 @@ describe.skipIf(!isWindows)(
     }
 
     it('should preserve inline double quotes through node -e', async () => {
-      const { result, output } = await runReal(
-        `node -e 'console.log("preserved")'`,
-      );
+      const { result, output } = await runReal(`node -e 'console.log("preserved")'`);
       expect(result.exitCode).toBe(0);
       expect(output).toBe('preserved');
     });
@@ -65,9 +63,7 @@ describe.skipIf(!isWindows)(
     });
 
     it('should handle quoted argument containing a space', async () => {
-      const { result, output } = await runReal(
-        `node -e "console.log('hello world')"`,
-      );
+      const { result, output } = await runReal(`node -e "console.log('hello world')"`);
       expect(result.exitCode).toBe(0);
       expect(output).toBe('hello world');
     });

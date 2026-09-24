@@ -324,9 +324,7 @@ async function disableAllAction(
 
   try {
     const allHookNames = allHooks.map((hook) => getHookDisplayName(hook));
-    const scope = settings.workspace
-      ? SettingScope.Workspace
-      : SettingScope.User;
+    const scope = settings.workspace ? SettingScope.Workspace : SettingScope.User;
     settings.setValue(scope, 'hooksConfig.disabled', allHookNames);
 
     for (const hook of enabledHooks) {

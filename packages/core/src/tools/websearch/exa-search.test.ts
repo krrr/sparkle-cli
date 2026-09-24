@@ -64,9 +64,7 @@ describe('ExaSearchProvider', () => {
 
   it('should delegate through retryWithBackoff with the abort signal', async () => {
     const signal = new AbortController().signal;
-    (fetchWithTimeout as Mock).mockResolvedValue(
-      mockOkResponse({ results: [] }),
-    );
+    (fetchWithTimeout as Mock).mockResolvedValue(mockOkResponse({ results: [] }));
 
     await provider.search('test query', signal);
 

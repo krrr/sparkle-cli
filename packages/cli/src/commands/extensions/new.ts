@@ -75,9 +75,7 @@ async function handleNew(args: NewArgs) {
 
 async function getBoilerplateChoices() {
   const entries = await readdir(EXAMPLES_PATH, { withFileTypes: true });
-  return entries
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name);
+  return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
 }
 
 export const newCommand: CommandModule = {

@@ -1,10 +1,9 @@
 # Git Worktrees (experimental)
 
-When working on multiple tasks at once, you can use Git worktrees to give each
-Sparkle session its own copy of the codebase. Git worktrees create separate
-working directories that each have their own files and branch while sharing the
-same repository history. This prevents changes in one session from colliding
-with another.
+When working on multiple tasks at once, you can use Git worktrees to give each Sparkle
+session its own copy of the codebase. Git worktrees create separate working directories
+that each have their own files and branch while sharing the same repository history.
+This prevents changes in one session from colliding with another.
 
 Learn more about [session management](./session-management.md).
 
@@ -22,8 +21,8 @@ Learn more in the official Git worktree
 
 ## How to enable Git worktrees
 
-Git worktrees are an experimental feature. You must enable them in your settings
-using the `/settings` command or by manually editing your `settings.json` file.
+Git worktrees are an experimental feature. You must enable them in your settings using
+the `/settings` command or by manually editing your `settings.json` file.
 
 1.  Use the `/settings` command.
 2.  Search for and set **Enable Git Worktrees** to `true`.
@@ -40,18 +39,18 @@ Alternatively, add the following to your `settings.json`:
 
 ## How to use Git worktrees
 
-Use the `--worktree` (`-w`) flag to create an isolated worktree and start
-Sparkle CLI in it.
+Use the `--worktree` (`-w`) flag to create an isolated worktree and start Sparkle CLI in
+it.
 
-- **Start with a specific name:** The value you pass becomes both the directory
-  name (within `.sparkle/worktrees/`) and the branch name.
+- **Start with a specific name:** The value you pass becomes both the directory name
+  (within `.sparkle/worktrees/`) and the branch name.
 
   ```bash
   sparkle --worktree feature-search
   ```
 
-- **Start with a random name:** If you omit the name, Sparkle generates a random
-  one automatically (for example, `worktree-a1b2c3d4`).
+- **Start with a random name:** If you omit the name, Sparkle generates a random one
+  automatically (for example, `worktree-a1b2c3d4`).
 
   ```bash
   sparkle --worktree
@@ -68,20 +67,19 @@ Sparkle CLI in it.
 
 When you exit a worktree session (using `/quit` or `Ctrl+C`), Sparkle leaves the
 worktree intact so your work is not lost. This includes your uncommitted changes
-(modified files, staged changes, or untracked files) and any new commits you
-have made.
+(modified files, staged changes, or untracked files) and any new commits you have made.
 
-Sparkle prioritizes a fast and safe exit: it **does not automatically delete**
-your worktree or branch. You are responsible for cleaning up your worktrees
-manually once you are finished with them.
+Sparkle prioritizes a fast and safe exit: it **does not automatically delete** your
+worktree or branch. You are responsible for cleaning up your worktrees manually once you
+are finished with them.
 
-When you exit, Sparkle displays instructions on how to resume your work or how
-to manually remove the worktree if you no longer need it.
+When you exit, Sparkle displays instructions on how to resume your work or how to
+manually remove the worktree if you no longer need it.
 
 ## Resuming work in a Git worktree
 
-To resume a session in a worktree, navigate to the worktree directory and start
-Sparkle CLI with the `--resume` flag and the session ID:
+To resume a session in a worktree, navigate to the worktree directory and start Sparkle
+CLI with the `--resume` flag and the session ID:
 
 ```bash
 cd .sparkle/worktrees/feature-search
@@ -90,8 +88,8 @@ sparkle --resume <session_id>
 
 ## Managing Git worktrees manually
 
-For more control over worktree location and branch configuration, or to clean up
-a preserved worktree, you can use Git directly:
+For more control over worktree location and branch configuration, or to clean up a
+preserved worktree, you can use Git directly:
 
 - **Clean up a preserved Git worktree:**
   ```bash

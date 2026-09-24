@@ -266,15 +266,10 @@ async function calculateRegexReplacement(
   const newLines = normalizedReplace.split('\n');
 
   // Use the appropriate regex for replacement based on allow_multiple.
-  const replaceRegex = new RegExp(
-    finalPattern,
-    params.allow_multiple ? 'gm' : 'm',
-  );
+  const replaceRegex = new RegExp(finalPattern, params.allow_multiple ? 'gm' : 'm');
 
-  const modifiedCode = currentContent.replace(
-    replaceRegex,
-    (_match, indentation) =>
-      applyIndentation(newLines, indentation || '').join('\n'),
+  const modifiedCode = currentContent.replace(replaceRegex, (_match, indentation) =>
+    applyIndentation(newLines, indentation || '').join('\n'),
   );
 
   return {
@@ -450,15 +445,8 @@ class EditToolInvocation
     toolName?: string,
     displayName?: string,
   ) {
-    super(
-      params,
-      messageBus,
-      toolName,
-      displayName,
-      undefined,
-      undefined,
-      true,
-      () => this.config.getApprovalMode(),
+    super(params, messageBus, toolName, displayName, undefined, undefined, true, () =>
+      this.config.getApprovalMode(),
     );
     if (this.config.isPlanMode()) {
       try {
@@ -496,10 +484,7 @@ class EditToolInvocation
             path.resolve(this.config.getTargetDir(), sanitizedPath),
           );
         } catch {
-          this.resolvedPath = path.resolve(
-            this.config.getTargetDir(),
-            sanitizedPath,
-          );
+          this.resolvedPath = path.resolve(this.config.getTargetDir(), sanitizedPath);
         }
       }
     } else {
@@ -714,10 +699,7 @@ class EditToolInvocation
   }
 
   getDescription(): string {
-    const relativePath = makeRelative(
-      this.resolvedPath,
-      this.config.getTargetDir(),
-    );
+    const relativePath = makeRelative(this.resolvedPath, this.config.getTargetDir());
     if (this.params.old_string === '') {
       return `Create ${shortenPath(relativePath)}`;
     }
@@ -831,8 +813,7 @@ class EditToolInvocation
             });
             fullAiProposedContent = aiReplacement.newContent;
           } catch (error) {
-            const errorMsg =
-              error instanceof Error ? error.message : String(error);
+            const errorMsg = error instanceof Error ? error.message : String(error);
             debugLogger.log(`AI replacement fallback: ${errorMsg}`);
             // Fallback to newContent if speculative calculation fails
             fullAiProposedContent = editData.newContent;
@@ -882,10 +863,7 @@ ${snippet}`);
       }
 
       // Discover JIT subdirectory context for the edited file path
-      const jitContext = await discoverJitContext(
-        this.config,
-        this.resolvedPath,
-      );
+      const jitContext = await discoverJitContext(this.config, this.resolvedPath);
       let llmContent = llmSuccessMessageParts.join(' ');
       if (jitContext) {
         llmContent = appendJitContext(llmContent, jitContext);
@@ -927,9 +905,7 @@ ${snippet}`);
   /**
    * Creates parent directories if they don't exist
    */
-  private async ensureParentDirectoriesExistAsync(
-    filePath: string,
-  ): Promise<void> {
+  private async ensureParentDirectoriesExistAsync(filePath: string): Promise<void> {
     const dirName = path.dirname(filePath);
     try {
       await fsPromises.access(dirName);
@@ -969,9 +945,7 @@ export class EditTool
    * @param params Parameters to validate
    * @returns Error message string or null if valid
    */
-  protected override validateToolParamValues(
-    params: EditToolParams,
-  ): string | null {
+  protected override validateToolParamValues(params: EditToolParams): string | null {
     if (!params.file_path) {
       return "The 'file_path' parameter must be non-empty.";
     }
@@ -1020,9 +994,7 @@ export class EditTool
     }
     const newPlaceholders = detectOmissionPlaceholders(params.new_string);
     if (newPlaceholders.length > 0) {
-      const oldPlaceholders = new Set(
-        detectOmissionPlaceholders(params.old_string),
-      );
+      const oldPlaceholders = new Set(detectOmissionPlaceholders(params.old_string));
 
       for (const placeholder of newPlaceholders) {
         if (!oldPlaceholders.has(placeholder)) {
@@ -1109,9 +1081,7 @@ export class EditTool
       getCurrentContent: async (params: EditToolParams): Promise<string> => {
         try {
           const resolvedPath = resolvePath(params);
-          return await this.config
-            .getFileSystemService()
-            .readTextFile(resolvedPath);
+          return await this.config.getFileSystemService().readTextFile(resolvedPath);
         } catch (err) {
           if (!isNodeError(err) || err.code !== 'ENOENT') throw err;
           return '';
@@ -1160,10 +1130,7 @@ function stripWhitespace(str: string): string {
  * Applies the target indentation to the lines, while preserving relative indentation.
  * It identifies the common indentation of the provided lines and replaces it with the target indentation.
  */
-function applyIndentation(
-  lines: string[],
-  targetIndentation: string,
-): string[] {
+function applyIndentation(lines: string[], targetIndentation: string): string[] {
   if (lines.length === 0) return [];
 
   // Use the first line as the reference for indentation, even if it's empty/whitespace.

@@ -217,9 +217,7 @@ describe('HookRunner', () => {
         mockSpawn.mockStdoutOn.mockImplementation(
           (event: string, callback: (data: Buffer) => void) => {
             if (event === 'data') {
-              setImmediate(() =>
-                callback(Buffer.from(JSON.stringify(mockOutput))),
-              );
+              setImmediate(() => callback(Buffer.from(JSON.stringify(mockOutput))));
             }
           },
         );
@@ -241,9 +239,7 @@ describe('HookRunner', () => {
         expect(result.success).toBe(true);
         expect(result.output).toEqual(mockOutput);
         expect(result.exitCode).toBe(0);
-        expect(mockSpawn.stdin.write).toHaveBeenCalledWith(
-          JSON.stringify(mockInput),
-        );
+        expect(mockSpawn.stdin.write).toHaveBeenCalledWith(JSON.stringify(mockInput));
       });
 
       it('should handle command hook failure', async () => {
@@ -288,16 +284,10 @@ describe('HookRunner', () => {
           throw new Error('Spawn error');
         });
 
-        await hookRunner.executeHook(
-          namedConfig,
-          HookEventName.BeforeTool,
-          mockInput,
-        );
+        await hookRunner.executeHook(namedConfig, HookEventName.BeforeTool, mockInput);
 
         expect(mockDebugLogger.warn).toHaveBeenCalledWith(
-          expect.stringContaining(
-            '(hook: my-friendly-hook): Error: Spawn error',
-          ),
+          expect.stringContaining('(hook: my-friendly-hook): Error: Spawn error'),
         );
       });
 
@@ -410,9 +400,7 @@ describe('HookRunner', () => {
         expect(spawn).toHaveBeenCalledWith(
           expect.stringMatching(/bash|pwsh|powershell/),
           expect.arrayContaining([
-            expect.stringMatching(
-              /ls ['"]\/test\/project\/plans with spaces['"]/,
-            ),
+            expect.stringMatching(/ls ['"]\/test\/project\/plans with spaces['"]/),
           ]),
           expect.any(Object),
         );
@@ -448,9 +436,7 @@ describe('HookRunner', () => {
         // If secure, spawn will be called with the shell executable and escaped command
         expect(spawn).toHaveBeenCalledWith(
           expect.stringMatching(/bash|pwsh|powershell/),
-          expect.arrayContaining([
-            expect.stringMatching(/ls (['"]).*echo.*pwned.*\1/),
-          ]),
+          expect.arrayContaining([expect.stringMatching(/ls (['"]).*echo.*pwned.*\1/)]),
           expect.objectContaining({ shell: false }),
         );
       });
@@ -677,9 +663,7 @@ describe('HookRunner', () => {
         (event: string, callback: (data: Buffer) => void) => {
           if (event === 'data') {
             if (hookCallCount === 0) {
-              setImmediate(() =>
-                callback(Buffer.from(JSON.stringify(mockOutput1))),
-              );
+              setImmediate(() => callback(Buffer.from(JSON.stringify(mockOutput1))));
             }
           }
         },
@@ -740,9 +724,7 @@ describe('HookRunner', () => {
         (event: string, callback: (data: Buffer) => void) => {
           if (event === 'data') {
             if (hookCallCount === 0) {
-              setImmediate(() =>
-                callback(Buffer.from(JSON.stringify(mockOutput1))),
-              );
+              setImmediate(() => callback(Buffer.from(JSON.stringify(mockOutput1))));
             }
           }
         },

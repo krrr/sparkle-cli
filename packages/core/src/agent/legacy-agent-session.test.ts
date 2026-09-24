@@ -12,10 +12,7 @@ import { GeminiEventType } from '../core/turn.js';
 import type { ServerGeminiStreamEvent } from '../core/turn.js';
 import type { AgentEvent, AgentSend } from './types.js';
 import { ToolErrorType } from '../tools/tool-error.js';
-import type {
-  CompletedToolCall,
-  ToolCallRequestInfo,
-} from '../scheduler/types.js';
+import type { CompletedToolCall, ToolCallRequestInfo } from '../scheduler/types.js';
 import { CoreToolCallStatus } from '../scheduler/types.js';
 import type { GeminiClient } from '../core/client.js';
 import type { Scheduler } from '../scheduler/scheduler.js';
@@ -112,9 +109,7 @@ function makeCompletedToolCall(
 
     tool: {} as CompletedToolCall extends { tool: infer T } ? T : never,
 
-    invocation: {} as CompletedToolCall extends { invocation: infer T }
-      ? T
-      : never,
+    invocation: {} as CompletedToolCall extends { invocation: infer T } ? T : never,
   } as CompletedToolCall;
 }
 
@@ -123,8 +118,7 @@ async function collectEvents(
   options?: { streamId?: string; eventId?: string },
 ): Promise<AgentEvent[]> {
   const events: AgentEvent[] = [];
-  const streamOptions =
-    options?.eventId || options?.streamId ? options : undefined;
+  const streamOptions = options?.eventId || options?.streamId ? options : undefined;
 
   for await (const event of streamOptions
     ? session.stream(streamOptions)
@@ -148,9 +142,7 @@ describe('LegacyAgentSession', () => {
 
   describe('send', () => {
     it('returns streamId', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           { type: GeminiEventType.Content, value: 'hello' },
@@ -168,9 +160,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('records the sent user message in the trajectory before send resolves', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -193,9 +183,7 @@ describe('LegacyAgentSession', () => {
         (e): e is AgentEvent<'message'> =>
           e.type === 'message' && e.role === 'user' && e.streamId === streamId,
       );
-      expect(userMessage?.content).toEqual([
-        { type: 'text', text: 'raw input' },
-      ]);
+      expect(userMessage?.content).toEqual([{ type: 'text', text: 'raw input' }]);
       expect(userMessage?._meta).toEqual({ source: 'user-test' });
       await vi.advanceTimersByTimeAsync(0);
       expect(sendMock).toHaveBeenCalledWith(
@@ -210,9 +198,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('returns streamId before emitting agent_start', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -231,14 +217,10 @@ describe('LegacyAgentSession', () => {
       const { streamId } = await session.send(makeMessageSend('hi'));
 
       expect(streamId).toBe('test-stream');
-      expect(liveEvents.some((event) => event.type === 'agent_start')).toBe(
-        false,
-      );
+      expect(liveEvents.some((event) => event.type === 'agent_start')).toBe(false);
 
       await collectEvents(session, { streamId: streamId ?? undefined });
-      expect(liveEvents.some((event) => event.type === 'agent_start')).toBe(
-        true,
-      );
+      expect(liveEvents.some((event) => event.type === 'agent_start')).toBe(true);
     });
 
     it('throws for non-message payloads', async () => {
@@ -250,9 +232,7 @@ describe('LegacyAgentSession', () => {
 
     it('throws if send is called while a stream is active', async () => {
       let resolveHang: (() => void) | undefined;
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         (async function* () {
           await new Promise<void>((resolve) => {
@@ -278,9 +258,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('creates a new streamId after the previous stream completes', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock
         .mockReturnValueOnce(
           makeStream([
@@ -312,8 +290,7 @@ describe('LegacyAgentSession', () => {
         streamId: second.streamId ?? undefined,
       });
       const userMessages = session.events.filter(
-        (e): e is AgentEvent<'message'> =>
-          e.type === 'message' && e.role === 'user',
+        (e): e is AgentEvent<'message'> => e.type === 'message' && e.role === 'user',
       );
 
       expect(first.streamId).not.toBe(second.streamId);
@@ -340,9 +317,7 @@ describe('LegacyAgentSession', () => {
 
   describe('stream - basic flow', () => {
     it('emits agent_start, content messages, and agent_end', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           { type: GeminiEventType.Content, value: 'Hello' },
@@ -364,8 +339,7 @@ describe('LegacyAgentSession', () => {
       expect(types).toContain('agent_end');
 
       const messages = events.filter(
-        (e): e is AgentEvent<'message'> =>
-          e.type === 'message' && e.role === 'agent',
+        (e): e is AgentEvent<'message'> => e.type === 'message' && e.role === 'agent',
       );
       expect(messages).toHaveLength(2);
       expect(messages[0]?.content).toEqual([{ type: 'text', text: 'Hello' }]);
@@ -379,9 +353,7 @@ describe('LegacyAgentSession', () => {
 
   describe('stream - tool calls', () => {
     it('handles a tool call round-trip', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       // First turn: model requests a tool
       sendMock.mockReturnValueOnce(
         makeStream([
@@ -435,9 +407,7 @@ describe('LegacyAgentSession', () => {
           result: { type: 'text', text: 'file contents' },
         }),
       );
-      expect(toolResp?.content).toEqual([
-        { type: 'text', text: 'file contents' },
-      ]);
+      expect(toolResp?.content).toEqual([{ type: 'text', text: 'file contents' }]);
       expect(toolResp?.isError).toBe(false);
 
       // Should have called sendMessageStream twice
@@ -445,9 +415,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('handles tool errors and sends error message in content', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValueOnce(
         makeStream([
           {
@@ -494,9 +462,7 @@ describe('LegacyAgentSession', () => {
       );
       expect(toolResp?.isError).toBe(true);
       // Uses error.message, not responseParts
-      expect(toolResp?.content).toEqual([
-        { type: 'text', text: 'Permission denied' },
-      ]);
+      expect(toolResp?.content).toEqual([{ type: 'text', text: 'Permission denied' }]);
       expect(toolResp?.display?.result).toEqual({
         type: 'text',
         text: 'Error display',
@@ -504,9 +470,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('stops on STOP_EXECUTION tool error', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValueOnce(
         makeStream([
           {
@@ -548,9 +512,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('treats fatal tool errors as tool_response followed by agent_end failed', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValueOnce(
         makeStream([
           {
@@ -590,8 +552,7 @@ describe('LegacyAgentSession', () => {
       expect(toolResp?.content).toEqual([{ type: 'text', text: 'Disk full' }]);
       expect(
         events.some(
-          (e): e is AgentEvent<'error'> =>
-            e.type === 'error' && e.fatal === true,
+          (e): e is AgentEvent<'error'> => e.type === 'error' && e.fatal === true,
         ),
       ).toBe(false);
 
@@ -605,9 +566,7 @@ describe('LegacyAgentSession', () => {
 
   describe('stream - terminal events', () => {
     it('handles AgentExecutionStopped', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -629,9 +588,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('handles AgentExecutionBlocked as non-terminal and continues the stream', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -658,8 +615,7 @@ describe('LegacyAgentSession', () => {
       expect(blocked?.message).toBe('Blocked by hook');
 
       const messages = events.filter(
-        (e): e is AgentEvent<'message'> =>
-          e.type === 'message' && e.role === 'agent',
+        (e): e is AgentEvent<'message'> => e.type === 'message' && e.role === 'agent',
       );
       expect(
         messages.some(
@@ -676,9 +632,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('handles Error events', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -692,17 +646,13 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?.message).toBe('API error');
       expect(events.some((e) => e.type === 'agent_end')).toBe(true);
     });
 
     it('handles LoopDetected as non-terminal warning event', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       // LoopDetected followed by more content — stream continues
       sendMock.mockReturnValue(
         makeStream([
@@ -728,8 +678,7 @@ describe('LegacyAgentSession', () => {
 
       // Stream should have continued — content after loop detected
       const messages = events.filter(
-        (e): e is AgentEvent<'message'> =>
-          e.type === 'message' && e.role === 'agent',
+        (e): e is AgentEvent<'message'> => e.type === 'message' && e.role === 'agent',
       );
       expect(
         messages.some(
@@ -749,18 +698,12 @@ describe('LegacyAgentSession', () => {
 
   describe('stream - max turns', () => {
     it('emits agent_end with max_turns when the session turn limit is exceeded', async () => {
-      const configMock = deps.config.getMaxSessionTurns as ReturnType<
-        typeof vi.fn
-      >;
+      const configMock = deps.config.getMaxSessionTurns as ReturnType<typeof vi.fn>;
       configMock.mockReturnValue(0);
 
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
-        makeStream([
-          { type: GeminiEventType.Content, value: 'should not be reached' },
-        ]),
+        makeStream([{ type: GeminiEventType.Content, value: 'should not be reached' }]),
       );
 
       const session = new LegacyAgentSession(deps);
@@ -780,12 +723,8 @@ describe('LegacyAgentSession', () => {
     });
 
     it('treats GeminiClient MaxSessionTurns as a terminal max_turns stream end', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
-      sendMock.mockReturnValue(
-        makeStream([{ type: GeminiEventType.MaxSessionTurns }]),
-      );
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
+      sendMock.mockReturnValue(makeStream([{ type: GeminiEventType.MaxSessionTurns }]));
 
       const session = new LegacyAgentSession(deps);
       await session.send(makeMessageSend('hi'));
@@ -809,9 +748,7 @@ describe('LegacyAgentSession', () => {
   describe('abort', () => {
     it('treats abort before the first model event as aborted without fatal error', async () => {
       let releaseAbort: (() => void) | undefined;
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         (async function* () {
           await new Promise<void>((resolve) => {
@@ -848,9 +785,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('aborts the stream', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       // Stream that yields content then checks abort signal via a deferred
       let resolveHang: (() => void) | undefined;
       sendMock.mockReturnValue(
@@ -891,9 +826,7 @@ describe('LegacyAgentSession', () => {
 
     it('treats abort during pending scheduler work as aborted without fatal error', async () => {
       let resolveSchedule: ((value: CompletedToolCall[]) => void) | undefined;
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -930,9 +863,7 @@ describe('LegacyAgentSession', () => {
             event.type === 'error' && event.fatal,
         ),
       ).toBe(false);
-      expect(events.some((event) => event.type === 'tool_response')).toBe(
-        false,
-      );
+      expect(events.some((event) => event.type === 'tool_response')).toBe(false);
 
       const streamEnd = events.findLast(
         (event): event is AgentEvent<'agent_end'> => event.type === 'agent_end',
@@ -943,9 +874,7 @@ describe('LegacyAgentSession', () => {
 
   describe('events property', () => {
     it('accumulates all events', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           { type: GeminiEventType.Content, value: 'hi' },
@@ -967,9 +896,7 @@ describe('LegacyAgentSession', () => {
 
   describe('subscription and stream scoping', () => {
     it('subscribe receives live events for the next stream', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           { type: GeminiEventType.Content, value: 'hello later' },
@@ -992,15 +919,11 @@ describe('LegacyAgentSession', () => {
 
       expect(liveEvents.length).toBeGreaterThan(0);
       expect(liveEvents[0]?.type).toBe('message');
-      expect(liveEvents.every((event) => event.streamId === streamId)).toBe(
-        true,
-      );
+      expect(liveEvents.every((event) => event.streamId === streamId)).toBe(true);
     });
 
     it('subscribe is live-only and does not replay old history when idle', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock
         .mockReturnValueOnce(
           makeStream([
@@ -1035,9 +958,9 @@ describe('LegacyAgentSession', () => {
       unsubscribe();
 
       expect(liveEvents.length).toBeGreaterThan(0);
-      expect(
-        liveEvents.every((event) => event.streamId === second.streamId),
-      ).toBe(true);
+      expect(liveEvents.every((event) => event.streamId === second.streamId)).toBe(
+        true,
+      );
       expect(
         liveEvents.some(
           (event) =>
@@ -1050,9 +973,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('streams only the requested streamId', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock
         .mockReturnValueOnce(
           makeStream([
@@ -1108,9 +1029,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('resumes from eventId within the same stream only', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock
         .mockReturnValueOnce(
           makeStream([
@@ -1151,9 +1070,9 @@ describe('LegacyAgentSession', () => {
       const resumedEvents = await collectEvents(session, {
         eventId: firstAgentMessage?.id,
       });
-      expect(
-        resumedEvents.every((event) => event.streamId === first.streamId),
-      ).toBe(true);
+      expect(resumedEvents.every((event) => event.streamId === first.streamId)).toBe(
+        true,
+      );
       expect(resumedEvents.map((event) => event.type)).toEqual(['agent_end']);
       expect(
         resumedEvents.some(
@@ -1169,9 +1088,7 @@ describe('LegacyAgentSession', () => {
 
   describe('agent_end ordering', () => {
     it('agent_end is always the final event yielded', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           { type: GeminiEventType.Content, value: 'Hello' },
@@ -1191,9 +1108,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('agent_end is final even after error events', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValue(
         makeStream([
           {
@@ -1213,9 +1128,7 @@ describe('LegacyAgentSession', () => {
 
   describe('intermediate Finished events', () => {
     it('does NOT emit agent_end when tool calls are pending', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       // First turn: tool request + Finished (should NOT produce agent_end)
       sendMock.mockReturnValueOnce(
         makeStream([
@@ -1262,9 +1175,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('emits usage for intermediate Finished events', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockReturnValueOnce(
         makeStream([
           {
@@ -1314,9 +1225,7 @@ describe('LegacyAgentSession', () => {
 
   describe('error handling in runLoop', () => {
     it('catches thrown errors and emits error + agent_end', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       sendMock.mockImplementation(() => {
         throw new Error('Connection refused');
       });
@@ -1325,9 +1234,7 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?.message).toBe('Connection refused');
       expect(err?.fatal).toBe(true);
       expect(err?._meta?.['stack']).toBeDefined();
@@ -1341,9 +1248,7 @@ describe('LegacyAgentSession', () => {
 
   describe('_emitErrorAndAgentEnd metadata', () => {
     it('preserves exitCode and code in _meta for FatalError', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       // Simulate a FatalError being thrown
       const { FatalError } = await import('../utils/errors.js');
       sendMock.mockImplementation(() => {
@@ -1354,9 +1259,7 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?.message).toBe('Disk full');
       expect(err?.fatal).toBe(true);
       expect(err?._meta?.['exitCode']).toBe(44);
@@ -1364,9 +1267,7 @@ describe('LegacyAgentSession', () => {
     });
 
     it('preserves exitCode for non-FatalError errors that carry one', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       const exitCodeError = new Error('custom exit');
       (exitCodeError as Error & { exitCode: number }).exitCode = 17;
       sendMock.mockImplementation(() => {
@@ -1377,16 +1278,12 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?._meta?.['exitCode']).toBe(17);
     });
 
     it('preserves code in _meta for errors with code property', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       const codedError = new Error('ENOENT');
       (codedError as Error & { code: string }).code = 'ENOENT';
       sendMock.mockImplementation(() => {
@@ -1397,16 +1294,12 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?._meta?.['code']).toBe('ENOENT');
     });
 
     it('preserves status in _meta for errors with status property', async () => {
-      const sendMock = deps.client.sendMessageStream as ReturnType<
-        typeof vi.fn
-      >;
+      const sendMock = deps.client.sendMessageStream as ReturnType<typeof vi.fn>;
       const statusError = new Error('rate limited');
       (statusError as Error & { status: string }).status = 'RESOURCE_EXHAUSTED';
       sendMock.mockImplementation(() => {
@@ -1417,9 +1310,7 @@ describe('LegacyAgentSession', () => {
       await session.send(makeMessageSend('hi'));
       const events = await collectEvents(session);
 
-      const err = events.find(
-        (e): e is AgentEvent<'error'> => e.type === 'error',
-      );
+      const err = events.find((e): e is AgentEvent<'error'> => e.type === 'error');
       expect(err?._meta?.['status']).toBe('RESOURCE_EXHAUSTED');
     });
   });

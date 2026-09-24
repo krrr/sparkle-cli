@@ -127,9 +127,9 @@ describe('ShellProcessor', () => {
       },
     });
 
-    await expect(
-      processor.process(prompt, contextWithoutConfig),
-    ).rejects.toThrow(/Security configuration not loaded/);
+    await expect(processor.process(prompt, contextWithoutConfig)).rejects.toThrow(
+      /Security configuration not loaded/,
+    );
   });
 
   it('should not change the prompt if no shell injections are present', async () => {
@@ -288,9 +288,8 @@ describe('ShellProcessor', () => {
 
   it('should throw ConfirmationRequiredError with multiple commands if multiple are disallowed', async () => {
     const processor = new ShellProcessor('test-command');
-    const prompt: PromptPipelineContent = createPromptPipelineContent(
-      '!{cmd1} and !{cmd2}',
-    );
+    const prompt: PromptPipelineContent =
+      createPromptPipelineContent('!{cmd1} and !{cmd2}');
     mockPolicyEngineCheck.mockImplementation(async (toolCall) => {
       const cmd = toolCall.args.command;
       if (cmd === 'cmd1' || cmd === 'cmd2') {
@@ -390,8 +389,7 @@ describe('ShellProcessor', () => {
   it('should support the full confirmation flow (Ask -> Approve -> Retry)', async () => {
     // 1. Initial State: Command NOT allowed
     const processor = new ShellProcessor('test-command');
-    const prompt: PromptPipelineContent =
-      createPromptPipelineContent('!{echo "once"}');
+    const prompt: PromptPipelineContent = createPromptPipelineContent('!{echo "once"}');
 
     // Policy Engine says ASK_USER
     mockPolicyEngineCheck.mockResolvedValue({
@@ -486,8 +484,7 @@ describe('ShellProcessor', () => {
   describe('Error Reporting', () => {
     it('should append exit code and command name on failure', async () => {
       const processor = new ShellProcessor('test-command');
-      const prompt: PromptPipelineContent =
-        createPromptPipelineContent('!{cmd}');
+      const prompt: PromptPipelineContent = createPromptPipelineContent('!{cmd}');
       mockShellExecute.mockReturnValue({
         result: Promise.resolve({
           ...SUCCESS_RESULT,
@@ -508,8 +505,7 @@ describe('ShellProcessor', () => {
 
     it('should append signal info and command name if terminated by signal', async () => {
       const processor = new ShellProcessor('test-command');
-      const prompt: PromptPipelineContent =
-        createPromptPipelineContent('!{cmd}');
+      const prompt: PromptPipelineContent = createPromptPipelineContent('!{cmd}');
       mockShellExecute.mockReturnValue({
         result: Promise.resolve({
           ...SUCCESS_RESULT,
@@ -711,8 +707,7 @@ describe('ShellProcessor', () => {
         'Commit message: !{git commit -m {{args}}}',
       );
 
-      const expectedEscapedArgs =
-        getExpectedEscapedArgForPlatform(multilineArgs);
+      const expectedEscapedArgs = getExpectedEscapedArgForPlatform(multilineArgs);
       const expectedCommand = `git commit -m ${expectedEscapedArgs}`;
 
       await processor.process(prompt, context);

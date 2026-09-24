@@ -12,9 +12,7 @@ import { Storage } from '../config/storage.js';
 
 describe('PolicyEngine - Core Tools Mapping', () => {
   beforeEach(() => {
-    vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue(
-      '/mock/user/policies',
-    );
+    vi.spyOn(Storage, 'getUserPoliciesDir').mockReturnValue('/mock/user/policies');
   });
 
   afterEach(() => {

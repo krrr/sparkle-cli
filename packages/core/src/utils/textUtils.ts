@@ -159,9 +159,7 @@ export function safeTemplateReplace(
   // Regex to match {{key}} in the template string. The regex enforces string naming rules.
   const placeHolderRegex = /\{\{(\w+)\}\}/g;
   return template.replace(placeHolderRegex, (match, key) =>
-    Object.prototype.hasOwnProperty.call(replacements, key)
-      ? replacements[key]
-      : match,
+    Object.prototype.hasOwnProperty.call(replacements, key) ? replacements[key] : match,
   );
 }
 
@@ -187,9 +185,6 @@ export function sanitizeOutput(output: string): string {
  * Wraps text in <untrusted_context> tags to mitigate prompt injection.
  */
 export function wrapUntrusted(text: string): string {
-  const escaped = text.replaceAll(
-    '</untrusted_context>',
-    '&lt;/untrusted_context&gt;',
-  );
+  const escaped = text.replaceAll('</untrusted_context>', '&lt;/untrusted_context&gt;');
   return `<untrusted_context>\n${escaped}\n</untrusted_context>`;
 }

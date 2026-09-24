@@ -132,24 +132,17 @@ export class FakeContentGenerator implements ContentGenerator {
     const responses = this.getNextResponse('generateContentStream', request);
     async function* stream() {
       for (const response of responses) {
-        yield Object.setPrototypeOf(
-          response,
-          GenerateContentResponse.prototype,
-        );
+        yield Object.setPrototypeOf(response, GenerateContentResponse.prototype);
       }
     }
     return stream();
   }
 
-  async countTokens(
-    request: CountTokensParameters,
-  ): Promise<CountTokensResponse> {
+  async countTokens(request: CountTokensParameters): Promise<CountTokensResponse> {
     return this.getNextResponse('countTokens', request);
   }
 
-  async embedContent(
-    request: EmbedContentParameters,
-  ): Promise<EmbedContentResponse> {
+  async embedContent(request: EmbedContentParameters): Promise<EmbedContentResponse> {
     const response: unknown = this.getNextResponse('embedContent', request);
     Object.setPrototypeOf(response, EmbedContentResponse.prototype);
     if (response instanceof EmbedContentResponse) {

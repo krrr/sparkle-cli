@@ -17,9 +17,7 @@ import {
 
 describe('normalizeSpace', () => {
   it('normalizes multiple whitespaces and trims', () => {
-    expect(normalizeSpace('  hello   world  \n  test  ')).toBe(
-      'hello world test',
-    );
+    expect(normalizeSpace('  hello   world  \n  test  ')).toBe('hello world test');
   });
 });
 
@@ -48,9 +46,7 @@ describe('formatUserHintsForModel', () => {
     const batch = formatUserHintsForModel(['hint 1']);
     const header = single.slice(0, single.indexOf('\n'));
     expect(batch?.startsWith(`${header}\n<user_input>`)).toBe(true);
-    expect(batch).toContain(
-      single.slice(single.indexOf('Internal instruction')),
-    );
+    expect(batch).toContain(single.slice(single.indexOf('Internal instruction')));
   });
 });
 

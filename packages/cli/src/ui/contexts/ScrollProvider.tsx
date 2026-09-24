@@ -94,9 +94,7 @@ const findScrollableCandidates = (
 export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [scrollables, setScrollables] = useState(
-    new Map<string, ScrollableEntry>(),
-  );
+  const [scrollables, setScrollables] = useState(new Map<string, ScrollableEntry>());
 
   const register = useCallback((entry: ScrollableEntry) => {
     setScrollables((prev) => new Map(prev).set(entry.id, entry));
@@ -146,8 +144,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
           const trueScroll = trueScrollRef.current.get(id);
 
           if (entry && trueScroll) {
-            const { scrollTop, scrollHeight, innerHeight } =
-              entry.getScrollState();
+            const { scrollTop, scrollHeight, innerHeight } = entry.getScrollState();
 
             // Re-verify it hasn't become stale before flushing
             if (trueScroll.expectedScrollTop !== scrollTop) {
@@ -193,8 +190,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (!terminalCapabilityManager.isGhosttyTerminal()) {
       const timeSinceLastScroll = now - scrollMomentumRef.current.lastTime;
-      const isSameDirection =
-        scrollMomentumRef.current.lastDirection === direction;
+      const isSameDirection = scrollMomentumRef.current.lastDirection === direction;
 
       // 50ms threshold to consider scrolls consecutive
       if (timeSinceLastScroll < 50 && isSameDirection) {
@@ -213,14 +209,10 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
     scrollMomentumRef.current.lastDirection = direction;
 
     const delta = (direction === 'up' ? -1 : 1) * multiplier;
-    const candidates = findScrollableCandidates(
-      mouseEvent,
-      scrollablesRef.current,
-    );
+    const candidates = findScrollableCandidates(mouseEvent, scrollablesRef.current);
 
     for (const candidate of candidates) {
-      const { scrollTop, scrollHeight, innerHeight } =
-        candidate.getScrollState();
+      const { scrollTop, scrollHeight, innerHeight } = candidate.getScrollState();
 
       let trueScroll = trueScrollRef.current.get(candidate.id);
       if (!trueScroll || trueScroll.expectedScrollTop !== scrollTop) {
@@ -229,8 +221,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const maxScroll = Math.max(0, scrollHeight - innerHeight);
       const canScrollUp = trueScroll.floatValue > SCROLL_STATIC_FRICTION;
-      const canScrollDown =
-        trueScroll.floatValue < maxScroll - SCROLL_STATIC_FRICTION;
+      const canScrollDown = trueScroll.floatValue < maxScroll - SCROLL_STATIC_FRICTION;
 
       if (
         (direction === 'up' && canScrollUp) ||
@@ -287,9 +278,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (maxThumbY <= 0) continue;
 
-        const currentThumbY = Math.round(
-          (scrollTop / maxScrollTop) * maxThumbY,
-        );
+        const currentThumbY = Math.round((scrollTop / maxScrollTop) * maxThumbY);
 
         const absoluteThumbTop = y + currentThumbY;
         const absoluteThumbBottom = absoluteThumbTop + thumbHeight;
@@ -298,12 +287,9 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
         const isBottom = mouseEvent.row === y + height - 1;
 
         const hitTop = isTop ? absoluteThumbTop : absoluteThumbTop - 1;
-        const hitBottom = isBottom
-          ? absoluteThumbBottom
-          : absoluteThumbBottom + 1;
+        const hitBottom = isBottom ? absoluteThumbBottom : absoluteThumbBottom + 1;
 
-        const isThumbClick =
-          mouseEvent.row >= hitTop && mouseEvent.row < hitBottom;
+        const isThumbClick = mouseEvent.row >= hitTop && mouseEvent.row < hitBottom;
 
         let offset = 0;
         const relativeMouseY = mouseEvent.row - y;
@@ -318,9 +304,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
             Math.min(maxThumbY, relativeMouseY - Math.floor(thumbHeight / 2)),
           );
 
-          const newScrollTop = Math.round(
-            (targetThumbY / maxThumbY) * maxScrollTop,
-          );
+          const newScrollTop = Math.round((targetThumbY / maxThumbY) * maxScrollTop);
           if (entry.scrollTo) {
             entry.scrollTo(newScrollTop);
           } else {
@@ -340,10 +324,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
 
-    const candidates = findScrollableCandidates(
-      mouseEvent,
-      scrollablesRef.current,
-    );
+    const candidates = findScrollableCandidates(mouseEvent, scrollablesRef.current);
 
     if (candidates.length > 0) {
       // The first candidate is the innermost one.
@@ -390,9 +371,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
       Math.min(maxThumbY, relativeMouseY - state.offset),
     );
 
-    const targetScrollTop = Math.round(
-      (targetThumbY / maxThumbY) * maxScrollTop,
-    );
+    const targetScrollTop = Math.round((targetThumbY / maxThumbY) * maxScrollTop);
 
     if (entry.scrollTo) {
       entry.scrollTo(targetScrollTop, 0);
@@ -438,9 +417,7 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   return (
-    <ScrollContext.Provider value={contextValue}>
-      {children}
-    </ScrollContext.Provider>
+    <ScrollContext.Provider value={contextValue}>{children}</ScrollContext.Provider>
   );
 };
 

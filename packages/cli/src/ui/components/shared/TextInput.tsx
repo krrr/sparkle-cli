@@ -34,13 +34,8 @@ export function TextInput({
   const keyMatchers = useKeyMatchers();
   const containerRef = useRef<DOMElement>(null);
 
-  const {
-    text,
-    handleInput,
-    visualCursor,
-    viewportVisualLines,
-    visualScrollRow,
-  } = buffer;
+  const { text, handleInput, visualCursor, viewportVisualLines, visualScrollRow } =
+    buffer;
   const [cursorVisualRowAbsolute, cursorVisualColAbsolute] = visualCursor;
 
   useMouseClick(
@@ -95,17 +90,13 @@ export function TextInput({
     <Box ref={containerRef} flexDirection="column">
       {viewportVisualLines.map((lineText, idx) => {
         const currentVisualRow = visualScrollRow + idx;
-        const isCursorLine =
-          focus && currentVisualRow === cursorVisualRowAbsolute;
+        const isCursorLine = focus && currentVisualRow === cursorVisualRowAbsolute;
 
         const lineDisplay = isCursorLine
           ? cpSlice(lineText, 0, cursorVisualColAbsolute) +
             chalk.inverse(
-              cpSlice(
-                lineText,
-                cursorVisualColAbsolute,
-                cursorVisualColAbsolute + 1,
-              ) || ' ',
+              cpSlice(lineText, cursorVisualColAbsolute, cursorVisualColAbsolute + 1) ||
+                ' ',
             ) +
             cpSlice(lineText, cursorVisualColAbsolute + 1)
           : lineText;

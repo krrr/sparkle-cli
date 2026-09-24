@@ -57,9 +57,7 @@ class ActivateSkillToolInvocation extends BaseToolInvocation<
     return `"${skillName}" (?) unknown skill`;
   }
 
-  private async getOrFetchFolderStructure(
-    skillLocation: string,
-  ): Promise<string> {
+  private async getOrFetchFolderStructure(skillLocation: string): Promise<string> {
     if (this.cachedFolderStructure === undefined) {
       this.cachedFolderStructure = await getFolderStructure(
         path.dirname(skillLocation),
@@ -86,9 +84,7 @@ class ActivateSkillToolInvocation extends BaseToolInvocation<
       return false;
     }
 
-    const folderStructure = await this.getOrFetchFolderStructure(
-      skill.location,
-    );
+    const folderStructure = await this.getOrFetchFolderStructure(skill.location);
 
     const confirmationDetails: ToolCallConfirmationDetails = {
       type: 'info',
@@ -130,13 +126,9 @@ ${folderStructure}`,
 
     // Add the skill's directory to the workspace context so the agent has permission
     // to read its bundled resources.
-    this.config
-      .getWorkspaceContext()
-      .addDirectory(path.dirname(skill.location));
+    this.config.getWorkspaceContext().addDirectory(path.dirname(skill.location));
 
-    const folderStructure = await this.getOrFetchFolderStructure(
-      skill.location,
-    );
+    const folderStructure = await this.getOrFetchFolderStructure(skill.location);
 
     return {
       llmContent: `<activated_skill name="${skillName}">

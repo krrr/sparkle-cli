@@ -111,9 +111,7 @@ export const useSlashCommandProcessor = (
     onConfirm: (confirmed: boolean) => void;
   }>(null);
 
-  const [sessionShellAllowlist, setSessionShellAllowlist] = useState(
-    new Set<string>(),
-  );
+  const [sessionShellAllowlist, setSessionShellAllowlist] = useState(new Set<string>());
   const gitService = useMemo(() => {
     if (!config?.getProjectRoot()) {
       return;
@@ -131,9 +129,7 @@ export const useSlashCommandProcessor = (
     return l;
   }, [config]);
 
-  const [pendingItem, setPendingItem] = useState<HistoryItemWithoutId | null>(
-    null,
-  );
+  const [pendingItem, setPendingItem] = useState<HistoryItemWithoutId | null>(null);
 
   const pendingHistoryItems = useMemo(() => {
     const items: HistoryItemWithoutId[] = [];
@@ -223,8 +219,7 @@ export const useSlashCommandProcessor = (
         openAgentConfigDialog: actions.openAgentConfigDialog,
         extensionsUpdateState,
         dispatchExtensionStateUpdate: actions.dispatchExtensionStateUpdate,
-        addConfirmUpdateExtensionRequest:
-          actions.addConfirmUpdateExtensionRequest,
+        addConfirmUpdateExtensionRequest: actions.addConfirmUpdateExtensionRequest,
         setConfirmationRequest,
         removeComponent: () => setCustomDialog(null),
         toggleBackgroundTasks: actions.toggleBackgroundTasks,
@@ -386,10 +381,7 @@ export const useSlashCommandProcessor = (
 
       if (addToHistory) {
         const userMessageTimestamp = Date.now();
-        addItem(
-          { type: MessageType.USER, text: trimmed },
-          userMessageTimestamp,
-        );
+        addItem({ type: MessageType.USER, text: trimmed }, userMessageTimestamp);
       }
 
       let hasError = false;
@@ -423,10 +415,7 @@ export const useSlashCommandProcessor = (
                 ]),
               };
             }
-            const result = await commandToExecute.action(
-              fullCommandContext,
-              args,
-            );
+            const result = await commandToExecute.action(fullCommandContext, args);
 
             if (result) {
               switch (result.type) {
@@ -506,9 +495,7 @@ export const useSlashCommandProcessor = (
                       return { type: 'handled' };
                     default: {
                       const unhandled: never = result.dialog;
-                      throw new Error(
-                        `Unhandled slash command result: ${unhandled}`,
-                      );
+                      throw new Error(`Unhandled slash command result: ${unhandled}`);
                     }
                   }
                 case 'load_history': {
@@ -648,9 +635,7 @@ export const useSlashCommandProcessor = (
                 }
                 default: {
                   const unhandled: never = result;
-                  throw new Error(
-                    `Unhandled slash command result: ${unhandled}`,
-                  );
+                  throw new Error(`Unhandled slash command result: ${unhandled}`);
                 }
               }
             }

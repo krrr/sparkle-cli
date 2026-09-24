@@ -56,9 +56,7 @@ export class ComponentRig {
   public homeDir: string;
   public sessionId: string;
 
-  constructor(
-    private options: { configOverrides?: Partial<ConfigParameters> } = {},
-  ) {
+  constructor(private options: { configOverrides?: Partial<ConfigParameters> } = {}) {
     const uniqueId = randomUUID();
     this.testDir = fs.mkdtempSync(
       path.join(os.tmpdir(), `gemini-component-rig-${uniqueId.slice(0, 8)}-`),
@@ -118,10 +116,7 @@ export class ComponentRig {
  * A helper for running behavioral evaluations directly against backend components.
  * It provides a fully initialized Config with real API access, bypassing the UI.
  */
-export function componentEvalTest(
-  policy: EvalPolicy,
-  evalCase: ComponentEvalCase,
-) {
+export function componentEvalTest(policy: EvalPolicy, evalCase: ComponentEvalCase) {
   const fn = async () => {
     await withEvalRetries(evalCase.name, async () => {
       const rig = new ComponentRig({

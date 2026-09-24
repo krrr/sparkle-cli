@@ -18,11 +18,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 80;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -48,11 +44,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 80;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -76,11 +68,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 50;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -102,11 +90,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 60;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -127,11 +111,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 50;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -154,11 +134,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 60;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -173,11 +149,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 50;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -198,11 +170,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 40;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -240,11 +208,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 160;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
       { width: terminalWidth },
     );
     const { lastFrame, unmount } = renderResult;
@@ -272,11 +236,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 1;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { unmount } = renderResult;
     // If it didn't throw RangeError: Invalid count value, the test passes
@@ -326,11 +286,7 @@ describe('TableRenderer', () => {
     },
   ])('$name', async ({ headers, rows, terminalWidth, expected }) => {
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
       { width: terminalWidth },
     );
     const { lastFrame, unmount } = renderResult;
@@ -359,11 +315,7 @@ describe('TableRenderer', () => {
     const terminalWidth = 50;
 
     const renderResult = await renderWithProviders(
-      <TableRenderer
-        headers={headers}
-        rows={rows}
-        terminalWidth={terminalWidth}
-      />,
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
     );
     const { lastFrame, unmount } = renderResult;
     const output = lastFrame();
@@ -455,9 +407,7 @@ describe('TableRenderer', () => {
         expect(output).toContain('https://bing.com');
         expect(output).toContain('https://yahoo.com');
         expect(output).toContain('(https://google.com)');
-        const dataLine = output
-          .split('\n')
-          .find((l) => l.includes('Visit Google'));
+        const dataLine = output.split('\n').find((l) => l.includes('Visit Google'));
         expect(dataLine).toContain('Visit Google');
       },
     },
@@ -481,25 +431,18 @@ describe('TableRenderer', () => {
         expect(output).toContain('***nested***');
       },
     },
-  ])(
-    '$name',
-    async ({ headers, rows, terminalWidth, waitForText, assertions }) => {
-      const renderResult = await renderWithProviders(
-        <TableRenderer
-          headers={headers}
-          rows={rows}
-          terminalWidth={terminalWidth}
-        />,
-        { width: terminalWidth },
-      );
-      const { lastFrame, unmount } = renderResult;
+  ])('$name', async ({ headers, rows, terminalWidth, waitForText, assertions }) => {
+    const renderResult = await renderWithProviders(
+      <TableRenderer headers={headers} rows={rows} terminalWidth={terminalWidth} />,
+      { width: terminalWidth },
+    );
+    const { lastFrame, unmount } = renderResult;
 
-      const output = lastFrame();
-      expect(output).toBeDefined();
-      expect(output).toContain(waitForText);
-      assertions(output);
-      await expect(renderResult).toMatchSvgSnapshot();
-      unmount();
-    },
-  );
+    const output = lastFrame();
+    expect(output).toBeDefined();
+    expect(output).toContain(waitForText);
+    assertions(output);
+    await expect(renderResult).toMatchSvgSnapshot();
+    unmount();
+  });
 });

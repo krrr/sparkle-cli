@@ -19,9 +19,7 @@ export function fromGraph(
   nodes: readonly ConcreteNode[],
   idService?: NodeIdService,
 ): HistoryTurn[] {
-  debugLogger.log(
-    `[fromGraph] Reconstructing history from ${nodes.length} nodes`,
-  );
+  debugLogger.log(`[fromGraph] Reconstructing history from ${nodes.length} nodes`);
 
   const history: HistoryTurn[] = [];
   let currentTurn: { id: string; content: Content } | null = null;
@@ -54,10 +52,7 @@ export function fromGraph(
       };
       history.push(currentTurn);
     } else {
-      currentTurn.content.parts = [
-        ...(currentTurn.content.parts || []),
-        node.payload,
-      ];
+      currentTurn.content.parts = [...(currentTurn.content.parts || []), node.payload];
     }
   }
 

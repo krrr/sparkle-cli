@@ -4,13 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-  useSyncExternalStore,
-  useRef,
-} from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore, useRef } from 'react';
 import {
   IdeClient,
   IDEConnectionStatus,
@@ -79,10 +73,7 @@ export function useIdeTrustListener() {
     const currentTrust = isWorkspaceTrusted(settings.merged).isTrusted;
     // Trigger a restart if the overall trust status for the CLI has changed,
     // but not on the initial trust value.
-    if (
-      previousTrust.current !== undefined &&
-      previousTrust.current !== currentTrust
-    ) {
+    if (previousTrust.current !== undefined && previousTrust.current !== currentTrust) {
       setNeedsRestart(true);
     }
     previousTrust.current = currentTrust;

@@ -48,11 +48,7 @@ describe('ApprovalModeStrategy', () => {
   it('should return null if the model is not an auto model', async () => {
     vi.mocked(mockConfig.getModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision).toBeNull();
   });
@@ -61,11 +57,7 @@ describe('ApprovalModeStrategy', () => {
     vi.mocked(mockConfig.getPlanModeRoutingEnabled).mockResolvedValue(false);
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision).toBeNull();
   });
@@ -74,11 +66,7 @@ describe('ApprovalModeStrategy', () => {
     vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision).toEqual({
       model: DEFAULT_GEMINI_MODEL,
@@ -93,15 +81,9 @@ describe('ApprovalModeStrategy', () => {
   it('should route to FLASH model if an approved plan exists', async () => {
     vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.DEFAULT);
-    vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(
-      '/path/to/plan.md',
-    );
+    vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue('/path/to/plan.md');
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision).toEqual({
       model: DEFAULT_GEMINI_FLASH_MODEL,
@@ -118,11 +100,7 @@ describe('ApprovalModeStrategy', () => {
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.DEFAULT);
     vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(undefined);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision).toBeNull();
   });
@@ -132,11 +110,7 @@ describe('ApprovalModeStrategy', () => {
     vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
   });
@@ -145,18 +119,12 @@ describe('ApprovalModeStrategy', () => {
     vi.mocked(mockConfig.getModel).mockReturnValue(SPARKLE_MODEL_ALIAS_AUTO);
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
 
-    const decision = await strategy.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const decision = await strategy.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(decision?.model).toBe(DEFAULT_GEMINI_MODEL);
 
     vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.DEFAULT);
-    vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue(
-      '/path/to/plan.md',
-    );
+    vi.mocked(mockConfig.getApprovedPlanPath).mockReturnValue('/path/to/plan.md');
 
     const implementationDecision = await strategy.route(
       mockContext,

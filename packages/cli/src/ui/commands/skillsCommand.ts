@@ -18,10 +18,7 @@ import {
 import { disableSkill, enableSkill } from '../../utils/skillSettings.js';
 
 import { getErrorMessage } from 'sparkle-cli-core';
-import {
-  linkSkill,
-  renderSkillActionFeedback,
-} from '../../utils/skillUtils.js';
+import { linkSkill, renderSkillActionFeedback } from '../../utils/skillUtils.js';
 import { SettingScope } from '../../config/settings.js';
 import {
   requestConsentInteractive,
@@ -176,8 +173,7 @@ async function disableAction(
     (label, path) => `${label} (${path})`,
   );
   if (result.status === 'success' || result.status === 'no-op') {
-    feedback +=
-      ' You can run "/skills reload" to refresh your current instance.';
+    feedback += ' You can run "/skills reload" to refresh your current instance.';
   }
 
   context.ui.addItem({
@@ -206,8 +202,7 @@ async function enableAction(
     (label, path) => `${label} (${path})`,
   );
   if (result.status === 'success' || result.status === 'no-op') {
-    feedback +=
-      ' You can run "/skills reload" to refresh your current instance.';
+    feedback += ' You can run "/skills reload" to refresh your current instance.';
   }
 
   context.ui.addItem({
@@ -304,10 +299,7 @@ async function reloadAction(
   }
 }
 
-function disableCompletion(
-  context: CommandContext,
-  partialArg: string,
-): string[] {
+function disableCompletion(context: CommandContext, partialArg: string): string[] {
   const skillManager = context.services.agentContext?.config.getSkillManager();
   if (!skillManager) {
     return [];
@@ -318,10 +310,7 @@ function disableCompletion(
     .map((s) => s.name);
 }
 
-function enableCompletion(
-  context: CommandContext,
-  partialArg: string,
-): string[] {
+function enableCompletion(context: CommandContext, partialArg: string): string[] {
   const skillManager = context.services.agentContext?.config.getSkillManager();
   if (!skillManager) {
     return [];
@@ -343,8 +332,7 @@ export const skillsCommand: SlashCommand = {
   subCommands: [
     {
       name: 'list',
-      description:
-        'List available agent skills. Usage: /skills list [nodesc] [all]',
+      description: 'List available agent skills. Usage: /skills list [nodesc] [all]',
       kind: CommandKind.BUILT_IN,
       action: listAction,
     },
@@ -364,8 +352,7 @@ export const skillsCommand: SlashCommand = {
     },
     {
       name: 'enable',
-      description:
-        'Enable a disabled skill by name. Usage: /skills enable <name>',
+      description: 'Enable a disabled skill by name. Usage: /skills enable <name>',
       kind: CommandKind.BUILT_IN,
       action: enableAction,
       completion: enableCompletion,
@@ -373,8 +360,7 @@ export const skillsCommand: SlashCommand = {
     {
       name: 'reload',
       altNames: ['refresh'],
-      description:
-        'Reload the list of discovered skills. Usage: /skills reload',
+      description: 'Reload the list of discovered skills. Usage: /skills reload',
       kind: CommandKind.BUILT_IN,
       action: reloadAction,
     },

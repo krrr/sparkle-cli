@@ -18,11 +18,7 @@ import {
   type ToolConfirmationOutcome,
   type ExecuteOptions,
 } from './tools.js';
-import {
-  shortenPath,
-  makeRelative,
-  resolveToRealPath,
-} from '../utils/paths.js';
+import { shortenPath, makeRelative, resolveToRealPath } from '../utils/paths.js';
 import { type Config } from '../config/config.js';
 import { DEFAULT_FILE_FILTERING_OPTIONS } from '../config/constants.js';
 import { ToolErrorType } from './tool-error.js';
@@ -98,10 +94,7 @@ export interface GlobToolParams {
   respect_sparkle_ignore?: boolean;
 }
 
-class GlobToolInvocation extends BaseToolInvocation<
-  GlobToolParams,
-  ToolResult
-> {
+class GlobToolInvocation extends BaseToolInvocation<GlobToolParams, ToolResult> {
   constructor(
     private config: Config,
     params: GlobToolParams,
@@ -221,8 +214,9 @@ class GlobToolInvocation extends BaseToolInvocation<
         return path.relative(realTargetDir, realFullPath);
       });
 
-      const { filteredPaths, ignoredCount } =
-        fileDiscovery.filterFilesWithReport(relativePaths, {
+      const { filteredPaths, ignoredCount } = fileDiscovery.filterFilesWithReport(
+        relativePaths,
+        {
           respectGitIgnore:
             this.params?.respect_git_ignore ??
             this.config.getFileFilteringOptions().respectGitIgnore ??
@@ -231,7 +225,8 @@ class GlobToolInvocation extends BaseToolInvocation<
             this.params?.respect_sparkle_ignore ??
             this.config.getFileFilteringOptions().respectSparkleIgnore ??
             DEFAULT_FILE_FILTERING_OPTIONS.respectSparkleIgnore,
-        });
+        },
+      );
 
       const filteredAbsolutePaths = new Set(
         filteredPaths.map((p) => path.resolve(this.config.getTargetDir(), p)),
@@ -262,15 +257,9 @@ class GlobToolInvocation extends BaseToolInvocation<
       const nowTimestamp = new Date().getTime();
 
       // Sort the filtered entries using the new helper function
-      const sortedEntries = sortFileEntries(
-        filteredEntries,
-        nowTimestamp,
-        oneDayInMs,
-      );
+      const sortedEntries = sortFileEntries(filteredEntries, nowTimestamp, oneDayInMs);
 
-      const sortedAbsolutePaths = sortedEntries.map((entry) =>
-        entry.fullpath(),
-      );
+      const sortedAbsolutePaths = sortedEntries.map((entry) => entry.fullpath());
       const fileListDescription = sortedAbsolutePaths.join('\n');
       const fileCount = sortedAbsolutePaths.length;
 
@@ -329,9 +318,7 @@ export class GlobTool extends BaseDeclarativeTool<GlobToolParams, ToolResult> {
   /**
    * Validates the parameters for the tool.
    */
-  protected override validateToolParamValues(
-    params: GlobToolParams,
-  ): string | null {
+  protected override validateToolParamValues(params: GlobToolParams): string | null {
     let searchDirAbsolute: string;
     try {
       searchDirAbsolute = resolveToRealPath(
@@ -341,10 +328,7 @@ export class GlobTool extends BaseDeclarativeTool<GlobToolParams, ToolResult> {
       return err instanceof Error ? err.message : String(err);
     }
 
-    const validationError = this.config.validatePathAccess(
-      searchDirAbsolute,
-      'read',
-    );
+    const validationError = this.config.validatePathAccess(searchDirAbsolute, 'read');
     if (validationError) {
       return validationError;
     }

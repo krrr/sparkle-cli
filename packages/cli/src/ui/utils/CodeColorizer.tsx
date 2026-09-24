@@ -18,10 +18,7 @@ import stripAnsi from 'strip-ansi';
 import { themeManager } from '../themes/theme-manager.js';
 import type { Theme } from '../themes/theme.js';
 import type { EmphasisRange } from './intraLineDiff.js';
-import {
-  MaxSizedBox,
-  MINIMUM_MAX_HEIGHT,
-} from '../components/shared/MaxSizedBox.js';
+import { MaxSizedBox, MINIMUM_MAX_HEIGHT } from '../components/shared/MaxSizedBox.js';
 import { debugLogger } from 'sparkle-cli-core';
 import type { LoadedSettings } from '../../config/settings.js';
 
@@ -89,13 +86,9 @@ function renderHastNode(
 
     // Recursively render children, passing the determined color down
     // Ensure child type matches expected HAST structure (ElementContent is common)
-    const children = node.children?.map(
-      (child: ElementContent, index: number) => (
-        <React.Fragment key={index}>
-          {renderHastNode(child, childOptions)}
-        </React.Fragment>
-      ),
-    );
+    const children = node.children?.map((child: ElementContent, index: number) => (
+      <React.Fragment key={index}>{renderHastNode(child, childOptions)}</React.Fragment>
+    ));
 
     // Element nodes now only group children; color is applied by Text nodes.
     // Use a React Fragment to avoid adding unnecessary elements.
@@ -112,9 +105,7 @@ function renderHastNode(
     // Pass down the initial inheritedColor (likely undefined from the top call)
     // Ensure child type matches expected HAST structure (RootContent is common)
     return node.children?.map((child: RootContent, index: number) => (
-      <React.Fragment key={index}>
-        {renderHastNode(child, options)}
-      </React.Fragment>
+      <React.Fragment key={index}>{renderHastNode(child, options)}</React.Fragment>
     ));
   }
 
@@ -294,9 +285,7 @@ export function colorizeCode({
 }: ColorizeCodeOptions): React.ReactNode | React.ReactNode[] {
   const codeToHighlight = code.replace(/\n$/, '');
   const activeTheme = theme || themeManager.getActiveTheme();
-  const showLineNumbers = hideLineNumbers
-    ? false
-    : settings.merged.ui.showLineNumbers;
+  const showLineNumbers = hideLineNumbers ? false : settings.merged.ui.showLineNumbers;
 
   // We force MaxSizedBox if availableHeight is provided, even if alternate buffer is enabled,
   // because this might be rendered in a constrained UI box (like tool confirmation).
@@ -340,10 +329,7 @@ export function colorizeCode({
               </Text>
             </Box>
           )}
-          <Text
-            color={disableColor ? undefined : activeTheme.defaultColor}
-            wrap="wrap"
-          >
+          <Text color={disableColor ? undefined : activeTheme.defaultColor} wrap="wrap">
             {contentToRender}
           </Text>
         </Box>

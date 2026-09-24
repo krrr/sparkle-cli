@@ -36,9 +36,7 @@ describe('Storage – initialize', () => {
 
   beforeEach(() => {
     ProjectRegistry.prototype.initialize = vi.fn().mockResolvedValue(undefined);
-    ProjectRegistry.prototype.getShortId = vi
-      .fn()
-      .mockReturnValue(PROJECT_SLUG);
+    ProjectRegistry.prototype.getShortId = vi.fn().mockReturnValue(PROJECT_SLUG);
     storage = new Storage(projectRoot);
     vi.clearAllMocks();
   });
@@ -52,9 +50,9 @@ describe('Storage – initialize', () => {
     // Verify registry initialization
     expect(ProjectRegistry).toHaveBeenCalled();
     expect(vi.mocked(ProjectRegistry).prototype.initialize).toHaveBeenCalled();
-    expect(
-      vi.mocked(ProjectRegistry).prototype.getShortId,
-    ).toHaveBeenCalledWith(projectRoot);
+    expect(vi.mocked(ProjectRegistry).prototype.getShortId).toHaveBeenCalledWith(
+      projectRoot,
+    );
 
     // Verify identifier is set by checking a path
     expect(storage.getProjectTempDir()).toContain(PROJECT_SLUG);
@@ -81,9 +79,7 @@ describe('Storage - Security', () => {
     vi.mocked(homedir).mockReturnValue('');
 
     // .sparkle falls back for backward compatibility
-    expect(Storage.getGlobalGeminiDir()).toBe(
-      path.join(os.tmpdir(), SPARKLE_DIR),
-    );
+    expect(Storage.getGlobalGeminiDir()).toBe(path.join(os.tmpdir(), SPARKLE_DIR));
 
     // .agents returns empty to avoid insecure fallback WITHOUT throwing error
     expect(Storage.getGlobalAgentsDir()).toBe('');
@@ -97,9 +93,7 @@ describe('Storage – additional helpers', () => {
   const storage = new Storage(projectRoot);
 
   beforeEach(() => {
-    ProjectRegistry.prototype.getShortId = vi
-      .fn()
-      .mockReturnValue(PROJECT_SLUG);
+    ProjectRegistry.prototype.getShortId = vi.fn().mockReturnValue(PROJECT_SLUG);
   });
 
   it('getWorkspaceSettingsPath returns project/.sparkle/settings.json', () => {
@@ -150,11 +144,7 @@ describe('Storage – additional helpers', () => {
   });
 
   it('getMcpOAuthTokensPath returns ~/.sparkle/mcp-oauth-tokens.json', () => {
-    const expected = path.join(
-      os.homedir(),
-      SPARKLE_DIR,
-      'mcp-oauth-tokens.json',
-    );
+    const expected = path.join(os.homedir(), SPARKLE_DIR, 'mcp-oauth-tokens.json');
     expect(Storage.getMcpOAuthTokensPath()).toBe(expected);
   });
 
@@ -168,9 +158,7 @@ describe('Storage – additional helpers', () => {
   it('getProjectPlansDir returns ~/.sparkle/data/<identifier>/<sessionId>/plans when sessionId is provided', async () => {
     const sessionId = 'test-session-id';
     const storageWithSession = new Storage(projectRoot, sessionId);
-    ProjectRegistry.prototype.getShortId = vi
-      .fn()
-      .mockReturnValue(PROJECT_SLUG);
+    ProjectRegistry.prototype.getShortId = vi.fn().mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
     const dataDir = storageWithSession.getProjectDataDir();
     const expected = path.join(dataDir, sessionId, 'plans');
@@ -187,9 +175,7 @@ describe('Storage – additional helpers', () => {
   it('getProjectTrackerDir returns ~/.sparkle/data/<identifier>/<sessionId>/tracker when sessionId is provided', async () => {
     const sessionId = 'test-session-id';
     const storageWithSession = new Storage(projectRoot, sessionId);
-    ProjectRegistry.prototype.getShortId = vi
-      .fn()
-      .mockReturnValue(PROJECT_SLUG);
+    ProjectRegistry.prototype.getShortId = vi.fn().mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
     const dataDir = storageWithSession.getProjectDataDir();
     const expected = path.join(dataDir, sessionId, 'tracker');
@@ -198,9 +184,7 @@ describe('Storage – additional helpers', () => {
 
   it('updates session-scoped directories when the sessionId changes', async () => {
     const storageWithSession = new Storage(projectRoot, 'session-one');
-    ProjectRegistry.prototype.getShortId = vi
-      .fn()
-      .mockReturnValue(PROJECT_SLUG);
+    ProjectRegistry.prototype.getShortId = vi.fn().mockReturnValue(PROJECT_SLUG);
     await storageWithSession.initialize();
     const dataDir = storageWithSession.getProjectDataDir();
 
@@ -255,9 +239,7 @@ describe('Storage – additional helpers', () => {
       // Sorted by mtime desc
       expect(sessions[0].filePath).toBe(path.join('chats', 'session-2.jsonl'));
       expect(sessions[1].filePath).toBe(path.join('chats', 'session-1.jsonl'));
-      expect(sessions[0].lastUpdated).toBe(
-        new Date('2026-02-02').toISOString(),
-      );
+      expect(sessions[0].lastUpdated).toBe(new Date('2026-02-02').toISOString());
 
       readdirSpy.mockRestore();
       statSpy.mockRestore();
@@ -375,9 +357,7 @@ describe('Storage - System Paths', () => {
     const result = Storage.getSystemSettingsPath();
 
     if (platform === 'darwin') {
-      expect(result).toBe(
-        '/Library/Application Support/GeminiCli/settings.json',
-      );
+      expect(result).toBe('/Library/Application Support/GeminiCli/settings.json');
     } else if (platform === 'win32') {
       expect(result).toBe('C:\\ProgramData\\sparkle-cli\\settings.json');
     } else {

@@ -107,9 +107,7 @@ describe('a2aUtils', () => {
         status: { state: 'failed' },
       };
 
-      const result = extractIdsFromResponse(
-        update as unknown as TaskStatusUpdateEvent,
-      );
+      const result = extractIdsFromResponse(update as unknown as TaskStatusUpdateEvent);
       expect(result.contextId).toBe('ctx-4');
       expect(result.taskId).toBe('task-4');
       expect(result.clearTaskId).toBe(true);
@@ -143,9 +141,7 @@ describe('a2aUtils', () => {
         status: { state: 'working' },
       };
 
-      const result = extractIdsFromResponse(
-        update as unknown as TaskStatusUpdateEvent,
-      );
+      const result = extractIdsFromResponse(update as unknown as TaskStatusUpdateEvent);
       expect(result.taskId).toBe('task-6');
       expect(result.contextId).toBe('ctx-6');
       expect(result.clearTaskId).toBe(false);
@@ -201,9 +197,7 @@ describe('a2aUtils', () => {
       };
       // The formatting logic in a2aUtils prefers name over uri
       expect(extractMessageText(message)).toContain('File: test.txt');
-      expect(extractMessageText(message)).toContain(
-        'File: http://example.com/doc',
-      );
+      expect(extractMessageText(message)).toContain('File: http://example.com/doc');
     });
 
     it('should handle mixed parts', () => {
@@ -216,9 +210,7 @@ describe('a2aUtils', () => {
           { kind: 'data', data: { value: 123 } } as DataPart,
         ],
       };
-      expect(extractMessageText(message)).toBe(
-        'Here is data:\nData: {"value":123}',
-      );
+      expect(extractMessageText(message)).toBe('Here is data:\nData: {"value":123}');
     });
 
     it('should return empty string for undefined or empty message', () => {
@@ -254,9 +246,7 @@ describe('a2aUtils', () => {
   describe('normalizeAgentCard', () => {
     it('should throw if input is not an object', () => {
       expect(() => normalizeAgentCard(null)).toThrow('Agent card is missing.');
-      expect(() => normalizeAgentCard(undefined)).toThrow(
-        'Agent card is missing.',
-      );
+      expect(() => normalizeAgentCard(undefined)).toThrow('Agent card is missing.');
       expect(() => normalizeAgentCard('not an object')).toThrow(
         'Agent card is missing.',
       );
@@ -336,9 +326,7 @@ describe('a2aUtils', () => {
       expect(normalized).not.toBe(raw);
       expect(normalized.additionalInterfaces).toBeDefined();
       // Original should not have additionalInterfaces added
-      expect(
-        (raw as Record<string, unknown>)['additionalInterfaces'],
-      ).toBeUndefined();
+      expect((raw as Record<string, unknown>)['additionalInterfaces']).toBeUndefined();
     });
   });
 

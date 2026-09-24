@@ -42,9 +42,7 @@ export function resolveAndValidatePlanPath(
 
   // 1. Handle case where agent provided an absolute path
   if (path.isAbsolute(trimmedPath)) {
-    if (
-      isSubpath(resolveToRealPath(plansDir), resolveToRealPath(trimmedPath))
-    ) {
+    if (isSubpath(resolveToRealPath(plansDir), resolveToRealPath(trimmedPath))) {
       return trimmedPath;
     }
   }
@@ -52,10 +50,7 @@ export function resolveAndValidatePlanPath(
   // 2. Handle case where agent provided a path relative to the project root
   const resolvedFromProjectRoot = path.resolve(projectRoot, trimmedPath);
   if (
-    isSubpath(
-      resolveToRealPath(plansDir),
-      resolveToRealPath(resolvedFromProjectRoot),
-    )
+    isSubpath(resolveToRealPath(plansDir), resolveToRealPath(resolvedFromProjectRoot))
   ) {
     return resolvedFromProjectRoot;
   }
@@ -66,9 +61,7 @@ export function resolveAndValidatePlanPath(
   const realPlansDir = resolveToRealPath(plansDir);
 
   if (!isSubpath(realPlansDir, realPath)) {
-    throw new Error(
-      PlanErrorMessages.PATH_ACCESS_DENIED(trimmedPath, plansDir),
-    );
+    throw new Error(PlanErrorMessages.PATH_ACCESS_DENIED(trimmedPath, plansDir));
   }
 
   return resolvedPath;
@@ -87,20 +80,13 @@ export async function validatePlanPath(
   projectRoot: string,
 ): Promise<string | null> {
   try {
-    const resolvedPath = resolveAndValidatePlanPath(
-      planPath,
-      plansDir,
-      projectRoot,
-    );
+    const resolvedPath = resolveAndValidatePlanPath(planPath, plansDir, projectRoot);
     if (!(await fileExists(resolvedPath))) {
       return PlanErrorMessages.FILE_NOT_FOUND(planPath);
     }
     return null;
   } catch {
-    return PlanErrorMessages.PATH_ACCESS_DENIED(
-      planPath,
-      resolveToRealPath(plansDir),
-    );
+    return PlanErrorMessages.PATH_ACCESS_DENIED(planPath, resolveToRealPath(plansDir));
   }
 }
 
@@ -109,9 +95,7 @@ export async function validatePlanPath(
  * @param planPath The path to the plan file.
  * @returns An error message if the file is empty or unreadable, or null if successful.
  */
-export async function validatePlanContent(
-  planPath: string,
-): Promise<string | null> {
+export async function validatePlanContent(planPath: string): Promise<string | null> {
   try {
     if (await isEmpty(planPath)) {
       return PlanErrorMessages.FILE_EMPTY;

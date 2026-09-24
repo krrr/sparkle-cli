@@ -72,10 +72,7 @@ try {
     stdio: 'inherit',
     cwd: root,
   });
-  if (
-    process.env.BUILD_SANDBOX === '1' ||
-    process.env.BUILD_SANDBOX === 'true'
-  ) {
+  if (process.env.BUILD_SANDBOX === '1' || process.env.BUILD_SANDBOX === 'true') {
     execSync('node scripts/build_sandbox.js -s', {
       stdio: 'inherit',
       cwd: root,

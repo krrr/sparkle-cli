@@ -88,10 +88,7 @@ describe('<SubagentGroupDisplay />', () => {
   });
 
   it('expands when availableTerminalHeight is undefined', async () => {
-    const { lastFrame, rerender } = await renderSubagentGroup(
-      mockToolCalls,
-      40,
-    );
+    const { lastFrame, rerender } = await renderSubagentGroup(mockToolCalls, 40);
 
     // Default collapsed view
     await waitFor(() => {

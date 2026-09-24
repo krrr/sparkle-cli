@@ -77,13 +77,8 @@ export function getOpenAiProvider(
   model: string,
 ): OpenAiProvider {
   const explicit =
-    (gcConfig.env && gcConfig.env['OPENAI_PROVIDER']) ||
-    process.env['OPENAI_PROVIDER'];
-  if (
-    explicit === 'deepseek' ||
-    explicit === 'openai' ||
-    explicit === 'custom'
-  ) {
+    (gcConfig.env && gcConfig.env['OPENAI_PROVIDER']) || process.env['OPENAI_PROVIDER'];
+  if (explicit === 'deepseek' || explicit === 'openai' || explicit === 'custom') {
     return explicit;
   }
   if (model.toLowerCase().startsWith('deepseek')) {
@@ -158,15 +153,12 @@ export async function createContentGenerator(
       return new LoggingContentGenerator(fakeGenerator, gcConfig);
     }
     if (gcConfig.fakeResponses) {
-      const fakeGenerator = await FakeContentGenerator.fromFile(
-        gcConfig.fakeResponses,
-      );
+      const fakeGenerator = await FakeContentGenerator.fromFile(gcConfig.fakeResponses);
       return new LoggingContentGenerator(fakeGenerator, gcConfig);
     }
     const version = await getVersion();
     const model = resolveModel(gcConfig.getModel(), gcConfig);
-    const customHeadersEnv =
-      process.env['SPARKLE_CLI_CUSTOM_HEADERS'] || undefined;
+    const customHeadersEnv = process.env['SPARKLE_CLI_CUSTOM_HEADERS'] || undefined;
     const clientName = gcConfig.getClientName();
     const surface = determineSurface();
 
@@ -189,9 +181,7 @@ export async function createContentGenerator(
 
       userAgent = `CloudCodeVSCode/${version} (aidev_client; os_type=${osType}; os_version=${osVersion}; arch=${arch}; host_path=${hostPath}; proxy_client=geminicli)`;
     } else {
-      const userAgentPrefix = clientName
-        ? `SparkleCLI-${clientName}`
-        : 'SparkleCLI';
+      const userAgentPrefix = clientName ? `SparkleCLI-${clientName}` : 'SparkleCLI';
       userAgent = `${userAgentPrefix}/${version}/${model} (${process.platform}; ${process.arch}; ${surface})`;
     }
 

@@ -1,8 +1,7 @@
 # Sparkle CLI keyboard shortcuts
 
-Sparkle CLI ships with a set of default keyboard shortcuts for editing input,
-navigating history, and controlling the UI. Use this reference to learn the
-available combinations.
+Sparkle CLI ships with a set of default keyboard shortcuts for editing input, navigating
+history, and controlling the UI. Use this reference to learn the available combinations.
 
 <!-- KEYBINDINGS-AUTOGEN:START -->
 
@@ -150,9 +149,9 @@ You can add alternative keybindings or remove default keybindings by creating a
 
 ### Configuration Format
 
-The configuration uses a JSON array of objects, similar to VS Code's keybinding
-schema. Each object must specify a `command` from the reference tables above and
-a `key` combination.
+The configuration uses a JSON array of objects, similar to VS Code's keybinding schema.
+Each object must specify a `command` from the reference tables above and a `key`
+combination.
 
 ```json
 [
@@ -187,20 +186,19 @@ a `key` combination.
 ]
 ```
 
-- **Unbinding** To remove an existing or default keybinding, prefix a minus sign
-  (`-`) to the `command` name.
-- **No Auto-unbinding** The same key can be bound to multiple commands in
-  different contexts at the same time. Therefore, creating a binding does not
-  automatically unbind the key from other commands.
-- **Explicit Modifiers**: Key matching is explicit. For example, a binding for
-  `ctrl+f` will only trigger on exactly `ctrl+f`, not `ctrl+shift+f` or
-  `alt+ctrl+f`.
-- **Literal Characters**: Terminals often translate complex key combinations
-  (especially on macOS with the `Option` key) into special characters, losing
-  modifier and keystroke information along the way. For example,`shift+5` might
-  be sent as `%`. In these cases, you must bind to the literal character `%` as
-  bindings to `shift+5` will never fire. To see precisely what is being sent,
-  enable `Debug Keystroke Logging` and hit f12 to open the debug log console.
+- **Unbinding** To remove an existing or default keybinding, prefix a minus sign (`-`)
+  to the `command` name.
+- **No Auto-unbinding** The same key can be bound to multiple commands in different
+  contexts at the same time. Therefore, creating a binding does not automatically unbind
+  the key from other commands.
+- **Explicit Modifiers**: Key matching is explicit. For example, a binding for `ctrl+f`
+  will only trigger on exactly `ctrl+f`, not `ctrl+shift+f` or `alt+ctrl+f`.
+- **Literal Characters**: Terminals often translate complex key combinations (especially
+  on macOS with the `Option` key) into special characters, losing modifier and keystroke
+  information along the way. For example,`shift+5` might be sent as `%`. In these cases,
+  you must bind to the literal character `%` as bindings to `shift+5` will never fire.
+  To see precisely what is being sent, enable `Debug Keystroke Logging` and hit f12 to
+  open the debug log console.
 - **Key Modifiers**: The supported key modifiers are:
   - `ctrl`
   - `shift`,
@@ -208,10 +206,9 @@ a `key` combination.
   - `cmd` (synonym: `meta`)
 - **Base Key**: The base key can be any single unicode code point or any of the
   following special keys:
-  - **Navigation**: `up`, `down`, `left`, `right`, `home`, `end`, `pageup`,
-    `pagedown`
-  - **Actions**: `enter`, `escape`, `tab`, `space`, `backspace`, `delete`,
-    `clear`, `insert`, `printscreen`
+  - **Navigation**: `up`, `down`, `left`, `right`, `home`, `end`, `pageup`, `pagedown`
+  - **Actions**: `enter`, `escape`, `tab`, `space`, `backspace`, `delete`, `clear`,
+    `insert`, `printscreen`
   - **Toggles**: `capslock`, `numlock`, `scrolllock`, `pausebreak`
   - **Function Keys**: `f1` through `f35`
   - **Numpad**: `numpad0` through `numpad9`, `numpad_add`, `numpad_subtract`,
@@ -219,40 +216,38 @@ a `key` combination.
 
 ## Additional context-specific shortcuts
 
-- `Option+B/F/M` (macOS only): Are interpreted as `Cmd+B/F/M` even if your
-  terminal isn't configured to send Meta with Option.
+- `Option+B/F/M` (macOS only): Are interpreted as `Cmd+B/F/M` even if your terminal
+  isn't configured to send Meta with Option.
 - `!` on an empty prompt: Enter or exit shell mode.
-- `?` on an empty prompt: Toggle the shortcuts panel above the input. Press
-  `Esc`, `Backspace`, any printable key, or a registered app hotkey to close it.
-  The panel also auto-hides while the agent is running/streaming or when
-  action-required dialogs are shown. Press `?` again to close the panel and
-  insert a `?` into the prompt.
-- `Tab` + `Tab` (while typing in the prompt): Toggle between minimal and full UI
-  details when no completion/search interaction is active. The selected mode is
-  remembered for future sessions. Full UI remains the default on first run, and
-  single `Tab` keeps its existing completion/focus behavior.
-- `Shift + Tab` (while typing in the prompt): Cycle approval modes: default,
-  auto-edit, and plan (skipped when agent is busy).
-- `\` (at end of a line) + `Enter`: Insert a newline without leaving single-line
-  mode.
-- `Esc` pressed twice quickly: Clear the input prompt if it is not empty,
-  otherwise browse and rewind previous interactions.
-- `Up Arrow` / `Down Arrow`: When the cursor is at the top or bottom of a
-  single-line input, navigate backward or forward through prompt history.
-- `Number keys (1-9, multi-digit)` inside selection dialogs: Jump directly to
-  the numbered radio option and confirm when the full number is entered.
-- `Ctrl + O`: Expand or collapse paste placeholders (`[Pasted Text: X lines]`)
-  inline when the cursor is over the placeholder.
+- `?` on an empty prompt: Toggle the shortcuts panel above the input. Press `Esc`,
+  `Backspace`, any printable key, or a registered app hotkey to close it. The panel also
+  auto-hides while the agent is running/streaming or when action-required dialogs are
+  shown. Press `?` again to close the panel and insert a `?` into the prompt.
+- `Tab` + `Tab` (while typing in the prompt): Toggle between minimal and full UI details
+  when no completion/search interaction is active. The selected mode is remembered for
+  future sessions. Full UI remains the default on first run, and single `Tab` keeps its
+  existing completion/focus behavior.
+- `Shift + Tab` (while typing in the prompt): Cycle approval modes: default, auto-edit,
+  and plan (skipped when agent is busy).
+- `\` (at end of a line) + `Enter`: Insert a newline without leaving single-line mode.
+- `Esc` pressed twice quickly: Clear the input prompt if it is not empty, otherwise
+  browse and rewind previous interactions.
+- `Up Arrow` / `Down Arrow`: When the cursor is at the top or bottom of a single-line
+  input, navigate backward or forward through prompt history.
+- `Number keys (1-9, multi-digit)` inside selection dialogs: Jump directly to the
+  numbered radio option and confirm when the full number is entered.
+- `Ctrl + O`: Expand or collapse paste placeholders (`[Pasted Text: X lines]`) inline
+  when the cursor is over the placeholder.
 - `Ctrl + X` (while a plan is presented): Open the plan in an external editor to
-  [collaboratively edit or comment](../cli/plan-mode.md#collaborative-plan-editing)
-  on the implementation strategy.
-- `Double-click` on a paste placeholder (alternate buffer mode only): Expand to
-  view full content inline. Double-click again to collapse.
+  [collaboratively edit or comment](../cli/plan-mode.md#collaborative-plan-editing) on
+  the implementation strategy.
+- `Double-click` on a paste placeholder (alternate buffer mode only): Expand to view
+  full content inline. Double-click again to collapse.
 
 ## Vi mode shortcuts
 
-When vim mode is enabled with `/vim` or `general.vimMode: true`, Sparkle CLI
-supports NORMAL and INSERT modes.
+When vim mode is enabled with `/vim` or `general.vimMode: true`, Sparkle CLI supports
+NORMAL and INSERT modes.
 
 ### Mode switching
 
@@ -288,8 +283,8 @@ supports NORMAL and INSERT modes.
 | Go to last line                   | `G`             |
 | Go to line N                      | `N G` or `N gg` |
 
-Counts are supported for navigation commands. For example, `5j` moves down five
-lines and `3w` moves forward three words.
+Counts are supported for navigation commands. For example, `5j` moves down five lines
+and `3w` moves forward three words.
 
 ### Editing in NORMAL mode
 
@@ -323,8 +318,8 @@ lines and `3w` moves forward three words.
 | Undo last change               | `u`   |
 | Repeat last command            | `.`   |
 
-Counts are also supported for editing commands. For example, `3dd` deletes three
-lines and `2cw` changes two words.
+Counts are also supported for editing commands. For example, `3dd` deletes three lines
+and `2cw` changes two words.
 
 ### Find, replace, yank, and paste in NORMAL mode
 
@@ -346,15 +341,15 @@ lines and `2cw` changes two words.
 | Paste after cursor                        | `p`         |
 | Paste before cursor                       | `P`         |
 
-Delete and change operators also compose with character-find motions, so
-commands such as `dfx`, `dtx`, `cFx`, and `cTx` are supported.
+Delete and change operators also compose with character-find motions, so commands such
+as `dfx`, `dtx`, `cFx`, and `cTx` are supported.
 
 ## Limitations
 
 - On [Windows Terminal](https://en.wikipedia.org/wiki/Windows_Terminal):
   - `shift+enter` is only supported in version 1.25 and higher.
   - `shift+tab`
-    [is not supported](https://github.com/google-gemini/gemini-cli/issues/20314)
-    on Node 20 and earlier versions of Node 22.
+    [is not supported](https://github.com/google-gemini/gemini-cli/issues/20314) on Node
+    20 and earlier versions of Node 22.
 - On macOS's [Terminal](<https://en.wikipedia.org/wiki/Terminal_(macOS)>):
   - `shift+enter` is not supported.

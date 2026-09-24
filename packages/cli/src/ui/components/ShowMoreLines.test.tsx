@@ -53,9 +53,7 @@ describe('ShowMoreLines', () => {
     const { lastFrame, unmount } = await render(
       <ShowMoreLines constrainHeight={true} />,
     );
-    expect(lastFrame().toLowerCase()).toContain(
-      'press ctrl+o to show more lines',
-    );
+    expect(lastFrame().toLowerCase()).toContain('press ctrl+o to show more lines');
     unmount();
   });
 
@@ -74,9 +72,7 @@ describe('ShowMoreLines', () => {
       const { lastFrame, unmount } = await render(
         <ShowMoreLines constrainHeight={true} />,
       );
-      expect(lastFrame().toLowerCase()).toContain(
-        'press ctrl+o to show more lines',
-      );
+      expect(lastFrame().toLowerCase()).toContain('press ctrl+o to show more lines');
       unmount();
     },
   );
@@ -90,9 +86,7 @@ describe('ShowMoreLines', () => {
     const { lastFrame, unmount } = await render(
       <ShowMoreLines constrainHeight={true} isOverflowing={true} />,
     );
-    expect(lastFrame().toLowerCase()).toContain(
-      'press ctrl+o to show more lines',
-    );
+    expect(lastFrame().toLowerCase()).toContain('press ctrl+o to show more lines');
     unmount();
   });
 

@@ -15,8 +15,7 @@ evalTest('USUALLY_PASSES', {
     console.log('TOOL LOGS:', JSON.stringify(toolLogs, null, 2));
 
     const createEventCall = toolLogs.find(
-      (log) =>
-        log.toolRequest.name === 'mcp_workspace-server_calendar.createEvent',
+      (log) => log.toolRequest.name === 'mcp_workspace-server_calendar.createEvent',
     );
 
     expect(createEventCall).toBeDefined();

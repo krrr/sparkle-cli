@@ -41,8 +41,7 @@ export const useTurnActivityMonitor = (
 
   useEffect(() => {
     const isNowResponding = streamingState === StreamingState.Responding;
-    const wasResponding =
-      prevStreamingStateRef.current === StreamingState.Responding;
+    const wasResponding = prevStreamingStateRef.current === StreamingState.Responding;
     const ptyChanged = activePtyId !== prevPtyIdRef.current;
 
     if (isNowResponding && (!wasResponding || ptyChanged)) {
@@ -63,8 +62,7 @@ export const useTurnActivityMonitor = (
       pendingToolCalls.some((tc) => {
         if (tc.request.name !== 'run_shell_command') return false;
 
-        const command =
-          (tc.request.args as { command?: string })?.command || '';
+        const command = (tc.request.args as { command?: string })?.command || '';
         return hasRedirection(command);
       }),
     [pendingToolCalls],

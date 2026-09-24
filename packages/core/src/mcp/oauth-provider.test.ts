@@ -225,10 +225,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -329,10 +326,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -407,10 +401,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -495,10 +486,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -605,10 +593,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -677,10 +662,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -707,10 +689,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -737,10 +716,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -778,9 +754,7 @@ describe('MCPOAuthProvider', () => {
           configWithoutAuth,
           'https://api.example.com',
         ),
-      ).rejects.toThrow(
-        'Failed to discover OAuth configuration from MCP server',
-      );
+      ).rejects.toThrow('Failed to discover OAuth configuration from MCP server');
     });
 
     it('should handle authorization server metadata discovery failure', async () => {
@@ -824,10 +798,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 0);
       });
 
@@ -857,10 +828,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -896,10 +864,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -973,10 +938,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1008,16 +970,11 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBeNull();
     });
@@ -1076,10 +1033,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
       mockHttpServer.address.mockReturnValue({
@@ -1100,10 +1054,7 @@ describe('MCPOAuthProvider', () => {
       const authProvider = new MCPOAuthProvider();
       await authProvider.authenticate('test-server', configWithPort);
 
-      expect(mockHttpServer.listen).toHaveBeenCalledWith(
-        12345,
-        expect.any(Function),
-      );
+      expect(mockHttpServer.listen).toHaveBeenCalledWith(12345, expect.any(Function));
     });
 
     it('should ignore invalid ports in redirectUri', async () => {
@@ -1128,10 +1079,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1148,10 +1096,7 @@ describe('MCPOAuthProvider', () => {
       await authProvider.authenticate('test-server', configWithInvalidPort);
 
       // Should be called with 0 (OS assigned) because the port was invalid
-      expect(mockHttpServer.listen).toHaveBeenCalledWith(
-        0,
-        expect.any(Function),
-      );
+      expect(mockHttpServer.listen).toHaveBeenCalledWith(0, expect.any(Function));
     });
 
     it('should not default to privileged ports when redirectUri has no port', async () => {
@@ -1176,10 +1121,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1196,10 +1138,7 @@ describe('MCPOAuthProvider', () => {
       await authProvider.authenticate('test-server', configNoPort);
 
       // Should be called with 0 (OS assigned), not 80
-      expect(mockHttpServer.listen).toHaveBeenCalledWith(
-        0,
-        expect.any(Function),
-      );
+      expect(mockHttpServer.listen).toHaveBeenCalledWith(0, expect.any(Function));
     });
     it('should include server name in the authentication message', async () => {
       // Mock HTTP server callback
@@ -1220,10 +1159,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1239,11 +1175,7 @@ describe('MCPOAuthProvider', () => {
 
       const authProvider = new MCPOAuthProvider();
 
-      await authProvider.authenticate(
-        'production-server',
-        mockConfig,
-        undefined,
-      );
+      await authProvider.authenticate('production-server', mockConfig, undefined);
 
       expect(getConsentForOauth).toHaveBeenCalledWith(
         expect.stringContaining('production-server'),
@@ -1266,9 +1198,7 @@ describe('MCPOAuthProvider', () => {
         }, 0);
         return mockHttpServer as unknown as http.Server;
       });
-      mockHttpServer.listen.mockImplementation((_port, callback) =>
-        callback?.(),
-      );
+      mockHttpServer.listen.mockImplementation((_port, callback) => callback?.());
       mockFetch.mockResolvedValue(
         createMockResponse({
           ok: true,
@@ -1286,9 +1216,7 @@ describe('MCPOAuthProvider', () => {
 
     it('should throw FatalCancellationError when consent is denied', async () => {
       vi.mocked(getConsentForOauth).mockResolvedValue(false);
-      mockHttpServer.listen.mockImplementation((_port, callback) =>
-        callback?.(),
-      );
+      mockHttpServer.listen.mockImplementation((_port, callback) => callback?.());
 
       // Use fake timers to avoid hanging from the 5-minute timeout in startCallbackServer
       vi.useFakeTimers();
@@ -1397,16 +1325,11 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        validCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(validCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(false);
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBe('access_token_123');
     });
@@ -1421,9 +1344,7 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       const refreshResponse = {
@@ -1443,10 +1364,7 @@ describe('MCPOAuthProvider', () => {
       );
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBe('new_access_token');
       expect(tokenStorage.saveToken).toHaveBeenCalledWith(
@@ -1468,9 +1386,7 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       mockFetch.mockResolvedValueOnce(
@@ -1507,10 +1423,7 @@ describe('MCPOAuthProvider', () => {
       vi.mocked(tokenStorage.getCredentials).mockResolvedValue(null);
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBeNull();
     });
@@ -1525,9 +1438,7 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
       vi.mocked(tokenStorage.deleteCredentials).mockResolvedValue(undefined);
 
@@ -1541,15 +1452,10 @@ describe('MCPOAuthProvider', () => {
       );
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBeNull();
-      expect(tokenStorage.deleteCredentials).toHaveBeenCalledWith(
-        'test-server',
-      );
+      expect(tokenStorage.deleteCredentials).toHaveBeenCalledWith('test-server');
       expect(coreEvents.emitFeedback).toHaveBeenCalledWith(
         'error',
         expect.stringContaining('Failed to refresh auth token'),
@@ -1571,16 +1477,11 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        tokenWithoutRefresh,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(tokenWithoutRefresh);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidToken(
-        'test-server',
-        mockConfig,
-      );
+      const result = await authProvider.getValidToken('test-server', mockConfig);
 
       expect(result).toBeNull();
     });
@@ -1599,9 +1500,7 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       mockFetch.mockResolvedValueOnce(
@@ -1614,10 +1513,7 @@ describe('MCPOAuthProvider', () => {
       );
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidTokenWithMetadata(
-        'test-server',
-        {},
-      );
+      const result = await authProvider.getValidTokenWithMetadata('test-server', {});
 
       expect(result?.accessToken).toBe('access_token_123');
       expect(mockFetch.mock.calls[0][1].body).toContain(
@@ -1643,9 +1539,7 @@ describe('MCPOAuthProvider', () => {
       };
 
       const tokenStorage = new MCPOAuthTokenStorage();
-      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(
-        expiredCredentials,
-      );
+      vi.mocked(tokenStorage.getCredentials).mockResolvedValue(expiredCredentials);
       vi.mocked(tokenStorage.isTokenExpired).mockReturnValue(true);
 
       mockFetch.mockResolvedValueOnce(
@@ -1658,10 +1552,9 @@ describe('MCPOAuthProvider', () => {
       );
 
       const authProvider = new MCPOAuthProvider();
-      const result = await authProvider.getValidTokenWithMetadata(
-        'test-server',
-        { clientId: 'configured-client-id' },
-      );
+      const result = await authProvider.getValidTokenWithMetadata('test-server', {
+        clientId: 'configured-client-id',
+      });
 
       expect(result?.accessToken).toBe('access_token_123');
       expect(mockFetch.mock.calls[0][1].body).toContain(
@@ -1690,10 +1583,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1740,10 +1630,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1797,10 +1684,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1851,10 +1735,7 @@ describe('MCPOAuthProvider', () => {
             writeHead: vi.fn(),
             end: vi.fn(),
           };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -1941,10 +1822,7 @@ describe('MCPOAuthProvider', () => {
             url: '/oauth/callback?code=auth_code&state=bW9ja19zdGF0ZV8xNl9ieXRlcw',
           };
           const mockRes = { writeHead: vi.fn(), end: vi.fn() };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -2030,10 +1908,7 @@ describe('MCPOAuthProvider', () => {
             url: '/oauth/callback?code=auth_code&state=bW9ja19zdGF0ZV8xNl9ieXRlcw',
           };
           const mockRes = { writeHead: vi.fn(), end: vi.fn() };
-          (callbackHandler as (req: unknown, res: unknown) => void)(
-            mockReq,
-            mockRes,
-          );
+          (callbackHandler as (req: unknown, res: unknown) => void)(mockReq, mockRes);
         }, 10);
       });
 
@@ -2084,27 +1959,22 @@ describe('MCPOAuthProvider', () => {
         }>;
       };
 
-      vi.spyOn(
-        OAuthUtils,
-        'discoverAuthorizationServerMetadata',
-      ).mockImplementation(async (issuer) => {
-        if (issuer === 'http://localhost:8888/realms/my-realm') {
-          return registrationMetadata;
-        }
-        return null;
-      });
+      vi.spyOn(OAuthUtils, 'discoverAuthorizationServerMetadata').mockImplementation(
+        async (issuer) => {
+          if (issuer === 'http://localhost:8888/realms/my-realm') {
+            return registrationMetadata;
+          }
+          return null;
+        },
+      );
 
-      const result =
-        await providerWithAccess.discoverAuthServerMetadataForRegistration(
-          'http://localhost:8888/realms/my-realm/protocol/openid-connect/auth',
-        );
+      const result = await providerWithAccess.discoverAuthServerMetadataForRegistration(
+        'http://localhost:8888/realms/my-realm/protocol/openid-connect/auth',
+      );
 
       expect(
         vi.mocked(OAuthUtils.discoverAuthorizationServerMetadata).mock.calls,
-      ).toEqual([
-        ['http://localhost:8888'],
-        ['http://localhost:8888/realms/my-realm'],
-      ]);
+      ).toEqual([['http://localhost:8888'], ['http://localhost:8888/realms/my-realm']]);
       expect(result.issuerUrl).toBe('http://localhost:8888/realms/my-realm');
       expect(result.metadata).toBe(registrationMetadata);
     });
@@ -2122,29 +1992,25 @@ describe('MCPOAuthProvider', () => {
 
       const oktaMetadata: OAuthAuthorizationServerMetadata = {
         issuer: 'https://auth.okta.local/oauth2/default',
-        authorization_endpoint:
-          'https://auth.okta.local/oauth2/default/v1/authorize',
+        authorization_endpoint: 'https://auth.okta.local/oauth2/default/v1/authorize',
         token_endpoint: 'https://auth.okta.local/oauth2/default/v1/token',
-        registration_endpoint:
-          'https://auth.okta.local/oauth2/default/v1/register',
+        registration_endpoint: 'https://auth.okta.local/oauth2/default/v1/register',
       };
 
       const attempts: string[] = [];
-      vi.spyOn(
-        OAuthUtils,
-        'discoverAuthorizationServerMetadata',
-      ).mockImplementation(async (issuer) => {
-        attempts.push(issuer);
-        if (issuer === 'https://auth.okta.local/oauth2/default') {
-          return oktaMetadata;
-        }
-        return null;
-      });
+      vi.spyOn(OAuthUtils, 'discoverAuthorizationServerMetadata').mockImplementation(
+        async (issuer) => {
+          attempts.push(issuer);
+          if (issuer === 'https://auth.okta.local/oauth2/default') {
+            return oktaMetadata;
+          }
+          return null;
+        },
+      );
 
-      const result =
-        await providerWithAccess.discoverAuthServerMetadataForRegistration(
-          'https://auth.okta.local/oauth2/default/v1/authorize',
-        );
+      const result = await providerWithAccess.discoverAuthServerMetadataForRegistration(
+        'https://auth.okta.local/oauth2/default/v1/authorize',
+      );
 
       expect(attempts).toEqual([
         'https://auth.okta.local',

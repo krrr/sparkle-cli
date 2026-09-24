@@ -50,9 +50,7 @@ export function useSessionResume({
   const loadHistoryForResume = useCallback(
     async (
       uiHistory: HistoryItemWithoutId[],
-      clientHistory: Array<
-        { role: 'user' | 'model'; parts: Part[] } | HistoryTurn
-      >,
+      clientHistory: Array<{ role: 'user' | 'model'; parts: Part[] } | HistoryTurn>,
       resumedData: ResumedSessionData,
     ) => {
       // Wait for the client.

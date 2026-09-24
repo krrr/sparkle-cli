@@ -1,19 +1,19 @@
 # Build Sparkle CLI extensions
 
-Sparkle CLI extensions let you expand the capabilities of Sparkle CLI by adding
-custom tools, commands, and context. This guide walks you through creating your
-first extension, from setting up a template to adding custom functionality and
-linking it for local development.
+Sparkle CLI extensions let you expand the capabilities of Sparkle CLI by adding custom
+tools, commands, and context. This guide walks you through creating your first
+extension, from setting up a template to adding custom functionality and linking it for
+local development.
 
 ## Prerequisites
 
-Before you start, ensure you have Sparkle CLI installed and a basic
-understanding of Node.js.
+Before you start, ensure you have Sparkle CLI installed and a basic understanding of
+Node.js.
 
 ## Extension features
 
-Extensions offer several ways to customize Sparkle CLI. Use this table to decide
-which features your extension needs.
+Extensions offer several ways to customize Sparkle CLI. Use this table to decide which
+features your extension needs.
 
 | Feature                                                        | What it is                                                                                                                | When to use it                                                                                                                                                                                                                                                                                 | Invoked by            |
 | :------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------- |
@@ -26,11 +26,11 @@ which features your extension needs.
 
 ## Step 1: Create a new extension
 
-The easiest way to start is by using a built-in template. We'll use the
-`mcp-server` example as our foundation.
+The easiest way to start is by using a built-in template. We'll use the `mcp-server`
+example as our foundation.
 
-Run the following command to create a new directory called `my-first-extension`
-with the template files:
+Run the following command to create a new directory called `my-first-extension` with the
+template files:
 
 ```bash
 sparkle extensions new my-first-extension mcp-server
@@ -70,9 +70,8 @@ The manifest file tells Sparkle CLI how to load and use your extension.
 - `name`: The unique name for your extension.
 - `version`: The version of your extension.
 - `mcpServers`: Defines Model Context Protocol (MCP) servers to add new tools.
-  - `command`, `args`, `cwd`: Specify how to start your server. The
-    `${extensionPath}` variable is replaced with the absolute path to your
-    extension's directory.
+  - `command`, `args`, `cwd`: Specify how to start your server. The `${extensionPath}`
+    variable is replaced with the absolute path to your extension's directory.
 
 ### `example.js`
 
@@ -103,9 +102,7 @@ server.registerTool(
     inputSchema: z.object({}).shape,
   },
   async () => {
-    const apiResponse = await fetch(
-      'https://jsonplaceholder.typicode.com/posts',
-    );
+    const apiResponse = await fetch('https://jsonplaceholder.typicode.com/posts');
     const posts = await apiResponse.json();
     const response = { posts: posts.slice(0, 5) };
     return {
@@ -125,13 +122,13 @@ await server.connect(transport);
 
 ### `package.json`
 
-The standard configuration file for a Node.js project. It defines dependencies
-and scripts for your extension.
+The standard configuration file for a Node.js project. It defines dependencies and
+scripts for your extension.
 
 ## Step 3: Add extension settings
 
-Some extensions need configuration, such as API keys or user preferences. Let's
-add a setting for an API key.
+Some extensions need configuration, such as API keys or user preferences. Let's add a
+setting for an API key.
 
 1.  Open `sparkle-extension.json`.
 2.  Add a `settings` array to the configuration:
@@ -154,17 +151,17 @@ add a setting for an API key.
     }
     ```
 
-When a user installs this extension, Sparkle CLI will prompt them to enter the
-"API Key". The value will be stored securely in the system keychain (because
-`sensitive` is true) and injected into the MCP server's process as the
-`MY_SERVICE_API_KEY` environment variable.
+When a user installs this extension, Sparkle CLI will prompt them to enter the "API
+Key". The value will be stored securely in the system keychain (because `sensitive` is
+true) and injected into the MCP server's process as the `MY_SERVICE_API_KEY` environment
+variable.
 
-> **Important (Environment Variable Sanitization):** For security reasons,
-> sensitive environment variables are filtered out and not passed to extensions
-> or MCP servers by default. Extensions will _only_ have access to environment
-> variables that are explicitly declared in the `settings` array using the
-> `envVar` property, plus a few standard safe variables. Do not expect host
-> environment variables to be available otherwise.
+> **Important (Environment Variable Sanitization):** For security reasons, sensitive
+> environment variables are filtered out and not passed to extensions or MCP servers by
+> default. Extensions will _only_ have access to environment variables that are
+> explicitly declared in the `settings` array using the `envVar` property, plus a few
+> standard safe variables. Do not expect host environment variables to be available
+> otherwise.
 
 ## Step 4: Link your extension
 
@@ -179,16 +176,15 @@ Link your extension to your Sparkle CLI installation for local development.
 
 2.  **Link the extension:**
 
-    The `link` command creates a symbolic link from Sparkle CLI extensions
-    directory to your development directory. Changes you make are reflected
-    immediately.
+    The `link` command creates a symbolic link from Sparkle CLI extensions directory to
+    your development directory. Changes you make are reflected immediately.
 
     ```bash
     sparkle extensions link .
     ```
 
-Restart your Sparkle CLI session to use the new `fetch_posts` tool. Test it by
-asking: "fetch posts".
+Restart your Sparkle CLI session to use the new `fetch_posts` tool. Test it by asking:
+"fetch posts".
 
 ## Step 5: Add a custom command
 
@@ -219,25 +215,24 @@ Custom commands create shortcuts for complex prompts.
     """
     ```
 
-    This command, `/fs:grep-code`, takes an argument, runs the `grep` shell
-    command, and pipes the results into a prompt for summarization.
+    This command, `/fs:grep-code`, takes an argument, runs the `grep` shell command, and
+    pipes the results into a prompt for summarization.
 
-After saving the file, restart Sparkle CLI. Run `/fs:grep-code "some pattern"`
-to use your new command.
+After saving the file, restart Sparkle CLI. Run `/fs:grep-code "some pattern"` to use
+your new command.
 
 ## Step 6: Add a custom `AGENTS.md`
 
-Provide persistent context to the model by adding an `AGENTS.md` file to your
-extension. This is useful for setting behavior or providing essential tool
-information.
+Provide persistent context to the model by adding an `AGENTS.md` file to your extension.
+This is useful for setting behavior or providing essential tool information.
 
 1.  Create a file named `AGENTS.md` in the root of your extension directory:
 
     ```markdown
     # My First Extension Instructions
 
-    You are an expert developer assistant. When the user asks you to fetch
-    posts, use the `fetch_posts` tool. Be concise in your responses.
+    You are an expert developer assistant. When the user asks you to fetch posts, use
+    the `fetch_posts` tool. Be concise in your responses.
     ```
 
 2.  Update your `sparkle-extension.json` to load this file:
@@ -257,13 +252,13 @@ information.
     }
     ```
 
-Restart Sparkle CLI. The model now has the context from your `AGENTS.md` file in
-every session where the extension is active.
+Restart Sparkle CLI. The model now has the context from your `AGENTS.md` file in every
+session where the extension is active.
 
 ## (Optional) Step 7: Add an Agent Skill
 
-[Agent Skills](../cli/skills.md) bundle specialized expertise and workflows.
-Skills are activated only when needed, which saves context tokens.
+[Agent Skills](../cli/skills.md) bundle specialized expertise and workflows. Skills are
+activated only when needed, which saves context tokens.
 
 1.  Create a `skills` directory and a subdirectory for your skill:
 
@@ -285,8 +280,8 @@ Skills are activated only when needed, which saves context tokens.
     ---
     name: security-audit
     description:
-      Expertise in auditing code for security vulnerabilities. Use when the user
-      asks to "check for security issues" or "audit" their changes.
+      Expertise in auditing code for security vulnerabilities. Use when the user asks to
+      "check for security issues" or "audit" their changes.
     ---
 
     # Security Auditor
@@ -298,18 +293,17 @@ Skills are activated only when needed, which saves context tokens.
     3. Suggest remediation steps for any findings.
     ```
 
-Sparkle CLI automatically discovers skills bundled with your extension. The
-model activates them when it identifies a relevant task.
+Sparkle CLI automatically discovers skills bundled with your extension. The model
+activates them when it identifies a relevant task.
 
 ## Step 8: Release your extension
 
-When your extension is ready, share it with others via a Git repository or
-GitHub Releases. Refer to the [Extension Releasing Guide](./releasing.md) for
-detailed instructions and learn how to list your extension in the gallery.
+When your extension is ready, share it with others via a Git repository or GitHub
+Releases. Refer to the [Extension Releasing Guide](./releasing.md) for detailed
+instructions and learn how to list your extension in the gallery.
 
 ## Next steps
 
-- [Extension reference](reference.md): Deeply understand the extension format,
-  commands, and configuration.
-- [Best practices](best-practices.md): Learn strategies for building great
-  extensions.
+- [Extension reference](reference.md): Deeply understand the extension format, commands,
+  and configuration.
+- [Best practices](best-practices.md): Learn strategies for building great extensions.

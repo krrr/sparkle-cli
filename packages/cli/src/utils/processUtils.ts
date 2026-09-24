@@ -145,8 +145,7 @@ export function getSpawnConfig(
       const existingNodeOptions = process.env['NODE_OPTIONS'] || '';
       // nodeArgs in our codebase are simple flags like --max-old-space-size=X
       // that do not contain spaces and do not require complex escaping.
-      newEnv['NODE_OPTIONS'] =
-        `${existingNodeOptions} ${nodeArgs.join(' ')}`.trim();
+      newEnv['NODE_OPTIONS'] = `${existingNodeOptions} ${nodeArgs.join(' ')}`.trim();
     }
     // Binary is its own entry point. To maintain the [node, script, ...args]
     // structure expected by the application (which uses slice(2)),

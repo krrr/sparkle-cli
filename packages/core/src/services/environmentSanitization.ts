@@ -49,62 +49,59 @@ export function sanitizeEnvironment(
   return results;
 }
 
-export const ALWAYS_ALLOWED_ENVIRONMENT_VARIABLES: ReadonlySet<string> =
-  new Set([
-    // Cross-platform
-    'PATH',
-    // Windows specific
-    'SYSTEMROOT',
-    'COMSPEC',
-    'PATHEXT',
-    'WINDIR',
-    'TEMP',
-    'TMP',
-    'USERPROFILE',
-    'SYSTEMDRIVE',
-    // Unix/Linux/macOS specific
-    'HOME',
-    'LANG',
-    'SHELL',
-    'TMPDIR',
-    'USER',
-    'LOGNAME',
-    // Terminal capability variables (needed by editors like vim/emacs and
-    // interactive commands like top)
-    'TERM',
-    'COLORTERM',
-    // GitHub Action-related variables
-    'ADDITIONAL_CONTEXT',
-    'AVAILABLE_LABELS',
-    'BRANCH_NAME',
-    'DESCRIPTION',
-    'EVENT_NAME',
-    'GITHUB_ENV',
-    'IS_PULL_REQUEST',
-    'ISSUES_TO_TRIAGE',
-    'ISSUE_BODY',
-    'ISSUE_NUMBER',
-    'ISSUE_TITLE',
-    'PULL_REQUEST_NUMBER',
-    'REPOSITORY',
-    'TITLE',
-    'TRIGGERING_ACTOR',
-  ]);
+export const ALWAYS_ALLOWED_ENVIRONMENT_VARIABLES: ReadonlySet<string> = new Set([
+  // Cross-platform
+  'PATH',
+  // Windows specific
+  'SYSTEMROOT',
+  'COMSPEC',
+  'PATHEXT',
+  'WINDIR',
+  'TEMP',
+  'TMP',
+  'USERPROFILE',
+  'SYSTEMDRIVE',
+  // Unix/Linux/macOS specific
+  'HOME',
+  'LANG',
+  'SHELL',
+  'TMPDIR',
+  'USER',
+  'LOGNAME',
+  // Terminal capability variables (needed by editors like vim/emacs and
+  // interactive commands like top)
+  'TERM',
+  'COLORTERM',
+  // GitHub Action-related variables
+  'ADDITIONAL_CONTEXT',
+  'AVAILABLE_LABELS',
+  'BRANCH_NAME',
+  'DESCRIPTION',
+  'EVENT_NAME',
+  'GITHUB_ENV',
+  'IS_PULL_REQUEST',
+  'ISSUES_TO_TRIAGE',
+  'ISSUE_BODY',
+  'ISSUE_NUMBER',
+  'ISSUE_TITLE',
+  'PULL_REQUEST_NUMBER',
+  'REPOSITORY',
+  'TITLE',
+  'TRIGGERING_ACTOR',
+]);
 
-export const NEVER_ALLOWED_ENVIRONMENT_VARIABLES: ReadonlySet<string> = new Set(
-  [
-    'CLIENT_ID',
-    'DB_URI',
-    'CONNECTION_STRING',
-    'AWS_DEFAULT_REGION',
-    'AZURE_CLIENT_ID',
-    'AZURE_TENANT_ID',
-    'SLACK_WEBHOOK_URL',
-    'TWILIO_ACCOUNT_SID',
-    'DATABASE_URL',
-    'FIREBASE_PROJECT_ID',
-  ],
-);
+export const NEVER_ALLOWED_ENVIRONMENT_VARIABLES: ReadonlySet<string> = new Set([
+  'CLIENT_ID',
+  'DB_URI',
+  'CONNECTION_STRING',
+  'AWS_DEFAULT_REGION',
+  'AZURE_CLIENT_ID',
+  'AZURE_TENANT_ID',
+  'SLACK_WEBHOOK_URL',
+  'TWILIO_ACCOUNT_SID',
+  'DATABASE_URL',
+  'FIREBASE_PROJECT_ID',
+]);
 
 export const NEVER_ALLOWED_NAME_PATTERNS = [
   /TOKEN/i,

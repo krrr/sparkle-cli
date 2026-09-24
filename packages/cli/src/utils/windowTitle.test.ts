@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import {
-  computeTerminalTitle,
-  type TerminalTitleOptions,
-} from './windowTitle.js';
+import { computeTerminalTitle, type TerminalTitleOptions } from './windowTitle.js';
 import { StreamingState } from '../ui/types.js';
 
 describe('computeTerminalTitle', () => {
@@ -43,8 +40,7 @@ describe('computeTerminalTitle', () => {
       exact: true,
     },
     {
-      description:
-        'active state title with "Working…" when thoughts are disabled',
+      description: 'active state title with "Working…" when thoughts are disabled',
       args: {
         streamingState: StreamingState.Responding,
         thoughtSubject: 'Reading files',

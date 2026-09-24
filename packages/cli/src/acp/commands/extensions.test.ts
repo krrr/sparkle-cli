@@ -6,10 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { CommandContext } from './types.js';
-import {
-  DisableExtensionCommand,
-  UninstallExtensionCommand,
-} from './extensions.js';
+import { DisableExtensionCommand, UninstallExtensionCommand } from './extensions.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
 
 const mockGetErrorMessage = vi.hoisted(() => vi.fn());

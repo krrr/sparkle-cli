@@ -13,9 +13,7 @@ import {
 } from 'sparkle-cli-core/src/ide/detect-ide.js';
 
 vi.mock('sparkle-cli-core/src/ide/detect-ide.js', async () => {
-  const actual = await vi.importActual(
-    'sparkle-cli-core/src/ide/detect-ide.js',
-  );
+  const actual = await vi.importActual('sparkle-cli-core/src/ide/detect-ide.js');
   return {
     ...actual,
     detectIdeFromEnv: vi.fn(() => IDE_DEFINITIONS.vscode),
@@ -76,9 +74,7 @@ describe('activate', () => {
   let context: vscode.ExtensionContext;
 
   beforeEach(() => {
-    vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(
-      undefined,
-    );
+    vi.mocked(vscode.window.showInformationMessage).mockResolvedValue(undefined);
     context = {
       subscriptions: [],
       environmentVariableCollection: {

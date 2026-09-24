@@ -143,9 +143,7 @@ export class MCPOAuthProvider {
     return OAuthUtils.discoverOAuthConfig(mcpServerUrl);
   }
 
-  private async discoverAuthServerMetadataForRegistration(
-    issuer: string,
-  ): Promise<{
+  private async discoverAuthServerMetadataForRegistration(issuer: string): Promise<{
     issuerUrl: string;
     metadata: NonNullable<
       Awaited<ReturnType<typeof OAuthUtils.discoverAuthorizationServerMetadata>>
@@ -185,9 +183,7 @@ export class MCPOAuthProvider {
       if (lastSegment && versionSegmentPattern.test(lastSegment)) {
         const withoutVersionPath = segments.slice(0, -1);
         if (withoutVersionPath.length) {
-          issuerCandidates.add(
-            `${authUrl.origin}/${withoutVersionPath.join('/')}`,
-          );
+          issuerCandidates.add(`${authUrl.origin}/${withoutVersionPath.join('/')}`);
         }
       }
     }
@@ -200,8 +196,7 @@ export class MCPOAuthProvider {
 
     for (const issuer of attemptedIssuers) {
       debugLogger.debug(`   Trying issuer URL: ${issuer}`);
-      const metadata =
-        await OAuthUtils.discoverAuthorizationServerMetadata(issuer);
+      const metadata = await OAuthUtils.discoverAuthorizationServerMetadata(issuer);
       if (metadata) {
         selectedIssuer = issuer;
         discoveredMetadata = metadata;
@@ -231,9 +226,7 @@ export class MCPOAuthProvider {
     try {
       return OAuthUtils.buildResourceParameter(mcpServerUrl);
     } catch (error) {
-      debugLogger.warn(
-        `Could not add resource parameter: ${getErrorMessage(error)}`,
-      );
+      debugLogger.warn(`Could not add resource parameter: ${getErrorMessage(error)}`);
       return undefined;
     }
   }
@@ -309,11 +302,10 @@ export class MCPOAuthProvider {
           const wwwAuthenticate = response.headers.get('www-authenticate');
 
           if (wwwAuthenticate) {
-            const discoveredConfig =
-              await OAuthUtils.discoverOAuthFromWWWAuthenticate(
-                wwwAuthenticate,
-                mcpServerUrl,
-              );
+            const discoveredConfig = await OAuthUtils.discoverOAuthFromWWWAuthenticate(
+              wwwAuthenticate,
+              mcpServerUrl,
+            );
             if (discoveredConfig) {
               // Merge discovered config with existing config, preserving clientId and clientSecret
               config = {
@@ -342,8 +334,7 @@ export class MCPOAuthProvider {
 
       // If we still don't have OAuth config, try the standard discovery
       if (!config.authorizationUrl) {
-        const discoveredConfig =
-          await this.discoverOAuthFromMCPServer(mcpServerUrl);
+        const discoveredConfig = await this.discoverOAuthFromMCPServer(mcpServerUrl);
         if (discoveredConfig) {
           // Merge discovered config with existing config, preserving clientId and clientSecret
           config = {
@@ -358,9 +349,7 @@ export class MCPOAuthProvider {
             clientSecret: config.clientSecret,
           };
         } else {
-          throw new Error(
-            'Failed to discover OAuth configuration from MCP server',
-          );
+          throw new Error('Failed to discover OAuth configuration from MCP server');
         }
       }
     }
@@ -412,9 +401,7 @@ export class MCPOAuthProvider {
 
         debugLogger.debug('✓ Dynamic client registration successful');
       } else {
-        throw new Error(
-          'No client ID provided and dynamic registration not supported',
-        );
+        throw new Error('No client ID provided and dynamic registration not supported');
       }
     }
 
@@ -464,18 +451,13 @@ ${authUrl}
     try {
       await openBrowserSecurely(authUrl);
     } catch (error) {
-      debugLogger.warn(
-        'Failed to open browser automatically:',
-        getErrorMessage(error),
-      );
+      debugLogger.warn('Failed to open browser automatically:', getErrorMessage(error));
     }
 
     // Wait for callback
     const { code } = await callbackServer.response;
 
-    debugLogger.debug(
-      '✓ Authorization code received, exchanging for tokens...',
-    );
+    debugLogger.debug('✓ Authorization code received, exchanging for tokens...');
 
     // Exchange code for tokens
     const tokenResponse = await exchangeCodeForToken(
@@ -574,9 +556,7 @@ ${authUrl}
     const clientId = config.clientId ?? credentials.clientId;
     if (token.refreshToken && clientId && credentials.tokenUrl) {
       try {
-        debugLogger.log(
-          `Refreshing expired token for MCP server: ${serverName}`,
-        );
+        debugLogger.log(`Refreshing expired token for MCP server: ${serverName}`);
 
         const newTokenResponse = await this.refreshAccessToken(
           { ...config, clientId },
@@ -607,11 +587,7 @@ ${authUrl}
 
         return newToken.accessToken;
       } catch (error) {
-        coreEvents.emitFeedback(
-          'error',
-          'Failed to refresh auth token.',
-          error,
-        );
+        coreEvents.emitFeedback('error', 'Failed to refresh auth token.', error);
         // Remove invalid token
         await this.tokenStorage.deleteCredentials(serverName);
       }
@@ -648,14 +624,12 @@ ${authUrl}
           const refreshed: OAuthToken = {
             accessToken: newTokenResponse.access_token,
             tokenType: newTokenResponse.token_type,
-            refreshToken:
-              newTokenResponse.refresh_token || current.refreshToken,
+            refreshToken: newTokenResponse.refresh_token || current.refreshToken,
             scope: newTokenResponse.scope || current.scope,
           };
 
           if (newTokenResponse.expires_in) {
-            refreshed.expiresAt =
-              Date.now() + newTokenResponse.expires_in * 1000;
+            refreshed.expiresAt = Date.now() + newTokenResponse.expires_in * 1000;
           }
 
           await this.tokenStorage.saveToken(
@@ -668,11 +642,7 @@ ${authUrl}
 
           current = refreshed;
         } catch (error) {
-          coreEvents.emitFeedback(
-            'error',
-            'Failed to refresh auth token.',
-            error,
-          );
+          coreEvents.emitFeedback('error', 'Failed to refresh auth token.', error);
           await this.tokenStorage.deleteCredentials(serverName);
           return null;
         }

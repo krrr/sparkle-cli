@@ -22,9 +22,7 @@ const esbuildProblemMatcherPlugin = {
     build.onEnd((result) => {
       result.errors.forEach(({ text, location }) => {
         console.error(`✘ [ERROR] ${text}`);
-        console.error(
-          `    ${location.file}:${location.line}:${location.column}:`,
-        );
+        console.error(`    ${location.file}:${location.line}:${location.column}:`);
       });
       console.log('[watch] build finished');
     });
@@ -48,9 +46,7 @@ async function main() {
     },
     define: {
       'import.meta.url': 'import_meta.url',
-      'process.env.NODE_ENV': JSON.stringify(
-        production ? 'production' : 'development',
-      ),
+      'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
     },
     alias: {
       punycode: 'punycode/',

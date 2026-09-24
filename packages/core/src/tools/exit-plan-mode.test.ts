@@ -246,9 +246,7 @@ The approved implementation plan is stored at: ${expectedPath}
 Read and follow the plan strictly during implementation.`,
         returnDisplay: `Plan approved: ${expectedPath}`,
       });
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.AUTO_EDIT,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.AUTO_EDIT);
       expect(mockConfig.setApprovedPlanPath).toHaveBeenCalledWith(expectedPath);
     });
 
@@ -372,9 +370,7 @@ Ask the user for specific feedback on how to improve the plan.`,
 
       expect(result.llmContent).toContain('Plan approved');
       expect(result.returnDisplay).toContain('Plan approved');
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.DEFAULT,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.DEFAULT);
       expect(mockConfig.setApprovedPlanPath).toHaveBeenCalledWith(expectedPath);
     });
   });
@@ -391,9 +387,7 @@ Ask the user for specific feedback on how to improve the plan.`,
       });
 
       expect(result.llmContent).toContain('YOLO mode');
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.YOLO,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.YOLO);
     });
 
     it('should return DEFAULT when config.isInteractive() is true', async () => {
@@ -407,9 +401,7 @@ Ask the user for specific feedback on how to improve the plan.`,
       });
 
       expect(result.llmContent).toContain('Default mode');
-      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(
-        ApprovalMode.DEFAULT,
-      );
+      expect(mockConfig.setApprovalMode).toHaveBeenCalledWith(ApprovalMode.DEFAULT);
     });
   });
 
@@ -443,10 +435,7 @@ Ask the user for specific feedback on how to improve the plan.`,
         ApprovalMode.DEFAULT,
         'Default mode (edits will require confirmation)',
       );
-      await testMode(
-        ApprovalMode.YOLO,
-        'YOLO mode (all tool calls auto-approved)',
-      );
+      await testMode(ApprovalMode.YOLO, 'YOLO mode (all tool calls auto-approved)');
     });
 
     it('should throw for invalid post-planning modes', async () => {
@@ -485,11 +474,7 @@ Ask the user for specific feedback on how to improve the plan.`,
     });
 
     it('should reject non-existent plan file', async () => {
-      const result = await validatePlanPath(
-        'ghost.md',
-        mockPlansDir,
-        tempRootDir,
-      );
+      const result = await validatePlanPath('ghost.md', mockPlansDir, tempRootDir);
       expect(result).toContain('Plan file does not exist');
     });
 

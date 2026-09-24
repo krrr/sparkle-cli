@@ -25,22 +25,13 @@ export const EXTENSION_SETTINGS_FILENAME = '.env';
 
 export type JsonObject = { [key: string]: JsonValue };
 export type JsonArray = JsonValue[];
-export type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonObject
-  | JsonArray;
+export type JsonValue = string | number | boolean | null | JsonObject | JsonArray;
 
 export type VariableContext = {
   [key: string]: string | undefined;
 };
 
-export function validateVariables(
-  variables: VariableContext,
-  schema: VariableSchema,
-) {
+export function validateVariables(variables: VariableContext, schema: VariableSchema) {
   for (const key in schema) {
     const definition = schema[key];
     if (definition.required && !variables[key]) {
@@ -58,10 +49,7 @@ export function hydrateString(str: string, context: VariableContext): string {
   });
 }
 
-export function recursivelyHydrateStrings<T>(
-  obj: T,
-  values: VariableContext,
-): T {
+export function recursivelyHydrateStrings<T>(obj: T, values: VariableContext): T {
   if (typeof obj === 'string') {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     return hydrateString(obj, values) as unknown as T;

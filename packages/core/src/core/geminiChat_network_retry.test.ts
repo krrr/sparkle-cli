@@ -47,15 +47,12 @@ vi.mock('../utils/retry.js', async (importOriginal) => {
 });
 
 // Mock loggers
-const {
-  mockLogContentRetry,
-  mockLogContentRetryFailure,
-  mockLogNetworkRetryAttempt,
-} = vi.hoisted(() => ({
-  mockLogContentRetry: vi.fn(),
-  mockLogContentRetryFailure: vi.fn(),
-  mockLogNetworkRetryAttempt: vi.fn(),
-}));
+const { mockLogContentRetry, mockLogContentRetryFailure, mockLogNetworkRetryAttempt } =
+  vi.hoisted(() => ({
+    mockLogContentRetry: vi.fn(),
+    mockLogContentRetryFailure: vi.fn(),
+    mockLogNetworkRetryAttempt: vi.fn(),
+  }));
 
 vi.mock('../telemetry/loggers.js', () => ({
   logContentRetry: mockLogContentRetry,
@@ -138,9 +135,7 @@ describe('GeminiChat Network Retries', () => {
 
     const mockMessageBus = createMockMessageBus();
     mockConfig.getMessageBus = vi.fn().mockReturnValue(mockMessageBus);
-    mockConfig.getHookSystem = vi
-      .fn()
-      .mockReturnValue(new HookSystem(mockConfig));
+    mockConfig.getHookSystem = vi.fn().mockReturnValue(new HookSystem(mockConfig));
 
     setSimulate429(false);
     chat = new GeminiChat(mockConfig);
@@ -280,15 +275,14 @@ describe('GeminiChat Network Retries', () => {
       status: 400,
     });
 
-    vi.mocked(
-      mockContentGenerator.generateContentStream,
-    ).mockImplementationOnce(async () =>
-      (async function* () {
-        yield {
-          candidates: [{ content: { parts: [{ text: '' }] } }],
-        } as GenerateContentResponse; // Dummy yield
-        throw error400;
-      })(),
+    vi.mocked(mockContentGenerator.generateContentStream).mockImplementationOnce(
+      async () =>
+        (async function* () {
+          yield {
+            candidates: [{ content: { parts: [{ text: '' }] } }],
+          } as GenerateContentResponse; // Dummy yield
+          throw error400;
+        })(),
     );
 
     const stream = await chat.sendMessageStream(
@@ -313,8 +307,7 @@ describe('GeminiChat Network Retries', () => {
     const sslError = new Error(
       'SSL routines:ssl3_read_bytes:sslv3 alert bad record mac',
     );
-    (sslError as NodeJS.ErrnoException).code =
-      'ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC';
+    (sslError as NodeJS.ErrnoException).code = 'ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC';
 
     // Instead of outer loop, connection retries are handled by retryWithBackoff.
     // Simulate retryWithBackoff attempting it twice: first throws, second succeeds.
@@ -345,9 +338,7 @@ describe('GeminiChat Network Retries', () => {
     // we need to actually execute the real retryWithBackoff logic for this test to see it work.
     // So let's restore the real retryWithBackoff for this test.
     const { retryWithBackoff } =
-      await vi.importActual<typeof import('../utils/retry.js')>(
-        '../utils/retry.js',
-      );
+      await vi.importActual<typeof import('../utils/retry.js')>('../utils/retry.js');
     mockRetryWithBackoff.mockImplementation(retryWithBackoff);
 
     const stream = await chat.sendMessageStream(
@@ -380,9 +371,7 @@ describe('GeminiChat Network Retries', () => {
     (connectionError as NodeJS.ErrnoException).code = 'ECONNRESET';
 
     const { retryWithBackoff } =
-      await vi.importActual<typeof import('../utils/retry.js')>(
-        '../utils/retry.js',
-      );
+      await vi.importActual<typeof import('../utils/retry.js')>('../utils/retry.js');
     mockRetryWithBackoff.mockImplementation(retryWithBackoff);
 
     vi.mocked(mockContentGenerator.generateContentStream)
@@ -466,9 +455,7 @@ describe('GeminiChat Network Retries', () => {
       .mockImplementationOnce(async () =>
         (async function* () {
           yield {
-            candidates: [
-              { content: { parts: [{ text: 'Partial response...' }] } },
-            ],
+            candidates: [{ content: { parts: [{ text: 'Partial response...' }] } }],
           } as unknown as GenerateContentResponse;
           // SSL error occurs while waiting for more data
           throw sslError;
@@ -505,8 +492,7 @@ describe('GeminiChat Network Retries', () => {
     const partialChunk = events.find(
       (e) =>
         e.type === StreamEventType.CHUNK &&
-        e.value.candidates?.[0]?.content?.parts?.[0]?.text ===
-          'Partial response...',
+        e.value.candidates?.[0]?.content?.parts?.[0]?.text === 'Partial response...',
     );
     expect(partialChunk).toBeDefined();
 
@@ -536,17 +522,14 @@ describe('GeminiChat Network Retries', () => {
       'request to https://cloudcode-pa.googleapis.com/v1internal:streamGenerateContent failed',
     ) as NodeJS.ErrnoException & { type?: string };
     sslError.type = 'system';
-    sslError.errno =
-      'ERR_SSL_SSL/TLS_ALERT_BAD_RECORD_MAC' as unknown as number;
+    sslError.errno = 'ERR_SSL_SSL/TLS_ALERT_BAD_RECORD_MAC' as unknown as number;
     sslError.code = 'ERR_SSL_SSL/TLS_ALERT_BAD_RECORD_MAC';
 
     vi.mocked(mockContentGenerator.generateContentStream)
       .mockImplementationOnce(async () =>
         (async function* () {
           yield {
-            candidates: [
-              { content: { parts: [{ text: 'Partial response...' }] } },
-            ],
+            candidates: [{ content: { parts: [{ text: 'Partial response...' }] } }],
           } as unknown as GenerateContentResponse;
           throw sslError;
         })(),

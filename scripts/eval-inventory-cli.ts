@@ -52,9 +52,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(
-    jsonMode ? formatInventoryJson(result) : formatInventoryReport(result),
-  );
+  console.log(jsonMode ? formatInventoryJson(result) : formatInventoryReport(result));
 }
 
 main().catch((error) => {

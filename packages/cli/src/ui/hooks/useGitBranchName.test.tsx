@@ -20,9 +20,7 @@ import {
 // Mock sparkle-cli-core
 vi.mock('sparkle-cli-core', async () => {
   const original =
-    await vi.importActual<typeof import('sparkle-cli-core')>(
-      'sparkle-cli-core',
-    );
+    await vi.importActual<typeof import('sparkle-cli-core')>('sparkle-cli-core');
   return {
     ...original,
     spawnAsync: vi.fn(),
@@ -132,9 +130,7 @@ describe('useGitBranchName', () => {
     const { result } = await renderGitBranchNameHook(CWD);
 
     await act(async () => {
-      const abbrevSpawn = deferredSpawn.find((s) =>
-        s.args.includes('--abbrev-ref'),
-      );
+      const abbrevSpawn = deferredSpawn.find((s) => s.args.includes('--abbrev-ref'));
       if (abbrevSpawn) {
         abbrevSpawn.reject(new Error('Git error'));
       }
@@ -148,9 +144,7 @@ describe('useGitBranchName', () => {
     const { result } = await renderGitBranchNameHook(CWD);
 
     await act(async () => {
-      const abbrevSpawn = deferredSpawn.find((s) =>
-        s.args.includes('--abbrev-ref'),
-      )!;
+      const abbrevSpawn = deferredSpawn.find((s) => s.args.includes('--abbrev-ref'))!;
       abbrevSpawn.resolve({ stdout: 'HEAD\n', stderr: '', code: 0 });
       await vi.advanceTimersByTimeAsync(1);
     });
@@ -173,9 +167,7 @@ describe('useGitBranchName', () => {
     const { result } = await renderGitBranchNameHook(CWD);
 
     await act(async () => {
-      const abbrevSpawn = deferredSpawn.find((s) =>
-        s.args.includes('--abbrev-ref'),
-      )!;
+      const abbrevSpawn = deferredSpawn.find((s) => s.args.includes('--abbrev-ref'))!;
       abbrevSpawn.resolve({ stdout: 'HEAD\n', stderr: '', code: 0 });
       await vi.advanceTimersByTimeAsync(1);
     });
@@ -258,9 +250,7 @@ describe('useGitBranchName', () => {
 
   it('should handle watcher setup error silently', async () => {
     // Cause an error in absolute git dir setup
-    vi.mocked(mockGetAbsoluteGitDir).mockRejectedValueOnce(
-      new Error('Git error'),
-    );
+    vi.mocked(mockGetAbsoluteGitDir).mockRejectedValueOnce(new Error('Git error'));
 
     const { result } = await renderGitBranchNameHook(CWD);
 
@@ -280,9 +270,7 @@ describe('useGitBranchName', () => {
     });
 
     // spawnAsync should NOT have been called again for updating
-    expect(
-      deferredSpawn.filter((s) => s.args.includes('--abbrev-ref')).length,
-    ).toBe(0);
+    expect(deferredSpawn.filter((s) => s.args.includes('--abbrev-ref')).length).toBe(0);
     expect(result.current).toBe('main');
   });
 

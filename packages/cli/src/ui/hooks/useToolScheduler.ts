@@ -82,9 +82,9 @@ export function useToolScheduler(
   Scheduler,
 ] {
   // State stores tool calls organized by their originating schedulerId
-  const [toolCallsMap, setToolCallsMap] = useState<
-    Record<string, TrackedToolCall[]>
-  >({});
+  const [toolCallsMap, setToolCallsMap] = useState<Record<string, TrackedToolCall[]>>(
+    {},
+  );
   const [lastToolOutputTime, setLastToolOutputTime] = useState<number>(0);
   const [subagentHistoryMap, setSubagentHistoryMap] = useState<
     Record<string, SubagentActivityItem[]>
@@ -158,11 +158,7 @@ export function useToolScheduler(
 
         // If this is a subagent and we have no tools to show and weren't showing any,
         // we can skip the update entirely to avoid unnecessary re-renders.
-        if (
-          !isRoot &&
-          filteredToolCalls.length === 0 &&
-          prevCalls.length === 0
-        ) {
+        if (!isRoot && filteredToolCalls.length === 0 && prevCalls.length === 0) {
           return prev;
         }
 
@@ -185,9 +181,7 @@ export function useToolScheduler(
     const handler = (event: SubagentActivityMessage) => {
       setSubagentHistoryMap((prev) => {
         const history = prev[event.subagentName] ?? [];
-        const index = history.findIndex(
-          (item) => item.id === event.activity.id,
-        );
+        const index = history.findIndex((item) => item.id === event.activity.id);
         const nextHistory = [...history];
         if (index >= 0) {
           nextHistory[index] = event.activity;
@@ -340,8 +334,7 @@ function adaptToolCalls(
     // If a tool call has completed but scheduled a tail call, it is in a transitional
     // state. Force the UI to render it as "executing".
     if (
-      (status === CoreToolCallStatus.Success ||
-        status === CoreToolCallStatus.Error) &&
+      (status === CoreToolCallStatus.Success || status === CoreToolCallStatus.Error) &&
       'tailToolCallRequest' in coreCall &&
       coreCall.tailToolCallRequest != null
     ) {

@@ -154,9 +154,7 @@ export const ToolStatsDisplay: React.FC = () => {
         User Decision Summary
       </Text>
       <Box>
-        <Box
-          width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}
-        >
+        <Box width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}>
           <Text color={theme.text.link}>Total Reviewed Suggestions:</Text>
         </Box>
         <Box width={AVG_DURATION_COL_WIDTH} justifyContent="flex-end">
@@ -164,9 +162,7 @@ export const ToolStatsDisplay: React.FC = () => {
         </Box>
       </Box>
       <Box>
-        <Box
-          width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}
-        >
+        <Box width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}>
           <Text color={theme.text.primary}> » Accepted:</Text>
         </Box>
         <Box width={AVG_DURATION_COL_WIDTH} justifyContent="flex-end">
@@ -174,9 +170,7 @@ export const ToolStatsDisplay: React.FC = () => {
         </Box>
       </Box>
       <Box>
-        <Box
-          width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}
-        >
+        <Box width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}>
           <Text color={theme.text.primary}> » Rejected:</Text>
         </Box>
         <Box width={AVG_DURATION_COL_WIDTH} justifyContent="flex-end">
@@ -184,9 +178,7 @@ export const ToolStatsDisplay: React.FC = () => {
         </Box>
       </Box>
       <Box>
-        <Box
-          width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}
-        >
+        <Box width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}>
           <Text color={theme.text.primary}> » Modified:</Text>
         </Box>
         <Box width={AVG_DURATION_COL_WIDTH} justifyContent="flex-end">
@@ -206,9 +198,7 @@ export const ToolStatsDisplay: React.FC = () => {
       />
 
       <Box>
-        <Box
-          width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}
-        >
+        <Box width={TOOL_NAME_COL_WIDTH + CALLS_COL_WIDTH + SUCCESS_RATE_COL_WIDTH}>
           <Text color={theme.text.primary}> Overall Agreement Rate:</Text>
         </Box>
         <Box width={AVG_DURATION_COL_WIDTH} justifyContent="flex-end">

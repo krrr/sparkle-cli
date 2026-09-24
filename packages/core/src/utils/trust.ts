@@ -34,8 +34,7 @@ export interface TrustOptions {
 
 export function isTrustLevel(value: unknown): value is TrustLevel {
   return (
-    typeof value === 'string' &&
-    Object.values(TrustLevel).some((v) => v === value)
+    typeof value === 'string' && Object.values(TrustLevel).some((v) => v === value)
   );
 }
 
@@ -162,9 +161,7 @@ export class LoadedTrustedFolders {
 
     for (const [rulePath, trustLevel] of Object.entries(configToUse)) {
       const effectivePath =
-        trustLevel === TrustLevel.TRUST_PARENT
-          ? path.dirname(rulePath)
-          : rulePath;
+        trustLevel === TrustLevel.TRUST_PARENT ? path.dirname(rulePath) : rulePath;
 
       // Resolve effectivePath to its realpath for canonical comparison
       const realEffectivePath = getRealPath(effectivePath);
@@ -323,9 +320,7 @@ export function loadTrustedFolders(): LoadedTrustedFolders {
   return loadedTrustedFolders;
 }
 
-export function saveTrustedFolders(
-  trustedFoldersFile: TrustedFoldersFile,
-): void {
+export function saveTrustedFolders(trustedFoldersFile: TrustedFoldersFile): void {
   // Ensure the directory exists
   const dirPath = path.dirname(trustedFoldersFile.path);
   if (!fs.existsSync(dirPath)) {

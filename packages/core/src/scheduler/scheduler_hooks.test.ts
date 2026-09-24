@@ -9,10 +9,7 @@ import { Scheduler } from './scheduler.js';
 import type { ErroredToolCall } from './types.js';
 import { CoreToolCallStatus } from './types.js';
 import type { Config, ToolRegistry, AgentLoopContext } from '../index.js';
-import {
-  ApprovalMode,
-  DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
-} from '../index.js';
+import { ApprovalMode, DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD } from '../index.js';
 import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
 import { MockTool } from '../test-utils/mock-tool.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
@@ -60,8 +57,7 @@ function createMockConfig(overrides: Partial<Config> = {}): Config {
     storage: {
       getProjectTempDir: () => '/tmp',
     },
-    getTruncateToolOutputThreshold: () =>
-      DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
+    getTruncateToolOutputThreshold: () => DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
     getTruncateToolOutputLines: () => 1000,
     getToolRegistry: () => defaultToolRegistry,
     getWorkingDir: () => '/mock/dir',
@@ -143,10 +139,7 @@ describe('Scheduler Hooks', () => {
       prompt_id: 'prompt-1',
     };
 
-    const results = await scheduler.schedule(
-      [request],
-      new AbortController().signal,
-    );
+    const results = await scheduler.schedule([request], new AbortController().signal);
 
     expect(results.length).toBe(1);
     const result = results[0];
@@ -211,10 +204,7 @@ describe('Scheduler Hooks', () => {
       prompt_id: 'prompt-1',
     };
 
-    const results = await scheduler.schedule(
-      [request],
-      new AbortController().signal,
-    );
+    const results = await scheduler.schedule([request], new AbortController().signal);
 
     expect(results.length).toBe(1);
     const result = results[0];
@@ -285,10 +275,7 @@ describe('Scheduler Hooks', () => {
       prompt_id: 'prompt-1',
     };
 
-    const results = await scheduler.schedule(
-      [request],
-      new AbortController().signal,
-    );
+    const results = await scheduler.schedule([request], new AbortController().signal);
 
     expect(results.length).toBe(1);
     const result = results[0];

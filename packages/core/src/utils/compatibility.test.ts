@@ -60,14 +60,11 @@ describe('compatibility', () => {
         expected: false,
         desc: 'non-Windows platforms',
       },
-    ])(
-      'should return $expected for $desc',
-      ({ platform, release, expected }) => {
-        vi.mocked(os.platform).mockReturnValue(platform);
-        vi.mocked(os.release).mockReturnValue(release);
-        expect(isWindows10()).toBe(expected);
-      },
-    );
+    ])('should return $expected for $desc', ({ platform, release, expected }) => {
+      vi.mocked(os.platform).mockReturnValue(platform);
+      vi.mocked(os.release).mockReturnValue(release);
+      expect(isWindows10()).toBe(expected);
+    });
   });
 
   describe('isJetBrainsTerminal', () => {
@@ -250,14 +247,11 @@ describe('compatibility', () => {
         expected: false,
         desc: 'true color is not supported',
       },
-    ])(
-      'should return $expected when $desc',
-      ({ colorterm, depth, expected }) => {
-        vi.stubEnv('COLORTERM', colorterm);
-        process.stdout.getColorDepth = vi.fn().mockReturnValue(depth);
-        expect(supportsTrueColor()).toBe(expected);
-      },
-    );
+    ])('should return $expected when $desc', ({ colorterm, depth, expected }) => {
+      vi.stubEnv('COLORTERM', colorterm);
+      process.stdout.getColorDepth = vi.fn().mockReturnValue(depth);
+      expect(supportsTrueColor()).toBe(expected);
+    });
   });
 
   describe('getCompatibilityWarnings', () => {
@@ -352,9 +346,7 @@ describe('compatibility', () => {
       vi.stubEnv('TERMINAL_EMULATOR', 'JetBrains-JediTerm');
 
       const warnings = getCompatibilityWarnings({ isAlternateBuffer: false });
-      expect(
-        warnings.find((w) => w.id === 'jetbrains-terminal'),
-      ).toBeUndefined();
+      expect(warnings.find((w) => w.id === 'jetbrains-terminal')).toBeUndefined();
     });
 
     it('should return 256-color warning when 256 colors are not supported', () => {
@@ -387,9 +379,7 @@ describe('compatibility', () => {
       expect(warnings).toContainEqual(
         expect.objectContaining({
           id: 'true-color',
-          message: expect.stringContaining(
-            'True color (24-bit) support not detected',
-          ),
+          message: expect.stringContaining('True color (24-bit) support not detected'),
           priority: WarningPriority.Low,
         }),
       );
@@ -407,9 +397,7 @@ describe('compatibility', () => {
       expect(warnings).toHaveLength(3);
       expect(warnings[0].message).toContain('Windows 10 detected');
       expect(warnings[1].message).toContain('JetBrains');
-      expect(warnings[2].message).toContain(
-        'True color (24-bit) support not detected',
-      );
+      expect(warnings[2].message).toContain('True color (24-bit) support not detected');
     });
 
     it('should return no color warnings for kmscon terminal', () => {

@@ -77,9 +77,7 @@ describe('Core System Prompt Substitution', () => {
     ];
     vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue(skills);
     vi.mocked(fs.existsSync).mockReturnValue(true);
-    vi.mocked(fs.readFileSync).mockReturnValue(
-      'Skills go here: ${AgentSkills}',
-    );
+    vi.mocked(fs.readFileSync).mockReturnValue('Skills go here: ${AgentSkills}');
 
     const prompt = getCoreSystemPrompt(mockConfig);
 
@@ -105,9 +103,7 @@ describe('Core System Prompt Substitution', () => {
     expect(prompt).toContain('Agents:');
     expect(prompt).toContain('# Sub-Agents');
     expect(prompt).toContain('<name>test-agent</name>');
-    expect(prompt).toContain(
-      '<description>Test Agent Description</description>',
-    );
+    expect(prompt).toContain('<description>Test Agent Description</description>');
     expect(prompt).not.toContain('${SubAgents}');
   });
 

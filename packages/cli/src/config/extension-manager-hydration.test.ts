@@ -9,11 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
 import { ExtensionManager } from './extension-manager.js';
-import {
-  debugLogger,
-  coreEvents,
-  type CommandHookConfig,
-} from 'sparkle-cli-core';
+import { debugLogger, coreEvents, type CommandHookConfig } from 'sparkle-cli-core';
 import { createTestMergedSettings } from './settings.js';
 import { createExtension } from '../test-utils/createExtension.js';
 import { EXTENSIONS_DIRECTORY_NAME } from './extensions/variables.js';
@@ -254,9 +250,7 @@ System using model: \${MODEL_NAME}
     expect(extension.hooks).toBeDefined();
     expect(extension.hooks?.BeforeTool).toHaveLength(1);
     expect(
-      (extension.hooks?.BeforeTool![0].hooks[0] as CommandHookConfig).env?.[
-        'HOOK_CMD'
-      ],
+      (extension.hooks?.BeforeTool![0].hooks[0] as CommandHookConfig).env?.['HOOK_CMD'],
     ).toBe('hello-world');
   });
 
@@ -302,8 +296,7 @@ System using model: \${MODEL_NAME}
     const { updateSetting, ExtensionSettingScope } = await import(
       './extensions/extensionSettings.js'
     );
-    const extensionConfig =
-      await extensionManager.loadExtensionConfig(extensionPath);
+    const extensionConfig = await extensionManager.loadExtensionConfig(extensionPath);
 
     const mockRequestSetting = vi.fn().mockResolvedValue('second');
     await updateSetting(

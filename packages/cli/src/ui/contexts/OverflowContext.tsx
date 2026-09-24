@@ -25,13 +25,9 @@ export interface OverflowActions {
   reset: () => void;
 }
 
-const OverflowStateContext = createContext<OverflowState | undefined>(
-  undefined,
-);
+const OverflowStateContext = createContext<OverflowState | undefined>(undefined);
 
-const OverflowActionsContext = createContext<OverflowActions | undefined>(
-  undefined,
-);
+const OverflowActionsContext = createContext<OverflowActions | undefined>(undefined);
 
 export const useOverflowState = (): OverflowState | undefined =>
   useContext(OverflowStateContext);

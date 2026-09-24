@@ -44,8 +44,7 @@ export interface AgentProtocol extends Trajectory {
 }
 
 type RequireExactlyOne<T> = {
-  [K in keyof T]: Required<Pick<T, K>> &
-    Partial<Record<Exclude<keyof T, K>, never>>;
+  [K in keyof T]: Required<Pick<T, K>> & Partial<Record<Exclude<keyof T, K>, never>>;
 }[keyof T];
 
 interface AgentSendPayloads {
@@ -84,18 +83,15 @@ export interface AgentEventCommon {
   };
 }
 
-export type AgentEventData<
-  EventType extends keyof AgentEvents = keyof AgentEvents,
-> = AgentEvents[EventType] & { type: EventType };
+export type AgentEventData<EventType extends keyof AgentEvents = keyof AgentEvents> =
+  AgentEvents[EventType] & { type: EventType };
 
 /**
  * Mapped type that produces a proper discriminated union when `EventType` is
  * the default (all keys), enabling `switch (event.type)` narrowing.
  * When a specific EventType is provided, resolves to a single variant.
  */
-export type AgentEvent<
-  EventType extends keyof AgentEvents = keyof AgentEvents,
-> = {
+export type AgentEvent<EventType extends keyof AgentEvents = keyof AgentEvents> = {
   [K in EventType]: AgentEventCommon & AgentEvents[K] & { type: K };
 }[EventType];
 
@@ -194,11 +190,7 @@ export type DisplayAgent = {
   threadId: string;
 };
 
-export type DisplayContent =
-  | DisplayText
-  | DisplayDiff
-  | DisplayTerminal
-  | DisplayAgent;
+export type DisplayContent = DisplayText | DisplayDiff | DisplayTerminal | DisplayAgent;
 
 export type ToolDisplayFormat =
   /**

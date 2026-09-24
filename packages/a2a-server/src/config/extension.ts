@@ -80,9 +80,7 @@ function loadExtensionsFromDir(dir: string): GeminiCLIExtension[] {
 
 function loadExtension(extensionDir: string): GeminiCLIExtension | null {
   if (!fs.statSync(extensionDir).isDirectory()) {
-    logger.error(
-      `Warning: unexpected file ${extensionDir} in extensions directory.`,
-    );
+    logger.error(`Warning: unexpected file ${extensionDir} in extensions directory.`);
     return null;
   }
 
@@ -123,9 +121,7 @@ function loadExtension(extensionDir: string): GeminiCLIExtension | null {
       isActive: true, // Barring any other signals extensions should be considered Active.
     } as GeminiCLIExtension;
   } catch (e) {
-    logger.error(
-      `Warning: error parsing extension config in ${configFilePath}: ${e}`,
-    );
+    logger.error(`Warning: error parsing extension config in ${configFilePath}: ${e}`);
     return null;
   }
 }

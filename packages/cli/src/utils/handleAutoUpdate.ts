@@ -27,9 +27,7 @@ export function isUpdateInProgress() {
 /**
  * Returns a promise that resolves when the update process completes or times out.
  */
-export async function waitForUpdateCompletion(
-  timeoutMs = 30000,
-): Promise<void> {
+export async function waitForUpdateCompletion(timeoutMs = 30000): Promise<void> {
   if (!_updateInProgress) {
     return;
   }
@@ -103,10 +101,7 @@ export function handleAutoUpdate(
     combinedMessage += `\n${installationInfo.updateMessage}`;
   }
 
-  if (
-    !installationInfo.updateCommand ||
-    !settings.merged.general.enableAutoUpdate
-  ) {
+  if (!installationInfo.updateCommand || !settings.merged.general.enableAutoUpdate) {
     updateEventEmitter.emit('update-received', {
       ...info,
       message: combinedMessage,
@@ -150,8 +145,7 @@ export function handleAutoUpdate(
     _updateInProgress = false;
     if (code === 0) {
       updateEventEmitter.emit('update-success', {
-        message:
-          'Update successful! The new version will be used on your next run.',
+        message: 'Update successful! The new version will be used on your next run.',
       });
     } else {
       updateEventEmitter.emit('update-failed', {
@@ -200,9 +194,7 @@ export function setUpdateHandler(
     addItem(
       {
         type: MessageType.ERROR,
-        text:
-          data?.message ||
-          `Automatic update failed. Please try updating manually`,
+        text: data?.message || `Automatic update failed. Please try updating manually`,
       },
       Date.now(),
     );

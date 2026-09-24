@@ -91,10 +91,7 @@ export function applySubstitutions(
 
   for (const toolName of allToolNames) {
     const varName = `${toolName}_ToolName`;
-    result = result.replace(
-      new RegExp(`\\\${\\b${varName}\\b}`, 'g'),
-      toolName,
-    );
+    result = result.replace(new RegExp(`\\\${\\b${varName}\\b}`, 'g'), toolName);
   }
 
   return result;

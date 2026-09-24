@@ -27,9 +27,7 @@ describe('SkillManager', () => {
   let testRootDir: string;
 
   beforeEach(async () => {
-    testRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'skill-manager-test-'),
-    );
+    testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skill-manager-test-'));
   });
 
   afterEach(async () => {

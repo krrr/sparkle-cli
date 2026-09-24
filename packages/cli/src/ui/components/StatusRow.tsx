@@ -112,13 +112,10 @@ export const StatusNode: React.FC<{
   let currentThought: ThoughtSummary | null = null;
 
   if (activeHooks.length > 0) {
-    const userVisibleHooks = activeHooks.filter((h) =>
-      isUserVisibleHook(h.source),
-    );
+    const userVisibleHooks = activeHooks.filter((h) => isUserVisibleHook(h.source));
 
     if (userVisibleHooks.length > 0) {
-      const label =
-        userVisibleHooks.length > 1 ? 'Executing Hooks' : 'Executing Hook';
+      const label = userVisibleHooks.length > 1 ? 'Executing Hooks' : 'Executing Hook';
       const displayNames = userVisibleHooks.map((h) => {
         let name = stripAnsi(h.name);
         if (h.index && h.total && h.total > 1) {
@@ -240,8 +237,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
   })();
 
   // Collision detection using measured widths
-  const willCollideTip =
-    statusWidth + tipWidth + LAYOUT.COLLISION_GAP > terminalWidth;
+  const willCollideTip = statusWidth + tipWidth + LAYOUT.COLLISION_GAP > terminalWidth;
 
   const showTipLine = Boolean(
     !hasPendingActionRequired && tipContentStr && !willCollideTip && !isNarrow,
@@ -250,8 +246,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
   const showRow1Minimal =
     showLoadingIndicator || uiState.activeHooks.length > 0 || showTipLine;
   const showRow2Minimal =
-    (Boolean(modeContentObj) && !hideUiDetailsForSuggestions) ||
-    showMinimalContext;
+    (Boolean(modeContentObj) && !hideUiDetailsForSuggestions) || showMinimalContext;
 
   const showRow1 = showUiDetails || showRow1Minimal;
   const showRow2 = showUiDetails || showRow2Minimal;
@@ -269,9 +264,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
       currentWittyPhrase={uiState.currentWittyPhrase}
       activeHooks={uiState.activeHooks}
       showLoadingIndicator={showLoadingIndicator}
-      errorVerbosity={
-        settings.merged.ui.errorVerbosity as 'low' | 'full' | undefined
-      }
+      errorVerbosity={settings.merged.ui.errorVerbosity as 'low' | 'full' | undefined}
       onResize={onStatusResize}
       pendingHistoryItems={uiState.pendingHistoryItems}
     />
@@ -293,9 +286,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
         <Text
           color={color}
           wrap="truncate-end"
-          italic={
-            !isShortcutHint && tipContentStr === uiState.currentWittyPhrase
-          }
+          italic={!isShortcutHint && tipContentStr === uiState.currentWittyPhrase}
         >
           {tipContentStr === uiState.currentTip
             ? `Tip: ${tipContentStr}`
@@ -326,9 +317,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
                 {statusNode}
                 {!showUiDetails && showRow2Minimal && modeContentObj && (
                   <Box>
-                    <Text color={modeContentObj.color}>
-                      ● {modeContentObj.text}
-                    </Text>
+                    <Text color={modeContentObj.color}>● {modeContentObj.text}</Text>
                   </Box>
                 )}
               </Box>
@@ -377,10 +366,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
       {/* Live reasoning tail: its own row so the status line keeps sharing
           Row 1 with the tip on the right. */}
       {showRow1 && showLoadingIndicator && uiState.activeHooks.length === 0 && (
-        <LiveThinkingTail
-          text={uiState.liveThought}
-          terminalWidth={terminalWidth}
-        />
+        <LiveThinkingTail text={uiState.liveThought} terminalWidth={terminalWidth} />
       )}
 
       {/* Internal Separator */}
@@ -407,13 +393,12 @@ export const StatusRow: React.FC<StatusRowProps> = ({
           >
             {showUiDetails ? (
               <>
-                {!hideUiDetailsForSuggestions &&
-                  !inputState.shellModeActive && (
-                    <ApprovalModeIndicator
-                      approvalMode={uiState.showApprovalModeIndicator}
-                      allowPlanMode={uiState.allowPlanMode}
-                    />
-                  )}
+                {!hideUiDetailsForSuggestions && !inputState.shellModeActive && (
+                  <ApprovalModeIndicator
+                    approvalMode={uiState.showApprovalModeIndicator}
+                    allowPlanMode={uiState.allowPlanMode}
+                  />
+                )}
                 {inputState.shellModeActive && (
                   <Box marginLeft={LAYOUT.INDICATOR_LEFT_MARGIN}>
                     <ShellModeIndicator />
@@ -428,9 +413,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
             ) : (
               showRow2Minimal &&
               modeContentObj && (
-                <Text color={modeContentObj.color}>
-                  ● {modeContentObj.text}
-                </Text>
+                <Text color={modeContentObj.color}>● {modeContentObj.text}</Text>
               )
             )}
           </Box>

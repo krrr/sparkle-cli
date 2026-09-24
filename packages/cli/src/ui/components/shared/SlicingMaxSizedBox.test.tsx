@@ -60,9 +60,7 @@ describe('<SlicingMaxSizedBox />', () => {
     expect(lastFrame()).toContain('Line 1');
     expect(lastFrame()).toContain('Line 2');
     expect(lastFrame()).not.toContain('Line 3');
-    expect(lastFrame()).toContain(
-      '... last 3 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... last 3 lines hidden (Ctrl+O to show) ...');
     unmount();
   });
 
@@ -91,9 +89,7 @@ describe('<SlicingMaxSizedBox />', () => {
     expect(lastFrame()).toContain('Item 1');
     expect(lastFrame()).toContain('Item 2');
     expect(lastFrame()).not.toContain('Item 3');
-    expect(lastFrame()).toContain(
-      '... last 3 lines hidden (Ctrl+O to show) ...',
-    );
+    expect(lastFrame()).toContain('... last 3 lines hidden (Ctrl+O to show) ...');
     unmount();
   });
 

@@ -79,14 +79,10 @@ export class PipelineOrchestrator {
 
     // First, run any sync pipelines matching this trigger
     let currentBuffer = buffer;
-    const triggerPipelines = this.pipelines.filter((p) =>
-      p.triggers.includes(trigger),
-    );
+    const triggerPipelines = this.pipelines.filter((p) => p.triggers.includes(trigger));
 
     // Freeze the inbox for this pipeline run
-    const inboxSnapshot = new InboxSnapshotImpl(
-      this.env.inbox.getMessages() || [],
-    );
+    const inboxSnapshot = new InboxSnapshotImpl(this.env.inbox.getMessages() || []);
 
     for (const pipeline of triggerPipelines) {
       for (const processor of pipeline.processors) {
@@ -129,15 +125,11 @@ export class PipelineOrchestrator {
               id: n.id,
               replacesId: n.replacesId,
               abstractsIds: n.abstractsIds,
-              approxTokens:
-                this.env.tokenCalculator.calculateConcreteListTokens([n]),
+              approxTokens: this.env.tokenCalculator.calculateConcreteListTokens([n]),
             })),
           });
         } catch (error) {
-          debugLogger.error(
-            `Synchronous processor ${processor.id} failed:`,
-            error,
-          );
+          debugLogger.error(`Synchronous processor ${processor.id} failed:`, error);
         }
       }
     }
@@ -187,13 +179,9 @@ export class PipelineOrchestrator {
 
         if (latestTargets.length === 0) return;
 
-        debugLogger.log(
-          `[Orchestrator] Executing async pipeline ${pipeline.name}`,
-        );
+        debugLogger.log(`[Orchestrator] Executing async pipeline ${pipeline.name}`);
 
-        const inboxSnapshot = new InboxSnapshotImpl(
-          this.env.inbox.getMessages() || [],
-        );
+        const inboxSnapshot = new InboxSnapshotImpl(this.env.inbox.getMessages() || []);
 
         for (const processor of pipeline.processors) {
           await processor.process({

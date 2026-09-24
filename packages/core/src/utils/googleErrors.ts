@@ -186,19 +186,13 @@ export function parseGoogleApiError(error: unknown): GoogleApiError | null {
   }
 
   let currentError: ErrorShape | undefined =
-    fromGaxiosError(errorObj) ??
-    fromApiError(errorObj) ??
-    fromCauseError(errorObj);
+    fromGaxiosError(errorObj) ?? fromApiError(errorObj) ?? fromCauseError(errorObj);
 
   let depth = 0;
   const maxDepth = 10;
   // Handle cases where the actual error object is stringified inside the message
   // by drilling down until we find an error that doesn't have a stringified message.
-  while (
-    currentError &&
-    typeof currentError.message === 'string' &&
-    depth < maxDepth
-  ) {
+  while (currentError && typeof currentError.message === 'string' && depth < maxDepth) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const parsedMessage = JSON.parse(
@@ -235,9 +229,7 @@ export function parseGoogleApiError(error: unknown): GoogleApiError | null {
         if (detail && typeof detail === 'object') {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           const detailObj = detail as Record<string, unknown>;
-          const typeKey = Object.keys(detailObj).find(
-            (key) => key.trim() === '@type',
-          );
+          const typeKey = Object.keys(detailObj).find((key) => key.trim() === '@type');
           if (typeKey) {
             if (typeKey !== '@type') {
               detailObj['@type'] = detailObj[typeKey];
@@ -270,8 +262,7 @@ function isErrorShape(obj: unknown): obj is ErrorShape {
   return (
     typeof obj === 'object' &&
     obj !== null &&
-    (('message' in obj &&
-      typeof (obj as { message: unknown }).message === 'string') ||
+    (('message' in obj && typeof (obj as { message: unknown }).message === 'string') ||
       ('code' in obj && typeof (obj as { code: unknown }).code === 'number'))
   );
 }
@@ -398,15 +389,11 @@ function fromCauseError(errorObj: object): ErrorShape | undefined {
   const fallbackCode =
     typeof rawCode === 'number'
       ? rawCode
-      : typeof rawCode === 'string' &&
-          rawCode.trim() !== '' &&
-          !isNaN(Number(rawCode))
+      : typeof rawCode === 'string' && rawCode.trim() !== '' && !isNaN(Number(rawCode))
         ? Number(rawCode)
         : undefined;
 
-  const resolveError = (
-    resolved: ErrorShape | undefined,
-  ): ErrorShape | undefined => {
+  const resolveError = (resolved: ErrorShape | undefined): ErrorShape | undefined => {
     if (!resolved) return undefined;
     const message = resolved.message;
     const details = resolved.details;
@@ -419,21 +406,14 @@ function fromCauseError(errorObj: object): ErrorShape | undefined {
   };
 
   if (typeof err.cause === 'object' && err.cause !== null) {
-    if (
-      'error' in err.cause &&
-      err.cause.error &&
-      isErrorShape(err.cause.error)
-    ) {
+    if ('error' in err.cause && err.cause.error && isErrorShape(err.cause.error)) {
       return resolveError(err.cause.error);
     }
     if ('message' in err.cause && err.cause.message) {
       if (typeof err.cause.message === 'string') {
         const parsed = fromApiError({ message: err.cause.message });
         if (parsed) return resolveError(parsed);
-      } else if (
-        typeof err.cause.message === 'object' &&
-        err.cause.message !== null
-      ) {
+      } else if (typeof err.cause.message === 'object' && err.cause.message !== null) {
         const msgObj = err.cause.message as { error?: unknown };
         if (msgObj.error && isErrorShape(msgObj.error)) {
           return resolveError(msgObj.error);

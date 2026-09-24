@@ -121,9 +121,7 @@ export class WhisperTranscriptionProvider
         });
 
         this.process.on('close', (code) => {
-          debugLogger.debug(
-            `[WhisperTranscription] Process closed with code ${code}`,
-          );
+          debugLogger.debug(`[WhisperTranscription] Process closed with code ${code}`);
           this.emit('close');
           this.process = null;
         });
@@ -139,10 +137,7 @@ export class WhisperTranscriptionProvider
           }
         }, 10000);
       } catch (err) {
-        debugLogger.error(
-          '[WhisperTranscription] Failed to spawn process:',
-          err,
-        );
+        debugLogger.error('[WhisperTranscription] Failed to spawn process:', err);
         if (!isResolved) {
           isResolved = true;
           reject(err);

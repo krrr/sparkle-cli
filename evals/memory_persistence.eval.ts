@@ -32,9 +32,7 @@ async function loadLatestSessionRecord(homeDir: string, sessionId: string) {
 
   const candidates = fs
     .readdirSync(chatsDir)
-    .filter(
-      (file) => file.startsWith(SESSION_FILE_PREFIX) && file.endsWith('.jsonl'),
-    );
+    .filter((file) => file.startsWith(SESSION_FILE_PREFIX) && file.endsWith('.jsonl'));
 
   const matchingRecords = [];
   for (const file of candidates) {
@@ -45,9 +43,7 @@ async function loadLatestSessionRecord(homeDir: string, sessionId: string) {
     }
   }
 
-  matchingRecords.sort(
-    (a, b) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated),
-  );
+  matchingRecords.sort((a, b) => Date.parse(b.lastUpdated) - Date.parse(a.lastUpdated));
   return matchingRecords[0] ?? null;
 }
 
@@ -113,9 +109,7 @@ describe('memory persistence', () => {
       {
         id: 'msg-5',
         type: 'user',
-        content: [
-          { text: 'Good catch — I fixed the import and the route works now.' },
-        ],
+        content: [{ text: 'Good catch — I fixed the import and the route works now.' }],
         timestamp: '2026-01-01T00:02:00Z',
       },
       {
@@ -143,9 +137,7 @@ describe('memory persistence', () => {
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
-        .filter((log) =>
-          ['write_file', 'replace'].includes(log.toolRequest.name),
-        );
+        .filter((log) => ['write_file', 'replace'].includes(log.toolRequest.name));
 
       const wroteVitestToGlobal = writeCalls.some((log) => {
         const args = log.toolRequest.args;
@@ -175,9 +167,7 @@ describe('memory persistence', () => {
 
       const leakedToPrivateProject = writeCalls.some((log) => {
         const args = log.toolRequest.args;
-        return (
-          /\.sparkle\/tmp\/[^/]+\/memory\//i.test(args) && /vitest/i.test(args)
-        );
+        return /\.sparkle\/tmp\/[^/]+\/memory\//i.test(args) && /vitest/i.test(args);
       });
       expect(
         leakedToPrivateProject,
@@ -206,9 +196,7 @@ describe('memory persistence', () => {
       {
         id: 'msg-2',
         type: 'gemini',
-        content: [
-          { text: 'Got it, I will keep `npm run test` in mind for tests.' },
-        ],
+        content: [{ text: 'Got it, I will keep `npm run test` in mind for tests.' }],
         timestamp: '2026-01-01T00:00:05Z',
       },
       {
@@ -224,9 +212,7 @@ describe('memory persistence', () => {
       {
         id: 'msg-4',
         type: 'gemini',
-        content: [
-          { text: 'Understood, 2-space indentation for this project.' },
-        ],
+        content: [{ text: 'Understood, 2-space indentation for this project.' }],
         timestamp: '2026-01-01T00:01:05Z',
       },
     ],
@@ -242,9 +228,7 @@ describe('memory persistence', () => {
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
-        .filter((log) =>
-          ['write_file', 'replace'].includes(log.toolRequest.name),
-        );
+        .filter((log) => ['write_file', 'replace'].includes(log.toolRequest.name));
 
       const wroteToProjectRoot = (factPattern: RegExp) =>
         writeCalls.some((log) => {
@@ -281,8 +265,7 @@ describe('memory persistence', () => {
       const leakedToGlobal = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.sparkle\/AGENTS\\\.md/i.test(args) &&
-          !/tmp\/[^/]+\/memory/i.test(args)
+          /\.sparkle\/AGENTS\\\.md/i.test(args) && !/tmp\/[^/]+\/memory/i.test(args)
         );
       });
       expect(
@@ -329,9 +312,7 @@ describe('memory persistence', () => {
       {
         id: 'msg-4',
         type: 'gemini',
-        content: [
-          { text: 'Understood. I will only save the durable preference.' },
-        ],
+        content: [{ text: 'Understood. I will only save the durable preference.' }],
         timestamp: '2026-01-01T00:01:05Z',
       },
     ],
@@ -341,9 +322,7 @@ describe('memory persistence', () => {
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
-        .filter((log) =>
-          ['write_file', 'replace'].includes(log.toolRequest.name),
-        );
+        .filter((log) => ['write_file', 'replace'].includes(log.toolRequest.name));
 
       expect(
         writeCalls.length,
@@ -416,16 +395,13 @@ Quirks to remember:
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
-        .filter((log) =>
-          ['write_file', 'replace'].includes(log.toolRequest.name),
-        );
+        .filter((log) => ['write_file', 'replace'].includes(log.toolRequest.name));
 
       const wroteUserProjectDetail = writeCalls.some((log) => {
         const args = log.toolRequest.args;
         return (
-          /\.sparkle\/tmp\/[^/]+\/memory\/(?!MEMORY\.md)[^"]+\.md/i.test(
-            args,
-          ) && /6543/.test(args)
+          /\.sparkle\/tmp\/[^/]+\/memory\/(?!MEMORY\.md)[^"]+\.md/i.test(args) &&
+          /6543/.test(args)
         );
       });
       expect(
@@ -492,9 +468,7 @@ Quirks to remember:
       await rig.waitForToolCall('write_file').catch(() => {});
       const writeCalls = rig
         .readToolLogs()
-        .filter((log) =>
-          ['write_file', 'replace'].includes(log.toolRequest.name),
-        );
+        .filter((log) => ['write_file', 'replace'].includes(log.toolRequest.name));
 
       const wroteToGlobal = (factPattern: RegExp) =>
         writeCalls.some((log) => {

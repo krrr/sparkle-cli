@@ -83,12 +83,7 @@ export const DEFAULT_ORDER = [
 /**
  * Items shown when the user has not configured `ui.footer.items`.
  */
-export const DEFAULT_ITEMS = [
-  'workspace',
-  'git-branch',
-  'sandbox',
-  'model-name',
-];
+export const DEFAULT_ITEMS = ['workspace', 'git-branch', 'sandbox', 'model-name'];
 
 const VALID_IDS: Set<string> = new Set(ALL_ITEMS.map((i) => i.id));
 
@@ -105,8 +100,8 @@ export function resolveFooterState(settings: MergedSettings): {
     ? VALID_IDS
     : new Set([...VALID_IDS].filter((id) => id !== 'provider'));
 
-  const source = (settings.ui?.footer?.items ?? DEFAULT_ITEMS).filter(
-    (id: string) => filteredValidIds.has(id),
+  const source = (settings.ui?.footer?.items ?? DEFAULT_ITEMS).filter((id: string) =>
+    filteredValidIds.has(id),
   );
 
   const others = DEFAULT_ORDER.filter(

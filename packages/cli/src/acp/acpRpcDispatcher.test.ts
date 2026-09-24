@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  type Mock,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock, type Mocked } from 'vitest';
 import { GeminiAgent } from './acpRpcDispatcher.js';
 import * as acp from '@agentclientprotocol/sdk';
 import {
@@ -183,9 +175,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     const mockSession = {
       cancelPendingPrompt: vi.fn(),
     };
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(mockSession),
     };
 
@@ -195,9 +185,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
   });
 
   it('should throw error when cancelling non-existent session', async () => {
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(undefined),
     };
 
@@ -210,9 +198,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     const mockSession = {
       prompt: vi.fn().mockResolvedValue({ stopReason: 'end_turn' }),
     };
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(mockSession),
     };
 
@@ -229,9 +215,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     const mockSession = {
       setMode: vi.fn().mockReturnValue({}),
     };
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(mockSession),
     };
 
@@ -245,9 +229,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
   });
 
   it('should throw error when setting mode on non-existent session', async () => {
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(undefined),
     };
 
@@ -263,9 +245,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
     const mockSession = {
       setModel: vi.fn().mockReturnValue({}),
     };
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(mockSession),
     };
 
@@ -279,9 +259,7 @@ describe('GeminiAgent - RPC Dispatcher', () => {
   });
 
   it('should throw error when setting model on non-existent session (unstable)', async () => {
-    (
-      agent as unknown as { sessionManager: { getSession: Mock } }
-    ).sessionManager = {
+    (agent as unknown as { sessionManager: { getSession: Mock } }).sessionManager = {
       getSession: vi.fn().mockReturnValue(undefined),
     };
 

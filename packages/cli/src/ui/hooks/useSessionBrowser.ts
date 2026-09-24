@@ -27,9 +27,7 @@ export const useSessionBrowser = (
   config: Config,
   onLoadHistory: (
     uiHistory: HistoryItemWithoutId[],
-    clientHistory: Array<
-      { role: 'user' | 'model'; parts: Part[] } | HistoryTurn
-    >,
+    clientHistory: Array<{ role: 'user' | 'model'; parts: Part[] } | HistoryTurn>,
     resumedSessionData: ResumedSessionData,
   ) => Promise<void>,
 ) => {
@@ -52,10 +50,7 @@ export const useSessionBrowser = (
     handleResumeSession: useCallback(
       async (session: SessionInfo) => {
         try {
-          const chatsDir = path.join(
-            config.storage.getProjectDataDir(),
-            'chats',
-          );
+          const chatsDir = path.join(config.storage.getProjectDataDir(), 'chats');
 
           const fileName = session.fileName;
 
@@ -64,9 +59,7 @@ export const useSessionBrowser = (
           // Load up the conversation.
           const conversation = await loadConversationRecord(originalFilePath);
           if (!conversation) {
-            throw new Error(
-              `Failed to parse conversation from ${originalFilePath}`,
-            );
+            throw new Error(`Failed to parse conversation from ${originalFilePath}`);
           }
 
           // Use the old session's ID to continue it.
@@ -81,9 +74,7 @@ export const useSessionBrowser = (
 
           // We've loaded it; tell the UI about it.
           setIsSessionBrowserOpen(false);
-          const historyData = convertSessionToHistoryFormats(
-            conversation.messages,
-          );
+          const historyData = convertSessionToHistoryFormats(conversation.messages);
           await onLoadHistory(
             historyData.uiHistory,
             convertSessionToClientHistory(conversation.messages),

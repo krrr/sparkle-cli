@@ -450,9 +450,7 @@ describe('AskUserDialog', () => {
         question: 'Which CI provider?',
         header: 'CI',
         type: QuestionType.CHOICE,
-        options: [
-          { label: 'GitHub Actions', description: 'Built into GitHub' },
-        ],
+        options: [{ label: 'GitHub Actions', description: 'Built into GitHub' }],
         multiSelect: false,
       },
     ];
@@ -1540,10 +1538,9 @@ describe('AskUserDialog', () => {
   });
 
   it('allows the question to exceed 15 lines in a tall terminal', async () => {
-    const longQuestion = Array.from(
-      { length: 25 },
-      (_, i) => `Line ${i + 1}`,
-    ).join('\n');
+    const longQuestion = Array.from({ length: 25 }, (_, i) => `Line ${i + 1}`).join(
+      '\n',
+    );
     const questions: Question[] = [
       {
         question: longQuestion,

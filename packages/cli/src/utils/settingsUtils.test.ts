@@ -36,8 +36,7 @@ import {
 } from '../config/settingsSchema.js';
 
 vi.mock('../config/settingsSchema.js', async (importOriginal) => {
-  const original =
-    await importOriginal<typeof import('../config/settingsSchema.js')>();
+  const original = await importOriginal<typeof import('../config/settingsSchema.js')>();
   return {
     ...original,
     getSettingsSchema: vi.fn(),
@@ -310,9 +309,7 @@ describe('SettingsUtils', () => {
     describe('isValidSettingKey', () => {
       it('should return true for valid setting keys', () => {
         expect(isValidSettingKey('ui.requiresRestart')).toBe(true);
-        expect(isValidSettingKey('ui.accessibility.enableLoadingPhrases')).toBe(
-          true,
-        );
+        expect(isValidSettingKey('ui.accessibility.enableLoadingPhrases')).toBe(true);
       });
 
       it('should return false for invalid setting keys', () => {
@@ -324,9 +321,7 @@ describe('SettingsUtils', () => {
     describe('getSettingCategory', () => {
       it('should return correct category for valid settings', () => {
         expect(getSettingCategory('ui.requiresRestart')).toBe('UI');
-        expect(
-          getSettingCategory('ui.accessibility.enableLoadingPhrases'),
-        ).toBe('UI');
+        expect(getSettingCategory('ui.accessibility.enableLoadingPhrases')).toBe('UI');
       });
 
       it('should return undefined for invalid settings', () => {
@@ -681,11 +676,7 @@ describe('SettingsUtils', () => {
           ui: { requiresRestart: true },
         });
 
-        const result = getDisplayValue(
-          'ui.requiresRestart',
-          settings,
-          mergedSettings,
-        );
+        const result = getDisplayValue('ui.requiresRestart', settings, mergedSettings);
         expect(result).toBe('true*');
       });
       it('should not show * when key is not in scope', () => {
@@ -694,11 +685,7 @@ describe('SettingsUtils', () => {
           ui: { requiresRestart: false },
         });
 
-        const result = getDisplayValue(
-          'ui.requiresRestart',
-          settings,
-          mergedSettings,
-        );
+        const result = getDisplayValue('ui.requiresRestart', settings, mergedSettings);
         expect(result).toBe('false'); // shows default value
       });
 
@@ -710,11 +697,7 @@ describe('SettingsUtils', () => {
           ui: { requiresRestart: false },
         });
 
-        const result = getDisplayValue(
-          'ui.requiresRestart',
-          settings,
-          mergedSettings,
-        );
+        const result = getDisplayValue('ui.requiresRestart', settings, mergedSettings);
         expect(result).toBe('false*');
       });
 
@@ -724,11 +707,7 @@ describe('SettingsUtils', () => {
           ui: { requiresRestart: true },
         }); // inherited merged value differs from schema default (false)
 
-        const result = getDisplayValue(
-          'ui.requiresRestart',
-          settings,
-          mergedSettings,
-        );
+        const result = getDisplayValue('ui.requiresRestart', settings, mergedSettings);
         expect(result).toBe('false');
       });
 

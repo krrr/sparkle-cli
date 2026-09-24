@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  renderWithProviders,
-  persistentStateMock,
-} from '../../test-utils/render.js';
+import { renderWithProviders, persistentStateMock } from '../../test-utils/render.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { AppHeader } from './AppHeader.js';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -132,22 +129,16 @@ describe('<AppHeader />', () => {
     // and interfering with the expected persistentState.set call.
     persistentStateMock.setData({ tipsShown: 10 });
 
-    const { unmount } = await renderWithProviders(
-      <AppHeader version="1.0.0" />,
-      {
-        uiState,
-      },
-    );
+    const { unmount } = await renderWithProviders(<AppHeader version="1.0.0" />, {
+      uiState,
+    });
 
-    expect(persistentStateMock.set).toHaveBeenCalledWith(
-      'defaultBannerShownCount',
-      {
-        [crypto
-          .createHash('sha256')
-          .update(uiState.bannerData.defaultText)
-          .digest('hex')]: 1,
-      },
-    );
+    expect(persistentStateMock.set).toHaveBeenCalledWith('defaultBannerShownCount', {
+      [crypto
+        .createHash('sha256')
+        .update(uiState.bannerData.defaultText)
+        .digest('hex')]: 1,
+    });
     unmount();
   });
 
@@ -239,10 +230,7 @@ describe('<AppHeader />', () => {
     session1.unmount();
 
     // Second session - state is persisted in the fake
-    const session2 = await renderWithProviders(
-      <AppHeader version="1.0.0" />,
-      {},
-    );
+    const session2 = await renderWithProviders(<AppHeader version="1.0.0" />, {});
 
     expect(session2.lastFrame()).not.toContain('Tips');
     session2.unmount();

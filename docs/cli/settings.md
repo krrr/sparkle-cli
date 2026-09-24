@@ -1,12 +1,11 @@
 # Sparkle CLI settings (`/settings` command)
 
-Control your Sparkle CLI experience with the `/settings` command. The
-`/settings` command opens a dialog to view and edit all your Sparkle CLI
-settings, including your UI experience, keybindings, and accessibility features.
+Control your Sparkle CLI experience with the `/settings` command. The `/settings`
+command opens a dialog to view and edit all your Sparkle CLI settings, including your UI
+experience, keybindings, and accessibility features.
 
-Your Sparkle CLI settings are stored in a `settings.json` file. In addition to
-using the `/settings` command, you can also edit them in one of the following
-locations:
+Your Sparkle CLI settings are stored in a `settings.json` file. In addition to using the
+`/settings` command, you can also edit them in one of the following locations:
 
 - **User settings**: `~/.sparkle/settings.json`
 - **Workspace settings**: `your-project/.sparkle/settings.json`
@@ -17,8 +16,8 @@ locations:
 
 ## Settings reference
 
-Here is a list of all the available settings, grouped by category and ordered as
-they appear in the UI.
+Here is a list of all the available settings, grouped by category and ordered as they
+appear in the UI.
 
 <!-- SETTINGS-AUTOGEN:START -->
 

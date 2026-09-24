@@ -1,7 +1,7 @@
 # Headless mode reference
 
-Headless mode provides a programmatic interface to Sparkle CLI, returning
-structured text or JSON output without an interactive terminal UI.
+Headless mode provides a programmatic interface to Sparkle CLI, returning structured
+text or JSON output without an interactive terminal UI.
 
 ## Technical reference
 
@@ -36,8 +36,7 @@ Returns a stream of newline-delimited JSON (JSONL) events.
 
 ## Exit codes
 
-The CLI returns standard exit codes to indicate the result of the headless
-execution:
+The CLI returns standard exit codes to indicate the result of the headless execution:
 
 - `0`: Success.
 - `1`: General error or API failure.
@@ -46,6 +45,6 @@ execution:
 
 ## Next steps
 
-- Follow the [Automation tutorial](./tutorials/automation.md) for practical
-  scripting examples.
+- Follow the [Automation tutorial](./tutorials/automation.md) for practical scripting
+  examples.
 - See the [CLI reference](./cli-reference.md) for all available flags.

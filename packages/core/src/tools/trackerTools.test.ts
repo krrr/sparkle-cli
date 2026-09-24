@@ -91,9 +91,7 @@ describe('Tracker Tools Integration', () => {
       getSignal(),
     );
 
-    expect(updateResult.llmContent).toContain(
-      `Status: ${TaskStatus.IN_PROGRESS}`,
-    );
+    expect(updateResult.llmContent).toContain(`Status: ${TaskStatus.IN_PROGRESS}`);
 
     const task = await config.getTrackerService().getTask(taskId);
     expect(task?.status).toBe(TaskStatus.IN_PROGRESS);

@@ -66,8 +66,7 @@ export function ProviderEditorView({
     initialText: profile?.id || '',
     initialCursorOffset: (profile?.id || '').length,
     viewport: { width: viewportWidth, height: 1 },
-    inputFilter: (text) =>
-      text.replace(/[^a-zA-Z0-9_-]/g, '').replace(/[\r\n]/g, ''),
+    inputFilter: (text) => text.replace(/[^a-zA-Z0-9_-]/g, '').replace(/[\r\n]/g, ''),
     singleLine: true,
   });
 
@@ -178,9 +177,7 @@ export function ProviderEditorView({
         </Text>
         <Box
           borderStyle="round"
-          borderColor={
-            focusField === 'id' ? theme.ui.focus : theme.border.default
-          }
+          borderColor={focusField === 'id' ? theme.ui.focus : theme.border.default}
           paddingX={1}
         >
           <TextInput
@@ -206,9 +203,7 @@ export function ProviderEditorView({
       {/* Base URL Input */}
       <Box marginTop={1} flexDirection="column">
         <Text
-          color={
-            focusField === 'baseUrl' ? theme.text.accent : theme.text.primary
-          }
+          color={focusField === 'baseUrl' ? theme.text.accent : theme.text.primary}
           bold={focusField === 'baseUrl'}
         >
           Base URL:{' '}
@@ -218,9 +213,7 @@ export function ProviderEditorView({
         </Text>
         <Box
           borderStyle="round"
-          borderColor={
-            focusField === 'baseUrl' ? theme.ui.focus : theme.border.default
-          }
+          borderColor={focusField === 'baseUrl' ? theme.ui.focus : theme.border.default}
           paddingX={1}
         >
           <TextInput
@@ -240,9 +233,7 @@ export function ProviderEditorView({
       {/* API Key Input */}
       <Box marginTop={1} flexDirection="column">
         <Text
-          color={
-            focusField === 'apiKey' ? theme.text.accent : theme.text.primary
-          }
+          color={focusField === 'apiKey' ? theme.text.accent : theme.text.primary}
           bold={focusField === 'apiKey'}
         >
           API Key:{' '}
@@ -252,9 +243,7 @@ export function ProviderEditorView({
         </Text>
         <Box
           borderStyle="round"
-          borderColor={
-            focusField === 'apiKey' ? theme.ui.focus : theme.border.default
-          }
+          borderColor={focusField === 'apiKey' ? theme.ui.focus : theme.border.default}
           paddingX={1}
         >
           <TextInput
@@ -280,8 +269,7 @@ export function ProviderEditorView({
       {/* Help text */}
       <Box marginTop={1}>
         <Text color={theme.text.secondary}>
-          (↑/↓ or Tab to switch fields, ←/→ to toggle type, Esc to save &
-          return)
+          (↑/↓ or Tab to switch fields, ←/→ to toggle type, Esc to save & return)
         </Text>
       </Box>
     </Box>

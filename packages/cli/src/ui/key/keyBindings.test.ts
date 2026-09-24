@@ -169,9 +169,7 @@ describe('loadCustomKeybindings', () => {
   let tempFilePath: string;
 
   beforeEach(async () => {
-    tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'gemini-keybindings-test-'),
-    );
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-keybindings-test-'));
     tempFilePath = path.join(tempDir, 'keybindings.json');
     vi.spyOn(Storage, 'getUserKeybindingsPath').mockReturnValue(tempFilePath);
   });
@@ -190,9 +188,7 @@ describe('loadCustomKeybindings', () => {
   });
 
   it('merges valid custom bindings, prepending them to defaults', async () => {
-    const customJson = JSON.stringify([
-      { command: Command.RETURN, key: 'ctrl+a' },
-    ]);
+    const customJson = JSON.stringify([{ command: Command.RETURN, key: 'ctrl+a' }]);
     await fs.writeFile(tempFilePath, customJson, 'utf8');
 
     const { config, errors } = await loadCustomKeybindings();

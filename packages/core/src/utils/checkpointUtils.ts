@@ -56,10 +56,7 @@ export function generateCheckpointFileName(
   }
   const toolFilePath = rawFilePath;
 
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/:/g, '-')
-    .replace(/\./g, '_');
+  const timestamp = new Date().toISOString().replace(/:/g, '-').replace(/\./g, '_');
   const toolName = toolCall.name;
   const fileName = path.basename(toolFilePath);
 
@@ -140,15 +137,10 @@ export async function processRestorableToolCalls<HistoryType>(
 
       const fileName = `${checkpointFileName}.json`;
       checkpointsToWrite.set(fileName, JSON.stringify(checkpointData, null, 2));
-      toolCallToCheckpointMap.set(
-        toolCall.callId,
-        fileName.replace('.json', ''),
-      );
+      toolCallToCheckpointMap.set(toolCall.callId, fileName.replace('.json', ''));
     } catch (error) {
       errors.push(
-        `Failed to create checkpoint for ${toolCall.name}: ${getErrorMessage(
-          error,
-        )}`,
+        `Failed to create checkpoint for ${toolCall.name}: ${getErrorMessage(error)}`,
       );
     }
   }

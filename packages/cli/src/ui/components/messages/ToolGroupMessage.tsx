@@ -81,12 +81,7 @@ export const hasDensePayload = (tool: IndividualToolCallDisplay): boolean => {
   if (tool.confirmationDetails?.type === 'edit') return true;
 
   // Generic summary/payload pattern
-  if (
-    typeof res === 'object' &&
-    res !== null &&
-    'summary' in res &&
-    'payload' in res
-  ) {
+  if (typeof res === 'object' && res !== null && 'summary' in res && 'payload' in res) {
     return true;
   }
 
@@ -133,12 +128,8 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
     [allToolCalls, isLowErrorVerbosity],
   );
 
-  const {
-    activePtyId,
-    embeddedShellFocused,
-    backgroundTasks,
-    pendingHistoryItems,
-  } = useUIState();
+  const { activePtyId, embeddedShellFocused, backgroundTasks, pendingHistoryItems } =
+    useUIState();
 
   const config = useConfig();
 
@@ -151,19 +142,11 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
         pendingHistoryItems,
         backgroundTasks,
       ),
-    [
-      item,
-      activePtyId,
-      embeddedShellFocused,
-      pendingHistoryItems,
-      backgroundTasks,
-    ],
+    [item, activePtyId, embeddedShellFocused, pendingHistoryItems, backgroundTasks],
   );
 
   const groupedTools = useMemo(() => {
-    const groups: Array<
-      IndividualToolCallDisplay | IndividualToolCallDisplay[]
-    > = [];
+    const groups: Array<IndividualToolCallDisplay | IndividualToolCallDisplay[]> = [];
     for (const tool of visibleToolCalls) {
       if (tool.kind === Kind.Agent) {
         const lastGroup = groups[groups.length - 1];
@@ -205,8 +188,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
         nextGroup && !Array.isArray(nextGroup) && isTopicTool(nextGroup.name);
 
       const isAgentGroup = Array.isArray(group);
-      const isCompact =
-        !isAgentGroup && isCompactTool(group, isCompactModeEnabled);
+      const isCompact = !isAgentGroup && isCompactTool(group, isCompactModeEnabled);
       const isTopicToolCall = !isAgentGroup && isTopicTool(group.name);
 
       // Align isFirst logic with rendering
@@ -216,10 +198,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
         let allPreviousTopics = true;
         for (let j = 0; j < i; j++) {
           const prevGroupItem = groupedTools[j];
-          if (
-            Array.isArray(prevGroupItem) ||
-            !isTopicTool(prevGroupItem.name)
-          ) {
+          if (Array.isArray(prevGroupItem) || !isTopicTool(prevGroupItem.name)) {
             allPreviousTopics = false;
             break;
           }
@@ -243,10 +222,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
         // 3. Agent List (group.length lines): One line per agent in the group.
         // 4. Closing Border (1): Added if transition logic (showClosingBorder) requires it.
         height +=
-          (isFirstProp ? 1 : 0) +
-          1 +
-          group.length +
-          (showClosingBorder ? 1 : 0);
+          (isFirstProp ? 1 : 0) + 1 + group.length + (showClosingBorder ? 1 : 0);
       } else if (isTopicToolCall) {
         // Topic Message Spacing Breakdown:
         // 1. Topic Content (1).
@@ -282,10 +258,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
         if (hasDensePayload(tool)) {
           countToolCallsWithResults++;
         }
-      } else if (
-        tool.resultDisplay !== undefined &&
-        tool.resultDisplay !== ''
-      ) {
+      } else if (tool.resultDisplay !== undefined && tool.resultDisplay !== '') {
         countToolCallsWithResults++;
       }
     }
@@ -378,8 +351,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
           nextGroup && !Array.isArray(nextGroup) && isTopicTool(nextGroup.name);
 
         const isAgentGroup = Array.isArray(group);
-        const isCompact =
-          !isAgentGroup && isCompactTool(group, isCompactModeEnabled);
+        const isCompact = !isAgentGroup && isCompactTool(group, isCompactModeEnabled);
         const isTopicToolCall = !isAgentGroup && isTopicTool(group.name);
 
         const isFirstProp = !!(isFirst
@@ -393,11 +365,7 @@ export const ToolGroupMessage: React.FC<ToolGroupMessageProps> = ({
 
         if (isAgentGroup) {
           return (
-            <Box
-              key={group[0].callId}
-              flexDirection="column"
-              width={contentWidth}
-            >
+            <Box key={group[0].callId} flexDirection="column" width={contentWidth}>
               <SubagentGroupDisplay
                 toolCalls={group}
                 availableTerminalHeight={availableTerminalHeight}

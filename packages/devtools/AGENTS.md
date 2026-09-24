@@ -1,17 +1,15 @@
 # Sparkle CLI DevTools
 
-Integrated Developer Tools for Sparkle CLI, providing a Chrome DevTools-like
-interface for Network and Console inspection. Launched automatically when the
-`general.devtools` setting is enabled.
+Integrated Developer Tools for Sparkle CLI, providing a Chrome DevTools-like interface
+for Network and Console inspection. Launched automatically when the `general.devtools`
+setting is enabled.
 
 ## Features
 
-- **Network Inspector**: Real-time request/response logging with streaming
-  chunks and duration tracking
-- **Console Inspector**: Real-time console log viewing
-  (log/warn/error/debug/info)
-- **Session Management**: Multiple CLI session support with live connection
-  status
+- **Network Inspector**: Real-time request/response logging with streaming chunks and
+  duration tracking
+- **Console Inspector**: Real-time console log viewing (log/warn/error/debug/info)
+- **Session Management**: Multiple CLI session support with live connection status
 - **Import/Export**: Import JSONL log files, export current session logs
 
 ## How It Works

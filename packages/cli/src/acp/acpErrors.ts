@@ -29,9 +29,7 @@ function extractRecursiveMessage(input: string): string {
       const parsed = JSON.parse(trimmed);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const next =
-        parsed?.error?.message ||
-        parsed?.[0]?.error?.message ||
-        parsed?.message;
+        parsed?.error?.message || parsed?.[0]?.error?.message || parsed?.message;
 
       if (next && typeof next === 'string' && next !== input) {
         return extractRecursiveMessage(next);

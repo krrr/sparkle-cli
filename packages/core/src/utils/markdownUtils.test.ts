@@ -24,9 +24,7 @@ describe('markdownUtils', () => {
 
     it('should handle simple objects and convert camelCase to Space Case', () => {
       const data = { userName: 'Alice', userAge: 30 };
-      expect(jsonToMarkdown(data)).toBe(
-        '- **User Name**: Alice\n- **User Age**: 30',
-      );
+      expect(jsonToMarkdown(data)).toBe('- **User Name**: Alice\n- **User Age**: 30');
     });
 
     it('should handle empty structures', () => {

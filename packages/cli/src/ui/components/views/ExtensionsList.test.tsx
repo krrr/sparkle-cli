@@ -46,9 +46,7 @@ describe('<ExtensionsList />', () => {
     vi.resetAllMocks();
   });
 
-  const mockUIState = (
-    extensionsUpdateState: Map<string, ExtensionUpdateState>,
-  ) => {
+  const mockUIState = (extensionsUpdateState: Map<string, ExtensionUpdateState>) => {
     mockUseUIState.mockReturnValue({
       extensionsUpdateState,
       // Add other required properties from UIState if needed by the component
@@ -57,9 +55,7 @@ describe('<ExtensionsList />', () => {
 
   it('should render "No extensions installed." if there are no extensions', async () => {
     mockUIState(new Map());
-    const { lastFrame, unmount } = await render(
-      <ExtensionsList extensions={[]} />,
-    );
+    const { lastFrame, unmount } = await render(<ExtensionsList extensions={[]} />);
     expect(lastFrame()).toContain('No extensions installed.');
     unmount();
   });
@@ -114,18 +110,15 @@ describe('<ExtensionsList />', () => {
       state: ExtensionUpdateState.UP_TO_DATE,
       expectedText: '(up to date)',
     },
-  ])(
-    'should correctly display the state: $state',
-    async ({ state, expectedText }) => {
-      const updateState = new Map([[mockExtensions[0].name, state]]);
-      mockUIState(updateState);
-      const { lastFrame, unmount } = await render(
-        <ExtensionsList extensions={[mockExtensions[0]]} />,
-      );
-      expect(lastFrame()).toContain(expectedText);
-      unmount();
-    },
-  );
+  ])('should correctly display the state: $state', async ({ state, expectedText }) => {
+    const updateState = new Map([[mockExtensions[0].name, state]]);
+    mockUIState(updateState);
+    const { lastFrame, unmount } = await render(
+      <ExtensionsList extensions={[mockExtensions[0]]} />,
+    );
+    expect(lastFrame()).toContain(expectedText);
+    unmount();
+  });
 
   it('should render resolved settings for an extension', async () => {
     mockUIState(new Map());

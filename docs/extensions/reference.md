@@ -5,22 +5,20 @@ This guide covers the `sparkle extensions` commands and the structure of the
 
 ## Manage extensions
 
-Use the `sparkle extensions` command group to manage your extensions from the
-terminal.
+Use the `sparkle extensions` command group to manage your extensions from the terminal.
 
-Note that commands like `sparkle extensions install` are not supported within
-the CLI's interactive mode. However, you can use the `/extensions list` command
-to view installed extensions. All management operations, including updates to
-slash commands, take effect only after you restart the CLI session.
+Note that commands like `sparkle extensions install` are not supported within the CLI's
+interactive mode. However, you can use the `/extensions list` command to view installed
+extensions. All management operations, including updates to slash commands, take effect
+only after you restart the CLI session.
 
 ### Install an extension
 
-Install an extension by providing its GitHub repository URL or a local file
-path.
+Install an extension by providing its GitHub repository URL or a local file path.
 
 Sparkle CLI creates a copy of the extension during installation. You must run
-`sparkle extensions update` to pull changes from the source. To install from
-GitHub, you must have `git` installed on your machine.
+`sparkle extensions update` to pull changes from the source. To install from GitHub, you
+must have `git` installed on your machine.
 
 ```bash
 sparkle extensions install <source> [--ref <ref>] [--auto-update] [--pre-release] [--consent] [--skip-settings]
@@ -43,8 +41,8 @@ sparkle extensions uninstall <name...>
 
 ### Disable an extension
 
-Extensions are enabled globally by default. You can disable an extension
-entirely or for a specific workspace.
+Extensions are enabled globally by default. You can disable an extension entirely or for
+a specific workspace.
 
 ```bash
 sparkle extensions disable <name> [--scope <scope>]
@@ -66,8 +64,7 @@ sparkle extensions enable <name> [--scope <scope>]
 
 ### Update an extension
 
-Update an extension to the version specified in its `sparkle-extension.json`
-file.
+Update an extension to the version specified in its `sparkle-extension.json` file.
 
 ```bash
 sparkle extensions update <name>
@@ -93,9 +90,8 @@ sparkle extensions new <path> [template]
 
 ### Link a local extension
 
-Create a symbolic link between your development directory and Sparkle CLI
-extensions directory. This lets you test changes immediately without
-reinstalling.
+Create a symbolic link between your development directory and Sparkle CLI extensions
+directory. This lets you test changes immediately without reinstalling.
 
 ```bash
 sparkle extensions link <path>
@@ -103,8 +99,8 @@ sparkle extensions link <path>
 
 ## Extension format
 
-Sparkle CLI loads extensions from `<home>/.sparkle/extensions`. Each extension
-must have a `sparkle-extension.json` file in its root directory.
+Sparkle CLI loads extensions from `<home>/.sparkle/extensions`. Each extension must have
+a `sparkle-extension.json` file in its root directory.
 
 ### `sparkle-extension.json`
 
@@ -131,55 +127,49 @@ The manifest file defines the extension's behavior and configuration.
 }
 ```
 
-- `name`: The name of the extension. This is used to uniquely identify the
-  extension and for conflict resolution when extension commands have the same
-  name as user or project commands. The name should be lowercase or numbers and
-  use dashes instead of underscores or spaces. This is how users will refer to
-  your extension in the CLI. Note that we expect this name to match the
-  extension directory name.
+- `name`: The name of the extension. This is used to uniquely identify the extension and
+  for conflict resolution when extension commands have the same name as user or project
+  commands. The name should be lowercase or numbers and use dashes instead of
+  underscores or spaces. This is how users will refer to your extension in the CLI. Note
+  that we expect this name to match the extension directory name.
 - `version`: The version of the extension.
 - `description`: A short description of the extension. This will be displayed on
   [geminicli.com/extensions](https://geminicli.com/extensions).
-- `migratedTo`: The URL of the new repository source for the extension. If this
-  is set, the CLI will automatically check this new source for updates and
-  migrate the extension's installation to the new source if an update is found.
-- `mcpServers`: A map of MCP servers to settings. The key is the name of the
-  server, and the value is the server configuration. These servers will be
-  loaded on startup just like MCP servers defined in a
-  [`settings.json` file](../reference/configuration.md). If both an extension
-  and a `settings.json` file define an MCP server with the same name, the server
-  defined in the `settings.json` file takes precedence.
-  - Note that all MCP server configuration options are supported except for
-    `trust`.
-  - For portability, you should use `${extensionPath}` to refer to files within
-    your extension directory.
-  - Separate your executable and its arguments using `command` and `args`
-    instead of putting them both in `command`.
-- `contextFileName`: The name of the file that contains the context for the
-  extension. This will be used to load the context from the extension directory.
-  If this property is not used but an `AGENTS.md` file is present in your
-  extension directory, then that file will be loaded.
-- `excludeTools`: An array of tool names to exclude from the model. You can also
-  specify command-specific restrictions for tools that support it, like the
-  `run_shell_command` tool. For example,
-  `"excludeTools": ["run_shell_command(rm -rf)"]` will block the `rm -rf`
-  command. Note that this differs from the MCP server `excludeTools`
+- `migratedTo`: The URL of the new repository source for the extension. If this is set,
+  the CLI will automatically check this new source for updates and migrate the
+  extension's installation to the new source if an update is found.
+- `mcpServers`: A map of MCP servers to settings. The key is the name of the server, and
+  the value is the server configuration. These servers will be loaded on startup just
+  like MCP servers defined in a [`settings.json` file](../reference/configuration.md).
+  If both an extension and a `settings.json` file define an MCP server with the same
+  name, the server defined in the `settings.json` file takes precedence.
+  - Note that all MCP server configuration options are supported except for `trust`.
+  - For portability, you should use `${extensionPath}` to refer to files within your
+    extension directory.
+  - Separate your executable and its arguments using `command` and `args` instead of
+    putting them both in `command`.
+- `contextFileName`: The name of the file that contains the context for the extension.
+  This will be used to load the context from the extension directory. If this property
+  is not used but an `AGENTS.md` file is present in your extension directory, then that
+  file will be loaded.
+- `excludeTools`: An array of tool names to exclude from the model. You can also specify
+  command-specific restrictions for tools that support it, like the `run_shell_command`
+  tool. For example, `"excludeTools": ["run_shell_command(rm -rf)"]` will block the
+  `rm -rf` command. Note that this differs from the MCP server `excludeTools`
   functionality, which can be listed in the MCP server config.
 - `plan`: Planning features configuration.
-  - `directory`: The directory where planning artifacts are stored. This serves
-    as a fallback if the user hasn't specified a plan directory in their
-    settings. If not specified by either the extension or the user, the default
-    is `~/.sparkle/data/<project>/<session-id>/plans/`.
+  - `directory`: The directory where planning artifacts are stored. This serves as a
+    fallback if the user hasn't specified a plan directory in their settings. If not
+    specified by either the extension or the user, the default is
+    `~/.sparkle/data/<project>/<session-id>/plans/`.
 
-When Sparkle CLI starts, it loads all the extensions and merges their
-configurations. If there are any conflicts, the workspace configuration takes
-precedence.
+When Sparkle CLI starts, it loads all the extensions and merges their configurations. If
+there are any conflicts, the workspace configuration takes precedence.
 
 ### Extension settings
 
-Extensions can define settings that users provide during installation, such as
-API keys or URLs. These values are stored in a `.env` file within the extension
-directory.
+Extensions can define settings that users provide during installation, such as API keys
+or URLs. These values are stored in a `.env` file within the extension directory.
 
 To define settings, add a `settings` array to your manifest:
 
@@ -201,8 +191,8 @@ To define settings, add a `settings` array to your manifest:
 - `name`: The setting's display name.
 - `description`: A clear explanation of the setting.
 - `envVar`: The environment variable name where the value is stored.
-- `sensitive`: If `true`, the value is stored in the system keychain and
-  obfuscated in the UI.
+- `sensitive`: If `true`, the value is stored in the system keychain and obfuscated in
+  the UI.
 
 To update an extension's settings:
 
@@ -212,25 +202,25 @@ sparkle extensions config <name> [setting] [--scope <scope>]
 
 #### Environment variable sanitization
 
-For security reasons, sensitive environment variables are filtered out and not
-passed to extensions or MCP servers by default.
+For security reasons, sensitive environment variables are filtered out and not passed to
+extensions or MCP servers by default.
 
-Extensions **will not** inherit the user's full shell environment variables.
-They will only have access to:
+Extensions **will not** inherit the user's full shell environment variables. They will
+only have access to:
 
 1. Standard safe variables (e.g., `HOME`, `PATH`, `TMPDIR`).
-2. Variables explicitly declared and requested in the `sparkle-extension.json`
-   manifest via the `settings` array (using the `envVar` property).
+2. Variables explicitly declared and requested in the `sparkle-extension.json` manifest
+   via the `settings` array (using the `envVar` property).
 
-If your extension requires specific environment variables (like an API key,
-custom host, or config path), you **must** declare them in the `settings` array
-so the CLI can allowlist them for use within the extension.
+If your extension requires specific environment variables (like an API key, custom host,
+or config path), you **must** declare them in the `settings` array so the CLI can
+allowlist them for use within the extension.
 
 ### Custom commands
 
 Provide [custom commands](../cli/custom-commands.md) by placing TOML files in a
-`commands/` subdirectory. Sparkle CLI uses the directory structure to determine
-the command name.
+`commands/` subdirectory. Sparkle CLI uses the directory structure to determine the
+command name.
 
 For an extension named `gcp`:
 
@@ -239,15 +229,15 @@ For an extension named `gcp`:
 
 ### Hooks
 
-Intercept and customize CLI behavior using [hooks](../hooks/index.md). Define
-hooks in a `hooks/hooks.json` file within your extension directory. Note that
-hooks are not defined in the `sparkle-extension.json` manifest.
+Intercept and customize CLI behavior using [hooks](../hooks/index.md). Define hooks in a
+`hooks/hooks.json` file within your extension directory. Note that hooks are not defined
+in the `sparkle-extension.json` manifest.
 
 ### Agent skills
 
-Bundle [agent skills](../cli/skills.md) to provide specialized workflows. Place
-skill definitions in a `skills/` directory. For example,
-`skills/security-audit/SKILL.md` exposes a `security-audit` skill.
+Bundle [agent skills](../cli/skills.md) to provide specialized workflows. Place skill
+definitions in a `skills/` directory. For example, `skills/security-audit/SKILL.md`
+exposes a `security-audit` skill.
 
 ### Sub-agents
 
@@ -255,22 +245,22 @@ skill definitions in a `skills/` directory. For example,
 > [!NOTE]
 > Sub-agents are a preview feature currently under active development.
 
-Provide [sub-agents](../core/subagents.md) that users can delegate tasks to. Add
-agent definition files (`.md`) to an `agents/` directory in your extension root.
+Provide [sub-agents](../core/subagents.md) that users can delegate tasks to. Add agent
+definition files (`.md`) to an `agents/` directory in your extension root.
 
 ### <a id="policy-engine"></a>Policy Engine
 
 Extensions can contribute policy rules and safety checkers to Sparkle CLI
-[Policy Engine](../reference/policy-engine.md). These rules are defined in
-`.toml` files and take effect when the extension is activated.
+[Policy Engine](../reference/policy-engine.md). These rules are defined in `.toml` files
+and take effect when the extension is activated.
 
-To add policies, create a `policies/` directory in your extension's root and
-place your `.toml` policy files inside it. Sparkle CLI automatically loads all
-`.toml` files from this directory.
+To add policies, create a `policies/` directory in your extension's root and place your
+`.toml` policy files inside it. Sparkle CLI automatically loads all `.toml` files from
+this directory.
 
 Rules contributed by extensions run in their own tier (tier 2), alongside
-workspace-defined policies. This tier has higher priority than the default rules
-but lower priority than user policies.
+workspace-defined policies. This tier has higher priority than the default rules but
+lower priority than user policies.
 
 <!-- prettier-ignore -->
 > [!WARNING]
@@ -300,8 +290,8 @@ required_context = ["environment"]
 
 ### Themes
 
-Extensions can provide custom themes to personalize the CLI UI. Themes are
-defined in the `themes` array in `sparkle-extension.json`.
+Extensions can provide custom themes to personalize the CLI UI. Themes are defined in
+the `themes` array in `sparkle-extension.json`.
 
 **Example**
 
@@ -337,17 +327,16 @@ defined in the `themes` array in `sparkle-extension.json`.
 }
 ```
 
-Custom themes provided by extensions can be selected using the `/theme` command
-or by setting the `ui.theme` property in your `settings.json` file. Note that
-when referring to a theme from an extension, the extension name is appended to
-the theme name in parentheses, for example,
-`shades-of-green (my-green-extension)`.
+Custom themes provided by extensions can be selected using the `/theme` command or by
+setting the `ui.theme` property in your `settings.json` file. Note that when referring
+to a theme from an extension, the extension name is appended to the theme name in
+parentheses, for example, `shades-of-green (my-green-extension)`.
 
 ### Conflict resolution
 
-Extension commands have the lowest precedence. If an extension command name
-conflicts with a user or project command, the extension command is prefixed with
-the extension name (for example, `/gcp.deploy`) using a dot separator.
+Extension commands have the lowest precedence. If an extension command name conflicts
+with a user or project command, the extension command is prefixed with the extension
+name (for example, `/gcp.deploy`) using a dot separator.
 
 ## Variables
 

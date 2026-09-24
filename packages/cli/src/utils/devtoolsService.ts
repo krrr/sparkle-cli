@@ -76,9 +76,7 @@ async function startOrJoinDevTools(
   const winnerAlive = await probeDevTools(defaultHost, defaultPort);
   if (winnerAlive) {
     await devtools.stop();
-    debugLogger.log(
-      `DevTools (existing) at: http://${defaultHost}:${defaultPort}`,
-    );
+    debugLogger.log(`DevTools (existing) at: http://${defaultHost}:${defaultPort}`);
     return { host: defaultHost, port: defaultPort };
   }
 
@@ -149,10 +147,7 @@ async function startDevToolsServerImpl(config: Config): Promise<string> {
   const onReconnectFailed = () => handlePromotion(config);
 
   // Probe for an existing DevTools server
-  const existing = await probeDevTools(
-    DEFAULT_DEVTOOLS_HOST,
-    DEFAULT_DEVTOOLS_PORT,
-  );
+  const existing = await probeDevTools(DEFAULT_DEVTOOLS_HOST, DEFAULT_DEVTOOLS_PORT);
 
   let host = DEFAULT_DEVTOOLS_HOST;
   let port = DEFAULT_DEVTOOLS_PORT;

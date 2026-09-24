@@ -14,10 +14,7 @@ import {
 
 import type { CommandContext } from '../../ui/commands/types.js';
 import type { IPromptProcessor, PromptPipelineContent } from './types.js';
-import {
-  SHELL_INJECTION_TRIGGER,
-  SHORTHAND_ARGS_PLACEHOLDER,
-} from './types.js';
+import { SHELL_INJECTION_TRIGGER, SHORTHAND_ARGS_PLACEHOLDER } from './types.js';
 import { extractInjections, type Injection } from './injectionParser.js';
 import { themeManager } from '../../ui/themes/theme-manager.js';
 
@@ -57,9 +54,7 @@ export class ShellProcessor implements IPromptProcessor {
     prompt: PromptPipelineContent,
     context: CommandContext,
   ): Promise<PromptPipelineContent> {
-    return flatMapTextParts(prompt, (text) =>
-      this.processString(text, context),
-    );
+    return flatMapTextParts(prompt, (text) => this.processString(text, context));
   }
 
   private async processString(
@@ -69,9 +64,7 @@ export class ShellProcessor implements IPromptProcessor {
     const userArgsRaw = context.invocation?.args || '';
 
     if (!prompt.includes(SHELL_INJECTION_TRIGGER)) {
-      return [
-        { text: prompt.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw) },
-      ];
+      return [{ text: prompt.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw) }];
     }
 
     const config = context.services.agentContext?.config;
@@ -89,29 +82,25 @@ export class ShellProcessor implements IPromptProcessor {
 
     // If extractInjections found no closed blocks (and didn't throw), treat as raw.
     if (injections.length === 0) {
-      return [
-        { text: prompt.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw) },
-      ];
+      return [{ text: prompt.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw) }];
     }
 
     const { shell } = getShellConfiguration();
     const userArgsEscaped = escapeShellArg(userArgsRaw, shell);
 
-    const resolvedInjections: ResolvedShellInjection[] = injections.map(
-      (injection) => {
-        const command = injection.content;
+    const resolvedInjections: ResolvedShellInjection[] = injections.map((injection) => {
+      const command = injection.content;
 
-        if (command === '') {
-          return { ...injection, resolvedCommand: undefined };
-        }
+      if (command === '') {
+        return { ...injection, resolvedCommand: undefined };
+      }
 
-        const resolvedCommand = command.replaceAll(
-          SHORTHAND_ARGS_PLACEHOLDER,
-          userArgsEscaped,
-        );
-        return { ...injection, resolvedCommand };
-      },
-    );
+      const resolvedCommand = command.replaceAll(
+        SHORTHAND_ARGS_PLACEHOLDER,
+        userArgsEscaped,
+      );
+      return { ...injection, resolvedCommand };
+    });
 
     const commandsToConfirm = new Set<string>();
     for (const injection of resolvedInjections) {
@@ -155,10 +144,7 @@ export class ShellProcessor implements IPromptProcessor {
     for (const injection of resolvedInjections) {
       // Append the text segment BEFORE the injection, substituting {{args}} with RAW input.
       const segment = prompt.substring(lastIndex, injection.startIndex);
-      processedPrompt += segment.replaceAll(
-        SHORTHAND_ARGS_PLACEHOLDER,
-        userArgsRaw,
-      );
+      processedPrompt += segment.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw);
 
       // Execute the resolved command (which already has ESCAPED input).
       if (injection.resolvedCommand) {
@@ -207,10 +193,7 @@ export class ShellProcessor implements IPromptProcessor {
 
     // Append the remaining text AFTER the last injection, substituting {{args}} with RAW input.
     const finalSegment = prompt.substring(lastIndex);
-    processedPrompt += finalSegment.replaceAll(
-      SHORTHAND_ARGS_PLACEHOLDER,
-      userArgsRaw,
-    );
+    processedPrompt += finalSegment.replaceAll(SHORTHAND_ARGS_PLACEHOLDER, userArgsRaw);
 
     return [{ text: processedPrompt }];
   }

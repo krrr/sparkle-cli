@@ -27,9 +27,7 @@ describe('ModelConfigService', () => {
       const service = new ModelConfigService(DEFAULT_MODEL_CONFIGS);
 
       expect(service.getContextWindow(DEFAULT_GEMINI_MODEL)).toBe(1_048_576);
-      expect(service.getContextWindow(DEFAULT_GEMINI_FLASH_MODEL)).toBe(
-        1_048_576,
-      );
+      expect(service.getContextWindow(DEFAULT_GEMINI_FLASH_MODEL)).toBe(1_048_576);
     });
 
     it('resolves model aliases before reading the context window', () => {
@@ -526,9 +524,7 @@ describe('ModelConfigService', () => {
           },
         };
         const service = new ModelConfigService(config);
-        expect(() =>
-          service.getResolvedConfig({ model: 'abstract-base' }),
-        ).toThrow(
+        expect(() => service.getResolvedConfig({ model: 'abstract-base' })).toThrow(
           'Could not resolve a model name for alias "abstract-base". Please ensure the alias chain or a matching override specifies a model.',
         );
       });
@@ -667,9 +663,7 @@ describe('ModelConfigService', () => {
       const resolved = service.getResolvedConfig({ model: 'base' });
 
       expect(resolved.model).toBe('gemini-pro');
-      expect(resolved.generateContentConfig.stopSequences).toEqual([
-        'overrideFoo',
-      ]);
+      expect(resolved.generateContentConfig.stopSequences).toEqual(['overrideFoo']);
     });
   });
 
@@ -1201,9 +1195,9 @@ describe('ModelConfigService', () => {
       expect(service.resolveModelId('flash')).toBe('gpt-4o-mini');
       expect(service.resolveModelId('flash-lite')).toBe('gpt-4o-mini');
       expect(service.resolveModelId('auto')).toBe(DEFAULT_OPENAI_MODEL);
-      expect(
-        service.resolveClassifierModelId('flash', DEFAULT_OPENAI_MODEL),
-      ).toBe('gpt-4o-mini');
+      expect(service.resolveClassifierModelId('flash', DEFAULT_OPENAI_MODEL)).toBe(
+        'gpt-4o-mini',
+      );
 
       // Chains resolve through the recompiled config
       const chain = service.resolveChain('auto-default');
@@ -1374,9 +1368,7 @@ describe('ModelConfigService', () => {
       service.applyProfile({
         id: 'effort-profile',
         providerType: ProviderType.USE_OPENAI,
-        models: [
-          { id: 'reasoner-v1', generateConfig: { reasoningEffort: 'high' } },
-        ],
+        models: [{ id: 'reasoner-v1', generateConfig: { reasoningEffort: 'high' } }],
         defaultModel: 'reasoner-v1',
       });
 
@@ -1403,9 +1395,7 @@ describe('ModelConfigService', () => {
       expect(optionsWithTrue.map((o) => o.modelId)).toContain('gemini-3-pro');
 
       const optionsWithUndefined = service.getAvailableModelOptions({});
-      expect(optionsWithUndefined.map((o) => o.modelId)).toContain(
-        'gemini-3-pro',
-      );
+      expect(optionsWithUndefined.map((o) => o.modelId)).toContain('gemini-3-pro');
     });
   });
 

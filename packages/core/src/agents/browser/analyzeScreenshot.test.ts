@@ -15,9 +15,7 @@ const mockMessageBus = {
   waitForConfirmation: vi.fn().mockResolvedValue({ approved: true }),
 } as unknown as MessageBus;
 
-function createMockBrowserManager(
-  callToolResult?: McpToolCallResult,
-): BrowserManager {
+function createMockBrowserManager(callToolResult?: McpToolCallResult): BrowserManager {
   return {
     callTool: vi.fn().mockResolvedValue(
       callToolResult ?? {
@@ -76,11 +74,7 @@ describe('analyzeScreenshot', () => {
     it('creates a tool with the correct name and schema', () => {
       const browserManager = createMockBrowserManager();
       const config = createMockConfig();
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       expect(tool.name).toBe('analyze_screenshot');
     });
@@ -90,11 +84,7 @@ describe('analyzeScreenshot', () => {
     it('captures a screenshot and returns visual analysis', async () => {
       const browserManager = createMockBrowserManager();
       const config = createMockConfig();
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Find the blue submit button',
@@ -104,10 +94,7 @@ describe('analyzeScreenshot', () => {
       });
 
       // Verify screenshot was captured
-      expect(browserManager.callTool).toHaveBeenCalledWith(
-        'take_screenshot',
-        {},
-      );
+      expect(browserManager.callTool).toHaveBeenCalledWith('take_screenshot', {});
 
       // Verify the visual model was called
       const contentGenerator = config.getContentGenerator();
@@ -158,11 +145,7 @@ describe('analyzeScreenshot', () => {
     it('omits computerUse tools for non-computer-use models', async () => {
       const browserManager = createMockBrowserManager();
       const config = createMockConfig(undefined, undefined, 'gemini-2.0-flash');
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Find the search bar',
@@ -187,11 +170,7 @@ describe('analyzeScreenshot', () => {
         content: [{ type: 'text', text: 'No screenshot available' }],
       });
       const config = createMockConfig();
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Find the button',
@@ -212,11 +191,7 @@ describe('analyzeScreenshot', () => {
       const config = createMockConfig({
         candidates: [{ content: { parts: [] } }],
       });
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Check the layout',
@@ -231,15 +206,8 @@ describe('analyzeScreenshot', () => {
 
     it('returns a model-unavailability fallback for 404 errors', async () => {
       const browserManager = createMockBrowserManager();
-      const config = createMockConfig(
-        undefined,
-        new Error('Model not found: 404'),
-      );
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const config = createMockConfig(undefined, new Error('Model not found: 404'));
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Find the red error',
@@ -249,22 +217,13 @@ describe('analyzeScreenshot', () => {
       });
 
       expect(result.error).toBeDefined();
-      expect(result.llmContent).toContain(
-        'Visual analysis model is not available',
-      );
+      expect(result.llmContent).toContain('Visual analysis model is not available');
     });
 
     it('returns a model-unavailability fallback for 403 errors', async () => {
       const browserManager = createMockBrowserManager();
-      const config = createMockConfig(
-        undefined,
-        new Error('permission denied: 403'),
-      );
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const config = createMockConfig(undefined, new Error('permission denied: 403'));
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Identify the element',
@@ -274,19 +233,13 @@ describe('analyzeScreenshot', () => {
       });
 
       expect(result.error).toBeDefined();
-      expect(result.llmContent).toContain(
-        'Visual analysis model is not available',
-      );
+      expect(result.llmContent).toContain('Visual analysis model is not available');
     });
 
     it('returns a generic error for non-model errors', async () => {
       const browserManager = createMockBrowserManager();
       const config = createMockConfig(undefined, new Error('Network timeout'));
-      const tool = createAnalyzeScreenshotTool(
-        browserManager,
-        config,
-        mockMessageBus,
-      );
+      const tool = createAnalyzeScreenshotTool(browserManager, config, mockMessageBus);
 
       const invocation = tool.build({
         instruction: 'Find something',

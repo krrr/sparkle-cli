@@ -20,11 +20,7 @@ describe('AppRig', () => {
   });
 
   it('should handle deterministic tool turns with breakpoints', async () => {
-    const fakeResponsesPath = path.join(
-      __dirname,
-      'fixtures',
-      'steering.responses',
-    );
+    const fakeResponsesPath = path.join(__dirname, 'fixtures', 'steering.responses');
     rig = new AppRig({
       fakeResponsesPath,
       configOverrides: { modelSteering: true },
@@ -61,11 +57,7 @@ describe('AppRig', () => {
   });
 
   it('should render the app and handle a simple message', async () => {
-    const fakeResponsesPath = path.join(
-      __dirname,
-      'fixtures',
-      'simple.responses',
-    );
+    const fakeResponsesPath = path.join(__dirname, 'fixtures', 'simple.responses');
     rig = new AppRig({ fakeResponsesPath });
     await rig.initialize();
     await rig.render();

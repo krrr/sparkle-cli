@@ -25,9 +25,7 @@ export function calculateAverageLatency(metrics: ModelMetrics): number {
   return metrics.api.totalLatencyMs / metrics.api.totalRequests;
 }
 
-export function calculateAverageTimeToFirstToken(
-  metrics: ModelMetrics,
-): number {
+export function calculateAverageTimeToFirstToken(metrics: ModelMetrics): number {
   const sampleCount =
     metrics.api.totalTimeToFirstTokenRequests ?? metrics.api.totalRequests;
   if (sampleCount === 0) {
@@ -43,18 +41,14 @@ export function calculateTokensPerSecond(metrics: ModelMetrics): number {
   return metrics.tokens.candidates / (metrics.api.totalLatencyMs / 1000);
 }
 
-export function calculateCacheHitRate(
-  metrics: ModelMetrics | RoleMetrics,
-): number {
+export function calculateCacheHitRate(metrics: ModelMetrics | RoleMetrics): number {
   if (metrics.tokens.prompt === 0) {
     return 0;
   }
   return (metrics.tokens.cached / metrics.tokens.prompt) * 100;
 }
 
-export const computeSessionStats = (
-  metrics: SessionMetrics,
-): ComputedSessionStats => {
+export const computeSessionStats = (metrics: SessionMetrics): ComputedSessionStats => {
   const { models, tools, files } = metrics;
   const totalApiTime = Object.values(models).reduce(
     (acc, model) => acc + model.api.totalLatencyMs,

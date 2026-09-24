@@ -30,9 +30,7 @@ export async function handleUninstall(args: UninstallArgs) {
 
     let namesToUninstall: string[] = [];
     if (args.all) {
-      namesToUninstall = extensionManager
-        .getExtensions()
-        .map((ext) => ext.name);
+      namesToUninstall = extensionManager.getExtensions().map((ext) => ext.name);
     } else if (args.names) {
       namesToUninstall = [...new Set(args.names)];
     }
@@ -72,8 +70,7 @@ export const uninstallCommand: CommandModule = {
   builder: (yargs) =>
     yargs
       .positional('names', {
-        describe:
-          'The name(s) or source path(s) of the extension(s) to uninstall.',
+        describe: 'The name(s) or source path(s) of the extension(s) to uninstall.',
         type: 'string',
         array: true,
       })

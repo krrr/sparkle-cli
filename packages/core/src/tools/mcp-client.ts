@@ -64,10 +64,7 @@ import {
   isAuthenticationError,
   UnauthorizedError,
 } from '../utils/errors.js';
-import type {
-  Unsubscribe,
-  WorkspaceContext,
-} from '../utils/workspaceContext.js';
+import type { Unsubscribe, WorkspaceContext } from '../utils/workspaceContext.js';
 import { getToolCallContext } from '../utils/toolCallContext.js';
 import type { ToolRegistry } from './tool-registry.js';
 import { debugLogger } from '../utils/debugLogger.js';
@@ -225,10 +222,7 @@ export class McpClient implements McpProgressReporter {
   /**
    * Discovers tools and prompts from the MCP server into the specified registries.
    */
-  async discoverInto(
-    cliConfig: McpContext,
-    registries: RegistrySet,
-  ): Promise<void> {
+  async discoverInto(cliConfig: McpContext, registries: RegistrySet): Promise<void> {
     this.assertConnected();
     this.registeredRegistries.add(registries);
 
@@ -347,12 +341,7 @@ export class McpClient implements McpProgressReporter {
     signal?: AbortSignal;
   }): Promise<DiscoveredMCPPrompt[]> {
     this.assertConnected();
-    return discoverPrompts(
-      this.serverName,
-      this.client!,
-      this.cliConfig,
-      options,
-    );
+    return discoverPrompts(this.serverName, this.client!, this.cliConfig, options);
   }
 
   private async discoverResources(): Promise<Resource[]> {
@@ -464,24 +453,21 @@ export class McpClient implements McpProgressReporter {
       );
     }
 
-    this.client.setNotificationHandler(
-      ProgressNotificationSchema,
-      (notification) => {
-        const { progressToken, progress, total, message } = notification.params;
-        const callId = this.progressTokenToCallId.get(progressToken);
+    this.client.setNotificationHandler(ProgressNotificationSchema, (notification) => {
+      const { progressToken, progress, total, message } = notification.params;
+      const callId = this.progressTokenToCallId.get(progressToken);
 
-        if (callId) {
-          coreEvents.emitMcpProgress({
-            serverName: this.serverName,
-            callId,
-            progressToken,
-            progress,
-            total,
-            message,
-          });
-        }
-      },
-    );
+      if (callId) {
+        coreEvents.emitMcpProgress({
+          serverName: this.serverName,
+          callId,
+          progressToken,
+          progress,
+          total,
+          message,
+        });
+      }
+    });
   }
 
   /**
@@ -520,9 +506,7 @@ export class McpClient implements McpProgressReporter {
             // Verification Retry: If no resources are found or resources didn't change,
             // wait briefly and try one more time. Some servers notify before they're fully ready.
             const currentResources =
-              registries.resourceRegistry.getResourcesByServer(
-                this.serverName,
-              ) || [];
+              registries.resourceRegistry.getResourcesByServer(this.serverName) || [];
             const resourceMatch =
               newResources.length === currentResources.length &&
               newResources.every((nr: Resource) =>
@@ -538,10 +522,7 @@ export class McpClient implements McpProgressReporter {
               newResources = await this.discoverResources();
             }
 
-            this.updateResourceRegistry(
-              newResources,
-              registries.resourceRegistry,
-            );
+            this.updateResourceRegistry(newResources, registries.resourceRegistry);
           }
         } catch (err) {
           debugLogger.error(
@@ -620,8 +601,7 @@ export class McpClient implements McpProgressReporter {
             // Verification Retry: If no prompts are found or prompts didn't change,
             // wait briefly and try one more time. Some servers notify before they're fully ready.
             const currentPrompts =
-              registries.promptRegistry.getPromptsByServer(this.serverName) ||
-              [];
+              registries.promptRegistry.getPromptsByServer(this.serverName) || [];
             const promptsMatch =
               newPrompts.length === currentPrompts.length &&
               newPrompts.every((np) =>
@@ -764,9 +744,7 @@ export class McpClient implements McpProgressReporter {
             registries.toolRegistry.sortTools();
           }
         } catch (err) {
-          debugLogger.error(
-            `Discovery failed during refresh: ${getErrorMessage(err)}`,
-          );
+          debugLogger.error(`Discovery failed during refresh: ${getErrorMessage(err)}`);
           clearTimeout(timeoutId);
           break;
         }
@@ -812,27 +790,20 @@ export const mcpServerRequiresOAuth: Map<string, boolean> = new Map();
 /**
  * Event listeners for MCP server status changes
  */
-type StatusChangeListener = (
-  serverName: string,
-  status: MCPServerStatus,
-) => void;
+type StatusChangeListener = (serverName: string, status: MCPServerStatus) => void;
 const statusChangeListeners: Set<StatusChangeListener> = new Set();
 
 /**
  * Add a listener for MCP server status changes
  */
-export function addMCPStatusChangeListener(
-  listener: StatusChangeListener,
-): void {
+export function addMCPStatusChangeListener(listener: StatusChangeListener): void {
   statusChangeListeners.add(listener);
 }
 
 /**
  * Remove a listener for MCP server status changes
  */
-export function removeMCPStatusChangeListener(
-  listener: StatusChangeListener,
-): void {
+export function removeMCPStatusChangeListener(listener: StatusChangeListener): void {
   statusChangeListeners.delete(listener);
 }
 
@@ -950,15 +921,11 @@ async function handleAutomaticOAuth(
     };
 
     // Perform OAuth authentication
-    debugLogger.log(
-      `Starting OAuth authentication for server '${mcpServerName}'...`,
-    );
+    debugLogger.log(`Starting OAuth authentication for server '${mcpServerName}'...`);
     const authProvider = new MCPOAuthProvider(new MCPOAuthTokenStorage());
     await authProvider.authenticate(mcpServerName, oauthAuthConfig, serverUrl);
 
-    debugLogger.log(
-      `OAuth authentication successful for server '${mcpServerName}'`,
-    );
+    debugLogger.log(`OAuth authentication successful for server '${mcpServerName}'`);
     return true;
   } catch (error) {
     cliConfig.emitMcpDiagnostic(
@@ -1240,9 +1207,7 @@ export async function connectAndDiscover(
     }
     cliConfig.emitMcpDiagnostic(
       'error',
-      `Error connecting to MCP server '${mcpServerName}': ${getErrorMessage(
-        error,
-      )}`,
+      `Error connecting to MCP server '${mcpServerName}': ${getErrorMessage(error)}`,
       error,
       mcpServerName,
     );
@@ -1376,9 +1341,7 @@ export async function discoverTools(
     if (!isMcpMethodNotFoundError(error)) {
       cliConfig.emitMcpDiagnostic(
         'error',
-        `Error discovering tools from ${mcpServerName}: ${getErrorMessage(
-          error,
-        )}`,
+        `Error discovering tools from ${mcpServerName}: ${getErrorMessage(error)}`,
         error,
         mcpServerName,
       );
@@ -1418,10 +1381,7 @@ class McpCallableTool implements CallableTool {
     const progressToken = randomUUID();
     const context = getToolCallContext();
     if (context && this.progressReporter) {
-      this.progressReporter.registerProgressToken(
-        progressToken,
-        context.callId,
-      );
+      this.progressReporter.registerProgressToken(progressToken, context.callId);
     }
 
     try {
@@ -1489,13 +1449,7 @@ export async function discoverPrompts(
       ...prompt,
       serverName: mcpServerName,
       invoke: (params: Record<string, unknown>) =>
-        invokeMcpPrompt(
-          mcpServerName,
-          mcpClient,
-          prompt.name,
-          params,
-          cliConfig,
-        ),
+        invokeMcpPrompt(mcpServerName, mcpClient, prompt.name, params, cliConfig),
     }));
   } catch (error) {
     if (isMcpMethodNotFoundError(error)) {
@@ -1503,9 +1457,7 @@ export async function discoverPrompts(
     }
     cliConfig.emitMcpDiagnostic(
       'error',
-      `Error discovering prompts from ${mcpServerName}: ${getErrorMessage(
-        error,
-      )}`,
+      `Error discovering prompts from ${mcpServerName}: ${getErrorMessage(error)}`,
       error,
       mcpServerName,
     );
@@ -1551,9 +1503,7 @@ async function listResources(
     }
     cliConfig.emitMcpDiagnostic(
       'error',
-      `Error discovering resources from ${mcpServerName}: ${getErrorMessage(
-        error,
-      )}`,
+      `Error discovering resources from ${mcpServerName}: ${getErrorMessage(error)}`,
       error,
       mcpServerName,
     );
@@ -1594,10 +1544,7 @@ export async function invokeMcpPrompt(
 
     return response;
   } catch (error) {
-    if (
-      error instanceof Error &&
-      !error.message?.includes('Method not found')
-    ) {
+    if (error instanceof Error && !error.message?.includes('Method not found')) {
       cliConfig.emitMcpDiagnostic(
         'error',
         `Error invoking prompt '${promptName}' from ${mcpServerName} ${promptParams}: ${getErrorMessage(
@@ -1724,13 +1671,9 @@ async function retryWithOAuth(
 ): Promise<void> {
   if (httpReturned404) {
     // HTTP returned 404, only try SSE
-    debugLogger.log(
-      `Retrying SSE connection to '${serverName}' with OAuth token...`,
-    );
+    debugLogger.log(`Retrying SSE connection to '${serverName}' with OAuth token...`);
     await connectWithSSETransport(client, config, accessToken);
-    debugLogger.log(
-      `Successfully connected to '${serverName}' using SSE with OAuth.`,
-    );
+    debugLogger.log(`Successfully connected to '${serverName}' using SSE with OAuth.`);
     return;
   }
 
@@ -1744,18 +1687,14 @@ async function retryWithOAuth(
     cliConfig,
   );
   if (!httpTransport) {
-    throw new Error(
-      `Failed to create OAuth transport for server '${serverName}'`,
-    );
+    throw new Error(`Failed to create OAuth transport for server '${serverName}'`);
   }
 
   try {
     await client.connect(httpTransport, {
       timeout: config.timeout ?? MCP_DEFAULT_TIMEOUT_MSEC,
     });
-    debugLogger.log(
-      `Successfully connected to '${serverName}' using HTTP with OAuth.`,
-    );
+    debugLogger.log(`Successfully connected to '${serverName}' using HTTP with OAuth.`);
   } catch (httpError) {
     await httpTransport.close();
 
@@ -1945,9 +1884,7 @@ export async function connectToMcpServer(
           error = sseError;
           // Continue to OAuth handling below
         } else {
-          debugLogger.log(
-            `MCP server '${mcpServerName}': SSE fallback also failed.`,
-          );
+          debugLogger.log(`MCP server '${mcpServerName}': SSE fallback also failed.`);
           // Both failed without 401, throw the original error
           throw firstAttemptError;
         }
@@ -2012,9 +1949,7 @@ export async function connectToMcpServer(
           }
         } catch (fetchError) {
           debugLogger.debug(
-            `Failed to fetch www-authenticate header: ${getErrorMessage(
-              fetchError,
-            )}`,
+            `Failed to fetch www-authenticate header: ${getErrorMessage(fetchError)}`,
           );
         }
       }
@@ -2035,9 +1970,7 @@ export async function connectToMcpServer(
           // Retry connection with OAuth token
           const accessToken = await getStoredOAuthToken(mcpServerName);
           if (!accessToken) {
-            throw new Error(
-              `Failed to get OAuth token for server '${mcpServerName}'`,
-            );
+            throw new Error(`Failed to get OAuth token for server '${mcpServerName}'`);
           }
 
           await retryWithOAuth(
@@ -2064,14 +1997,10 @@ export async function connectToMcpServer(
         }
 
         // For SSE/HTTP servers, try to discover OAuth configuration from the base URL
-        debugLogger.log(
-          `🔍 Attempting OAuth discovery for '${mcpServerName}'...`,
-        );
+        debugLogger.log(`🔍 Attempting OAuth discovery for '${mcpServerName}'...`);
 
         if (hasNetworkTransport(mcpServerConfig)) {
-          const serverUrl = new URL(
-            mcpServerConfig.httpUrl || mcpServerConfig.url!,
-          );
+          const serverUrl = new URL(mcpServerConfig.httpUrl || mcpServerConfig.url!);
           const baseUrl = `${serverUrl.protocol}//${serverUrl.host}`;
 
           // Try to discover OAuth configuration from the base URL
@@ -2092,14 +2021,11 @@ export async function connectToMcpServer(
 
             // Perform OAuth authentication
             // Pass the server URL for proper discovery
-            const authServerUrl =
-              mcpServerConfig.httpUrl || mcpServerConfig.url;
+            const authServerUrl = mcpServerConfig.httpUrl || mcpServerConfig.url;
             debugLogger.log(
               `Starting OAuth authentication for server '${mcpServerName}'...`,
             );
-            const authProvider = new MCPOAuthProvider(
-              new MCPOAuthTokenStorage(),
-            );
+            const authProvider = new MCPOAuthProvider(new MCPOAuthTokenStorage());
             await authProvider.authenticate(
               mcpServerName,
               oauthAuthConfig,
@@ -2158,9 +2084,7 @@ export async function connectToMcpServer(
 function createUrlTransport(
   mcpServerName: string,
   mcpServerConfig: MCPServerConfig,
-  transportOptions:
-    | StreamableHTTPClientTransportOptions
-    | SSEClientTransportOptions,
+  transportOptions: StreamableHTTPClientTransportOptions | SSEClientTransportOptions,
 ): StreamableHTTPClientTransport | SSEClientTransport {
   // Create a proxy-aware fetcher that respects NO_PROXY for this MCP server
   // This is especially important for local MCP servers (localhost, 127.0.0.1)
@@ -2218,19 +2142,13 @@ function createUrlTransport(
         httpOptions,
       );
     } else if (mcpServerConfig.type === 'sse') {
-      return new SSEClientTransport(
-        new URL(mcpServerConfig.url),
-        transportOptions,
-      );
+      return new SSEClientTransport(new URL(mcpServerConfig.url), transportOptions);
     }
   }
 
   // Priority 4: url without type (default to HTTP)
   if (mcpServerConfig.url) {
-    return new StreamableHTTPClientTransport(
-      new URL(mcpServerConfig.url),
-      httpOptions,
-    );
+    return new StreamableHTTPClientTransport(new URL(mcpServerConfig.url), httpOptions);
   }
 
   throw new Error(`No URL configured for MCP server '${mcpServerName}'`);
@@ -2266,13 +2184,8 @@ export async function createTransport(
       }
 
       if (shouldUseDynamicOAuthProvider) {
-        debugLogger.log(
-          `Found stored OAuth token for server '${mcpServerName}'`,
-        );
-        authProvider = createDynamicOAuthTokenProvider(
-          mcpServerName,
-          mcpServerConfig,
-        );
+        debugLogger.log(`Found stored OAuth token for server '${mcpServerName}'`);
+        authProvider = createDynamicOAuthTokenProvider(mcpServerName, mcpServerConfig);
       }
     }
 
@@ -2308,8 +2221,7 @@ export async function createTransport(
     });
 
     const finalEnv: Record<string, string> = {
-      [SPARKLE_CLI_IDENTIFICATION_ENV_VAR]:
-        SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
+      [SPARKLE_CLI_IDENTIFICATION_ENV_VAR]: SPARKLE_CLI_IDENTIFICATION_ENV_VAR_VALUE,
       ...extensionEnv,
     };
     for (const [key, value] of Object.entries(sanitizedEnv)) {
@@ -2340,9 +2252,7 @@ export async function createTransport(
       // which exposes `stderr` for debug logging. We need to unwrap it to attach the listener.
 
       const underlyingTransport =
-        transport instanceof McpComplianceTransport
-          ? transport.transport
-          : transport;
+        transport instanceof McpComplianceTransport ? transport.transport : transport;
 
       if (
         underlyingTransport instanceof StdioClientTransport &&
@@ -2351,10 +2261,7 @@ export async function createTransport(
         underlyingTransport.stderr.on('data', (data) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const stderrStr = data.toString().trim();
-          debugLogger.debug(
-            `[DEBUG] [MCP STDERR (${mcpServerName})]: `,
-            stderrStr,
-          );
+          debugLogger.debug(`[DEBUG] [MCP STDERR (${mcpServerName})]: `, stderrStr);
         });
       }
     }

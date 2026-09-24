@@ -16,9 +16,7 @@ describe('AES-GCM Tag Length Verification', () => {
 
   beforeEach(async () => {
     // Create a unique temporary directory for test isolation
-    tempDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'sparkle-test-keychain-'),
-    );
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sparkle-test-keychain-'));
     vi.stubEnv('SPARKLE_CLI_HOME', tempDir);
   });
 
@@ -95,14 +93,9 @@ describe('AES-GCM Tag Length Verification', () => {
     const legacyIv = crypto.randomBytes(16);
     const encryptionKey = (keychain as unknown as { encryptionKey: Buffer })
       .encryptionKey;
-    const cipher = crypto.createCipheriv(
-      'aes-256-gcm',
-      encryptionKey,
-      legacyIv,
-      {
-        authTagLength: 16,
-      },
-    );
+    const cipher = crypto.createCipheriv('aes-256-gcm', encryptionKey, legacyIv, {
+      authTagLength: 16,
+    });
 
     let encrypted = cipher.update(
       JSON.stringify({ [service]: { [account]: password } }),
@@ -113,11 +106,7 @@ describe('AES-GCM Tag Length Verification', () => {
     const authTag = cipher.getAuthTag();
 
     const legacyPayload =
-      legacyIv.toString('hex') +
-      ':' +
-      authTag.toString('hex') +
-      ':' +
-      encrypted;
+      legacyIv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
     await fs.writeFile(credentialsFilePath, legacyPayload, 'utf-8');
 
     // 4. Verify 16-byte IV decryption works successfully (backward compatibility)

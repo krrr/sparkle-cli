@@ -14,9 +14,7 @@ import { powerUserProfile } from '../config/profiles.js';
 expect.addSnapshotSerializer({
   test: (val) =>
     typeof val === 'string' &&
-    (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(
-      val,
-    ) ||
+    (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(val) ||
       /\b[0-9a-f]{32}\b/i.test(val) ||
       /\bsynth_[a-zA-Z0-9_]+_[0-9a-f]{32}\b/.test(val) ||
       /[\\/]tmp[\\/]sim/.test(val)),
@@ -70,10 +68,7 @@ describe('Power User Lifecycle Tests', () => {
       },
     };
 
-    const harness = await SimulationHarness.create(
-      powerStressProfile,
-      mockLlmClient,
-    );
+    const harness = await SimulationHarness.create(powerStressProfile, mockLlmClient);
 
     // Turn 0: System Prompt
     await harness.simulateTurn([

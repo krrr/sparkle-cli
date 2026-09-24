@@ -36,9 +36,7 @@ export interface InventoryResult {
  * Discovers all eval files under the given repo root and runs
  * the static analyzer on each, returning the aggregated results.
  */
-export async function collectInventory(
-  repoRoot: string,
-): Promise<InventoryResult> {
+export async function collectInventory(repoRoot: string): Promise<InventoryResult> {
   const evalsDir = path.join(repoRoot, 'evals');
 
   try {
@@ -225,10 +223,7 @@ interface InventoryJsonDiagnostic {
   location: { line: number; column: number };
 }
 
-export function formatInventoryJson(
-  result: InventoryResult,
-  now?: Date,
-): string {
+export function formatInventoryJson(result: InventoryResult, now?: Date): string {
   const filePathLookup = new Map<string, string>();
   for (const f of result.files) {
     filePathLookup.set(f.filePath, f.relativePath);
@@ -236,10 +231,7 @@ export function formatInventoryJson(
 
   const policyCounts = new Map<string, number>();
   for (const evalCase of result.cases) {
-    policyCounts.set(
-      evalCase.policy,
-      (policyCounts.get(evalCase.policy) ?? 0) + 1,
-    );
+    policyCounts.set(evalCase.policy, (policyCounts.get(evalCase.policy) ?? 0) + 1);
   }
 
   const byPolicy: Record<string, number> = {};
@@ -264,8 +256,7 @@ export function formatInventoryJson(
   }
   if (
     !generatedDate &&
-    (process.env.EVAL_INVENTORY_STABLE_DATE ||
-      process.env.EVAL_INVENTORY_DETERMINISTIC)
+    (process.env.EVAL_INVENTORY_STABLE_DATE || process.env.EVAL_INVENTORY_DETERMINISTIC)
   ) {
     generatedDate = new Date(0);
   }
@@ -313,10 +304,7 @@ export function formatInventoryJson(
   return JSON.stringify(output, null, 2);
 }
 
-function groupBy<T>(
-  items: readonly T[],
-  keyFn: (item: T) => string,
-): Map<string, T[]> {
+function groupBy<T>(items: readonly T[], keyFn: (item: T) => string): Map<string, T[]> {
   const groups = new Map<string, T[]>();
   for (const item of items) {
     const key = keyFn(item);

@@ -72,10 +72,7 @@ export async function deleteSessionArtifactsAsync(
     });
 
     const toolOutputsBase = path.join(tempDir, TOOL_OUTPUTS_DIR);
-    const toolOutputDir = path.join(
-      toolOutputsBase,
-      `session-${safeSessionId}`,
-    );
+    const toolOutputDir = path.join(toolOutputsBase, `session-${safeSessionId}`);
 
     await fs
       .rm(toolOutputDir, { recursive: true, force: true })
@@ -97,10 +94,7 @@ export async function deleteSessionArtifactsAsync(
       safeSessionId.includes(path.sep) ||
       safeSessionId.includes('/') ||
       safeSessionId.includes('\\');
-    if (
-      !hasSeparator &&
-      !RESERVED_SESSION_DIR_NAMES.has(safeSessionId.toLowerCase())
-    ) {
+    if (!hasSeparator && !RESERVED_SESSION_DIR_NAMES.has(safeSessionId.toLowerCase())) {
       const sessionDir = path.join(tempDir, safeSessionId);
       await fs
         .rm(sessionDir, { recursive: true, force: true })
@@ -109,10 +103,7 @@ export async function deleteSessionArtifactsAsync(
         });
     }
   } catch (error) {
-    debugLogger.error(
-      `Error deleting session artifacts for ${sessionId}:`,
-      error,
-    );
+    debugLogger.error(`Error deleting session artifacts for ${sessionId}:`, error);
   }
 }
 
@@ -227,9 +218,7 @@ export async function deleteSessionFileAndArtifacts(
         const contentChunk = buffer.toString('utf8', 0, bytesRead);
         const newlineIndex = contentChunk.indexOf('\n');
         firstLine =
-          newlineIndex !== -1
-            ? contentChunk.substring(0, newlineIndex)
-            : contentChunk;
+          newlineIndex !== -1 ? contentChunk.substring(0, newlineIndex) : contentChunk;
 
         try {
           const content = JSON.parse(firstLine) as unknown;
@@ -248,21 +237,14 @@ export async function deleteSessionFileAndArtifacts(
 
     if (fullSessionId) {
       await deleteSessionArtifactsAsync(fullSessionId, tempDir);
-      await deleteSubagentSessionDirAndArtifactsAsync(
-        fullSessionId,
-        chatsDir,
-        tempDir,
-      );
+      await deleteSubagentSessionDirAndArtifactsAsync(fullSessionId, chatsDir, tempDir);
     }
   } catch (error) {
     // ENOENT here is most likely a concurrent deletion race (another caller
     // unlinked the file between `getMatchingSessionFiles` returning it and
     // our `fs.open`). Don't log that as an error to avoid noise.
     if (!isNodeError(error) || error.code !== 'ENOENT') {
-      debugLogger.error(
-        `Error deleting artifacts for session file ${file}:`,
-        error,
-      );
+      debugLogger.error(`Error deleting artifacts for session file ${file}:`, error);
     }
   } finally {
     try {

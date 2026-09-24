@@ -64,8 +64,7 @@ export const linkCommand: CommandModule = {
         demandOption: true,
       })
       .option('scope', {
-        describe:
-          'The scope to link the skill into. Defaults to "user" (global).',
+        describe: 'The scope to link the skill into. Defaults to "user" (global).',
         choices: ['user', 'workspace'],
         default: 'user',
       })

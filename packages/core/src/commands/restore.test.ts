@@ -78,9 +78,7 @@ describe('performRestore', () => {
     };
     const spy = vi
       .spyOn(mockGitService, 'restoreProjectFromSnapshot')
-      .mockRejectedValue(
-        new Error('fatal: unable to read tree invalid-commit-hash'),
-      );
+      .mockRejectedValue(new Error('fatal: unable to read tree invalid-commit-hash'));
 
     const generator = performRestore(toolCallData, mockGitService);
     const result = await generator.next();
@@ -104,9 +102,7 @@ describe('performRestore', () => {
       commitHash: 'some-commit-hash',
     };
     const testError = new Error('something went wrong');
-    vi.spyOn(mockGitService, 'restoreProjectFromSnapshot').mockRejectedValue(
-      testError,
-    );
+    vi.spyOn(mockGitService, 'restoreProjectFromSnapshot').mockRejectedValue(testError);
 
     const generator = performRestore(toolCallData, mockGitService);
     await expect(generator.next()).rejects.toThrow(testError);

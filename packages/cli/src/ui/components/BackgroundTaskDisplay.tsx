@@ -21,17 +21,11 @@ import { type BackgroundTask } from '../hooks/useExecutionLifecycle.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { formatCommand } from '../key/keybindingUtils.js';
-import {
-  ScrollableList,
-  type ScrollableListRef,
-} from './shared/ScrollableList.js';
+import { ScrollableList, type ScrollableListRef } from './shared/ScrollableList.js';
 
 import { SCROLL_TO_ITEM_END } from './shared/VirtualizedList.js';
 
-import {
-  RadioButtonSelect,
-  type RadioSelectItem,
-} from './shared/RadioButtonSelect.js';
+import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 
 interface BackgroundTaskDisplayProps {
@@ -48,8 +42,7 @@ const BORDER_WIDTH = 2; // Left and Right border
 const MAIN_BORDER_HEIGHT = 2; // Top and Bottom border
 const HEADER_HEIGHT = 1;
 const FOOTER_HEIGHT = 1;
-const TOTAL_OVERHEAD_HEIGHT =
-  MAIN_BORDER_HEIGHT + HEADER_HEIGHT + FOOTER_HEIGHT;
+const TOTAL_OVERHEAD_HEIGHT = MAIN_BORDER_HEIGHT + HEADER_HEIGHT + FOOTER_HEIGHT;
 const PROCESS_LIST_HEADER_HEIGHT = 3; // 1 padding top, 1 text, 1 margin bottom
 const TAB_DISPLAY_HORIZONTAL_PADDING = 4;
 const LOG_PATH_OVERHEAD = 7; // "Log: " (5) + paddingX (2)
@@ -76,12 +69,8 @@ export const BackgroundTaskDisplay = ({
     setIsBackgroundTaskListOpen,
   } = useUIActions();
   const activeShell = shells.get(activePid);
-  const [output, setOutput] = useState<string | AnsiOutput>(
-    activeShell?.output || '',
-  );
-  const [highlightedPid, setHighlightedPid] = useState<number | null>(
-    activePid,
-  );
+  const [output, setOutput] = useState<string | AnsiOutput>(activeShell?.output || '');
+  const [highlightedPid, setHighlightedPid] = useState<number | null>(activePid);
   const outputRef = useRef<ScrollableListRef<AnsiLine | string>>(null);
   const subscribedRef = useRef(false);
 
@@ -218,17 +207,14 @@ export const BackgroundTaskDisplay = ({
       {helpTextParts.map((p, i) => (
         <Text key={p.label}>
           {i > 0 ? ' | ' : ''}
-          {p.label} (
-          <Text color={theme.text.accent}>{formatCommand(p.command)}</Text>)
+          {p.label} (<Text color={theme.text.accent}>{formatCommand(p.command)}</Text>)
         </Text>
       ))}
     </Text>
   );
 
   const renderTabs = () => {
-    const shellList = Array.from(shells.values()).filter(
-      (s) => s.status === 'running',
-    );
+    const shellList = Array.from(shells.values()).filter((s) => s.status === 'running');
 
     const pidInfoWidth = getCachedStringWidth(
       ` (PID: ${activePid}) ${isFocused ? '(Focused)' : ''}`,
@@ -305,25 +291,25 @@ export const BackgroundTaskDisplay = ({
       width - BORDER_WIDTH - CONTENT_PADDING_X * 2 - 10,
     );
 
-    const items: Array<RadioSelectItem<number>> = Array.from(
-      shells.values(),
-    ).map((shell, index) => {
-      const truncatedCommand = formatShellCommandForDisplay(
-        shell.command,
-        maxCommandLength,
-      );
+    const items: Array<RadioSelectItem<number>> = Array.from(shells.values()).map(
+      (shell, index) => {
+        const truncatedCommand = formatShellCommandForDisplay(
+          shell.command,
+          maxCommandLength,
+        );
 
-      let label = `${index + 1}: ${truncatedCommand} (PID: ${shell.pid})`;
-      if (shell.status === 'exited') {
-        label += ` (Exit Code: ${shell.exitCode})`;
-      }
+        let label = `${index + 1}: ${truncatedCommand} (PID: ${shell.pid})`;
+        if (shell.status === 'exited') {
+          label += ` (Exit Code: ${shell.exitCode})`;
+        }
 
-      return {
-        key: shell.pid.toString(),
-        value: shell.pid,
-        label,
-      };
-    });
+        return {
+          key: shell.pid.toString(),
+          value: shell.pid,
+          label,
+        };
+      },
+    );
 
     const initialIndex = items.findIndex((item) => item.value === activePid);
 
@@ -376,9 +362,7 @@ export const BackgroundTaskDisplay = ({
                   {shell.status === 'exited' ? (
                     <Text
                       color={
-                        shell.exitCode === 0
-                          ? theme.status.success
-                          : theme.status.error
+                        shell.exitCode === 0 ? theme.status.success : theme.status.error
                       }
                     >
                       {' '}
@@ -395,15 +379,10 @@ export const BackgroundTaskDisplay = ({
   };
 
   const renderFooter = () => {
-    const pidToDisplay = isListOpenProp
-      ? (highlightedPid ?? activePid)
-      : activePid;
+    const pidToDisplay = isListOpenProp ? (highlightedPid ?? activePid) : activePid;
     if (!pidToDisplay) return null;
     const logPath = ShellExecutionService.getLogFilePath(pidToDisplay);
-    const displayPath = shortenPath(
-      tildeifyPath(logPath),
-      width - LOG_PATH_OVERHEAD,
-    );
+    const displayPath = shortenPath(tildeifyPath(logPath), width - LOG_PATH_OVERHEAD);
     return (
       <Box paddingX={1}>
         <Text color={theme.text.secondary}>Log: {displayPath}</Text>

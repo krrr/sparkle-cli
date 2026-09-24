@@ -142,9 +142,7 @@ describe('directoryUtils', () => {
         isDirectory: () => true,
       } as fs.Stats);
       vi.mocked(fsPromises.opendir).mockResolvedValue(
-        createMockDir([
-          { name: 'sub', isDirectory: () => true },
-        ]) as unknown as fs.Dir,
+        createMockDir([{ name: 'sub', isDirectory: () => true }]) as unknown as fs.Dir,
       );
 
       const suggestions = await getDirectorySuggestions('docs/');
@@ -269,9 +267,7 @@ describe('directoryUtils', () => {
       }));
 
       const mockDir = createMockDir(manyDirs);
-      vi.mocked(fsPromises.opendir).mockResolvedValue(
-        mockDir as unknown as fs.Dir,
-      );
+      vi.mocked(fsPromises.opendir).mockResolvedValue(mockDir as unknown as fs.Dir);
 
       await getDirectorySuggestions('');
 

@@ -14,11 +14,7 @@ import { ExtensionStorage } from './storage.js';
 
 vi.mock('./storage.js');
 
-import {
-  coreEvents,
-  SPARKLE_DIR,
-  type GeminiCLIExtension,
-} from 'sparkle-cli-core';
+import { coreEvents, SPARKLE_DIR, type GeminiCLIExtension } from 'sparkle-cli-core';
 
 vi.mock('node:os', () => ({
   homedir: vi.fn().mockReturnValue('/virtual-home'),
@@ -55,32 +51,23 @@ describe('ExtensionEnablementManager', () => {
     expect(Object.keys(inMemoryFs).length).toBe(0); // Add this assertion
 
     // Mock fs functions
-    vi.spyOn(fs, 'readFileSync').mockImplementation(
-      (path: fs.PathOrFileDescriptor) => {
-        const content = inMemoryFs[path.toString()];
-        if (content === undefined) {
-          const error = new Error(
-            `ENOENT: no such file or directory, open '${path}'`,
-          );
-          (error as NodeJS.ErrnoException).code = 'ENOENT';
-          throw error;
-        }
-        return content;
-      },
-    );
+    vi.spyOn(fs, 'readFileSync').mockImplementation((path: fs.PathOrFileDescriptor) => {
+      const content = inMemoryFs[path.toString()];
+      if (content === undefined) {
+        const error = new Error(`ENOENT: no such file or directory, open '${path}'`);
+        (error as NodeJS.ErrnoException).code = 'ENOENT';
+        throw error;
+      }
+      return content;
+    });
     vi.spyOn(fs, 'writeFileSync').mockImplementation(
-      (
-        path: fs.PathOrFileDescriptor,
-        data: string | NodeJS.ArrayBufferView,
-      ) => {
+      (path: fs.PathOrFileDescriptor, data: string | NodeJS.ArrayBufferView) => {
         inMemoryFs[path.toString()] = data.toString(); // Convert ArrayBufferView to string for inMemoryFs
       },
     );
     vi.spyOn(fs, 'mkdirSync').mockImplementation(
-      (
-        _path: fs.PathLike,
-        _options?: fs.MakeDirectoryOptions | fs.Mode | null,
-      ) => undefined,
+      (_path: fs.PathLike, _options?: fs.MakeDirectoryOptions | fs.Mode | null) =>
+        undefined,
     );
     vi.spyOn(fs, 'mkdtempSync').mockImplementation((prefix: string) => {
       const virtualPath = `/virtual-tmp/${prefix.replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -115,44 +102,34 @@ describe('ExtensionEnablementManager', () => {
     it('should enable a path based on an override rule', () => {
       manager.disable('ext-test', true, '/');
       manager.enable('ext-test', true, '/home/user/projects/');
-      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(
-        true,
-      );
+      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(true);
     });
 
     it('should disable a path based on a disable override rule', () => {
       manager.enable('ext-test', true, '/');
       manager.disable('ext-test', true, '/home/user/projects/');
-      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(
-        false,
-      );
+      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(false);
     });
 
     it('should respect the last matching rule (enable wins)', () => {
       manager.disable('ext-test', true, '/home/user/projects/');
       manager.enable('ext-test', false, '/home/user/projects/my-app');
-      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(
-        true,
-      );
+      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(true);
     });
 
     it('should respect the last matching rule (disable wins)', () => {
       manager.enable('ext-test', true, '/home/user/projects/');
       manager.disable('ext-test', false, '/home/user/projects/my-app');
-      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(
-        false,
-      );
+      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(false);
     });
 
     it('should handle overlapping rules correctly', () => {
       manager.enable('ext-test', true, '/home/user/projects');
       manager.disable('ext-test', false, '/home/user/projects/my-app');
-      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(
-        false,
+      expect(manager.isEnabled('ext-test', '/home/user/projects/my-app')).toBe(false);
+      expect(manager.isEnabled('ext-test', '/home/user/projects/something-else')).toBe(
+        true,
       );
-      expect(
-        manager.isEnabled('ext-test', '/home/user/projects/something-else'),
-      ).toBe(true);
     });
   });
 
@@ -319,16 +296,12 @@ describe('ExtensionEnablementManager', () => {
     manager.disable('ext-test', true, '/Users/chrstn');
     manager.enable('ext-test', true, '/Users/chrstn/sparkle-cli');
 
-    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(
-      true,
-    );
+    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(true);
   });
 
   it('should not disable subdirectories if includeSubdirs is false', () => {
     manager.disable('ext-test', false, '/Users/chrstn');
-    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(
-      true,
-    );
+    expect(manager.isEnabled('ext-test', '/Users/chrstn/sparkle-cli')).toBe(true);
   });
 
   describe('extension overrides (-e <name>)', () => {
@@ -341,9 +314,7 @@ describe('ExtensionEnablementManager', () => {
       expect(manager.isEnabled('ext-test', '/')).toBe(true);
       expect(manager.isEnabled('Ext-Test', '/')).toBe(true);
       // Double check that it would have been disabled otherwise
-      expect(new ExtensionEnablementManager().isEnabled('ext-test', '/')).toBe(
-        false,
-      );
+      expect(new ExtensionEnablementManager().isEnabled('ext-test', '/')).toBe(false);
     });
 
     it('disable all other extensions', () => {
@@ -351,9 +322,7 @@ describe('ExtensionEnablementManager', () => {
       manager.enable('ext-test-2', true, '/');
       expect(manager.isEnabled('ext-test-2', '/')).toBe(false);
       // Double check that it would have been enabled otherwise
-      expect(
-        new ExtensionEnablementManager().isEnabled('ext-test-2', '/'),
-      ).toBe(true);
+      expect(new ExtensionEnablementManager().isEnabled('ext-test-2', '/')).toBe(true);
     });
 
     it('none disables all extensions', () => {
@@ -361,9 +330,7 @@ describe('ExtensionEnablementManager', () => {
       manager.enable('ext-test', true, '/');
       expect(manager.isEnabled('ext-test', '/path/to/dir')).toBe(false);
       // Double check that it would have been enabled otherwise
-      expect(new ExtensionEnablementManager().isEnabled('ext-test', '/')).toBe(
-        true,
-      );
+      expect(new ExtensionEnablementManager().isEnabled('ext-test', '/')).toBe(true);
     });
   });
 

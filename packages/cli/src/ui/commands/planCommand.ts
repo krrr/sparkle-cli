@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  type CommandContext,
-  CommandKind,
-  type SlashCommand,
-} from './types.js';
+import { type CommandContext, CommandKind, type SlashCommand } from './types.js';
 import {
   ApprovalMode,
   coreEvents,

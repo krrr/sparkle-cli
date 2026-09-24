@@ -17,9 +17,7 @@ describe('Checkpointing Integration', () => {
   let originalEnv: NodeJS.ProcessEnv;
 
   beforeEach(async () => {
-    tmpDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'gemini-checkpoint-test-'),
-    );
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'gemini-checkpoint-test-'));
     projectRoot = path.join(tmpDir, 'project');
     fakeHome = path.join(tmpDir, 'home');
 
@@ -67,10 +65,7 @@ describe('Checkpointing Integration', () => {
     expect(snapshotHash).toBeDefined();
 
     // 4. Modify files
-    await fs.writeFile(
-      path.join(projectRoot, 'file1.txt'),
-      'version 2 (BAD CHANGE)',
-    );
+    await fs.writeFile(path.join(projectRoot, 'file1.txt'), 'version 2 (BAD CHANGE)');
     await fs.writeFile(
       path.join(projectRoot, 'file3.txt'),
       'new file (SHOULD BE GONE)',
@@ -134,20 +129,16 @@ describe('Checkpointing Integration', () => {
 
     const { execFileSync } = await import('node:child_process');
 
-    const logOutput = execFileSync(
-      'git',
-      ['log', '-1', '--pretty=format:%an <%ae>'],
-      {
-        cwd: historyDir,
-        env: {
-          ...process.env,
-          GIT_DIR: path.join(historyDir, '.git'),
-          GIT_CONFIG_GLOBAL: path.join(historyDir, '.gitconfig'),
-          GIT_CONFIG_SYSTEM: path.join(historyDir, '.gitconfig_system_empty'),
-        },
-        encoding: 'utf-8',
+    const logOutput = execFileSync('git', ['log', '-1', '--pretty=format:%an <%ae>'], {
+      cwd: historyDir,
+      env: {
+        ...process.env,
+        GIT_DIR: path.join(historyDir, '.git'),
+        GIT_CONFIG_GLOBAL: path.join(historyDir, '.gitconfig'),
+        GIT_CONFIG_SYSTEM: path.join(historyDir, '.gitconfig_system_empty'),
       },
-    );
+      encoding: 'utf-8',
+    });
 
     expect(logOutput).toBe('Sparkle CLI <sparkle-cli@hazama.cc>');
     expect(logOutput).not.toContain('Global User');

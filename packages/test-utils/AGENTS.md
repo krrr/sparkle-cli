@@ -5,20 +5,20 @@ published to npm.
 
 ## Key Modules
 
-- `src/test-rig.ts`: The primary test rig for spinning up end-to-end CLI
-  sessions with mock responses.
+- `src/test-rig.ts`: The primary test rig for spinning up end-to-end CLI sessions with
+  mock responses.
 - `src/file-system-test-helpers.ts`: Helpers for creating temporary file system
   fixtures.
 - `src/mock-utils.ts`: Common mock utilities.
 - `src/test-mcp-server.ts`: Helper for building test MCP servers for tests.
-- `src/test-mcp-server-template.mjs`: Generic template script for running
-  isolated MCP processes.
+- `src/test-mcp-server-template.mjs`: Generic template script for running isolated MCP
+  processes.
 
 ## Test MCP Servers
 
 The `TestRig` provides a fully isolated, compliant way to test tool triggers and
-workflows using local test MCP servers. This isolates your tests from live API
-endpoints and rate-limiting.
+workflows using local test MCP servers. This isolates your tests from live API endpoints
+and rate-limiting.
 
 ### Usage
 
@@ -37,8 +37,7 @@ endpoints and rate-limiting.
    ```
 
 2. **Predefined configurations via JSON:** Place a configuration file in
-   `packages/test-utils/assets/test-servers/google-workspace.json` and load it
-   by title:
+   `packages/test-utils/assets/test-servers/google-workspace.json` and load it by title:
 
    ```typescript
    rig.addTestMcpServer('workspace-server', 'google-workspace');

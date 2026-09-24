@@ -22,12 +22,7 @@ import {
   TRACKER_UPDATE_TASK_TOOL_NAME,
   TRACKER_VISUALIZE_TOOL_NAME,
 } from './tool-names.js';
-import type {
-  ToolResult,
-  TodoList,
-  TodoStatus,
-  ExecuteOptions,
-} from './tools.js';
+import type { ToolResult, TodoList, TodoStatus, ExecuteOptions } from './tools.js';
 import { BaseDeclarativeTool, BaseToolInvocation, Kind } from './tools.js';
 import { ToolErrorType } from './tool-error.js';
 import type { TrackerTask, TaskType } from '../services/trackerTypes.js';
@@ -156,8 +151,7 @@ class TrackerCreateTaskInvocation extends BaseToolInvocation<
         returnDisplay: await buildTodosReturnDisplay(this.service),
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error creating task: ${errorMessage}`,
         returnDisplay: 'Failed to create task.',
@@ -189,12 +183,7 @@ export class TrackerCreateTaskTool extends BaseDeclarativeTool<
     );
   }
   protected createInvocation(params: CreateTaskParams, messageBus: MessageBus) {
-    return new TrackerCreateTaskInvocation(
-      this.config,
-      params,
-      messageBus,
-      this.name,
-    );
+    return new TrackerCreateTaskInvocation(this.config, params, messageBus, this.name);
   }
   override getSchema(_modelId?: string) {
     return TRACKER_CREATE_TASK_DECLARATION;
@@ -242,8 +231,7 @@ class TrackerUpdateTaskInvocation extends BaseToolInvocation<
         returnDisplay: await buildTodosReturnDisplay(this.service),
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error updating task: ${errorMessage}`,
         returnDisplay: 'Failed to update task.',
@@ -275,12 +263,7 @@ export class TrackerUpdateTaskTool extends BaseDeclarativeTool<
     );
   }
   protected createInvocation(params: UpdateTaskParams, messageBus: MessageBus) {
-    return new TrackerUpdateTaskInvocation(
-      this.config,
-      params,
-      messageBus,
-      this.name,
-    );
+    return new TrackerUpdateTaskInvocation(this.config, params, messageBus, this.name);
   }
   override getSchema(_modelId?: string) {
     return TRACKER_UPDATE_TASK_DECLARATION;
@@ -293,10 +276,7 @@ interface GetTaskParams {
   id: string;
 }
 
-class TrackerGetTaskInvocation extends BaseToolInvocation<
-  GetTaskParams,
-  ToolResult
-> {
+class TrackerGetTaskInvocation extends BaseToolInvocation<GetTaskParams, ToolResult> {
   constructor(
     private readonly config: Config,
     params: GetTaskParams,
@@ -330,10 +310,7 @@ class TrackerGetTaskInvocation extends BaseToolInvocation<
   }
 }
 
-export class TrackerGetTaskTool extends BaseDeclarativeTool<
-  GetTaskParams,
-  ToolResult
-> {
+export class TrackerGetTaskTool extends BaseDeclarativeTool<GetTaskParams, ToolResult> {
   static readonly Name = TRACKER_GET_TASK_TOOL_NAME;
   constructor(
     private config: Config,
@@ -349,12 +326,7 @@ export class TrackerGetTaskTool extends BaseDeclarativeTool<
     );
   }
   protected createInvocation(params: GetTaskParams, messageBus: MessageBus) {
-    return new TrackerGetTaskInvocation(
-      this.config,
-      params,
-      messageBus,
-      this.name,
-    );
+    return new TrackerGetTaskInvocation(this.config, params, messageBus, this.name);
   }
   override getSchema(_modelId?: string) {
     return TRACKER_GET_TASK_DECLARATION;
@@ -410,9 +382,7 @@ class TrackerListTasksInvocation extends BaseToolInvocation<
       };
     }
 
-    const content = tasks
-      .map((t) => `- [${t.id}] ${t.title} (${t.status})`)
-      .join('\n');
+    const content = tasks.map((t) => `- [${t.id}] ${t.title} (${t.status})`).join('\n');
     return {
       llmContent: content,
       returnDisplay: await buildTodosReturnDisplay(this.service),
@@ -439,12 +409,7 @@ export class TrackerListTasksTool extends BaseDeclarativeTool<
     );
   }
   protected createInvocation(params: ListTasksParams, messageBus: MessageBus) {
-    return new TrackerListTasksInvocation(
-      this.config,
-      params,
-      messageBus,
-      this.name,
-    );
+    return new TrackerListTasksInvocation(this.config, params, messageBus, this.name);
   }
   override getSchema(_modelId?: string) {
     return TRACKER_LIST_TASKS_DECLARATION;
@@ -520,8 +485,7 @@ class TrackerAddDependencyInvocation extends BaseToolInvocation<
         returnDisplay: await buildTodosReturnDisplay(this.service),
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error adding dependency: ${errorMessage}`,
         returnDisplay: 'Failed to add dependency.',
@@ -552,10 +516,7 @@ export class TrackerAddDependencyTool extends BaseDeclarativeTool<
       messageBus,
     );
   }
-  protected createInvocation(
-    params: AddDependencyParams,
-    messageBus: MessageBus,
-  ) {
+  protected createInvocation(params: AddDependencyParams, messageBus: MessageBus) {
     return new TrackerAddDependencyInvocation(
       this.config,
       params,
@@ -624,11 +585,7 @@ class TrackerVisualizeInvocation extends BaseToolInvocation<
 
     let output = 'Task Tracker Graph:\n';
 
-    const renderTask = (
-      task: TrackerTask,
-      depth: number,
-      visited: Set<string>,
-    ) => {
+    const renderTask = (task: TrackerTask, depth: number, visited: Set<string>) => {
       if (visited.has(task.id)) {
         output += `${'  '.repeat(depth)}[CYCLE DETECTED: ${task.id}]\n`;
         return;
@@ -676,16 +633,8 @@ export class TrackerVisualizeTool extends BaseDeclarativeTool<
       messageBus,
     );
   }
-  protected createInvocation(
-    params: Record<string, never>,
-    messageBus: MessageBus,
-  ) {
-    return new TrackerVisualizeInvocation(
-      this.config,
-      params,
-      messageBus,
-      this.name,
-    );
+  protected createInvocation(params: Record<string, never>, messageBus: MessageBus) {
+    return new TrackerVisualizeInvocation(this.config, params, messageBus, this.name);
   }
   override getSchema(_modelId?: string) {
     return TRACKER_VISUALIZE_DECLARATION;

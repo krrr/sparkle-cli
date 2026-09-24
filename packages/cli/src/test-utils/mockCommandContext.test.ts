@@ -53,9 +53,7 @@ describe('createMockCommandContext', () => {
     const context = createMockCommandContext(overrides);
 
     expect(context.services.agentContext).toBeDefined();
-    expect(context.services.agentContext?.config?.getModel()).toBe(
-      'gemini-pro',
-    );
+    expect(context.services.agentContext?.config?.getModel()).toBe('gemini-pro');
     expect(context.services.agentContext?.config?.getProjectRoot()).toBe(
       '/test/project',
     );

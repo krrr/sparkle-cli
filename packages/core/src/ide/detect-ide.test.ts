@@ -227,9 +227,7 @@ describe('detectIde with ideInfoFromFile', () => {
     vi.stubEnv('TERM_PROGRAM', 'vscode');
     vi.stubEnv('CURSOR_TRACE_ID', '');
     vi.stubEnv('POSITRON', '');
-    expect(detectIde(ideProcessInfo, ideInfoFromFile)).toBe(
-      IDE_DEFINITIONS.vscode,
-    );
+    expect(detectIde(ideProcessInfo, ideInfoFromFile)).toBe(IDE_DEFINITIONS.vscode);
   });
 
   it('should fall back to env detection if displayName is missing', () => {
@@ -237,8 +235,6 @@ describe('detectIde with ideInfoFromFile', () => {
     vi.stubEnv('TERM_PROGRAM', 'vscode');
     vi.stubEnv('CURSOR_TRACE_ID', '');
     vi.stubEnv('POSITRON', '');
-    expect(detectIde(ideProcessInfo, ideInfoFromFile)).toBe(
-      IDE_DEFINITIONS.vscode,
-    );
+    expect(detectIde(ideProcessInfo, ideInfoFromFile)).toBe(IDE_DEFINITIONS.vscode);
   });
 });

@@ -54,8 +54,7 @@ export async function isStrictlyApproved(
     }
     // The segment is approved if the root tool is in the allowlist OR if the whole segment is safe.
     return (
-      tools.some((t) => t.toLowerCase() === root) ||
-      isKnownSafeCommand(parsedArgs)
+      tools.some((t) => t.toLowerCase() === root) || isKnownSafeCommand(parsedArgs)
     );
   });
 }

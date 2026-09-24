@@ -216,9 +216,7 @@ describe('policyHelpers', () => {
       consumeStickyAttempt: vi.fn(),
     };
 
-    const createExtendedMockConfig = (
-      overrides: Partial<Config> = {},
-    ): Config => {
+    const createExtendedMockConfig = (overrides: Partial<Config> = {}): Config => {
       const defaults = {
         getModelAvailabilityService: () => mockAvailabilityService,
         setActiveModel: vi.fn(),
@@ -395,9 +393,7 @@ describe('policyHelpers', () => {
           consumeAttempt: false,
         },
       );
-      expect(
-        mockAvailabilityService.consumeStickyAttempt,
-      ).not.toHaveBeenCalled();
+      expect(mockAvailabilityService.consumeStickyAttempt).not.toHaveBeenCalled();
       expect(config.setActiveModel).toHaveBeenCalledWith('gemini-pro');
       expect(result.maxAttempts).toBe(1);
     });
@@ -417,10 +413,7 @@ describe('policyHelpers', () => {
 
       applyAvailabilityTransition(getContext, 'transient');
 
-      expect(mockService.markTerminal).toHaveBeenCalledWith(
-        'test-model',
-        'capacity',
-      );
+      expect(mockService.markTerminal).toHaveBeenCalledWith('test-model', 'capacity');
     });
 
     it('marks sticky and consumes on sticky_retry transition', () => {
@@ -440,13 +433,8 @@ describe('policyHelpers', () => {
 
       applyAvailabilityTransition(getContext, 'transient');
 
-      expect(mockService.markRetryOncePerTurn).toHaveBeenCalledWith(
-        'test-model',
-        3,
-      );
-      expect(mockService.consumeStickyAttempt).toHaveBeenCalledWith(
-        'test-model',
-      );
+      expect(mockService.markRetryOncePerTurn).toHaveBeenCalledWith('test-model', 3);
+      expect(mockService.consumeStickyAttempt).toHaveBeenCalledWith('test-model');
     });
   });
 });

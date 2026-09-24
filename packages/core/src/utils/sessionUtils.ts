@@ -58,10 +58,7 @@ export function ensureStableToolIds(history: HistoryTurn[]): void {
         const prevTurn = history[i - 1];
         if (prevTurn?.content.role === 'model') {
           const matchingCall = prevTurn.content.parts?.find(
-            (p) =>
-              p.functionCall &&
-              p.functionCall.name === name &&
-              !p.functionCall.id,
+            (p) => p.functionCall && p.functionCall.name === name && !p.functionCall.id,
           );
           if (matchingCall) {
             const pairedId = `synth_${name}_${deriveStableId([prevTurn.id, (i - 1).toString(), partIdx.toString()])}`;
@@ -84,9 +81,7 @@ export function ensureStableToolIds(history: HistoryTurn[]): void {
  */
 function ensurePartArray(content: PartListUnion): Part[] {
   if (Array.isArray(content)) {
-    return content.map((part) =>
-      typeof part === 'string' ? { text: part } : part,
-    );
+    return content.map((part) => (typeof part === 'string' ? { text: part } : part));
   }
   if (typeof content === 'string') {
     return [{ text: content }];

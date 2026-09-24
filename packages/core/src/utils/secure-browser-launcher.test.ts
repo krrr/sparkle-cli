@@ -72,9 +72,7 @@ describe('secure-browser-launcher', () => {
     });
 
     it('should reject invalid URLs', async () => {
-      await expect(openBrowserSecurely('not-a-url')).rejects.toThrow(
-        'Invalid URL',
-      );
+      await expect(openBrowserSecurely('not-a-url')).rejects.toThrow('Invalid URL');
       await expect(openBrowserSecurely('')).rejects.toThrow('Invalid URL');
     });
 
@@ -85,9 +83,9 @@ describe('secure-browser-launcher', () => {
       await expect(
         openBrowserSecurely('http://example.com\rmalicious-command'),
       ).rejects.toThrow('invalid characters');
-      await expect(
-        openBrowserSecurely('http://example.com\x00'),
-      ).rejects.toThrow('invalid characters');
+      await expect(openBrowserSecurely('http://example.com\x00')).rejects.toThrow(
+        'invalid characters',
+      );
     });
   });
 
@@ -131,19 +129,14 @@ describe('secure-browser-launcher', () => {
       for (const url of urlsWithSpecialChars) {
         await openBrowserSecurely(url);
         // Verify the URL is passed as an argument, not interpreted by shell
-        expect(mockExecFile).toHaveBeenCalledWith(
-          'open',
-          [url],
-          expect.any(Object),
-        );
+        expect(mockExecFile).toHaveBeenCalledWith('open', [url], expect.any(Object));
       }
     });
 
     it('should properly escape single quotes in URLs on Windows', async () => {
       setPlatform('win32');
 
-      const urlWithSingleQuotes =
-        "http://example.com/path?name=O'Brien&test='value'";
+      const urlWithSingleQuotes = "http://example.com/path?name=O'Brien&test='value'";
       await openBrowserSecurely(urlWithSingleQuotes);
 
       // Verify that single quotes are escaped by doubling them
@@ -178,10 +171,7 @@ describe('secure-browser-launcher', () => {
       await openBrowserSecurely('https://example.com');
       expect(mockExecFile).toHaveBeenCalledWith(
         'powershell.exe',
-        expect.arrayContaining([
-          '-Command',
-          `Start-Process 'https://example.com'`,
-        ]),
+        expect.arrayContaining(['-Command', `Start-Process 'https://example.com'`]),
         expect.any(Object),
       );
     });

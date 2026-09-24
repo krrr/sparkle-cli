@@ -13,8 +13,7 @@ import {
 
 export const MIN_TARGET_TOKENS = 10;
 export const MIN_CHARS_FOR_TRUNCATION = 100;
-export const TEXT_TRUNCATION_PREFIX =
-  '[Message Normalized: Exceeded size limit]';
+export const TEXT_TRUNCATION_PREFIX = '[Message Normalized: Exceeded size limit]';
 export const TOOL_TRUNCATION_PREFIX =
   '[Message Normalized: Tool output exceeded size limit]';
 
@@ -23,10 +22,7 @@ export const TOOL_TRUNCATION_PREFIX =
  * Uses a weighted average based on the provided text to decide how many characters
  * fit into the target token budget.
  */
-export function estimateCharsFromTokens(
-  text: string,
-  targetTokens: number,
-): number {
+export function estimateCharsFromTokens(text: string, targetTokens: number): number {
   if (text.length === 0) return 0;
 
   // Count ASCII vs Non-ASCII in a sample of the text.
@@ -41,8 +37,7 @@ export function estimateCharsFromTokens(
   const asciiRatio = asciiCount / sampleLen;
   // Weighted tokens per character:
   const avgTokensPerChar =
-    asciiRatio * ASCII_TOKENS_PER_CHAR +
-    (1 - asciiRatio) * NON_ASCII_TOKENS_PER_CHAR;
+    asciiRatio * ASCII_TOKENS_PER_CHAR + (1 - asciiRatio) * NON_ASCII_TOKENS_PER_CHAR;
 
   // Characters = Tokens / (Tokens per Character)
   return Math.floor(targetTokens / avgTokensPerChar);

@@ -1,7 +1,6 @@
 # Sparkle CLI SDK (`sparkle-cli-sdk`)
 
-Programmatic SDK for embedding Sparkle CLI agent capabilities into other
-applications.
+Programmatic SDK for embedding Sparkle CLI agent capabilities into other applications.
 
 ## Architecture
 

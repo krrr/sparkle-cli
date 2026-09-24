@@ -283,9 +283,7 @@ export class ProjectRegistry {
         for (const candidate of candidates) {
           const markerPath = path.join(baseDir, candidate, PROJECT_ROOT_FILE);
           if (fs.existsSync(markerPath)) {
-            const owner = (
-              await fs.promises.readFile(markerPath, 'utf8')
-            ).trim();
+            const owner = (await fs.promises.readFile(markerPath, 'utf8')).trim();
             if (this.normalizePath(owner) === normalizedTarget) {
               // Found it! Ensure all base dirs have the marker
               await this.ensureOwnershipMarkers(candidate, normalizedTarget);
@@ -326,9 +324,7 @@ export class ProjectRegistry {
         const markerPath = path.join(baseDir, candidate, PROJECT_ROOT_FILE);
         if (fs.existsSync(markerPath)) {
           try {
-            const owner = (
-              await fs.promises.readFile(markerPath, 'utf8')
-            ).trim();
+            const owner = (await fs.promises.readFile(markerPath, 'utf8')).trim();
             if (this.normalizePath(owner) !== this.normalizePath(projectPath)) {
               diskCollision = true;
               break;
@@ -355,8 +351,7 @@ export class ProjectRegistry {
         const code = isNodeError(error) ? error.code : '';
         const isCollision =
           code === 'EEXIST' ||
-          (error instanceof Error &&
-            error.message.includes('already owned by'));
+          (error instanceof Error && error.message.includes('already owned by'));
 
         if (isCollision) {
           debugLogger.debug(`Slug collision for ${candidate}, trying next...`);

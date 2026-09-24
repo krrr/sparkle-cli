@@ -28,9 +28,7 @@ export type ModelPolicyActionMap = Partial<Record<FailureKind, FallbackAction>>;
 /**
  * What state (e.g. Terminal, Sticky Retry) to set a model after failed API call.
  */
-export type ModelPolicyStateMap = Partial<
-  Record<FailureKind, ModelHealthStatus>
->;
+export type ModelPolicyStateMap = Partial<Record<FailureKind, ModelHealthStatus>>;
 
 /**
  * Defines the policy for a single model in the availability chain.

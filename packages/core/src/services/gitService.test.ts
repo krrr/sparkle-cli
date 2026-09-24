@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import {
   GitService,
   SHADOW_REPO_AUTHOR_NAME,
@@ -181,13 +173,7 @@ describe('GitService', () => {
     let gitConfigPath: string;
 
     beforeEach(async () => {
-      repoDir = path.join(
-        homedir,
-        SPARKLE_DIR,
-        'data',
-        PROJECT_SLUG,
-        'history',
-      );
+      repoDir = path.join(homedir, SPARKLE_DIR, 'data', PROJECT_SLUG, 'history');
       gitConfigPath = path.join(repoDir, '.gitconfig');
     });
 
@@ -211,10 +197,7 @@ describe('GitService', () => {
       hoistedMockCheckIsRepo.mockResolvedValue(false);
       const service = new GitService(projectRoot, storage);
       await service.setupShadowGitRepository();
-      expect(hoistedMockSimpleGit).toHaveBeenCalledWith(
-        repoDir,
-        expect.anything(),
-      );
+      expect(hoistedMockSimpleGit).toHaveBeenCalledWith(repoDir, expect.anything());
       expect(hoistedMockInit).toHaveBeenCalled();
     });
 
@@ -401,10 +384,7 @@ describe('GitService', () => {
         await service.setupShadowGitRepository();
 
         const expectedConfigPath = path.join(repoDir, '.gitconfig');
-        const expectedSystemPath = path.join(
-          repoDir,
-          '.gitconfig_system_empty',
-        );
+        const expectedSystemPath = path.join(repoDir, '.gitconfig_system_empty');
 
         expect(hoistedMockEnv).toHaveBeenCalledWith(
           expect.objectContaining({

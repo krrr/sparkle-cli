@@ -80,11 +80,7 @@ describe('CompositeStrategy', () => {
       'test-router',
     );
 
-    const result = await composite.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const result = await composite.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(mockStrategy1.route).toHaveBeenCalledWith(
       mockContext,
@@ -108,11 +104,7 @@ describe('CompositeStrategy', () => {
       'test-router',
     );
 
-    const result = await composite.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const result = await composite.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(mockStrategy1.route).toHaveBeenCalledTimes(1);
     expect(mockStrategy2.route).toHaveBeenCalledTimes(1);
@@ -123,20 +115,14 @@ describe('CompositeStrategy', () => {
   });
 
   it('should handle errors in non-terminal strategies and continue', async () => {
-    vi.spyOn(mockStrategy1, 'route').mockRejectedValue(
-      new Error('Strategy 1 failed'),
-    );
+    vi.spyOn(mockStrategy1, 'route').mockRejectedValue(new Error('Strategy 1 failed'));
 
     const composite = new CompositeStrategy(
       [mockStrategy1, mockTerminalStrategy],
       'test-router',
     );
 
-    const result = await composite.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const result = await composite.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(debugLogger.warn).toHaveBeenCalledWith(
       "[Routing] Strategy 'strategy1' failed. Continuing to next strategy. Error:",
@@ -178,11 +164,7 @@ describe('CompositeStrategy', () => {
       'my-composite',
     );
 
-    const result = await composite.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const result = await composite.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(result.model).toBe('some-model');
     expect(result.metadata.source).toBe('my-composite/child-source');
@@ -208,11 +190,7 @@ describe('CompositeStrategy', () => {
       'my-composite',
     );
 
-    const result = await composite.route(
-      mockContext,
-      mockConfig,
-      mockBaseLlmClient,
-    );
+    const result = await composite.route(mockContext, mockConfig, mockBaseLlmClient);
 
     expect(result.metadata.latencyMs).toBeGreaterThanOrEqual(0);
   });

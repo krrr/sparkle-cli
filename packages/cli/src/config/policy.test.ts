@@ -223,10 +223,7 @@ describe('resolveWorkspacePolicyState', () => {
     fs.writeFileSync(path.join(policiesDir, 'policy.toml'), 'rules = []');
 
     // Create a symlink to the home directory
-    const symlinkDir = path.join(
-      os.tmpdir(),
-      `sparkle-cli-symlink-${Date.now()}`,
-    );
+    const symlinkDir = path.join(os.tmpdir(), `sparkle-cli-symlink-${Date.now()}`);
     fs.symlinkSync(tempDir, symlinkDir, 'dir');
 
     try {

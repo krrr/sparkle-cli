@@ -11,26 +11,17 @@ import {
   loadSettings,
   type LoadedSettings,
 } from '../../config/settings.js';
-import {
-  MCPServerStatus,
-  createTransport,
-  debugLogger,
-} from 'sparkle-cli-core';
+import { MCPServerStatus, createTransport, debugLogger } from 'sparkle-cli-core';
 import type { MCPServerConfig } from 'sparkle-cli-core';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { ExtensionManager } from '../../config/extension-manager.js';
-import {
-  canLoadServer,
-  McpServerEnablementManager,
-} from '../../config/mcp/index.js';
+import { canLoadServer, McpServerEnablementManager } from '../../config/mcp/index.js';
 import { requestConsentNonInteractive } from '../../config/extensions/consent.js';
 import { promptForSetting } from '../../config/extensions/extensionSettings.js';
 import { exitCli } from '../utils.js';
 import chalk from 'chalk';
 
-export async function getMcpServersFromConfig(
-  settings?: MergedSettings,
-): Promise<{
+export async function getMcpServersFromConfig(settings?: MergedSettings): Promise<{
   mcpServers: Record<string, MCPServerConfig>;
 }> {
   if (!settings) {
@@ -101,9 +92,7 @@ async function testMCPConnection(
         );
       } else if (severity === 'warning') {
         debugLogger.warn(
-          chalk.yellow(
-            `Warning${serverName ? ` (${serverName})` : ''}: ${message}`,
-          ),
+          chalk.yellow(`Warning${serverName ? ` (${serverName})` : ''}: ${message}`),
           error,
         );
       } else {
@@ -134,10 +123,7 @@ async function testMCPConnection(
     try {
       await client.ping({ timeout });
     } catch (e) {
-      debugLogger.debug(
-        `MCP ping failed for ${serverName}, but connect succeeded:`,
-        e,
-      );
+      debugLogger.debug(`MCP ping failed for ${serverName}, but connect succeeded:`, e);
     }
 
     await client.close();
@@ -160,8 +146,7 @@ async function getServerStatus(
 
   const loadResult = await canLoadServer(serverName, {
     allowedList: consolidatedAllowed,
-    excludedList:
-      consolidatedExcluded.length > 0 ? consolidatedExcluded : undefined,
+    excludedList: consolidatedExcluded.length > 0 ? consolidatedExcluded : undefined,
     enablement: mcpEnablementManager.getEnablementCallbacks(),
   });
 
@@ -212,8 +197,7 @@ export async function listMcpServers(
     );
   }
 
-  const consolidatedExcluded =
-    loadedSettings.getConsolidatedExcludedMcpServers();
+  const consolidatedExcluded = loadedSettings.getConsolidatedExcludedMcpServers();
   const consolidatedAllowed = loadedSettings.getConsolidatedAllowedMcpServers();
 
   debugLogger.log('Configured MCP servers:\n');

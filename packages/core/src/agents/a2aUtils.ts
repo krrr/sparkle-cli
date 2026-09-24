@@ -75,9 +75,7 @@ export class A2AResultReassembler {
         if (chunk.artifacts) {
           for (const art of chunk.artifacts) {
             this.artifacts.set(art.artifactId, structuredClone(art));
-            this.artifactChunks.set(art.artifactId, [
-              extractPartsText(art.parts, ''),
-            ]);
+            this.artifactChunks.set(art.artifactId, [extractPartsText(art.parts, '')]);
           }
         }
         // History Fallback: Some agent implementations do not populate the
@@ -180,9 +178,7 @@ export class A2AResultReassembler {
         const artifact = this.artifacts.get(id);
         if (!chunks || !artifact) return '';
         const content = chunks.join('');
-        const header = artifact.name
-          ? `Artifact (${artifact.name}):`
-          : 'Artifact:';
+        const header = artifact.name ? `Artifact (${artifact.name}):` : 'Artifact:';
         return `${header}\n${content}`;
       })
       .filter(Boolean)
@@ -210,10 +206,7 @@ export function extractMessageText(message: Message | undefined): string {
 /**
  * Extracts text from an array of parts, joining them with the specified separator.
  */
-function extractPartsText(
-  parts: Part[] | undefined,
-  separator: string,
-): string {
+function extractPartsText(parts: Part[] | undefined, separator: string): string {
   if (!parts || parts.length === 0) {
     return '';
   }
@@ -269,9 +262,7 @@ export function normalizeAgentCard(card: unknown): AgentCard {
     const raw = card;
     if (Array.isArray(raw['supportedInterfaces'])) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      result.additionalInterfaces = raw[
-        'supportedInterfaces'
-      ] as AgentInterface[];
+      result.additionalInterfaces = raw['supportedInterfaces'] as AgentInterface[];
     }
   }
 

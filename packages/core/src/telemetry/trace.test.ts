@@ -19,11 +19,7 @@ import {
   SERVICE_DESCRIPTION,
   SERVICE_NAME,
 } from './constants.js';
-import {
-  runInDevTraceSpan,
-  spanRegistry,
-  truncateForTelemetry,
-} from './trace.js';
+import { runInDevTraceSpan, spanRegistry, truncateForTelemetry } from './trace.js';
 
 vi.mock('@opentelemetry/api', async (importOriginal) => {
   const original = await importOriginal();
@@ -148,12 +144,8 @@ describe('runInDevTraceSpan', () => {
           GeminiCliOperation.LLMCall,
         );
         expect(metadata.attributes[GEN_AI_AGENT_NAME]).toBe(SERVICE_NAME);
-        expect(metadata.attributes[GEN_AI_AGENT_DESCRIPTION]).toBe(
-          SERVICE_DESCRIPTION,
-        );
-        expect(metadata.attributes[GEN_AI_CONVERSATION_ID]).toBe(
-          'test-session-id',
-        );
+        expect(metadata.attributes[GEN_AI_AGENT_DESCRIPTION]).toBe(SERVICE_DESCRIPTION);
+        expect(metadata.attributes[GEN_AI_CONVERSATION_ID]).toBe('test-session-id');
       },
     );
   });
@@ -276,8 +268,7 @@ describe('runInDevTraceSpan', () => {
     expect(mockSpan.end).toHaveBeenCalledTimes(1);
 
     // Try to end again (simulating registry or double call)
-    const endSpanFn = vi.mocked(spanRegistry.register).mock
-      .calls[0][1] as () => void;
+    const endSpanFn = vi.mocked(spanRegistry.register).mock.calls[0][1] as () => void;
     endSpanFn();
 
     expect(mockSpan.end).toHaveBeenCalledTimes(1);

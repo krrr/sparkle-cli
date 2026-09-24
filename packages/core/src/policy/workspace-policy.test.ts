@@ -29,9 +29,7 @@ describe('Workspace-Level Policies', () => {
 
     // Mock FS
     const actualFs =
-      await vi.importActual<typeof import('node:fs/promises')>(
-        'node:fs/promises',
-      );
+      await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
 
     const mockRoot = nodePath.resolve('/mock/');
     const mockStat = vi.fn(async (path: string) => {
@@ -140,9 +138,7 @@ priority = 10
 
     // Mock FS (simplified)
     const actualFs =
-      await vi.importActual<typeof import('node:fs/promises')>(
-        'node:fs/promises',
-      );
+      await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
 
     const mockRoot = nodePath.resolve('/mock/');
     const mockStat = vi.fn(async (path: string) => {
@@ -206,9 +202,7 @@ priority=10`,
 
     // Mock FS
     const actualFs =
-      await vi.importActual<typeof import('node:fs/promises')>(
-        'node:fs/promises',
-      );
+      await vi.importActual<typeof import('node:fs/promises')>('node:fs/promises');
 
     const mockRoot = nodePath.resolve('/mock/');
     const mockStat = vi.fn(async (path: string) => {

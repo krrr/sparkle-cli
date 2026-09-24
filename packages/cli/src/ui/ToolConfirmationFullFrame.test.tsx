@@ -144,12 +144,7 @@ describe('Full Terminal Tool Confirmation Snapshot', () => {
               showProviderInfo: false,
               showShortcutsHint: false,
               footer: {
-                items: [
-                  'workspace',
-                  'model-name',
-                  'context-used',
-                  'token-count',
-                ],
+                items: ['workspace', 'model-name', 'context-used', 'token-count'],
               },
             },
             security: {

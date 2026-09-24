@@ -63,11 +63,7 @@ export const TopicMessage: React.FC<TopicMessageProps> = ({
   const intent = strategicIntent || summary;
 
   // Extra summary: only if both exist and are different (or just summary if we want to show it below)
-  const hasExtraSummary = !!(
-    strategicIntent &&
-    summary &&
-    strategicIntent !== summary
-  );
+  const hasExtraSummary = !!(strategicIntent && summary && strategicIntent !== summary);
 
   const handleToggle = useCallback(() => {
     if (toggleExpansion && hasExtraSummary) {

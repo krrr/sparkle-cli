@@ -19,9 +19,7 @@ describe('SessionBrowser UI States', () => {
 
   it('SessionBrowserError renders correctly', async () => {
     const mockState = { error: 'Test error message' } as SessionBrowserState;
-    const { lastFrame } = await render(
-      <SessionBrowserError state={mockState} />,
-    );
+    const { lastFrame } = await render(<SessionBrowserError state={mockState} />);
     expect(lastFrame()).toMatchSnapshot();
   });
 

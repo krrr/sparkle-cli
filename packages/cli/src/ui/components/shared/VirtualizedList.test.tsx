@@ -8,14 +8,7 @@ import { render } from '../../../test-utils/render.js';
 import { waitFor } from '../../../test-utils/async.js';
 import { VirtualizedList, type VirtualizedListRef } from './VirtualizedList.js';
 import { Text, Box } from 'ink';
-import {
-  createRef,
-  act,
-  useEffect,
-  createContext,
-  useContext,
-  useState,
-} from 'react';
+import { createRef, act, useEffect, createContext, useContext, useState } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 describe('<VirtualizedList />', () => {
@@ -165,18 +158,13 @@ describe('<VirtualizedList />', () => {
           );
         };
 
-        const veryLongData = Array.from(
-          { length: 1000 },
-          (_, i) => `Item ${i}`,
-        );
+        const veryLongData = Array.from({ length: 1000 }, (_, i) => `Item ${i}`);
 
         const { lastFrame, unmount } = await render(
           <Box height={20} width={100} borderStyle="round">
             <VirtualizedList
               data={veryLongData}
-              renderItem={({ item }) => (
-                <ItemWithEffect key={item} item={item} />
-              )}
+              renderItem={({ item }) => <ItemWithEffect key={item} item={item} />}
               keyExtractor={keyExtractor}
               estimatedItemHeight={() => tallItemHeight}
               initialScrollIndex={initialScrollIndex}
@@ -251,9 +239,7 @@ describe('<VirtualizedList />', () => {
       return null;
     };
 
-    const { lastFrame, unmount, waitUntilReady } = await render(
-      <TestComponent />,
-    );
+    const { lastFrame, unmount, waitUntilReady } = await render(<TestComponent />);
 
     // Initially, only Item 0 (height 10) fills the 10px viewport
     expect(lastFrame()).toContain('Item 0');

@@ -58,19 +58,14 @@ describe('ExtensionIntegrityManager', () => {
     it('should retrieve key from keychain if available', async () => {
       const key = await manager.getSecretKey();
       expect(key).toBe('test-key');
-      expect(mockKeychainService.getPassword).toHaveBeenCalledWith(
-        'secret-key',
-      );
+      expect(mockKeychainService.getPassword).toHaveBeenCalledWith('secret-key');
     });
 
     it('should generate and store key in keychain if not exists', async () => {
       mockKeychainService.getPassword.mockResolvedValue(null);
       const key = await manager.getSecretKey();
       expect(key).toHaveLength(64);
-      expect(mockKeychainService.setPassword).toHaveBeenCalledWith(
-        'secret-key',
-        key,
-      );
+      expect(mockKeychainService.setPassword).toHaveBeenCalledWith('secret-key', key);
     });
 
     it('should fallback to file-based key if keychain is unavailable', async () => {
@@ -113,13 +108,11 @@ describe('ExtensionIntegrityManager', () => {
         (p.endsWith('extension_integrity.json') ||
           p.endsWith('extension_integrity.json.tmp'));
 
-      vi.mocked(fs.promises.writeFile).mockImplementation(
-        async (p, content) => {
-          if (isIntegrityStore(p)) {
-            storedContent = content as string;
-          }
-        },
-      );
+      vi.mocked(fs.promises.writeFile).mockImplementation(async (p, content) => {
+        if (isIntegrityStore(p)) {
+          storedContent = content as string;
+        }
+      });
 
       vi.mocked(fs.promises.readFile).mockImplementation(async (p) => {
         if (isIntegrityStore(p)) {

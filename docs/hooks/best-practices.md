@@ -1,15 +1,15 @@
 # Hooks Best Practices
 
 This guide covers security considerations, performance optimization, debugging
-techniques, and privacy considerations for developing and deploying hooks in
-Sparkle CLI.
+techniques, and privacy considerations for developing and deploying hooks in Sparkle
+CLI.
 
 ## Performance
 
 ### Keep hooks fast
 
-Hooks run synchronously—slow hooks delay the agent loop. Optimize for speed by
-using parallel operations:
+Hooks run synchronously—slow hooks delay the agent loop. Optimize for speed by using
+parallel operations:
 
 ```javascript
 // Sequential operations are slower
@@ -27,8 +27,8 @@ const [data1, data2] = await Promise.all([p1, p2]);
 
 ### Cache expensive operations
 
-Store results between invocations to avoid repeated computation, especially for
-hooks that run frequently (like `BeforeTool` or `AfterModel`).
+Store results between invocations to avoid repeated computation, especially for hooks
+that run frequently (like `BeforeTool` or `AfterModel`).
 
 ```javascript
 const fs = require('fs');
@@ -71,19 +71,18 @@ async function main() {
 
 Choose hook events that match your use case to avoid unnecessary execution.
 
-- **`AfterAgent`**: Fires **once** per turn after the model finishes its final
-  response. Use this for quality validation (Retries) or final logging.
-- **`AfterModel`**: Fires after **every chunk** of LLM output. Use this for
-  real-time redaction, PII filtering, or monitoring output as it streams.
+- **`AfterAgent`**: Fires **once** per turn after the model finishes its final response.
+  Use this for quality validation (Retries) or final logging.
+- **`AfterModel`**: Fires after **every chunk** of LLM output. Use this for real-time
+  redaction, PII filtering, or monitoring output as it streams.
 
-If you only need to check the final completion, use `AfterAgent` to save
-performance.
+If you only need to check the final completion, use `AfterAgent` to save performance.
 
 ### Filter with matchers
 
-Use specific matchers to avoid unnecessary hook execution. Instead of matching
-all tools with `*`, specify only the tools you need. This saves the overhead of
-spawning a process for irrelevant events.
+Use specific matchers to avoid unnecessary hook execution. Instead of matching all tools
+with `*`, specify only the tools you need. This saves the overhead of spawning a process
+for irrelevant events.
 
 ```json
 {
@@ -100,9 +99,9 @@ spawning a process for irrelevant events.
 
 ### Optimize JSON parsing
 
-For large inputs (like `AfterModel` receiving a large context), standard JSON
-parsing can be slow. If you only need one field, consider streaming parsers or
-lightweight extraction logic, though for most shell scripts `jq` is sufficient.
+For large inputs (like `AfterModel` receiving a large context), standard JSON parsing
+can be slow. If you only need one field, consider streaming parsers or lightweight
+extraction logic, though for most shell scripts `jq` is sufficient.
 
 ## Debugging
 
@@ -124,8 +123,8 @@ echo '{"decision": "allow"}'
 
 ### Log to files
 
-Since hooks run in the background, writing to a dedicated log file is often the
-easiest way to debug complex logic.
+Since hooks run in the background, writing to a dedicated log file is often the easiest
+way to debug complex logic.
 
 ```bash
 #!/usr/bin/env bash
@@ -164,8 +163,8 @@ try {
 
 ### Test hooks independently
 
-Run hook scripts manually with sample JSON input to verify they behave as
-expected before hooking them up to the CLI.
+Run hook scripts manually with sample JSON input to verify they behave as expected
+before hooking them up to the CLI.
 
 **macOS/Linux**
 
@@ -219,10 +218,9 @@ Write-Host "Exit code: $LASTEXITCODE"
 
 Sparkle CLI uses exit codes for high-level flow control:
 
-- **Exit 0 (Success)**: The hook ran successfully. The CLI parses `stdout` for
-  JSON decisions.
-- **Exit 2 (System Block)**: A critical block occurred. `stderr` is used as the
-  reason.
+- **Exit 0 (Success)**: The hook ran successfully. The CLI parses `stdout` for JSON
+  decisions.
+- **Exit 2 (System Block)**: A critical block occurred. `stderr` is used as the reason.
   - For **Agent/Model** events, this aborts the turn.
   - For **Tool** events, this blocks the tool but allows the agent to continue.
   - For **AfterAgent**, this triggers an automatic retry turn.
@@ -230,8 +228,8 @@ Sparkle CLI uses exit codes for high-level flow control:
 > **TIP**
 >
 > **Blocking vs. Stopping**: Use `decision: "deny"` (or Exit Code 2) to block a
-> **specific action**. Use `{"continue": false}` in your JSON output to **kill
-> the entire agent loop** immediately.
+> **specific action**. Use `{"continue": false}` in your JSON output to **kill the
+> entire agent loop** immediately.
 
 ```bash
 #!/usr/bin/env bash
@@ -250,8 +248,8 @@ fi
 
 ### Enable telemetry
 
-Hook execution is logged when `telemetry.logPrompts` is enabled. You can view
-these logs to debug execution flow.
+Hook execution is logged when `telemetry.logPrompts` is enabled. You can view these logs
+to debug execution flow.
 
 ```json
 {
@@ -263,8 +261,7 @@ these logs to debug execution flow.
 
 ### Use hook panel
 
-The `/hooks panel` command inside the CLI shows execution status and recent
-output:
+The `/hooks panel` command inside the CLI shows execution status and recent output:
 
 ```bash
 /hooks panel
@@ -295,11 +292,11 @@ echo "{}"
 
 ### Documenting your hooks
 
-Maintainability is critical for complex hook systems. Use descriptions and
-comments to help yourself and others understand why a hook exists.
+Maintainability is critical for complex hook systems. Use descriptions and comments to
+help yourself and others understand why a hook exists.
 
-**Use the `description` field**: This text is displayed in the `/hooks panel` UI
-and helps diagnose issues.
+**Use the `description` field**: This text is displayed in the `/hooks panel` UI and
+helps diagnose issues.
 
 ```json
 {
@@ -321,8 +318,7 @@ and helps diagnose issues.
 }
 ```
 
-**Add comments in hook scripts**: Explain performance expectations and
-dependencies.
+**Add comments in hook scripts**: Explain performance expectations and dependencies.
 
 ```javascript
 #!/usr/bin/env node
@@ -366,8 +362,8 @@ chmod +x .sparkle/hooks/*.js
 
 ```
 
-**Windows Note**: On Windows, PowerShell scripts (`.ps1`) don't use `chmod`, but
-you may need to ensure your execution policy allows them to run (for example,
+**Windows Note**: On Windows, PowerShell scripts (`.ps1`) don't use `chmod`, but you may
+need to ensure your execution policy allows them to run (for example,
 `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`).
 
 ### Version control
@@ -398,8 +394,7 @@ git add .sparkle/settings.json
 
 ### Threat Model
 
-Understanding where hooks come from and what they can do is critical for secure
-usage.
+Understanding where hooks come from and what they can do is critical for secure usage.
 
 | Hook Source                    | Description                                                                                                                        |
 | :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------- |
@@ -413,19 +408,17 @@ usage.
 When you open a project with hooks defined in `.sparkle/settings.json`:
 
 1. **Detection**: Sparkle CLI detects the hooks.
-2. **Identification**: A unique identity is generated for each hook based on its
-   `name` and `command`.
-3. **Warning**: If this specific hook identity has not been seen before, a
-   **warning** is displayed.
-4. **Execution**: The hook is executed (unless specific security settings block
-   it).
+2. **Identification**: A unique identity is generated for each hook based on its `name`
+   and `command`.
+3. **Warning**: If this specific hook identity has not been seen before, a **warning**
+   is displayed.
+4. **Execution**: The hook is executed (unless specific security settings block it).
 5. **Trust**: The hook is marked as "trusted" for this project.
 
-> **Modification detection**: If the `command` string of a project hook is
-> changed (for example, by a `git pull`), its identity changes. Sparkle CLI will
-> treat it as a **new, untrusted hook** and warn you again. This prevents
-> malicious actors from silently swapping a verified command for a malicious
-> one.
+> **Modification detection**: If the `command` string of a project hook is changed (for
+> example, by a `git pull`), its identity changes. Sparkle CLI will treat it as a **new,
+> untrusted hook** and warn you again. This prevents malicious actors from silently
+> swapping a verified command for a malicious one.
 
 ### Risks
 
@@ -442,27 +435,27 @@ When you open a project with hooks defined in `.sparkle/settings.json`:
 **Verify the source** of any project hooks or extensions before enabling them.
 
 - For open-source projects, a quick review of the hook scripts is recommended.
-- For extensions, ensure you trust the author or publisher (for example,
-  verified publishers, well-known community members).
+- For extensions, ensure you trust the author or publisher (for example, verified
+  publishers, well-known community members).
 - Be cautious with obfuscated scripts or compiled binaries from unknown sources.
 
 #### Sanitize environment
 
-Hooks inherit the environment of Sparkle CLI process, which may include
-sensitive API keys. Sparkle CLI provides a
-[redaction system](../reference/configuration.md#environment-variable-redaction)
-that automatically filters variables matching sensitive patterns (for example,
-`KEY`, `TOKEN`).
+Hooks inherit the environment of Sparkle CLI process, which may include sensitive API
+keys. Sparkle CLI provides a
+[redaction system](../reference/configuration.md#environment-variable-redaction) that
+automatically filters variables matching sensitive patterns (for example, `KEY`,
+`TOKEN`).
 
-> **Disabled by Default**: Environment redaction is currently **OFF by
-> default**. We strongly recommend enabling it if you are running third-party
-> hooks or working in sensitive environments.
+> **Disabled by Default**: Environment redaction is currently **OFF by default**. We
+> strongly recommend enabling it if you are running third-party hooks or working in
+> sensitive environments.
 
 **Impact on hooks:**
 
 - **Security**: Prevents your hook scripts from accidentally leaking secrets.
-- **Troubleshooting**: If your hook depends on a specific environment variable
-  that is being blocked, you must explicitly allow it in `settings.json`.
+- **Troubleshooting**: If your hook depends on a specific environment variable that is
+  being blocked, you must explicitly allow it in `settings.json`.
 
 ```json
 {
@@ -482,8 +475,8 @@ configuration.
 
 ### Hook not executing
 
-**Check hook name in `/hooks panel`:** Verify the hook appears in the list and
-is enabled.
+**Check hook name in `/hooks panel`:** Verify the hook appears in the list and is
+enabled.
 
 **Verify matcher pattern:**
 
@@ -503,16 +496,16 @@ echo "write_file|replace" | grep -E "write_.*|replace"
 }
 ```
 
-**Ensure script is executable**: For macOS and Linux users, verify the script
-has execution permissions:
+**Ensure script is executable**: For macOS and Linux users, verify the script has
+execution permissions:
 
 ```bash
 ls -la .sparkle/hooks/my-hook.sh
 chmod +x .sparkle/hooks/my-hook.sh
 ```
 
-**Windows Note**: On Windows, ensure your execution policy allows running
-scripts (for example, `Get-ExecutionPolicy`).
+**Windows Note**: On Windows, ensure your execution policy allows running scripts (for
+example, `Get-ExecutionPolicy`).
 
 **Verify script path:** Ensure the path in `settings.json` resolves correctly.
 
@@ -526,8 +519,8 @@ test -f "$SPARKLE_PROJECT_DIR/.sparkle/hooks/my-hook.sh" && echo "File exists"
 
 ### Hook timing out
 
-**Check configured timeout:** The default is 60000ms (1 minute). You can
-increase this in `settings.json`:
+**Check configured timeout:** The default is 60000ms (1 minute). You can increase this
+in `settings.json`:
 
 ```json
 {
@@ -536,8 +529,7 @@ increase this in `settings.json`:
 }
 ```
 
-**Optimize slow operations:** Move heavy processing to background tasks or use
-caching.
+**Optimize slow operations:** Move heavy processing to background tasks or use caching.
 
 ### Invalid JSON output
 
@@ -578,13 +570,13 @@ env > .sparkle/hook-env.log
 
 ## Authoring secure hooks
 
-When writing your own hooks, follow these practices to ensure they are robust
-and secure.
+When writing your own hooks, follow these practices to ensure they are robust and
+secure.
 
 ### Validate all inputs
 
-Never trust data from hooks without validation. Hook inputs often come from the
-LLM or user prompts, which can be manipulated.
+Never trust data from hooks without validation. Hook inputs often come from the LLM or
+user prompts, which can be manipulated.
 
 ```bash
 #!/usr/bin/env bash
@@ -606,8 +598,8 @@ fi
 
 ### Use timeouts
 
-Prevent denial-of-service (hanging agents) by enforcing timeouts. Sparkle CLI
-defaults to 60 seconds, but you should set stricter limits for fast hooks.
+Prevent denial-of-service (hanging agents) by enforcing timeouts. Sparkle CLI defaults
+to 60 seconds, but you should set stricter limits for fast hooks.
 
 ```json
 {
@@ -652,8 +644,8 @@ fi
 
 ### Example: Secret Scanner
 
-Use `BeforeTool` hooks to prevent committing sensitive data. This is a powerful
-pattern for enhancing security in your workflow.
+Use `BeforeTool` hooks to prevent committing sensitive data. This is a powerful pattern
+for enhancing security in your workflow.
 
 ```javascript
 const SECRET_PATTERNS = [
@@ -676,13 +668,13 @@ Hook inputs and outputs may contain sensitive information.
 
 ### What data is collected
 
-Hook telemetry may include inputs (prompts, code) and outputs (decisions,
-reasons) unless disabled.
+Hook telemetry may include inputs (prompts, code) and outputs (decisions, reasons)
+unless disabled.
 
 ### Privacy settings
 
-**Disable PII logging:** If you are working with sensitive data, disable prompt
-logging in your settings:
+**Disable PII logging:** If you are working with sensitive data, disable prompt logging
+in your settings:
 
 ```json
 {
@@ -692,19 +684,18 @@ logging in your settings:
 }
 ```
 
-**Suppress Output:** Individual hooks can request their metadata be hidden from
-logs and telemetry by returning `"suppressOutput": true` in their JSON response.
+**Suppress Output:** Individual hooks can request their metadata be hidden from logs and
+telemetry by returning `"suppressOutput": true` in their JSON response.
 
 > **Note**
 
-> `suppressOutput` only affects background logging. Any `systemMessage` or
-> `reason` included in the JSON will still be displayed to the user in the
-> terminal.
+> `suppressOutput` only affects background logging. Any `systemMessage` or `reason`
+> included in the JSON will still be displayed to the user in the terminal.
 
 ### Sensitive data in hooks
 
 If your hooks process sensitive data:
 
 1. **Minimize logging:** Don't write sensitive data to log files.
-2. **Sanitize outputs:** Remove sensitive data before outputting JSON or writing
-   to stderr.
+2. **Sanitize outputs:** Remove sensitive data before outputting JSON or writing to
+   stderr.

@@ -81,10 +81,7 @@ export class Session {
     private readonly connection: acp.AgentSideConnection,
     private readonly settings: LoadedSettings,
   ) {
-    coreEvents.on(
-      CoreEvent.ApprovalModeChanged,
-      this.handleApprovalModeChanged,
-    );
+    coreEvents.on(CoreEvent.ApprovalModeChanged, this.handleApprovalModeChanged);
 
     // Subscribe to tool confirmation requests to handle policy checks (e.g. auto-allowing safe shell commands)
     this.context.config
@@ -96,9 +93,7 @@ export class Session {
       );
   }
 
-  private handleToolConfirmationRequest = async (
-    request: ToolConfirmationRequest,
-  ) => {
+  private handleToolConfirmationRequest = async (request: ToolConfirmationRequest) => {
     try {
       const policyEngine = this.context.config.getPolicyEngine?.();
       const messageBus = this.context.config.getMessageBus();
@@ -108,9 +103,7 @@ export class Session {
       }
 
       if (!policyEngine) {
-        debugLogger.warn(
-          'Policy engine missing. Denying tool confirmation request.',
-        );
+        debugLogger.warn('Policy engine missing. Denying tool confirmation request.');
         await messageBus.publish({
           type: MessageBusType.TOOL_CONFIRMATION_RESPONSE,
           correlationId: request.correlationId,
@@ -122,9 +115,7 @@ export class Session {
 
       const toolName = request.toolCall.name?.trim();
       if (!toolName) {
-        debugLogger.warn(
-          'Tool confirmation request missing tool name. Denying.',
-        );
+        debugLogger.warn('Tool confirmation request missing tool name. Denying.');
         await messageBus.publish({
           type: MessageBusType.TOOL_CONFIRMATION_RESPONSE,
           correlationId: request.correlationId,
@@ -190,10 +181,7 @@ export class Session {
   };
 
   dispose(): void {
-    coreEvents.off(
-      CoreEvent.ApprovalModeChanged,
-      this.handleApprovalModeChanged,
-    );
+    coreEvents.off(CoreEvent.ApprovalModeChanged, this.handleApprovalModeChanged);
     this.disposeController.abort();
   }
 
@@ -207,9 +195,7 @@ export class Session {
   }
 
   setMode(modeId: acp.SessionModeId): acp.SetSessionModeResponse {
-    const availableModes = buildAvailableModes(
-      this.context.config.isPlanEnabled(),
-    );
+    const availableModes = buildAvailableModes(this.context.config.isPlanEnabled());
     const mode = availableModes.find((m) => m.id === modeId);
     if (!mode) {
       throw new Error(`Invalid or unavailable mode: ${modeId}`);
@@ -297,9 +283,7 @@ export class Session {
               sessionUpdate: 'tool_call',
               toolCallId: toolCall.id,
               status:
-                toolCall.status === CoreToolCallStatus.Success
-                  ? 'completed'
-                  : 'failed',
+                toolCall.status === CoreToolCallStatus.Success ? 'completed' : 'failed',
               title: toolCall.displayName || toolCall.name,
               content: toolCallContent,
               kind: tool ? toAcpToolKind(tool.kind) : 'other',
@@ -340,10 +324,7 @@ export class Session {
 
     commandText = commandText.trim();
 
-    if (
-      commandText &&
-      (commandText.startsWith('/') || commandText.startsWith('$'))
-    ) {
+    if (commandText && (commandText.startsWith('/') || commandText.startsWith('$'))) {
       // If we found a command, pass it to handleCommand
       // Note: handleCommand currently expects `commandText` to be the command string
       // It uses `parts` argument but effectively ignores it in current implementation
@@ -447,8 +428,7 @@ export class Session {
               const usage = event.value.usageMetadata;
               if (usage) {
                 turnInputTokens = usage.promptTokenCount ?? turnInputTokens;
-                turnOutputTokens =
-                  usage.candidatesTokenCount ?? turnOutputTokens;
+                turnOutputTokens = usage.candidatesTokenCount ?? turnOutputTokens;
               }
               break;
             }
@@ -470,9 +450,7 @@ export class Session {
               break;
 
             case GeminiEventType.Error: {
-              const parseResult = StructuredErrorSchema.safeParse(
-                event.value.error,
-              );
+              const parseResult = StructuredErrorSchema.safeParse(event.value.error);
               const errData = parseResult.success ? parseResult.data : {};
 
               throw new acp.RequestError(
@@ -487,10 +465,7 @@ export class Session {
         }
       } catch (error) {
         if (getErrorStatus(error) === 429) {
-          throw new acp.RequestError(
-            429,
-            'Rate limit exceeded. Try again later.',
-          );
+          throw new acp.RequestError(429, 'Rate limit exceeded. Try again later.');
         }
 
         if (
@@ -705,9 +680,7 @@ export class Session {
     const tool = toolRegistry.getTool(fc.name);
 
     if (!tool) {
-      return errorResponse(
-        new Error(`Tool "${fc.name}" not found in registry.`),
-      );
+      return errorResponse(new Error(`Tool "${fc.name}" not found in registry.`));
     }
 
     try {
@@ -723,8 +696,7 @@ export class Session {
           ? invocation.getExplanation()
           : '';
 
-      const confirmationDetails =
-        await invocation.shouldConfirmExecute(abortSignal);
+      const confirmationDetails = await invocation.shouldConfirmExecute(abortSignal);
 
       if (confirmationDetails) {
         const content: acp.ToolCallContent[] = [];
@@ -776,9 +748,7 @@ export class Session {
         const outcome =
           output.outcome.outcome === 'cancelled'
             ? ToolConfirmationOutcome.Cancel
-            : z
-                .nativeEnum(ToolConfirmationOutcome)
-                .parse(output.outcome.optionId);
+            : z.nativeEnum(ToolConfirmationOutcome).parse(output.outcome.optionId);
 
         await confirmationDetails.onConfirm(outcome);
 
@@ -905,9 +875,7 @@ export class Session {
         sessionUpdate: 'tool_call_update',
         toolCallId: callId,
         status: 'failed',
-        content: [
-          { type: 'content', content: { type: 'text', text: error.message } },
-        ],
+        content: [{ type: 'content', content: { type: 'text', text: error.message } }],
         kind: toAcpToolKind(tool.kind),
       });
 
@@ -1002,8 +970,7 @@ export class Session {
       this.context.config.getFileFilteringOptions();
 
     const pathSpecsToRead: string[] = [];
-    const directoryPaths: Array<{ pathName: string; absolutePath: string }> =
-      [];
+    const directoryPaths: Array<{ pathName: string; absolutePath: string }> = [];
     const contentLabelsForDisplay: string[] = [];
     const ignoredPaths: string[] = [];
     const directContents: Array<{
@@ -1035,10 +1002,8 @@ export class Session {
       let resolvedSuccessfully = false;
       let readDirectly = false;
 
-      const result = await resolveAtCommandPath(
-        pathName,
-        this.context.config,
-        (msg) => this.debug(msg),
+      const result = await resolveAtCommandPath(pathName, this.context.config, (msg) =>
+        this.debug(msg),
       );
 
       let validationError: string | null = null;
@@ -1059,10 +1024,7 @@ export class Session {
         // We still check if it's an unauthorized absolute path that we can ask permission for,
         // specifically for paths that are completely outside the root and not even in any workspace directory.
         // For relative paths not found anywhere, we resolve relative to targetDir for permission check.
-        absolutePath = path.resolve(
-          this.context.config.getTargetDir(),
-          pathName,
-        );
+        absolutePath = path.resolve(this.context.config.getTargetDir(), pathName);
       }
 
       if (
@@ -1113,14 +1075,10 @@ export class Session {
             const outcome =
               output.outcome.outcome === 'cancelled'
                 ? ToolConfirmationOutcome.Cancel
-                : z
-                    .nativeEnum(ToolConfirmationOutcome)
-                    .parse(output.outcome.optionId);
+                : z.nativeEnum(ToolConfirmationOutcome).parse(output.outcome.optionId);
 
             if (outcome === ToolConfirmationOutcome.ProceedOnce) {
-              this.context.config
-                .getWorkspaceContext()
-                .addReadOnlyPath(absolutePath);
+              this.context.config.getWorkspaceContext().addReadOnlyPath(absolutePath);
               validationError = null;
             } else {
               this.debug(
@@ -1153,16 +1111,11 @@ export class Session {
           // read it directly to avoid ReadManyFilesTool absolute path resolution issues.
           if (
             (path.isAbsolute(pathName) ||
-              !isWithinRoot(
-                absolutePath,
-                this.context.config.getTargetDir(),
-              )) &&
+              !isWithinRoot(absolutePath, this.context.config.getTargetDir())) &&
             !readDirectly
           ) {
             try {
-              const stats = resolved
-                ? resolved.stats
-                : await fs.stat(absolutePath);
+              const stats = resolved ? resolved.stats : await fs.stat(absolutePath);
               if (stats.isFile()) {
                 const fileReadResult = await processSingleFileContent(
                   absolutePath,
@@ -1221,15 +1174,11 @@ export class Session {
           }
 
           if (!readDirectly) {
-            const stats = resolved
-              ? resolved.stats
-              : await fs.stat(absolutePath);
+            const stats = resolved ? resolved.stats : await fs.stat(absolutePath);
             if (stats.isDirectory()) {
               // Directories are listed (not read recursively): collect them
               // for the LSTool pass.
-              const resolvedDirPath = resolved
-                ? resolved.absolutePath
-                : absolutePath;
+              const resolvedDirPath = resolved ? resolved.absolutePath : absolutePath;
               directoryPaths.push({
                 pathName,
                 absolutePath: resolvedDirPath,
@@ -1258,9 +1207,7 @@ export class Session {
       } catch (error) {
         if (isNodeError(error) && error.code === 'ENOENT') {
           if (this.context.config.getEnableRecursiveFileSearch() && globTool) {
-            this.debug(
-              `Path ${pathName} not found directly, attempting glob search.`,
-            );
+            this.debug(`Path ${pathName} not found directly, attempting glob search.`);
             try {
               const globResult = await globTool.buildAndExecute(
                 {
@@ -1302,9 +1249,7 @@ export class Session {
               );
             }
           } else {
-            this.debug(
-              `Glob tool not found. Path ${pathName} will be skipped.`,
-            );
+            this.debug(`Glob tool not found. Path ${pathName} will be skipped.`);
           }
         } else {
           debugLogger.error(
@@ -1369,9 +1314,7 @@ export class Session {
     initialQueryText = initialQueryText.trim();
     // Inform user about ignored paths
     if (ignoredPaths.length > 0) {
-      this.debug(
-        `Ignored ${ignoredPaths.length} files: ${ignoredPaths.join(', ')}`,
-      );
+      this.debug(`Ignored ${ignoredPaths.length} files: ${ignoredPaths.join(', ')}`);
     }
 
     const processedQueryParts: Part[] = [{ text: initialQueryText }];

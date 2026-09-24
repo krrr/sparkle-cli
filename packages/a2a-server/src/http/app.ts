@@ -182,9 +182,7 @@ async function handleExecuteCommand(
     }
   } catch (e) {
     logger.error(
-      `Error executing /executeCommand: ${command} with args: ${JSON.stringify(
-        args,
-      )}`,
+      `Error executing /executeCommand: ${command} with args: ${JSON.stringify(args)}`,
       e,
     );
     const errorMessage =
@@ -274,9 +272,7 @@ export async function createApp() {
       try {
         const taskId = uuidv4();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        const agentSettings = req.body.agentSettings as
-          | AgentSettings
-          | undefined;
+        const agentSettings = req.body.agentSettings as AgentSettings | undefined;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const contextId = req.body.contextId || uuidv4();
         const wrapper = await agentExecutor.createTask(
@@ -289,9 +285,7 @@ export async function createApp() {
       } catch (error) {
         logger.error('[CoreAgent] Error creating task:', error);
         const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Unknown error creating task';
+          error instanceof Error ? error.message : 'Unknown error creating task';
         res.status(500).send({ error: errorMessage });
       }
     });
@@ -322,9 +316,7 @@ export async function createApp() {
               .map((subCommand) =>
                 transformCommand(subCommand, visited.concat(commandName)),
               )
-              .filter(
-                (subCommand): subCommand is CommandResponse => !!subCommand,
-              ),
+              .filter((subCommand): subCommand is CommandResponse => !!subCommand),
           };
         };
 
@@ -408,9 +400,7 @@ export async function main() {
         throw new Error('[Core Agent] Could not find port number.');
       }
       updateCoderAgentCardUrl(Number(actualPort));
-      logger.info(
-        `[CoreAgent] Agent Server started on http://localhost:${actualPort}`,
-      );
+      logger.info(`[CoreAgent] Agent Server started on http://localhost:${actualPort}`);
       logger.info(
         `[CoreAgent] Agent Card: http://localhost:${actualPort}/.well-known/agent-card.json`,
       );

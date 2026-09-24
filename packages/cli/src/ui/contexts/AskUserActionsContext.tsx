@@ -24,15 +24,14 @@ interface AskUserActionsContextValue {
   cancel: () => void;
 }
 
-export const AskUserActionsContext =
-  createContext<AskUserActionsContextValue | null>(null);
+export const AskUserActionsContext = createContext<AskUserActionsContextValue | null>(
+  null,
+);
 
 export const useAskUserActions = () => {
   const context = useContext(AskUserActionsContext);
   if (!context) {
-    throw new Error(
-      'useAskUserActions must be used within an AskUserActionsProvider',
-    );
+    throw new Error('useAskUserActions must be used within an AskUserActionsProvider');
   }
   return context;
 };

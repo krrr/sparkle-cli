@@ -31,12 +31,9 @@ export const IdeTrustChangeDialog = ({ reason }: IdeTrustChangeDialogProps) => {
   let message = 'Workspace trust has changed.';
   if (reason === 'NONE') {
     // This should not happen, but provides a fallback and a debug log.
-    debugLogger.warn(
-      'IdeTrustChangeDialog rendered with unexpected reason "NONE"',
-    );
+    debugLogger.warn('IdeTrustChangeDialog rendered with unexpected reason "NONE"');
   } else if (reason === 'CONNECTION_CHANGE') {
-    message =
-      'Workspace trust has changed due to a change in the IDE connection.';
+    message = 'Workspace trust has changed due to a change in the IDE connection.';
   } else if (reason === 'TRUST_CHANGE') {
     message = 'Workspace trust has changed due to a change in the IDE trust.';
   }

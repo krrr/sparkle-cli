@@ -183,9 +183,7 @@ export class RemoteSessionInvocation extends BaseToolInvocation<
           agentName,
           state: SubagentState.CANCELLED,
           result:
-            typeof partialProgress?.result === 'string'
-              ? partialProgress.result
-              : '',
+            typeof partialProgress?.result === 'string' ? partialProgress.result : '',
           recentActivity,
         };
         if (updateOutput) updateOutput(errorProgress);
@@ -205,9 +203,7 @@ export class RemoteSessionInvocation extends BaseToolInvocation<
     } catch (error: unknown) {
       const partialProgress = session.getLatestProgress();
       const partialOutput =
-        typeof partialProgress?.result === 'string'
-          ? partialProgress.result
-          : '';
+        typeof partialProgress?.result === 'string' ? partialProgress.result : '';
       const errorMessage = this.formatExecutionError(error);
       const fullDisplay = partialOutput
         ? `${partialOutput}\n\n${errorMessage}`
@@ -241,10 +237,7 @@ export class RemoteSessionInvocation extends BaseToolInvocation<
       };
     } finally {
       // Persist A2A state for next invocation — even on abort/error
-      RemoteSessionInvocation.sessionState.set(
-        stateKey,
-        session.getSessionState(),
-      );
+      RemoteSessionInvocation.sessionState.set(stateKey, session.getSessionState());
       _signal?.removeEventListener('abort', abortListener);
       unsubscribeProgress();
       unsubscribeParent?.();
@@ -257,9 +250,7 @@ export class RemoteSessionInvocation extends BaseToolInvocation<
   ): SubagentActivityItem[] {
     const result: SubagentActivityItem[] = [];
     for (const item of activity) {
-      result.push(
-        item.status === SubagentState.RUNNING ? { ...item, status } : item,
-      );
+      result.push(item.status === SubagentState.RUNNING ? { ...item, status } : item);
     }
     return result;
   }

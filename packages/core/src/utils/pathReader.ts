@@ -30,9 +30,7 @@ export async function readPathFromWorkspace(
 
   if (path.isAbsolute(pathStr)) {
     if (!workspace.isPathWithinWorkspace(pathStr)) {
-      throw new Error(
-        `Absolute path is outside of the allowed workspace: ${pathStr}`,
-      );
+      throw new Error(`Absolute path is outside of the allowed workspace: ${pathStr}`);
     }
     absolutePath = pathStr;
   } else {
@@ -75,16 +73,12 @@ export async function readPathFromWorkspace(
       absolute: true,
     });
 
-    const relativeFiles = files.map((p) =>
-      path.relative(config.getTargetDir(), p),
-    );
+    const relativeFiles = files.map((p) => path.relative(config.getTargetDir(), p));
     const filteredFiles = fileService.filterFiles(relativeFiles, {
       respectGitIgnore: config.getFileFilteringRespectGitIgnore(),
       respectSparkleIgnore: config.getFileFilteringRespectSparkleIgnore(),
     });
-    const finalFiles = filteredFiles.map((p) =>
-      path.resolve(config.getTargetDir(), p),
-    );
+    const finalFiles = filteredFiles.map((p) => path.resolve(config.getTargetDir(), p));
 
     for (const filePath of finalFiles) {
       // Defense in depth: validate each file found within the directory.

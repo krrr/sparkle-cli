@@ -8,11 +8,7 @@ import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { quote, parse, type ParseEntry } from 'shell-quote';
-import {
-  spawn,
-  spawnSync,
-  type SpawnOptionsWithoutStdio,
-} from 'node:child_process';
+import { spawn, spawnSync, type SpawnOptionsWithoutStdio } from 'node:child_process';
 
 /**
  * Extracts the primary command name from a potentially wrapped shell command.
@@ -22,16 +18,11 @@ import {
  * @param args - The arguments for the command.
  * @returns The primary command name.
  */
-export async function getCommandName(
-  command: string,
-  args: string[],
-): Promise<string> {
+export async function getCommandName(command: string, args: string[]): Promise<string> {
   await initializeShellParsers();
   const fullCmd = [command, ...args].join(' ');
   const stripped = stripShellWrapper(fullCmd);
-  const roots = getCommandRoots(stripped).filter(
-    (r) => r !== 'shopt' && r !== 'set',
-  );
+  const roots = getCommandRoots(stripped).filter((r) => r !== 'shopt' && r !== 'set');
   if (roots.length > 0) {
     return roots[0];
   }
@@ -96,8 +87,7 @@ export function resolveExecutable(exe: string): string | undefined {
   if (!pathEnv) {
     return undefined;
   }
-  const extensions =
-    os.platform() === 'win32' ? ['.exe', '.cmd', '.bat', ''] : [''];
+  const extensions = os.platform() === 'win32' ? ['.exe', '.cmd', '.bat', ''] : [''];
   for (const dir of pathEnv.split(path.delimiter)) {
     for (const ext of extensions) {
       const fullPath = path.join(dir, exe + ext);
@@ -389,10 +379,7 @@ function extractNameFromNode(node: Node): string | null {
   }
 }
 
-function collectCommandDetails(
-  root: Node,
-  source: string,
-): ParsedCommandDetail[] {
+function collectCommandDetails(root: Node, source: string): ParsedCommandDetail[] {
   const stack: Node[] = [root];
   const details: ParsedCommandDetail[] = [];
 
@@ -454,10 +441,7 @@ function hasPromptCommandTransform(root: Node): boolean {
         const operatorNode = current.child(i);
         const transformNode = current.child(i + 1);
 
-        if (
-          operatorNode?.text === '@' &&
-          transformNode?.text?.toLowerCase() === 'p'
-        ) {
+        if (operatorNode?.text === '@' && transformNode?.text?.toLowerCase() === 'p') {
           return true;
         }
       }
@@ -474,14 +458,9 @@ function hasPromptCommandTransform(root: Node): boolean {
   return false;
 }
 
-export function parseBashCommandDetails(
-  command: string,
-): CommandParseResult | null {
+export function parseBashCommandDetails(command: string): CommandParseResult | null {
   if (treeSitterInitializationError) {
-    debugLogger.debug(
-      'Bash parser not initialized:',
-      treeSitterInitializationError,
-    );
+    debugLogger.debug('Bash parser not initialized:', treeSitterInitializationError);
     return null;
   }
 
@@ -602,17 +581,13 @@ function parsePowerShellCommandDetails(
 
         const name = normalizeCommandName(commandDetail.name);
         const text =
-          typeof commandDetail.text === 'string'
-            ? commandDetail.text.trim()
-            : command;
+          typeof commandDetail.text === 'string' ? commandDetail.text.trim() : command;
 
         return {
           name,
           text,
           startIndex: 0,
-          args: Array.isArray(commandDetail.args)
-            ? commandDetail.args
-            : undefined,
+          args: Array.isArray(commandDetail.args) ? commandDetail.args : undefined,
         };
       })
       .filter((detail): detail is ParsedCommandDetail => detail !== null);
@@ -627,16 +602,11 @@ function parsePowerShellCommandDetails(
   }
 }
 
-export function parseCommandDetails(
-  command: string,
-): CommandParseResult | null {
+export function parseCommandDetails(command: string): CommandParseResult | null {
   const configuration = getShellConfiguration();
 
   if (configuration.shell === 'powershell') {
-    const result = parsePowerShellCommandDetails(
-      command,
-      configuration.executable,
-    );
+    const result = parsePowerShellCommandDetails(command, configuration.executable);
     if (!result || result.hasError) {
       // Fallback to bash parser which is usually good enough for simple commands
       // and doesn't rely on the host PowerShell environment restrictions (e.g., ConstrainedLanguage)
@@ -681,10 +651,7 @@ export function getShellConfiguration(): ShellConfiguration {
     const comSpec = process.env['ComSpec'];
     if (comSpec) {
       const executable = comSpec.toLowerCase();
-      if (
-        executable.endsWith('powershell.exe') ||
-        executable.endsWith('pwsh.exe')
-      ) {
+      if (executable.endsWith('powershell.exe') || executable.endsWith('pwsh.exe')) {
         return {
           executable: comSpec,
           argsPrefix: powershellArgsPrefix,
@@ -775,13 +742,8 @@ export function hasRedirection(command: string): boolean {
   const configuration = getShellConfiguration();
 
   if (configuration.shell === 'powershell') {
-    const parsed = parsePowerShellCommandDetails(
-      command,
-      configuration.executable,
-    );
-    return parsed && !parsed.hasError
-      ? !!parsed.hasRedirection
-      : fallbackCheck();
+    const parsed = parsePowerShellCommandDetails(command, configuration.executable);
+    return parsed && !parsed.hasError ? !!parsed.hasRedirection : fallbackCheck();
   }
 
   if (configuration.shell === 'bash' && bashLanguage) {
@@ -943,9 +905,7 @@ export const spawnAsync = async (
         if (code === 0) {
           resolve({ stdout, stderr });
         } else {
-          reject(
-            new Error(`Command failed with exit code ${code}:\n${stderr}`),
-          );
+          reject(new Error(`Command failed with exit code ${code}:\n${stderr}`));
         }
       });
 
@@ -1073,9 +1033,7 @@ export async function* execStreaming(
               const truncatedMsg =
                 stderrTotalBytes >= MAX_STDERR_BYTES ? '...[truncated]' : '';
               reject(
-                new Error(
-                  `Process exited with code ${code}: ${stderr}${truncatedMsg}`,
-                ),
+                new Error(`Process exited with code ${code}: ${stderr}${truncatedMsg}`),
               );
             }
           }
@@ -1143,11 +1101,7 @@ function detectBashSubstitution(command: string): boolean {
     if (char === '$' && command[i + 1] === '(') {
       return true;
     }
-    if (
-      !inDoubleQuote &&
-      (char === '<' || char === '>') &&
-      command[i + 1] === '('
-    ) {
+    if (!inDoubleQuote && (char === '<' || char === '>') && command[i + 1] === '(') {
       return true;
     }
     if (char === '`') {

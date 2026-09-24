@@ -20,9 +20,7 @@ export const exportSessionCommand: SlashCommand = {
   description: 'Export the current session to a JSON file',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (
-    context: CommandContext,
-  ): Promise<SlashCommandActionReturn | void> => {
+  action: async (context: CommandContext): Promise<SlashCommandActionReturn | void> => {
     const { ui } = context;
     const args = context.invocation?.args.trim();
     if (!args) {
@@ -69,11 +67,7 @@ export const exportSessionCommand: SlashCommand = {
 
       const targetPath = path.resolve(process.cwd(), args);
 
-      await fs.writeFile(
-        targetPath,
-        JSON.stringify(sessionData, null, 2),
-        'utf-8',
-      );
+      await fs.writeFile(targetPath, JSON.stringify(sessionData, null, 2), 'utf-8');
 
       ui.addItem(
         {

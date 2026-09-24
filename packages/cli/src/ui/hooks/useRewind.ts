@@ -13,15 +13,13 @@ import {
 } from '../utils/rewindFileOps.js';
 
 export function useRewind(conversation: ConversationRecord) {
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [confirmationStats, setConfirmationStats] = useState<FileChangeStats | null>(
     null,
   );
-  const [confirmationStats, setConfirmationStats] =
-    useState<FileChangeStats | null>(null);
 
   const getStats = useCallback(
-    (userMessage: MessageRecord) =>
-      calculateTurnStats(conversation, userMessage),
+    (userMessage: MessageRecord) => calculateTurnStats(conversation, userMessage),
     [conversation],
   );
 

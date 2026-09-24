@@ -46,12 +46,7 @@ describe('Config Agents Reload Integration', () => {
 
   it('should unregister agents from the agent registry when they are disabled after being enabled', async () => {
     const agentName = 'test-agent';
-    const agentPath = path.join(
-      tmpDir,
-      '.sparkle',
-      'agents',
-      `${agentName}.md`,
-    );
+    const agentPath = path.join(tmpDir, '.sparkle', 'agents', `${agentName}.md`);
 
     // Create agent definition file
     const agentContent = `---
@@ -80,10 +75,9 @@ Test System Prompt`;
 
     const config = new Config(baseParams);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    vi.spyOn(
-      config.getAcknowledgedAgentsService(),
-      'isAcknowledged',
-    ).mockResolvedValue(true);
+    vi.spyOn(config.getAcknowledgedAgentsService(), 'isAcknowledged').mockResolvedValue(
+      true,
+    );
     await config.initialize();
 
     const agentRegistry = config.getAgentRegistry();
@@ -112,12 +106,7 @@ Test System Prompt`;
 
   it('should not register agents in the agent registry when agents are disabled from the start', async () => {
     const agentName = 'test-agent-disabled';
-    const agentPath = path.join(
-      tmpDir,
-      '.sparkle',
-      'agents',
-      `${agentName}.md`,
-    );
+    const agentPath = path.join(tmpDir, '.sparkle', 'agents', `${agentName}.md`);
 
     const agentContent = `---
 name: ${agentName}
@@ -144,10 +133,9 @@ Test System Prompt`;
 
     const config = new Config(params);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    vi.spyOn(
-      config.getAcknowledgedAgentsService(),
-      'isAcknowledged',
-    ).mockResolvedValue(true);
+    vi.spyOn(config.getAcknowledgedAgentsService(), 'isAcknowledged').mockResolvedValue(
+      true,
+    );
     await config.initialize();
 
     const agentRegistry = config.getAgentRegistry();
@@ -159,12 +147,7 @@ Test System Prompt`;
 
   it('should register agents in the agent registry even when they are not in allowedTools', async () => {
     const agentName = 'test-agent-allowed';
-    const agentPath = path.join(
-      tmpDir,
-      '.sparkle',
-      'agents',
-      `${agentName}.md`,
-    );
+    const agentPath = path.join(tmpDir, '.sparkle', 'agents', `${agentName}.md`);
 
     const agentContent = `---
 name: ${agentName}
@@ -192,10 +175,9 @@ Test System Prompt`;
 
     const config = new Config(params);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    vi.spyOn(
-      config.getAcknowledgedAgentsService(),
-      'isAcknowledged',
-    ).mockResolvedValue(true);
+    vi.spyOn(config.getAcknowledgedAgentsService(), 'isAcknowledged').mockResolvedValue(
+      true,
+    );
     await config.initialize();
 
     const agentRegistry = config.getAgentRegistry();
@@ -206,12 +188,7 @@ Test System Prompt`;
 
   it('should register agents in the agent registry when they are enabled after being disabled', async () => {
     const agentName = 'test-agent-enable';
-    const agentPath = path.join(
-      tmpDir,
-      '.sparkle',
-      'agents',
-      `${agentName}.md`,
-    );
+    const agentPath = path.join(tmpDir, '.sparkle', 'agents', `${agentName}.md`);
 
     const agentContent = `---
 name: ${agentName}
@@ -238,10 +215,9 @@ Test System Prompt`;
 
     const config = new Config(params);
     vi.spyOn(config, 'isTrustedFolder').mockReturnValue(true);
-    vi.spyOn(
-      config.getAcknowledgedAgentsService(),
-      'isAcknowledged',
-    ).mockResolvedValue(true);
+    vi.spyOn(config.getAcknowledgedAgentsService(), 'isAcknowledged').mockResolvedValue(
+      true,
+    );
     await config.initialize();
 
     const agentRegistry = config.getAgentRegistry();
@@ -261,8 +237,6 @@ Test System Prompt`;
 
     await config.getAgentRegistry().reload();
 
-    expect(agentRegistry.getAllDefinitions().map((d) => d.name)).toContain(
-      agentName,
-    );
+    expect(agentRegistry.getAllDefinitions().map((d) => d.name)).toContain(agentName);
   });
 });

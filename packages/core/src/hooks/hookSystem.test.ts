@@ -87,8 +87,8 @@ describe('HookSystem Integration', () => {
     });
 
     // Provide getMessageBus mock for MessageBus integration tests
-    (config as unknown as { getMessageBus: () => unknown }).getMessageBus =
-      () => undefined;
+    (config as unknown as { getMessageBus: () => unknown }).getMessageBus = () =>
+      undefined;
 
     hookSystem = new HookSystem(config);
 

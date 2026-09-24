@@ -77,9 +77,7 @@ function main() {
     // 2. Trustworthy Criterion:
     // - Every single day must be above the floor (e.g. > 60%)
     // - The overall aggregate must be high-signal (e.g. > 80%)
-    const isDailyStable = dailyRates.every(
-      (rate) => rate > PASS_RATE_THRESHOLD,
-    );
+    const isDailyStable = dailyRates.every((rate) => rate > PASS_RATE_THRESHOLD);
     const isAggregateHighSignal = aggregateRate > AGGREGATE_PASS_RATE_THRESHOLD;
 
     if (isDailyStable && isAggregateHighSignal) {
@@ -100,9 +98,7 @@ function main() {
   );
   trustworthyTests.sort().forEach((name) => console.error(`   - ${name}`));
   console.error(`\n⚪ Ignored ${volatileTests.length} volatile tests.`);
-  console.error(
-    `🆕 Ignored ${newTests.length} tests with insufficient history.`,
-  );
+  console.error(`🆕 Ignored ${newTests.length} tests with insufficient history.`);
 
   // Output the list of names as a regex-friendly pattern for vitest -t
   const pattern = trustworthyTests.map((name) => escapeRegex(name)).join('|');

@@ -100,9 +100,7 @@ const cliConfig = {
     'process.env.SPARKLE_SANDBOX_IMAGE_DEFAULT': JSON.stringify(
       pkg.config?.sandboxImageUri,
     ),
-    'process.env.NODE_ENV': JSON.stringify(
-      process.env.NODE_ENV || 'production',
-    ),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     'process.env.DEV': JSON.stringify(process.env.DEV || 'false'),
   },
   plugins: createWasmPlugins(),
@@ -116,10 +114,7 @@ const cliConfig = {
       __dirname,
       'packages/cli/src/patches/http-proxy-agent.ts',
     ),
-    'sparkle-cli-devtools': path.resolve(
-      __dirname,
-      'packages/devtools/src/index.ts',
-    ),
+    'sparkle-cli-devtools': path.resolve(__dirname, 'packages/devtools/src/index.ts'),
     ...commonAliases,
   },
   metafile: true,
@@ -140,9 +135,7 @@ const workerConfig = {
   define: {
     __filename: '__chunk_filename',
     __dirname: '__chunk_dirname',
-    'process.env.NODE_ENV': JSON.stringify(
-      process.env.NODE_ENV || 'production',
-    ),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
   plugins: createWasmPlugins(),
   alias: commonAliases,
@@ -159,9 +152,7 @@ const a2aServerConfig = {
     __filename: '__chunk_filename',
     __dirname: '__chunk_dirname',
     'process.env.CLI_VERSION': JSON.stringify(pkg.version),
-    'process.env.NODE_ENV': JSON.stringify(
-      process.env.NODE_ENV || 'production',
-    ),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     'process.env.DEV': JSON.stringify(process.env.DEV || 'false'),
   },
   plugins: createWasmPlugins(),

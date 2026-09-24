@@ -37,9 +37,7 @@ export class GeminiAgent {
     this.sessionManager.dispose();
   }
 
-  async initialize(
-    args: acp.InitializeRequest,
-  ): Promise<acp.InitializeResponse> {
+  async initialize(args: acp.InitializeRequest): Promise<acp.InitializeResponse> {
     if (args.clientCapabilities) {
       this.sessionManager.setClientCapabilities(args.clientCapabilities);
     }
@@ -88,8 +86,7 @@ export class GeminiAgent {
 
     // Check for api-key in _meta
     const meta = hasMeta(req) ? req._meta : undefined;
-    const apiKey =
-      typeof meta?.['api-key'] === 'string' ? meta['api-key'] : undefined;
+    const apiKey = typeof meta?.['api-key'] === 'string' ? meta['api-key'] : undefined;
 
     // Refresh auth with the requested method
     // This will reuse existing credentials if they're valid,
@@ -164,25 +161,18 @@ export class GeminiAgent {
     };
   }
 
-  async newSession(
-    params: acp.NewSessionRequest,
-  ): Promise<acp.NewSessionResponse> {
+  async newSession(params: acp.NewSessionRequest): Promise<acp.NewSessionResponse> {
     return this.sessionManager.newSession(params, this.getAuthDetails());
   }
 
-  async loadSession(
-    params: acp.LoadSessionRequest,
-  ): Promise<acp.LoadSessionResponse> {
+  async loadSession(params: acp.LoadSessionRequest): Promise<acp.LoadSessionResponse> {
     return this.sessionManager.loadSession(params, this.getAuthDetails());
   }
 
   async cancel(params: acp.CancelNotification): Promise<void> {
     const session = this.sessionManager.getSession(params.sessionId);
     if (!session) {
-      throw new acp.RequestError(
-        -32602,
-        `Session not found: ${params.sessionId}`,
-      );
+      throw new acp.RequestError(-32602, `Session not found: ${params.sessionId}`);
     }
     await session.cancelPendingPrompt();
   }
@@ -190,10 +180,7 @@ export class GeminiAgent {
   async prompt(params: acp.PromptRequest): Promise<acp.PromptResponse> {
     const session = this.sessionManager.getSession(params.sessionId);
     if (!session) {
-      throw new acp.RequestError(
-        -32602,
-        `Session not found: ${params.sessionId}`,
-      );
+      throw new acp.RequestError(-32602, `Session not found: ${params.sessionId}`);
     }
     return session.prompt(params);
   }
@@ -203,10 +190,7 @@ export class GeminiAgent {
   ): Promise<acp.SetSessionModeResponse> {
     const session = this.sessionManager.getSession(params.sessionId);
     if (!session) {
-      throw new acp.RequestError(
-        -32602,
-        `Session not found: ${params.sessionId}`,
-      );
+      throw new acp.RequestError(-32602, `Session not found: ${params.sessionId}`);
     }
     return session.setMode(params.modeId);
   }
@@ -216,10 +200,7 @@ export class GeminiAgent {
   ): Promise<acp.SetSessionModelResponse> {
     const session = this.sessionManager.getSession(params.sessionId);
     if (!session) {
-      throw new acp.RequestError(
-        -32602,
-        `Session not found: ${params.sessionId}`,
-      );
+      throw new acp.RequestError(-32602, `Session not found: ${params.sessionId}`);
     }
     return session.setModel(params.modelId);
   }

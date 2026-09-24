@@ -38,8 +38,7 @@ describe('ExtensionStorage', () => {
     vi.mocked(Storage).mockImplementation(
       () =>
         ({
-          getExtensionsDir: () =>
-            path.join(mockHomeDir, '.sparkle', 'extensions'),
+          getExtensionsDir: () => path.join(mockHomeDir, '.sparkle', 'extensions'),
         }) as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     );
     storage = new ExtensionStorage(extensionName);
@@ -50,12 +49,7 @@ describe('ExtensionStorage', () => {
   });
 
   it('should return the correct extension directory', () => {
-    const expectedDir = path.join(
-      mockHomeDir,
-      '.sparkle',
-      'extensions',
-      extensionName,
-    );
+    const expectedDir = path.join(mockHomeDir, '.sparkle', 'extensions', extensionName);
     expect(storage.getExtensionDir()).toBe(expectedDir);
   });
 

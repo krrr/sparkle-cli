@@ -35,13 +35,10 @@ describe('tracker_mode', () => {
     prompt:
       'We have a bug in src/login.js: the password check is missing. First, create a task in the tracker to fix it. Then fix the bug, and mark the task as closed.',
     assert: async (rig, result) => {
-      const wasCreateCalled = await rig.waitForToolCall(
-        TRACKER_CREATE_TASK_TOOL_NAME,
+      const wasCreateCalled = await rig.waitForToolCall(TRACKER_CREATE_TASK_TOOL_NAME);
+      expect(wasCreateCalled, 'Expected tracker_create_task tool to be called').toBe(
+        true,
       );
-      expect(
-        wasCreateCalled,
-        'Expected tracker_create_task tool to be called',
-      ).toBe(true);
 
       const toolLogs = rig.readToolLogs();
       const createCall = toolLogs.find(
@@ -50,17 +47,13 @@ describe('tracker_mode', () => {
       expect(createCall).toBeDefined();
       const args = JSON.parse(createCall!.toolRequest.args);
       expect(
-        (args.title?.toLowerCase() ?? '') +
-          (args.description?.toLowerCase() ?? ''),
+        (args.title?.toLowerCase() ?? '') + (args.description?.toLowerCase() ?? ''),
       ).toContain('login');
 
-      const wasUpdateCalled = await rig.waitForToolCall(
-        TRACKER_UPDATE_TASK_TOOL_NAME,
+      const wasUpdateCalled = await rig.waitForToolCall(TRACKER_UPDATE_TASK_TOOL_NAME);
+      expect(wasUpdateCalled, 'Expected tracker_update_task tool to be called').toBe(
+        true,
       );
-      expect(
-        wasUpdateCalled,
-        'Expected tracker_update_task tool to be called',
-      ).toBe(true);
 
       const updateCalls = toolLogs.filter(
         (log) => log.toolRequest.name === TRACKER_UPDATE_TASK_TOOL_NAME,
@@ -93,9 +86,7 @@ describe('tracker_mode', () => {
       'I need to build a complex new feature for user authentication in our project. Create a detailed implementation plan and organize the work into bite-sized chunks. Do not actually implement the code yet, just plan it.',
     assert: async (rig, result) => {
       // The model should proactively use tracker_create_task to organize the work
-      const wasToolCalled = await rig.waitForToolCall(
-        TRACKER_CREATE_TASK_TOOL_NAME,
-      );
+      const wasToolCalled = await rig.waitForToolCall(TRACKER_CREATE_TASK_TOOL_NAME);
       expect(
         wasToolCalled,
         'Expected tracker_create_task to be called implicitly to organize plan',

@@ -22,8 +22,7 @@ const mockedCwd = vi.hoisted(() => vi.fn().mockReturnValue('/mock/cwd'));
 const mockedRows = vi.hoisted(() => ({ current: 24 }));
 
 vi.mock('node:process', async () => {
-  const actual =
-    await vi.importActual<typeof import('node:process')>('node:process');
+  const actual = await vi.importActual<typeof import('node:process')>('node:process');
   return {
     ...actual,
     exit: mockedExit,
@@ -72,10 +71,7 @@ describe('FolderTrustDialog', () => {
       securityWarnings: [],
     };
     const { lastFrame, unmount } = await renderWithProviders(
-      <FolderTrustDialog
-        onSelect={vi.fn()}
-        discoveryResults={discoveryResults}
-      />,
+      <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       {
         width: 80,
         config: makeFakeConfig({ useAlternateBuffer: false }),
@@ -102,10 +98,7 @@ describe('FolderTrustDialog', () => {
       securityWarnings: [],
     };
     const { lastFrame, unmount } = await renderWithProviders(
-      <FolderTrustDialog
-        onSelect={vi.fn()}
-        discoveryResults={discoveryResults}
-      />,
+      <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       {
         width: 80,
         config: makeFakeConfig({ useAlternateBuffer: false }),
@@ -133,10 +126,7 @@ describe('FolderTrustDialog', () => {
       securityWarnings: [],
     };
     const { lastFrame, unmount } = await renderWithProviders(
-      <FolderTrustDialog
-        onSelect={vi.fn()}
-        discoveryResults={discoveryResults}
-      />,
+      <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       {
         width: 80,
         config: makeFakeConfig({ useAlternateBuffer: false }),
@@ -162,10 +152,7 @@ describe('FolderTrustDialog', () => {
     };
 
     const { lastFrame, unmount } = await renderWithProviders(
-      <FolderTrustDialog
-        onSelect={vi.fn()}
-        discoveryResults={discoveryResults}
-      />,
+      <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       {
         width: 80,
         config: makeFakeConfig({ useAlternateBuffer: false }),
@@ -188,10 +175,7 @@ describe('FolderTrustDialog', () => {
     // But we can re-render with constrainHeight: false.
     const { lastFrame: lastFrameExpanded, unmount: unmountExpanded } =
       await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
         {
           width: 80,
           config: makeFakeConfig({ useAlternateBuffer: false }),
@@ -211,10 +195,9 @@ describe('FolderTrustDialog', () => {
 
   it('should display exit message and call process.exit and not call onSelect when escape is pressed', async () => {
     const onSelect = vi.fn();
-    const { lastFrame, stdin, waitUntilReady, unmount } =
-      await renderWithProviders(
-        <FolderTrustDialog onSelect={onSelect} isRestarting={false} />,
-      );
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <FolderTrustDialog onSelect={onSelect} isRestarting={false} />,
+    );
 
     await act(async () => {
       stdin.write('\u001b[27u'); // Press kitty escape key
@@ -230,9 +213,7 @@ describe('FolderTrustDialog', () => {
       );
     });
     await waitFor(() => {
-      expect(mockedExit).toHaveBeenCalledWith(
-        ExitCodes.FATAL_CANCELLATION_ERROR,
-      );
+      expect(mockedExit).toHaveBeenCalledWith(ExitCodes.FATAL_CANCELLATION_ERROR);
     });
     expect(onSelect).not.toHaveBeenCalled();
     unmount();
@@ -335,10 +316,7 @@ describe('FolderTrustDialog', () => {
         securityWarnings: [],
       };
       const { lastFrame, unmount } = await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
         { width: 80 },
       );
 
@@ -372,10 +350,7 @@ describe('FolderTrustDialog', () => {
         securityWarnings: ['Dangerous setting detected!'],
       };
       const { lastFrame, unmount } = await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       );
 
       expect(lastFrame()).toContain('Security Warnings:');
@@ -395,10 +370,7 @@ describe('FolderTrustDialog', () => {
         securityWarnings: [],
       };
       const { lastFrame, unmount } = await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
       );
 
       expect(lastFrame()).toContain('Discovery Errors:');
@@ -418,10 +390,7 @@ describe('FolderTrustDialog', () => {
         securityWarnings: [],
       };
       const { lastFrame, unmount } = await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
         {
           width: 80,
           config: makeFakeConfig({ useAlternateBuffer: true }),
@@ -453,10 +422,7 @@ describe('FolderTrustDialog', () => {
       };
 
       const { lastFrame, unmount } = await renderWithProviders(
-        <FolderTrustDialog
-          onSelect={vi.fn()}
-          discoveryResults={discoveryResults}
-        />,
+        <FolderTrustDialog onSelect={vi.fn()} discoveryResults={discoveryResults} />,
         { width: 100, uiState: { terminalHeight: 40 } },
       );
 

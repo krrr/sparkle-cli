@@ -29,15 +29,10 @@ export async function listSessions(config: Config): Promise<void> {
     return;
   }
 
-  writeToStdout(
-    `\nAvailable sessions for this project (${sessions.length}):\n`,
-  );
+  writeToStdout(`\nAvailable sessions for this project (${sessions.length}):\n`);
 
   sessions
-    .sort(
-      (a, b) =>
-        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-    )
+    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
     .forEach((session, index) => {
       const current = session.isCurrentSession ? ', current' : '';
       const time = formatRelativeTime(session.lastUpdated);
@@ -45,9 +40,7 @@ export async function listSessions(config: Config): Promise<void> {
         session.displayName.length > 100
           ? session.displayName.slice(0, 97) + '...'
           : session.displayName;
-      writeToStdout(
-        `  ${index + 1}. ${title} (${time}${current}) [${session.id}]\n`,
-      );
+      writeToStdout(`  ${index + 1}. ${title} (${time}${current}) [${session.id}]\n`);
     });
 }
 
@@ -71,9 +64,7 @@ export async function deleteSession(
   let sessionToDelete: SessionInfo;
 
   // Try to find by UUID first
-  const sessionByUuid = sortedSessions.find(
-    (session) => session.id === sessionIndex,
-  );
+  const sessionByUuid = sortedSessions.find((session) => session.id === sessionIndex);
   if (sessionByUuid) {
     sessionToDelete = sessionByUuid;
   } else {

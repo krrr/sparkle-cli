@@ -14,8 +14,7 @@ import { main } from './app.js';
 
 // Check if the module is the main script being run
 const isMainModule =
-  path.basename(process.argv[1]) ===
-  path.basename(url.fileURLToPath(import.meta.url));
+  path.basename(process.argv[1]) === path.basename(url.fileURLToPath(import.meta.url));
 
 if (
   import.meta.url.startsWith('file:') &&

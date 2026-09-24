@@ -46,9 +46,7 @@ describe('GoogleGenAiContentGenerator', () => {
       },
       {
         role: 'user',
-        parts: [
-          { functionResponse: { name: 'my_tool', response: { result: 'ok' } } },
-        ],
+        parts: [{ functionResponse: { name: 'my_tool', response: { result: 'ok' } } }],
       },
     ];
 
@@ -57,11 +55,7 @@ describe('GoogleGenAiContentGenerator', () => {
       contents,
     };
 
-    const res = await generator.generateContent(
-      request,
-      'prompt-1',
-      LlmRole.MAIN,
-    );
+    const res = await generator.generateContent(request, 'prompt-1', LlmRole.MAIN);
     expect(res).toBe(fakeResponse);
 
     expect(mockModels.generateContent).toHaveBeenCalledTimes(1);
@@ -80,9 +74,7 @@ describe('GoogleGenAiContentGenerator', () => {
   it('strips thought parts and scrubs properties in generateContentStream', async () => {
     async function* fakeStream() {
       yield {
-        candidates: [
-          { content: { role: 'model', parts: [{ text: 'chunk' }] } },
-        ],
+        candidates: [{ content: { role: 'model', parts: [{ text: 'chunk' }] } }],
       } as unknown as GenerateContentResponse;
     }
     vi.mocked(mockModels.generateContentStream).mockResolvedValue(fakeStream());
@@ -121,8 +113,7 @@ describe('GoogleGenAiContentGenerator', () => {
     }
     expect(chunks).toHaveLength(1);
 
-    const passedReq = vi.mocked(mockModels.generateContentStream).mock
-      .calls[0][0];
+    const passedReq = vi.mocked(mockModels.generateContentStream).mock.calls[0][0];
     const passedContents = passedReq.contents as Content[];
     expect(passedContents[1].parts).toHaveLength(1);
     expect(passedContents[1].parts?.[0]).toEqual({

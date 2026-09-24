@@ -155,11 +155,7 @@ describe('ShellInputPrompt', () => {
 
   it('respects scrollPageSize prop', async () => {
     const { waitUntilReady, unmount } = await render(
-      <ShellInputPrompt
-        activeShellPtyId={1}
-        focus={true}
-        scrollPageSize={10}
-      />,
+      <ShellInputPrompt activeShellPtyId={1} focus={true} scrollPageSize={10} />,
     );
 
     const handler = mockUseKeypress.mock.calls[0][0];

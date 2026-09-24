@@ -25,10 +25,7 @@ describe('Hooks Agent Flow', () => {
   describe('BeforeAgent Hooks', () => {
     it('should inject additional context via BeforeAgent hook', async () => {
       await rig.setup('should inject additional context via BeforeAgent hook', {
-        fakeResponsesPath: join(
-          import.meta.dirname,
-          'hooks-agent-flow.responses',
-        ),
+        fakeResponsesPath: join(import.meta.dirname, 'hooks-agent-flow.responses'),
       });
 
       const hookScript = `
@@ -95,10 +92,7 @@ describe('Hooks Agent Flow', () => {
   describe('AfterAgent Hooks', () => {
     it('should receive prompt and response in AfterAgent hook', async () => {
       await rig.setup('should receive prompt and response in AfterAgent hook', {
-        fakeResponsesPath: join(
-          import.meta.dirname,
-          'hooks-agent-flow.responses',
-        ),
+        fakeResponsesPath: join(import.meta.dirname, 'hooks-agent-flow.responses'),
       });
 
       const hookScript = `

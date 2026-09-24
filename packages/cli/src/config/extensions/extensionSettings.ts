@@ -333,19 +333,12 @@ function getSettingsChanges(
     removeSensitive: sensitiveOld.filter(
       (s) => !sensitiveNew.some((neu) => isSameSetting(s, neu)),
     ),
-    promptForEnv: envNew.filter(
-      (s) => !envOld.some((old) => isSameSetting(s, old)),
-    ),
-    removeEnv: envOld.filter(
-      (s) => !envNew.some((neu) => isSameSetting(s, neu)),
-    ),
+    promptForEnv: envNew.filter((s) => !envOld.some((old) => isSameSetting(s, old))),
+    removeEnv: envOld.filter((s) => !envNew.some((neu) => isSameSetting(s, neu))),
   };
 }
 
-async function clearSettings(
-  envFilePath: string,
-  keychain: KeychainTokenStorage,
-) {
+async function clearSettings(envFilePath: string, keychain: KeychainTokenStorage) {
   if (fsSync.existsSync(envFilePath)) {
     const stat = fsSync.statSync(envFilePath);
     if (!stat.isDirectory()) {

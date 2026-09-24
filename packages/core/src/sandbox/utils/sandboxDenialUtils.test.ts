@@ -30,8 +30,7 @@ describe('parsePosixSandboxDenials', () => {
 
   it('should use fallback heuristic for absolute paths', () => {
     const parsed = parsePosixSandboxDenials({
-      output:
-        'operation not permitted\nsome error happened with /some/path/to/file',
+      output: 'operation not permitted\nsome error happened with /some/path/to/file',
     } as unknown as ShellExecutionResult);
     expect(parsed).toBeDefined();
     expect(parsed?.filePaths).toContain('/some/path/to/file');
@@ -67,9 +66,7 @@ npm error path /Users/galzahavi/.npm/_cacache/tmp/ccf579a2
       output,
     } as unknown as ShellExecutionResult);
     expect(parsed).toBeDefined();
-    expect(parsed?.filePaths).toContain(
-      '/Users/galzahavi/.npm/_cacache/tmp/ccf579a2',
-    );
+    expect(parsed?.filePaths).toContain('/Users/galzahavi/.npm/_cacache/tmp/ccf579a2');
   });
 
   it('should detect network denials with ENOTFOUND', () => {
@@ -93,9 +90,7 @@ npm ERR! path /Users/galzahavi/.npm/_cacache/tmp/ccf579a2
       output,
     } as unknown as ShellExecutionResult);
     expect(parsed).toBeDefined();
-    expect(parsed?.filePaths).toContain(
-      '/Users/galzahavi/.npm/_cacache/tmp/ccf579a2',
-    );
+    expect(parsed?.filePaths).toContain('/Users/galzahavi/.npm/_cacache/tmp/ccf579a2');
   });
 
   it('should detect pnpm specific network errors', () => {
@@ -169,9 +164,7 @@ PermissionError: [Errno 13] Permission denied: '/etc/test_sandbox_denial'`;
     const parsed = parsePosixSandboxDenials({
       output,
     } as unknown as ShellExecutionResult);
-    expect(parsed?.filePaths || []).not.toContain(
-      '/etc/shadow/../../etc/passwd',
-    );
+    expect(parsed?.filePaths || []).not.toContain('/etc/shadow/../../etc/passwd');
   });
 
   it('should reject home-relative paths with directory traversal', () => {

@@ -34,10 +34,7 @@ describe('useInputHistoryStore', () => {
       result.current.addInput('test message 2');
     });
 
-    expect(result.current.inputHistory).toEqual([
-      'test message 1',
-      'test message 2',
-    ]);
+    expect(result.current.inputHistory).toEqual(['test message 1', 'test message 2']);
   });
 
   it('should not add empty or whitespace-only inputs', async () => {
@@ -104,14 +101,10 @@ describe('useInputHistoryStore', () => {
 
   it('should handle logger initialization failure gracefully', async () => {
     const mockLogger = {
-      getPreviousUserMessages: vi
-        .fn()
-        .mockRejectedValue(new Error('Logger error')),
+      getPreviousUserMessages: vi.fn().mockRejectedValue(new Error('Logger error')),
     };
 
-    const consoleSpy = vi
-      .spyOn(debugLogger, 'warn')
-      .mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
     const { result } = await renderHook(() => useInputHistoryStore());
 
@@ -130,9 +123,7 @@ describe('useInputHistoryStore', () => {
 
   it('should initialize only once', async () => {
     const mockLogger = {
-      getPreviousUserMessages: vi
-        .fn()
-        .mockResolvedValue(['message1', 'message2']),
+      getPreviousUserMessages: vi.fn().mockResolvedValue(['message1', 'message2']),
     };
 
     const { result } = await renderHook(() => useInputHistoryStore());
@@ -192,11 +183,7 @@ describe('useInputHistoryStore', () => {
       });
 
       // Should deduplicate consecutive messages and reverse to oldest first
-      expect(result.current.inputHistory).toEqual([
-        'message3',
-        'message2',
-        'message1',
-      ]);
+      expect(result.current.inputHistory).toEqual(['message3', 'message2', 'message1']);
     });
 
     it('should deduplicate across session boundaries', async () => {
@@ -240,11 +227,7 @@ describe('useInputHistoryStore', () => {
       });
 
       // Non-consecutive duplicates should be preserved
-      expect(result.current.inputHistory).toEqual([
-        'message2',
-        'message1',
-        'message2',
-      ]);
+      expect(result.current.inputHistory).toEqual(['message2', 'message1', 'message2']);
     });
 
     it('should handle complex deduplication with current session', async () => {

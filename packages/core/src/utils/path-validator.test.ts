@@ -38,16 +38,12 @@ describe('PathValidator', () => {
     const longComponent = 'a'.repeat(256);
     const result = validatePath(`path/to/${longComponent}/file`);
     expect(result.isValid).toBe(false);
-    expect(result.error).toContain(
-      'component "aaaaaaaaaaaaaaaaaaaa..." is too long',
-    );
+    expect(result.error).toContain('component "aaaaaaaaaaaaaaaaaaaa..." is too long');
   });
 
   it('should allow paths with single quotes (apostrophes)', () => {
     // This was previously a false positive
-    expect(validatePath("/Users/john's_files/project/index.ts").isValid).toBe(
-      true,
-    );
+    expect(validatePath("/Users/john's_files/project/index.ts").isValid).toBe(true);
   });
 
   it('should allow long paths with brackets or parentheses', () => {
@@ -55,9 +51,9 @@ describe('PathValidator', () => {
     expect(
       validatePath('packages/web/app/dashboard/[id]/settings/page.tsx').isValid,
     ).toBe(true);
-    expect(
-      validatePath('/Users/name/Documents/Project (Copy)/index.ts').isValid,
-    ).toBe(true);
+    expect(validatePath('/Users/name/Documents/Project (Copy)/index.ts').isValid).toBe(
+      true,
+    );
   });
 
   it('should only reject log markers at the start of a component', () => {
@@ -68,12 +64,10 @@ describe('PathValidator', () => {
 
     // But they should be rejected if they start a component
     expect(validatePath('FAIL tests/int/my.test.ts').isValid).toBe(false);
-    expect(validatePath('/project/root/FAIL tests/my.test.ts').isValid).toBe(
+    expect(validatePath('/project/root/FAIL tests/my.test.ts').isValid).toBe(false);
+    expect(validatePath('AssertionError: expected true to be false').isValid).toBe(
       false,
     );
-    expect(
-      validatePath('AssertionError: expected true to be false').isValid,
-    ).toBe(false);
     expect(validatePath('✓ test passed').isValid).toBe(false);
   });
 
@@ -92,8 +86,7 @@ describe('PathValidator', () => {
 
   it('should reject long paths with ellipses', () => {
     expect(
-      validatePath('this/is/a/very/long/path/with/ellipses/.../and/more')
-        .isValid,
+      validatePath('this/is/a/very/long/path/with/ellipses/.../and/more').isValid,
     ).toBe(false);
   });
 

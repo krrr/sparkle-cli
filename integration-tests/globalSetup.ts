@@ -64,9 +64,7 @@ async function startFixtureServer(): Promise<number> {
 
     server.on('error', (err: NodeJS.ErrnoException) => {
       if (err.code === 'EADDRINUSE') {
-        console.warn(
-          `Port ${FIXTURE_PORT} in use, trying ${FIXTURE_PORT + 1}...`,
-        );
+        console.warn(`Port ${FIXTURE_PORT} in use, trying ${FIXTURE_PORT + 1}...`);
         server.listen(FIXTURE_PORT + 1, '127.0.0.1');
       } else {
         reject(err);

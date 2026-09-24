@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  vi,
-  type Mocked,
-} from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi, type Mocked } from 'vitest';
 import {
   resolveAndReadFile,
   WriteFileTool,
@@ -137,9 +129,7 @@ describe('WriteFileTool', () => {
     );
     tempDir = fs.realpathSync(rawTempDir);
 
-    const rawRootDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'sparkle-cli-test-root-'),
-    );
+    const rawRootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-test-root-'));
     rootDir = fs.realpathSync(rawRootDir);
 
     const rawPlansDir = fs.mkdtempSync(
@@ -192,12 +182,8 @@ describe('WriteFileTool', () => {
     );
 
     // Now that mock instances are initialized, set the mock implementations for config getters
-    mockConfigInternal.getGeminiClient.mockReturnValue(
-      mockGeminiClientInstance,
-    );
-    mockConfigInternal.getBaseLlmClient.mockReturnValue(
-      mockBaseLlmClientInstance,
-    );
+    mockConfigInternal.getGeminiClient.mockReturnValue(mockGeminiClientInstance);
+    mockConfigInternal.getBaseLlmClient.mockReturnValue(mockBaseLlmClientInstance);
 
     const bus = createMockMessageBus();
     getMockMessageBusInstance(bus).defaultToolDecision = 'ask_user';
@@ -378,8 +364,7 @@ describe('WriteFileTool', () => {
 
     it('should keep the proposed content unchanged for .ipynb files', async () => {
       const filePath = path.join(rootDir, 'notebook.ipynb');
-      const proposedContent =
-        '{"cells": [{"source": ["print(\\"hello\\\\n\\")"]}]}';
+      const proposedContent = '{"cells": [{"source": ["print(\\"hello\\\\n\\")"]}]}';
       const abortSignal = new AbortController().signal;
 
       const result = await resolveAndReadFile(
@@ -461,12 +446,8 @@ describe('WriteFileTool', () => {
           fileDiff: expect.stringContaining(proposedContent),
         }),
       );
-      expect(confirmation.fileDiff).toMatch(
-        /--- confirm_new_file.txt\tCurrent/,
-      );
-      expect(confirmation.fileDiff).toMatch(
-        /\+\+\+ confirm_new_file.txt\tProposed/,
-      );
+      expect(confirmation.fileDiff).toMatch(/--- confirm_new_file.txt\tCurrent/);
+      expect(confirmation.fileDiff).toMatch(/\+\+\+ confirm_new_file.txt\tProposed/);
     });
 
     it('should request confirmation with diff for an existing file', async () => {
@@ -621,9 +602,7 @@ describe('WriteFileTool', () => {
 
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).toMatch(
-        /Successfully created and wrote to new file/,
-      );
+      expect(result.llmContent).toMatch(/Successfully created and wrote to new file/);
       expect(result.display).toEqual(
         expect.objectContaining({
           name: 'WriteFile',
@@ -656,8 +635,7 @@ describe('WriteFileTool', () => {
         /Error checking existing file: Simulated read error for execute/,
       );
       expect(result.error).toEqual({
-        message:
-          'Error checking existing file: Simulated read error for execute',
+        message: 'Error checking existing file: Simulated read error for execute',
         type: ToolErrorType.FILE_WRITE_FAILURE,
       });
 
@@ -675,17 +653,13 @@ describe('WriteFileTool', () => {
 
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).toMatch(
-        /Successfully created and wrote to new file/,
-      );
+      expect(result.llmContent).toMatch(/Successfully created and wrote to new file/);
       expect(fs.existsSync(filePath)).toBe(true);
       const writtenContent = await fsService.readTextFile(filePath);
       expect(writtenContent).toBe(content);
       const display = result.returnDisplay as FileDiff;
       expect(display.fileName).toBe('execute_new_corrected_file.txt');
-      expect(display.fileDiff).toMatch(
-        /--- execute_new_corrected_file.txt\tOriginal/,
-      );
+      expect(display.fileDiff).toMatch(/--- execute_new_corrected_file.txt\tOriginal/);
       expect(display.fileDiff).toMatch(
         /\+\+\+ execute_new_corrected_file.txt\tWritten/,
       );
@@ -693,10 +667,7 @@ describe('WriteFileTool', () => {
     });
 
     it('should overwrite an existing file and return diff', async () => {
-      const filePath = path.join(
-        rootDir,
-        'execute_existing_corrected_file.txt',
-      );
+      const filePath = path.join(rootDir, 'execute_existing_corrected_file.txt');
       const initialContent = 'Initial content for execute.';
       const proposedContent = 'Proposed overwrite for execute.';
       fs.writeFileSync(filePath, initialContent, 'utf8');
@@ -976,9 +947,7 @@ describe('WriteFileTool', () => {
       const invocation = tool.build(params);
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).not.toContain(
-        'Newly Discovered Project Context',
-      );
+      expect(result.llmContent).not.toContain('Newly Discovered Project Context');
     });
   });
 

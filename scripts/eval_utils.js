@@ -108,10 +108,9 @@ export function fetchNightlyHistory(lookbackCount) {
         path.join(os.tmpdir(), `sparkle-evals-hist-${run.databaseId}-`),
       );
       try {
-        execSync(
-          `gh run download ${run.databaseId} -p "eval-logs-*" -D "${tmpDir}"`,
-          { stdio: 'ignore' },
-        );
+        execSync(`gh run download ${run.databaseId} -p "eval-logs-*" -D "${tmpDir}"`, {
+          stdio: 'ignore',
+        });
 
         const runReports = findReports(tmpDir);
         if (runReports.length > 0) {

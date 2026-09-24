@@ -1,27 +1,25 @@
 # Creating Agent Skills
 
 Agent Skills let you extend Sparkle CLI with specialized expertise, procedural
-workflows, and task-specific resources. This guide walks you through both
-automated and manual methods for creating and organizing your skills.
+workflows, and task-specific resources. This guide walks you through both automated and
+manual methods for creating and organizing your skills.
 
 ## Quickstart: Create a skill with a prompt
 
-The fastest way to create a new skill is to use the built-in `skill-creator`.
-This meta-skill guides you through designing, scaffolding, and validating your
-expertise.
+The fastest way to create a new skill is to use the built-in `skill-creator`. This
+meta-skill guides you through designing, scaffolding, and validating your expertise.
 
 Simply ask Sparkle CLI to create a skill for you:
 
-> "Create a new skill called 'code-reviewer' that analyzes local files for
-> common errors and style violations."
+> "Create a new skill called 'code-reviewer' that analyzes local files for common errors
+> and style violations."
 
 Sparkle will then:
 
 1.  Generate a new directory for your skill (for example, `my-new-skill/`).
 2.  Create a `SKILL.md` file with the necessary YAML frontmatter (`name` and
     `description`).
-3.  Create the standard resource directories: `scripts/`, `references/`, and
-    `assets/`.
+3.  Create the standard resource directories: `scripts/`, `references/`, and `assets/`.
 
 Once created, you can find your new skill in `.sparkle/skills/code-reviewer/`.
 
@@ -32,8 +30,7 @@ Once created, you can find your new skill in `.sparkle/skills/code-reviewer/`.
 
 ### 1. Create the directory structure
 
-The first step is to create the necessary folders for your skill and its
-scripts.
+The first step is to create the necessary folders for your skill and its scripts.
 
 **macOS/Linux**
 
@@ -49,34 +46,34 @@ New-Item -ItemType Directory -Force -Path ".sparkle\skills\code-reviewer\scripts
 
 ### 2. Define the skill (`SKILL.md`)
 
-The `SKILL.md` file defines the skill's purpose and instructions for the agent.
-Create a file at `.sparkle/skills/code-reviewer/SKILL.md`.
+The `SKILL.md` file defines the skill's purpose and instructions for the agent. Create a
+file at `.sparkle/skills/code-reviewer/SKILL.md`.
 
 ```markdown
 ---
 name: code-reviewer
 description:
-  Expertise in reviewing code changes for correctness, security, and style. Use
-  when the user asks to "review" their code or a PR.
+  Expertise in reviewing code changes for correctness, security, and style. Use when the
+  user asks to "review" their code or a PR.
 ---
 
 # Code Reviewer Instructions
 
-You act as a senior software engineer specialized in code quality. When this
-skill is active, you MUST:
+You act as a senior software engineer specialized in code quality. When this skill is
+active, you MUST:
 
-1.  **Analyze**: Review the provided code for logical errors, security
-    vulnerabilities, and style violations.
-2.  **Review**: Use the bundled `scripts/review.js` utility to perform an
-    automated check.
-3.  **Feedback**: Provide constructive feedback, clearly distinguishing between
-    critical issues and minor improvements.
+1.  **Analyze**: Review the provided code for logical errors, security vulnerabilities,
+    and style violations.
+2.  **Review**: Use the bundled `scripts/review.js` utility to perform an automated
+    check.
+3.  **Feedback**: Provide constructive feedback, clearly distinguishing between critical
+    issues and minor improvements.
 ```
 
 ### 3. Add the tool logic
 
-Skills can bundle resources like scripts to perform deterministic tasks. Create
-a file at `.sparkle/skills/code-reviewer/scripts/review.js`.
+Skills can bundle resources like scripts to perform deterministic tasks. Create a file
+at `.sparkle/skills/code-reviewer/scripts/review.js`.
 
 ```javascript
 // .sparkle/skills/code-reviewer/scripts/review.js
@@ -98,10 +95,10 @@ setTimeout(() => {
 
 Sparkle CLI automatically discovers skills in the `.sparkle/skills` directory.
 
-1.  Start a new session and ask a question that triggers the skill's
-    description: "Can you review index.js"
-2.  Sparkle identifies the request matches the `code-reviewer` description and
-    asks for permission to activate it.
+1.  Start a new session and ask a question that triggers the skill's description: "Can
+    you review index.js"
+2.  Sparkle identifies the request matches the `code-reviewer` description and asks for
+    permission to activate it.
 3.  Once you approve, Sparkle executes the bundled script:
     `node .sparkle/skills/code-reviewer/scripts/review.js index.js`
 
@@ -115,24 +112,24 @@ To determine whether your skill has been correctly loaded, run the command:
 
 You can share your skills in several ways depending on your target audience.
 
-- **Workspace skills**: Commit your skill to a `.sparkle/skills/` directory in
-  your project repository.
+- **Workspace skills**: Commit your skill to a `.sparkle/skills/` directory in your
+  project repository.
 - **Extensions**: Bundle your skill within a
   [Sparkle CLI extension](../extensions/writing-extensions.md).
-- **Git repositories**: Share the skill directory as a standalone Git repo and
-  install it using `sparkle skills install <url>`.
+- **Git repositories**: Share the skill directory as a standalone Git repo and install
+  it using `sparkle skills install <url>`.
 
 ---
 
 ## Core concepts
 
-Now that you've built your first skill, let's explore the core components and
-workflows for developing more complex expertise.
+Now that you've built your first skill, let's explore the core components and workflows
+for developing more complex expertise.
 
 ### Skill structure
 
-While a `SKILL.md` file is the only required component, we recommend the
-following structure for organizing your skill's resources.
+While a `SKILL.md` file is the only required component, we recommend the following
+structure for organizing your skill's resources.
 
 ```text
 my-skill/
@@ -142,24 +139,21 @@ my-skill/
 └── assets/        (Optional) Templates and other resources
 ```
 
-When a skill is activated, the model is granted access to this entire directory.
-You can instruct the model to use the tools and files found within these
-folders.
+When a skill is activated, the model is granted access to this entire directory. You can
+instruct the model to use the tools and files found within these folders.
 
 ### Metadata and triggers
 
 The `SKILL.md` file uses YAML frontmatter for metadata.
 
-- **`name`**: A unique identifier for the skill. This should match the directory
-  name.
-- **`description`**: **CRITICAL.** This is how Sparkle decides when to use the
-  skill. Be specific about the tasks it handles and the keywords that should
-  trigger it.
+- **`name`**: A unique identifier for the skill. This should match the directory name.
+- **`description`**: **CRITICAL.** This is how Sparkle decides when to use the skill. Be
+  specific about the tasks it handles and the keywords that should trigger it.
 
 ### Discovery tiers
 
-Sparkle CLI discovers skills from several locations, following a specific order
-of precedence (lowest to highest):
+Sparkle CLI discovers skills from several locations, following a specific order of
+precedence (lowest to highest):
 
 1.  **Built-in Skills**: Included with Sparkle CLI (pre-approved).
 2.  **Extension Skills**: Bundled within [extensions](../extensions/).
@@ -168,30 +162,30 @@ of precedence (lowest to highest):
 
 ### Discovery aliases
 
-You can use `.agents/skills` as an alternative to `.sparkle/skills`. This alias
-is compatible with other AI agent tools following the
+You can use `.agents/skills` as an alternative to `.sparkle/skills`. This alias is
+compatible with other AI agent tools following the
 [Agent Skills](https://agentskills.io) standard.
 
 ## Advanced development
 
-Once you've built a basic skill, you can use specialized scripts and workflows
-to streamline your development process.
+Once you've built a basic skill, you can use specialized scripts and workflows to
+streamline your development process.
 
 ### Creation scripts
 
-If you are developing a skill and want to use the same scripts the built-in
-tools use, you can find them in the core package. These scripts help automate
-the initialization, validation, and packaging of skills.
+If you are developing a skill and want to use the same scripts the built-in tools use,
+you can find them in the core package. These scripts help automate the initialization,
+validation, and packaging of skills.
 
 - **Initialize**: `node scripts/init_skill.cjs <name> --path <dir>`
 - **Validate**: `node scripts/validate_skill.cjs <path/to/skill>`
-- **Package**: `node scripts/package_skill.cjs <path/to/skill>` (Creates a
-  `.skill` zip file)
+- **Package**: `node scripts/package_skill.cjs <path/to/skill>` (Creates a `.skill` zip
+  file)
 
 ### Linking for local development
 
-If you are developing a skill in a separate directory, you can link it to your
-user skills directory for testing:
+If you are developing a skill in a separate directory, you can link it to your user
+skills directory for testing:
 
 ```bash
 sparkle skills link .
@@ -199,9 +193,9 @@ sparkle skills link .
 
 ## Next steps
 
-- [Skill best practices](./skills-best-practices.md): Learn strategies for
-  building reliable and effective skills.
-- [Agent Skills overview](./skills.md): Deep dive into discovery tiers and the
-  skill lifecycle.
-- [Get started with Agent Skills](./tutorials/skills-getting-started.md): A
-  quick walkthrough of triggering and using skills.
+- [Skill best practices](./skills-best-practices.md): Learn strategies for building
+  reliable and effective skills.
+- [Agent Skills overview](./skills.md): Deep dive into discovery tiers and the skill
+  lifecycle.
+- [Get started with Agent Skills](./tutorials/skills-getting-started.md): A quick
+  walkthrough of triggering and using skills.

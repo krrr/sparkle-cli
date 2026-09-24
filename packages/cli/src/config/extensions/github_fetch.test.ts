@@ -101,9 +101,9 @@ describe('fetchJson', () => {
       return new EventEmitter() as ClientRequest;
     });
 
-    await expect(
-      fetchJson('https://example.com/redirect-perm'),
-    ).resolves.toEqual({ permanent: true });
+    await expect(fetchJson('https://example.com/redirect-perm')).resolves.toEqual({
+      permanent: true,
+    });
   });
 
   it('should reject on non-200/30x status code', async () => {

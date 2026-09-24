@@ -69,10 +69,7 @@ export async function start_sandbox(
     // determine full path for sparkle-cli to distinguish linked vs installed setting
     const gcPath = process.argv[1] ? fs.realpathSync(process.argv[1]) : '';
 
-    const projectSandboxDockerfile = path.join(
-      SPARKLE_DIR,
-      'sandbox.Dockerfile',
-    );
+    const projectSandboxDockerfile = path.join(SPARKLE_DIR, 'sandbox.Dockerfile');
     const isCustomProjectSandbox = fs.existsSync(projectSandboxDockerfile);
 
     const image = config.image;
@@ -96,24 +93,18 @@ export async function start_sandbox(
         const gcRoot = gcPath.split('/packages/')[0];
         // if project folder has sandbox.Dockerfile under project settings folder, use that
         let buildArgs = '';
-        const projectSandboxDockerfile = path.join(
-          SPARKLE_DIR,
-          'sandbox.Dockerfile',
-        );
+        const projectSandboxDockerfile = path.join(SPARKLE_DIR, 'sandbox.Dockerfile');
         if (isCustomProjectSandbox) {
           debugLogger.log(`using ${projectSandboxDockerfile} for sandbox`);
           buildArgs += `-f ${path.resolve(projectSandboxDockerfile)} -i ${image}`;
         }
-        execSync(
-          `cd ${gcRoot} && node scripts/build_sandbox.js -s ${buildArgs}`,
-          {
-            stdio: 'inherit',
-            env: {
-              ...process.env,
-              SPARKLE_SANDBOX: command, // in case sandbox is enabled via flags (see config.ts under cli package)
-            },
+        execSync(`cd ${gcRoot} && node scripts/build_sandbox.js -s ${buildArgs}`, {
+          stdio: 'inherit',
+          env: {
+            ...process.env,
+            SPARKLE_SANDBOX: command, // in case sandbox is enabled via flags (see config.ts under cli package)
           },
-        );
+        });
       }
     }
 
@@ -164,9 +155,7 @@ export async function start_sandbox(
     // mount user settings directory inside container, after creating if missing
     // note user/home changes inside sandbox and we mount at BOTH paths for consistency
     const userHomeDirOnHost = homedir();
-    const userSettingsDirInSandbox = getContainerPath(
-      `/home/node/${SPARKLE_DIR}`,
-    );
+    const userSettingsDirInSandbox = getContainerPath(`/home/node/${SPARKLE_DIR}`);
     if (!fs.existsSync(userHomeDirOnHost)) {
       fs.mkdirSync(userHomeDirOnHost, { recursive: true });
     }
@@ -175,10 +164,7 @@ export async function start_sandbox(
       fs.mkdirSync(userSettingsDirOnHost, { recursive: true });
     }
 
-    args.push(
-      '--volume',
-      `${userSettingsDirOnHost}:${userSettingsDirInSandbox}`,
-    );
+    args.push('--volume', `${userSettingsDirOnHost}:${userSettingsDirInSandbox}`);
     if (userSettingsDirInSandbox !== getContainerPath(userSettingsDirOnHost)) {
       args.push(
         '--volume',
@@ -229,9 +215,7 @@ export async function start_sandbox(
       for (const hostPath of config.allowedPaths) {
         if (hostPath && path.isAbsolute(hostPath) && fs.existsSync(hostPath)) {
           const containerPath = getContainerPath(hostPath);
-          debugLogger.log(
-            `Config allowedPath: ${hostPath} -> ${containerPath} (ro)`,
-          );
+          debugLogger.log(`Config allowedPath: ${hostPath} -> ${containerPath} (ro)`);
           args.push('--volume', `${hostPath}:${containerPath}:ro`);
         }
       }
@@ -297,23 +281,17 @@ export async function start_sandbox(
     // Use a random suffix instead of probing existing containers so concurrent
     // CLI starts cannot race on the same sequential name.
     const imageName = parseImageName(image);
-    const isIntegrationTest =
-      process.env['SPARKLE_CLI_INTEGRATION_TEST'] === 'true';
+    const isIntegrationTest = process.env['SPARKLE_CLI_INTEGRATION_TEST'] === 'true';
     const containerNamePrefix = isIntegrationTest
       ? 'sparkle-cli-integration-test'
       : imageName;
-    const containerName = `${containerNamePrefix}-${randomBytes(6).toString(
-      'hex',
-    )}`;
+    const containerName = `${containerNamePrefix}-${randomBytes(6).toString('hex')}`;
     debugLogger.log(`ContainerName: ${containerName}`);
     args.push('--name', containerName, '--hostname', containerName);
 
     // copy SPARKLE_CLI_TEST_VAR for integration tests
     if (process.env['SPARKLE_CLI_TEST_VAR']) {
-      args.push(
-        '--env',
-        `SPARKLE_CLI_TEST_VAR=${process.env['SPARKLE_CLI_TEST_VAR']}`,
-      );
+      args.push('--env', `SPARKLE_CLI_TEST_VAR=${process.env['SPARKLE_CLI_TEST_VAR']}`);
     }
 
     // copy GEMINI_API_KEY(s)
@@ -366,11 +344,7 @@ export async function start_sandbox(
     // also mount-replace VIRTUAL_ENV directory with <project_settings>/sandbox.venv
     // sandbox can then set up this new VIRTUAL_ENV directory using sandbox.bashrc (see below)
     // directory will be empty if not set up, which is still preferable to having host binaries
-    if (
-      process.env['VIRTUAL_ENV']
-        ?.toLowerCase()
-        .startsWith(workdir.toLowerCase())
-    ) {
+    if (process.env['VIRTUAL_ENV']?.toLowerCase().startsWith(workdir.toLowerCase())) {
       const sandboxVenvPath = path.resolve(SPARKLE_DIR, 'sandbox.venv');
       if (!fs.existsSync(sandboxVenvPath)) {
         fs.mkdirSync(sandboxVenvPath, { recursive: true });
@@ -379,10 +353,7 @@ export async function start_sandbox(
         '--volume',
         `${sandboxVenvPath}:${getContainerPath(process.env['VIRTUAL_ENV'])}`,
       );
-      args.push(
-        '--env',
-        `VIRTUAL_ENV=${getContainerPath(process.env['VIRTUAL_ENV'])}`,
-      );
+      args.push('--env', `VIRTUAL_ENV=${getContainerPath(process.env['VIRTUAL_ENV'])}`);
     }
 
     // copy additional environment variables from SANDBOX_ENV
@@ -670,11 +641,11 @@ async function start_lxc_sandbox(
   const removeDevices = () => {
     for (const deviceName of devicesToRemove) {
       try {
-        spawnSync(
-          'lxc',
-          ['config', 'device', 'remove', containerName, deviceName],
-          { timeout: 1000, killSignal: 'SIGKILL', stdio: 'ignore' },
-        );
+        spawnSync('lxc', ['config', 'device', 'remove', containerName, deviceName], {
+          timeout: 1000,
+          killSignal: 'SIGKILL',
+          stdio: 'ignore',
+        });
       } catch {
         // Best-effort cleanup; ignore errors on exit.
       }
@@ -684,9 +655,7 @@ async function start_lxc_sandbox(
   try {
     // Bind-mount the working directory into the container at the same path.
     // Using "lxc config device add" is idempotent when the device name matches.
-    const workspaceDeviceName = `sparkle-workspace-${randomBytes(4).toString(
-      'hex',
-    )}`;
+    const workspaceDeviceName = `sparkle-workspace-${randomBytes(4).toString('hex')}`;
     devicesToRemove.push(workspaceDeviceName);
 
     try {
@@ -713,9 +682,7 @@ async function start_lxc_sandbox(
     if (config.allowedPaths) {
       for (const hostPath of config.allowedPaths) {
         if (hostPath && path.isAbsolute(hostPath) && fs.existsSync(hostPath)) {
-          const allowedDeviceName = `sparkle-allowed-${randomBytes(4).toString(
-            'hex',
-          )}`;
+          const allowedDeviceName = `sparkle-allowed-${randomBytes(4).toString('hex')}`;
           devicesToRemove.push(allowedDeviceName);
           try {
             await execFileAsync('lxc', [
@@ -757,8 +724,7 @@ async function start_lxc_sandbox(
       TERM: process.env['TERM'],
       COLORTERM: process.env['COLORTERM'],
       SPARKLE_CLI_IDE_SERVER_PORT: process.env['SPARKLE_CLI_IDE_SERVER_PORT'],
-      SPARKLE_CLI_IDE_WORKSPACE_PATH:
-        process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'],
+      SPARKLE_CLI_IDE_WORKSPACE_PATH: process.env['SPARKLE_CLI_IDE_WORKSPACE_PATH'],
       TERM_PROGRAM: process.env['TERM_PROGRAM'],
     };
     for (const [key, value] of Object.entries(envVarsToForward)) {

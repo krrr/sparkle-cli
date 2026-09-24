@@ -134,8 +134,7 @@ class GetInternalDocsInvocation extends BaseToolInvocation<
         returnDisplay: `Successfully read documentation: ${this.params.path}`,
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error accessing internal documentation: ${errorMessage}`,
         returnDisplay: `Failed to access documentation: ${errorMessage}`,

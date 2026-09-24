@@ -45,10 +45,7 @@ export async function cloneFromGit(
     if (token) {
       try {
         const parsedUrl = new URL(sourceUrl);
-        if (
-          parsedUrl.protocol === 'https:' &&
-          parsedUrl.hostname === 'github.com'
-        ) {
+        if (parsedUrl.protocol === 'https:' && parsedUrl.hostname === 'github.com') {
           if (!parsedUrl.username) {
             parsedUrl.username = token;
           }
@@ -63,9 +60,7 @@ export async function cloneFromGit(
 
     const remotes = await git.getRemotes(true);
     if (remotes.length === 0) {
-      throw new Error(
-        `Unable to find any remotes for repo ${installMetadata.source}`,
-      );
+      throw new Error(`Unable to find any remotes for repo ${installMetadata.source}`);
     }
 
     const refToFetch = installMetadata.ref || 'HEAD';
@@ -181,9 +176,7 @@ export async function checkForExtensionUpdate(
   if (installMetadata?.type === 'local') {
     let latestConfig: ExtensionConfig | undefined;
     try {
-      latestConfig = await extensionManager.loadExtensionConfig(
-        installMetadata.source,
-      );
+      latestConfig = await extensionManager.loadExtensionConfig(installMetadata.source);
     } catch (e) {
       debugLogger.warn(
         `Failed to check for update for local extension "${extension.name}". Could not load extension from source path: ${installMetadata.source}. Error: ${getErrorMessage(e)}`,
@@ -204,8 +197,7 @@ export async function checkForExtensionUpdate(
   }
   if (
     !installMetadata ||
-    (installMetadata.type !== 'git' &&
-      installMetadata.type !== 'github-release')
+    (installMetadata.type !== 'git' && installMetadata.type !== 'github-release')
   ) {
     return ExtensionUpdateState.NOT_UPDATABLE;
   }
@@ -237,9 +229,7 @@ export async function checkForExtensionUpdate(
       }
       const remoteUrl = remotes[0].refs.fetch;
       if (!remoteUrl) {
-        debugLogger.error(
-          `No fetch URL found for git remote ${remotes[0].name}.`,
-        );
+        debugLogger.error(`No fetch URL found for git remote ${remotes[0].name}.`);
         return ExtensionUpdateState.ERROR;
       }
 
@@ -545,9 +535,7 @@ export async function downloadFile(
           }
 
           if (!res.headers.location) {
-            return reject(
-              new Error('Redirect response missing Location header'),
-            );
+            return reject(new Error('Redirect response missing Location header'));
           }
           downloadFile(res.headers.location, dest, options, redirectCount + 1)
             .then(resolve)
@@ -555,9 +543,7 @@ export async function downloadFile(
           return;
         }
         if (res.statusCode !== 200) {
-          return reject(
-            new Error(`Request failed with status code ${res.statusCode}`),
-          );
+          return reject(new Error(`Request failed with status code ${res.statusCode}`));
         }
         const file = fs.createWriteStream(dest);
         res.pipe(file);

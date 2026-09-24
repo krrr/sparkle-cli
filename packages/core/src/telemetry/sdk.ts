@@ -15,10 +15,7 @@ import {
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import {
-  BatchSpanProcessor,
-  ConsoleSpanExporter,
-} from '@opentelemetry/sdk-trace-node';
+import { BatchSpanProcessor, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
 import {
   BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
@@ -36,16 +33,10 @@ import {
   FileSpanExporter,
 } from './file-exporters.js';
 import { debugLogger } from '../utils/debugLogger.js';
-import {
-  startGlobalMemoryMonitoring,
-  getMemoryMonitor,
-} from './memory-monitor.js';
+import { startGlobalMemoryMonitoring, getMemoryMonitor } from './memory-monitor.js';
 import { startGlobalEventLoopMonitoring } from './event-loop-monitor.js';
 import { coreEvents, CoreEvent } from '../utils/events.js';
-import {
-  logKeychainAvailability,
-  logTokenStorageInitialization,
-} from './loggers.js';
+import { logKeychainAvailability, logTokenStorageInitialization } from './loggers.js';
 import type {
   KeychainAvailabilityEvent,
   TokenStorageInitializationEvent,
@@ -145,10 +136,7 @@ export async function initializeTelemetry(config: Config): Promise<void> {
     tokenStorageTypeListener = (event: TokenStorageInitializationEvent) => {
       logTokenStorageInitialization(config, event);
     };
-    coreEvents.on(
-      CoreEvent.TelemetryTokenStorageType,
-      tokenStorageTypeListener,
-    );
+    coreEvents.on(CoreEvent.TelemetryTokenStorageType, tokenStorageTypeListener);
   }
 
   const telemetryOutfile = config.getTelemetryOutfile();
@@ -192,9 +180,7 @@ export async function initializeTelemetry(config: Config): Promise<void> {
 
     // Start memory monitoring if interval is specified via environment variable
     const monitorInterval = process.env['GEMINI_MEMORY_MONITOR_INTERVAL'];
-    debugLogger.log(
-      `[TELEMETRY] GEMINI_MEMORY_MONITOR_INTERVAL: ${monitorInterval}`,
-    );
+    debugLogger.log(`[TELEMETRY] GEMINI_MEMORY_MONITOR_INTERVAL: ${monitorInterval}`);
     if (monitorInterval) {
       const intervalMs = parseInt(monitorInterval, 10);
       if (!isNaN(intervalMs) && intervalMs > 0) {
@@ -284,10 +270,7 @@ export async function shutdownTelemetry(
       keychainAvailabilityListener = undefined;
     }
     if (tokenStorageTypeListener) {
-      coreEvents.off(
-        CoreEvent.TelemetryTokenStorageType,
-        tokenStorageTypeListener,
-      );
+      coreEvents.off(CoreEvent.TelemetryTokenStorageType, tokenStorageTypeListener);
       tokenStorageTypeListener = undefined;
     }
   }

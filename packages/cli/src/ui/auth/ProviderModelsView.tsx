@@ -19,10 +19,7 @@ import { ProviderModelEditorView } from './ProviderModelEditorView.js';
 export interface ProviderModelsViewProps {
   profile: ProviderProfile;
   onAddModel: (model: ProviderModel) => void | Promise<void>;
-  onUpdateModel: (
-    oldModelId: string,
-    model: ProviderModel,
-  ) => void | Promise<void>;
+  onUpdateModel: (oldModelId: string, model: ProviderModel) => void | Promise<void>;
   onDeleteModel: (modelId: string) => void | Promise<void>;
   onSetDefaultModel: (modelId: string) => void | Promise<void>;
   onBack: () => void;
@@ -49,9 +46,7 @@ export function ProviderModelsView({
   const [editingModelTarget, setEditingModelTarget] = useState<
     ProviderModel | undefined
   >(undefined);
-  const [pendingDeleteModelId, setPendingDeleteModelId] = useState<
-    string | null
-  >(null);
+  const [pendingDeleteModelId, setPendingDeleteModelId] = useState<string | null>(null);
 
   const clampedIndex =
     models.length > 0 ? Math.min(selectedIndex, models.length - 1) : 0;
@@ -125,10 +120,7 @@ export function ProviderModelsView({
         setIsEditingModel(true);
         return true;
       }
-      if (
-        (key.name === 's' || keyMatchers[Command.RETURN](key)) &&
-        selectedModel
-      ) {
+      if ((key.name === 's' || keyMatchers[Command.RETURN](key)) && selectedModel) {
         void onSetDefaultModel(selectedModel.id);
         return true;
       }
@@ -238,9 +230,7 @@ export function ProviderModelsView({
                 </Text>
                 {isDefault && (
                   <Box justifyContent="flex-end" flexGrow={1}>
-                    <Text
-                      color={pendingDeleteTextColor ?? theme.status.success}
-                    >
+                    <Text color={pendingDeleteTextColor ?? theme.status.success}>
                       {'✓ Default'}
                     </Text>
                   </Box>

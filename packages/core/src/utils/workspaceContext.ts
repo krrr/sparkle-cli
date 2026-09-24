@@ -191,11 +191,7 @@ export class WorkspaceContext {
             const clean = trimTrailingSpacesAndDots(
               segment.split(':')[0],
             ).toLowerCase();
-            if (
-              clean === '.git' ||
-              clean === '.env' ||
-              clean === 'node_modules'
-            ) {
+            if (clean === '.git' || clean === '.env' || clean === 'node_modules') {
               return true;
             }
             // Block GitHub Actions Workload Identity credentials
@@ -259,10 +255,7 @@ export class WorkspaceContext {
    * @param rootDirectory The absolute root directory
    * @returns True if the path is within the root directory, false otherwise
    */
-  private isPathWithinRoot(
-    pathToCheck: string,
-    rootDirectory: string,
-  ): boolean {
+  private isPathWithinRoot(pathToCheck: string, rootDirectory: string): boolean {
     const relative = path.relative(rootDirectory, pathToCheck);
     return (
       !relative.startsWith(`..${path.sep}`) &&

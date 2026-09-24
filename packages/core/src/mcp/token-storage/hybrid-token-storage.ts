@@ -6,11 +6,7 @@
 
 import { BaseTokenStorage } from './base-token-storage.js';
 import { KeychainTokenStorage } from './keychain-token-storage.js';
-import {
-  TokenStorageType,
-  type TokenStorage,
-  type OAuthCredentials,
-} from './types.js';
+import { TokenStorageType, type TokenStorage, type OAuthCredentials } from './types.js';
 import { coreEvents } from '../../utils/events.js';
 import { TokenStorageInitializationEvent } from '../../telemetry/types.js';
 import { FORCE_FILE_STORAGE_ENV_VAR } from '../../services/keychainService.js';

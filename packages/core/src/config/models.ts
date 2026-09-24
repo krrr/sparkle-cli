@@ -23,10 +23,7 @@ export interface IModelConfigService {
       }
     | undefined;
 
-  resolveModelId(
-    requestedModel: string,
-    context?: ModelResolutionContext,
-  ): string;
+  resolveModelId(requestedModel: string, context?: ModelResolutionContext): string;
 
   resolveClassifierModelId(
     tier: string,
@@ -128,10 +125,7 @@ export function resolveClassifierModel(
   return resolveModel(requestedModel, config);
 }
 
-export function getDisplayString(
-  model: string,
-  config?: ModelCapabilityContext,
-) {
+export function getDisplayString(model: string, config?: ModelCapabilityContext) {
   if (config) {
     const definition = config.modelConfigService.getModelDefinition(model);
     if (definition?.displayName) {
@@ -158,10 +152,7 @@ export function getDisplayString(
  * @param config Optional config object for dynamic model configuration.
  * @returns True if the model is a Pro model.
  */
-export function isProModel(
-  model: string,
-  config?: ModelCapabilityContext,
-): boolean {
+export function isProModel(model: string, config?: ModelCapabilityContext): boolean {
   if (config) {
     return config.modelConfigService.getModelDefinition(model)?.tier === 'pro';
   }
@@ -175,15 +166,12 @@ export function isProModel(
  * @param config Optional config object for dynamic model configuration.
  * @returns True if the model is not a Gemini branded model.
  */
-export function isCustomModel(
-  model: string,
-  config?: ModelCapabilityContext,
-): boolean {
+export function isCustomModel(model: string, config?: ModelCapabilityContext): boolean {
   if (config) {
     const resolved = resolveModel(model, config);
     return (
-      config.modelConfigService.getModelDefinition(resolved)?.tier ===
-        'custom' || !resolved.startsWith('gemini-')
+      config.modelConfigService.getModelDefinition(resolved)?.tier === 'custom' ||
+      !resolved.startsWith('gemini-')
     );
   }
   const resolved = resolveModel(model);
@@ -197,10 +185,7 @@ export function isCustomModel(
  * @param config Optional config object for dynamic model configuration.
  * @returns True if the model is an auto model.
  */
-export function isAutoModel(
-  model: string,
-  config?: ModelCapabilityContext,
-): boolean {
+export function isAutoModel(model: string, config?: ModelCapabilityContext): boolean {
   if (config) {
     return config.modelConfigService.getModelDefinition(model)?.tier === 'auto';
   }

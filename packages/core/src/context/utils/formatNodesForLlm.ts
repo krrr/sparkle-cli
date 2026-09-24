@@ -20,12 +20,10 @@ export interface FormatNodesOptions {
  * Maps common tool names to semantic wrappers that improve LLM reading comprehension.
  */
 function getSemanticToolWrapper(toolName: string): string {
-  if (toolName.includes('search') || toolName.includes('grep'))
-    return `SEARCH RESULTS`;
+  if (toolName.includes('search') || toolName.includes('grep')) return `SEARCH RESULTS`;
   if (toolName.includes('list') || toolName.includes('dir'))
     return `WORKSPACE STRUCTURE`;
-  if (toolName.includes('shell') || toolName.includes('cmd'))
-    return `SHELL EXECUTION`;
+  if (toolName.includes('shell') || toolName.includes('cmd')) return `SHELL EXECUTION`;
   if (toolName.includes('read') || toolName.includes('fetch'))
     return `FILE/WEB CONTENT`;
   return `TOOL RESPONSE`;
@@ -44,9 +42,7 @@ export function formatNodesForLlm(
   let transcript = '';
 
   // Extract unique chronological turn IDs
-  const uniqueTurns = Array.from(
-    new Set(nodes.map((n) => n.turnId).filter(Boolean)),
-  );
+  const uniqueTurns = Array.from(new Set(nodes.map((n) => n.turnId).filter(Boolean)));
 
   for (const node of nodes) {
     const payload = node.payload;

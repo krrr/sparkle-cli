@@ -1,59 +1,56 @@
 # Release extensions
 
 Release Sparkle CLI extensions to your users through a Git repository or GitHub
-Releases. This guide explains how to share your work, list it in the gallery,
-and manage updates.
+Releases. This guide explains how to share your work, list it in the gallery, and manage
+updates.
 
-Git repository releases are the simplest approach and offer the most flexibility
-for managing development branches. GitHub Releases are more efficient for
-initial installations because they ship as single archives rather than requiring
-a full `git clone`. Use GitHub Releases if you need to include platform-specific
-binary files.
+Git repository releases are the simplest approach and offer the most flexibility for
+managing development branches. GitHub Releases are more efficient for initial
+installations because they ship as single archives rather than requiring a full
+`git clone`. Use GitHub Releases if you need to include platform-specific binary files.
 
 ## List your extension in the gallery
 
 The [Sparkle CLI extension gallery](https://geminicli.com/extensions/browse/)
-automatically indexes public extensions to help users discover your work. You
-don't need to submit an issue or email us to list your extension.
+automatically indexes public extensions to help users discover your work. You don't need
+to submit an issue or email us to list your extension.
 
 To have your extension automatically discovered and listed:
 
-1.  **Use a public repository:** Ensure your extension is hosted in a public
-    GitHub repository.
-2.  **Add the GitHub topic:** Add the `sparkle-cli-extension` topic to your
-    repository's **About** section. Our crawler uses this topic to find new
-    extensions.
-3.  **Place the manifest at the root:** Ensure your `sparkle-extension.json`
-    file is in the absolute root of the repository or the release archive.
+1.  **Use a public repository:** Ensure your extension is hosted in a public GitHub
+    repository.
+2.  **Add the GitHub topic:** Add the `sparkle-cli-extension` topic to your repository's
+    **About** section. Our crawler uses this topic to find new extensions.
+3.  **Place the manifest at the root:** Ensure your `sparkle-extension.json` file is in
+    the absolute root of the repository or the release archive.
 
 Our system crawls tagged repositories daily. Once you tag your repository, your
 extension will appear in the gallery if it passes validation.
 
 ## Release through a Git repository
 
-Releasing through Git is the most flexible option. Create a public Git
-repository and provide the URL to your users. They can then install your
-extension using `sparkle extensions install <your-repo-uri>`.
+Releasing through Git is the most flexible option. Create a public Git repository and
+provide the URL to your users. They can then install your extension using
+`sparkle extensions install <your-repo-uri>`.
 
-Users can optionally depend on a specific branch, tag, or commit using the
-`--ref` argument. For example:
+Users can optionally depend on a specific branch, tag, or commit using the `--ref`
+argument. For example:
 
 ```bash
 sparkle extensions install <your-repo-uri> --ref=stable
 ```
 
-Whenever you push commits to the referenced branch, the CLI prompts users to
-update their installation. The `HEAD` commit is always treated as the latest
-version.
+Whenever you push commits to the referenced branch, the CLI prompts users to update
+their installation. The `HEAD` commit is always treated as the latest version.
 
 ### Manage versions with branches
 
 You can use branches to manage different versions, such as `stable` and `dev`.
 
-We recommend using your default branch as the stable version. This ensures that
-the default installation command always provides the most reliable version of
-your extension. You can then use a `dev` branch for active development and merge
-it into the default branch when you are ready for a release.
+We recommend using your default branch as the stable version. This ensures that the
+default installation command always provides the most reliable version of your
+extension. You can then use a `dev` branch for active development and merge it into the
+default branch when you are ready for a release.
 
 ## Release through GitHub Releases
 
@@ -61,31 +58,29 @@ Distributing extensions through
 [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases)
 provides a faster installation experience by avoiding a repository clone.
 
-Sparkle CLI checks for updates by looking for the **Latest** release on GitHub.
-Users can also install specific versions using the `--ref` argument with a
-release tag. Use the `--pre-release` flag to install the latest version even if
-it isn't marked as **Latest**.
+Sparkle CLI checks for updates by looking for the **Latest** release on GitHub. Users
+can also install specific versions using the `--ref` argument with a release tag. Use
+the `--pre-release` flag to install the latest version even if it isn't marked as
+**Latest**.
 
 ### Custom pre-built archives
 
-You can attach custom archives directly to your GitHub Release as assets. This
-is useful if your extension requires a build step or includes platform-specific
-binaries.
+You can attach custom archives directly to your GitHub Release as assets. This is useful
+if your extension requires a build step or includes platform-specific binaries.
 
 Custom archives must be fully self-contained and follow the required
-[archive structure](#archive-structure). If your extension is
-platform-independent, provide a single generic asset.
+[archive structure](#archive-structure). If your extension is platform-independent,
+provide a single generic asset.
 
 #### Platform-specific archives
 
-To let Sparkle CLI find the correct asset for a user's platform, use the
-following naming convention:
+To let Sparkle CLI find the correct asset for a user's platform, use the following
+naming convention:
 
-1.  **Platform and architecture-specific:**
-    `{platform}.{arch}.{name}.{extension}`
+1.  **Platform and architecture-specific:** `{platform}.{arch}.{name}.{extension}`
 2.  **Platform-specific:** `{platform}.{name}.{extension}`
-3.  **Generic:** A single asset will be used as a fallback if no specific match
-    is found.
+3.  **Generic:** A single asset will be used as a fallback if no specific match is
+    found.
 
 Use these values for the placeholders:
 
@@ -103,14 +98,13 @@ Use these values for the placeholders:
 
 #### Archive structure
 
-Archives must be fully contained extensions. The `sparkle-extension.json` file
-must be at the root of the archive. The rest of the layout should match a
-standard extension structure.
+Archives must be fully contained extensions. The `sparkle-extension.json` file must be
+at the root of the archive. The rest of the layout should match a standard extension
+structure.
 
 #### Example GitHub Actions workflow
 
-Use this example workflow to build and release your extension for multiple
-platforms:
+Use this example workflow to build and release your extension for multiple platforms:
 
 ```yaml
 name: Release Extension
@@ -154,14 +148,13 @@ jobs:
 
 ## Migrate an extension repository
 
-If you move your extension to a new repository or rename it, use the
-`migratedTo` property in `sparkle-extension.json` to seamlessly transition your
-users.
+If you move your extension to a new repository or rename it, use the `migratedTo`
+property in `sparkle-extension.json` to seamlessly transition your users.
 
 1.  **Create the new repository:** Set up your extension in its new location.
 2.  **Update the old repository:** In your original repository, update the
-    `sparkle-extension.json` file to include the `migratedTo` property pointing
-    to the new repository URL, and increment the version number.
+    `sparkle-extension.json` file to include the `migratedTo` property pointing to the
+    new repository URL, and increment the version number.
     ```json
     {
       "name": "my-extension",
@@ -171,22 +164,21 @@ users.
     ```
 3.  **Release the update:** Publish this new version in your old repository.
 
-When users check for updates, Sparkle CLI detects the `migratedTo` field,
-verifies the new repository, and automatically updates their local installation
-to track the new source. All settings migrate automatically.
+When users check for updates, Sparkle CLI detects the `migratedTo` field, verifies the
+new repository, and automatically updates their local installation to track the new
+source. All settings migrate automatically.
 
 ## How updates work
 
-Sparkle CLI automatically checks for extension updates based on the installation
-method. Understanding these mechanisms helps you ensure your users always have
-the latest version.
+Sparkle CLI automatically checks for extension updates based on the installation method.
+Understanding these mechanisms helps you ensure your users always have the latest
+version.
 
 ### Sync manifest and tags
 
-For GitHub releases, always ensure the `version` in `sparkle-extension.json`
-matches your GitHub release tag. While the CLI uses tags for update detection,
-it displays the manifest version in the UI. Keeping them in sync prevents
-confusion.
+For GitHub releases, always ensure the `version` in `sparkle-extension.json` matches
+your GitHub release tag. While the CLI uses tags for update detection, it displays the
+manifest version in the UI. Keeping them in sync prevents confusion.
 
 ### Update mechanisms
 
@@ -195,15 +187,15 @@ confusion.
 
 The CLI uses different strategies depending on the installation type:
 
-- **GitHub releases:** The CLI queries the GitHub API for the latest release
-  tag. It ignores the `version` field in the manifest for detection.
-- **Git clones:** The CLI runs `git ls-remote` to compare the latest remote
-  commit hash with your local `HEAD`.
-- **Local extensions:** The CLI compares the `version` field in the source
-  directory's manifest with the installed version.
+- **GitHub releases:** The CLI queries the GitHub API for the latest release tag. It
+  ignores the `version` field in the manifest for detection.
+- **Git clones:** The CLI runs `git ls-remote` to compare the latest remote commit hash
+  with your local `HEAD`.
+- **Local extensions:** The CLI compares the `version` field in the source directory's
+  manifest with the installed version.
 
-To verify an extension's installation type, inspect the `type` field in the
-metadata file at `~/.sparkle/extensions/<name>/.sparkle-extension-install.json`.
+To verify an extension's installation type, inspect the `type` field in the metadata
+file at `~/.sparkle/extensions/<name>/.sparkle-extension-install.json`.
 
 </details>
 

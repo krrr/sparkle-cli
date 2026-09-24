@@ -101,12 +101,8 @@ describe('ApiKeyCredentialStorage', () => {
     });
 
     it('should throw when clearApiKeyForProfile fails', async () => {
-      deleteCredentialsMock.mockRejectedValueOnce(
-        new Error('Failed to delete'),
-      );
-      await expect(clearApiKeyForProfile('p1')).rejects.toThrow(
-        'Failed to delete',
-      );
+      deleteCredentialsMock.mockRejectedValueOnce(new Error('Failed to delete'));
+      await expect(clearApiKeyForProfile('p1')).rejects.toThrow('Failed to delete');
     });
   });
 });

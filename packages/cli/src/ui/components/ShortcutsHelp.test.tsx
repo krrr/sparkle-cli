@@ -42,12 +42,9 @@ describe('ShortcutsHelp', () => {
         value: platform.value,
       });
 
-      const { lastFrame, unmount } = await renderWithProviders(
-        <ShortcutsHelp />,
-        {
-          width,
-        },
-      );
+      const { lastFrame, unmount } = await renderWithProviders(<ShortcutsHelp />, {
+        width,
+      });
       expect(lastFrame()).toContain('shell mode');
       expect(lastFrame()).toMatchSnapshot();
       unmount();

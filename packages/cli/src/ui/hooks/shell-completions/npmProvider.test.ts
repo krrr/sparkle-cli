@@ -21,9 +21,7 @@ describe('npmProvider', () => {
     const result = await npmProvider.getCompletions(['npm', 'ru'], 1, '/tmp');
 
     expect(result.exclusive).toBe(true);
-    expect(result.suggestions).toEqual([
-      expect.objectContaining({ value: 'run' }),
-    ]);
+    expect(result.suggestions).toEqual([expect.objectContaining({ value: 'run' })]);
   });
 
   it('suggests package.json scripts for npm run at cursorIndex 2', async () => {
@@ -36,11 +34,7 @@ describe('npmProvider', () => {
     };
     vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify(mockPackageJson));
 
-    const result = await npmProvider.getCompletions(
-      ['npm', 'run', 'bu'],
-      2,
-      '/tmp',
-    );
+    const result = await npmProvider.getCompletions(['npm', 'run', 'bu'], 2, '/tmp');
 
     expect(result.exclusive).toBe(true);
     expect(result.suggestions).toHaveLength(2);
@@ -63,11 +57,7 @@ describe('npmProvider', () => {
     };
     vi.mocked(fs.readFile).mockResolvedValue(JSON.stringify(mockPackageJson));
 
-    const result = await npmProvider.getCompletions(
-      ['npm', 'run', 'bu'],
-      2,
-      '/tmp',
-    );
+    const result = await npmProvider.getCompletions(['npm', 'run', 'bu'], 2, '/tmp');
 
     expect(result.exclusive).toBe(true);
     expect(result.suggestions).toHaveLength(1);
@@ -75,19 +65,13 @@ describe('npmProvider', () => {
 
     // Windows does not escape spaces/parens in cmds by default in our function, but Unix does.
     const isWin = process.platform === 'win32';
-    expect(result.suggestions[0].value).toBe(
-      isWin ? 'build(prod)' : 'build\\(prod\\)',
-    );
+    expect(result.suggestions[0].value).toBe(isWin ? 'build(prod)' : 'build\\(prod\\)');
   });
 
   it('handles missing package.json gracefully', async () => {
     vi.mocked(fs.readFile).mockRejectedValue(new Error('ENOENT'));
 
-    const result = await npmProvider.getCompletions(
-      ['npm', 'run', ''],
-      2,
-      '/tmp',
-    );
+    const result = await npmProvider.getCompletions(['npm', 'run', ''], 2, '/tmp');
 
     expect(result.exclusive).toBe(true);
     expect(result.suggestions).toHaveLength(0);

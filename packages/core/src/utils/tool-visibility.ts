@@ -34,9 +34,7 @@ export interface ToolVisibilityContext {
 /**
  * Maps a core ToolCall to a ToolVisibilityContext.
  */
-export function buildToolVisibilityContext(
-  tc: ToolCall,
-): ToolVisibilityContext {
+export function buildToolVisibilityContext(tc: ToolCall): ToolVisibilityContext {
   let hasResult = false;
   if (
     tc.status === CoreToolCallStatus.Success ||
@@ -91,9 +89,7 @@ export function isRenderedInHistory(ctx: ToolVisibilityContext): boolean {
 /**
  * Determines if a tool belongs in the Awaiting Approval confirmation queue.
  */
-export function belongsInConfirmationQueue(
-  ctx: ToolVisibilityContext,
-): boolean {
+export function belongsInConfirmationQueue(ctx: ToolVisibilityContext): boolean {
   const displayName = ctx.displayName ?? ctx.name;
 
   // Narrative background tools auto-execute and never require confirmation
@@ -147,8 +143,7 @@ export function isVisibleInToolGroup(
 
   // In Plan Mode, edits are redundant because the plan shows the diffs.
   if (
-    (displayName === WRITE_FILE_DISPLAY_NAME ||
-      displayName === EDIT_DISPLAY_NAME) &&
+    (displayName === WRITE_FILE_DISPLAY_NAME || displayName === EDIT_DISPLAY_NAME) &&
     ctx.approvalMode === ApprovalMode.PLAN
   ) {
     return false;

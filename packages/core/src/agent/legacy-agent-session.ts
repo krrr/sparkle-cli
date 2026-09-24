@@ -141,10 +141,7 @@ export class LegacyAgentProtocol implements AgentProtocol {
     this._abortController.abort();
   }
 
-  private _scheduleRunLoop(
-    initialParts: Part[],
-    displayContent?: string,
-  ): void {
+  private _scheduleRunLoop(initialParts: Part[], displayContent?: string): void {
     // Use a macrotask so send() resolves with the streamId before agent_start
     // is emitted and consumers can attach to the stream without racing startup.
     setTimeout(() => {
@@ -295,9 +292,7 @@ export class LegacyAgentProtocol implements AgentProtocol {
           .getChat()
           .recordCompletedToolCalls(currentModel, completedToolCalls);
       } catch (error) {
-        debugLogger.error(
-          `Error recording completed tool call information: ${error}`,
-        );
+        debugLogger.error(`Error recording completed tool call information: ${error}`);
       }
 
       const stopTool = completedToolCalls.find(
@@ -367,10 +362,7 @@ export class LegacyAgentProtocol implements AgentProtocol {
     }
   }
 
-  private _finishStream(
-    reason: StreamEndReason,
-    data?: Record<string, unknown>,
-  ): void {
+  private _finishStream(reason: StreamEndReason, data?: Record<string, unknown>): void {
     if (data && !this._agentEndEmitted) {
       this._emit([this._makeAgentEndEvent(reason, data)]);
     } else {
@@ -477,10 +469,7 @@ export class LegacyAgentProtocol implements AgentProtocol {
   }
 
   private _makeErrorEvent(
-    payload: Omit<
-      AgentEvent<'error'>,
-      'id' | 'timestamp' | 'streamId' | 'type'
-    >,
+    payload: Omit<AgentEvent<'error'>, 'id' | 'timestamp' | 'streamId' | 'type'>,
   ): AgentEvent<'error'> {
     const event = {
       ...this._nextEventFields(),

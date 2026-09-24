@@ -9,10 +9,7 @@ import { rewindCommand } from './rewindCommand.js';
 import { createMockCommandContext } from '../../test-utils/mockCommandContext.js';
 import { waitFor } from '../../test-utils/async.js';
 import { RewindOutcome } from '../components/RewindConfirmation.js';
-import {
-  type OpenCustomDialogActionReturn,
-  type CommandContext,
-} from './types.js';
+import { type OpenCustomDialogActionReturn, type CommandContext } from './types.js';
 import type { ReactElement } from 'react';
 import { coreEvents } from 'sparkle-cli-core';
 
@@ -173,10 +170,7 @@ describe('rewindCommand', () => {
         'msg-id-123',
       );
       expect(mockRewindTo).toHaveBeenCalledWith('msg-id-123');
-      expect(mockLoadHistory).toHaveBeenCalledWith(
-        expect.any(Array),
-        'New Prompt',
-      );
+      expect(mockLoadHistory).toHaveBeenCalledWith(expect.any(Array), 'New Prompt');
     });
     expect(mockSetInput).not.toHaveBeenCalled();
   });
@@ -252,10 +246,7 @@ describe('rewindCommand', () => {
     await onRewind('msg-1', 'Prompt', RewindOutcome.RewindOnly);
 
     await waitFor(() => {
-      expect(coreEvents.emitFeedback).toHaveBeenCalledWith(
-        'error',
-        'Rewind Failed',
-      );
+      expect(coreEvents.emitFeedback).toHaveBeenCalledWith('error', 'Rewind Failed');
     });
   });
 

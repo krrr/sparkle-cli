@@ -47,11 +47,7 @@ export class ReadMcpResourceTool extends BaseDeclarativeTool<
   protected createInvocation(
     params: ReadMcpResourceParams,
   ): ReadMcpResourceToolInvocation {
-    return new ReadMcpResourceToolInvocation(
-      this.context,
-      params,
-      this.messageBus,
-    );
+    return new ReadMcpResourceToolInvocation(this.context, params, this.messageBus);
   }
 }
 
@@ -78,9 +74,7 @@ class ReadMcpResourceToolInvocation extends BaseToolInvocation<
     return `Read MCP resource: ${this.params.uri}`;
   }
 
-  async execute({
-    abortSignal: _abortSignal,
-  }: ExecuteOptions): Promise<ToolResult> {
+  async execute({ abortSignal: _abortSignal }: ExecuteOptions): Promise<ToolResult> {
     const mcpManager = this.context.config.getMcpClientManager();
     if (!mcpManager) {
       return {

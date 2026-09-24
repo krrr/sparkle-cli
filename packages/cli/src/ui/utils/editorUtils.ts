@@ -143,14 +143,10 @@ export async function openFileInEditor(
 
   try {
     if (isTerminal) {
-      const result = spawnSync(
-        executable,
-        [...initialArgs, ...extraArgs, ...args],
-        {
-          stdio: 'inherit',
-          shell: process.platform === 'win32',
-        },
-      );
+      const result = spawnSync(executable, [...initialArgs, ...extraArgs, ...args], {
+        stdio: 'inherit',
+        shell: process.platform === 'win32',
+      });
       if (result.error) {
         const spawnErr = result.error as NodeJS.ErrnoException;
         coreEvents.emitFeedback(
@@ -170,14 +166,10 @@ export async function openFileInEditor(
       }
     } else {
       await new Promise<void>((resolve) => {
-        const child = spawn(
-          executable,
-          [...initialArgs, ...extraArgs, ...args],
-          {
-            stdio: 'inherit',
-            shell: process.platform === 'win32',
-          },
-        );
+        const child = spawn(executable, [...initialArgs, ...extraArgs, ...args], {
+          stdio: 'inherit',
+          shell: process.platform === 'win32',
+        });
 
         child.on('error', (err) => {
           const spawnErr = err as NodeJS.ErrnoException;

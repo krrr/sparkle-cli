@@ -65,8 +65,7 @@ describe('extension reloading', () => {
       goodbye: () => ({ content: [{ type: 'text', text: 'world' }] }),
     });
     extension.version = '0.0.2';
-    extension.mcpServers['test-server'].httpUrl =
-      `http://localhost:${portB}/mcp`;
+    extension.mcpServers['test-server'].httpUrl = `http://localhost:${portB}/mcp`;
     writeFileSync(testServerPath, safeJsonStringify(extension, 2));
 
     // Start the CLI.
@@ -88,9 +87,8 @@ describe('extension reloading', () => {
       () => {
         const output = stripAnsi(run.output);
         return (
-          output.includes(
-            'test-server (from test-extension) - Ready (1 tool)',
-          ) && output.includes('- mcp_test-server_hello')
+          output.includes('test-server (from test-extension) - Ready (1 tool)') &&
+          output.includes('- mcp_test-server_hello')
         );
       },
       30000, // 30s timeout
@@ -102,9 +100,7 @@ describe('extension reloading', () => {
     await run.type('\r');
     await new Promise((resolve) => setTimeout(resolve, 500));
     await run.type('\r');
-    await run.expectText(
-      ` * test-server (remote): http://localhost:${portB}/mcp`,
-    );
+    await run.expectText(` * test-server (remote): http://localhost:${portB}/mcp`);
     await run.type('\r'); // consent
     await run.expectText(
       'Extension "test-extension" successfully updated: 0.0.1 → 0.0.2',
@@ -117,9 +113,7 @@ describe('extension reloading', () => {
         await run.type('\r');
       },
       () =>
-        stripAnsi(run.output).includes(
-          'test-extension (v0.0.2) - active (updated)',
-        ),
+        stripAnsi(run.output).includes('test-extension (v0.0.2) - active (updated)'),
       30000,
     );
 
@@ -132,9 +126,8 @@ describe('extension reloading', () => {
       () => {
         const output = stripAnsi(run.output);
         return (
-          output.includes(
-            'test-server (from test-extension) - Ready (1 tool)',
-          ) && output.includes('- mcp_test-server_goodbye')
+          output.includes('test-server (from test-extension) - Ready (1 tool)') &&
+          output.includes('- mcp_test-server_goodbye')
         );
       },
       30000,

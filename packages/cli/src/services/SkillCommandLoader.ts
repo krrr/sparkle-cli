@@ -47,9 +47,7 @@ export class SkillCommandLoader implements ICommandLoader {
           toolName: ACTIVATE_SKILL_TOOL_NAME,
           toolArgs: { name: skill.name },
           postSubmitPrompt:
-            args.trim().length > 0
-              ? args.trim()
-              : `Use the skill ${skill.name}`,
+            args.trim().length > 0 ? args.trim() : `Use the skill ${skill.name}`,
         }),
       };
     });

@@ -171,12 +171,7 @@ describe('useAtCompletion', () => {
       vi.spyOn(FileSearchFactory, 'create').mockReturnValue(fileSearch);
 
       const { result } = await renderHook(() =>
-        useTestHarnessForAtCompletion(
-          true,
-          'CrAzYCaSe',
-          mockConfig,
-          testRootDir,
-        ),
+        useTestHarnessForAtCompletion(true, 'CrAzYCaSe', mockConfig, testRootDir),
       );
 
       // The hook should find 'cRaZycAsE.txt' even though the pattern is 'CrAzYCaSe'.
@@ -264,9 +259,7 @@ describe('useAtCompletion', () => {
       );
 
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'a.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['a.txt']);
       });
       expect(result.current.isLoadingSuggestions).toBe(false);
 
@@ -274,9 +267,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the final result
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'b.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['b.txt']);
       });
 
       expect(result.current.isLoadingSuggestions).toBe(false);
@@ -332,9 +323,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the initial search to complete (using real timers)
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'a.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['a.txt']);
       });
 
       // Now switch to fake timers for precise control of the loading behavior
@@ -362,9 +351,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the search results to be processed
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'b.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['b.txt']);
       });
 
       expect(result.current.isLoadingSuggestions).toBe(false);
@@ -406,10 +393,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the hook to be ready (initialization is complete)
       await waitFor(() => {
-        expect(mockFileSearch.search).toHaveBeenCalledWith(
-          'a',
-          expect.any(Object),
-        );
+        expect(mockFileSearch.search).toHaveBeenCalledWith('a', expect.any(Object));
       });
 
       // Now that the first search is in-flight, trigger the second one.
@@ -429,10 +413,7 @@ describe('useAtCompletion', () => {
       );
 
       // The search spy should have been called for both patterns.
-      expect(mockFileSearch.search).toHaveBeenCalledWith(
-        'b',
-        expect.any(Object),
-      );
+      expect(mockFileSearch.search).toHaveBeenCalledWith('b', expect.any(Object));
     });
   });
 
@@ -449,9 +430,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the hook to be ready and have suggestions
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'a.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['a.txt']);
       });
 
       // Now, disable the hook
@@ -604,9 +583,7 @@ describe('useAtCompletion', () => {
 
       // Wait for initial suggestions from the first directory
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'file1.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['file1.txt']);
       });
 
       // Change the CWD
@@ -622,9 +599,7 @@ describe('useAtCompletion', () => {
 
       // Wait for the new suggestions from the second directory
       await waitFor(() => {
-        expect(result.current.suggestions.map((s) => s.value)).toEqual([
-          'file2.txt',
-        ]);
+        expect(result.current.suggestions.map((s) => s.value)).toEqual(['file2.txt']);
       });
       expect(result.current.isLoadingSuggestions).toBe(false);
 
@@ -665,12 +640,7 @@ describe('useAtCompletion', () => {
       );
 
       const { result } = await renderHook(() =>
-        useTestHarnessForAtCompletion(
-          true,
-          '',
-          nonRecursiveConfig,
-          testRootDir,
-        ),
+        useTestHarnessForAtCompletion(true, '', nonRecursiveConfig, testRootDir),
       );
 
       await act(async () => {
@@ -721,9 +691,7 @@ describe('useAtCompletion', () => {
       await waitFor(() => {
         const values = result.current.suggestions.map((s) => s.value);
         expect(values).toContain('main.txt');
-        expect(values).toContain(
-          escapePath(path.join(addedDir, 'added-file.txt')),
-        );
+        expect(values).toContain(escapePath(path.join(addedDir, 'added-file.txt')));
       });
     });
 
@@ -769,9 +737,7 @@ describe('useAtCompletion', () => {
 
       await waitFor(() => {
         const values = result.current.suggestions.map((s) => s.value);
-        expect(values).toContain(
-          escapePath(path.join(addedDir, 'new-file.txt')),
-        );
+        expect(values).toContain(escapePath(path.join(addedDir, 'new-file.txt')));
       });
     });
 
@@ -801,9 +767,7 @@ describe('useAtCompletion', () => {
         const readmeEntries = values.filter((v) => v.includes('readme.md'));
         expect(readmeEntries.length).toBe(2);
         expect(readmeEntries).toContain('readme.md');
-        expect(readmeEntries).toContain(
-          escapePath(path.join(dir2, 'readme.md')),
-        );
+        expect(readmeEntries).toContain(escapePath(path.join(dir2, 'readme.md')));
       });
     });
   });

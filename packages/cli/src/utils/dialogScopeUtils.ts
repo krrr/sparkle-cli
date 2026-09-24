@@ -63,10 +63,7 @@ export function getScopeMessageForSetting(
 
   const modifiedScopesStr = modifiedInOtherScopes.join(', ');
   const currentScopeSettings = settings.forScope(selectedScope).settings;
-  const existsInCurrentScope = isInSettingsScope(
-    settingKey,
-    currentScopeSettings,
-  );
+  const existsInCurrentScope = isInSettingsScope(settingKey, currentScopeSettings);
 
   return existsInCurrentScope
     ? `(Also modified in ${modifiedScopesStr})`

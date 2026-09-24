@@ -47,14 +47,9 @@ export {
 import { resolveEnvVarsInObject } from '../utils/envVarResolver.js';
 import { customDeepMerge } from '../utils/deepMerge.js';
 import { updateSettingsFilePreservingFormat } from '../utils/commentJson.js';
-import {
-  validateSettings,
-  formatValidationError,
-} from './settings-validation.js';
+import { validateSettings, formatValidationError } from './settings-validation.js';
 
-export function getMergeStrategyForPath(
-  path: string[],
-): MergeStrategy | undefined {
+export function getMergeStrategyForPath(path: string[]): MergeStrategy | undefined {
   let current: SettingDefinition | undefined = undefined;
   let currentSchema: SettingsSchema | undefined = getSettingsSchema();
   let parent: SettingDefinition | undefined = undefined;
@@ -111,10 +106,7 @@ export function getSystemDefaultsPath(): string {
   if (process.env['SPARKLE_CLI_SYSTEM_DEFAULTS_PATH']) {
     return process.env['SPARKLE_CLI_SYSTEM_DEFAULTS_PATH'];
   }
-  return path.join(
-    path.dirname(getSystemSettingsPath()),
-    'system-defaults.json',
-  );
+  return path.join(path.dirname(getSystemSettingsPath()), 'system-defaults.json');
 }
 
 export type { DnsResolutionOrder } from './settingsSchema.js';
@@ -202,11 +194,7 @@ export interface SettingsFile {
   readOnly?: boolean;
 }
 
-function setNestedProperty(
-  obj: Record<string, unknown>,
-  path: string,
-  value: unknown,
-) {
+function setNestedProperty(obj: Record<string, unknown>, path: string, value: unknown) {
   const keys = path.split('.');
   const lastKey = keys.pop();
   if (!lastKey) return;
@@ -317,9 +305,7 @@ export class LoadedSettings {
     this.user = user;
     this._workspaceFile = workspace;
     this.isTrusted = isTrusted;
-    this.workspace = isTrusted
-      ? workspace
-      : this.createEmptyWorkspace(workspace);
+    this.workspace = isTrusted ? workspace : this.createEmptyWorkspace(workspace);
     this.errors = errors;
     this._merged = this.computeMergedSettings();
     this._snapshot = this.computeSnapshot();
@@ -437,9 +423,7 @@ export class LoadedSettings {
 
     // Clone value to prevent reference sharing
     const valueToSet =
-      typeof value === 'object' && value !== null
-        ? structuredClone(value)
-        : value;
+      typeof value === 'object' && value !== null ? structuredClone(value) : value;
 
     setNestedProperty(settingsFile.settings, key, valueToSet);
 
@@ -462,12 +446,7 @@ export class LoadedSettings {
    * Returns a consolidated list of excluded MCP servers across all settings files.
    */
   getConsolidatedExcludedMcpServers(): string[] {
-    const scopes = [
-      this.system,
-      this.systemDefaults,
-      this.user,
-      this.workspace,
-    ];
+    const scopes = [this.system, this.systemDefaults, this.user, this.workspace];
     return scopes.flatMap((scope) => {
       const excluded = scope?.settings?.mcp?.excluded;
       return Array.isArray(excluded) ? excluded : [];
@@ -478,12 +457,7 @@ export class LoadedSettings {
    * Returns a consolidated list of allowed MCP servers (via intersection of all defined lists).
    */
   getConsolidatedAllowedMcpServers(): string[] | undefined {
-    const scopes = [
-      this.system,
-      this.systemDefaults,
-      this.user,
-      this.workspace,
-    ];
+    const scopes = [this.system, this.systemDefaults, this.user, this.workspace];
     const definedAllowlists = scopes.flatMap((scope) => {
       const allowed = scope?.settings?.mcp?.allowed;
       return Array.isArray(allowed) ? [allowed] : [];
@@ -497,9 +471,7 @@ export class LoadedSettings {
       const normalizedCurrent = new Set(
         current.map((item) => item.toLowerCase().trim()),
       );
-      return acc.filter((item) =>
-        normalizedCurrent.has(item.toLowerCase().trim()),
-      );
+      return acc.filter((item) => normalizedCurrent.has(item.toLowerCase().trim()));
     });
   }
 }
@@ -556,12 +528,10 @@ export function loadEnvironment(
   // that happens early in the CLI lifecycle.
   const args = process.argv.slice(2);
   const doubleDashIndex = args.indexOf('--');
-  const relevantArgs =
-    doubleDashIndex === -1 ? args : args.slice(0, doubleDashIndex);
+  const relevantArgs = doubleDashIndex === -1 ? args : args.slice(0, doubleDashIndex);
 
   const shouldIgnoreEnv =
-    !!settings.advanced?.ignoreLocalEnv ||
-    relevantArgs.includes('--ignore-env');
+    !!settings.advanced?.ignoreLocalEnv || relevantArgs.includes('--ignore-env');
 
   const envFilePath = findEnvFile(workspaceDir, isTrusted, shouldIgnoreEnv);
 
@@ -627,9 +597,7 @@ export function isWorktreeEnabled(settings: LoadedSettings): boolean {
  * Loads settings from user and workspace directories.
  * Project settings override user settings.
  */
-export function loadSettings(
-  workspaceDir: string = process.cwd(),
-): LoadedSettings {
+export function loadSettings(workspaceDir: string = process.cwd()): LoadedSettings {
   const normalizedWorkspaceDir = path.resolve(workspaceDir);
   return settingsCache.getOrCreate(normalizedWorkspaceDir, () =>
     _doLoadSettings(normalizedWorkspaceDir),
@@ -676,17 +644,12 @@ function _doLoadSettings(workspaceDir: string): LoadedSettings {
         const settingsObject = rawSettings as Record<string, unknown>;
 
         // Expand environment variables
-        const expandedSettings = resolveEnvVarsInObject(
-          settingsObject as Settings,
-        );
+        const expandedSettings = resolveEnvVarsInObject(settingsObject as Settings);
 
         // Validate settings structure with Zod after environment variable expansion
         const validationResult = validateSettings(expandedSettings);
         if (!validationResult.success && validationResult.error) {
-          const errorMessage = formatValidationError(
-            validationResult.error,
-            filePath,
-          );
+          const errorMessage = formatValidationError(validationResult.error, filePath);
           settingsErrors.push({
             message: errorMessage,
             path: filePath,
@@ -741,9 +704,7 @@ function _doLoadSettings(workspaceDir: string): LoadedSettings {
     systemDefaultsResult.rawSettings,
   );
   const userOriginalSettings = structuredClone(userResult.rawSettings);
-  const workspaceOriginalSettings = structuredClone(
-    workspaceResult.rawSettings,
-  );
+  const workspaceOriginalSettings = structuredClone(workspaceResult.rawSettings);
 
   // Environment variables for runtime use are already resolved and validated in load()
   systemSettings = systemResult.settings;
@@ -772,8 +733,8 @@ function _doLoadSettings(workspaceDir: string): LoadedSettings {
     systemSettings,
   );
   const isTrusted =
-    isWorkspaceTrusted(initialTrustCheckSettings as Settings, workspaceDir)
-      .isTrusted ?? false;
+    isWorkspaceTrusted(initialTrustCheckSettings as Settings, workspaceDir).isTrusted ??
+    false;
 
   // Create a temporary merged settings object to pass to loadEnvironment.
   const tempMergedSettings = mergeSettings(
@@ -863,13 +824,9 @@ export function saveSettings(settingsFile: SettingsFile): void {
   }
 }
 
-export function saveModelChange(
-  loadedSettings: LoadedSettings,
-  model: string,
-): void {
+export function saveModelChange(loadedSettings: LoadedSettings, model: string): void {
   try {
-    const selectedProviderId =
-      loadedSettings.merged.security.auth.selectedProviderId;
+    const selectedProviderId = loadedSettings.merged.security.auth.selectedProviderId;
     const providers = loadedSettings.merged.security.auth.providers || [];
     if (selectedProviderId && providers.length > 0) {
       const updated = providers.map((p) => {
@@ -882,11 +839,7 @@ export function saveModelChange(
         }
         return p;
       });
-      loadedSettings.setValue(
-        SettingScope.User,
-        'security.auth.providers',
-        updated,
-      );
+      loadedSettings.setValue(SettingScope.User, 'security.auth.providers', updated);
     }
   } catch (error) {
     const detailedErrorMessage = getFsErrorMessage(error);

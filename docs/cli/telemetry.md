@@ -1,35 +1,34 @@
 # Observability with OpenTelemetry
 
-Observability is the key to turning experimental AI into reliable software.
-Sparkle CLI provides built-in support for OpenTelemetry, transforming every
-agent interaction into a rich stream of logs, metrics, and traces. This
-three-pillar approach gives you the high-fidelity visibility needed to
-understand agent behavior, optimize performance, and ensure reliability across
-your entire workflow.
+Observability is the key to turning experimental AI into reliable software. Sparkle CLI
+provides built-in support for OpenTelemetry, transforming every agent interaction into a
+rich stream of logs, metrics, and traces. This three-pillar approach gives you the
+high-fidelity visibility needed to understand agent behavior, optimize performance, and
+ensure reliability across your entire workflow.
 
 Whether you are debugging a complex tool interaction locally or monitoring
-enterprise-wide usage in the cloud, Sparkle CLI's observability system provides
-the actionable intelligence needed to move from "black box" AI to predictable,
+enterprise-wide usage in the cloud, Sparkle CLI's observability system provides the
+actionable intelligence needed to move from "black box" AI to predictable,
 high-performance systems.
 
 ## OpenTelemetry integration
 
-Sparkle CLI integrates with **[OpenTelemetry]**, a vendor-neutral,
-industry-standard observability framework.
+Sparkle CLI integrates with **[OpenTelemetry]**, a vendor-neutral, industry-standard
+observability framework.
 
 The observability system provides:
 
 - Standardized data: Use consistent formats and collection methods across your
   toolchain.
-- Local output: Capture logs, metrics, and traces to a file or the console for
-  debugging and performance analysis.
+- Local output: Capture logs, metrics, and traces to a file or the console for debugging
+  and performance analysis.
 
 [OpenTelemetry]: https://opentelemetry.io/
 
 ## Configuration
 
-You control telemetry behavior through the `.sparkle/settings.json` file.
-Environment variables can override these settings.
+You control telemetry behavior through the `.sparkle/settings.json` file. Environment
+variables can override these settings.
 
 | Setting      | Environment Variable              | Description                                 | Values         | Default |
 | ------------ | --------------------------------- | ------------------------------------------- | -------------- | ------- |
@@ -39,16 +38,16 @@ Environment variables can override these settings.
 | `logPrompts` | `GEMINI_TELEMETRY_LOG_PROMPTS`    | Include prompts in telemetry logs           | `true`/`false` | `true`  |
 | -            | `SPARKLE_CLI_SURFACE`             | Optional custom label for traffic reporting | string         | -       |
 
-**Note on boolean environment variables:** For boolean settings like `enabled`,
-setting the environment variable to `true` or `1` enables the feature.
+**Note on boolean environment variables:** For boolean settings like `enabled`, setting
+the environment variable to `true` or `1` enables the feature.
 
 For detailed configuration information, see the
 [Configuration guide](../reference/configuration.md).
 
 ## Local telemetry
 
-You can capture telemetry data locally for development and debugging. We
-recommend using file-based output for local development.
+You can capture telemetry data locally for development and debugging. We recommend using
+file-based output for local development.
 
 1.  Enable telemetry in `.sparkle/settings.json`:
     ```json
@@ -64,15 +63,15 @@ recommend using file-based output for local development.
 
 ## Client identification
 
-Sparkle CLI includes identifiers in its `User-Agent` header to help you
-differentiate and report on API traffic from different environments (for
-example, identifying calls from the IDE companion versus a standard terminal).
+Sparkle CLI includes identifiers in its `User-Agent` header to help you differentiate
+and report on API traffic from different environments (for example, identifying calls
+from the IDE companion versus a standard terminal).
 
 ### Automatic identification
 
 Most integrated environments are identified automatically without additional
-configuration. The identifier is included as a prefix to the `User-Agent` and as
-a "surface" tag in the parenthetical metadata.
+configuration. The identifier is included as a prefix to the `User-Agent` and as a
+"surface" tag in the parenthetical metadata.
 
 | Environment                 | User-Agent Prefix            | Surface Tag |
 | :-------------------------- | :--------------------------- | :---------- |
@@ -85,10 +84,9 @@ a "surface" tag in the parenthetical metadata.
 
 ### Custom identification
 
-You can provide a custom identifier for your own scripts or automation by
-setting the `SPARKLE_CLI_SURFACE` environment variable. This is useful for
-tracking specific internal tools or distribution channels in your telemetry
-logs.
+You can provide a custom identifier for your own scripts or automation by setting the
+`SPARKLE_CLI_SURFACE` environment variable. This is useful for tracking specific
+internal tools or distribution channels in your telemetry logs.
 
 **macOS/Linux**
 
@@ -107,16 +105,16 @@ When set, the value appears at the end of the `User-Agent` parenthetical:
 
 ## Logs, metrics, and traces
 
-This section describes the structure of logs, metrics, and traces generated by
-Sparkle CLI.
+This section describes the structure of logs, metrics, and traces generated by Sparkle
+CLI.
 
-Sparkle CLI includes `session.id`, `installation.id`, `active_approval_mode`,
-and `user.email` (when authenticated) as common attributes on all data.
+Sparkle CLI includes `session.id`, `installation.id`, `active_approval_mode`, and
+`user.email` (when authenticated) as common attributes on all data.
 
 ### Logs
 
-Logs provide timestamped records of specific events. Sparkle CLI logs events
-across several categories.
+Logs provide timestamped records of specific events. Sparkle CLI logs events across
+several categories.
 
 #### Sessions
 
@@ -755,11 +753,11 @@ Incremented once per CLI startup.
 
 Tracks onboarding flow from authentication to the user
 
-- `gemini_cli.onboarding.start` (Counter, Int): Incremented when the
-  authentication flow begins.
+- `gemini_cli.onboarding.start` (Counter, Int): Incremented when the authentication flow
+  begins.
 
-- `gemini_cli.onboarding.success` (Counter, Int): Incremented when the user
-onboarding flow completes successfully.
+- `gemini_cli.onboarding.success` (Counter, Int): Incremented when the user onboarding
+flow completes successfully.
 <details>
 <summary>Attributes (Success)</summary>
 
@@ -1032,8 +1030,7 @@ Breaks down tool time by phase.
 <summary>Attributes</summary>
 
 - `function_name` (string)
-- `phase` (string: "validation", "preparation", "execution",
-  "result_processing")
+- `phase` (string: "validation", "preparation", "execution", "result_processing")
 
 </details>
 
@@ -1049,8 +1046,8 @@ These metrics follow standard [OpenTelemetry GenAI semantic conventions].
 
 ### Traces
 
-Traces provide an "under-the-hood" view of agent and backend operations. Use
-traces to debug tool interactions and optimize performance.
+Traces provide an "under-the-hood" view of agent and backend operations. Use traces to
+debug tool interactions and optimize performance.
 
 <!-- prettier-ignore -->
 > [!NOTE]
@@ -1063,9 +1060,8 @@ Every trace captures rich metadata via standard span attributes.
 <details open>
 <summary>Standard span attributes</summary>
 
-- `gen_ai.operation.name`: High-level operation (for example, `tool_call`,
-  `llm_call`, `user_prompt`, `system_prompt`, `agent_call`, or
-  `schedule_tool_calls`).
+- `gen_ai.operation.name`: High-level operation (for example, `tool_call`, `llm_call`,
+  `user_prompt`, `system_prompt`, `agent_call`, or `schedule_tool_calls`).
 - `gen_ai.agent.name`: Set to `sparkle-cli`.
 - `gen_ai.agent.description`: The service agent description.
 - `gen_ai.input.messages`: Input data or metadata.

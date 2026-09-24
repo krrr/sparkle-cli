@@ -20,8 +20,7 @@ describe('<SectionHeader />', () => {
       width: 40,
     },
     {
-      description:
-        'renders correctly when title is truncated but still shows dashes',
+      description: 'renders correctly when title is truncated but still shows dashes',
       title: 'Very Long Header Title That Will Truncate',
       width: 20,
     },

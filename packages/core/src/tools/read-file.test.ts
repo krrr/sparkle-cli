@@ -151,9 +151,7 @@ describe('ReadFileTool', () => {
         file_path: 'test.txt',
         start_line: 0,
       };
-      expect(() => tool.build(params)).toThrow(
-        'params/start_line must be >= 1',
-      );
+      expect(() => tool.build(params)).toThrow('params/start_line must be >= 1');
     });
 
     it('should throw error if end_line is less than 1', () => {
@@ -184,9 +182,7 @@ describe('ReadFileTool', () => {
       };
       const invocation = tool.build(params);
       expect(typeof invocation).not.toBe('string');
-      expect(invocation.getDescription()).toBe(
-        path.join('sub', 'dir', 'file.txt'),
-      );
+      expect(invocation.getDescription()).toBe(path.join('sub', 'dir', 'file.txt'));
     });
 
     it('should return shortened path when file path is deep', () => {
@@ -218,9 +214,7 @@ describe('ReadFileTool', () => {
       };
       const invocation = tool.build(params);
       expect(typeof invocation).not.toBe('string');
-      expect(invocation.getDescription()).toBe(
-        path.join('sub', 'dir', 'file.txt'),
-      );
+      expect(invocation.getDescription()).toBe(path.join('sub', 'dir', 'file.txt'));
     });
 
     it('should return . if path is the root directory', () => {
@@ -320,9 +314,7 @@ describe('ReadFileTool', () => {
       const result = await invocation.execute({ abortSignal });
       expect(result).toHaveProperty('error');
       expect(result.error?.type).toBe(ToolErrorType.FILE_TOO_LARGE);
-      expect(result.error?.message).toContain(
-        'File size exceeds the 20MB limit',
-      );
+      expect(result.error?.message).toContain('File size exceeds the 20MB limit');
     });
 
     it('should handle text file with lines exceeding maximum length', async () => {
@@ -344,9 +336,7 @@ describe('ReadFileTool', () => {
     it('should handle image file and return appropriate content', async () => {
       const imagePath = path.join(tempRootDir, 'image.png');
       // Minimal PNG header
-      const pngHeader = Buffer.from([
-        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
-      ]);
+      const pngHeader = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
       await fsp.writeFile(imagePath, pngHeader);
       const params: ReadFileToolParams = { file_path: imagePath };
       const invocation = tool.build(params);
@@ -418,9 +408,7 @@ describe('ReadFileTool', () => {
       expect(result.llmContent).toBe(
         'Cannot display content of SVG file larger than 1MB: large.svg',
       );
-      expect(result.returnDisplay).toBe(
-        'Skipped large SVG file (>1MB): large.svg',
-      );
+      expect(result.returnDisplay).toBe('Skipped large SVG file (>1MB): large.svg');
     });
 
     it('should handle empty file', async () => {
@@ -457,9 +445,7 @@ describe('ReadFileTool', () => {
       expect(result.llmContent).toContain('Line 6');
       expect(result.llmContent).toContain('Line 7');
       expect(result.llmContent).toContain('Line 8');
-      expect(result.returnDisplay).toBe(
-        'Read lines 6-8 of 20 from paginated.txt',
-      );
+      expect(result.returnDisplay).toBe('Read lines 6-8 of 20 from paginated.txt');
     });
 
     it('should successfully read files from project temp directory', async () => {
@@ -504,10 +490,7 @@ describe('ReadFileTool', () => {
             const projectTempDir = this.storage.getProjectTempDir();
             return isSubpath(path.resolve(projectTempDir), absolutePath);
           },
-          validatePathAccess(
-            this: Config,
-            absolutePath: string,
-          ): string | null {
+          validatePathAccess(this: Config, absolutePath: string): string | null {
             if (this.isPathAllowed(absolutePath)) {
               return null;
             }
@@ -578,10 +561,7 @@ describe('ReadFileTool', () => {
             const projectTempDir = this.storage.getProjectTempDir();
             return isSubpath(path.resolve(projectTempDir), absolutePath);
           },
-          validatePathAccess(
-            this: Config,
-            absolutePath: string,
-          ): string | null {
+          validatePathAccess(this: Config, absolutePath: string): string | null {
             if (this.isPathAllowed(absolutePath)) {
               return null;
             }
@@ -592,10 +572,7 @@ describe('ReadFileTool', () => {
           },
         } as unknown as Config;
 
-        const toolNoIgnore = new ReadFileTool(
-          configNoIgnore,
-          createMockMessageBus(),
-        );
+        const toolNoIgnore = new ReadFileTool(configNoIgnore, createMockMessageBus());
         const params: ReadFileToolParams = {
           file_path: ignoredFilePath,
         };
@@ -660,9 +637,7 @@ describe('ReadFileTool', () => {
       const invocation = tool.build({ file_path: filePath });
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).not.toContain(
-        'Newly Discovered Project Context',
-      );
+      expect(result.llmContent).not.toContain('Newly Discovered Project Context');
     });
 
     it('should append JIT context as Part array for non-string llmContent (binary files)', async () => {
@@ -673,12 +648,12 @@ describe('ReadFileTool', () => {
 
       // Create a minimal valid PNG file (1x1 pixel)
       const pngHeader = Buffer.from([
-        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
-        0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-        0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xde, 0x00, 0x00, 0x00,
-        0x0c, 0x49, 0x44, 0x41, 0x54, 0x08, 0xd7, 0x63, 0xf8, 0xcf, 0xc0, 0x00,
-        0x00, 0x00, 0x02, 0x00, 0x01, 0xe2, 0x21, 0xbc, 0x33, 0x00, 0x00, 0x00,
-        0x00, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49,
+        0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x02,
+        0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xde, 0x00, 0x00, 0x00, 0x0c, 0x49, 0x44,
+        0x41, 0x54, 0x08, 0xd7, 0x63, 0xf8, 0xcf, 0xc0, 0x00, 0x00, 0x00, 0x02, 0x00,
+        0x01, 0xe2, 0x21, 0xbc, 0x33, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44,
+        0xae, 0x42, 0x60, 0x82,
       ]);
       const filePath = path.join(tempRootDir, 'test-image.png');
       await fsp.writeFile(filePath, pngHeader);
@@ -696,12 +671,8 @@ describe('ReadFileTool', () => {
           typeof p['text'] === 'string' && p['text'].includes('Auth rules'),
       );
       expect(jitTextPart).toBeDefined();
-      expect(jitTextPart!['text']).toContain(
-        'Newly Discovered Project Context',
-      );
-      expect(jitTextPart!['text']).toContain(
-        'Auth rules: use httpOnly cookies.',
-      );
+      expect(jitTextPart!['text']).toContain('Newly Discovered Project Context');
+      expect(jitTextPart!['text']).toContain('Auth rules: use httpOnly cookies.');
     });
   });
 });

@@ -79,10 +79,7 @@ function toContent(content: ContentUnion, preserveThoughts: boolean): Content {
 /**
  * Converts an array of PartUnion into an array of Part.
  */
-export function toParts(
-  parts: PartUnion[],
-  preserveThoughts: boolean = false,
-): Part[] {
+export function toParts(parts: PartUnion[], preserveThoughts: boolean = false): Part[] {
   return parts.map((p) => toPart(p, preserveThoughts));
 }
 
@@ -119,9 +116,7 @@ function toPart(part: PartUnion, preserveThoughts: boolean): Part {
     // Combine existing text (if any) with the thought, preserving other properties.
     const text = (newPart as { text?: unknown }).text;
     const existingText = text ? String(text) : '';
-    const combinedText = existingText
-      ? `${existingText}\n${thoughtText}`
-      : thoughtText;
+    const combinedText = existingText ? `${existingText}\n${thoughtText}` : thoughtText;
 
     return {
       ...newPart,

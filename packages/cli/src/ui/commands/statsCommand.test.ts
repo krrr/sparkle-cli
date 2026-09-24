@@ -43,9 +43,7 @@ describe('statsCommand', () => {
 
     await statsCommand.action(mockContext, '');
 
-    const expectedDuration = formatDuration(
-      endTime.getTime() - startTime.getTime(),
-    );
+    const expectedDuration = formatDuration(endTime.getTime() - startTime.getTime());
     expect(mockContext.ui.addItem).toHaveBeenCalledWith({
       type: MessageType.STATS,
       duration: expectedDuration,
@@ -55,9 +53,7 @@ describe('statsCommand', () => {
   });
 
   it('should display model stats when using the "model" subcommand', () => {
-    const modelSubCommand = statsCommand.subCommands?.find(
-      (sc) => sc.name === 'model',
-    );
+    const modelSubCommand = statsCommand.subCommands?.find((sc) => sc.name === 'model');
     if (!modelSubCommand?.action) throw new Error('Subcommand has no action');
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -71,9 +67,7 @@ describe('statsCommand', () => {
   });
 
   it('should display tool stats when using the "tools" subcommand', () => {
-    const toolsSubCommand = statsCommand.subCommands?.find(
-      (sc) => sc.name === 'tools',
-    );
+    const toolsSubCommand = statsCommand.subCommands?.find((sc) => sc.name === 'tools');
     if (!toolsSubCommand?.action) throw new Error('Subcommand has no action');
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

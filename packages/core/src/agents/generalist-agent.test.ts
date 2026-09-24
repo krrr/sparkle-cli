@@ -82,8 +82,6 @@ describe('GeneralistAgent', () => {
     // Plan Mode description
     vi.spyOn(config, 'getApprovalMode').mockReturnValue(ApprovalMode.PLAN);
     expect(agent.description).not.toContain('batch refactoring/error fixing');
-    expect(agent.description).toContain(
-      'large-scale investigation and batch planning',
-    );
+    expect(agent.description).toContain('large-scale investigation and batch planning');
   });
 });

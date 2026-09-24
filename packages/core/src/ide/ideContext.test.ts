@@ -4,18 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  IDE_MAX_OPEN_FILES,
-  IDE_MAX_SELECTED_TEXT_LENGTH,
-} from './constants.js';
+import { IDE_MAX_OPEN_FILES, IDE_MAX_SELECTED_TEXT_LENGTH } from './constants.js';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { IdeContextStore } from './ideContext.js';
-import {
-  type IdeContext,
-  FileSchema,
-  IdeContextSchema,
-  type File,
-} from './types.js';
+import { type IdeContext, FileSchema, IdeContextSchema, type File } from './types.js';
 
 describe('ideContext', () => {
   describe('createIdeContextStore', () => {
@@ -335,14 +327,11 @@ describe('ideContext', () => {
     });
 
     it('should truncate the openFiles list if it exceeds the max length', () => {
-      const files: File[] = Array.from(
-        { length: IDE_MAX_OPEN_FILES + 5 },
-        (_, i) => ({
-          path: `file${i}.ts`,
-          timestamp: i,
-          isActive: false,
-        }),
-      );
+      const files: File[] = Array.from({ length: IDE_MAX_OPEN_FILES + 5 }, (_, i) => ({
+        path: `file${i}.ts`,
+        timestamp: i,
+        isActive: false,
+      }));
       const context: IdeContext = {
         workspaceState: {
           openFiles: files,

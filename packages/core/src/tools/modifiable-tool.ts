@@ -11,11 +11,7 @@ import fs from 'node:fs';
 import * as Diff from 'diff';
 import { DEFAULT_DIFF_OPTIONS } from './diffOptions.js';
 import { isNodeError } from '../utils/errors.js';
-import type {
-  AnyDeclarativeTool,
-  DeclarativeTool,
-  ToolResult,
-} from './tools.js';
+import type { AnyDeclarativeTool, DeclarativeTool, ToolResult } from './tools.js';
 import { debugLogger } from '../utils/debugLogger.js';
 
 /**
@@ -64,9 +60,7 @@ function createTempFilesForModify(
   proposedContent: string,
   file_path: string,
 ): { oldPath: string; newPath: string; dirPath: string } {
-  const diffDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'sparkle-cli-tool-modify-'),
-  );
+  const diffDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sparkle-cli-tool-modify-'));
 
   try {
     fs.chmodSync(diffDir, 0o700);
@@ -142,11 +136,7 @@ function getUpdatedParams<ToolParams>(
   return { updatedParams, updatedDiff };
 }
 
-function deleteTempFiles(
-  oldPath: string,
-  newPath: string,
-  dirPath: string,
-): void {
+function deleteTempFiles(oldPath: string, newPath: string, dirPath: string): void {
   try {
     fs.unlinkSync(oldPath);
   } catch {
@@ -177,10 +167,8 @@ export async function modifyWithEditor<ToolParams>(
   _abortSignal: AbortSignal,
   overrides?: ModifyContentOverrides,
 ): Promise<ModifyResult<ToolParams>> {
-  const hasCurrentOverride =
-    overrides !== undefined && 'currentContent' in overrides;
-  const hasProposedOverride =
-    overrides !== undefined && 'proposedContent' in overrides;
+  const hasCurrentOverride = overrides !== undefined && 'currentContent' in overrides;
+  const hasProposedOverride = overrides !== undefined && 'proposedContent' in overrides;
 
   const currentContent = hasCurrentOverride
     ? (overrides.currentContent ?? '')
@@ -198,12 +186,7 @@ export async function modifyWithEditor<ToolParams>(
 
   try {
     await openDiff(oldPath, newPath, editorType);
-    const result = getUpdatedParams(
-      oldPath,
-      newPath,
-      originalParams,
-      modifyContext,
-    );
+    const result = getUpdatedParams(oldPath, newPath, originalParams, modifyContext);
 
     return result;
   } finally {

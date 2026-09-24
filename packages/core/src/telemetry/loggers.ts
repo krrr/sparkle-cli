@@ -89,10 +89,7 @@ import {
 import { bufferTelemetryEvent } from './sdk.js';
 import { uiTelemetryService, type UiEvent } from './uiTelemetry.js';
 
-export function logCliConfiguration(
-  config: Config,
-  event: StartSessionEvent,
-): void {
+export function logCliConfiguration(config: Config, event: StartSessionEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -185,10 +182,7 @@ export function logToolOutputMasking(
   });
 }
 
-export function logFileOperation(
-  config: Config,
-  event: FileOperationEvent,
-): void {
+export function logFileOperation(config: Config, event: FileOperationEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -215,10 +209,7 @@ export function logApiRequest(config: Config, event: ApiRequestEvent): void {
   });
 }
 
-export function logFlashFallback(
-  config: Config,
-  event: FlashFallbackEvent,
-): void {
+export function logFlashFallback(config: Config, event: FlashFallbackEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -229,10 +220,7 @@ export function logFlashFallback(
   });
 }
 
-export function logRipgrepFallback(
-  config: Config,
-  event: RipgrepFallbackEvent,
-): void {
+export function logRipgrepFallback(config: Config, event: RipgrepFallbackEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -315,10 +303,7 @@ export function logApiResponse(config: Config, event: ApiResponseEvent): void {
   });
 }
 
-export function logLoopDetected(
-  config: Config,
-  event: LoopDetectedEvent,
-): void {
+export function logLoopDetected(config: Config, event: LoopDetectedEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -343,10 +328,7 @@ export function logLoopDetectionDisabled(
   });
 }
 
-export function logSlashCommand(
-  config: Config,
-  event: SlashCommandEvent,
-): void {
+export function logSlashCommand(config: Config, event: SlashCommandEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -376,10 +358,7 @@ export function logRewind(config: Config, event: RewindEvent): void {
   });
 }
 
-export function logIdeConnection(
-  config: Config,
-  event: IdeConnectionEvent,
-): void {
+export function logIdeConnection(config: Config, event: IdeConnectionEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -404,10 +383,7 @@ export function logConversationFinishedEvent(
   });
 }
 
-export function logChatCompression(
-  config: Config,
-  event: ChatCompressionEvent,
-): void {
+export function logChatCompression(config: Config, event: ChatCompressionEvent): void {
   const logger = logs.getLogger(SERVICE_NAME);
   const logRecord: LogRecord = {
     body: event.toLogBody(),
@@ -435,10 +411,7 @@ export function logMalformedJsonResponse(
   });
 }
 
-export function logInvalidChunk(
-  config: Config,
-  event: InvalidChunkEvent,
-): void {
+export function logInvalidChunk(config: Config, event: InvalidChunkEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -468,10 +441,7 @@ export function logNetworkRetryAttempt(
   });
 }
 
-export function logContentRetry(
-  config: Config,
-  event: ContentRetryEvent,
-): void {
+export function logContentRetry(config: Config, event: ContentRetryEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -498,10 +468,7 @@ export function logContentRetryFailure(
   });
 }
 
-export function logModelRouting(
-  config: Config,
-  event: ModelRoutingEvent,
-): void {
+export function logModelRouting(config: Config, event: ModelRoutingEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -598,10 +565,7 @@ export async function logExtensionDisable(
   });
 }
 
-export function logEditStrategy(
-  config: Config,
-  event: EditStrategyEvent,
-): void {
+export function logEditStrategy(config: Config, event: EditStrategyEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -636,10 +600,7 @@ export function logAgentFinish(config: Config, event: AgentFinishEvent): void {
   });
 }
 
-export function logRecoveryAttempt(
-  config: Config,
-  event: RecoveryAttemptEvent,
-): void {
+export function logRecoveryAttempt(config: Config, event: RecoveryAttemptEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -666,10 +627,7 @@ export function logWebFetchFallbackAttempt(
   });
 }
 
-export function logLlmLoopCheck(
-  config: Config,
-  event: LlmLoopCheckEvent,
-): void {
+export function logLlmLoopCheck(config: Config, event: LlmLoopCheckEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -680,10 +638,7 @@ export function logLlmLoopCheck(
   });
 }
 
-export function logApprovalModeSwitch(
-  config: Config,
-  event: ApprovalModeSwitchEvent,
-) {
+export function logApprovalModeSwitch(config: Config, event: ApprovalModeSwitchEvent) {
   bufferTelemetryEvent(() => {
     logs.getLogger(SERVICE_NAME).emit({
       body: event.toLogBody(),
@@ -736,10 +691,7 @@ export function logHookCall(config: Config, event: HookCallEvent): void {
   });
 }
 
-export function logStartupStats(
-  config: Config,
-  event: StartupStatsEvent,
-): void {
+export function logStartupStats(config: Config, event: StartupStatsEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -782,10 +734,7 @@ export function logTokenStorageInitialization(
   });
 }
 
-export function logOnboardingStart(
-  config: Config,
-  event: OnboardingStartEvent,
-): void {
+export function logOnboardingStart(config: Config, event: OnboardingStartEvent): void {
   bufferTelemetryEvent(() => {
     const logger = logs.getLogger(SERVICE_NAME);
     const logRecord: LogRecord = {
@@ -825,11 +774,7 @@ export function logBrowserAgentConnection(
     session_mode: 'persistent' | 'isolated' | 'existing';
     headless: boolean;
     success: boolean;
-    error_type?:
-      | 'profile_locked'
-      | 'timeout'
-      | 'connection_refused'
-      | 'unknown';
+    error_type?: 'profile_locked' | 'timeout' | 'connection_refused' | 'unknown';
     tool_count?: number;
   },
 ): void {

@@ -38,10 +38,7 @@ describe('GetInternalDocsTool (Integration)', () => {
     // We need to resolve the path relative to THIS test file to find the expected content
     // Test file is in packages/core/src/tools/
     // Docs are in docs/ (root)
-    const expectedDocsPath = path.resolve(
-      __dirname,
-      '../../../../docs/index.md',
-    );
+    const expectedDocsPath = path.resolve(__dirname, '../../../../docs/index.md');
     const expectedContent = await fs.readFile(expectedDocsPath, 'utf8');
 
     const invocation = tool.build({ path: 'index.md' });

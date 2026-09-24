@@ -68,9 +68,7 @@ describe('useBackgroundTaskManager', () => {
       terminalHeight,
     });
 
-    const newShells = new Map<number, BackgroundTask>([
-      [123, {} as BackgroundTask],
-    ]);
+    const newShells = new Map<number, BackgroundTask>([[123, {} as BackgroundTask]]);
     rerender({
       backgroundTasks: newShells,
       backgroundTaskCount: 1,

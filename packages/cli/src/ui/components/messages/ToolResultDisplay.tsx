@@ -90,9 +90,7 @@ export const ToolResultDisplay: React.FC<ToolResultDisplayProps> = ({
     // Check if string content is valid JSON and pretty-print it
     const prettyJSON =
       typeof contentData === 'string' ? tryParseJSON(contentData) : null;
-    const formattedJSON = prettyJSON
-      ? JSON.stringify(prettyJSON, null, 2)
-      : null;
+    const formattedJSON = prettyJSON ? JSON.stringify(prettyJSON, null, 2) : null;
 
     let content: React.ReactNode;
 
@@ -105,10 +103,7 @@ export const ToolResultDisplay: React.FC<ToolResultDisplayProps> = ({
       );
     } else if (isSubagentProgress(contentData)) {
       content = (
-        <SubagentProgressDisplay
-          progress={contentData}
-          terminalWidth={childWidth}
-        />
+        <SubagentProgressDisplay progress={contentData} terminalWidth={childWidth} />
       );
     } else if (typeof contentData === 'string' && renderOutputAsMarkdown) {
       content = (
@@ -168,9 +163,7 @@ export const ToolResultDisplay: React.FC<ToolResultDisplayProps> = ({
         <AnsiOutputText
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           data={contentData as AnsiOutput}
-          availableTerminalHeight={
-            isAlternateBuffer ? undefined : availableHeight
-          }
+          availableTerminalHeight={isAlternateBuffer ? undefined : availableHeight}
           width={childWidth}
           maxLines={isAlternateBuffer ? undefined : maxLines}
           disableTruncation={shouldDisableTruncation}
@@ -216,9 +209,7 @@ export const ToolResultDisplay: React.FC<ToolResultDisplayProps> = ({
     // Calculate list height: if not constrained, use full data length.
     // If constrained (e.g. alternate buffer), limit to available height
     // to ensure virtualization works and fits within the viewport.
-    const listHeight = !constrainHeight
-      ? data.length
-      : Math.min(data.length, limit);
+    const listHeight = !constrainHeight ? data.length : Math.min(data.length, limit);
 
     if (isAlternateBuffer) {
       const initialScrollIndex =
@@ -264,11 +255,7 @@ export const ToolResultDisplay: React.FC<ToolResultDisplayProps> = ({
               const actualIndex =
                 (overflowDirection === 'top' ? hiddenLines : 0) + index;
               return (
-                <Box
-                  key={keyExtractor(item, actualIndex)}
-                  height={1}
-                  overflow="hidden"
-                >
+                <Box key={keyExtractor(item, actualIndex)} height={1} overflow="hidden">
                   <AnsiLineText line={item} />
                 </Box>
               );

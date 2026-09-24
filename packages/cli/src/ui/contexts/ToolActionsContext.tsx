@@ -5,13 +5,7 @@
  */
 
 import type React from 'react';
-import {
-  createContext,
-  useContext,
-  useCallback,
-  useState,
-  useEffect,
-} from 'react';
+import { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import {
   IdeClient,
   ToolConfirmationOutcome,
@@ -33,11 +27,7 @@ type LegacyConfirmationDetails = SerializableConfirmationDetails & {
 function hasLegacyCallback(
   details: SerializableConfirmationDetails | undefined,
 ): details is LegacyConfirmationDetails {
-  return (
-    !!details &&
-    'onConfirm' in details &&
-    typeof details.onConfirm === 'function'
-  );
+  return !!details && 'onConfirm' in details && typeof details.onConfirm === 'function';
 }
 
 interface ToolActionsContextValue {
@@ -164,9 +154,7 @@ export const ToolActionsProvider: React.FC<ToolActionsProviderProps> = (
         return;
       }
 
-      debugLogger.warn(
-        `ToolActions: No correlationId or callback for ${callId}`,
-      );
+      debugLogger.warn(`ToolActions: No correlationId or callback for ${callId}`);
     },
     [config, ideClient, toolCalls, isDiffingEnabled],
   );

@@ -23,10 +23,7 @@ describe('stdout-stderr-output', () => {
     signal,
   }) => {
     await rig.setup('prompt-output-test', {
-      fakeResponsesPath: join(
-        import.meta.dirname,
-        'stdout-stderr-output.responses',
-      ),
+      fakeResponsesPath: join(import.meta.dirname, 'stdout-stderr-output.responses'),
     });
 
     const { stdout, exitCode } = await rig.runWithStreams(['-p', 'Say hello'], {
@@ -55,8 +52,6 @@ describe('stdout-stderr-output', () => {
     );
 
     expect(exitCode).toBe(0);
-    expect(stdout.toLowerCase()).toMatch(
-      /could not find|not exist|does not exist/,
-    );
+    expect(stdout.toLowerCase()).toMatch(/could not find|not exist|does not exist/);
   });
 });

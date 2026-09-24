@@ -151,9 +151,7 @@ describe('GrepTool', () => {
         dir_path: 'nonexistent',
       };
       // Check for the core error message, as the full path might vary
-      expect(grepTool.validateToolParams(params)).toContain(
-        'Path does not exist',
-      );
+      expect(grepTool.validateToolParams(params)).toContain('Path does not exist');
       expect(grepTool.validateToolParams(params)).toContain('nonexistent');
     });
 
@@ -185,13 +183,9 @@ describe('GrepTool', () => {
       expect(result.llmContent).toContain('File: fileA.txt');
       expect(result.llmContent).toContain('L1: hello world');
       expect(result.llmContent).toContain('L2: second line with world');
-      expect(result.llmContent).toContain(
-        `File: ${path.join('sub', 'fileC.txt')}`,
-      );
+      expect(result.llmContent).toContain(`File: ${path.join('sub', 'fileC.txt')}`);
       expect(result.llmContent).toContain('L1: another world in sub dir');
-      expect((result.returnDisplay as GrepResult)?.summary).toBe(
-        'Found 3 matches',
-      );
+      expect((result.returnDisplay as GrepResult)?.summary).toBe('Found 3 matches');
     }, 30000);
 
     it('should include files that start with ".." in JS fallback', async () => {
@@ -233,9 +227,7 @@ describe('GrepTool', () => {
       );
       expect(result.llmContent).toContain('File: fileC.txt'); // Path relative to 'sub'
       expect(result.llmContent).toContain('L1: another world in sub dir');
-      expect((result.returnDisplay as GrepResult)?.summary).toBe(
-        'Found 1 match',
-      );
+      expect((result.returnDisplay as GrepResult)?.summary).toBe('Found 1 match');
     }, 30000);
 
     it('should find matches with an include glob', async () => {
@@ -249,12 +241,8 @@ describe('GrepTool', () => {
         'Found 1 match for pattern "hello" in the workspace directory (filter: "*.js"):',
       );
       expect(result.llmContent).toContain('File: fileB.js');
-      expect(result.llmContent).toContain(
-        'L2: function baz() { return "hello"; }',
-      );
-      expect((result.returnDisplay as GrepResult)?.summary).toBe(
-        'Found 1 match',
-      );
+      expect(result.llmContent).toContain('L2: function baz() { return "hello"; }');
+      expect((result.returnDisplay as GrepResult)?.summary).toBe('Found 1 match');
     }, 30000);
 
     it('should find matches with an include glob and path', async () => {
@@ -274,9 +262,7 @@ describe('GrepTool', () => {
       );
       expect(result.llmContent).toContain('File: another.js');
       expect(result.llmContent).toContain('L1: const greeting = "hello";');
-      expect((result.returnDisplay as GrepResult)?.summary).toBe(
-        'Found 1 match',
-      );
+      expect((result.returnDisplay as GrepResult)?.summary).toBe('Found 1 match');
     }, 30000);
 
     it('should match nested files with a basename glob (rg parity)', async () => {
@@ -290,12 +276,8 @@ describe('GrepTool', () => {
       };
       const invocation = grepTool.build(params);
       const result = await invocation.execute({ abortSignal });
-      expect(result.llmContent).toContain(
-        'Found 1 match for pattern "greeting"',
-      );
-      expect(result.llmContent).toContain(
-        `File: ${path.join('sub', 'nested.js')}`,
-      );
+      expect(result.llmContent).toContain('Found 1 match for pattern "greeting"');
+      expect(result.llmContent).toContain(`File: ${path.join('sub', 'nested.js')}`);
       // Basename globs must be normalized to recursive form, like rg --glob.
       expect(vi.mocked(glob.globStream)).toHaveBeenCalledWith(
         '**/*.js',
@@ -310,9 +292,7 @@ describe('GrepTool', () => {
       expect(result.llmContent).toContain(
         'No matches found for pattern "nonexistentpattern" in the workspace directory.',
       );
-      expect((result.returnDisplay as GrepResult)?.summary).toBe(
-        'No matches found',
-      );
+      expect((result.returnDisplay as GrepResult)?.summary).toBe('No matches found');
     }, 30000);
 
     it('should handle regex special characters correctly', async () => {
@@ -336,9 +316,7 @@ describe('GrepTool', () => {
       expect(result.llmContent).toContain('File: fileA.txt');
       expect(result.llmContent).toContain('L1: hello world');
       expect(result.llmContent).toContain('File: fileB.js');
-      expect(result.llmContent).toContain(
-        'L2: function baz() { return "hello"; }',
-      );
+      expect(result.llmContent).toContain('L2: function baz() { return "hello"; }');
     }, 30000);
 
     it('should throw an error if params are invalid', async () => {
@@ -361,9 +339,7 @@ describe('GrepTool', () => {
   describe('multi-directory workspace', () => {
     it('should search across all workspace directories when no path is specified', async () => {
       // Create additional directory with test files
-      const secondDir = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'grep-tool-second-'),
-      );
+      const secondDir = await fs.mkdtemp(path.join(os.tmpdir(), 'grep-tool-second-'));
       await fs.writeFile(
         path.join(secondDir, 'other.txt'),
         'hello from second directory\nworld in second',
@@ -376,8 +352,7 @@ describe('GrepTool', () => {
       // Create a mock config with multiple directories
       const multiDirConfig = {
         getTargetDir: () => tempRootDir,
-        getWorkspaceContext: () =>
-          createMockWorkspaceContext(tempRootDir, [secondDir]),
+        getWorkspaceContext: () => createMockWorkspaceContext(tempRootDir, [secondDir]),
         getFileExclusions: () => ({
           getGlobExcludes: () => [],
         }),
@@ -411,18 +386,13 @@ describe('GrepTool', () => {
         },
       } as unknown as Config;
 
-      const multiDirGrepTool = new GrepTool(
-        multiDirConfig,
-        createMockMessageBus(),
-      );
+      const multiDirGrepTool = new GrepTool(multiDirConfig, createMockMessageBus());
       const params: GrepToolParams = { pattern: 'world' };
       const invocation = multiDirGrepTool.build(params);
       const result = await invocation.execute({ abortSignal });
 
       // Should find matches in both directories
-      expect(result.llmContent).toContain(
-        'Found 5 matches for pattern "world"',
-      );
+      expect(result.llmContent).toContain('Found 5 matches for pattern "world"');
 
       // Matches from first directory
       expect(result.llmContent).toContain('fileA.txt');
@@ -448,9 +418,7 @@ describe('GrepTool', () => {
 
     it('should search only specified path within workspace directories', async () => {
       // Create additional directory
-      const secondDir = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'grep-tool-second-'),
-      );
+      const secondDir = await fs.mkdtemp(path.join(os.tmpdir(), 'grep-tool-second-'));
       await fs.mkdir(path.join(secondDir, 'sub'));
       await fs.writeFile(
         path.join(secondDir, 'sub', 'test.txt'),
@@ -460,8 +428,7 @@ describe('GrepTool', () => {
       // Create a mock config with multiple directories
       const multiDirConfig = {
         getTargetDir: () => tempRootDir,
-        getWorkspaceContext: () =>
-          createMockWorkspaceContext(tempRootDir, [secondDir]),
+        getWorkspaceContext: () => createMockWorkspaceContext(tempRootDir, [secondDir]),
         getFileExclusions: () => ({
           getGlobExcludes: () => [],
         }),
@@ -495,10 +462,7 @@ describe('GrepTool', () => {
         },
       } as unknown as Config;
 
-      const multiDirGrepTool = new GrepTool(
-        multiDirConfig,
-        createMockMessageBus(),
-      );
+      const multiDirGrepTool = new GrepTool(multiDirConfig, createMockMessageBus());
 
       // Search only in the 'sub' directory of the first workspace
       const params: GrepToolParams = { pattern: 'world', dir_path: 'sub' };
@@ -559,9 +523,7 @@ describe('GrepTool', () => {
       expect(result.llmContent).toContain('L1: hello world');
       // Should NOT be a match (but might be in context as L2-)
       expect(result.llmContent).not.toContain('L2: second line with world');
-      expect(result.llmContent).toContain(
-        `File: ${path.join('sub', 'fileC.txt')}`,
-      );
+      expect(result.llmContent).toContain(`File: ${path.join('sub', 'fileC.txt')}`);
       expect(result.llmContent).toContain('L1: another world in sub dir');
     });
 
@@ -605,18 +567,13 @@ describe('GrepTool', () => {
     it('should include context when matches are <= 3', async () => {
       const lines = Array.from({ length: 100 }, (_, i) => `Line ${i + 1}`);
       lines[50] = 'Target match';
-      await fs.writeFile(
-        path.join(tempRootDir, 'context.txt'),
-        lines.join('\n'),
-      );
+      await fs.writeFile(path.join(tempRootDir, 'context.txt'), lines.join('\n'));
 
       const params: GrepToolParams = { pattern: 'Target match' };
       const invocation = grepTool.build(params);
       const result = await invocation.execute({ abortSignal });
 
-      expect(result.llmContent).toContain(
-        'Found 1 match for pattern "Target match"',
-      );
+      expect(result.llmContent).toContain('Found 1 match for pattern "Target match"');
       // Verify context before
       expect(result.llmContent).toContain('L40- Line 40');
       // Verify match line
@@ -689,10 +646,7 @@ describe('GrepTool', () => {
         }),
       } as unknown as Config;
 
-      const multiDirGrepTool = new GrepTool(
-        multiDirConfig,
-        createMockMessageBus(),
-      );
+      const multiDirGrepTool = new GrepTool(multiDirConfig, createMockMessageBus());
       const params: GrepToolParams = { pattern: 'testPattern' };
       const invocation = multiDirGrepTool.build(params);
       expect(invocation.getDescription()).toBe(
@@ -709,9 +663,7 @@ describe('GrepTool', () => {
         dir_path: path.join('src', 'app'),
       };
       const invocation = grepTool.build(params);
-      expect(invocation.getDescription()).toContain(
-        "'testPattern' in *.ts within",
-      );
+      expect(invocation.getDescription()).toContain("'testPattern' in *.ts within");
       expect(invocation.getDescription()).toContain(path.join('src', 'app'));
     });
 

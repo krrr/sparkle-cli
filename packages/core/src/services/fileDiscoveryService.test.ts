@@ -23,9 +23,7 @@ describe('FileDiscoveryService', () => {
   }
 
   beforeEach(async () => {
-    testRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'file-discovery-test-'),
-    );
+    testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'file-discovery-test-'));
     projectRoot = path.join(testRootDir, 'project');
     await fs.mkdir(projectRoot, { recursive: true });
   });
@@ -150,8 +148,8 @@ describe('FileDiscoveryService', () => {
       });
 
       expect(filtered).toEqual(
-        ['src/index.ts', 'node_modules/package/index.js', '.git/config'].map(
-          (f) => path.join(projectRoot, f),
+        ['src/index.ts', 'node_modules/package/index.js', '.git/config'].map((f) =>
+          path.join(projectRoot, f),
         ),
       );
     });
@@ -171,9 +169,7 @@ describe('FileDiscoveryService', () => {
       });
 
       expect(filtered).toEqual(
-        ['src/index.ts', 'logs/latest.log'].map((f) =>
-          path.join(projectRoot, f),
-        ),
+        ['src/index.ts', 'logs/latest.log'].map((f) => path.join(projectRoot, f)),
       );
     });
 
@@ -209,9 +205,7 @@ describe('FileDiscoveryService', () => {
     });
 
     it('should handle no ignored files', () => {
-      const files = ['src/index.ts', 'README.md'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['src/index.ts', 'README.md'].map((f) => path.join(projectRoot, f));
 
       const service = new FileDiscoveryService(projectRoot);
       const report = service.filterFilesWithReport(files);
@@ -248,25 +242,23 @@ describe('FileDiscoveryService', () => {
     it('should return false for non-git-ignored files', () => {
       const service = new FileDiscoveryService(projectRoot);
 
-      expect(
-        service.shouldIgnoreFile(path.join(projectRoot, 'src/index.ts')),
-      ).toBe(false);
+      expect(service.shouldIgnoreFile(path.join(projectRoot, 'src/index.ts'))).toBe(
+        false,
+      );
     });
 
     it('should return true for sparkle-ignored files', () => {
       const service = new FileDiscoveryService(projectRoot);
 
-      expect(
-        service.shouldIgnoreFile(path.join(projectRoot, 'debug.log')),
-      ).toBe(true);
+      expect(service.shouldIgnoreFile(path.join(projectRoot, 'debug.log'))).toBe(true);
     });
 
     it('should return false for non-sparkle-ignored files', () => {
       const service = new FileDiscoveryService(projectRoot);
 
-      expect(
-        service.shouldIgnoreFile(path.join(projectRoot, 'src/index.ts')),
-      ).toBe(false);
+      expect(service.shouldIgnoreFile(path.join(projectRoot, 'src/index.ts'))).toBe(
+        false,
+      );
     });
   });
 
@@ -278,12 +270,12 @@ describe('FileDiscoveryService', () => {
         path.relative(process.cwd(), projectRoot),
       );
 
-      expect(
-        service.shouldIgnoreFile(path.join(projectRoot, 'ignored.txt')),
-      ).toBe(true);
-      expect(
-        service.shouldIgnoreFile(path.join(projectRoot, 'not-ignored.txt')),
-      ).toBe(false);
+      expect(service.shouldIgnoreFile(path.join(projectRoot, 'ignored.txt'))).toBe(
+        true,
+      );
+      expect(service.shouldIgnoreFile(path.join(projectRoot, 'not-ignored.txt'))).toBe(
+        false,
+      );
     });
 
     it('should handle filterFiles with undefined options', async () => {
@@ -311,9 +303,7 @@ describe('FileDiscoveryService', () => {
       await createTestFile(SPARKLE_IGNORE_FILE_NAME, '!important.txt');
 
       const service = new FileDiscoveryService(projectRoot);
-      const files = ['file.txt', 'important.txt'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['file.txt', 'important.txt'].map((f) => path.join(projectRoot, f));
 
       const filtered = service.filterFiles(files);
       expect(filtered).toEqual([path.join(projectRoot, 'important.txt')]);
@@ -337,9 +327,7 @@ describe('FileDiscoveryService', () => {
       await createTestFile(SPARKLE_IGNORE_FILE_NAME, 'temp/');
 
       const service = new FileDiscoveryService(projectRoot);
-      const files = ['app.log', 'temp/file.txt'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['app.log', 'temp/file.txt'].map((f) => path.join(projectRoot, f));
 
       const filtered = service.filterFiles(files);
       expect(filtered).toEqual([]);
@@ -350,9 +338,7 @@ describe('FileDiscoveryService', () => {
       await createTestFile(SPARKLE_IGNORE_FILE_NAME, '!important.txt');
 
       const service = new FileDiscoveryService(projectRoot);
-      const files = ['file.txt', 'important.txt'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['file.txt', 'important.txt'].map((f) => path.join(projectRoot, f));
 
       const filtered = service.filterFiles(files, {
         respectGitIgnore: true,
@@ -394,9 +380,7 @@ describe('FileDiscoveryService', () => {
         customIgnoreFilePaths: [customIgnoreName],
       });
 
-      const files = ['file.txt', 'file.secret'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['file.txt', 'file.secret'].map((f) => path.join(projectRoot, f));
 
       const filtered = service.filterFiles(files);
       expect(filtered).toEqual([path.join(projectRoot, 'file.txt')]);
@@ -415,9 +399,7 @@ describe('FileDiscoveryService', () => {
         customIgnoreFilePaths: [customIgnoreName],
       });
 
-      const files = ['debug.log', 'error.log'].map((f) =>
-        path.join(projectRoot, f),
-      );
+      const files = ['debug.log', 'error.log'].map((f) => path.join(projectRoot, f));
 
       const filtered = service.filterFiles(files);
       expect(filtered).toEqual([path.join(projectRoot, 'debug.log')]);
@@ -554,10 +536,7 @@ describe('FileDiscoveryService', () => {
     });
 
     it('should return all ignored paths that exist on disk', async () => {
-      await createTestFile(
-        '.gitignore',
-        'ignored-dir/\nignored-file.txt\n*.log',
-      );
+      await createTestFile('.gitignore', 'ignored-dir/\nignored-file.txt\n*.log');
       await createTestFile('ignored-dir/inside.txt');
       await createTestFile('ignored-file.txt');
       await createTestFile('keep.log');
@@ -594,19 +573,14 @@ describe('FileDiscoveryService', () => {
     });
 
     it('should handle un-ignore patterns correctly', async () => {
-      await createTestFile(
-        '.gitignore',
-        'ignored-dir/*\n!ignored-dir/keep.txt',
-      );
+      await createTestFile('.gitignore', 'ignored-dir/*\n!ignored-dir/keep.txt');
       await createTestFile('ignored-dir/ignored.txt');
       await createTestFile('ignored-dir/keep.txt');
 
       const service = new FileDiscoveryService(projectRoot);
       const ignoredPaths = await service.getIgnoredPaths();
 
-      expect(ignoredPaths).toContain(
-        path.join(projectRoot, 'ignored-dir/ignored.txt'),
-      );
+      expect(ignoredPaths).toContain(path.join(projectRoot, 'ignored-dir/ignored.txt'));
       expect(ignoredPaths).not.toContain(
         path.join(projectRoot, 'ignored-dir/keep.txt'),
       );
@@ -625,21 +599,15 @@ describe('FileDiscoveryService', () => {
         respectGitIgnore: false,
         respectSparkleIgnore: true,
       });
-      expect(onlyGemini).toContain(
-        path.join(projectRoot, 'ignored-by-sparkle.txt'),
-      );
-      expect(onlyGemini).not.toContain(
-        path.join(projectRoot, 'ignored-by-git.txt'),
-      );
+      expect(onlyGemini).toContain(path.join(projectRoot, 'ignored-by-sparkle.txt'));
+      expect(onlyGemini).not.toContain(path.join(projectRoot, 'ignored-by-git.txt'));
 
       const onlyGit = await service.getIgnoredPaths({
         respectGitIgnore: true,
         respectSparkleIgnore: false,
       });
       expect(onlyGit).toContain(path.join(projectRoot, 'ignored-by-git.txt'));
-      expect(onlyGit).not.toContain(
-        path.join(projectRoot, 'ignored-by-sparkle.txt'),
-      );
+      expect(onlyGit).not.toContain(path.join(projectRoot, 'ignored-by-sparkle.txt'));
     });
   });
 });

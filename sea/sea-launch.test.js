@@ -175,8 +175,7 @@ describe('sea-launch', () => {
       const mockCrypto = {
         createHash: vi.fn(() => ({
           update: vi.fn(function (content) {
-            this._content =
-              (this._content || '') + Buffer.from(content).toString();
+            this._content = (this._content || '') + Buffer.from(content).toString();
             return this;
           }),
           digest: vi.fn(function () {
@@ -211,8 +210,7 @@ describe('sea-launch', () => {
       const mockCrypto = {
         createHash: vi.fn(() => ({
           update: vi.fn(function (content) {
-            this._content =
-              (this._content || '') + Buffer.from(content).toString();
+            this._content = (this._content || '') + Buffer.from(content).toString();
             return this;
           }),
           digest: vi.fn(function () {
@@ -353,10 +351,7 @@ describe('sea-launch', () => {
     it('recreates runtime if existing has wrong permissions', () => {
       // On Windows, the strict permission check is skipped (see sea-launch.cjs),
       // so force a POSIX platform to exercise the permission logic.
-      const originalPlatform = Object.getOwnPropertyDescriptor(
-        process,
-        'platform',
-      );
+      const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
       Object.defineProperty(process, 'platform', {
         value: 'linux',
         configurable: true,
@@ -364,10 +359,7 @@ describe('sea-launch', () => {
       try {
         const deps = {
           fs: {
-            existsSync: vi
-              .fn()
-              .mockReturnValueOnce(true)
-              .mockReturnValue(false),
+            existsSync: vi.fn().mockReturnValueOnce(true).mockReturnValue(false),
             rmSync: vi.fn(),
             mkdirSync: vi.fn(),
             writeFileSync: vi.fn(),

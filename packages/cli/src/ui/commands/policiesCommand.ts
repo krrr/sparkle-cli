@@ -15,9 +15,7 @@ interface CategorizedRules {
   plan: PolicyRule[];
 }
 
-const categorizeRulesByMode = (
-  rules: readonly PolicyRule[],
-): CategorizedRules => {
+const categorizeRulesByMode = (rules: readonly PolicyRule[]): CategorizedRules => {
   const result: CategorizedRules = {
     normal: [],
     autoEdit: [],
@@ -83,12 +81,8 @@ const listPoliciesCommand: SlashCommand = {
     const uniqueAutoEdit = categorized.autoEdit.filter(
       (rule) => !normalRulesSet.has(rule),
     );
-    const uniqueYolo = categorized.yolo.filter(
-      (rule) => !normalRulesSet.has(rule),
-    );
-    const uniquePlan = categorized.plan.filter(
-      (rule) => !normalRulesSet.has(rule),
-    );
+    const uniqueYolo = categorized.yolo.filter((rule) => !normalRulesSet.has(rule));
+    const uniquePlan = categorized.plan.filter((rule) => !normalRulesSet.has(rule));
 
     let content = '**Active Policies**\n\n';
     content += formatSection('Normal Mode Policies', categorized.normal);

@@ -36,9 +36,7 @@ export interface IdeInfo {
 }
 
 function isJetBrains(): boolean {
-  return !!process.env['TERMINAL_EMULATOR']
-    ?.toLowerCase()
-    .includes('jetbrains');
+  return !!process.env['TERMINAL_EMULATOR']?.toLowerCase().includes('jetbrains');
 }
 
 export function detectIdeFromEnv(): IdeInfo {

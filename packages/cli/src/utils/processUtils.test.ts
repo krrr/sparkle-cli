@@ -26,9 +26,7 @@ vi.mock('./handleAutoUpdate.js', () => ({
 }));
 
 describe('processUtils', () => {
-  const processExit = vi
-    .spyOn(process, 'exit')
-    .mockReturnValue(undefined as never);
+  const processExit = vi.spyOn(process, 'exit').mockReturnValue(undefined as never);
   const runExitCleanup = vi.spyOn(cleanup, 'runExitCleanup');
 
   beforeEach(() => {
@@ -145,10 +143,7 @@ describe('SEA handling utilities', () => {
       process.execArgv = ['--inspect'];
       process.execPath = '/bin/node';
 
-      const config = getSpawnConfig(
-        ['--max-old-space-size=8192'],
-        ['my-command'],
-      );
+      const config = getSpawnConfig(['--max-old-space-size=8192'], ['my-command']);
 
       expect(config.spawnArgs).toEqual([
         '--inspect',
@@ -167,10 +162,7 @@ describe('SEA handling utilities', () => {
       process.execArgv = ['--inspect']; // Should not be duplicated in NODE_OPTIONS
       process.execPath = '/bin/gemini';
 
-      const config = getSpawnConfig(
-        ['--max-old-space-size=8192'],
-        ['my-command'],
-      );
+      const config = getSpawnConfig(['--max-old-space-size=8192'], ['my-command']);
 
       expect(config.spawnArgs).toEqual([
         '/bin/gemini', // explicitly uses execPath as placeholder
@@ -239,14 +231,10 @@ describe('SEA handling utilities', () => {
     it('returns default path when NODE_COMPILE_CACHE is 1 or true', () => {
       vi.stubEnv('SPARKLE_CLI_HOME', '/custom/home');
       vi.stubEnv('NODE_COMPILE_CACHE', '1');
-      expect(getCompileCacheDir()).toBe(
-        path.join('/custom/home', 'cache', 'v8'),
-      );
+      expect(getCompileCacheDir()).toBe(path.join('/custom/home', 'cache', 'v8'));
 
       vi.stubEnv('NODE_COMPILE_CACHE', 'true');
-      expect(getCompileCacheDir()).toBe(
-        path.join('/custom/home', 'cache', 'v8'),
-      );
+      expect(getCompileCacheDir()).toBe(path.join('/custom/home', 'cache', 'v8'));
     });
   });
 });

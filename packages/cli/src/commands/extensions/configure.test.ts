@@ -3,15 +3,7 @@
  * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { configureCommand } from './configure.js';
 import yargs from 'yargs';
 import { debugLogger } from 'sparkle-cli-core';
@@ -26,8 +18,8 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-const { mockExtensionManager, mockGetExtensionManager, mockLoadSettings } =
-  vi.hoisted(() => {
+const { mockExtensionManager, mockGetExtensionManager, mockLoadSettings } = vi.hoisted(
+  () => {
     const extensionManager = {
       loadExtensionConfig: vi.fn(),
       getExtensions: vi.fn(),
@@ -39,7 +31,8 @@ const { mockExtensionManager, mockGetExtensionManager, mockLoadSettings } =
       mockGetExtensionManager: vi.fn(),
       mockLoadSettings: vi.fn().mockReturnValue({ merged: {} }),
     };
-  });
+  },
+);
 
 vi.mock('../../config/extension-manager.js', () => ({
   ExtensionManager: vi.fn().mockImplementation(() => mockExtensionManager),
@@ -127,9 +120,7 @@ describe('extensions configure command', () => {
 
   describe('Specific setting configuration', () => {
     it('should configure a specific setting', async () => {
-      setupExtension('test-ext', [
-        { name: 'Test Setting', envVar: 'TEST_VAR' },
-      ]);
+      setupExtension('test-ext', [{ name: 'Test Setting', envVar: 'TEST_VAR' }]);
       (updateSetting as Mock).mockResolvedValue(undefined);
 
       await runCommand('config test-ext TEST_VAR');
@@ -190,12 +181,10 @@ describe('extensions configure command', () => {
     it('should verify overwrite if setting is already set', async () => {
       const settings = [{ name: 'Setting 1', envVar: 'VAR_1' }];
       setupExtension('test-ext', settings);
-      (getScopedEnvContents as Mock).mockImplementation(
-        async (_config, _id, scope) => {
-          if (scope === 'user') return { VAR_1: 'existing' };
-          return {};
-        },
-      );
+      (getScopedEnvContents as Mock).mockImplementation(async (_config, _id, scope) => {
+        if (scope === 'user') return { VAR_1: 'existing' };
+        return {};
+      });
       (prompts as unknown as Mock).mockResolvedValue({ confirm: true });
       (updateSetting as Mock).mockResolvedValue(undefined);
 
@@ -213,12 +202,10 @@ describe('extensions configure command', () => {
     it('should note if setting is configured in workspace', async () => {
       const settings = [{ name: 'Setting 1', envVar: 'VAR_1' }];
       setupExtension('test-ext', settings);
-      (getScopedEnvContents as Mock).mockImplementation(
-        async (_config, _id, scope) => {
-          if (scope === 'workspace') return { VAR_1: 'workspace_value' };
-          return {};
-        },
-      );
+      (getScopedEnvContents as Mock).mockImplementation(async (_config, _id, scope) => {
+        if (scope === 'workspace') return { VAR_1: 'workspace_value' };
+        return {};
+      });
       (updateSetting as Mock).mockResolvedValue(undefined);
 
       await runCommand('config test-ext');
@@ -257,15 +244,13 @@ describe('extensions configure command', () => {
       };
       mockExtensionManager.getExtensions.mockReturnValue([ext1, ext2]);
 
-      mockExtensionManager.loadExtensionConfig.mockImplementation(
-        async (path) => {
-          if (path === '/p1')
-            return { name: 'ext1', settings: [{ name: 'S1', envVar: 'V1' }] };
-          if (path === '/p2')
-            return { name: 'ext2', settings: [{ name: 'S2', envVar: 'V2' }] };
-          return null;
-        },
-      );
+      mockExtensionManager.loadExtensionConfig.mockImplementation(async (path) => {
+        if (path === '/p1')
+          return { name: 'ext1', settings: [{ name: 'S1', envVar: 'V1' }] };
+        if (path === '/p2')
+          return { name: 'ext2', settings: [{ name: 'S2', envVar: 'V2' }] };
+        return null;
+      });
 
       (getScopedEnvContents as Mock).mockResolvedValue({});
       (updateSetting as Mock).mockResolvedValue(undefined);

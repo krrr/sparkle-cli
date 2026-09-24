@@ -4,14 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  CoreToolCallStatus,
-  belongsInConfirmationQueue,
-} from 'sparkle-cli-core';
-import {
-  type HistoryItemWithoutId,
-  type IndividualToolCallDisplay,
-} from '../types.js';
+import { CoreToolCallStatus, belongsInConfirmationQueue } from 'sparkle-cli-core';
+import { type HistoryItemWithoutId, type IndividualToolCallDisplay } from '../types.js';
 import {
   getAllToolCalls,
   buildToolVisibilityContextFromDisplay,

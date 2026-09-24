@@ -130,8 +130,7 @@ export function stableStringify(obj: unknown): string {
           typeof value !== 'function' &&
           typeof value !== 'symbol'
         ) {
-          let pairStr =
-            JSON.stringify(key) + ':' + stringify(value, ancestors, false);
+          let pairStr = JSON.stringify(key) + ':' + stringify(value, ancestors, false);
 
           if (isTopLevel) {
             // We use a null byte (\0) to denote structural boundaries.

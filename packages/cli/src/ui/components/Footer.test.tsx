@@ -248,13 +248,7 @@ describe('<Footer />', () => {
       settings: createMockSettings({
         ui: {
           footer: {
-            items: [
-              'workspace',
-              'git-branch',
-              'sandbox',
-              'model-name',
-              'context-used',
-            ],
+            items: ['workspace', 'git-branch', 'sandbox', 'model-name', 'context-used'],
           },
         },
       }),
@@ -272,13 +266,7 @@ describe('<Footer />', () => {
       settings: createMockSettings({
         ui: {
           footer: {
-            items: [
-              'workspace',
-              'git-branch',
-              'sandbox',
-              'model-name',
-              'context-used',
-            ],
+            items: ['workspace', 'git-branch', 'sandbox', 'model-name', 'context-used'],
           },
         },
       }),
@@ -380,9 +368,7 @@ describe('<Footer />', () => {
           },
         }),
       });
-      expect(normalizeFrame(lastFrame())).toMatchSnapshot(
-        'complete-footer-wide',
-      );
+      expect(normalizeFrame(lastFrame())).toMatchSnapshot('complete-footer-wide');
       unmount();
     });
 
@@ -437,9 +423,7 @@ describe('<Footer />', () => {
           },
         }),
       });
-      expect(normalizeFrame(lastFrame())).toMatchSnapshot(
-        'footer-only-sandbox',
-      );
+      expect(normalizeFrame(lastFrame())).toMatchSnapshot('footer-only-sandbox');
       unmount();
     });
 
@@ -502,9 +486,7 @@ describe('<Footer />', () => {
           },
         }),
       });
-      expect(normalizeFrame(lastFrame())).toMatchSnapshot(
-        'complete-footer-narrow',
-      );
+      expect(normalizeFrame(lastFrame())).toMatchSnapshot('complete-footer-narrow');
       unmount();
     });
   });

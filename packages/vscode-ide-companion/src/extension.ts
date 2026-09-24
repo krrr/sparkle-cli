@@ -132,26 +132,20 @@ export async function activate(context: vscode.ExtensionContext) {
       DIFF_SCHEME,
       diffContentProvider,
     ),
-    (vscode.commands.registerCommand(
-      'sparkle.diff.accept',
-      (uri?: vscode.Uri) => {
-        const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
-        if (docUri && docUri.scheme === DIFF_SCHEME) {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          diffManager.acceptDiff(docUri);
-        }
-      },
-    ),
-    vscode.commands.registerCommand(
-      'sparkle.diff.cancel',
-      (uri?: vscode.Uri) => {
-        const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
-        if (docUri && docUri.scheme === DIFF_SCHEME) {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          diffManager.cancelDiff(docUri);
-        }
-      },
-    )),
+    (vscode.commands.registerCommand('sparkle.diff.accept', (uri?: vscode.Uri) => {
+      const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+      if (docUri && docUri.scheme === DIFF_SCHEME) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        diffManager.acceptDiff(docUri);
+      }
+    }),
+    vscode.commands.registerCommand('sparkle.diff.cancel', (uri?: vscode.Uri) => {
+      const docUri = uri ?? vscode.window.activeTextEditor?.document.uri;
+      if (docUri && docUri.scheme === DIFF_SCHEME) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        diffManager.cancelDiff(docUri);
+      }
+    })),
   );
 
   ideServer = new IDEServer(log, diffManager);
@@ -162,10 +156,7 @@ export async function activate(context: vscode.ExtensionContext) {
     log(`Failed to start IDE server: ${message}`);
   }
 
-  if (
-    !context.globalState.get(INFO_MESSAGE_SHOWN_KEY) &&
-    !isManagedExtensionSurface
-  ) {
+  if (!context.globalState.get(INFO_MESSAGE_SHOWN_KEY) && !isManagedExtensionSurface) {
     void vscode.window.showInformationMessage(
       'Sparkle CLI Companion extension successfully installed.',
     );
@@ -210,10 +201,7 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     }),
     vscode.commands.registerCommand('sparkle-cli.showNotices', async () => {
-      const noticePath = vscode.Uri.joinPath(
-        context.extensionUri,
-        'NOTICES.txt',
-      );
+      const noticePath = vscode.Uri.joinPath(context.extensionUri, 'NOTICES.txt');
       await vscode.window.showTextDocument(noticePath);
     }),
   );

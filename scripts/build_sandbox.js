@@ -18,13 +18,7 @@
 // limitations under the License.
 
 import { execSync } from 'node:child_process';
-import {
-  chmodSync,
-  existsSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs';
+import { chmodSync, existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import os from 'node:os';
 import yargs from 'yargs';
@@ -58,9 +52,7 @@ const argv = yargs(hideBin(process.argv))
 
 let sandboxCommand;
 try {
-  sandboxCommand = execSync('node scripts/sandbox_command.js')
-    .toString()
-    .trim();
+  sandboxCommand = execSync('node scripts/sandbox_command.js').toString().trim();
 } catch (e) {
   console.warn('ERROR: could not detect sandbox container command');
   console.error(e);
@@ -95,19 +87,15 @@ const corePackageDir = join('packages', 'core');
 rmSync(join(corePackageDir, 'dist', 'sparkle-cli-core-*.tgz'), {
   force: true,
 });
-execSync(
-  `npm pack -w sparkle-cli-core --pack-destination ./packages/core/dist`,
-  { stdio: 'ignore' },
-);
+execSync(`npm pack -w sparkle-cli-core --pack-destination ./packages/core/dist`, {
+  stdio: 'ignore',
+});
 
 const packageVersion = JSON.parse(
   readFileSync(join(process.cwd(), 'package.json'), 'utf-8'),
 ).version;
 
-chmodSync(
-  join(cliPackageDir, 'dist', `sparkle-cli-${packageVersion}.tgz`),
-  0o755,
-);
+chmodSync(join(cliPackageDir, 'dist', `sparkle-cli-${packageVersion}.tgz`), 0o755);
 chmodSync(
   join(corePackageDir, 'dist', `sparkle-cli-core-${packageVersion}.tgz`),
   0o755,
@@ -142,8 +130,7 @@ function buildImage(imageName, dockerfile) {
     readFileSync(join(process.cwd(), 'package.json'), 'utf-8'),
   ).version;
 
-  const imageTag =
-    process.env.SPARKLE_SANDBOX_IMAGE_TAG || imageName.split(':')[1];
+  const imageTag = process.env.SPARKLE_SANDBOX_IMAGE_TAG || imageName.split(':')[1];
   const finalImageName = `${imageName.split(':')[0]}:${imageTag}`;
 
   try {
@@ -157,9 +144,7 @@ function buildImage(imageName, dockerfile) {
 
     // If an output file path was provided via command-line, write the final image URI to it.
     if (argv.outputFile) {
-      console.log(
-        `Writing final image URI for CI artifact to: ${argv.outputFile}`,
-      );
+      console.log(`Writing final image URI for CI artifact to: ${argv.outputFile}`);
       // The publish step only supports one image. If we build multiple, only the last one
       // will be published. Throw an error to make this failure explicit if the file already exists.
       if (existsSync(argv.outputFile)) {

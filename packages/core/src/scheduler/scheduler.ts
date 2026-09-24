@@ -26,15 +26,9 @@ import {
   type ScheduledToolCall,
 } from './types.js';
 import { ToolErrorType } from '../tools/tool-error.js';
-import {
-  UPDATE_TOPIC_TOOL_NAME,
-  EDIT_TOOL_NAMES,
-} from '../tools/tool-names.js';
+import { UPDATE_TOPIC_TOOL_NAME, EDIT_TOOL_NAMES } from '../tools/tool-names.js';
 import { PolicyDecision, type ApprovalMode } from '../policy/types.js';
-import {
-  ToolConfirmationOutcome,
-  type AnyDeclarativeTool,
-} from '../tools/tools.js';
+import { ToolConfirmationOutcome, type AnyDeclarativeTool } from '../tools/tools.js';
 import { getToolSuggestion } from '../utils/tool-utils.js';
 import { runInDevTraceSpan } from '../telemetry/trace.js';
 import { logToolCall } from '../telemetry/loggers.js';
@@ -47,11 +41,7 @@ import {
   type ToolConfirmationRequest,
 } from '../confirmation-bus/types.js';
 import { runWithToolCallContext } from '../utils/toolCallContext.js';
-import {
-  coreEvents,
-  CoreEvent,
-  type McpProgressPayload,
-} from '../utils/events.js';
+import { coreEvents, CoreEvent, type McpProgressPayload } from '../utils/events.js';
 import { GeminiCliOperation } from '../telemetry/constants.js';
 
 interface SchedulerQueueItem {
@@ -124,10 +114,8 @@ export class Scheduler {
     this.subagent = options.subagent;
     this.parentCallId = options.parentCallId;
     this.onWaitingForConfirmation = options.onWaitingForConfirmation;
-    this.state = new SchedulerStateManager(
-      this.messageBus,
-      this.schedulerId,
-      (call) => logToolCall(this.config, new ToolCallEvent(call)),
+    this.state = new SchedulerStateManager(this.messageBus, this.schedulerId, (call) =>
+      logToolCall(this.config, new ToolCallEvent(call)),
     );
     this.executor = new ToolExecutor(this.context);
     this.modifier = new ToolModificationHandler();
@@ -151,9 +139,7 @@ export class Scheduler {
     }
 
     const validTotal =
-      payload.total !== undefined &&
-      Number.isFinite(payload.total) &&
-      payload.total > 0
+      payload.total !== undefined && Number.isFinite(payload.total) && payload.total > 0
         ? payload.total
         : undefined;
 
@@ -228,9 +214,7 @@ export class Scheduler {
   ): Promise<CompletedToolCall[]> {
     return new Promise<CompletedToolCall[]>((resolve, reject) => {
       const abortHandler = () => {
-        const index = this.requestQueue.findIndex(
-          (item) => item.requests === requests,
-        );
+        const index = this.requestQueue.findIndex((item) => item.requests === requests);
         if (index > -1) {
           this.requestQueue.splice(index, 1);
           reject(new Error('Tool call cancelled while in queue.'));
@@ -488,8 +472,7 @@ export class Scheduler {
     // 1. Process all 'validating' calls (Policy & Confirmation)
     let activeCalls = this.state.allActiveCalls;
     const validatingCalls = activeCalls.filter(
-      (c): c is ValidatingToolCall =>
-        c.status === CoreToolCallStatus.Validating,
+      (c): c is ValidatingToolCall => c.status === CoreToolCallStatus.Validating,
     );
     if (validatingCalls.length > 0) {
       await Promise.all(
@@ -506,8 +489,7 @@ export class Scheduler {
 
     // We only execute if ALL active calls are in a ready state (scheduled or terminal)
     const allReady = activeCalls.every(
-      (c) =>
-        c.status === CoreToolCallStatus.Scheduled || this.isTerminal(c.status),
+      (c) => c.status === CoreToolCallStatus.Scheduled || this.isTerminal(c.status),
     );
 
     let madeProgress = false;
@@ -560,10 +542,7 @@ export class Scheduler {
 
   private _isParallelizable(request: ToolCallRequestInfo): boolean {
     // update_topic tool is forced as sequential call
-    if (
-      request.name === UPDATE_TOPIC_TOOL_NAME ||
-      EDIT_TOOL_NAMES.has(request.name)
-    ) {
+    if (request.name === UPDATE_TOPIC_TOOL_NAME || EDIT_TOOL_NAMES.has(request.name)) {
       return false;
     }
     if (request.args) {
@@ -597,11 +576,7 @@ export class Scheduler {
         this.state.updateStatus(
           active.request.callId,
           CoreToolCallStatus.Error,
-          createErrorResponse(
-            active.request,
-            err,
-            ToolErrorType.UNHANDLED_EXCEPTION,
-          ),
+          createErrorResponse(active.request, err, ToolErrorType.UNHANDLED_EXCEPTION),
         );
       }
     }
@@ -627,17 +602,12 @@ export class Scheduler {
       this.state.updateStatus(
         callId,
         CoreToolCallStatus.Error,
-        createErrorResponse(
-          toolCall.request,
-          hookResult.error,
-          hookResult.errorType,
-        ),
+        createErrorResponse(toolCall.request, hookResult.error, hookResult.errorType),
       );
       return;
     }
 
-    const { hookDecision, hookSystemMessage, modifiedArgs, newInvocation } =
-      hookResult;
+    const { hookDecision, hookSystemMessage, modifiedArgs, newInvocation } = hookResult;
 
     if (modifiedArgs && newInvocation) {
       toolCall.request.args = modifiedArgs;
@@ -657,19 +627,12 @@ export class Scheduler {
     }
 
     if (decision === PolicyDecision.DENY) {
-      const { errorMessage, errorType } = getPolicyDenialError(
-        this.config,
-        rule,
-      );
+      const { errorMessage, errorType } = getPolicyDenialError(this.config, rule);
 
       this.state.updateStatus(
         callId,
         CoreToolCallStatus.Error,
-        createErrorResponse(
-          toolCall.request,
-          new Error(errorMessage),
-          errorType,
-        ),
+        createErrorResponse(toolCall.request, new Error(errorMessage), errorType),
       );
       return;
     }
@@ -761,10 +724,7 @@ export class Scheduler {
               liveOutput: out,
             }),
           onUpdateToolCall: (updated) => {
-            if (
-              updated.status === CoreToolCallStatus.Executing &&
-              updated.pid
-            ) {
+            if (updated.status === CoreToolCallStatus.Executing && updated.pid) {
               this.state.updateStatus(callId, CoreToolCallStatus.Executing, {
                 pid: updated.pid,
               });
@@ -805,8 +765,7 @@ export class Scheduler {
         name: tailRequest.name,
         args: tailRequest.args,
         originalRequestName,
-        originalRequestArgs:
-          result.request.originalRequestArgs ?? result.request.args,
+        originalRequestArgs: result.request.originalRequestArgs ?? result.request.args,
         isClientInitiated: result.request.isClientInitiated,
         prompt_id: result.request.prompt_id,
         schedulerId: this.schedulerId,
@@ -872,11 +831,7 @@ export class Scheduler {
         // CRITICAL: We must push the new args and invocation into the state manager
         // before calling resolveConfirmation, because resolveConfirmation fetches
         // the tool call directly from the state manager!
-        this.state.updateArgs(
-          callId,
-          activeCall.request.args,
-          activeCall.invocation,
-        );
+        this.state.updateArgs(callId, activeCall.request.args, activeCall.invocation);
 
         this.state.updateStatus(callId, CoreToolCallStatus.AwaitingApproval, {
           confirmationDetails,
@@ -908,11 +863,7 @@ export class Scheduler {
             'User cancelled sandbox expansion. The command failed with a sandbox denial. Shell output:\n' +
             String(errorResponse.returnDisplay);
 
-          this.state.updateStatus(
-            callId,
-            CoreToolCallStatus.Error,
-            errorResponse,
-          );
+          this.state.updateStatus(callId, CoreToolCallStatus.Error, errorResponse);
           return false;
         }
 
@@ -938,23 +889,11 @@ export class Scheduler {
     }
 
     if (result.status === CoreToolCallStatus.Success) {
-      this.state.updateStatus(
-        callId,
-        CoreToolCallStatus.Success,
-        result.response,
-      );
+      this.state.updateStatus(callId, CoreToolCallStatus.Success, result.response);
     } else if (result.status === CoreToolCallStatus.Cancelled) {
-      this.state.updateStatus(
-        callId,
-        CoreToolCallStatus.Cancelled,
-        result.response,
-      );
+      this.state.updateStatus(callId, CoreToolCallStatus.Cancelled, result.response);
     } else {
-      this.state.updateStatus(
-        callId,
-        CoreToolCallStatus.Error,
-        result.response,
-      );
+      this.state.updateStatus(callId, CoreToolCallStatus.Error, result.response);
     }
     return false;
   }
@@ -962,9 +901,7 @@ export class Scheduler {
   private _processNextInRequestQueue() {
     if (this.requestQueue.length > 0) {
       const next = this.requestQueue.shift()!;
-      this.schedule(next.requests, next.signal)
-        .then(next.resolve)
-        .catch(next.reject);
+      this.schedule(next.requests, next.signal).then(next.resolve).catch(next.reject);
     }
   }
 }

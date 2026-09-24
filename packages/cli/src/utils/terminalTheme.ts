@@ -38,9 +38,7 @@ export async function setupTerminalAndTheme(
     if (!themeManager.setActiveTheme(settings.merged.ui.theme)) {
       // If the theme is not found during initial load, log a warning and continue.
       // The useThemeCommand hook in AppContainer.tsx will handle opening the dialog.
-      debugLogger.warn(
-        `Warning: Theme "${settings.merged.ui.theme}" not found.`,
-      );
+      debugLogger.warn(`Warning: Theme "${settings.merged.ui.theme}" not found.`);
     }
   } else {
     // If no theme is set, check terminal background color
@@ -62,8 +60,7 @@ export async function setupTerminalAndTheme(
   ) {
     const currentTheme = themeManager.getActiveTheme();
     if (!themeManager.isThemeCompatible(currentTheme, terminalBackground)) {
-      const backgroundType =
-        getThemeTypeFromBackgroundColor(terminalBackground);
+      const backgroundType = getThemeTypeFromBackgroundColor(terminalBackground);
       coreEvents.emitFeedback(
         'warning',
         `Theme '${currentTheme.name}' (${currentTheme.type}) might look incorrect on your ${backgroundType} terminal background. Type /theme to change theme.`,

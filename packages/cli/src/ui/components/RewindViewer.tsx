@@ -82,12 +82,8 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
     clearSelection,
   } = useRewind(conversation);
 
-  const [highlightedMessageId, setHighlightedMessageId] = useState<
-    string | null
-  >(null);
-  const [expandedMessageId, setExpandedMessageId] = useState<string | null>(
-    null,
-  );
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [expandedMessageId, setExpandedMessageId] = useState<string | null>(null);
 
   const interactions = useMemo(
     () => conversation.messages.filter(isRewindEligibleUserMessage),
@@ -125,10 +121,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
           return true;
         }
         if (keyMatchers[Command.EXPAND_SUGGESTION](key)) {
-          if (
-            highlightedMessageId &&
-            highlightedMessageId !== 'current-position'
-          ) {
+          if (highlightedMessageId && highlightedMessageId !== 'current-position') {
             setExpandedMessageId(highlightedMessageId);
             return true;
           }
@@ -177,9 +170,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
       return null;
     }
 
-    const selectedMessage = interactions.find(
-      (m) => m.id === selectedMessageId,
-    );
+    const selectedMessage = interactions.find((m) => m.id === selectedMessageId);
     return (
       <RewindConfirmation
         stats={confirmationStats}
@@ -190,9 +181,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
             clearSelection();
           } else {
             void (async () => {
-              const userPrompt = interactions.find(
-                (m) => m.id === selectedMessageId,
-              );
+              const userPrompt = interactions.find((m) => m.id === selectedMessageId);
               if (userPrompt) {
                 const cleanedText = getCleanedRewindText(userPrompt);
                 setIsRewinding(true);
@@ -284,18 +273,10 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
             if (userPrompt.id === 'current-position') {
               return (
                 <Box flexDirection="column" marginBottom={1}>
-                  <Text
-                    color={
-                      isSelected ? theme.status.success : theme.text.primary
-                    }
-                  >
-                    {partToString(
-                      userPrompt.displayContent || userPrompt.content,
-                    )}
+                  <Text color={isSelected ? theme.status.success : theme.text.primary}>
+                    {partToString(userPrompt.displayContent || userPrompt.content)}
                   </Text>
-                  <Text color={theme.text.secondary}>
-                    Cancel rewind and stay here
-                  </Text>
+                  <Text color={theme.text.secondary}>Cancel rewind and stay here</Text>
                 </Box>
               );
             }
@@ -310,9 +291,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
                   <ExpandableText
                     label={cleanedText}
                     isExpanded={expandedMessageId === userPrompt.id}
-                    textColor={
-                      isSelected ? theme.status.success : theme.text.primary
-                    }
+                    textColor={isSelected ? theme.status.success : theme.text.primary}
                     maxWidth={(terminalWidth - 4) * MAX_LINES_PER_BOX}
                     maxLines={MAX_LINES_PER_BOX}
                   />
@@ -334,9 +313,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
                     )}
                   </Box>
                 ) : (
-                  <Text color={theme.text.secondary}>
-                    No files have been changed
-                  </Text>
+                  <Text color={theme.text.secondary}>No files have been changed</Text>
                 )}
               </Box>
             );
@@ -346,8 +323,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
 
       <Box marginTop={1}>
         <Text color={theme.text.secondary}>
-          (Use Enter to select a message, Esc to close, Right/Left to
-          expand/collapse)
+          (Use Enter to select a message, Esc to close, Right/Left to expand/collapse)
         </Text>
       </Box>
     </Box>

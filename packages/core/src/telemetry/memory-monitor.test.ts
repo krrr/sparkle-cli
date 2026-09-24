@@ -56,9 +56,7 @@ vi.mock('node:process', () => ({
 
 const mockRecordMemoryUsage = vi.mocked(recordMemoryUsage);
 const mockRecordCpuUsage = vi.mocked(recordCpuUsage);
-const mockIsPerformanceMonitoringActive = vi.mocked(
-  isPerformanceMonitoringActive,
-);
+const mockIsPerformanceMonitoringActive = vi.mocked(isPerformanceMonitoringActive);
 const mockV8GetHeapStatistics = vi.mocked(v8.getHeapStatistics);
 const mockV8GetHeapSpaceStatistics = vi.mocked(v8.getHeapSpaceStatistics);
 const mockProcessMemoryUsage = vi.mocked(process.memoryUsage);
@@ -337,14 +335,8 @@ describe('MemoryMonitor', () => {
       });
 
       it('should periodically cleanup tracker state to prevent growth', () => {
-        const trackerCleanupSpy = vi.spyOn(
-          HighWaterMarkTracker.prototype,
-          'cleanup',
-        );
-        const rateLimiterCleanupSpy = vi.spyOn(
-          RateLimiter.prototype,
-          'cleanup',
-        );
+        const trackerCleanupSpy = vi.spyOn(HighWaterMarkTracker.prototype, 'cleanup');
+        const rateLimiterCleanupSpy = vi.spyOn(RateLimiter.prototype, 'cleanup');
 
         const monitor = new MemoryMonitor();
         monitor.start(mockConfig, 1000);
@@ -649,9 +641,7 @@ describe('MemoryMonitor', () => {
 
       const monitor = new MemoryMonitor();
 
-      expect(() => monitor.getCurrentMemoryUsage()).toThrow(
-        'Memory access error',
-      );
+      expect(() => monitor.getCurrentMemoryUsage()).toThrow('Memory access error');
     });
 
     it('should handle v8.getHeapStatistics() errors gracefully', () => {
@@ -661,9 +651,7 @@ describe('MemoryMonitor', () => {
 
       const monitor = new MemoryMonitor();
 
-      expect(() => monitor.getCurrentMemoryUsage()).toThrow(
-        'Heap statistics error',
-      );
+      expect(() => monitor.getCurrentMemoryUsage()).toThrow('Heap statistics error');
     });
 
     it('should handle metric recording errors gracefully', () => {

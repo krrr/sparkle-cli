@@ -102,10 +102,7 @@ describe('HttpAuthProvider', () => {
 
       process.env['DYNAMIC_TOKEN'] = 'second';
       const mockResponse = { status: 401 } as Response;
-      const retryHeaders = await provider.shouldRetryWithHeaders(
-        {},
-        mockResponse,
-      );
+      const retryHeaders = await provider.shouldRetryWithHeaders({}, mockResponse);
 
       expect(retryHeaders).toEqual({ Authorization: 'Bearer second' });
       delete process.env['DYNAMIC_TOKEN'];

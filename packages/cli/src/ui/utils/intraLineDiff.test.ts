@@ -9,10 +9,7 @@ import { computeIntraLineEmphasis } from './intraLineDiff.js';
 
 describe('computeIntraLineEmphasis', () => {
   it('returns ranges covering only the changed word', () => {
-    const result = computeIntraLineEmphasis(
-      'const oldVar = 1;',
-      'const newVar = 1;',
-    );
+    const result = computeIntraLineEmphasis('const oldVar = 1;', 'const newVar = 1;');
     expect(result).toBeDefined();
     // "oldVar" occupies offsets 6..12 in both lines.
     expect(result?.old).toEqual([{ start: 6, end: 12 }]);

@@ -37,9 +37,7 @@ async function loadConsoleModeApi(): Promise<void> {
     const koffi = (await loadKoffi()).default;
     const kernel32 = koffi.load('kernel32.dll');
     consoleApi = {
-      GetStdHandle: kernel32.func(
-        'void* __stdcall GetStdHandle(int32 nStdHandle)',
-      ),
+      GetStdHandle: kernel32.func('void* __stdcall GetStdHandle(int32 nStdHandle)'),
       GetConsoleMode: kernel32.func(
         'int32 __stdcall GetConsoleMode(void* hConsoleHandle, _Out_ uint32_t *mode)',
       ),

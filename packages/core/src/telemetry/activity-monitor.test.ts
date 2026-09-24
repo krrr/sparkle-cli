@@ -98,10 +98,7 @@ describe('ActivityMonitor', () => {
     });
 
     it('should record activity events', () => {
-      activityMonitor.recordActivity(
-        ActivityType.USER_INPUT_START,
-        'test-context',
-      );
+      activityMonitor.recordActivity(ActivityType.USER_INPUT_START, 'test-context');
 
       const stats = activityMonitor.getActivityStats();
       expect(stats.totalEvents).toBe(2); // includes the start event
@@ -134,10 +131,7 @@ describe('ActivityMonitor', () => {
 
       // Record more events than buffer size
       for (let i = 0; i < 5; i++) {
-        activityMonitor.recordActivity(
-          ActivityType.USER_INPUT_START,
-          `event-${i}`,
-        );
+        activityMonitor.recordActivity(ActivityType.USER_INPUT_START, `event-${i}`);
       }
 
       const stats = activityMonitor.getActivityStats();
@@ -192,9 +186,7 @@ describe('ActivityMonitor', () => {
       };
 
       // Spy on console.debug to check error handling
-      const debugSpy = vi
-        .spyOn(debugLogger, 'debug')
-        .mockImplementation(() => {});
+      const debugSpy = vi.spyOn(debugLogger, 'debug').mockImplementation(() => {});
 
       activityMonitor.addListener(faultyListener);
       activityMonitor.addListener(goodListener);

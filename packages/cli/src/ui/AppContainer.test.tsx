@@ -68,14 +68,10 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
     coreEvents: mockCoreEvents,
     IdeClient: mockIdeClient,
     writeToStdout: vi.fn((...args) =>
-      process.stdout.write(
-        ...(args as Parameters<typeof process.stdout.write>),
-      ),
+      process.stdout.write(...(args as Parameters<typeof process.stdout.write>)),
     ),
     writeToStderr: vi.fn((...args) =>
-      process.stderr.write(
-        ...(args as Parameters<typeof process.stderr.write>),
-      ),
+      process.stderr.write(...(args as Parameters<typeof process.stderr.write>)),
     ),
     patchStdio: vi.fn(() => () => {}),
     createWorkingStdio: vi.fn(() => ({
@@ -101,10 +97,7 @@ import type { InitializationResult } from '../core/initializer.js';
 import { useQuotaAndFallback } from './hooks/useQuotaAndFallback.js';
 import { StreamingState, MessageType } from './types.js';
 import { UIStateContext, type UIState } from './contexts/UIStateContext.js';
-import {
-  UIActionsContext,
-  type UIActions,
-} from './contexts/UIActionsContext.js';
+import { UIActionsContext, type UIActions } from './contexts/UIActionsContext.js';
 import { KeypressProvider } from './contexts/KeypressContext.js';
 import { OverflowProvider } from './contexts/OverflowContext.js';
 import {
@@ -175,11 +168,10 @@ vi.mock('./hooks/atCommandProcessor.js');
 vi.mock('./hooks/useHookDisplayState.js');
 vi.mock('./hooks/useBanner.js', () => ({
   useBanner: vi.fn((bannerData) => ({
-    bannerText: (
-      bannerData.warningText ||
-      bannerData.defaultText ||
-      ''
-    ).replace(/\\n/g, '\n'),
+    bannerText: (bannerData.warningText || bannerData.defaultText || '').replace(
+      /\\n/g,
+      '\n',
+    ),
   })),
 }));
 vi.mock('./hooks/useShellInactivityStatus.js', () => ({
@@ -238,16 +230,9 @@ import { useInputHistoryStore } from './hooks/useInputHistoryStore.js';
 import { useKeypress, type Key } from './hooks/useKeypress.js';
 import * as useKeypressModule from './hooks/useKeypress.js';
 import { useSuspend } from './hooks/useSuspend.js';
-import {
-  writeToStdout,
-  enableMouseEvents,
-  disableMouseEvents,
-} from 'sparkle-cli-core';
+import { writeToStdout, enableMouseEvents, disableMouseEvents } from 'sparkle-cli-core';
 import { type ExtensionManager } from '../config/extension-manager.js';
-import {
-  WARNING_PROMPT_DURATION_MS,
-  EXPAND_HINT_DURATION_MS,
-} from './constants.js';
+import { WARNING_PROMPT_DURATION_MS, EXPAND_HINT_DURATION_MS } from './constants.js';
 
 describe('AppContainer State Management', () => {
   let mockConfig: Config;
@@ -486,9 +471,7 @@ describe('AppContainer State Management', () => {
       setRequestSetting: vi.fn(),
       start: vi.fn(),
     } as unknown as MockedObject<ExtensionManager>;
-    vi.spyOn(mockConfig, 'getExtensionLoader').mockReturnValue(
-      mockExtensionManager,
-    );
+    vi.spyOn(mockConfig, 'getExtensionLoader').mockReturnValue(mockExtensionManager);
 
     // Mock LoadedSettings
     mockSettings = createMockSettings({
@@ -662,9 +645,7 @@ describe('AppContainer State Management', () => {
 
       const { unmount } = await act(async () => renderAppContainer());
 
-      expect(
-        terminalNotificationsMocks.notifyViaTerminal,
-      ).not.toHaveBeenCalled();
+      expect(terminalNotificationsMocks.notifyViaTerminal).not.toHaveBeenCalled();
 
       unmount();
     });
@@ -842,9 +823,7 @@ describe('AppContainer State Management', () => {
 
       const { unmount, rerender } = await act(async () => renderAppContainer());
 
-      expect(
-        terminalNotificationsMocks.notifyViaTerminal,
-      ).toHaveBeenCalledTimes(1);
+      expect(terminalNotificationsMocks.notifyViaTerminal).toHaveBeenCalledTimes(1);
 
       pendingHistoryItems = [];
       await act(async () => {
@@ -876,9 +855,7 @@ describe('AppContainer State Management', () => {
         rerender(getAppContainer());
       });
 
-      expect(
-        terminalNotificationsMocks.notifyViaTerminal,
-      ).toHaveBeenCalledTimes(2);
+      expect(terminalNotificationsMocks.notifyViaTerminal).toHaveBeenCalledTimes(2);
 
       unmount();
     });
@@ -997,9 +974,7 @@ describe('AppContainer State Management', () => {
     it.each(['1.0.0', '2.1.3-beta', '3.0.0-nightly'])(
       'handles version format: %s',
       async (version) => {
-        const { unmount } = await act(async () =>
-          renderAppContainer({ version }),
-        );
+        const { unmount } = await act(async () => renderAppContainer({ version }));
         expect(capturedUIState).toBeTruthy();
         unmount();
       },
@@ -1146,9 +1121,7 @@ describe('AppContainer State Management', () => {
       vi.spyOn(configWithRecording, 'getGeminiClient').mockReturnValue(
         mockGeminiClient as unknown as ReturnType<Config['getGeminiClient']>,
       );
-      vi.spyOn(configWithRecording, 'getSessionId').mockReturnValue(
-        'test-session-123',
-      );
+      vi.spyOn(configWithRecording, 'getSessionId').mockReturnValue('test-session-123');
 
       const { unmount } = await act(async () =>
         renderAppContainer({
@@ -1335,8 +1308,7 @@ describe('AppContainer State Management', () => {
       // systemMessage text and no `source` field. The HookSystemMessage
       // event-listener path (the correct one) always sets `source`.
       const directRenderCall = mockAddItem.mock.calls.find(
-        ([item]) =>
-          item?.text === 'Hello from SessionStart hook' && !item?.source,
+        ([item]) => item?.text === 'Hello from SessionStart hook' && !item?.source,
       );
       expect(directRenderCall).toBeUndefined();
 
@@ -1672,8 +1644,8 @@ describe('AppContainer State Management', () => {
         });
 
         // Now it should show Action Required
-        const titleWritesDelayed = mocks.mockStdout.write.mock.calls.filter(
-          (call) => call[0].includes('\x1b]0;'),
+        const titleWritesDelayed = mocks.mockStdout.write.mock.calls.filter((call) =>
+          call[0].includes('\x1b]0;'),
         );
         const lastTitle = titleWritesDelayed[titleWritesDelayed.length - 1][0];
         expect(lastTitle).toContain('✋  Action Required');
@@ -1726,8 +1698,8 @@ describe('AppContainer State Management', () => {
           await vi.advanceTimersByTimeAsync(65000);
         });
 
-        const titleWritesMid = mocks.mockStdout.write.mock.calls.filter(
-          (call) => call[0].includes('\x1b]0;'),
+        const titleWritesMid = mocks.mockStdout.write.mock.calls.filter((call) =>
+          call[0].includes('\x1b]0;'),
         );
         expect(titleWritesMid[titleWritesMid.length - 1][0]).not.toContain(
           '✋  Action Required',
@@ -1738,12 +1710,10 @@ describe('AppContainer State Management', () => {
           await vi.advanceTimersByTimeAsync(60000);
         });
 
-        const titleWritesEnd = mocks.mockStdout.write.mock.calls.filter(
-          (call) => call[0].includes('\x1b]0;'),
+        const titleWritesEnd = mocks.mockStdout.write.mock.calls.filter((call) =>
+          call[0].includes('\x1b]0;'),
         );
-        expect(titleWritesEnd[titleWritesEnd.length - 1][0]).toContain(
-          '⏲  Working…',
-        );
+        expect(titleWritesEnd[titleWritesEnd.length - 1][0]).toContain('⏲  Working…');
 
         unmount();
       });
@@ -1858,8 +1828,7 @@ describe('AppContainer State Management', () => {
         const titleWritesAfterOutput = mocks.mockStdout.write.mock.calls.filter(
           (call) => call[0].includes('\x1b]0;'),
         );
-        const lastTitle =
-          titleWritesAfterOutput[titleWritesAfterOutput.length - 1][0];
+        const lastTitle = titleWritesAfterOutput[titleWritesAfterOutput.length - 1][0];
         expect(lastTitle).not.toContain('✋  Action Required');
         expect(lastTitle).toContain('✦  Executing shell command');
 
@@ -2511,15 +2480,10 @@ describe('AppContainer State Management', () => {
     let unmount: () => void;
     let stdin: Awaited<ReturnType<typeof render>>['stdin'];
 
-    const setupCopyModeTest = async (
-      isAlternateMode = false,
-      childHandler?: Mock,
-    ) => {
+    const setupCopyModeTest = async (isAlternateMode = false, childHandler?: Mock) => {
       vi.spyOn(mockConfig, 'getUseTerminalBuffer').mockReturnValue(false);
 
-      vi.spyOn(mockConfig, 'getUseAlternateBuffer').mockReturnValue(
-        isAlternateMode,
-      );
+      vi.spyOn(mockConfig, 'getUseAlternateBuffer').mockReturnValue(isAlternateMode);
 
       // Update settings for this test run
       const testSettings = createMockSettings({
@@ -2956,9 +2920,7 @@ describe('AppContainer State Management', () => {
       });
 
       expect(capturedUIState.authConsentRequest).toBeDefined();
-      expect(capturedUIState.authConsentRequest?.prompt).toBe(
-        'Do you consent?',
-      );
+      expect(capturedUIState.authConsentRequest?.prompt).toBe('Do you consent?');
 
       act(() => {
         capturedUIState.authConsentRequest?.onConfirm(true);
@@ -3163,9 +3125,7 @@ describe('AppContainer State Management', () => {
 
   describe('Submission Handling', () => {
     it('resets expansion state on submission when not in alternate buffer', async () => {
-      const { checkPermissions } = await import(
-        './hooks/atCommandProcessor.js'
-      );
+      const { checkPermissions } = await import('./hooks/atCommandProcessor.js');
       vi.mocked(checkPermissions).mockResolvedValue([]);
 
       const { unmount } = await act(async () =>
@@ -3193,9 +3153,7 @@ describe('AppContainer State Management', () => {
     });
 
     it('resets expansion state on submission when in alternate buffer without clearing terminal', async () => {
-      const { checkPermissions } = await import(
-        './hooks/atCommandProcessor.js'
-      );
+      const { checkPermissions } = await import('./hooks/atCommandProcessor.js');
       vi.mocked(checkPermissions).mockResolvedValue([]);
 
       vi.spyOn(mockConfig, 'getUseTerminalBuffer').mockReturnValue(false);
@@ -3477,18 +3435,14 @@ describe('AppContainer State Management', () => {
 
   describe('Permission Handling', () => {
     it('shows permission dialog when checkPermissions returns paths', async () => {
-      const { checkPermissions } = await import(
-        './hooks/atCommandProcessor.js'
-      );
+      const { checkPermissions } = await import('./hooks/atCommandProcessor.js');
       vi.mocked(checkPermissions).mockResolvedValue(['/test/file.txt']);
 
       const { unmount } = await act(async () => renderAppContainer());
 
       expect(capturedUIActions).toBeTruthy();
 
-      await act(async () =>
-        capturedUIActions.handleFinalSubmit('read @file.txt'),
-      );
+      await act(async () => capturedUIActions.handleFinalSubmit('read @file.txt'));
 
       expect(capturedUIState.permissionConfirmationRequest).not.toBeNull();
       expect(capturedUIState.permissionConfirmationRequest?.files).toEqual([
@@ -3500,9 +3454,7 @@ describe('AppContainer State Management', () => {
     it.each([true, false])(
       'handles permissions when allowed is %s',
       async (allowed) => {
-        const { checkPermissions } = await import(
-          './hooks/atCommandProcessor.js'
-        );
+        const { checkPermissions } = await import('./hooks/atCommandProcessor.js');
         vi.mocked(checkPermissions).mockResolvedValue(['/test/file.txt']);
         const addReadOnlyPathSpy = vi.spyOn(
           mockConfig.getWorkspaceContext(),
@@ -3514,9 +3466,7 @@ describe('AppContainer State Management', () => {
 
         expect(capturedUIActions).toBeTruthy();
 
-        await act(async () =>
-          capturedUIActions.handleFinalSubmit('read @file.txt'),
-        );
+        await act(async () => capturedUIActions.handleFinalSubmit('read @file.txt'));
 
         await act(async () =>
           capturedUIState.permissionConfirmationRequest?.onComplete({
@@ -3608,9 +3558,7 @@ describe('AppContainer State Management', () => {
 
   describe('Compression Queuing', () => {
     beforeEach(async () => {
-      const { checkPermissions } = await import(
-        './hooks/atCommandProcessor.js'
-      );
+      const { checkPermissions } = await import('./hooks/atCommandProcessor.js');
       vi.mocked(checkPermissions).mockResolvedValue([]);
 
       vi.spyOn(mockConfig, 'isModelSteeringEnabled').mockReturnValue(true);
@@ -3644,9 +3592,7 @@ describe('AppContainer State Management', () => {
       expect(capturedUIState.streamingState).toBe(StreamingState.Idle);
 
       // Submit a message
-      await act(async () =>
-        capturedUIActions.handleFinalSubmit('follow up message'),
-      );
+      await act(async () => capturedUIActions.handleFinalSubmit('follow up message'));
 
       // Verify it was queued, not submitted as steering hint
       expect(capturedUIState.messageQueue).toContain('follow up message');

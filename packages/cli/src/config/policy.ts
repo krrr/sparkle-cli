@@ -97,9 +97,7 @@ export async function resolveWorkspacePolicyState(options: {
   const { cwd, trustedFolder, interactive } = options;
 
   let workspacePoliciesDir: string | undefined;
-  let policyUpdateConfirmationRequest:
-    | PolicyUpdateConfirmationRequest
-    | undefined;
+  let policyUpdateConfirmationRequest: PolicyUpdateConfirmationRequest | undefined;
 
   if (trustedFolder && !disableWorkspacePolicies) {
     const storage = new Storage(cwd);
@@ -136,11 +134,7 @@ export async function resolveWorkspacePolicyState(options: {
       };
     } else {
       // Non-interactive mode or auto-accept is enabled: automatically accept/load
-      await integrityManager.acceptIntegrity(
-        'workspace',
-        cwd,
-        integrityResult.hash,
-      );
+      await integrityManager.acceptIntegrity('workspace', cwd, integrityResult.hash);
       workspacePoliciesDir = potentialWorkspacePoliciesDir;
 
       if (!interactive) {

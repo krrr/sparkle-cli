@@ -34,9 +34,7 @@ export function extractMcpContext(
 
   // Get the server config
   const mcpServers =
-    config.getMcpClientManager()?.getMcpServers() ??
-    config.getMcpServers() ??
-    {};
+    config.getMcpClientManager()?.getMcpServers() ?? config.getMcpServers() ?? {};
   const serverConfig = mcpServers[invocation.serverName];
   if (!serverConfig) {
     return undefined;
@@ -171,10 +169,7 @@ export async function executeToolWithHooks(
       toolResult.llmContent.push({ text: modificationMsg });
     } else if (toolResult.llmContent) {
       // Handle single Part case by converting to an array
-      toolResult.llmContent = [
-        toolResult.llmContent,
-        { text: modificationMsg },
-      ];
+      toolResult.llmContent = [toolResult.llmContent, { text: modificationMsg }];
     }
   }
 
@@ -227,10 +222,7 @@ export async function executeToolWithHooks(
         toolResult.llmContent.push({ text: wrappedContext });
       } else if (toolResult.llmContent) {
         // Handle single Part case by converting to an array
-        toolResult.llmContent = [
-          toolResult.llmContent,
-          { text: wrappedContext },
-        ];
+        toolResult.llmContent = [toolResult.llmContent, { text: wrappedContext }];
       } else {
         toolResult.llmContent = wrappedContext;
       }

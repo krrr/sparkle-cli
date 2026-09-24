@@ -38,9 +38,7 @@ export function useInputHistory({
 
   // Cache stores text and cursor offset for each history index level.
   // Level -1 is the current unsubmitted prompt.
-  const historyCacheRef = useRef<
-    Record<number, { text: string; offset: number }>
-  >({});
+  const historyCacheRef = useRef<Record<number, { text: string; offset: number }>>({});
 
   const resetHistoryNav = useCallback(() => {
     setHistoryIndex(-1);

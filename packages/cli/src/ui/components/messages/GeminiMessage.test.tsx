@@ -51,14 +51,9 @@ describe('<GeminiMessage /> - Raw Markdown Display Snapshots', () => {
 
   it('wraps long lines correctly in raw markdown mode', async () => {
     const terminalWidth = 20;
-    const text =
-      'This is a long line that should wrap correctly without truncation';
+    const text = 'This is a long line that should wrap correctly without truncation';
     const { lastFrame, unmount } = await renderWithProviders(
-      <GeminiMessage
-        text={text}
-        isPending={false}
-        terminalWidth={terminalWidth}
-      />,
+      <GeminiMessage text={text} isPending={false} terminalWidth={terminalWidth} />,
       {
         uiState: { renderMarkdown: false, streamingState: StreamingState.Idle },
       },

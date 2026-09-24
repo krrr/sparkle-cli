@@ -125,11 +125,9 @@ export function createToolMaskingProcessor(
 
         await fs.writeFile(filePath, content);
 
-        const fileSizeMB = (
-          Buffer.byteLength(content, 'utf8') /
-          1024 /
-          1024
-        ).toFixed(2);
+        const fileSizeMB = (Buffer.byteLength(content, 'utf8') / 1024 / 1024).toFixed(
+          2,
+        );
         const totalLines = content.split('\n').length;
 
         // Ensure consistent path separators for LLM tokenization and deterministic tests across OSes
@@ -146,8 +144,7 @@ export function createToolMaskingProcessor(
         }
 
         const payload = node.payload;
-        const toolName =
-          payload.functionCall?.name || payload.functionResponse?.name;
+        const toolName = payload.functionCall?.name || payload.functionResponse?.name;
 
         if (toolName && UNMASKABLE_TOOLS.has(toolName)) {
           returnedNodes.push(node);

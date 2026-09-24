@@ -4,10 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type {
-  GenerateContentParameters,
-  GenerateContentResponse,
-} from '@google/genai';
+import type { GenerateContentParameters, GenerateContentResponse } from '@google/genai';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HookEventHandler } from './hookEventHandler.js';
 import type { Config } from '../config/config.js';
@@ -131,12 +128,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const result = await hookEventHandler.fireBeforeToolEvent('EditTool', {
         file: 'test.txt',
@@ -164,8 +157,7 @@ describe('HookEventHandler', () => {
       // Verify event emission via callbacks
       const onHookStart = vi.mocked(mockHookRunner.executeHooksParallel).mock
         .calls[0][3];
-      const onHookEnd = vi.mocked(mockHookRunner.executeHooksParallel).mock
-        .calls[0][4];
+      const onHookEnd = vi.mocked(mockHookRunner.executeHooksParallel).mock.calls[0][4];
 
       if (onHookStart) onHookStart(mockPlan[0].hookConfig, 0);
       expect(mockCoreEvents.emitHookStart).toHaveBeenCalledWith({
@@ -237,12 +229,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan,
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       await hookEventHandler.fireBeforeToolEvent('EditTool', {});
 
@@ -290,12 +278,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const mcpContext = {
         server_name: 'my-mcp-server',
@@ -362,19 +346,14 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       await hookEventHandler.fireBeforeToolEvent('EditTool', {
         file: 'test.txt',
       });
 
-      const callArgs = vi.mocked(mockHookRunner.executeHooksParallel).mock
-        .calls[0][2];
+      const callArgs = vi.mocked(mockHookRunner.executeHooksParallel).mock.calls[0][2];
       expect(callArgs).not.toHaveProperty('mcp_context');
     });
   });
@@ -414,12 +393,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const toolInput = { file: 'test.txt' };
       const toolResponse = { success: true, content: 'File edited' };
@@ -479,12 +454,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const toolInput = { path: '/etc/passwd' };
       const toolResponse = { success: true, content: 'File content' };
@@ -553,12 +524,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const prompt = 'Please help me with this task';
 
@@ -613,12 +580,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const message = 'Tool execution requires permission';
 
@@ -678,12 +641,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const result = await hookEventHandler.fireSessionStartEvent(
         SessionStartSource.Startup,
@@ -743,12 +702,8 @@ describe('HookEventHandler', () => {
         hookConfigs: mockPlan.map((p) => p.hookConfig),
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const llmRequest = {
         model: 'gemini-pro',
@@ -808,12 +763,8 @@ describe('HookEventHandler', () => {
         hookConfigs: [mockHook],
         sequential: false,
       });
-      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(
-        mockResults,
-      );
-      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(
-        mockAggregated,
-      );
+      vi.mocked(mockHookRunner.executeHooksParallel).mockResolvedValue(mockResults);
+      vi.mocked(mockHookAggregator.aggregateResults).mockReturnValue(mockAggregated);
 
       const llmRequest = { model: 'test', contents: [] };
       const llmResponse = { candidates: [] };
@@ -886,10 +837,7 @@ describe('HookEventHandler', () => {
   });
 
   describe('systemMessage event emission', () => {
-    const buildMocks = (
-      outputFormat: 'json' | 'text',
-      systemMessage: string,
-    ) => {
+    const buildMocks = (outputFormat: 'json' | 'text', systemMessage: string) => {
       const hookConfig: HookConfig = {
         type: HookType.Command,
         command: './hook.sh',

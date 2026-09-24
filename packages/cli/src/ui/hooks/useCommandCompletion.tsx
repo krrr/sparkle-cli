@@ -59,15 +59,11 @@ export interface UseCommandCompletionReturn {
   navigateDown: () => void;
   handleAutocomplete: (indexToUse: number) => void;
   promptCompletion: PromptCompletion;
-  getCommandFromSuggestion: (
-    suggestion: Suggestion,
-  ) => SlashCommand | undefined;
+  getCommandFromSuggestion: (suggestion: Suggestion) => SlashCommand | undefined;
   slashCompletionRange: {
     completionStart: number;
     completionEnd: number;
-    getCommandFromSuggestion: (
-      suggestion: Suggestion,
-    ) => SlashCommand | undefined;
+    getCommandFromSuggestion: (suggestion: Suggestion) => SlashCommand | undefined;
     isArgumentCompletion: boolean;
     leafCommand: SlashCommand | null;
   };
@@ -96,8 +92,7 @@ export function useCommandCompletion({
   config,
   active,
 }: UseCommandCompletionOptions): UseCommandCompletionReturn {
-  const [forceShowShellSuggestions, setForceShowShellSuggestions] =
-    useState(false);
+  const [forceShowShellSuggestions, setForceShowShellSuggestions] = useState(false);
 
   const {
     suggestions,
@@ -137,9 +132,7 @@ export function useCommandCompletion({
     if (shellModeActive) {
       return {
         completionMode:
-          currentLine.trim().length === 0
-            ? CompletionMode.IDLE
-            : CompletionMode.SHELL,
+          currentLine.trim().length === 0 ? CompletionMode.IDLE : CompletionMode.SHELL,
         query: '',
         completionStart: -1,
         completionEnd: -1,
@@ -214,8 +207,7 @@ export function useCommandCompletion({
   });
 
   const slashCompletionRange = useSlashCompletion({
-    enabled:
-      active && completionMode === CompletionMode.SLASH && !shellModeActive,
+    enabled: active && completionMode === CompletionMode.SLASH && !shellModeActive,
     query: memoQuery,
     slashCommands,
     commandContext,
@@ -234,9 +226,7 @@ export function useCommandCompletion({
   });
 
   const query =
-    completionMode === CompletionMode.SHELL
-      ? shellCompletionRange.query
-      : memoQuery;
+    completionMode === CompletionMode.SHELL ? shellCompletionRange.query : memoQuery;
 
   const isShellSuggestionsVisible =
     completionMode !== CompletionMode.SHELL || forceShowShellSuggestions;
@@ -270,9 +260,7 @@ export function useCommandCompletion({
         }
 
         const newText =
-          currentLine.substring(0, start) +
-          textToInsert +
-          currentLine.substring(end);
+          currentLine.substring(0, start) + textToInsert + currentLine.substring(end);
 
         return {
           text: newText,
@@ -291,14 +279,7 @@ export function useCommandCompletion({
       }
     }
     return EMPTY_PROMPT_COMPLETION;
-  }, [
-    completionMode,
-    suggestions,
-    query,
-    buffer,
-    cursorRow,
-    shellCompletionRange,
-  ]);
+  }, [completionMode, suggestions, query, buffer, cursorRow, shellCompletionRange]);
 
   useEffect(() => {
     setActiveSuggestionIndex(suggestions.length > 0 ? 0 : -1);
@@ -323,11 +304,7 @@ export function useCommandCompletion({
   ]);
 
   useEffect(() => {
-    if (
-      !active ||
-      completionMode === CompletionMode.IDLE ||
-      reverseSearchActive
-    ) {
+    if (!active || completionMode === CompletionMode.IDLE || reverseSearchActive) {
       resetCompletionState();
     }
   }, [active, completionMode, reverseSearchActive, resetCompletionState]);
@@ -375,9 +352,7 @@ export function useCommandCompletion({
 
       // Build the completed text with proper spacing
       return (
-        currentLine.substring(0, start) +
-        suggestionText +
-        currentLine.substring(end)
+        currentLine.substring(0, start) + suggestionText + currentLine.substring(end)
       );
     },
     [
@@ -430,8 +405,7 @@ export function useCommandCompletion({
 
       let shouldAddSpace = true;
       if (completionMode === CompletionMode.SLASH) {
-        const command =
-          slashCompletionRange.getCommandFromSuggestion(suggestion);
+        const command = slashCompletionRange.getCommandFromSuggestion(suggestion);
         // Don't add a space if the command has an action (can be executed)
         // and doesn't have a completion function (doesn't REQUIRE more arguments)
         const isExecutableCommand = !!(command && command.action);

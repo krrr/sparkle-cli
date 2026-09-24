@@ -151,9 +151,7 @@ async function readFullStructure(
     } catch (error: unknown) {
       if (
         isNodeError(error) &&
-        (error.code === 'EACCES' ||
-          error.code === 'ENOENT' ||
-          error.code === 'EPERM')
+        (error.code === 'EACCES' || error.code === 'ENOENT' || error.code === 'EPERM')
       ) {
         debugLogger.warn(
           `Warning: Could not read directory ${currentPath}: ${error.message}`,
@@ -189,15 +187,10 @@ async function readFullStructure(
         }
         const fileName = entry.name;
         const filePath = path.join(currentPath, fileName);
-        if (
-          options.fileService?.shouldIgnoreFile(filePath, filterFileOptions)
-        ) {
+        if (options.fileService?.shouldIgnoreFile(filePath, filterFileOptions)) {
           continue;
         }
-        if (
-          !options.fileIncludePattern ||
-          options.fileIncludePattern.test(fileName)
-        ) {
+        if (!options.fileIncludePattern || options.fileIncludePattern.test(fileName)) {
           filesInCurrentDir.push(fileName);
           currentItemCount++;
           folderInfo.totalFiles++;
@@ -288,11 +281,8 @@ function formatStructure(
   // Its children are printed relative to that conceptual root.
   // Ignored root nodes ARE printed with a connector.
   if (!isProcessingRootNode || node.isIgnored || node.skippedByBudget) {
-    const suffix =
-      node.isIgnored || node.skippedByBudget ? TRUNCATION_INDICATOR : '';
-    builder.push(
-      `${currentIndent}${connector}${node.name}${path.sep}${suffix}`,
-    );
+    const suffix = node.isIgnored || node.skippedByBudget ? TRUNCATION_INDICATOR : '';
+    builder.push(`${currentIndent}${connector}${node.name}${path.sep}${suffix}`);
   }
 
   // Determine the indent for the children of *this* node.
@@ -306,9 +296,7 @@ function formatStructure(
   const fileCount = node.files.length;
   for (let i = 0; i < fileCount; i++) {
     const isLastFileAmongSiblings =
-      i === fileCount - 1 &&
-      node.subFolders.length === 0 &&
-      !node.hasMoreSubfolders;
+      i === fileCount - 1 && node.subFolders.length === 0 && !node.hasMoreSubfolders;
     const fileConnector = isLastFileAmongSiblings ? '└───' : '├───';
     builder.push(`${indentForChildren}${fileConnector}${node.files[i]}`);
   }
@@ -404,10 +392,7 @@ export async function getFolderStructure(
 
     return `${summary}\n\n${resolvedPath}${path.sep}\n${structureLines.join('\n')}`;
   } catch (error: unknown) {
-    debugLogger.warn(
-      `Error getting folder structure for ${resolvedPath}:`,
-      error,
-    );
+    debugLogger.warn(`Error getting folder structure for ${resolvedPath}:`, error);
     return `Error processing directory "${resolvedPath}": ${getErrorMessage(error)}`;
   }
 }

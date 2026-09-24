@@ -27,10 +27,7 @@ import type {
   AgentEventType,
   ToolDisplay,
 } from './types.js';
-import {
-  geminiPartsToContentParts,
-  buildToolResponseData,
-} from './content-utils.js';
+import { geminiPartsToContentParts, buildToolResponseData } from './content-utils.js';
 import { toolResultDisplayToDisplayContent } from './tool-display-utils.js';
 
 // ---------------------------------------------------------------------------
@@ -222,9 +219,7 @@ export function translateEvent(
       out.push(
         makeEvent('error', state, {
           status: 'INTERNAL',
-          message:
-            event.value?.message?.trim() ||
-            'Invalid stream received from model',
+          message: event.value?.message?.trim() || 'Invalid stream received from model',
           fatal: true,
           _meta: {
             code: 'INVALID_STREAM',
@@ -255,9 +250,7 @@ export function translateEvent(
         event.value.display ??
         (event.value.resultDisplay
           ? {
-              result: toolResultDisplayToDisplayContent(
-                event.value.resultDisplay,
-              ),
+              result: toolResultDisplayToDisplayContent(event.value.resultDisplay),
             }
           : undefined);
       out.push(
@@ -317,11 +310,7 @@ function handleFinished(
 // Error Handling
 // ---------------------------------------------------------------------------
 
-function handleError(
-  error: unknown,
-  state: TranslationState,
-  out: AgentEvent[],
-): void {
+function handleError(error: unknown, state: TranslationState, out: AgentEvent[]): void {
   ensureStreamStart(state, out);
 
   const mapped = mapError(error);
@@ -335,9 +324,7 @@ function handleError(
 /**
  * Maps a Gemini FinishReason to an AgentEnd reason.
  */
-export function mapFinishReason(
-  reason: FinishReason | undefined,
-): StreamEndReason {
+export function mapFinishReason(reason: FinishReason | undefined): StreamEndReason {
   if (!reason) return 'completed';
 
   switch (reason) {

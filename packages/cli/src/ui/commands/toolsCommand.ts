@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  type CommandContext,
-  type SlashCommand,
-  CommandKind,
-} from './types.js';
+import { type CommandContext, type SlashCommand, CommandKind } from './types.js';
 import { MessageType, type HistoryItemToolsList } from '../types.js';
 
 async function listTools(
@@ -46,8 +42,7 @@ const listSubCommand: SlashCommand = {
   description: 'List available Sparkle CLI tools.',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (context: CommandContext): Promise<void> =>
-    listTools(context, false),
+  action: async (context: CommandContext): Promise<void> => listTools(context, false),
 };
 
 const descSubCommand: SlashCommand = {
@@ -56,8 +51,7 @@ const descSubCommand: SlashCommand = {
   description: 'List available Sparkle CLI tools with descriptions.',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (context: CommandContext): Promise<void> =>
-    listTools(context, true),
+  action: async (context: CommandContext): Promise<void> => listTools(context, true),
 };
 
 export const toolsCommand: SlashCommand = {
@@ -71,8 +65,7 @@ export const toolsCommand: SlashCommand = {
     const subCommand = args?.trim();
 
     // Keep backward compatibility for typed arguments while exposing subcommands in TUI.
-    const useShowDescriptions =
-      subCommand === 'desc' || subCommand === 'descriptions';
+    const useShowDescriptions = subCommand === 'desc' || subCommand === 'descriptions';
 
     await listTools(context, useShowDescriptions);
   },

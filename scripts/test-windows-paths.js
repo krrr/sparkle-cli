@@ -37,10 +37,7 @@ function testPathNormalization() {
 
   // Test with normalized path in marker
   const normalizedMarker = `--- File: ${path.normalize(absoluteTestPath)} ---`;
-  console.log(
-    'Normalized marker match:',
-    testContent.includes(normalizedMarker),
-  );
+  console.log('Normalized marker match:', testContent.includes(normalizedMarker));
 
   // Test path resolution
   const __filename = fileURLToPath(import.meta.url);

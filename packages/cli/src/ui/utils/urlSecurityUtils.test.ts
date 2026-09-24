@@ -10,9 +10,7 @@ import { getDeceptiveUrlDetails, toUnicodeUrl } from './urlSecurityUtils.js';
 describe('urlSecurityUtils', () => {
   describe('toUnicodeUrl', () => {
     it('should convert a Punycode URL string to its Unicode version', () => {
-      expect(toUnicodeUrl('https://xn--tst-qla.com/')).toBe(
-        'https://täst.com/',
-      );
+      expect(toUnicodeUrl('https://xn--tst-qla.com/')).toBe('https://täst.com/');
     });
 
     it('should convert a URL object to its Unicode version', () => {

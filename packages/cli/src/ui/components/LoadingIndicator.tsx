@@ -51,11 +51,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
   const { columns: terminalWidth } = useTerminalSize();
   const isNarrow = isNarrowWidth(terminalWidth);
 
-  if (
-    streamingState === StreamingState.Idle &&
-    !currentLoadingPhrase &&
-    !thought
-  ) {
+  if (streamingState === StreamingState.Idle && !currentLoadingPhrase && !thought) {
     return null;
   }
 
@@ -67,9 +63,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       : thought?.subject
         ? (thoughtLabel ?? thought.subject)
         : currentLoadingPhrase ||
-          (streamingState === StreamingState.Responding
-            ? 'Thinking...'
-            : undefined);
+          (streamingState === StreamingState.Responding ? 'Thinking...' : undefined);
 
   const cancelAndTimerContent =
     showCancelAndTimer && streamingState === StreamingState.Responding
@@ -77,10 +71,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       : null;
 
   const wittyPhraseNode =
-    !forceRealStatusOnly &&
-    showWit &&
-    wittyPhrase &&
-    primaryText === 'Thinking...' ? (
+    !forceRealStatusOnly && showWit && wittyPhrase && primaryText === 'Thinking...' ? (
       <Box marginLeft={1}>
         <Text color={theme.text.secondary} dimColor italic>
           {wittyPhrase}
@@ -95,9 +86,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
           <GeminiRespondingSpinner
             nonRespondingDisplay={
               spinnerIcon ??
-              (streamingState === StreamingState.WaitingForConfirmation
-                ? '⠏'
-                : '')
+              (streamingState === StreamingState.WaitingForConfirmation ? '⠏' : '')
             }
             isHookActive={isHookActive}
           />
@@ -139,9 +128,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
             <GeminiRespondingSpinner
               nonRespondingDisplay={
                 spinnerIcon ??
-                (streamingState === StreamingState.WaitingForConfirmation
-                  ? '⠏'
-                  : '')
+                (streamingState === StreamingState.WaitingForConfirmation ? '⠏' : '')
               }
               isHookActive={isHookActive}
             />

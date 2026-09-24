@@ -148,8 +148,7 @@ export class PerfTestHarness {
     }
 
     // Round wall-clock time to nearest 0.1 ms
-    const wallClockMs =
-      Math.round((performance.now() - timer.startTime) * 10) / 10;
+    const wallClockMs = Math.round((performance.now() - timer.startTime) * 10) / 10;
     const cpuDelta = process.cpuUsage(timer.startCpuUsage);
     this.activeTimers.delete(label);
 
@@ -223,9 +222,7 @@ export class PerfTestHarness {
     for (let i = 0; i < totalRuns; i++) {
       const isWarmup = i < this.warmupCount;
       const snapshot = await fn();
-      snapshot.label = isWarmup
-        ? `warmup-${i}`
-        : `sample-${i - this.warmupCount}`;
+      snapshot.label = isWarmup ? `warmup-${i}` : `sample-${i - this.warmupCount}`;
 
       if (!isWarmup) {
         allSnapshots.push(snapshot);
@@ -252,8 +249,7 @@ export class PerfTestHarness {
 
     if (baseline) {
       deltaPercent =
-        ((median.wallClockMs - baseline.wallClockMs) / baseline.wallClockMs) *
-        100;
+        ((median.wallClockMs - baseline.wallClockMs) / baseline.wallClockMs) * 100;
       cpuDeltaPercent =
         ((median.cpuTotalUs - baseline.cpuTotalUs) / baseline.cpuTotalUs) * 100;
       withinTolerance = deltaPercent <= tolerance;
@@ -357,11 +353,7 @@ export class PerfTestHarness {
       const delta = result.baseline
         ? `${result.deltaPercent >= 0 ? '+' : ''}${result.deltaPercent.toFixed(1)}%`
         : 'N/A';
-      const status = !result.baseline
-        ? 'NEW'
-        : result.withinTolerance
-          ? '✅'
-          : '❌';
+      const status = !result.baseline ? 'NEW' : result.withinTolerance ? '✅' : '❌';
 
       lines.push(
         `${result.scenarioName}: ${measured} (Baseline: ${baseline}, Delta: ${delta}) ${status}`,
@@ -401,17 +393,14 @@ export class PerfTestHarness {
         default?: { plot?: PlotFn };
         plot?: PlotFn;
       };
-      const plot: PlotFn | undefined =
-        asciichart.default?.plot ?? asciichart.plot;
+      const plot: PlotFn | undefined = asciichart.default?.plot ?? asciichart.plot;
 
       for (const result of resultsToReport) {
         if (result.filteredSamples.length > 2) {
           lines.push(`📈 Wall-clock trend: ${result.scenarioName}`);
           lines.push('─'.repeat(60));
 
-          const wallClockData = result.filteredSamples.map(
-            (s) => s.wallClockMs,
-          );
+          const wallClockData = result.filteredSamples.map((s) => s.wallClockMs);
 
           if (plot) {
             const chart = plot(wallClockData, {
@@ -507,10 +496,7 @@ export function loadPerfBaselines(path: string): PerfBaselineFile {
 /**
  * Save perf baselines to a JSON file.
  */
-export function savePerfBaselines(
-  path: string,
-  baselines: PerfBaselineFile,
-): void {
+export function savePerfBaselines(path: string, baselines: PerfBaselineFile): void {
   baselines.updatedAt = new Date().toISOString();
   writeFileSync(path, JSON.stringify(baselines, null, 2) + '\n');
 }

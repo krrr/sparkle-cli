@@ -87,9 +87,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
         return withNestedCompatibility;
       }
 
-      return withNestedCompatibility.some(
-        (cmd) => cmd.name === debugCommand.name,
-      )
+      return withNestedCompatibility.some((cmd) => cmd.name === debugCommand.name)
         ? withNestedCompatibility
         : [
             ...withNestedCompatibility,

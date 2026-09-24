@@ -91,26 +91,20 @@ describe('Auto Routing Fallback Integration', () => {
     };
 
     // Spy on generateContent to simulate failures
-    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
-      async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
-          attemptsPro++;
-          throw new RetryableQuotaError(
-            'Quota exceeded for Pro',
-            mockGoogleApiError,
-            0,
-          );
-        } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
-          attemptsFlash++;
-          throw new RetryableQuotaError(
-            'Quota exceeded for Flash',
-            mockGoogleApiError,
-            0,
-          );
-        }
-        throw new Error(`Unexpected model: ${params.model}`);
-      },
-    );
+    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(async (params) => {
+      if (params.model === DEFAULT_GEMINI_MODEL) {
+        attemptsPro++;
+        throw new RetryableQuotaError('Quota exceeded for Pro', mockGoogleApiError, 0);
+      } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
+        attemptsFlash++;
+        throw new RetryableQuotaError(
+          'Quota exceeded for Flash',
+          mockGoogleApiError,
+          0,
+        );
+      }
+      throw new Error(`Unexpected model: ${params.model}`);
+    });
 
     // Set a fallback handler that approves the switch (simulating user or auto approval)
     config.setFallbackModelHandler(
@@ -169,24 +163,21 @@ describe('Auto Routing Fallback Integration', () => {
     };
 
     // Spy on generateContent to simulate failures
-    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
-      async (params) => {
-        if (params.model === 'my-custom-model') {
-          attemptsCustom++;
-          throw new RetryableQuotaError(
-            'Quota exceeded for custom model',
-            mockGoogleApiError,
-            0,
-          );
-        }
-        throw new Error(`Unexpected model: ${params.model}`);
-      },
-    );
+    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(async (params) => {
+      if (params.model === 'my-custom-model') {
+        attemptsCustom++;
+        throw new RetryableQuotaError(
+          'Quota exceeded for custom model',
+          mockGoogleApiError,
+          0,
+        );
+      }
+      throw new Error(`Unexpected model: ${params.model}`);
+    });
 
     // Set a fallback handler that returns 'stop' (simulating user stopping or failing to handle)
     const handler = vi.fn(
-      async (_failed, _fallback, _error): Promise<FallbackIntent | null> =>
-        'stop',
+      async (_failed, _fallback, _error): Promise<FallbackIntent | null> => 'stop',
     );
     configNonAuto.setFallbackModelHandler(handler);
 
@@ -241,28 +232,22 @@ describe('Auto Routing Fallback Integration', () => {
     };
 
     // Turn 1: Pro fails, Flash succeeds
-    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
-      async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
-          attemptsPro++;
-          throw new RetryableQuotaError(
-            'Quota exceeded for Pro',
-            mockGoogleApiError,
-            0,
-          );
-        } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
-          attemptsFlash++;
-          return {
-            candidates: [
-              {
-                content: { role: 'model', parts: [{ text: 'Flash success' }] },
-              },
-            ],
-          } as unknown as GenerateContentResponse;
-        }
-        throw new Error(`Unexpected model: ${params.model}`);
-      },
-    );
+    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(async (params) => {
+      if (params.model === DEFAULT_GEMINI_MODEL) {
+        attemptsPro++;
+        throw new RetryableQuotaError('Quota exceeded for Pro', mockGoogleApiError, 0);
+      } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
+        attemptsFlash++;
+        return {
+          candidates: [
+            {
+              content: { role: 'model', parts: [{ text: 'Flash success' }] },
+            },
+          ],
+        } as unknown as GenerateContentResponse;
+      }
+      throw new Error(`Unexpected model: ${params.model}`);
+    });
 
     config.setFallbackModelHandler(
       async (_failed, _fallback, _error): Promise<FallbackIntent | null> =>
@@ -281,9 +266,7 @@ describe('Auto Routing Fallback Integration', () => {
     await vi.runAllTimersAsync();
     const result1 = await promise1;
 
-    expect(result1.candidates?.[0]?.content?.parts?.[0]?.text).toBe(
-      'Flash success',
-    );
+    expect(result1.candidates?.[0]?.content?.parts?.[0]?.text).toBe('Flash success');
     expect(attemptsPro).toBe(3);
     expect(attemptsFlash).toBe(1);
 
@@ -292,18 +275,16 @@ describe('Auto Routing Fallback Integration', () => {
 
     // Turn 2: Pro should be attempted again!
     // Let's make it succeed this time to verify it works!
-    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
-      async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
-          return {
-            candidates: [
-              { content: { role: 'model', parts: [{ text: 'Pro success' }] } },
-            ],
-          } as unknown as GenerateContentResponse;
-        }
-        throw new Error(`Unexpected model: ${params.model}`);
-      },
-    );
+    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(async (params) => {
+      if (params.model === DEFAULT_GEMINI_MODEL) {
+        return {
+          candidates: [
+            { content: { role: 'model', parts: [{ text: 'Pro success' }] } },
+          ],
+        } as unknown as GenerateContentResponse;
+      }
+      throw new Error(`Unexpected model: ${params.model}`);
+    });
 
     const promise2 = client.generateContent({
       modelConfigKey: { model: DEFAULT_GEMINI_MODEL, isChatModel: true }, // Request Pro again
@@ -314,9 +295,7 @@ describe('Auto Routing Fallback Integration', () => {
     });
 
     const result2 = await promise2;
-    expect(result2.candidates?.[0]?.content?.parts?.[0]?.text).toBe(
-      'Pro success',
-    );
+    expect(result2.candidates?.[0]?.content?.parts?.[0]?.text).toBe('Pro success');
   });
 
   it('should rotate session ID on fallback and retry successfully with the Flash model', async () => {
@@ -343,31 +322,25 @@ describe('Auto Routing Fallback Integration', () => {
       details: [],
     };
 
-    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(
-      async (params) => {
-        if (params.model === DEFAULT_GEMINI_MODEL) {
-          attemptsPro++;
-          throw new RetryableQuotaError(
-            'Quota exceeded for Pro',
-            mockGoogleApiError,
-            0,
-          );
-        } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
-          attemptsFlash++;
-          return {
-            candidates: [
-              {
-                content: {
-                  role: 'model',
-                  parts: [{ text: 'Flash success after rotation' }],
-                },
+    vi.spyOn(fakeGenerator, 'generateContent').mockImplementation(async (params) => {
+      if (params.model === DEFAULT_GEMINI_MODEL) {
+        attemptsPro++;
+        throw new RetryableQuotaError('Quota exceeded for Pro', mockGoogleApiError, 0);
+      } else if (params.model === DEFAULT_GEMINI_FLASH_MODEL) {
+        attemptsFlash++;
+        return {
+          candidates: [
+            {
+              content: {
+                role: 'model',
+                parts: [{ text: 'Flash success after rotation' }],
               },
-            ],
-          } as unknown as GenerateContentResponse;
-        }
-        throw new Error(`Unexpected model: ${params.model}`);
-      },
-    );
+            },
+          ],
+        } as unknown as GenerateContentResponse;
+      }
+      throw new Error(`Unexpected model: ${params.model}`);
+    });
 
     config.setFallbackModelHandler(
       async (_failed, _fallback, _error): Promise<FallbackIntent | null> =>

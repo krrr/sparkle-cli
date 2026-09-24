@@ -182,9 +182,7 @@ export class LocalSessionInvocation extends BaseToolInvocation<
           const data = activity.data['data'];
           const isError = isToolActivityError(data);
 
-          const callId = activity.data['id']
-            ? String(activity.data['id'])
-            : undefined;
+          const callId = activity.data['id'] ? String(activity.data['id']) : undefined;
 
           if (callId) {
             for (let i = recentActivity.length - 1; i >= 0; i--) {
@@ -359,8 +357,7 @@ ${output.result}`;
         returnDisplay: progress,
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       const isAbort =
         (error instanceof Error && error.name === 'AbortError') ||

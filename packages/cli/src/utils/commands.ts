@@ -47,9 +47,7 @@ export const parseSlashCommand = (
 
     // Second pass: if no primary name matches, check for an alias.
     if (!foundCommand) {
-      foundCommand = currentCommands.find((cmd) =>
-        cmd.altNames?.includes(part),
-      );
+      foundCommand = currentCommands.find((cmd) => cmd.altNames?.includes(part));
     }
 
     if (foundCommand) {

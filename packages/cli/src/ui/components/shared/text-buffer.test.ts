@@ -10,10 +10,7 @@ import { act } from 'react';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
-import {
-  renderHook,
-  renderHookWithProviders,
-} from '../../../test-utils/render.js';
+import { renderHook, renderHookWithProviders } from '../../../test-utils/render.js';
 
 import type {
   Viewport,
@@ -90,9 +87,7 @@ function createStateWithTransformations(
   const state = { ...initialState, ...partial };
   return {
     ...state,
-    transformationsByLine: state.lines.map((l) =>
-      calculateTransformationsForLine(l),
-    ),
+    transformationsByLine: state.lines.map((l) => calculateTransformationsForLine(l)),
   };
 }
 
@@ -392,10 +387,7 @@ describe('textBufferReducer', () => {
 
         // Delete the placeholder
         const deleteAction: TextBufferAction = { type: 'backspace' };
-        const stateAfterDelete = textBufferReducer(
-          stateWithPlaceholder,
-          deleteAction,
-        );
+        const stateAfterDelete = textBufferReducer(stateWithPlaceholder, deleteAction);
         expect(stateAfterDelete.lines).toEqual(['']);
         expect(stateAfterDelete.pastedContent[placeholder]).toBeUndefined();
 
@@ -462,10 +454,7 @@ describe('textBufferReducer', () => {
   });
 
   describe('delete_word_left action', () => {
-    const createSingleLineState = (
-      text: string,
-      col: number,
-    ): TextBufferState => ({
+    const createSingleLineState = (text: string, col: number): TextBufferState => ({
       ...initialState,
       lines: [text],
       cursorRow: 0,
@@ -494,17 +483,13 @@ describe('textBufferReducer', () => {
         expectedCol: 9,
         desc: 'variable_name parts',
       },
-    ])(
-      'should delete $desc',
-      ({ input, cursorCol, expectedLines, expectedCol }) => {
-        const state = textBufferReducer(
-          createSingleLineState(input, cursorCol),
-          { type: 'delete_word_left' },
-        );
-        expect(state.lines).toEqual(expectedLines);
-        expect(state.cursorCol).toBe(expectedCol);
-      },
-    );
+    ])('should delete $desc', ({ input, cursorCol, expectedLines, expectedCol }) => {
+      const state = textBufferReducer(createSingleLineState(input, cursorCol), {
+        type: 'delete_word_left',
+      });
+      expect(state.lines).toEqual(expectedLines);
+      expect(state.cursorCol).toBe(expectedCol);
+    });
 
     it('should act like backspace at the beginning of a line', async () => {
       const stateWithText: TextBufferState = {
@@ -523,10 +508,7 @@ describe('textBufferReducer', () => {
   });
 
   describe('delete_word_right action', () => {
-    const createSingleLineState = (
-      text: string,
-      col: number,
-    ): TextBufferState => ({
+    const createSingleLineState = (text: string, col: number): TextBufferState => ({
       ...initialState,
       lines: [text],
       cursorRow: 0,
@@ -548,17 +530,13 @@ describe('textBufferReducer', () => {
         expectedCol: 0,
         desc: 'variable_name parts',
       },
-    ])(
-      'should delete $desc',
-      ({ input, cursorCol, expectedLines, expectedCol }) => {
-        const state = textBufferReducer(
-          createSingleLineState(input, cursorCol),
-          { type: 'delete_word_right' },
-        );
-        expect(state.lines).toEqual(expectedLines);
-        expect(state.cursorCol).toBe(expectedCol);
-      },
-    );
+    ])('should delete $desc', ({ input, cursorCol, expectedLines, expectedCol }) => {
+      const state = textBufferReducer(createSingleLineState(input, cursorCol), {
+        type: 'delete_word_right',
+      });
+      expect(state.lines).toEqual(expectedLines);
+      expect(state.cursorCol).toBe(expectedCol);
+    });
 
     it('should delete path segments progressively', async () => {
       const stateWithText: TextBufferState = {
@@ -675,14 +653,7 @@ describe('textBufferReducer', () => {
 
     it('should collapse an expanded placeholder correctly', async () => {
       const expandedState = createStateWithTransformations({
-        lines: [
-          'prefix line1',
-          'line2',
-          'line3',
-          'line4',
-          'line5',
-          'line6 suffix',
-        ],
+        lines: ['prefix line1', 'line2', 'line3', 'line4', 'line5', 'line6 suffix'],
         cursorRow: 5,
         cursorCol: 5,
         pastedContent: { [placeholder]: content },
@@ -946,9 +917,7 @@ describe('useTextBuffer', () => {
       act(() => result.current.insert(largeText, { paste: true }));
       const state = getBufferState(result);
       expect(state.text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
     });
 
     it('insert: should NOT use placeholder for large text if NOT a paste', async () => {
@@ -963,9 +932,7 @@ describe('useTextBuffer', () => {
       const { result } = await renderHook(() => useTextBuffer({ viewport }));
       const largeText = '1\n2\n3\n4\n5\n6';
       act(() => result.current.insert(largeText, { paste: true }));
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       // Delete the placeholder using setText
       act(() => result.current.setText(''));
@@ -976,9 +943,7 @@ describe('useTextBuffer', () => {
       const { result } = await renderHook(() => useTextBuffer({ viewport }));
       const largeText = '1\n2\n3\n4\n5\n6';
       act(() => result.current.insert(largeText, { paste: true }));
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       // Single backspace at end of placeholder removes entire placeholder
       act(() => {
@@ -996,9 +961,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       act(() => {
         for (let i = 0; i < 12; i++) {
@@ -1010,9 +973,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
     });
 
     it('deleteWordRight: should clean up pastedContent and avoid #2 suffix on repaste', async () => {
@@ -1021,9 +982,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       act(() => result.current.move('home'));
       act(() => {
@@ -1031,17 +990,13 @@ describe('useTextBuffer', () => {
           result.current.deleteWordRight();
         }
       });
-      expect(getBufferState(result).text).not.toContain(
-        '[Pasted Text: 6 lines]',
-      );
+      expect(getBufferState(result).text).not.toContain('[Pasted Text: 6 lines]');
       expect(Object.keys(result.current.pastedContent)).toHaveLength(0);
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toContain('[Pasted Text: 6 lines]');
       expect(getBufferState(result).text).not.toContain('#2');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
     });
 
     it('killLineLeft: should clean up pastedContent and avoid #2 suffix on repaste', async () => {
@@ -1050,9 +1005,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       act(() => result.current.killLineLeft());
       expect(getBufferState(result).text).toBe('');
@@ -1060,9 +1013,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
     });
 
     it('killLineRight: should clean up pastedContent and avoid #2 suffix on repaste', async () => {
@@ -1071,9 +1022,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
 
       act(() => {
         for (let i = 0; i < 40; i++) {
@@ -1086,9 +1035,7 @@ describe('useTextBuffer', () => {
 
       act(() => result.current.insert(largeText, { paste: true }));
       expect(getBufferState(result).text).toBe('[Pasted Text: 6 lines]');
-      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(
-        largeText,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 6 lines]']).toBe(largeText);
     });
 
     it('newline: should create a new line and move cursor', async () => {
@@ -1453,11 +1400,7 @@ describe('useTextBuffer', () => {
         'l4',
         'l5',
       ]);
-      expect(getBufferState(result).viewportVisualLines).toEqual([
-        'l1',
-        'l2',
-        'l3',
-      ]);
+      expect(getBufferState(result).viewportVisualLines).toEqual(['l1', 'l2', 'l3']);
 
       act(() => result.current.move('down')); // vc=[1,0]
       act(() => result.current.move('down')); // vc=[2,0] (l3)
@@ -2203,19 +2146,10 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
       expect(state.lines).toStrictEqual([
         '[Pasted Text: 8 lines][Pasted Text: 8 lines #2][Pasted Text: 8 lines #3]',
       ]);
-      expect(result.current.pastedContent['[Pasted Text: 8 lines]']).toBe(
-        longText,
-      );
-      expect(result.current.pastedContent['[Pasted Text: 8 lines #2]']).toBe(
-        longText,
-      );
-      expect(result.current.pastedContent['[Pasted Text: 8 lines #3]']).toBe(
-        longText,
-      );
-      const expectedCursorPos = offsetToLogicalPos(
-        state.text,
-        state.text.length,
-      );
+      expect(result.current.pastedContent['[Pasted Text: 8 lines]']).toBe(longText);
+      expect(result.current.pastedContent['[Pasted Text: 8 lines #2]']).toBe(longText);
+      expect(result.current.pastedContent['[Pasted Text: 8 lines #3]']).toBe(longText);
+      const expectedCursorPos = offsetToLogicalPos(state.text, state.text.length);
       expect(state.cursor).toEqual(expectedCursorPos);
     });
   });
@@ -2587,9 +2521,7 @@ Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots 
 
   describe('Memoization', () => {
     it('should keep action references stable across re-renders', async () => {
-      const { result, rerender } = await renderHook(() =>
-        useTextBuffer({ viewport }),
-      );
+      const { result, rerender } = await renderHook(() => useTextBuffer({ viewport }));
 
       const initialInsert = result.current.insert;
       const initialBackspace = result.current.backspace;
@@ -2868,12 +2800,9 @@ describe('offsetToLogicalPos', () => {
       { offset: 13, expected: [2, 1], desc: 'middle of third line' },
       { offset: 15, expected: [2, 3], desc: 'end of third line' },
       { offset: 20, expected: [2, 3], desc: 'beyond end' },
-    ])(
-      'should return $expected for $desc (offset $offset)',
-      ({ offset, expected }) => {
-        expect(offsetToLogicalPos(text, offset)).toEqual(expected);
-      },
-    );
+    ])('should return $expected for $desc (offset $offset)', ({ offset, expected }) => {
+      expect(offsetToLogicalPos(text, offset)).toEqual(expected);
+    });
   });
 });
 
@@ -3276,9 +3205,7 @@ describe('Transformation Utilities', () => {
     });
 
     it('should handle paths with directories', async () => {
-      expect(getTransformedImagePath('@path/to/image.jpg')).toBe(
-        '[Image image.jpg]',
-      );
+      expect(getTransformedImagePath('@path/to/image.jpg')).toBe('[Image image.jpg]');
     });
 
     it('should truncate long filenames', async () => {
@@ -3428,12 +3355,7 @@ describe('Transformation Utilities', () => {
       const line = 'Check out @test.png';
       const transformations = calculateTransformationsForLine(line);
       // Cursor at '@' (position 10 in the line)
-      const result = calculateTransformedLine(
-        line,
-        0,
-        [0, 10],
-        transformations,
-      );
+      const result = calculateTransformedLine(line, 0, [0, 10], transformations);
 
       // Should show full path when cursor is on it
       expect(result.transformedLine).toBe('Check out @test.png');
@@ -3502,8 +3424,7 @@ describe('Transformation Utilities', () => {
       const { result, rerender } = await renderHookWithProviders(
         ({ vp }) =>
           useTextBuffer({
-            initialText:
-              'a very long line that will wrap when the viewport is small',
+            initialText: 'a very long line that will wrap when the viewport is small',
             viewport: vp,
             escapePastedPaths: true,
           }),
@@ -3541,9 +3462,7 @@ describe('Transformation Utilities', () => {
         result.current.moveToOffset(7); // onto @
       });
       expect(result.current.allVisualLines[0]).toContain('@image.png');
-      expect(result.current.allVisualLines[0]).not.toContain(
-        '[Image image.png]',
-      );
+      expect(result.current.allVisualLines[0]).not.toContain('[Image image.png]');
 
       // Move cursor away (collapsed again)
       act(() => {

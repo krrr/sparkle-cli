@@ -91,16 +91,9 @@ export class MockAgentProtocol implements AgentProtocol {
       this._emit(event);
     }
 
-    if (
-      options?.close &&
-      !events.some((eventData) => eventData.type === 'agent_end')
-    ) {
+    if (options?.close && !events.some((eventData) => eventData.type === 'agent_end')) {
       this._emit(
-        this._normalizeEvent(
-          { type: 'agent_end', reason: 'completed' },
-          now,
-          streamId,
-        ),
+        this._normalizeEvent({ type: 'agent_end', reason: 'completed' }, now, streamId),
       );
     }
   }

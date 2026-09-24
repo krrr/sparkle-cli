@@ -39,10 +39,7 @@ describe('OAuthUtils', () => {
     });
 
     it('should build root-based URLs when useRootDiscovery is true', () => {
-      const urls = OAuthUtils.buildWellKnownUrls(
-        'https://example.com/mcp',
-        true,
-      );
+      const urls = OAuthUtils.buildWellKnownUrls('https://example.com/mcp', true);
       expect(urls.protectedResource).toBe(
         'https://example.com/.well-known/oauth-protected-resource',
       );
@@ -246,9 +243,7 @@ describe('OAuthUtils', () => {
           json: () => Promise.resolve(mockAuthServerMetadata),
         });
 
-      const config = await OAuthUtils.discoverOAuthConfig(
-        'https://example.com/mcp',
-      );
+      const config = await OAuthUtils.discoverOAuthConfig('https://example.com/mcp');
 
       expect(config).toEqual({
         authorizationUrl: 'https://auth.example.com/authorize',
@@ -352,9 +347,7 @@ describe('OAuthUtils', () => {
       const header =
         'Bearer realm="example", resource_metadata="https://example.com/.well-known/oauth-protected-resource"';
       const result = OAuthUtils.parseWWWAuthenticateHeader(header);
-      expect(result).toBe(
-        'https://example.com/.well-known/oauth-protected-resource',
-      );
+      expect(result).toBe('https://example.com/.well-known/oauth-protected-resource');
     });
 
     it('should return null when no resource metadata URI is found', () => {
@@ -410,9 +403,7 @@ describe('OAuthUtils', () => {
     });
 
     it('should handle URLs with ports', () => {
-      const result = OAuthUtils.extractBaseUrl(
-        'https://example.com:8080/mcp/v1',
-      );
+      const result = OAuthUtils.extractBaseUrl('https://example.com:8080/mcp/v1');
       expect(result).toBe('https://example.com:8080');
     });
   });
@@ -420,9 +411,7 @@ describe('OAuthUtils', () => {
   describe('isSSEEndpoint', () => {
     it('should return true for SSE endpoints', () => {
       expect(OAuthUtils.isSSEEndpoint('https://example.com/sse')).toBe(true);
-      expect(OAuthUtils.isSSEEndpoint('https://example.com/api/v1/sse')).toBe(
-        true,
-      );
+      expect(OAuthUtils.isSSEEndpoint('https://example.com/api/v1/sse')).toBe(true);
     });
 
     it('should return true for non-MCP endpoints', () => {
@@ -431,9 +420,7 @@ describe('OAuthUtils', () => {
 
     it('should return false for MCP endpoints', () => {
       expect(OAuthUtils.isSSEEndpoint('https://example.com/mcp')).toBe(false);
-      expect(OAuthUtils.isSSEEndpoint('https://example.com/api/mcp/v1')).toBe(
-        false,
-      );
+      expect(OAuthUtils.isSSEEndpoint('https://example.com/api/mcp/v1')).toBe(false);
     });
   });
 

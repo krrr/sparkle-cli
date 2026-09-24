@@ -41,9 +41,7 @@ export async function handleUpdate(args: UpdateArgs) {
   const extensions = await extensionManager.loadExtensions();
   if (args.name) {
     try {
-      const extension = extensions.find(
-        (extension) => extension.name === args.name,
-      );
+      const extension = extensions.find((extension) => extension.name === args.name);
       if (!extension) {
         if (extensions.length === 0) {
           coreEvents.emitFeedback(
@@ -68,10 +66,7 @@ export async function handleUpdate(args: UpdateArgs) {
         );
         return;
       }
-      const updateState = await checkForExtensionUpdate(
-        extension,
-        extensionManager,
-      );
+      const updateState = await checkForExtensionUpdate(extension, extensionManager);
       if (updateState !== ExtensionUpdateState.UPDATE_AVAILABLE) {
         debugLogger.log(`Extension "${args.name}" is already up to date.`);
         return;
@@ -84,8 +79,7 @@ export async function handleUpdate(args: UpdateArgs) {
         settings.experimental?.extensionReloading,
       ))!;
       if (
-        updatedExtensionInfo.originalVersion !==
-        updatedExtensionInfo.updatedVersion
+        updatedExtensionInfo.originalVersion !== updatedExtensionInfo.updatedVersion
       ) {
         debugLogger.log(
           `Extension "${args.name}" successfully updated: ${updatedExtensionInfo.originalVersion} → ${updatedExtensionInfo.updatedVersion}.`,
@@ -100,17 +94,13 @@ export async function handleUpdate(args: UpdateArgs) {
   if (args.all) {
     try {
       const extensionState = new Map();
-      await checkForAllExtensionUpdates(
-        extensions,
-        extensionManager,
-        (action) => {
-          if (action.type === 'SET_STATE') {
-            extensionState.set(action.payload.name, {
-              status: action.payload.state,
-            });
-          }
-        },
-      );
+      await checkForAllExtensionUpdates(extensions, extensionManager, (action) => {
+        if (action.type === 'SET_STATE') {
+          extensionState.set(action.payload.name, {
+            status: action.payload.state,
+          });
+        }
+      });
       let updateInfos = await updateAllUpdatableExtensions(
         extensions,
         extensionState,
@@ -133,8 +123,7 @@ export async function handleUpdate(args: UpdateArgs) {
 
 export const updateCommand: CommandModule = {
   command: 'update [<name>] [--all]',
-  describe:
-    'Updates all extensions or a named extension to the latest version.',
+  describe: 'Updates all extensions or a named extension to the latest version.',
   builder: (yargs) =>
     yargs
       .positional('name', {

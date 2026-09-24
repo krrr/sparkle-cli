@@ -23,12 +23,8 @@ describe('mcp command', () => {
     const parser = yargsInstance.command(mcpCommand).help();
 
     // Mock console.log and console.error to catch help output
-    const consoleLogMock = vi
-      .spyOn(console, 'log')
-      .mockImplementation(() => {});
-    const consoleErrorMock = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleLogMock = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     try {
       await parser.parse('mcp');
@@ -38,8 +34,7 @@ describe('mcp command', () => {
 
     // Check if help output is shown
     const helpOutput =
-      consoleLogMock.mock.calls.join('\n') +
-      consoleErrorMock.mock.calls.join('\n');
+      consoleLogMock.mock.calls.join('\n') + consoleErrorMock.mock.calls.join('\n');
     expect(helpOutput).toContain('Manage MCP servers');
     expect(helpOutput).toContain('Commands:');
     expect(helpOutput).toContain('add');

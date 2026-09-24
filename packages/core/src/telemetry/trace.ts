@@ -38,10 +38,7 @@ export const spanRegistry = new FinalizationRegistry((endSpan: () => void) => {
   try {
     endSpan();
   } catch (e) {
-    debugLogger.warn(
-      'Error in FinalizationRegistry callback for span cleanup',
-      e,
-    );
+    debugLogger.warn('Error in FinalizationRegistry callback for span cleanup', e);
   }
 });
 
@@ -78,9 +75,7 @@ export function truncateForTelemetry(
 }
 
 function isAsyncIterable<T>(value: T): value is T & AsyncIterable<unknown> {
-  return (
-    typeof value === 'object' && value !== null && Symbol.asyncIterator in value
-  );
+  return typeof value === 'object' && value !== null && Symbol.asyncIterator in value;
 }
 
 /**
@@ -129,8 +124,7 @@ export async function runInDevTraceSpan<R>(
   },
   fn: ({ metadata }: { metadata: SpanMetadata }) => Promise<R>,
 ): Promise<R> {
-  const { operation, logPrompts, sessionId, tracesEnabled, ...restOfSpanOpts } =
-    opts;
+  const { operation, logPrompts, sessionId, tracesEnabled, ...restOfSpanOpts } = opts;
 
   restOfSpanOpts.attributes = {
     ...restOfSpanOpts.attributes,

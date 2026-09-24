@@ -29,9 +29,7 @@ class MockInvocation extends BaseToolInvocation<{ key?: string }, ToolResult> {
   async execute() {
     return {
       llmContent: this.params.key ? `key: ${this.params.key}` : 'success',
-      returnDisplay: this.params.key
-        ? `key: ${this.params.key}`
-        : 'success display',
+      returnDisplay: this.params.key ? `key: ${this.params.key}` : 'success display',
     };
   }
 }
@@ -197,9 +195,7 @@ describe('executeToolWithHooks', () => {
         tool_input: { key: 'modified' },
       },
     });
-    vi.mocked(mockHookSystem.fireBeforeToolEvent).mockResolvedValue(
-      mockBeforeOutput,
-    );
+    vi.mocked(mockHookSystem.fireBeforeToolEvent).mockResolvedValue(mockBeforeOutput);
 
     vi.mocked(mockHookSystem.fireAfterToolEvent).mockResolvedValue(undefined);
 
@@ -237,9 +233,7 @@ describe('executeToolWithHooks', () => {
         // No tool input
       },
     });
-    vi.mocked(mockHookSystem.fireBeforeToolEvent).mockResolvedValue(
-      mockBeforeOutput,
-    );
+    vi.mocked(mockHookSystem.fireBeforeToolEvent).mockResolvedValue(mockBeforeOutput);
 
     vi.mocked(mockHookSystem.fireAfterToolEvent).mockResolvedValue(undefined);
 

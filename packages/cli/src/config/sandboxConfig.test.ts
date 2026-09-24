@@ -191,9 +191,7 @@ describe('loadSandboxConfig', () => {
 
     it('should throw if the specified command does not exist', async () => {
       mockedCommandExistsSync.mockReturnValue(false);
-      await expect(
-        loadSandboxConfig({}, { sandbox: 'podman' }),
-      ).rejects.toThrow(
+      await expect(loadSandboxConfig({}, { sandbox: 'podman' })).rejects.toThrow(
         "Missing sandbox command 'podman' (from SPARKLE_SANDBOX)",
       );
     });
@@ -406,10 +404,7 @@ describe('loadSandboxConfig', () => {
     });
 
     it('should use runsc via settings file', async () => {
-      const config = await loadSandboxConfig(
-        { tools: { sandbox: 'runsc' } },
-        {},
-      );
+      const config = await loadSandboxConfig({ tools: { sandbox: 'runsc' } }, {});
 
       expect(config).toEqual({
         enabled: true,

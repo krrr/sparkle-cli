@@ -45,9 +45,7 @@ export async function shouldUseCurrentUserInSandbox(): Promise<boolean> {
         osReleaseContent.match(
           /^ID=["']?(?:debian|ubuntu|nixos|arch|fedora|suse|opensuse)/m,
         ) ||
-        osReleaseContent.match(
-          /^ID_LIKE=["']?.*(?:debian|ubuntu|arch|fedora|suse).*/m,
-        );
+        osReleaseContent.match(/^ID_LIKE=["']?.*(?:debian|ubuntu|arch|fedora|suse).*/m);
 
       if (isSupportedDistro) {
         debugLogger.log(
@@ -100,9 +98,7 @@ export function entrypoint(workdir: string, cliArgs: string[]): string[] {
     const paths = process.env['PATH'].split(pathSeparator);
     for (const p of paths) {
       const containerPath = getContainerPath(p);
-      if (
-        containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())
-      ) {
+      if (containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())) {
         pathSuffix += `:${containerPath}`;
       }
     }
@@ -116,9 +112,7 @@ export function entrypoint(workdir: string, cliArgs: string[]): string[] {
     const paths = process.env['PYTHONPATH'].split(pathSeparator);
     for (const p of paths) {
       const containerPath = getContainerPath(p);
-      if (
-        containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())
-      ) {
+      if (containerPath.toLowerCase().startsWith(containerWorkdir.toLowerCase())) {
         pythonPathSuffix += `:${containerPath}`;
       }
     }
@@ -139,8 +133,7 @@ export function entrypoint(workdir: string, cliArgs: string[]): string[] {
   );
 
   const quotedCliArgs = cliArgs.slice(2).map((arg) => quote([arg]));
-  const isDebugMode =
-    process.env['DEBUG'] === 'true' || process.env['DEBUG'] === '1';
+  const isDebugMode = process.env['DEBUG'] === 'true' || process.env['DEBUG'] === '1';
   const cliCmd =
     process.env['NODE_ENV'] === 'development'
       ? isDebugMode

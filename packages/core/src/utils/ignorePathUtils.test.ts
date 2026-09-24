@@ -26,31 +26,19 @@ describe('ignorePathUtils', () => {
       getNormalizedRelativePath(projectRoot, null as unknown as string, false),
     ).toBeNull();
     expect(
-      getNormalizedRelativePath(
-        projectRoot,
-        undefined as unknown as string,
-        false,
-      ),
+      getNormalizedRelativePath(projectRoot, undefined as unknown as string, false),
     ).toBeNull();
   });
 
   it('should return null for paths outside the project root', () => {
-    expect(
-      getNormalizedRelativePath(projectRoot, '/work/other', false),
-    ).toBeNull();
-    expect(
-      getNormalizedRelativePath(projectRoot, '../outside', false),
-    ).toBeNull();
+    expect(getNormalizedRelativePath(projectRoot, '/work/other', false)).toBeNull();
+    expect(getNormalizedRelativePath(projectRoot, '../outside', false)).toBeNull();
   });
 
   it('should return null for sibling directories with matching prefixes', () => {
     // If projectRoot is /work/project, /work/project-other should be null
     expect(
-      getNormalizedRelativePath(
-        projectRoot,
-        '/work/project-other/file.txt',
-        false,
-      ),
+      getNormalizedRelativePath(projectRoot, '/work/project-other/file.txt', false),
     ).toBeNull();
   });
 
@@ -58,9 +46,9 @@ describe('ignorePathUtils', () => {
     expect(getNormalizedRelativePath(projectRoot, 'src/index.ts', false)).toBe(
       'src/index.ts',
     );
-    expect(
-      getNormalizedRelativePath(projectRoot, './src/index.ts', false),
-    ).toBe('src/index.ts');
+    expect(getNormalizedRelativePath(projectRoot, './src/index.ts', false)).toBe(
+      'src/index.ts',
+    );
   });
 
   it('should normalize absolute paths within the root', () => {
@@ -92,9 +80,7 @@ describe('ignorePathUtils', () => {
     );
 
     const winDir = 'node_modules\\';
-    expect(getNormalizedRelativePath(projectRoot, winDir, true)).toBe(
-      'node_modules/',
-    );
+    expect(getNormalizedRelativePath(projectRoot, winDir, true)).toBe('node_modules/');
   });
 
   it('should handle the project root itself', () => {
@@ -106,24 +92,16 @@ describe('ignorePathUtils', () => {
 
   it('should remove leading slashes from relative-looking paths', () => {
     expect(
-      getNormalizedRelativePath(
-        projectRoot,
-        path.join(projectRoot, '/file.ts'),
-        false,
-      ),
+      getNormalizedRelativePath(projectRoot, path.join(projectRoot, '/file.ts'), false),
     ).toBe('file.ts');
   });
 
   it('should reject Windows cross-drive absolute paths', () => {
     // Simulate Windows path resolution where cross-drive paths return an
     // absolute path without "..".
-    vi.spyOn(path, 'resolve').mockImplementation(
-      (...args) => args[args.length - 1],
-    );
+    vi.spyOn(path, 'resolve').mockImplementation((...args) => args[args.length - 1]);
     vi.spyOn(path, 'relative').mockReturnValue('D:\\outside');
 
-    expect(
-      getNormalizedRelativePath('C:\\project', 'D:\\outside', false),
-    ).toBeNull();
+    expect(getNormalizedRelativePath('C:\\project', 'D:\\outside', false)).toBeNull();
   });
 });

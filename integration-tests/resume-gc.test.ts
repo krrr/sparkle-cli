@@ -71,10 +71,7 @@ describe('Context Management Resume E2E', () => {
 
     const setupResponses = (fileName: string, mocks: FakeResponse[]) => {
       const filePath = path.join(rig.testDir!, fileName);
-      fs.writeFileSync(
-        filePath,
-        mocks.map((m) => JSON.stringify(m)).join('\n'),
-      );
+      fs.writeFileSync(filePath, mocks.map((m) => JSON.stringify(m)).join('\n'));
       return filePath;
     };
 

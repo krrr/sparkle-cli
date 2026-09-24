@@ -5,10 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  FakeContentGenerator,
-  type FakeResponse,
-} from './fakeContentGenerator.js';
+import { FakeContentGenerator, type FakeResponse } from './fakeContentGenerator.js';
 import { promises } from 'node:fs';
 import {
   GenerateContentResponse,
@@ -37,9 +34,7 @@ describe('FakeContentGenerator', () => {
   const fakeGenerateContentResponse: FakeResponse = {
     method: 'generateContent',
     response: {
-      candidates: [
-        { content: { parts: [{ text: 'response1' }], role: 'model' } },
-      ],
+      candidates: [{ content: { parts: [{ text: 'response1' }], role: 'model' } }],
     } as GenerateContentResponse,
   };
 
@@ -47,14 +42,10 @@ describe('FakeContentGenerator', () => {
     method: 'generateContentStream',
     response: [
       {
-        candidates: [
-          { content: { parts: [{ text: 'chunk1' }], role: 'model' } },
-        ],
+        candidates: [{ content: { parts: [{ text: 'chunk1' }], role: 'model' } }],
       },
       {
-        candidates: [
-          { content: { parts: [{ text: 'chunk2' }], role: 'model' } },
-        ],
+        candidates: [{ content: { parts: [{ text: 'chunk2' }], role: 'model' } }],
       },
     ] as GenerateContentResponse[],
   };
@@ -87,9 +78,7 @@ describe('FakeContentGenerator', () => {
   });
 
   it('should return responses for generateContentStream', async () => {
-    const generator = new FakeContentGenerator([
-      fakeGenerateContentStreamResponse,
-    ]);
+    const generator = new FakeContentGenerator([fakeGenerateContentStreamResponse]);
     const stream = await generator.generateContentStream(
       {} as GenerateContentParameters,
       'id',
@@ -163,11 +152,7 @@ describe('FakeContentGenerator', () => {
       ),
     ).rejects.toThrow('No more mock responses for generateContentStream');
     await expect(
-      generator.generateContent(
-        {} as GenerateContentParameters,
-        'id',
-        LlmRole.MAIN,
-      ),
+      generator.generateContent({} as GenerateContentParameters, 'id', LlmRole.MAIN),
     ).rejects.toThrowError('No more mock responses for generateContent');
   });
 

@@ -12,8 +12,7 @@ import { coreEvents, CoreEvent } from '../utils/events.js';
 
 // Mock memoryDiscovery module
 vi.mock('../utils/memoryDiscovery.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/memoryDiscovery.js')>();
+  const actual = await importOriginal<typeof import('../utils/memoryDiscovery.js')>();
   return {
     ...actual,
     getGlobalMemoryPaths: vi.fn(),
@@ -23,9 +22,7 @@ vi.mock('../utils/memoryDiscovery.js', async (importOriginal) => {
     readGeminiMdFiles: vi.fn(),
     loadJitSubdirectoryMemory: vi.fn(),
     deduplicatePathsByFileIdentity: vi.fn(),
-    concatenateInstructions: vi
-      .fn()
-      .mockImplementation(actual.concatenateInstructions),
+    concatenateInstructions: vi.fn().mockImplementation(actual.concatenateInstructions),
   };
 });
 
@@ -61,12 +58,12 @@ describe('MemoryContextManager', () => {
     vi.mocked(memoryDiscovery.getExtensionMemoryPaths).mockReturnValue([]);
     vi.mocked(memoryDiscovery.getUserProjectMemoryPaths).mockResolvedValue([]);
     // default mock: deduplication returns paths as-is (no deduplication)
-    vi.mocked(
-      memoryDiscovery.deduplicatePathsByFileIdentity,
-    ).mockImplementation(async (paths: string[]) => ({
-      paths,
-      identityMap: new Map<string, string>(),
-    }));
+    vi.mocked(memoryDiscovery.deduplicatePathsByFileIdentity).mockImplementation(
+      async (paths: string[]) => ({
+        paths,
+        identityMap: new Map<string, string>(),
+      }),
+    );
   });
 
   describe('refresh', () => {
@@ -74,12 +71,8 @@ describe('MemoryContextManager', () => {
       const globalPaths = ['/home/user/.sparkle/AGENTS.md'];
       const envPaths = ['/app/AGENTS.md'];
 
-      vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(
-        globalPaths,
-      );
-      vi.mocked(memoryDiscovery.getEnvironmentMemoryPaths).mockResolvedValue(
-        envPaths,
-      );
+      vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(globalPaths);
+      vi.mocked(memoryDiscovery.getEnvironmentMemoryPaths).mockResolvedValue(envPaths);
 
       vi.mocked(memoryDiscovery.readGeminiMdFiles).mockResolvedValue([
         { filePath: globalPaths[0], content: 'Global Content' },
@@ -99,15 +92,9 @@ describe('MemoryContextManager', () => {
         ['.git'],
       );
 
-      expect(memoryContextManager.getGlobalMemory()).toContain(
-        'Global Content',
-      );
-      expect(memoryContextManager.getEnvironmentMemory()).toContain(
-        'Env Content',
-      );
-      expect(memoryContextManager.getEnvironmentMemory()).toContain(
-        'MCP Instructions',
-      );
+      expect(memoryContextManager.getGlobalMemory()).toContain('Global Content');
+      expect(memoryContextManager.getEnvironmentMemory()).toContain('Env Content');
+      expect(memoryContextManager.getEnvironmentMemory()).toContain('MCP Instructions');
 
       expect(memoryContextManager.getLoadedPaths()).toContain(globalPaths[0]);
       expect(memoryContextManager.getLoadedPaths()).toContain(envPaths[0]);
@@ -148,26 +135,18 @@ describe('MemoryContextManager', () => {
 
       expect(memoryDiscovery.getEnvironmentMemoryPaths).not.toHaveBeenCalled();
       expect(memoryContextManager.getEnvironmentMemory()).toBe('');
-      expect(memoryContextManager.getGlobalMemory()).toContain(
-        'Global Content',
-      );
+      expect(memoryContextManager.getGlobalMemory()).toContain('Global Content');
     });
 
     it('should deduplicate files by file identity in case-insensitive filesystems', async () => {
       const globalPaths = ['/home/user/.sparkle/AGENTS.md'];
       const envPaths = ['/app/AGENTS.md', '/app/AGENTS.md'];
 
-      vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(
-        globalPaths,
-      );
-      vi.mocked(memoryDiscovery.getEnvironmentMemoryPaths).mockResolvedValue(
-        envPaths,
-      );
+      vi.mocked(memoryDiscovery.getGlobalMemoryPaths).mockResolvedValue(globalPaths);
+      vi.mocked(memoryDiscovery.getEnvironmentMemoryPaths).mockResolvedValue(envPaths);
 
       // mock deduplication to return deduplicated paths (simulating same file)
-      vi.mocked(
-        memoryDiscovery.deduplicatePathsByFileIdentity,
-      ).mockResolvedValue({
+      vi.mocked(memoryDiscovery.deduplicatePathsByFileIdentity).mockResolvedValue({
         paths: ['/home/user/.sparkle/AGENTS.md', '/app/AGENTS.md'],
         identityMap: new Map<string, string>(),
       });
@@ -182,9 +161,7 @@ describe('MemoryContextManager', () => {
 
       await memoryContextManager.refresh();
 
-      expect(
-        memoryDiscovery.deduplicatePathsByFileIdentity,
-      ).toHaveBeenCalledWith(
+      expect(memoryDiscovery.deduplicatePathsByFileIdentity).toHaveBeenCalledWith(
         expect.arrayContaining([
           '/home/user/.sparkle/AGENTS.md',
           '/app/AGENTS.md',
@@ -196,9 +173,7 @@ describe('MemoryContextManager', () => {
         'tree',
         ['.git'],
       );
-      expect(memoryContextManager.getEnvironmentMemory()).toContain(
-        'Project Content',
-      );
+      expect(memoryContextManager.getEnvironmentMemory()).toContain('Project Content');
     });
   });
 
@@ -211,10 +186,9 @@ describe('MemoryContextManager', () => {
         mockResult,
       );
 
-      const result = await memoryContextManager.discoverContext(
-        '/app/src/file.ts',
-        ['/app'],
-      );
+      const result = await memoryContextManager.discoverContext('/app/src/file.ts', [
+        '/app',
+      ]);
 
       expect(memoryDiscovery.loadJitSubdirectoryMemory).toHaveBeenCalledWith(
         '/app/src/file.ts',
@@ -225,9 +199,7 @@ describe('MemoryContextManager', () => {
       );
       expect(result).toMatch(/--- Context from: \/app\/src\/AGENTS\.md ---/);
       expect(result).toContain('Src Content');
-      expect(memoryContextManager.getLoadedPaths()).toContain(
-        '/app/src/AGENTS.md',
-      );
+      expect(memoryContextManager.getLoadedPaths()).toContain('/app/src/AGENTS.md');
     });
 
     it('should return empty string if no new files found', async () => {
@@ -236,10 +208,9 @@ describe('MemoryContextManager', () => {
         mockResult,
       );
 
-      const result = await memoryContextManager.discoverContext(
-        '/app/src/file.ts',
-        ['/app'],
-      );
+      const result = await memoryContextManager.discoverContext('/app/src/file.ts', [
+        '/app',
+      ]);
 
       expect(result).toBe('');
     });
@@ -247,10 +218,9 @@ describe('MemoryContextManager', () => {
     it('should return empty string if folder is not trusted', async () => {
       vi.mocked(mockConfig.isTrustedFolder).mockReturnValue(false);
 
-      const result = await memoryContextManager.discoverContext(
-        '/app/src/file.ts',
-        ['/app'],
-      );
+      const result = await memoryContextManager.discoverContext('/app/src/file.ts', [
+        '/app',
+      ]);
 
       expect(memoryDiscovery.loadJitSubdirectoryMemory).not.toHaveBeenCalled();
       expect(result).toBe('');
@@ -258,9 +228,7 @@ describe('MemoryContextManager', () => {
 
     it('should pass custom boundary markers from config', async () => {
       const customMarkers = ['.monorepo-root', 'package.json'];
-      vi.mocked(mockConfig.getMemoryBoundaryMarkers).mockReturnValue(
-        customMarkers,
-      );
+      vi.mocked(mockConfig.getMemoryBoundaryMarkers).mockReturnValue(customMarkers);
       vi.mocked(memoryDiscovery.loadJitSubdirectoryMemory).mockResolvedValue({
         files: [],
       });

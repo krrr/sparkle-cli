@@ -39,13 +39,10 @@ export function patchStdio(): () => void {
 
   process.stdout.write = (
     chunk: Uint8Array | string,
-    encodingOrCb?:
-      | BufferEncoding
-      | ((err?: NodeJS.ErrnoException | null) => void),
+    encodingOrCb?: BufferEncoding | ((err?: NodeJS.ErrnoException | null) => void),
     cb?: (err?: NodeJS.ErrnoException | null) => void,
   ) => {
-    const encoding =
-      typeof encodingOrCb === 'string' ? encodingOrCb : undefined;
+    const encoding = typeof encodingOrCb === 'string' ? encodingOrCb : undefined;
     coreEvents.emitOutput(false, chunk, encoding);
     const callback = typeof encodingOrCb === 'function' ? encodingOrCb : cb;
     if (callback) {
@@ -56,13 +53,10 @@ export function patchStdio(): () => void {
 
   process.stderr.write = (
     chunk: Uint8Array | string,
-    encodingOrCb?:
-      | BufferEncoding
-      | ((err?: NodeJS.ErrnoException | null) => void),
+    encodingOrCb?: BufferEncoding | ((err?: NodeJS.ErrnoException | null) => void),
     cb?: (err?: NodeJS.ErrnoException | null) => void,
   ) => {
-    const encoding =
-      typeof encodingOrCb === 'string' ? encodingOrCb : undefined;
+    const encoding = typeof encodingOrCb === 'string' ? encodingOrCb : undefined;
     coreEvents.emitOutput(true, chunk, encoding);
     const callback = typeof encodingOrCb === 'function' ? encodingOrCb : cb;
     if (callback) {

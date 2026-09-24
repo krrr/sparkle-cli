@@ -1,30 +1,27 @@
 # Tools reference
 
-Sparkle CLI uses tools to interact with your local environment, access
-information, and perform actions on your behalf. These tools extend the model's
-capabilities beyond text generation, letting it read files, execute commands,
-and search the web.
+Sparkle CLI uses tools to interact with your local environment, access information, and
+perform actions on your behalf. These tools extend the model's capabilities beyond text
+generation, letting it read files, execute commands, and search the web.
 
 ## How to use Sparkle CLI's tools
 
-Tools are generally invoked automatically by Sparkle CLI when it needs to
-perform an action. However, you can also trigger specific tools manually using
-shorthand syntax.
+Tools are generally invoked automatically by Sparkle CLI when it needs to perform an
+action. However, you can also trigger specific tools manually using shorthand syntax.
 
 ### Automatic execution and security
 
-When the model wants to use a tool, Sparkle CLI evaluates the request against
-its security policies.
+When the model wants to use a tool, Sparkle CLI evaluates the request against its
+security policies.
 
-- **User confirmation:** You must manually approve tools that modify files or
-  execute shell commands (mutators). The CLI shows you a diff or the exact
-  command before you confirm.
-- **Sandboxing:** You can run tool executions in secure, containerized
-  environments to isolate changes from your host system. For more details, see
-  the [Sandboxing](../cli/sandbox.md) guide.
-- **Trusted folders:** You can configure which directories allow the model to
-  use system tools. For more details, see the
-  [Trusted folders](../cli/trusted-folders.md) guide.
+- **User confirmation:** You must manually approve tools that modify files or execute
+  shell commands (mutators). The CLI shows you a diff or the exact command before you
+  confirm.
+- **Sandboxing:** You can run tool executions in secure, containerized environments to
+  isolate changes from your host system. For more details, see the
+  [Sandboxing](../cli/sandbox.md) guide.
+- **Trusted folders:** You can configure which directories allow the model to use system
+  tools. For more details, see the [Trusted folders](../cli/trusted-folders.md) guide.
 
 Review confirmation prompts carefully before allowing a tool to execute.
 
@@ -32,18 +29,15 @@ Review confirmation prompts carefully before allowing a tool to execute.
 
 You can directly trigger key tools using special syntax in your prompt:
 
-- **[File access](../tools/file-system.md) (`@`):** Use the `@` symbol followed
-  by a file or directory path to include its content in your prompt. This
-  triggers the `read_many_files` tool for files and the `list_directory` tool
-  for directories.
-- **[Shell commands](../tools/shell.md) (`!`):** Use the `!` symbol followed by
-  a system command to execute it directly. This triggers the `run_shell_command`
-  tool.
+- **[File access](../tools/file-system.md) (`@`):** Use the `@` symbol followed by a
+  file or directory path to include its content in your prompt. This triggers the
+  `read_many_files` tool for files and the `list_directory` tool for directories.
+- **[Shell commands](../tools/shell.md) (`!`):** Use the `!` symbol followed by a system
+  command to execute it directly. This triggers the `run_shell_command` tool.
 
 ## How to manage tools
 
-Using built-in commands, you can inspect available tools and configure how they
-behave.
+Using built-in commands, you can inspect available tools and configure how they behave.
 
 ### Tool discovery
 
@@ -52,21 +46,19 @@ Use the `/tools` command to see what tools are currently active in your session.
 - **`/tools`**: Lists all registered tools with their display names.
 - **`/tools desc`**: Lists all tools with their full descriptions.
 
-This is especially useful for verifying that
-[MCP servers](../tools/mcp-server.md) or custom tools are loaded correctly.
+This is especially useful for verifying that [MCP servers](../tools/mcp-server.md) or
+custom tools are loaded correctly.
 
 ### Tool configuration
 
-You can enable, disable, or configure specific tools in your settings. For
-example, you can set a specific pager for shell commands or configure the
-browser used for web searches. See the [Settings](../cli/settings.md) guide for
-details.
+You can enable, disable, or configure specific tools in your settings. For example, you
+can set a specific pager for shell commands or configure the browser used for web
+searches. See the [Settings](../cli/settings.md) guide for details.
 
 ## Available tools
 
-The following sections list all available tools, categorized by their primary
-function. For detailed parameter information, see the linked documentation for
-each tool.
+The following sections list all available tools, categorized by their primary function.
+For detailed parameter information, see the linked documentation for each tool.
 
 ### Execution
 
@@ -157,9 +149,9 @@ each tool.
 ### Tool argument keys
 
 When writing [`argsPattern`](./policy-engine.md#arguments-pattern) rules for the
-[policy engine](./policy-engine.md), you need to know the JSON argument keys for
-each tool. The following table lists the keys that appear in the JSON
-representation of each tool's arguments.
+[policy engine](./policy-engine.md), you need to know the JSON argument keys for each
+tool. The following table lists the keys that appear in the JSON representation of each
+tool's arguments.
 
 | Tool                     | JSON argument keys                                                                                                                                                                                   |
 | :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -187,8 +179,8 @@ representation of each tool's arguments.
 | `web_search`             | `query`                                                                                                                                                                                              |
 | `web_fetch`              | `prompt`                                                                                                                                                                                             |
 
-For example, to write a policy rule that blocks any `write_file` call targeting
-a `.env` file, you would match against the `file_path` key:
+For example, to write a policy rule that blocks any `write_file` call targeting a `.env`
+file, you would match against the `file_path` key:
 
 ```toml
 [[rule]]
@@ -199,16 +191,16 @@ priority = 100
 denyMessage = "Writing to .env files is not allowed."
 ```
 
-For full argument descriptions and types, see the individual tool pages linked
-in the [tables above](#available-tools).
+For full argument descriptions and types, see the individual tool pages linked in the
+[tables above](#available-tools).
 
 ## Under the hood
 
 For developers, the tool system is designed to be extensible and robust. The
 `ToolRegistry` class manages all available tools.
 
-You can extend Sparkle CLI with custom tools by configuring
-`tools.discoveryCommand` in your settings or by connecting to MCP servers.
+You can extend Sparkle CLI with custom tools by configuring `tools.discoveryCommand` in
+your settings or by connecting to MCP servers.
 
 <!-- prettier-ignore -->
 > [!NOTE]

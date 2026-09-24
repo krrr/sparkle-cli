@@ -101,15 +101,10 @@ function sanitizeWorkflowToolSequenceEntry(entry: string): string | undefined {
   if (trimmed.startsWith(shellPrefix)) {
     const command = trimmed.slice(shellPrefix.length).trim();
     const commandSummary = summarizeShellCommandForScratchpad(command);
-    return commandSummary
-      ? `${SHELL_TOOL_NAME}: ${commandSummary}`
-      : SHELL_TOOL_NAME;
+    return commandSummary ? `${SHELL_TOOL_NAME}: ${commandSummary}` : SHELL_TOOL_NAME;
   }
 
-  if (
-    trimmed === SHELL_TOOL_NAME ||
-    SAFE_TOOL_SEQUENCE_ENTRY_REGEX.test(trimmed)
-  ) {
+  if (trimmed === SHELL_TOOL_NAME || SAFE_TOOL_SEQUENCE_ENTRY_REGEX.test(trimmed)) {
     return trimmed;
   }
 
@@ -135,9 +130,7 @@ export function sanitizeWorkflowSummaryForScratchpad(summary: string): string {
         .map(sanitizeWorkflowToolSequenceEntry)
         .filter((entry): entry is string => Boolean(entry));
       if (sanitizedToolSequence.length > 0) {
-        sanitizedParts.push(
-          sanitizedToolSequence.join(TOOL_SEQUENCE_SEPARATOR),
-        );
+        sanitizedParts.push(sanitizedToolSequence.join(TOOL_SEQUENCE_SEPARATOR));
       }
       continue;
     }

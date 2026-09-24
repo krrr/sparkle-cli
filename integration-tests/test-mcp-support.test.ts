@@ -5,11 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  TestRig,
-  assertModelHasOutput,
-  TestMcpServerBuilder,
-} from './test-helper.js';
+import { TestRig, assertModelHasOutput, TestMcpServerBuilder } from './test-helper.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
@@ -61,13 +57,8 @@ describe('test-mcp-support', () => {
     });
 
     // Assert tool call
-    const foundToolCall = await rig.waitForToolCall(
-      'mcp_weather-server_get_weather',
-    );
-    expect(
-      foundToolCall,
-      'Expected to find a get_weather tool call',
-    ).toBeTruthy();
+    const foundToolCall = await rig.waitForToolCall('mcp_weather-server_get_weather');
+    expect(foundToolCall, 'Expected to find a get_weather tool call').toBeTruthy();
 
     assertModelHasOutput(output);
     expect(output.toLowerCase()).toContain('rainy');

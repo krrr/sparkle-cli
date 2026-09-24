@@ -7,8 +7,8 @@
 import fs from 'node:fs';
 import ignorePkg, { type Ignore as IgnoreType } from 'ignore';
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-const ignore = ((ignorePkg as unknown as { default?: () => IgnoreType })
-  .default ?? ignorePkg) as () => IgnoreType;
+const ignore = ((ignorePkg as unknown as { default?: () => IgnoreType }).default ??
+  ignorePkg) as () => IgnoreType;
 import picomatch from 'picomatch';
 import type { FileDiscoveryService } from '../../services/fileDiscoveryService.js';
 
@@ -67,8 +67,7 @@ export class Ignore {
 
       this.allPatterns.push(pattern);
 
-      const isPositiveDirPattern =
-        pattern.endsWith('/') && !pattern.startsWith('!');
+      const isPositiveDirPattern = pattern.endsWith('/') && !pattern.startsWith('!');
 
       if (isPositiveDirPattern) {
         this.dirIgnorer.add(pattern);

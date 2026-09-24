@@ -35,12 +35,11 @@ describe('Flash Model Fallback Configuration', () => {
     });
 
     // Initialize contentGeneratorConfig for testing
-    (
-      config as unknown as { contentGeneratorConfig: unknown }
-    ).contentGeneratorConfig = {
-      model: DEFAULT_GEMINI_MODEL,
-      authType: 'oauth-personal',
-    };
+    (config as unknown as { contentGeneratorConfig: unknown }).contentGeneratorConfig =
+      {
+        model: DEFAULT_GEMINI_MODEL,
+        authType: 'oauth-personal',
+      };
   });
 
   describe('getModel', () => {
@@ -75,10 +74,7 @@ describe('Flash Model Fallback Configuration', () => {
     });
 
     it('should set fallback override when failedModel is provided and register runtime override', () => {
-      config.activateFallbackMode(
-        DEFAULT_GEMINI_FLASH_MODEL,
-        DEFAULT_GEMINI_MODEL,
-      );
+      config.activateFallbackMode(DEFAULT_GEMINI_FLASH_MODEL, DEFAULT_GEMINI_MODEL);
       expect(config.getModel()).toBe(DEFAULT_GEMINI_FLASH_MODEL);
       expect(config.getFallbackOverride(DEFAULT_GEMINI_MODEL)).toBe(
         DEFAULT_GEMINI_FLASH_MODEL,
@@ -97,8 +93,7 @@ describe('Flash Model Fallback Configuration', () => {
       config.activateFallbackMode('model-B', 'model-A');
       expect(config.getFallbackOverride('model-A')).toBe('model-B');
       expect(
-        config.getModelConfigService().getResolvedConfig({ model: 'model-A' })
-          .model,
+        config.getModelConfigService().getResolvedConfig({ model: 'model-A' }).model,
       ).toBe('model-B');
 
       // 2. Chained fallback: B fails, fallback to C
@@ -109,12 +104,10 @@ describe('Flash Model Fallback Configuration', () => {
       expect(config.getFallbackOverride('model-B')).toBe('model-C');
 
       expect(
-        config.getModelConfigService().getResolvedConfig({ model: 'model-A' })
-          .model,
+        config.getModelConfigService().getResolvedConfig({ model: 'model-A' }).model,
       ).toBe('model-C');
       expect(
-        config.getModelConfigService().getResolvedConfig({ model: 'model-B' })
-          .model,
+        config.getModelConfigService().getResolvedConfig({ model: 'model-B' }).model,
       ).toBe('model-C');
     });
 

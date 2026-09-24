@@ -50,8 +50,7 @@ describe('EditorSettingsDialog', () => {
     vi.clearAllMocks();
   });
 
-  const renderWithProvider = async (ui: React.ReactElement) =>
-    renderWithProviders(ui);
+  const renderWithProvider = async (ui: React.ReactElement) => renderWithProviders(ui);
 
   it('renders correctly', async () => {
     const { lastFrame } = await renderWithProvider(
@@ -167,10 +166,7 @@ describe('EditorSettingsDialog', () => {
 
     const frame = lastFrame() || '';
     if (!frame.includes('(Also modified')) {
-      debugLogger.debug(
-        'Modified message test failure. Frame:',
-        JSON.stringify(frame),
-      );
+      debugLogger.debug('Modified message test failure. Frame:', JSON.stringify(frame));
     }
     expect(frame).toContain('(Also modified');
   });

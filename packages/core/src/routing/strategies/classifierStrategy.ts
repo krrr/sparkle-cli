@@ -15,10 +15,7 @@ import type {
 import { resolveClassifierModel, isCustomModel } from '../../config/models.js';
 import { createUserContent, Type } from '@google/genai';
 import type { Config } from '../../config/config.js';
-import {
-  isFunctionCall,
-  isFunctionResponse,
-} from '../../utils/messageInspectors.js';
+import { isFunctionCall, isFunctionResponse } from '../../utils/messageInspectors.js';
 import { debugLogger } from '../../utils/debugLogger.js';
 import { normalizeModelId } from '../../utils/modelUtils.js';
 import { LlmRole } from '../../telemetry/types.js';
@@ -148,9 +145,7 @@ export class ClassifierStrategy implements RoutingStrategy {
       // Since we prune all tool turns from history, sending a function response
       // request would result in an invalid payload (missing the preceding function call).
       if (isFunctionResponse(createUserContent(context.request))) {
-        debugLogger.log(
-          '[Routing] Bypassing Classifier: request is FunctionResponse.',
-        );
+        debugLogger.log('[Routing] Bypassing Classifier: request is FunctionResponse.');
         return null;
       }
 

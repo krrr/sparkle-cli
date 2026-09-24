@@ -319,9 +319,7 @@ export class GeminiChat {
     // This is critical for hot-restarts after operations like context compression.
     if (history.length > 0) {
       initialHistory = history.map((item) =>
-        'id' in item && 'content' in item
-          ? item
-          : { id: randomUUID(), content: item },
+        'id' in item && 'content' in item ? item : { id: randomUUID(), content: item },
       );
     } else if (resumedSessionData) {
       // Otherwise, if resuming from disk, rebuild through the same canonical
@@ -357,9 +355,7 @@ export class GeminiChat {
     await this.chatRecordingService.initialize(resumedSessionData, kind);
     // Sync initial history with the recorder to ensure all turns (even bootstrapped ones)
     // are durable and coordinated.
-    this.chatRecordingService.updateMessagesFromHistory(
-      this.agentHistory.get(),
-    );
+    this.chatRecordingService.updateMessagesFromHistory(this.agentHistory.get());
   }
 
   setSystemInstruction(sysInstr: string) {
@@ -431,8 +427,7 @@ export class GeminiChat {
     const { model } =
       this.context.config.modelConfigService.getResolvedConfig(modelConfigKey);
 
-    const isContextManagementEnabled =
-      this.context.config.isContextManagementEnabled();
+    const isContextManagementEnabled = this.context.config.isContextManagementEnabled();
 
     // Record user input - capture complete message with all parts (text, files, images, etc.)
     // but skip recording function responses (tool call results) as they should be stored in tool call records
@@ -467,8 +462,7 @@ export class GeminiChat {
         const lastTurn = history[history.length - 1];
         if (
           !lastTurn ||
-          partListUnionToString(lastTurn.content.parts || []) !==
-            userMessageContent
+          partListUnionToString(lastTurn.content.parts || []) !== userMessageContent
         ) {
           const id = this.chatRecordingService.recordMessage({
             model,
@@ -494,16 +488,13 @@ export class GeminiChat {
           this.agentHistory.push({ id, content: userContent });
 
           // Turn 2: Synthetic Model Acknowledgment
-          const modelId = this.chatRecordingService.recordSyntheticMessage(
-            'gemini',
-            [
-              {
-                text: 'Binary content received. Proceeding with analysis.',
-                thought: true,
-                thoughtSignature: SYNTHETIC_THOUGHT_SIGNATURE,
-              },
-            ],
-          );
+          const modelId = this.chatRecordingService.recordSyntheticMessage('gemini', [
+            {
+              text: 'Binary content received. Proceeding with analysis.',
+              thought: true,
+              thoughtSignature: SYNTHETIC_THOUGHT_SIGNATURE,
+            },
+          ]);
           this.agentHistory.push({
             id: modelId,
             content: {
@@ -625,9 +616,7 @@ export class GeminiChat {
 
             const isContentError = error instanceof InvalidStreamError;
             const isRetryableContentError = isContentError;
-            const errorType = isContentError
-              ? error.type
-              : getRetryErrorType(error);
+            const errorType = isContentError ? error.type : getRetryErrorType(error);
 
             if (isRetryableContentError || (isRetryable && !signal.aborted)) {
               // The issue requests exactly 3 retries (4 attempts) for API errors during stream iteration.
@@ -635,13 +624,9 @@ export class GeminiChat {
               // up to 3 times before finally throwing the error to the user.
               const maxMidStreamAttempts = MID_STREAM_RETRY_OPTIONS.maxAttempts;
 
-              if (
-                attempt < maxAttempts - 1 &&
-                attempt < maxMidStreamAttempts - 1
-              ) {
+              if (attempt < maxAttempts - 1 && attempt < maxMidStreamAttempts - 1) {
                 const delayMs = MID_STREAM_RETRY_OPTIONS.useExponentialBackoff
-                  ? MID_STREAM_RETRY_OPTIONS.initialDelayMs *
-                    Math.pow(2, attempt)
+                  ? MID_STREAM_RETRY_OPTIONS.initialDelayMs * Math.pow(2, attempt)
                   : MID_STREAM_RETRY_OPTIONS.initialDelayMs * (attempt + 1);
 
                 if (isContentError) {
@@ -689,9 +674,7 @@ export class GeminiChat {
       } catch (error) {
         if (!isOriginalFunctionResponse) {
           this.agentHistory.rollback(historyLengthBefore);
-          this.chatRecordingService.updateMessagesFromHistory(
-            this.agentHistory.get(),
-          );
+          this.chatRecordingService.updateMessagesFromHistory(this.agentHistory.get());
           this.lastPromptTokenCount = baselinePromptTokenCount;
         }
         throw error;
@@ -725,9 +708,7 @@ export class GeminiChat {
     });
   }
 
-  private extractBinaryInjections(
-    parts: Part[] | undefined,
-  ): Part[] | undefined {
+  private extractBinaryInjections(parts: Part[] | undefined): Part[] | undefined {
     const binaryParts: Part[] = [];
     if (parts) {
       for (const part of parts) {
@@ -771,8 +752,7 @@ export class GeminiChat {
     } = applyModelSelection(this.context.config, modelConfigKey);
 
     let lastModelToUse = availabilityFinalModel;
-    let currentGenerateContentConfig: GenerateContentConfig =
-      newAvailabilityConfig;
+    let currentGenerateContentConfig: GenerateContentConfig = newAvailabilityConfig;
     let lastConfig: GenerateContentConfig = currentGenerateContentConfig;
     let lastContentsToUse: Content[] = [...requestContents];
 
@@ -890,20 +870,16 @@ export class GeminiChat {
           contentsToUse = beforeModelResult.modifiedContents as Content[];
         }
 
-        const toolSelectionResult =
-          await hookSystem.fireBeforeToolSelectionEvent({
-            model: modelToUse,
-            config,
-            contents: contentsToUse,
-          });
+        const toolSelectionResult = await hookSystem.fireBeforeToolSelectionEvent({
+          model: modelToUse,
+          config,
+          contents: contentsToUse,
+        });
 
         if (toolSelectionResult.toolConfig) {
           config.toolConfig = toolSelectionResult.toolConfig;
         }
-        if (
-          toolSelectionResult.tools &&
-          Array.isArray(toolSelectionResult.tools)
-        ) {
+        if (toolSelectionResult.tools && Array.isArray(toolSelectionResult.tools)) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
           config.tools = toolSelectionResult.tools as Tool[];
         }
@@ -931,10 +907,8 @@ export class GeminiChat {
       );
     };
 
-    const onPersistent429Callback = async (
-      authType?: string,
-      error?: unknown,
-    ) => handleFallback(this.context.config, lastModelToUse, authType, error);
+    const onPersistent429Callback = async (authType?: string, error?: unknown) =>
+      handleFallback(this.context.config, lastModelToUse, authType, error);
 
     const onValidationRequiredCallback = async (
       validationError: ValidationRequiredError,
@@ -957,14 +931,12 @@ export class GeminiChat {
       authType: this.context.config.getContentGeneratorConfig()?.authType,
       retryFetchErrors: this.context.config.getRetryFetchErrors(),
       signal: abortSignal,
-      maxAttempts:
-        availabilityMaxAttempts ?? this.context.config.getMaxAttempts(),
+      maxAttempts: availabilityMaxAttempts ?? this.context.config.getMaxAttempts(),
       getAvailabilityContext,
       onRetry: (attempt, error, delayMs) => {
         coreEvents.emitRetryAttempt({
           attempt,
-          maxAttempts:
-            availabilityMaxAttempts ?? this.context.config.getMaxAttempts(),
+          maxAttempts: availabilityMaxAttempts ?? this.context.config.getMaxAttempts(),
           delayMs,
           error: error instanceof Error ? error.message : String(error),
           model: lastModelToUse,
@@ -979,11 +951,7 @@ export class GeminiChat {
       contents: lastContentsToUse,
     };
 
-    return this.processStreamResponse(
-      lastModelToUse,
-      streamResponse,
-      originalRequest,
-    );
+    return this.processStreamResponse(lastModelToUse, streamResponse, originalRequest);
   }
 
   /**
@@ -1089,9 +1057,7 @@ export class GeminiChat {
     this.lastPromptTokenCount = estimateTokenCountSync(
       this.agentHistory.flatMap((c) => c.content.parts || []),
     );
-    this.chatRecordingService.updateMessagesFromHistory(
-      this.agentHistory.get(),
-    );
+    this.chatRecordingService.updateMessagesFromHistory(this.agentHistory.get());
   }
 
   setTools(tools: Tool[]): void {
@@ -1105,10 +1071,7 @@ export class GeminiChat {
   async maybeIncludeSchemaDepthContext(error: StructuredError): Promise<void> {
     // Check for potentially problematic cyclic tools with cyclic schemas
     // and include a recommendation to remove potentially problematic tools.
-    if (
-      isSchemaDepthError(error.message) ||
-      isInvalidArgumentError(error.message)
-    ) {
+    if (isSchemaDepthError(error.message) || isInvalidArgumentError(error.message)) {
       const tools = this.context.toolRegistry.getAllTools();
       const cyclicSchemaTools: string[] = [];
       for (const tool of tools) {
@@ -1142,11 +1105,9 @@ export class GeminiChat {
     let finishReason: FinishReason | undefined;
 
     // Buffers to prevent failed stream attempts from polluting telemetry and logs
-    const bufferedThoughts: Array<{ subject: string; description: string }> =
-      [];
-    let bufferedUsageMetadata:
-      | GenerateContentResponse['usageMetadata']
-      | undefined = undefined;
+    const bufferedThoughts: Array<{ subject: string; description: string }> = [];
+    let bufferedUsageMetadata: GenerateContentResponse['usageMetadata'] | undefined =
+      undefined;
 
     // The SDK provides fully assembled FunctionCall objects in chunk.functionCalls
     // We use a Map to ensure we only keep the latest version of each call (by ID)
@@ -1228,8 +1189,7 @@ export class GeminiChat {
               }
               let callIndex: number | undefined;
               if (part.functionCall) {
-                callIndex =
-                  currentChunkStartCounter + localFunctionCallCounter++;
+                callIndex = currentChunkStartCounter + localFunctionCallCounter++;
               }
               return {
                 ...part,
@@ -1247,10 +1207,7 @@ export class GeminiChat {
 
       const hookSystem = this.context.config.getHookSystem();
       if (originalRequest && chunk && hookSystem) {
-        const hookResult = await hookSystem.fireAfterModelEvent(
-          originalRequest,
-          chunk,
-        );
+        const hookResult = await hookSystem.fireAfterModelEvent(originalRequest, chunk);
 
         if (hookResult.stopped) {
           throw new AgentExecutionStoppedError(
@@ -1463,10 +1420,7 @@ export class GeminiChat {
    * Records completed tool calls with full metadata.
    * This is called by external components when tool calls complete, before sending responses to Gemini.
    */
-  recordCompletedToolCalls(
-    model: string,
-    toolCalls: CompletedToolCall[],
-  ): void {
+  recordCompletedToolCalls(model: string, toolCalls: CompletedToolCall[]): void {
     const toolCallRecords = toolCalls.map((call) => {
       const resultDisplayRaw = call.response?.resultDisplay;
       const resultDisplay =
@@ -1497,9 +1451,7 @@ export class GeminiChat {
   /**
    * Extracts thought from thought content.
    */
-  private extractThoughtFromContent(
-    content: Content,
-  ): ThoughtSummary | undefined {
+  private extractThoughtFromContent(content: Content): ThoughtSummary | undefined {
     if (!content.parts || content.parts.length === 0) {
       return undefined;
     }
@@ -1507,9 +1459,8 @@ export class GeminiChat {
     // Partial thought parts are transient live-reasoning updates; skip them
     // so the first durable part is treated as the thought.
     const thoughtPart =
-      content.parts.find(
-        (part) => !isPartialThoughtPart(part) && part.thought,
-      ) ?? content.parts[0];
+      content.parts.find((part) => !isPartialThoughtPart(part) && part.thought) ??
+      content.parts[0];
     if (thoughtPart.text) {
       return parseThought(thoughtPart.text);
     }
@@ -1535,10 +1486,7 @@ export function stripToolCallIdPrefixes(contents: Content[]): Content[] {
   // its prefix, strip — and apply that decision uniformly to every part
   // sharing the id.
   const strippedIds = new Map<string, string>();
-  const considerName = (
-    id: string | undefined,
-    rawName: string | undefined,
-  ): void => {
+  const considerName = (id: string | undefined, rawName: string | undefined): void => {
     if (!id || strippedIds.has(id)) {
       return;
     }
@@ -1585,9 +1533,7 @@ export function stripToolCallIdPrefixes(contents: Content[]): Content[] {
   }));
 }
 
-export function coalesceConsecutiveRoles(
-  history: HistoryTurn[],
-): HistoryTurn[] {
+export function coalesceConsecutiveRoles(history: HistoryTurn[]): HistoryTurn[] {
   const result: HistoryTurn[] = [];
   for (const turn of history) {
     const lastIdx = result.length - 1;

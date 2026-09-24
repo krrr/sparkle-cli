@@ -15,10 +15,7 @@ import {
 import { buildToolRegistry } from '../utils/tool-registry.js';
 import { collectInventory } from '../utils/eval-inventory.js';
 import type { InventoryResult } from '../utils/eval-inventory.js';
-import type {
-  EvalCaseRecord,
-  EvalFileAnalysis,
-} from '../utils/eval-analysis.js';
+import type { EvalCaseRecord, EvalFileAnalysis } from '../utils/eval-analysis.js';
 
 function makeCase(overrides: Partial<EvalCaseRecord> = {}): EvalCaseRecord {
   return {
@@ -59,9 +56,7 @@ describe('eval-coverage', () => {
       const result = computeCoverage(makeInventory([]), registry);
 
       expect(result.totalTools).toBe(registry.totalTools);
-      expect(result.coveredCount + result.uncoveredCount).toBe(
-        result.totalTools,
-      );
+      expect(result.coveredCount + result.uncoveredCount).toBe(result.totalTools);
     });
 
     it('marks all tools uncovered when inventory is empty', () => {
@@ -215,9 +210,7 @@ describe('eval-coverage', () => {
         registry,
       );
 
-      expect(result.covered.map((t) => t.name)).not.toContain(
-        'nonexistent_tool_xyz',
-      );
+      expect(result.covered.map((t) => t.name)).not.toContain('nonexistent_tool_xyz');
       expect(result.coveredCount).toBe(0);
     });
 
@@ -263,13 +256,8 @@ describe('eval-coverage', () => {
 
     it('computes coverage percent correctly', () => {
       const totalTools = registry.totalTools;
-      const halfTools = [...registry.tools.keys()].slice(
-        0,
-        Math.floor(totalTools / 2),
-      );
-      const cases = halfTools.map((name) =>
-        makeCase({ toolReferences: [name] }),
-      );
+      const halfTools = [...registry.tools.keys()].slice(0, Math.floor(totalTools / 2));
+      const cases = halfTools.map((name) => makeCase({ toolReferences: [name] }));
 
       const result = computeCoverage(makeInventory(cases), registry);
 
@@ -483,9 +471,7 @@ describe('eval-coverage', () => {
       const result = computeCoverage(inventory, registry);
 
       expect(result.totalTools).toBe(registry.totalTools);
-      expect(result.coveredCount + result.uncoveredCount).toBe(
-        result.totalTools,
-      );
+      expect(result.coveredCount + result.uncoveredCount).toBe(result.totalTools);
       expect(result.coveragePercent).toBeGreaterThanOrEqual(0);
       expect(result.coveragePercent).toBeLessThanOrEqual(100);
       expect(result.coveredCount).toBeGreaterThanOrEqual(5);

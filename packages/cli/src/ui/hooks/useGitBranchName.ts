@@ -51,21 +51,18 @@ export function useGitBranchName(cwd: string): string | undefined {
         await fsPromises.access(gitDir, fs.constants.F_OK);
         if (cancelled) return;
 
-        const w = fs.watch(
-          gitDir,
-          (eventType: string, filename: string | null) => {
-            // Changes to HEAD indicate branch checkout or detached commit.
-            // On some platforms filename may be null, so we refresh in that case too.
-            if (!filename || filename === 'HEAD') {
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-              }
-              timeoutRef.current = setTimeout(() => {
-                void fetchBranchName();
-              }, 100);
+        const w = fs.watch(gitDir, (eventType: string, filename: string | null) => {
+          // Changes to HEAD indicate branch checkout or detached commit.
+          // On some platforms filename may be null, so we refresh in that case too.
+          if (!filename || filename === 'HEAD') {
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
             }
-          },
-        );
+            timeoutRef.current = setTimeout(() => {
+              void fetchBranchName();
+            }, 100);
+          }
+        });
 
         if (cancelled) {
           w.close();

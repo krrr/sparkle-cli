@@ -13,10 +13,7 @@ import { useSettingsStore } from '../contexts/SettingsContext.js';
 import { SettingScope } from '../../config/settings.js';
 import { useKeypress, type Key } from '../hooks/useKeypress.js';
 import { isBinaryAvailable } from 'sparkle-cli-core';
-import {
-  WhisperModelManager,
-  type WhisperModelProgress,
-} from 'sparkle-cli-core';
+import { WhisperModelManager, type WhisperModelProgress } from 'sparkle-cli-core';
 import { CliSpinner } from './CliSpinner.js';
 import { WarningMessage } from './messages/WarningMessage.js';
 
@@ -54,23 +51,19 @@ export function VoiceModelDialog({
 }: VoiceModelDialogProps): React.JSX.Element {
   const { settings, setSetting } = useSettingsStore();
   const [view, setView] = useState<DialogView>('backend');
-  const [downloadProgress, setDownloadProgress] =
-    useState<WhisperModelProgress | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<WhisperModelProgress | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
-  const whisperInstalled = useMemo(
-    () => isBinaryAvailable('whisper-stream'),
-    [],
-  );
+  const whisperInstalled = useMemo(() => isBinaryAvailable('whisper-stream'), []);
   const modelManager = useMemo(() => new WhisperModelManager(), []);
 
-  const currentBackend =
-    settings.merged.experimental.voice?.backend ?? 'gemini-live';
+  const currentBackend = settings.merged.experimental.voice?.backend ?? 'gemini-live';
   const currentWhisperModel =
     settings.merged.experimental.voice?.whisperModel ?? 'ggml-base.en.bin';
 
-  const [highlightedBackend, setHighlightedBackend] =
-    useState<string>(currentBackend);
+  const [highlightedBackend, setHighlightedBackend] = useState<string>(currentBackend);
 
   const handleKeypress = useCallback(
     (key: Key) => {
@@ -94,11 +87,7 @@ export function VoiceModelDialog({
       if (value === 'whisper') {
         setView('whisper-models');
       } else {
-        setSetting(
-          SettingScope.User,
-          'experimental.voice.backend',
-          'gemini-live',
-        );
+        setSetting(SettingScope.User, 'experimental.voice.backend', 'gemini-live');
         onClose();
       }
     },
@@ -113,11 +102,7 @@ export function VoiceModelDialog({
     async (modelName: string) => {
       if (modelManager.isModelInstalled(modelName)) {
         setSetting(SettingScope.User, 'experimental.voice.backend', 'whisper');
-        setSetting(
-          SettingScope.User,
-          'experimental.voice.whisperModel',
-          modelName,
-        );
+        setSetting(SettingScope.User, 'experimental.voice.whisperModel', modelName);
         onClose();
       } else {
         setError(null);
@@ -127,16 +112,8 @@ export function VoiceModelDialog({
         try {
           await modelManager.downloadModel(modelName);
 
-          setSetting(
-            SettingScope.User,
-            'experimental.voice.backend',
-            'whisper',
-          );
-          setSetting(
-            SettingScope.User,
-            'experimental.voice.whisperModel',
-            modelName,
-          );
+          setSetting(SettingScope.User, 'experimental.voice.backend', 'whisper');
+          setSetting(SettingScope.User, 'experimental.voice.whisperModel', modelName);
           onClose();
         } catch (err) {
           setError(

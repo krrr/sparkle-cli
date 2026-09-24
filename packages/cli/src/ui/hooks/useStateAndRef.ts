@@ -18,20 +18,17 @@ export const useStateAndRef = <
   const [state, setState] = React.useState<T>(initialValue);
   const ref = React.useRef<T>(initialValue);
 
-  const setStateInternal = React.useCallback<typeof setState>(
-    (newStateOrCallback) => {
-      let newValue: T;
-      if (typeof newStateOrCallback === 'function') {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        newValue = newStateOrCallback(ref.current);
-      } else {
-        newValue = newStateOrCallback;
-      }
-      setState(newValue);
-      ref.current = newValue;
-    },
-    [],
-  );
+  const setStateInternal = React.useCallback<typeof setState>((newStateOrCallback) => {
+    let newValue: T;
+    if (typeof newStateOrCallback === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      newValue = newStateOrCallback(ref.current);
+    } else {
+      newValue = newStateOrCallback;
+    }
+    setState(newValue);
+    ref.current = newValue;
+  }, []);
 
   return [state, ref, setStateInternal] as const;
 };

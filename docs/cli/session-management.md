@@ -1,35 +1,33 @@
 # Session management
 
-Session management saves your conversation history so you can resume your work
-where you left off. Use these features to review past interactions, manage
-history across different projects, and configure how long data is retained.
+Session management saves your conversation history so you can resume your work where you
+left off. Use these features to review past interactions, manage history across
+different projects, and configure how long data is retained.
 
 ## Automatic saving
 
-Your session history is recorded automatically as you interact with the model.
-This background process ensures your work is preserved even if you interrupt a
-session.
+Your session history is recorded automatically as you interact with the model. This
+background process ensures your work is preserved even if you interrupt a session.
 
 - **What is saved:** The complete conversation history, including:
   - Your prompts and the model's responses.
   - All tool executions (inputs and outputs).
   - Token usage statistics (input, output, cached, etc.).
   - Assistant thoughts and reasoning summaries (when available).
-- **Location:** Sessions are stored in `~/.sparkle/data/<project-id>/chats/`,
-  where `<project-id>` is a unique identifier for your project directory.
-- **Scope:** Sessions are project-specific. Switching directories to a different
-  project switches to that project's session history.
+- **Location:** Sessions are stored in `~/.sparkle/data/<project-id>/chats/`, where
+  `<project-id>` is a unique identifier for your project directory.
+- **Scope:** Sessions are project-specific. Switching directories to a different project
+  switches to that project's session history.
 
 ## Resuming sessions
 
-You can resume a previous session to continue the conversation with all prior
-context restored. Resuming is supported both through command-line flags and an
-interactive browser.
+You can resume a previous session to continue the conversation with all prior context
+restored. Resuming is supported both through command-line flags and an interactive
+browser.
 
 ### From the command line
 
-When starting Sparkle CLI, use the `--resume` (or `-r`) flag to load existing
-sessions.
+When starting Sparkle CLI, use the `--resume` (or `-r`) flag to load existing sessions.
 
 - **Resume latest:**
 
@@ -53,15 +51,14 @@ sessions.
 
 ### From the interactive interface
 
-While the CLI is running, use the `/chat` slash command to open the **Session
-Browser**:
+While the CLI is running, use the `/chat` slash command to open the **Session Browser**:
 
 ```text
 /chat
 ```
 
-When typing `/chat` (or `/resume`) in slash completion, commands are grouped
-under titled separators:
+When typing `/chat` (or `/resume`) in slash completion, commands are grouped under
+titled separators:
 
 - `-- auto --` (session browser)
   - `list` is selectable and opens the session browser
@@ -73,10 +70,10 @@ The Session Browser provides an interactive interface where you can perform the
 following actions:
 
 - **Browse:** Scroll through a list of your past sessions.
-- **Preview:** See details like the session date, message count, and the first
-  user prompt.
-- **Search:** Press `/` to enter search mode, then type to filter sessions by ID
-  or content.
+- **Preview:** See details like the session date, message count, and the first user
+  prompt.
+- **Search:** Press `/` to enter search mode, then type to filter sessions by ID or
+  content.
 - **Select:** Press **Enter** to resume the selected session.
 - **Esc:** Press **Esc** to exit the Session Browser.
 
@@ -97,19 +94,18 @@ Aliases:
 
 ## Parallel sessions with Git worktrees
 
-When working on multiple tasks at once, you can use
-[Git worktrees](./git-worktrees.md) to give each Sparkle session its own copy of
-the codebase. This prevents changes in one session from colliding with another.
+When working on multiple tasks at once, you can use [Git worktrees](./git-worktrees.md)
+to give each Sparkle session its own copy of the codebase. This prevents changes in one
+session from colliding with another.
 
 ## Managing sessions
 
-You can list and delete sessions to keep your history organized and manage disk
-space.
+You can list and delete sessions to keep your history organized and manage disk space.
 
 ### Listing sessions
 
-To see a list of all available sessions for the current project from the command
-line, use the `--list-sessions` flag:
+To see a list of all available sessions for the current project from the command line,
+use the `--list-sessions` flag:
 
 ```bash
 sparkle --list-sessions
@@ -127,8 +123,7 @@ Available sessions for this project (3):
 
 ### Deleting sessions
 
-You can remove old or unwanted sessions to free up space or declutter your
-history.
+You can remove old or unwanted sessions to free up space or declutter your history.
 
 **From the command line:** Use the `--delete-session` flag with an index or ID:
 
@@ -144,23 +139,22 @@ sparkle --delete-session 2
 
 ## Configuration
 
-You can configure how Sparkle CLI manages your session history in your
-`settings.json` file. These settings let you control retention policies and
-session lengths.
+You can configure how Sparkle CLI manages your session history in your `settings.json`
+file. These settings let you control retention policies and session lengths.
 
 ### Session retention
 
-By default, Sparkle CLI automatically cleans up old session data to prevent your
-history from growing indefinitely. When a session is deleted, Sparkle CLI also
-removes all associated data, including implementation plans, task trackers, tool
-outputs, and activity logs.
+By default, Sparkle CLI automatically cleans up old session data to prevent your history
+from growing indefinitely. When a session is deleted, Sparkle CLI also removes all
+associated data, including implementation plans, task trackers, tool outputs, and
+activity logs.
 
 The default policy is to **retain sessions for 30 days**.
 
 #### Configuration
 
-You can customize these policies using the `/settings` command or by manually
-editing your `settings.json` file:
+You can customize these policies using the `/settings` command or by manually editing
+your `settings.json` file:
 
 ```json
 {
@@ -174,20 +168,18 @@ editing your `settings.json` file:
 }
 ```
 
-- **`enabled`**: (boolean) Master switch for session cleanup. Defaults to
-  `true`.
-- **`maxAge`**: (string) Duration to keep sessions (for example, "24h", "7d",
-  "4w"). Sessions older than this are deleted. Defaults to `"30d"`.
-- **`maxCount`**: (number) Maximum number of sessions to retain. The oldest
-  sessions exceeding this count are deleted. Defaults to undefined (unlimited).
-- **`minRetention`**: (string) Minimum retention period (safety limit). Defaults
-  to `"1d"`. Sessions newer than this period are never deleted by automatic
-  cleanup.
+- **`enabled`**: (boolean) Master switch for session cleanup. Defaults to `true`.
+- **`maxAge`**: (string) Duration to keep sessions (for example, "24h", "7d", "4w").
+  Sessions older than this are deleted. Defaults to `"30d"`.
+- **`maxCount`**: (number) Maximum number of sessions to retain. The oldest sessions
+  exceeding this count are deleted. Defaults to undefined (unlimited).
+- **`minRetention`**: (string) Minimum retention period (safety limit). Defaults to
+  `"1d"`. Sessions newer than this period are never deleted by automatic cleanup.
 
 ### Session limits
 
-You can limit the length of individual sessions to prevent context windows from
-becoming too large and expensive.
+You can limit the length of individual sessions to prevent context windows from becoming
+too large and expensive.
 
 ```json
 {
@@ -197,18 +189,18 @@ becoming too large and expensive.
 }
 ```
 
-- **`maxSessionTurns`**: (number) The maximum number of turns (user and model
-  exchanges) allowed in a single session. Set to `-1` for unlimited (default).
+- **`maxSessionTurns`**: (number) The maximum number of turns (user and model exchanges)
+  allowed in a single session. Set to `-1` for unlimited (default).
 
   **Behavior when limit is reached:**
 
-  - **Interactive mode:** The CLI shows an informational message and stops
-    sending requests to the model. You must manually start a new session.
+  - **Interactive mode:** The CLI shows an informational message and stops sending
+    requests to the model. You must manually start a new session.
   - **Non-interactive mode:** The CLI exits with an error.
 
 ## Next steps
 
-- Explore the [Memory tool](../tools/memory.md) to save persistent information
-  across sessions.
+- Explore the [Memory tool](../tools/memory.md) to save persistent information across
+  sessions.
 - Learn how to [Checkpoint](./checkpointing.md) your session state.
 - Check out the [CLI reference](./cli-reference.md) for all command-line flags.

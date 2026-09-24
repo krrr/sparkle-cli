@@ -42,14 +42,8 @@ describe('generalist_delegation', () => {
       rig.setBreakpoint(['generalist']);
     },
     assert: async (rig) => {
-      const confirmation = await rig.waitForPendingConfirmation(
-        'generalist',
-        60000,
-      );
-      expect(
-        confirmation,
-        'Expected a tool call for generalist agent',
-      ).toBeTruthy();
+      const confirmation = await rig.waitForPendingConfirmation('generalist', 60000);
+      expect(confirmation, 'Expected a tool call for generalist agent').toBeTruthy();
       await rig.resolveTool(confirmation);
       await rig.waitForIdle(60000);
     },
@@ -82,10 +76,7 @@ describe('generalist_delegation', () => {
       rig.setBreakpoint(['generalist']);
     },
     assert: async (rig) => {
-      const confirmation = await rig.waitForPendingConfirmation(
-        'generalist',
-        60000,
-      );
+      const confirmation = await rig.waitForPendingConfirmation('generalist', 60000);
       expect(
         confirmation,
         'Expected autonomously delegate to generalist for batch task',
@@ -114,8 +105,7 @@ describe('generalist_delegation', () => {
     files: {
       'README.md': 'This is a proyect.',
     },
-    prompt:
-      'There is a typo in README.md ("proyect"). Please fix it to "project".',
+    prompt: 'There is a typo in README.md ("proyect"). Please fix it to "project".',
     setup: async (rig) => {
       // Break on everything to see what it calls
       rig.setBreakpoint(['*']);

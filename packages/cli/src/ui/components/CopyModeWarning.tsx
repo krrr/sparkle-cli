@@ -16,8 +16,8 @@ export const CopyModeWarning: React.FC = () => {
     <Box height={1}>
       {copyModeEnabled && (
         <Text color={theme.status.warning}>
-          In Copy Mode. Use Page Up/Down to scroll. Press Ctrl+S or any other
-          key to exit.
+          In Copy Mode. Use Page Up/Down to scroll. Press Ctrl+S or any other key to
+          exit.
         </Text>
       )}
     </Box>

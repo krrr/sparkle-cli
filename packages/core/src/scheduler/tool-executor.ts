@@ -146,10 +146,7 @@ export class ToolExecutor {
               toolResult,
             );
           } else if (toolResult.error === undefined) {
-            completedToolCall = await this.createSuccessResult(
-              call,
-              toolResult,
-            );
+            completedToolCall = await this.createSuccessResult(call, toolResult);
           } else {
             const displayText =
               typeof toolResult.returnDisplay === 'string'
@@ -274,9 +271,7 @@ export class ToolExecutor {
 
           // We need to return a NEW array to avoid mutating the original toolResult if it matters,
           // though here we are creating the response so it's probably fine to mutate or return new.
-          const truncatedContent: Part[] = [
-            { ...firstPart, text: truncatedText },
-          ];
+          const truncatedContent: Part[] = [{ ...firstPart, text: truncatedText }];
 
           logToolOutputTruncated(
             this.config,
@@ -372,8 +367,10 @@ export class ToolExecutor {
     call: ToolCall,
     toolResult: ToolResult,
   ): Promise<SuccessfulToolCall> {
-    const { truncatedContent: content, outputFile } =
-      await this.truncateOutputIfNeeded(call, toolResult.llmContent);
+    const { truncatedContent: content, outputFile } = await this.truncateOutputIfNeeded(
+      call,
+      toolResult.llmContent,
+    );
 
     const toolName = call.request.originalRequestName || call.request.name;
     const callId = call.request.callId;

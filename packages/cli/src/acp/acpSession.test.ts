@@ -295,10 +295,7 @@ describe('Session', () => {
   });
 
   it('should handle prompt with no finish reason (InvalidStreamError)', async () => {
-    const error = new InvalidStreamError(
-      'No finish reason',
-      'NO_FINISH_REASON',
-    );
+    const error = new InvalidStreamError('No finish reason', 'NO_FINISH_REASON');
     mockSendMessageStream.mockImplementation(() => {
       async function* errorGen(): AsyncGenerator<
         ServerGeminiStreamEvent,
@@ -358,8 +355,7 @@ describe('Session', () => {
   it('should handle /memory command', async () => {
     const handleCommandSpy = vi
       .spyOn(
-        (session as unknown as { commandHandler: CommandHandler })
-          .commandHandler,
+        (session as unknown as { commandHandler: CommandHandler }).commandHandler,
         'handleCommand',
       )
       .mockResolvedValue(true);
@@ -370,10 +366,7 @@ describe('Session', () => {
     });
 
     expect(result).toMatchObject({ stopReason: 'end_turn' });
-    expect(handleCommandSpy).toHaveBeenCalledWith(
-      '/memory view',
-      expect.any(Object),
-    );
+    expect(handleCommandSpy).toHaveBeenCalledWith('/memory view', expect.any(Object));
   });
 
   it('should handle tool calls', async () => {
@@ -396,9 +389,7 @@ describe('Session', () => {
       },
     ]);
 
-    mockSendMessageStream
-      .mockReturnValueOnce(stream1)
-      .mockReturnValueOnce(stream2);
+    mockSendMessageStream.mockReturnValueOnce(stream1).mockReturnValueOnce(stream2);
 
     const result = await session.prompt({
       sessionId: 'session-1',
@@ -447,9 +438,7 @@ describe('Session', () => {
       },
     ]);
 
-    mockSendMessageStream
-      .mockReturnValueOnce(stream1)
-      .mockReturnValueOnce(stream2);
+    mockSendMessageStream.mockReturnValueOnce(stream1).mockReturnValueOnce(stream2);
 
     await session.prompt({
       sessionId: 'session-1',
@@ -510,8 +499,7 @@ describe('Session', () => {
       getDescription: () => 'List dir',
       toolLocations: () => [],
       execute: vi.fn().mockResolvedValue({
-        llmContent:
-          'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
+        llmContent: 'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
         returnDisplay: {
           summary: 'Found 2 item(s).',
           files: ['[DIR] sub', 'inner.txt'],
@@ -588,8 +576,8 @@ describe('Session', () => {
 
   it('should keep a mixed directory + file prompt inside one reference block', async () => {
     // Two resource links: a file (@file.txt) and a directory (@dir).
-    (path.resolve as unknown as Mock).mockImplementation(
-      (_dir: string, p: string) => (p === 'dir' ? '/tmp/dir' : '/tmp/file.txt'),
+    (path.resolve as unknown as Mock).mockImplementation((_dir: string, p: string) =>
+      p === 'dir' ? '/tmp/dir' : '/tmp/file.txt',
     );
     (fs.stat as unknown as Mock).mockImplementation(async (p: string) => ({
       isDirectory: () => p === '/tmp/dir',
@@ -600,8 +588,7 @@ describe('Session', () => {
       getDescription: () => 'List dir',
       toolLocations: () => [],
       execute: vi.fn().mockResolvedValue({
-        llmContent:
-          'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
+        llmContent: 'Directory listing for /tmp/dir:\n[DIR] sub\ninner.txt (7 bytes)',
         returnDisplay: {
           summary: 'Found 2 item(s).',
           files: ['[DIR] sub', 'inner.txt'],
@@ -659,16 +646,12 @@ describe('Session', () => {
     });
 
     const sentParts: Part[] = mockSendMessageStream.mock.calls[0][0];
-    const texts = sentParts.map((p) =>
-      typeof p.text === 'string' ? p.text : '',
-    );
+    const texts = sentParts.map((p) => (typeof p.text === 'string' ? p.text : ''));
     const startIdx = texts.findIndex((t) =>
       t.includes('--- Content from referenced files ---'),
     );
     const dirIdx = texts.findIndex((t) => t.includes('Content from @dir:'));
-    const fileIdx = texts.findIndex((t) =>
-      t.includes('Content from @file.txt:'),
-    );
+    const fileIdx = texts.findIndex((t) => t.includes('Content from @file.txt:'));
     const endIdx = texts.findIndex((t) => t.includes('--- End of content ---'));
 
     // Exactly one reference block: directory listing first, then the file
@@ -735,9 +718,7 @@ describe('Session', () => {
       },
     ]);
 
-    mockSendMessageStream
-      .mockReturnValueOnce(stream1)
-      .mockReturnValueOnce(stream2);
+    mockSendMessageStream.mockReturnValueOnce(stream1).mockReturnValueOnce(stream2);
 
     await session.prompt({
       sessionId: 'session-1',
@@ -797,9 +778,7 @@ describe('Session', () => {
   });
 
   it('should send sessionUpdate when approval mode changes', async () => {
-    const { coreEvents, CoreEvent, ApprovalMode } = await import(
-      'sparkle-cli-core'
-    );
+    const { coreEvents, CoreEvent, ApprovalMode } = await import('sparkle-cli-core');
 
     coreEvents.emit(CoreEvent.ApprovalModeChanged, {
       sessionId: 'session-1',
@@ -855,9 +834,7 @@ describe('Session', () => {
       },
     ]);
 
-    mockSendMessageStream
-      .mockReturnValueOnce(stream1)
-      .mockReturnValueOnce(stream2);
+    mockSendMessageStream.mockReturnValueOnce(stream1).mockReturnValueOnce(stream2);
 
     await session.prompt({
       sessionId: 'session-1',
@@ -915,9 +892,7 @@ describe('Session', () => {
       },
     ]);
 
-    mockSendMessageStream
-      .mockReturnValueOnce(stream1)
-      .mockReturnValueOnce(stream2);
+    mockSendMessageStream.mockReturnValueOnce(stream1).mockReturnValueOnce(stream2);
 
     await session.prompt({
       sessionId: 'session-1',
@@ -1102,9 +1077,7 @@ describe('Session', () => {
           ) => Promise<{ decision: PolicyDecision }>
         >;
       };
-      mockPolicyEngine.check.mockRejectedValue(
-        new Error('Policy check failed'),
-      );
+      mockPolicyEngine.check.mockRejectedValue(new Error('Policy check failed'));
 
       const handler = mockMessageBus.subscribe.mock.calls.find(
         (call) => call[0] === MessageBusType.TOOL_CONFIRMATION_REQUEST,

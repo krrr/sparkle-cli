@@ -60,10 +60,7 @@ describe('evalTest reliability logic', () => {
     expect(mockRig.run).toHaveBeenCalledTimes(4);
 
     // Verify log content
-    const logContent = fs
-      .readFileSync(RELIABILITY_LOG, 'utf-8')
-      .trim()
-      .split('\n');
+    const logContent = fs.readFileSync(RELIABILITY_LOG, 'utf-8').trim().split('\n');
     expect(logContent.length).toBe(4);
 
     const entries = logContent.map((line) => JSON.parse(line));
@@ -123,10 +120,7 @@ describe('evalTest reliability logic', () => {
     expect(mockRig.run).toHaveBeenCalledTimes(2);
 
     // Log should only have the one RETRY entry
-    const logContent = fs
-      .readFileSync(RELIABILITY_LOG, 'utf-8')
-      .trim()
-      .split('\n');
+    const logContent = fs.readFileSync(RELIABILITY_LOG, 'utf-8').trim().split('\n');
     expect(logContent.length).toBe(1);
     expect(JSON.parse(logContent[0]).status).toBe('RETRY');
   });
@@ -136,9 +130,7 @@ describe('evalTest reliability logic', () => {
     (TestRig as any).mockReturnValue(mockRig);
 
     // Simulate permanent 503 error
-    mockRig.run.mockRejectedValue(
-      new Error('status: UNAVAILABLE - Service Busy'),
-    );
+    mockRig.run.mockRejectedValue(new Error('status: UNAVAILABLE - Service Busy'));
 
     await internalEvalTest({
       suiteName: 'test',
@@ -150,10 +142,7 @@ describe('evalTest reliability logic', () => {
 
     expect(mockRig.run).toHaveBeenCalledTimes(4);
 
-    const logContent = fs
-      .readFileSync(RELIABILITY_LOG, 'utf-8')
-      .trim()
-      .split('\n');
+    const logContent = fs.readFileSync(RELIABILITY_LOG, 'utf-8').trim().split('\n');
     const entries = logContent.map((line) => JSON.parse(line));
     expect(entries[0].errorCode).toBe('503');
     expect(entries[3].status).toBe('SKIP');

@@ -5,14 +5,7 @@
  */
 
 import type React from 'react';
-import {
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-  useReducer,
-  useContext,
-} from 'react';
+import { useCallback, useMemo, useRef, useEffect, useReducer, useContext } from 'react';
 import { Box, Text, type DOMElement } from 'ink';
 import { useMouseClick } from '../hooks/useMouseClick.js';
 import { theme } from '../semantic-colors.js';
@@ -24,10 +17,7 @@ import { useKeypress, type Key } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { TextInput } from './shared/TextInput.js';
 import { formatCommand } from '../key/keybindingUtils.js';
-import {
-  useTextBuffer,
-  expandPastePlaceholders,
-} from './shared/text-buffer.js';
+import { useTextBuffer, expandPastePlaceholders } from './shared/text-buffer.js';
 import { getCachedStringWidth } from '../utils/textUtils.js';
 import { useTabbedNavigation } from '../hooks/useTabbedNavigation.js';
 import { DialogFooter } from './shared/DialogFooter.js';
@@ -139,8 +129,7 @@ function askUserDialogReducerLogic(
   switch (action.type) {
     case 'SET_ANSWER': {
       const { index, answer, submit } = action.payload;
-      const hasAnswer =
-        answer !== undefined && answer !== null && answer.trim() !== '';
+      const hasAnswer = answer !== undefined && answer !== null && answer.trim() !== '';
       const newAnswers = { ...state.answers };
 
       if (hasAnswer) {
@@ -266,9 +255,7 @@ const ReviewView: React.FC<ReviewViewProps> = ({
           <Box key={i} marginBottom={0}>
             <Text color={theme.text.secondary}>{q.header}</Text>
             <Text color={theme.text.secondary}> → </Text>
-            <Text
-              color={answers[i] ? theme.text.primary : theme.status.warning}
-            >
+            <Text color={answers[i] ? theme.text.primary : theme.status.warning}>
               {answers[i] || '(not answered)'}
             </Text>
           </Box>
@@ -312,8 +299,7 @@ const TextQuestionView: React.FC<TextQuestionViewProps> = ({
   const isAlternateBuffer = useAlternateBuffer();
   const prefix = '> ';
   const horizontalPadding = 1; // 1 for cursor
-  const bufferWidth =
-    availableWidth - getCachedStringWidth(prefix) - horizontalPadding;
+  const bufferWidth = availableWidth - getCachedStringWidth(prefix) - horizontalPadding;
 
   const buffer = useTextBuffer({
     initialText: initialAnswer,
@@ -327,9 +313,7 @@ const TextQuestionView: React.FC<TextQuestionViewProps> = ({
   const lastTextValueRef = useRef(textValue);
   useEffect(() => {
     if (textValue !== lastTextValueRef.current) {
-      onSelectionChange?.(
-        expandPastePlaceholders(textValue, buffer.pastedContent),
-      );
+      onSelectionChange?.(expandPastePlaceholders(textValue, buffer.pastedContent));
       lastTextValueRef.current = textValue;
     }
   }, [textValue, onSelectionChange, buffer.pastedContent]);
@@ -396,11 +380,7 @@ const TextQuestionView: React.FC<TextQuestionViewProps> = ({
 
       <Box flexDirection="row" marginBottom={1}>
         <Text color={theme.status.success}>{'> '}</Text>
-        <TextInput
-          buffer={buffer}
-          placeholder={placeholder}
-          onSubmit={handleSubmit}
-        />
+        <TextInput buffer={buffer} placeholder={placeholder} onSubmit={handleSubmit} />
       </Box>
 
       {keyboardHints}
@@ -470,9 +450,7 @@ function choiceQuestionReducer(
         ...state,
         selectedIndices: newIndices,
         // In single select, selecting an option deselects custom
-        isCustomOptionSelected: multiSelect
-          ? state.isCustomOptionSelected
-          : false,
+        isCustomOptionSelected: multiSelect ? state.isCustomOptionSelected : false,
       };
     }
     case 'SET_CUSTOM_SELECTED': {
@@ -545,10 +523,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
 
   const bufferWidth = availableWidth - horizontalPadding;
 
-  const questionOptions = useMemo(
-    () => question.options ?? [],
-    [question.options],
-  );
+  const questionOptions = useMemo(() => question.options ?? [], [question.options]);
 
   // Initialize state from initialAnswer if returning to a previously answered question
   const initialReducerState = useMemo((): ChoiceQuestionState => {
@@ -575,9 +550,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
         }
       });
     } else {
-      const index = questionOptions.findIndex(
-        (opt) => opt.label === initialAnswer,
-      );
+      const index = questionOptions.findIndex((opt) => opt.label === initialAnswer);
       if (index !== -1) {
         selectedIndices.add(index);
       } else {
@@ -592,12 +565,8 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
     };
   }, [initialAnswer, questionOptions, question.multiSelect]);
 
-  const [state, dispatch] = useReducer(
-    choiceQuestionReducer,
-    initialReducerState,
-  );
-  const { selectedIndices, isCustomOptionSelected, isCustomOptionFocused } =
-    state;
+  const [state, dispatch] = useReducer(choiceQuestionReducer, initialReducerState);
+  const { selectedIndices, isCustomOptionSelected, isCustomOptionFocused } = state;
 
   const initialCustomText = useMemo(() => {
     if (!initialAnswer) return '';
@@ -608,9 +577,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
       );
       return custom || '';
     } else {
-      const isPredefined = questionOptions.some(
-        (opt) => opt.label === initialAnswer,
-      );
+      const isPredefined = questionOptions.some((opt) => opt.label === initialAnswer);
       return isPredefined ? '' : initialAnswer;
     }
   }, [initialAnswer, questionOptions, question.multiSelect]);
@@ -625,11 +592,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
 
   // Helper to build answer string from selections
   const buildAnswerString = useCallback(
-    (
-      indices: Set<number>,
-      includeCustomOption: boolean,
-      customOption: string,
-    ) => {
+    (indices: Set<number>, includeCustomOption: boolean, customOption: string) => {
       const answers: string[] = [];
       questionOptions.forEach((opt, i) => {
         if (indices.has(i)) {
@@ -730,18 +693,16 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
   useKeypress(handleExtraKeys, { isActive: true, priority: true });
 
   const selectionItems = useMemo((): Array<SelectionListItem<OptionItem>> => {
-    const list: Array<SelectionListItem<OptionItem>> = questionOptions.map(
-      (opt, i) => {
-        const item: OptionItem = {
-          key: `opt-${i}`,
-          label: opt.label,
-          description: opt.description,
-          type: 'option',
-          index: i,
-        };
-        return { key: item.key, value: item };
-      },
-    );
+    const list: Array<SelectionListItem<OptionItem>> = questionOptions.map((opt, i) => {
+      const item: OptionItem = {
+        key: `opt-${i}`,
+        label: opt.label,
+        description: opt.description,
+        type: 'option',
+        index: i,
+      };
+      return { key: item.key, value: item };
+    });
 
     // Add 'All of the above' for multi-select
     if (question.multiSelect && questionOptions.length > 1) {
@@ -880,10 +841,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
     listHeight && (!isAlternateBuffer || availableHeight !== undefined)
       ? Math.min(
           selectionItems.length,
-          Math.max(
-            1,
-            Math.floor((listHeight - (questionHeightLimit ?? 0)) / 2),
-          ),
+          Math.max(1, Math.floor((listHeight - (questionHeightLimit ?? 0)) / 2)),
         )
       : selectionItems.length;
 
@@ -921,8 +879,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
         renderItem={(item, context) => {
           const optionItem = item.value;
           const isChecked =
-            (optionItem.type === 'option' &&
-              selectedIndices.has(optionItem.index)) ||
+            (optionItem.type === 'option' && selectedIndices.has(optionItem.index)) ||
             (optionItem.type === 'other' && isCustomOptionSelected) ||
             (optionItem.type === 'all' &&
               selectedIndices.size === questionOptions.length);
@@ -954,11 +911,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
                   focus={context.isSelected}
                   onSubmit={(val) => {
                     if (question.multiSelect) {
-                      const fullAnswer = buildAnswerString(
-                        selectedIndices,
-                        true,
-                        val,
-                      );
+                      const fullAnswer = buildAnswerString(selectedIndices, true, val);
                       if (fullAnswer) {
                         onAnswer(fullAnswer);
                       }
@@ -1036,16 +989,13 @@ export const AskUserDialog: React.FC<AskUserDialogProps> = ({
   const uiState = useContext(UIStateContext);
   const availableHeight =
     availableHeightProp ??
-    (uiState?.constrainHeight !== false
-      ? uiState?.availableTerminalHeight
-      : undefined);
+    (uiState?.constrainHeight !== false ? uiState?.availableTerminalHeight : undefined);
 
   const [state, dispatch] = useReducer(askUserDialogReducerLogic, initialState);
   const { answers, isEditingCustomOption, submitted } = state;
 
   const reviewTabIndex = questions.length;
-  const tabCount =
-    questions.length > 1 ? questions.length + 1 : questions.length;
+  const tabCount = questions.length > 1 ? questions.length + 1 : questions.length;
 
   const { currentIndex, goToNextTab, goToPrevTab } = useTabbedNavigation({
     tabCount,

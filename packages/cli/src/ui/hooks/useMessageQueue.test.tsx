@@ -73,10 +73,7 @@ describe('useMessageQueue', () => {
       result.current.addMessage('Test message 2');
     });
 
-    expect(result.current.messageQueue).toEqual([
-      'Test message 1',
-      'Test message 2',
-    ]);
+    expect(result.current.messageQueue).toEqual(['Test message 1', 'Test message 2']);
   });
 
   it('should filter out empty messages', async () => {

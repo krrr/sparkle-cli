@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { renderHook } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
 import { useIncludeDirsTrust } from './useIncludeDirsTrust.js';
@@ -24,15 +16,11 @@ import type { LoadedTrustedFolders } from '../../config/trustedFolders.js';
 import type { MultiFolderTrustDialogProps } from '../components/MultiFolderTrustDialog.js';
 
 vi.mock('../utils/directoryUtils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/directoryUtils.js')>();
+  const actual = await importOriginal<typeof import('../utils/directoryUtils.js')>();
   return {
     ...actual,
     expandHomeDir: (p: string) => p, // Simple pass-through for testing
-    batchAddDirectories: (
-      workspaceContext: WorkspaceContext,
-      paths: string[],
-    ) => {
+    batchAddDirectories: (workspaceContext: WorkspaceContext, paths: string[]) => {
       const result = workspaceContext.addDirectories(paths);
       const errors: string[] = [];
       for (const failure of result.failed) {
@@ -82,9 +70,7 @@ describe('useIncludeDirsTrust', () => {
       getWorkspaceContext: () => mockWorkspaceContext,
       shouldLoadMemoryFromIncludeDirectories: vi.fn().mockReturnValue(false),
       getMemoryContextManager: vi.fn(),
-      getGeminiClient: vi
-        .fn()
-        .mockReturnValue({ addDirectoryContext: vi.fn() }),
+      getGeminiClient: vi.fn().mockReturnValue({ addDirectoryContext: vi.fn() }),
     } as unknown as Config;
 
     mockHistoryManager = {
@@ -109,9 +95,7 @@ describe('useIncludeDirsTrust', () => {
   };
 
   it('should do nothing if isTrustedFolder is undefined', async () => {
-    vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue([
-      '/foo',
-    ]);
+    vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue(['/foo']);
     await renderTestHook(undefined);
     expect(mockConfig.clearPendingIncludeDirectories).not.toHaveBeenCalled();
   });
@@ -154,9 +138,7 @@ describe('useIncludeDirsTrust', () => {
               text: expect.stringContaining("Error adding '/dir2': Test error"),
             }),
           );
-          expect(
-            mockConfig.clearPendingIncludeDirectories,
-          ).toHaveBeenCalledTimes(1);
+          expect(mockConfig.clearPendingIncludeDirectories).toHaveBeenCalledTimes(1);
         });
       },
     );
@@ -171,9 +153,7 @@ describe('useIncludeDirsTrust', () => {
       const mockLoadedFolders = {
         isPathTrusted: mockIsPathTrusted,
       } as unknown as LoadedTrustedFolders;
-      vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(
-        mockLoadedFolders,
-      );
+      vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(mockLoadedFolders);
     });
 
     afterEach(() => {
@@ -182,9 +162,7 @@ describe('useIncludeDirsTrust', () => {
 
     it('should add trusted dirs, collect untrusted errors, and open dialog for undefined', async () => {
       const pendingDirs = ['/trusted', '/untrusted', '/undefined'];
-      vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue(
-        pendingDirs,
-      );
+      vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue(pendingDirs);
 
       mockIsPathTrusted.mockImplementation((path: string) => {
         if (path === '/trusted') return true;
@@ -215,9 +193,7 @@ describe('useIncludeDirsTrust', () => {
 
     it('should only add directories and clear pending if no dialog is needed', async () => {
       const pendingDirs = ['/trusted1', '/trusted2'];
-      vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue(
-        pendingDirs,
-      );
+      vi.mocked(mockConfig.getPendingIncludeDirectories).mockReturnValue(pendingDirs);
       mockIsPathTrusted.mockReturnValue(true);
       vi.mocked(mockWorkspaceContext.addDirectories).mockReturnValue({
         added: pendingDirs,
@@ -227,13 +203,9 @@ describe('useIncludeDirsTrust', () => {
       await renderTestHook(true);
 
       await waitFor(() => {
-        expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith(
-          pendingDirs,
-        );
+        expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith(pendingDirs);
         expect(mockSetCustomDialog).not.toHaveBeenCalled();
-        expect(mockConfig.clearPendingIncludeDirectories).toHaveBeenCalledTimes(
-          1,
-        );
+        expect(mockConfig.clearPendingIncludeDirectories).toHaveBeenCalledTimes(1);
       });
     });
   });

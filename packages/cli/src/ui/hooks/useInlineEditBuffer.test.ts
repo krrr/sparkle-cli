@@ -6,15 +6,7 @@
 
 import { renderHook } from '../../test-utils/render.js';
 import { act } from 'react';
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { useInlineEditBuffer } from './useInlineEditBuffer.js';
 
 describe('useEditBuffer', () => {

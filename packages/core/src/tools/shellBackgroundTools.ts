@@ -91,10 +91,7 @@ export class ListBackgroundProcessesTool extends BaseDeclarativeTool<
     );
   }
 
-  protected createInvocation(
-    params: Record<string, never>,
-    messageBus: MessageBus,
-  ) {
+  protected createInvocation(params: Record<string, never>, messageBus: MessageBus) {
     return new ListBackgroundProcessesInvocation(
       this.context,
       params,
@@ -232,8 +229,7 @@ class ReadBackgroundOutputInvocation extends BaseToolInvocation<
           },
         };
       }
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error reading background log: ${errorMessage}`,
         returnDisplay: 'Failed to read log.',
@@ -266,8 +262,7 @@ export class ReadBackgroundOutputTool extends BaseDeclarativeTool<
         properties: {
           pid: {
             type: 'integer',
-            description:
-              'The process ID (PID) of the background process to inspect.',
+            description: 'The process ID (PID) of the background process to inspect.',
           },
           lines: {
             type: 'integer',

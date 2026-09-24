@@ -24,9 +24,7 @@ describe('SkillManager Alias', () => {
   let testRootDir: string;
 
   beforeEach(async () => {
-    testRootDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'skill-manager-alias-test-'),
-    );
+    testRootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skill-manager-alias-test-'));
   });
 
   afterEach(async () => {
@@ -37,18 +35,8 @@ describe('SkillManager Alias', () => {
   it('should discover skills from .agents/skills directory', async () => {
     const userGeminiDir = path.join(testRootDir, 'user', '.sparkle', 'skills');
     const userAgentDir = path.join(testRootDir, 'user', '.agents', 'skills');
-    const projectGeminiDir = path.join(
-      testRootDir,
-      'workspace',
-      '.sparkle',
-      'skills',
-    );
-    const projectAgentDir = path.join(
-      testRootDir,
-      'workspace',
-      '.agents',
-      'skills',
-    );
+    const projectGeminiDir = path.join(testRootDir, 'workspace', '.sparkle', 'skills');
+    const projectAgentDir = path.join(testRootDir, 'workspace', '.agents', 'skills');
 
     await fs.mkdir(userGeminiDir, { recursive: true });
     await fs.mkdir(userAgentDir, { recursive: true });
@@ -104,9 +92,7 @@ describe('SkillManager Alias', () => {
 
     const storage = new Storage(path.join(testRootDir, 'workspace'));
     vi.spyOn(storage, 'getProjectSkillsDir').mockReturnValue(projectGeminiDir);
-    vi.spyOn(storage, 'getProjectAgentSkillsDir').mockReturnValue(
-      projectAgentDir,
-    );
+    vi.spyOn(storage, 'getProjectAgentSkillsDir').mockReturnValue(projectAgentDir);
 
     const service = new SkillManager();
     // @ts-expect-error accessing private method for testing
@@ -158,9 +144,7 @@ describe('SkillManager Alias', () => {
     vi.spyOn(Storage, 'getUserAgentSkillsDir').mockReturnValue(userAgentDir);
 
     const storage = new Storage('/dummy');
-    vi.spyOn(storage, 'getProjectSkillsDir').mockReturnValue(
-      '/non-existent-gemini',
-    );
+    vi.spyOn(storage, 'getProjectSkillsDir').mockReturnValue('/non-existent-gemini');
     vi.spyOn(storage, 'getProjectAgentSkillsDir').mockReturnValue(
       '/non-existent-agent',
     );

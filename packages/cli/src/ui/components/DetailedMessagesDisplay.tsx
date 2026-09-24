@@ -9,10 +9,7 @@ import { useRef, useCallback, useMemo } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
 import type { ConsoleMessageItem } from '../types.js';
-import {
-  ScrollableList,
-  type ScrollableListRef,
-} from './shared/ScrollableList.js';
+import { ScrollableList, type ScrollableListRef } from './shared/ScrollableList.js';
 import { useConsoleMessages } from '../hooks/useConsoleMessages.js';
 import { useConfig } from '../contexts/ConfigContext.js';
 
@@ -24,9 +21,11 @@ interface DetailedMessagesDisplayProps {
 
 const iconBoxWidth = 3;
 
-export const DetailedMessagesDisplay: React.FC<
-  DetailedMessagesDisplayProps
-> = ({ maxHeight, width, hasFocus }) => {
+export const DetailedMessagesDisplay: React.FC<DetailedMessagesDisplayProps> = ({
+  maxHeight,
+  width,
+  hasFocus,
+}) => {
   const scrollableListRef = useRef<ScrollableListRef<ConsoleMessageItem>>(null);
 
   const consoleMessages = useConsoleMessages();

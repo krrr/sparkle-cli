@@ -50,8 +50,7 @@ export async function resolveGitWorktreePaths(workspacePath: string): Promise<{
                 match[1].trim(),
               );
               if (
-                resolveToRealPath(worktreePath) ===
-                resolveToRealPath(workspacePath)
+                resolveToRealPath(worktreePath) === resolveToRealPath(workspacePath)
               ) {
                 isValid = true;
               }

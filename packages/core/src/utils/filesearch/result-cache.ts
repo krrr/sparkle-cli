@@ -24,9 +24,7 @@ export class ResultCache {
    * @returns An object containing the files to search and a boolean indicating
    *          if the result is an exact cache hit.
    */
-  async get(
-    query: string,
-  ): Promise<{ files: string[]; isExactMatch: boolean }> {
+  async get(query: string): Promise<{ files: string[]; isExactMatch: boolean }> {
     const isCacheHit = this.cache.has(query);
 
     if (isCacheHit) {

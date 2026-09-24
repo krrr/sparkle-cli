@@ -148,12 +148,7 @@ export const MaxSizedBox: React.FC<MaxSizedBoxProps> = ({
         flexGrow={0}
         maxHeight={isOverflowing ? visibleContentHeight : undefined}
       >
-        <Box
-          flexDirection="column"
-          ref={onRefChange}
-          flexShrink={0}
-          marginTop={offset}
-        >
+        <Box flexDirection="column" ref={onRefChange} flexShrink={0} marginTop={offset}>
           {children}
         </Box>
       </Box>

@@ -24,9 +24,7 @@ vi.mock('../utils/debugLogger.js', () => ({
 describe('TrustedHooksManager', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.mocked(Storage.getGlobalGeminiDir).mockReturnValue(
-      '/mock/home/.sparkle',
-    );
+    vi.mocked(Storage.getGlobalGeminiDir).mockReturnValue('/mock/home/.sparkle');
   });
 
   describe('initialization', () => {
@@ -111,9 +109,7 @@ describe('TrustedHooksManager', () => {
       });
 
       // Only the other one is untrusted
-      expect(manager.getUntrustedHooks('/project', projectHooks)).toEqual([
-        'new-hook',
-      ]);
+      expect(manager.getUntrustedHooks('/project', projectHooks)).toEqual(['new-hook']);
     });
 
     it('should use command if name is missing', () => {
@@ -143,18 +139,14 @@ describe('TrustedHooksManager', () => {
       const originalHook = {
         [HookEventName.BeforeTool]: [
           {
-            hooks: [
-              { name: 'my-hook', type: HookType.Command, command: 'old-cmd' },
-            ],
+            hooks: [{ name: 'my-hook', type: HookType.Command, command: 'old-cmd' }],
           },
         ],
       };
       const updatedHook = {
         [HookEventName.BeforeTool]: [
           {
-            hooks: [
-              { name: 'my-hook', type: HookType.Command, command: 'new-cmd' },
-            ],
+            hooks: [{ name: 'my-hook', type: HookType.Command, command: 'new-cmd' }],
           },
         ],
       };

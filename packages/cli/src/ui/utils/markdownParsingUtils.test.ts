@@ -123,9 +123,7 @@ describe('parsingUtils', () => {
     it('should handle inline code', () => {
       const input = 'This is `code` text';
       const output = parseMarkdownToANSI(input);
-      expect(output).toBe(
-        `${primary('This is ')}${accent('code')}${primary(' text')}`,
-      );
+      expect(output).toBe(`${primary('This is ')}${accent('code')}${primary(' text')}`);
     });
 
     it('should handle links', () => {
@@ -191,9 +189,7 @@ describe('parsingUtils', () => {
       const input = 'Hello **world**';
       const output = parseMarkdownToANSI(input, hexColor);
       const magenta = (str: string) => chalk.hex('#ff00ff')(str);
-      expect(output).toBe(
-        `${magenta('Hello ')}${chalk.bold(magenta('world'))}`,
-      );
+      expect(output).toBe(`${magenta('Hello ')}${chalk.bold(magenta('world'))}`);
     });
 
     it('should override default color with link color', () => {
@@ -217,9 +213,7 @@ describe('parsingUtils', () => {
       const input = '**Bold with `code` inside**';
       const output = parseMarkdownToANSI(input);
       expect(output).toBe(
-        chalk.bold(
-          `${primary('Bold with ')}${accent('code')}${primary(' inside')}`,
-        ),
+        chalk.bold(`${primary('Bold with ')}${accent('code')}${primary(' inside')}`),
       );
     });
 

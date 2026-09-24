@@ -76,8 +76,7 @@ const RETRYABLE_SSL_ERROR_PATTERN = /^ERR_SSL_.*BAD_RECORD_MAC/i;
  */
 function isRetryableSslErrorCode(code: string): boolean {
   return (
-    RETRYABLE_NETWORK_CODES.includes(code) ||
-    RETRYABLE_SSL_ERROR_PATTERN.test(code)
+    RETRYABLE_NETWORK_CODES.includes(code) || RETRYABLE_SSL_ERROR_PATTERN.test(code)
   );
 }
 
@@ -102,11 +101,7 @@ function getNetworkErrorCode(error: unknown): string | undefined {
   let current: unknown = error;
   const maxDepth = 5; // Prevent infinite loops in case of circular references
   for (let depth = 0; depth < maxDepth; depth++) {
-    if (
-      typeof current !== 'object' ||
-      current === null ||
-      !('cause' in current)
-    ) {
+    if (typeof current !== 'object' || current === null || !('cause' in current)) {
       break;
     }
     current = (current as { cause: unknown }).cause;
@@ -307,10 +302,7 @@ export async function retryWithBackoff<T>(
       ) {
         if (onPersistent429) {
           try {
-            const fallbackModel = await onPersistent429(
-              authType,
-              classifiedError,
-            );
+            const fallbackModel = await onPersistent429(authType, classifiedError);
             if (fallbackModel) {
               attempt = 0; // Reset attempts and retry with the new model.
               currentDelay = initialDelayMs;
@@ -321,9 +313,7 @@ export async function retryWithBackoff<T>(
           }
         }
         // Terminal/not_found already recorded; nothing else to mark here.
-        throw classifiedError instanceof Error
-          ? classifiedError
-          : classifiedError; // Throw if no fallback or fallback failed.
+        throw classifiedError instanceof Error ? classifiedError : classifiedError; // Throw if no fallback or fallback failed.
       }
 
       // Handle ValidationRequiredError - user needs to verify before proceeding
@@ -346,8 +336,7 @@ export async function retryWithBackoff<T>(
         throw classifiedError;
       }
 
-      const is500 =
-        errorCode !== undefined && errorCode >= 500 && errorCode < 600;
+      const is500 = errorCode !== undefined && errorCode >= 500 && errorCode < 600;
 
       if (classifiedError instanceof RetryableQuotaError || is500) {
         if (attempt >= getCurrentMaxAttempts()) {
@@ -358,10 +347,7 @@ export async function retryWithBackoff<T>(
           );
           if (onPersistent429) {
             try {
-              const fallbackModel = await onPersistent429(
-                authType,
-                classifiedError,
-              );
+              const fallbackModel = await onPersistent429(authType, classifiedError);
               if (fallbackModel) {
                 attempt = 0; // Reset attempts and retry with the new model.
                 currentDelay = initialDelayMs;
@@ -441,11 +427,7 @@ export async function retryWithBackoff<T>(
  * @param error The error that caused the retry.
  * @param errorStatus The HTTP status code of the error, if available.
  */
-function logRetryAttempt(
-  attempt: number,
-  error: unknown,
-  errorStatus?: number,
-): void {
+function logRetryAttempt(attempt: number, error: unknown, errorStatus?: number): void {
   let message = `Attempt ${attempt} failed. Retrying with backoff...`;
   if (errorStatus) {
     message = `Attempt ${attempt} failed with status ${errorStatus}. Retrying with backoff...`;

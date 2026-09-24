@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { WebSearchTool, type WebSearchToolParams } from './web-search.js';
 import type { Config } from '../config/config.js';
 import { GeminiClient } from '../core/client.js';
@@ -71,15 +63,11 @@ describe('WebSearchTool', () => {
       getWebSearchConfig: Mock;
       [key: string]: unknown;
     };
-    (
-      mockConfigInstance as unknown as { config: Config; promptId: string }
-    ).config = mockConfigInstance as unknown as Config;
-    (
-      mockConfigInstance as unknown as { config: Config; promptId: string }
-    ).promptId = 'test-prompt-id';
-    mockGeminiClient = new GeminiClient(
-      mockConfigInstance as unknown as Config,
-    );
+    (mockConfigInstance as unknown as { config: Config; promptId: string }).config =
+      mockConfigInstance as unknown as Config;
+    (mockConfigInstance as unknown as { config: Config; promptId: string }).promptId =
+      'test-prompt-id';
+    mockGeminiClient = new GeminiClient(mockConfigInstance as unknown as Config);
     tool = new WebSearchTool(
       mockConfigInstance as unknown as Config,
       createMockMessageBus(),
@@ -117,9 +105,7 @@ describe('WebSearchTool', () => {
     it('should return a description of the search', () => {
       const params: WebSearchToolParams = { query: 'test query' };
       const invocation = tool.build(params);
-      expect(invocation.getDescription()).toBe(
-        'Searching the web for: "test query"',
-      );
+      expect(invocation.getDescription()).toBe('Searching the web for: "test query"');
     });
   });
 
@@ -337,9 +323,7 @@ Sources:
       const result = await invocation.execute({ abortSignal });
 
       expect(mockGeminiClient.generateContent).not.toHaveBeenCalled();
-      expect(result.returnDisplay).toBe(
-        'Search results for "exa query" returned.',
-      );
+      expect(result.returnDisplay).toBe('Search results for "exa query" returned.');
       expect(result.llmContent).toContain(
         '[1] Exa Result (https://exa.example/result)',
       );
@@ -377,9 +361,7 @@ Sources:
       expect(mockGeminiClient.generateContent).not.toHaveBeenCalled();
       expect(fetchWithTimeout).not.toHaveBeenCalled();
       expect(result.error?.type).toBe(ToolErrorType.WEB_SEARCH_FAILED);
-      expect(result.llmContent).toContain(
-        'does not support Google Search grounding',
-      );
+      expect(result.llmContent).toContain('does not support Google Search grounding');
       expect(result.llmContent).toContain('tools.webSearch.thirdPartyProvider');
       expect(result.returnDisplay).toBe('Web search is not configured.');
     });

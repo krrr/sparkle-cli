@@ -12,10 +12,7 @@ import {
   CoreToolCallStatus,
   type SubagentActivityItem,
 } from 'sparkle-cli-core';
-import {
-  type HistoryItemToolGroup,
-  type IndividualToolCallDisplay,
-} from '../types.js';
+import { type HistoryItemToolGroup, type IndividualToolCallDisplay } from '../types.js';
 
 function hasSubagentHistory(
   call: ToolCall,
@@ -63,8 +60,7 @@ export function mapToDisplay(
     };
 
     let resultDisplay: ToolResultDisplay | undefined = undefined;
-    let confirmationDetails: SerializableConfirmationDetails | undefined =
-      undefined;
+    let confirmationDetails: SerializableConfirmationDetails | undefined = undefined;
     let outputFile: string | undefined = undefined;
     let ptyId: number | undefined = undefined;
     let correlationId: string | undefined = undefined;
@@ -122,9 +118,7 @@ export function mapToDisplay(
       progressTotal,
       approvalMode: call.approvalMode,
       originalRequestName: call.request.originalRequestName,
-      subagentHistory: hasSubagentHistory(call)
-        ? call.subagentHistory
-        : undefined,
+      subagentHistory: hasSubagentHistory(call) ? call.subagentHistory : undefined,
     };
   });
 

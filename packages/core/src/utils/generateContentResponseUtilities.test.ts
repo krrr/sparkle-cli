@@ -26,10 +26,7 @@ import {
 } from '@google/genai';
 
 const mockTextPart = (text: string): Part => ({ text });
-const mockFunctionCallPart = (
-  name: string,
-  args?: Record<string, unknown>,
-): Part => ({
+const mockFunctionCallPart = (name: string, args?: Record<string, unknown>): Part => ({
   functionCall: { name, args: args ?? {} },
 });
 
@@ -458,9 +455,7 @@ describe('generateContentResponseUtilities', () => {
         undefined,
         citationMetadata,
       );
-      expect(getCitations(response)).toEqual([
-        '(Example Title) https://example.com',
-      ]);
+      expect(getCitations(response)).toEqual(['(Example Title) https://example.com']);
     });
 
     it('should return citations with uri only if no title', () => {
@@ -516,10 +511,7 @@ describe('generateContentResponseUtilities', () => {
     });
     it('should concatenate text from multiple text parts', () => {
       expect(
-        getResponseTextFromParts([
-          mockTextPart('Hello '),
-          mockTextPart('World'),
-        ]),
+        getResponseTextFromParts([mockTextPart('Hello '), mockTextPart('World')]),
       ).toBe('Hello World');
     });
     it('should ignore function call parts', () => {
@@ -554,9 +546,7 @@ describe('generateContentResponseUtilities', () => {
     });
     it('should extract a single function call', () => {
       const func = { name: 'testFunc', args: { a: 1 } };
-      const response = mockResponse([
-        mockFunctionCallPart(func.name, func.args),
-      ]);
+      const response = mockResponse([mockFunctionCallPart(func.name, func.args)]);
       expect(getFunctionCalls(response)).toEqual([func]);
     });
     it('should extract multiple function calls', () => {
@@ -669,9 +659,7 @@ describe('generateContentResponseUtilities', () => {
     });
     it('should return only function call JSON if only function calls exist', () => {
       const func = { name: 'testFunc', args: { data: 'payload' } };
-      const response = mockResponse([
-        mockFunctionCallPart(func.name, func.args),
-      ]);
+      const response = mockResponse([mockFunctionCallPart(func.name, func.args)]);
       const expectedJson = JSON.stringify([func], null, 2);
       expect(getStructuredResponse(response)).toBe(expectedJson);
     });
@@ -705,14 +693,9 @@ describe('generateContentResponseUtilities', () => {
     it('should return text and function call JSON if both exist in parts', () => {
       const text = 'Consider this data:';
       const func = { name: 'processData', args: { item: 42 } };
-      const parts = [
-        mockTextPart(text),
-        mockFunctionCallPart(func.name, func.args),
-      ];
+      const parts = [mockTextPart(text), mockFunctionCallPart(func.name, func.args)];
       const expectedJson = JSON.stringify([func], null, 2);
-      expect(getStructuredResponseFromParts(parts)).toBe(
-        `${text}\n${expectedJson}`,
-      );
+      expect(getStructuredResponseFromParts(parts)).toBe(`${text}\n${expectedJson}`);
     });
     it('should return undefined if neither text nor function calls exist in parts', () => {
       const parts: Part[] = [];

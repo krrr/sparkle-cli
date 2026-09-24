@@ -337,9 +337,7 @@ Implement a comprehensive authentication system with multiple providers.
         });
 
         await waitFor(() => {
-          expect(lastFrame()).toContain(
-            'Error reading plan: Plan file is empty.',
-          );
+          expect(lastFrame()).toContain('Error reading plan: Plan file is empty.');
         });
       });
 
@@ -429,11 +427,7 @@ Implement a comprehensive authentication system with multiple providers.
       it('bubbles up Ctrl+C when feedback is empty while editing', async () => {
         const onBubbledQuit = vi.fn();
 
-        const BubbleListener = ({
-          children,
-        }: {
-          children: React.ReactNode;
-        }) => {
+        const BubbleListener = ({ children }: { children: React.ReactNode }) => {
           const keyMatchers = useKeyMatchers();
           useKeypress(
             (key) => {

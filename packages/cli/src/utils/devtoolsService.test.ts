@@ -71,9 +71,7 @@ vi.mock('./activityLogger.js', () => ({
 }));
 
 const mockShouldLaunchBrowser = vi.hoisted(() => vi.fn(() => true));
-const mockOpenBrowserSecurely = vi.hoisted(() =>
-  vi.fn(() => Promise.resolve()),
-);
+const mockOpenBrowserSecurely = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 
 vi.mock('sparkle-cli-core', () => ({
   debugLogger: {
@@ -178,9 +176,7 @@ describe('devtoolsService', () => {
         25417,
         expect.any(Function),
       );
-      expect(
-        mockActivityLoggerInstance.enableNetworkLogging,
-      ).toHaveBeenCalled();
+      expect(mockActivityLoggerInstance.enableNetworkLogging).toHaveBeenCalled();
     });
 
     it('connects to existing server if one is found', async () => {
@@ -195,9 +191,7 @@ describe('devtoolsService', () => {
 
       expect(url).toBe('http://localhost:25417');
       expect(mockAddNetworkTransport).toHaveBeenCalled();
-      expect(
-        mockActivityLoggerInstance.enableNetworkLogging,
-      ).toHaveBeenCalled();
+      expect(mockActivityLoggerInstance.enableNetworkLogging).toHaveBeenCalled();
     });
 
     it('deduplicates concurrent calls (returns same promise)', async () => {
@@ -222,9 +216,7 @@ describe('devtoolsService', () => {
 
     it('throws when DevTools server fails to start', async () => {
       const config = createMockConfig();
-      mockDevToolsInstance.start.mockRejectedValue(
-        new Error('MODULE_NOT_FOUND'),
-      );
+      mockDevToolsInstance.start.mockRejectedValue(new Error('MODULE_NOT_FOUND'));
 
       const promise = startDevToolsServer(config);
 
@@ -238,9 +230,7 @@ describe('devtoolsService', () => {
 
     it('allows retry after server start failure', async () => {
       const config = createMockConfig();
-      mockDevToolsInstance.start.mockRejectedValueOnce(
-        new Error('MODULE_NOT_FOUND'),
-      );
+      mockDevToolsInstance.start.mockRejectedValueOnce(new Error('MODULE_NOT_FOUND'));
 
       const promise1 = startDevToolsServer(config);
 

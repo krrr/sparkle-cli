@@ -118,28 +118,27 @@ export function startCallbackServer(
 
   let timeoutId: NodeJS.Timeout | undefined;
 
-  const responsePromise = new Promise<OAuthAuthorizationResponse>(
-    (resolve, reject) => {
-      let serverPort: number;
+  const responsePromise = new Promise<OAuthAuthorizationResponse>((resolve, reject) => {
+    let serverPort: number;
 
-      const server = http.createServer(
-        async (req: http.IncomingMessage, res: http.ServerResponse) => {
-          try {
-            const url = new URL(req.url!, `http://localhost:${serverPort}`);
+    const server = http.createServer(
+      async (req: http.IncomingMessage, res: http.ServerResponse) => {
+        try {
+          const url = new URL(req.url!, `http://localhost:${serverPort}`);
 
-            if (url.pathname !== REDIRECT_PATH) {
-              res.writeHead(404);
-              res.end('Not found');
-              return;
-            }
+          if (url.pathname !== REDIRECT_PATH) {
+            res.writeHead(404);
+            res.end('Not found');
+            return;
+          }
 
-            const code = url.searchParams.get('code');
-            const state = url.searchParams.get('state');
-            const error = url.searchParams.get('error');
+          const code = url.searchParams.get('code');
+          const state = url.searchParams.get('state');
+          const error = url.searchParams.get('error');
 
-            if (error) {
-              res.writeHead(HTTP_OK, { 'Content-Type': 'text/html' });
-              res.end(`
+          if (error) {
+            res.writeHead(HTTP_OK, { 'Content-Type': 'text/html' });
+            res.end(`
               <html>
                 <body>
                   <h1>Authentication Failed</h1>
@@ -149,28 +148,28 @@ export function startCallbackServer(
                 </body>
               </html>
             `);
-              server.close();
-              reject(new Error(`OAuth error: ${error}`));
-              return;
-            }
+            server.close();
+            reject(new Error(`OAuth error: ${error}`));
+            return;
+          }
 
-            if (!code || !state) {
-              res.writeHead(400);
-              res.end('Missing code or state parameter');
-              return;
-            }
+          if (!code || !state) {
+            res.writeHead(400);
+            res.end('Missing code or state parameter');
+            return;
+          }
 
-            if (state !== expectedState) {
-              res.writeHead(400);
-              res.end('Invalid state parameter');
-              server.close();
-              reject(new Error('State mismatch - possible CSRF attack'));
-              return;
-            }
+          if (state !== expectedState) {
+            res.writeHead(400);
+            res.end('Invalid state parameter');
+            server.close();
+            reject(new Error('State mismatch - possible CSRF attack'));
+            return;
+          }
 
-            // Send success response to browser
-            res.writeHead(HTTP_OK, { 'Content-Type': 'text/html' });
-            res.end(`
+          // Send success response to browser
+          res.writeHead(HTTP_OK, { 'Content-Type': 'text/html' });
+          res.end(`
             <html>
               <body>
                 <h1>Authentication Successful!</h1>
@@ -180,69 +179,64 @@ export function startCallbackServer(
             </html>
           `);
 
-            server.close();
-            resolve({ code, state });
-          } catch (error) {
-            server.close();
-            reject(error);
-          }
-        },
-      );
+          server.close();
+          resolve({ code, state });
+        } catch (error) {
+          server.close();
+          reject(error);
+        }
+      },
+    );
 
-      server.on('error', (error) => {
+    server.on('error', (error) => {
+      portReject(error);
+      reject(error);
+    });
+
+    // Determine which port to use (env var, argument, or OS-assigned)
+    let listenPort = 0; // Default to OS-assigned port
+
+    const portStr = process.env['OAUTH_CALLBACK_PORT'];
+    if (portStr) {
+      const envPort = parseInt(portStr, 10);
+      if (isNaN(envPort) || envPort <= 0 || envPort > 65535) {
+        const error = new Error(`Invalid value for OAUTH_CALLBACK_PORT: "${portStr}"`);
         portReject(error);
         reject(error);
-      });
-
-      // Determine which port to use (env var, argument, or OS-assigned)
-      let listenPort = 0; // Default to OS-assigned port
-
-      const portStr = process.env['OAUTH_CALLBACK_PORT'];
-      if (portStr) {
-        const envPort = parseInt(portStr, 10);
-        if (isNaN(envPort) || envPort <= 0 || envPort > 65535) {
-          const error = new Error(
-            `Invalid value for OAUTH_CALLBACK_PORT: "${portStr}"`,
-          );
-          portReject(error);
-          reject(error);
-          return;
-        }
-        listenPort = envPort;
-      } else if (port !== undefined) {
-        listenPort = port;
+        return;
       }
+      listenPort = envPort;
+    } else if (port !== undefined) {
+      listenPort = port;
+    }
 
-      server.listen(listenPort, () => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-        const address = server.address() as net.AddressInfo;
-        serverPort = address.port;
-        debugLogger.log(
-          `OAuth callback server listening on port ${serverPort}`,
-        );
-        portResolve(serverPort); // Resolve port promise immediately
-      });
+    server.listen(listenPort, () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+      const address = server.address() as net.AddressInfo;
+      serverPort = address.port;
+      debugLogger.log(`OAuth callback server listening on port ${serverPort}`);
+      portResolve(serverPort); // Resolve port promise immediately
+    });
 
-      const abortController = new AbortController();
-      timeoutId = setTimeout(
-        () => {
-          abortController.abort(new Error('OAuth callback timeout'));
-        },
-        5 * 60 * 1000,
-      );
-      timeoutId.unref();
+    const abortController = new AbortController();
+    timeoutId = setTimeout(
+      () => {
+        abortController.abort(new Error('OAuth callback timeout'));
+      },
+      5 * 60 * 1000,
+    );
+    timeoutId.unref();
 
-      const onAbort = () => {
-        server.close();
-        reject(abortController.signal.reason);
-      };
-      abortController.signal.addEventListener('abort', onAbort, { once: true });
+    const onAbort = () => {
+      server.close();
+      reject(abortController.signal.reason);
+    };
+    abortController.signal.addEventListener('abort', onAbort, { once: true });
 
-      server.on('close', () => {
-        abortController.signal.removeEventListener('abort', onAbort);
-      });
-    },
-  );
+    server.on('close', () => {
+      abortController.signal.removeEventListener('abort', onAbort);
+    });
+  });
 
   return {
     port: portPromise,
@@ -352,8 +346,7 @@ async function parseTokenEndpointResponse(
       // Fall back to raw error
     }
     throw new Error(
-      errorMessage ||
-        `${operationName} failed: ${response.status} - ${responseText}`,
+      errorMessage || `${operationName} failed: ${response.status} - ${responseText}`,
     );
   }
 
@@ -390,9 +383,7 @@ async function parseTokenEndpointResponse(
           typeof obj['expires_in'] === 'number' ? obj['expires_in'] : undefined,
         refresh_token:
           // eslint-disable-next-line no-restricted-syntax
-          typeof obj['refresh_token'] === 'string'
-            ? obj['refresh_token']
-            : undefined,
+          typeof obj['refresh_token'] === 'string' ? obj['refresh_token'] : undefined,
         // eslint-disable-next-line no-restricted-syntax
         scope: typeof obj['scope'] === 'string' ? obj['scope'] : undefined,
       };
@@ -478,11 +469,7 @@ export async function exchangeCodeForToken(
     body: params.toString(),
   });
 
-  return parseTokenEndpointResponse(
-    response,
-    'Token exchange',
-    'no_access_token',
-  );
+  return parseTokenEndpointResponse(response, 'Token exchange', 'no_access_token');
 }
 
 /**

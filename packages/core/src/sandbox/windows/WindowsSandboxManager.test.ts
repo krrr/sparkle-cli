@@ -15,8 +15,7 @@ import type { SandboxRequest } from '../../services/sandboxManager.js';
 import type { SandboxPolicyManager } from '../../policy/sandboxPolicyManager.js';
 
 vi.mock('../../utils/shell-utils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../utils/shell-utils.js')>();
+  const actual = await importOriginal<typeof import('../../utils/shell-utils.js')>();
   return {
     ...actual,
     spawnAsync: vi.fn(),
@@ -37,10 +36,7 @@ describe('WindowsSandboxManager', () => {
     return fs.realpathSync(rawPath);
   }
 
-  const helperExePath = path.resolve(
-    __dirname,
-    WindowsSandboxManager.HELPER_EXE,
-  );
+  const helperExePath = path.resolve(__dirname, WindowsSandboxManager.HELPER_EXE);
 
   /**
    * Helper to read manifests from sandbox args
@@ -55,10 +51,7 @@ describe('WindowsSandboxManager', () => {
       .readFileSync(forbiddenPath, 'utf8')
       .split('\n')
       .filter(Boolean);
-    const allowed = fs
-      .readFileSync(allowedPath, 'utf8')
-      .split('\n')
-      .filter(Boolean);
+    const allowed = fs.readFileSync(allowedPath, 'utf8').split('\n').filter(Boolean);
     return { forbidden, allowed };
   }
 

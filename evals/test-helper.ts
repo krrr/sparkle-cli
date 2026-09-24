@@ -27,8 +27,7 @@ export * from 'sparkle-cli-test-utils';
  * The default model used for all evaluations.
  * Can be overridden by setting the SPARKLE_MODEL environment variable.
  */
-export const EVAL_MODEL =
-  process.env['SPARKLE_MODEL'] || DEFAULT_GEMINI_FLASH_MODEL;
+export const EVAL_MODEL = process.env['SPARKLE_MODEL'] || DEFAULT_GEMINI_FLASH_MODEL;
 
 // Indicates the consistency expectation for this test.
 // - ALWAYS_PASSES - Means that the test is expected to pass 100% of the time. These
@@ -122,8 +121,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
       let sessionId: string | undefined;
       if (evalCase.messages) {
         sessionId =
-          evalCase.sessionId ||
-          `test-session-${crypto.randomUUID().slice(0, 8)}`;
+          evalCase.sessionId || `test-session-${crypto.randomUUID().slice(0, 8)}`;
 
         // Temporarily set SPARKLE_CLI_HOME so Storage writes to the same
         // directory the CLI subprocess will use (rig.homeDir).
@@ -143,10 +141,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
             messages: evalCase.messages,
           };
 
-          const timestamp = new Date()
-            .toISOString()
-            .slice(0, 16)
-            .replace(/:/g, '-');
+          const timestamp = new Date().toISOString().slice(0, 16).replace(/:/g, '-');
           const filename = `${SESSION_FILE_PREFIX}${timestamp}-${sessionId.slice(0, 8)}.jsonl`;
           const { messages, ...metadata } = conversation;
           fs.writeFileSync(
@@ -170,9 +165,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
       }
 
       const result = await rig.run({
-        args: sessionId
-          ? ['--resume', sessionId, evalCase.prompt]
-          : evalCase.prompt,
+        args: sessionId ? ['--resume', sessionId, evalCase.prompt] : evalCase.prompt,
         approvalMode: evalCase.approvalMode ?? 'yolo',
         timeout: evalCase.timeout,
         env: {
@@ -181,8 +174,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
         },
       });
 
-      const unauthorizedErrorPrefix =
-        createUnauthorizedToolError('').split("'")[0];
+      const unauthorizedErrorPrefix = createUnauthorizedToolError('').split("'")[0];
       if (result.includes(unauthorizedErrorPrefix)) {
         throw new Error(
           'Test failed due to unauthorized tool call in output: ' + result,
@@ -220,10 +212,7 @@ export async function internalEvalTest(evalCase: EvalCase) {
         await fs.promises.writeFile(stderrFile, rig._lastRunStderr);
       }
 
-      await fs.promises.writeFile(
-        logFile,
-        JSON.stringify(rig.readToolLogs(), null, 2),
-      );
+      await fs.promises.writeFile(logFile, JSON.stringify(rig.readToolLogs(), null, 2));
       await rig.cleanup();
     }
   });
@@ -331,12 +320,7 @@ export async function prepareWorkspace(
   }
 
   if (Object.keys(acknowledgedAgents).length > 0) {
-    const ackPath = path.join(
-      homeDir,
-      '.sparkle',
-      'acknowledgments',
-      'agents.json',
-    );
+    const ackPath = path.join(homeDir, '.sparkle', 'acknowledgments', 'agents.json');
     fs.mkdirSync(path.dirname(ackPath), { recursive: true });
     fs.writeFileSync(ackPath, JSON.stringify(acknowledgedAgents, null, 2));
   }
@@ -372,10 +356,8 @@ export function runEval(
 
   const meta = { suiteType, suiteName };
 
-  const skipBySuiteType =
-    targetSuiteType && suiteType && suiteType !== targetSuiteType;
-  const skipBySuiteName =
-    targetSuiteName && suiteName && suiteName !== targetSuiteName;
+  const skipBySuiteType = targetSuiteType && suiteType && suiteType !== targetSuiteType;
+  const skipBySuiteName = targetSuiteName && suiteName && suiteName !== targetSuiteName;
 
   const options = { timeout: timeoutOverride ?? timeout, meta };
 
@@ -406,11 +388,7 @@ export async function prepareLogDir(name: string) {
 export function symlinkNodeModules(testDir: string) {
   const rootNodeModules = path.join(process.cwd(), 'node_modules');
   const testNodeModules = path.join(testDir, 'node_modules');
-  if (
-    testDir &&
-    fs.existsSync(rootNodeModules) &&
-    !fs.existsSync(testNodeModules)
-  ) {
+  if (testDir && fs.existsSync(rootNodeModules) && !fs.existsSync(testNodeModules)) {
     fs.symlinkSync(rootNodeModules, testNodeModules, 'dir');
   }
 }

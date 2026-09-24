@@ -19,9 +19,7 @@ async function main() {
   try {
     runCmd('gh --version');
   } catch {
-    console.error(
-      'Error: "gh" CLI is required but not installed or not working.',
-    );
+    console.error('Error: "gh" CLI is required but not installed or not working.');
     process.exit(1);
   }
 
@@ -53,26 +51,23 @@ async function main() {
   const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
   const now = Math.floor(Date.now() / 1000);
 
-  const remoteBranches: { name: string; lastCommitDate: number }[] =
-    allBranchesOutput
-      .split(/\r?\n/)
-      .map((line) => {
-        const parts = line.split(' ');
-        if (parts.length < 2) return null;
-        const date = parseInt(parts.pop() || '0', 10);
-        const name = parts.join(' ');
-        return { name, lastCommitDate: date };
-      })
-      .filter((b): b is { name: string; lastCommitDate: number } => b !== null);
+  const remoteBranches: { name: string; lastCommitDate: number }[] = allBranchesOutput
+    .split(/\r?\n/)
+    .map((line) => {
+      const parts = line.split(' ');
+      if (parts.length < 2) return null;
+      const date = parseInt(parts.pop() || '0', 10);
+      const name = parts.join(' ');
+      return { name, lastCommitDate: date };
+    })
+    .filter((b): b is { name: string; lastCommitDate: number } => b !== null);
 
   console.log(`Found ${remoteBranches.length} branches on origin.`);
 
   console.log('Fetching open PRs...');
   let openPrsJson = '[]';
   try {
-    openPrsJson = runCmd(
-      'gh pr list --state open --limit 5000 --json headRefName',
-    );
+    openPrsJson = runCmd('gh pr list --state open --limit 5000 --json headRefName');
   } catch {
     console.error('Failed to fetch open PRs.');
     process.exit(1);
@@ -110,13 +105,9 @@ async function main() {
   console.log(
     '\nThe following remote branches are NOT release branches, have NO active PR, and are OLDER than 30 days:',
   );
-  console.log(
-    '---------------------------------------------------------------------',
-  );
+  console.log('---------------------------------------------------------------------');
   branchesToDelete.forEach((b) => console.log(` - ${b.name}`));
-  console.log(
-    '---------------------------------------------------------------------',
-  );
+  console.log('---------------------------------------------------------------------');
   console.log(`Total to delete: ${branchesToDelete.length}`);
 
   const rl = readline.createInterface({

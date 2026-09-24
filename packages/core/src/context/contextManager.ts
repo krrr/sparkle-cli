@@ -5,10 +5,7 @@
  */
 
 import type { Content } from '@google/genai';
-import type {
-  AgentChatHistory,
-  HistoryTurn,
-} from '../core/agentChatHistory.js';
+import type { AgentChatHistory, HistoryTurn } from '../core/agentChatHistory.js';
 import type { ConcreteNode } from './graph/types.js';
 import type { ContextEventBus } from './eventBus.js';
 import type { ContextTracer } from './tracer.js';
@@ -25,8 +22,7 @@ import type { AdvancedTokenCalculator } from './utils/contextTokenCalculator.js'
 
 export class ContextManager {
   // Master state containing the pristine graph and current active graph.
-  private buffer: ContextWorkingBufferImpl =
-    ContextWorkingBufferImpl.initialize([]);
+  private buffer: ContextWorkingBufferImpl = ContextWorkingBufferImpl.initialize([]);
 
   private readonly eventBus: ContextEventBus;
   private readonly orchestrator: PipelineOrchestrator;
@@ -164,9 +160,7 @@ export class ContextManager {
     nodes = [...this.buffer.nodes, ...previewNodes];
 
     // 5. Final Render
-    const header = this.headerProvider
-      ? await this.headerProvider()
-      : undefined;
+    const header = this.headerProvider ? await this.headerProvider() : undefined;
 
     const nodesHash = deriveStableId([
       ...nodes.map((n) => n.id),
@@ -236,8 +230,7 @@ export class ContextManager {
       if (
         !foundPending &&
         (pendingIds.has(turn.id) ||
-          (turn.id.startsWith('turn_') &&
-            pendingIds.has(turn.id.substring(5)))) &&
+          (turn.id.startsWith('turn_') && pendingIds.has(turn.id.substring(5)))) &&
         turn.id !== envContextId &&
         turn.id !== `turn_${envContextId}`
       ) {
@@ -299,9 +292,7 @@ export class ContextManager {
         pristineSet.set(root.id, root);
       }
     }
-    return Array.from(pristineSet.values()).sort(
-      (a, b) => a.timestamp - b.timestamp,
-    );
+    return Array.from(pristineSet.values()).sort((a, b) => a.timestamp - b.timestamp);
   }
 
   private async evaluateTriggers(
@@ -329,10 +320,7 @@ export class ContextManager {
       const agedOutRetainedNodes = new Set<string>();
       const agedOutNormalizedNodes = new Set<string>();
 
-      const protectionMap = this.getProtectedNodeIds(
-        currentNodes,
-        activeTaskIds,
-      );
+      const protectionMap = this.getProtectedNodeIds(currentNodes, activeTaskIds);
       const protectedIds = new Set(protectionMap.keys());
 
       // Also pin Turn 0 (Environment Context)
@@ -346,9 +334,7 @@ export class ContextManager {
       for (let i = currentNodes.length - 1; i >= 0; i--) {
         const node = currentNodes[i];
         const priorTokens = rollingTokens;
-        rollingTokens += this.env.tokenCalculator.calculateConcreteListTokens([
-          node,
-        ]);
+        rollingTokens += this.env.tokenCalculator.calculateConcreteListTokens([node]);
 
         if (priorTokens > this.sidecar.config.budget.retainedTokens) {
           if (!protectedIds.has(node.id)) {
@@ -371,10 +357,8 @@ export class ContextManager {
       }
 
       if (agedOutRetainedNodes.size > 0) {
-        const targetDeficit =
-          currentTokens - this.sidecar.config.budget.retainedTokens;
-        const threshold =
-          this.sidecar.config.budget.coalescingThresholdTokens || 0;
+        const targetDeficit = currentTokens - this.sidecar.config.budget.retainedTokens;
+        const threshold = this.sidecar.config.budget.coalescingThresholdTokens || 0;
 
         if (targetDeficit < this.lastTriggeredDeficit) {
           this.lastTriggeredDeficit = targetDeficit;
@@ -407,8 +391,7 @@ export class ContextManager {
       if (agedOutNormalizedNodes.size > 0) {
         const targetDeficit =
           currentTokens - this.sidecar.config.budget.normalizedTokens!;
-        const threshold =
-          this.sidecar.config.budget.coalescingThresholdTokens || 0;
+        const threshold = this.sidecar.config.budget.coalescingThresholdTokens || 0;
 
         if (targetDeficit < this.lastTriggeredNormalizeDeficit) {
           this.lastTriggeredNormalizeDeficit = targetDeficit;

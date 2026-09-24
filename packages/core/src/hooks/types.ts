@@ -127,13 +127,7 @@ export function getHookKey(hook: HookConfig): string {
 /**
  * Decision types for hook outputs
  */
-export type HookDecision =
-  | 'ask'
-  | 'block'
-  | 'deny'
-  | 'approve'
-  | 'allow'
-  | undefined;
+export type HookDecision = 'ask' | 'block' | 'deny' | 'approve' | 'allow' | undefined;
 
 /**
  * Base hook input - common fields for all events
@@ -261,10 +255,7 @@ export class DefaultHookOutput implements HookOutput {
    * Get sanitized additional context for adding to responses.
    */
   getAdditionalContext(): string | undefined {
-    if (
-      this.hookSpecificOutput &&
-      'additionalContext' in this.hookSpecificOutput
-    ) {
+    if (this.hookSpecificOutput && 'additionalContext' in this.hookSpecificOutput) {
       const context = this.hookSpecificOutput['additionalContext'];
       if (typeof context !== 'string') {
         return undefined;
@@ -306,16 +297,9 @@ export class DefaultHookOutput implements HookOutput {
         args: Record<string, unknown>;
       }
     | undefined {
-    if (
-      this.hookSpecificOutput &&
-      'tailToolCallRequest' in this.hookSpecificOutput
-    ) {
+    if (this.hookSpecificOutput && 'tailToolCallRequest' in this.hookSpecificOutput) {
       const request = this.hookSpecificOutput['tailToolCallRequest'];
-      if (
-        typeof request === 'object' &&
-        request !== null &&
-        !Array.isArray(request)
-      ) {
+      if (typeof request === 'object' && request !== null && !Array.isArray(request)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return request as { name: string; args: Record<string, unknown> };
       }
@@ -334,11 +318,7 @@ export class BeforeToolHookOutput extends DefaultHookOutput {
   getModifiedToolInput(): Record<string, unknown> | undefined {
     if (this.hookSpecificOutput && 'tool_input' in this.hookSpecificOutput) {
       const input = this.hookSpecificOutput['tool_input'];
-      if (
-        typeof input === 'object' &&
-        input !== null &&
-        !Array.isArray(input)
-      ) {
+      if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
         return input as Record<string, unknown>;
       }
@@ -357,9 +337,7 @@ export class BeforeModelHookOutput extends DefaultHookOutput {
   getSyntheticResponse(): GenerateContentResponse | undefined {
     if (this.hookSpecificOutput && 'llm_response' in this.hookSpecificOutput) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const hookResponse = this.hookSpecificOutput[
-        'llm_response'
-      ] as LLMResponse;
+      const hookResponse = this.hookSpecificOutput['llm_response'] as LLMResponse;
       if (hookResponse) {
         // Convert hook format to SDK format
         return defaultHookTranslator.fromHookLLMResponse(hookResponse);
@@ -376,9 +354,7 @@ export class BeforeModelHookOutput extends DefaultHookOutput {
   ): GenerateContentParameters {
     if (this.hookSpecificOutput && 'llm_request' in this.hookSpecificOutput) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const hookRequest = this.hookSpecificOutput[
-        'llm_request'
-      ] as Partial<LLMRequest>;
+      const hookRequest = this.hookSpecificOutput['llm_request'] as Partial<LLMRequest>;
       if (hookRequest) {
         // Convert hook format to SDK format
         const sdkRequest = defaultHookTranslator.fromHookLLMRequest(
@@ -409,13 +385,10 @@ export class BeforeToolSelectionHookOutput extends DefaultHookOutput {
   }): { toolConfig?: GenAIToolConfig; tools?: ToolListUnion } {
     if (this.hookSpecificOutput && 'toolConfig' in this.hookSpecificOutput) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-      const hookToolConfig = this.hookSpecificOutput[
-        'toolConfig'
-      ] as HookToolConfig;
+      const hookToolConfig = this.hookSpecificOutput['toolConfig'] as HookToolConfig;
       if (hookToolConfig) {
         // Convert hook format to SDK format
-        const sdkToolConfig =
-          defaultHookTranslator.fromHookToolConfig(hookToolConfig);
+        const sdkToolConfig = defaultHookTranslator.fromHookToolConfig(hookToolConfig);
         return {
           ...target,
           tools: target.tools || [],

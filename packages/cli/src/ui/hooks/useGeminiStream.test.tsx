@@ -17,10 +17,7 @@ import {
 import { act } from 'react';
 import { renderHookWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
-import {
-  nextLiveThoughtFromEvent,
-  useGeminiStream,
-} from './useGeminiStream.js';
+import { nextLiveThoughtFromEvent, useGeminiStream } from './useGeminiStream.js';
 import { useKeypress } from './useKeypress.js';
 import * as atCommandProcessor from './atCommandProcessor.js';
 import {
@@ -72,9 +69,7 @@ import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';
 import { theme } from '../semantic-colors.js';
 
 // --- MOCKS ---
-const mockSendMessageStream = vi
-  .fn()
-  .mockReturnValue((async function* () {})());
+const mockSendMessageStream = vi.fn().mockReturnValue((async function* () {})());
 const mockStartChat = vi.fn();
 const mockMessageBus = {
   publish: vi.fn(),
@@ -106,15 +101,11 @@ const MockedGeminiClientClass = vi.hoisted(() =>
       recordToolCalls: vi.fn(),
       getConversationFile: vi.fn(),
     });
-    this.getCurrentSequenceModel = vi
-      .fn()
-      .mockReturnValue('gemini-2.0-flash-exp');
+    this.getCurrentSequenceModel = vi.fn().mockReturnValue('gemini-2.0-flash-exp');
   }),
 );
 
-const MockedUserPromptEvent = vi.hoisted(() =>
-  vi.fn().mockImplementation(() => {}),
-);
+const MockedUserPromptEvent = vi.hoisted(() => vi.fn().mockImplementation(() => {}));
 const mockParseAndFormatApiError = vi.hoisted(() => vi.fn());
 const mockIsBackgroundExecutionData = vi.hoisted(
   () =>
@@ -130,8 +121,7 @@ const mockIsBackgroundExecutionData = vi.hoisted(
       return (
         (value.pid === undefined || typeof value.pid === 'number') &&
         (value.command === undefined || typeof value.command === 'string') &&
-        (value.initialOutput === undefined ||
-          typeof value.initialOutput === 'string')
+        (value.initialOutput === undefined || typeof value.initialOutput === 'string')
       );
     },
 );
@@ -219,9 +209,7 @@ vi.mock('./useStateAndRef.js', async () => {
         ) => {
           const nextValue =
             typeof updater === 'function'
-              ? (updater as (prev: typeof initial) => typeof initial)(
-                  ref.current,
-                )
+              ? (updater as (prev: typeof initial) => typeof initial)(ref.current)
               : updater;
           ref.current = nextValue;
           setState(nextValue);
@@ -285,9 +273,7 @@ describe('useGeminiStream', () => {
   let handleAtCommandSpy: MockInstance;
 
   const emptyHistory: HistoryItem[] = [];
-  let capturedOnComplete:
-    | ((tools: CompletedToolCall[]) => Promise<void>)
-    | null = null;
+  let capturedOnComplete: ((tools: CompletedToolCall[]) => Promise<void>) | null = null;
   const mockGetPreferredEditor = vi.fn(() => 'vscode' as EditorType);
   const mockOnAuthError = vi.fn();
   const mockPerformMemoryRefresh = vi.fn(() => Promise.resolve());
@@ -328,9 +314,7 @@ describe('useGeminiStream', () => {
       getProjectDataDir: vi.fn(() => '/test/data'),
       getProjectCheckpointsDir: vi.fn(() => '/test/data/checkpoints'),
     } as any,
-    getToolRegistry: vi.fn(
-      () => ({ getToolSchemaList: vi.fn(() => []) }) as any,
-    ),
+    getToolRegistry: vi.fn(() => ({ getToolSchemaList: vi.fn(() => []) }) as any),
     getProjectRoot: vi.fn(() => '/test/dir'),
     getCheckpointingEnabled: vi.fn(() => false),
     getGeminiClient: mockGetGeminiClient,
@@ -400,9 +384,7 @@ describe('useGeminiStream', () => {
     mockStartChat.mockClear().mockResolvedValue({
       sendMessageStream: mockSendMessageStream,
     } as unknown as any); // GeminiChat -> any
-    mockSendMessageStream
-      .mockClear()
-      .mockReturnValue((async function* () {})());
+    mockSendMessageStream.mockClear().mockReturnValue((async function* () {})());
     handleAtCommandSpy = vi.spyOn(atCommandProcessor, 'handleAtCommand');
     vi.spyOn(coreEvents, 'emitFeedback');
   });
@@ -448,9 +430,7 @@ describe('useGeminiStream', () => {
         mockScheduleToolCalls,
         mockMarkToolsAsSubmitted,
         (
-          updater:
-            | TrackedToolCall[]
-            | ((prev: TrackedToolCall[]) => TrackedToolCall[]),
+          updater: TrackedToolCall[] | ((prev: TrackedToolCall[]) => TrackedToolCall[]),
         ) => {
           lastToolCalls =
             typeof updater === 'function' ? updater(lastToolCalls) : updater;
@@ -1183,14 +1163,7 @@ describe('useGeminiStream', () => {
 
     mockUseToolScheduler.mockImplementation((onComplete) => {
       capturedOnComplete = onComplete;
-      return [
-        topicToolCalls,
-        vi.fn(),
-        mockMarkToolsAsSubmitted,
-        vi.fn(),
-        vi.fn(),
-        0,
-      ];
+      return [topicToolCalls, vi.fn(), mockMarkToolsAsSubmitted, vi.fn(), vi.fn(), 0];
     });
 
     await renderHookWithProviders(() =>
@@ -1291,9 +1264,7 @@ describe('useGeminiStream', () => {
     );
     expect(
       infoTexts.some((text) =>
-        text.includes(
-          'Some internal tool attempts failed before this final error',
-        ),
+        text.includes('Some internal tool attempts failed before this final error'),
       ),
     ).toBe(false);
     expect(
@@ -1358,9 +1329,7 @@ describe('useGeminiStream', () => {
       ([item]) => (item as { text?: string }).text ?? '',
     );
     const noteIndex = infoTexts.findIndex((text) =>
-      text.includes(
-        'Some internal tool attempts failed before this final error',
-      ),
+      text.includes('Some internal tool attempts failed before this final error'),
     );
     const stopIndex = infoTexts.findIndex((text) =>
       text.includes('Agent execution stopped: Stop reason from hook'),
@@ -1396,9 +1365,7 @@ describe('useGeminiStream', () => {
       status: CoreToolCallStatus.Cancelled,
       response: {
         callId: 'cancel-1',
-        responseParts: [
-          { functionResponse: { name: 'toolA', id: 'cancel-1' } },
-        ],
+        responseParts: [{ functionResponse: { name: 'toolA', id: 'cancel-1' } }],
         resultDisplay: undefined,
         error: undefined,
         errorType: undefined, // FIX: Added missing property
@@ -1425,9 +1392,7 @@ describe('useGeminiStream', () => {
       status: CoreToolCallStatus.Cancelled,
       response: {
         callId: 'cancel-2',
-        responseParts: [
-          { functionResponse: { name: 'toolB', id: 'cancel-2' } },
-        ],
+        responseParts: [{ functionResponse: { name: 'toolB', id: 'cancel-2' } }],
         resultDisplay: undefined,
         error: undefined,
         errorType: undefined, // FIX: Added missing property
@@ -1486,10 +1451,7 @@ describe('useGeminiStream', () => {
 
     await waitFor(() => {
       // The tools should be marked as submitted locally
-      expect(mockMarkToolsAsSubmitted).toHaveBeenCalledWith([
-        'cancel-1',
-        'cancel-2',
-      ]);
+      expect(mockMarkToolsAsSubmitted).toHaveBeenCalledWith(['cancel-1', 'cancel-2']);
 
       // Crucially, addHistory should be called only ONCE
       expect(client.addHistory).toHaveBeenCalledTimes(1);
@@ -1509,9 +1471,7 @@ describe('useGeminiStream', () => {
   });
 
   it('should not flicker streaming state to Idle between tool completion and submission', async () => {
-    const toolCallResponseParts: PartListUnion = [
-      { text: 'tool 1 final response' },
-    ];
+    const toolCallResponseParts: PartListUnion = [{ text: 'tool 1 final response' }];
 
     const initialToolCalls: TrackedToolCall[] = [
       {
@@ -1832,9 +1792,7 @@ describe('useGeminiStream', () => {
       });
 
       // The text should not have been updated with " Canceled"
-      const lastCall = mockAddItem.mock.calls.find(
-        (call) => call[0].type === 'gemini',
-      );
+      const lastCall = mockAddItem.mock.calls.find((call) => call[0].type === 'gemini');
       expect(lastCall?.[0].text).toBe('Initial');
 
       // The final state should be idle after cancellation
@@ -2027,9 +1985,7 @@ describe('useGeminiStream', () => {
       const { result } = await renderTestHook(toolCalls);
 
       // State is `WaitingForConfirmation` because a tool is awaiting approval
-      expect(result.current.streamingState).toBe(
-        StreamingState.WaitingForConfirmation,
-      );
+      expect(result.current.streamingState).toBe(StreamingState.WaitingForConfirmation);
 
       // Try to cancel
       simulateEscapeKeyPress();
@@ -2226,9 +2182,7 @@ describe('useGeminiStream', () => {
       });
 
       await waitFor(() => {
-        expect(mockHandleSlashCommand).toHaveBeenCalledWith(
-          '/my-custom-command',
-        );
+        expect(mockHandleSlashCommand).toHaveBeenCalledWith('/my-custom-command');
 
         expect(localMockSendMessageStream).not.toHaveBeenCalledWith(
           '/my-custom-command',
@@ -2642,11 +2596,7 @@ describe('useGeminiStream', () => {
     });
 
     it('should auto-approve shell commands with redirection when switching to AUTO_EDIT mode', async () => {
-      const shellCall = createMockToolCall(
-        SHELL_TOOL_NAME,
-        'call-shell',
-        'info',
-      );
+      const shellCall = createMockToolCall(SHELL_TOOL_NAME, 'call-shell', 'info');
       shellCall.request.args = { command: 'ls > files.txt' };
 
       const { result } = await renderTestHook([shellCall]);
@@ -2662,11 +2612,7 @@ describe('useGeminiStream', () => {
     });
 
     it('should NOT auto-approve shell commands without redirection when switching to AUTO_EDIT mode', async () => {
-      const shellCall = createMockToolCall(
-        SHELL_TOOL_NAME,
-        'call-shell',
-        'info',
-      );
+      const shellCall = createMockToolCall(SHELL_TOOL_NAME, 'call-shell', 'info');
       shellCall.request.args = { command: 'ls -la' };
 
       const { result } = await renderTestHook([shellCall]);
@@ -2695,9 +2641,7 @@ describe('useGeminiStream', () => {
     });
 
     it('should handle errors gracefully when auto-approving tool calls', async () => {
-      const debuggerSpy = vi
-        .spyOn(debugLogger, 'warn')
-        .mockImplementation(() => {});
+      const debuggerSpy = vi.spyOn(debugLogger, 'warn').mockImplementation(() => {});
 
       mockMessageBus.publish.mockRejectedValueOnce(new Error('Bus error'));
 
@@ -2815,9 +2759,7 @@ describe('useGeminiStream', () => {
       const { result, client } = await renderTestHook([]);
 
       // Update mockConfig to return DEFAULT mode (new mode)
-      (mockConfig.getApprovalMode as Mock).mockReturnValue(
-        ApprovalMode.DEFAULT,
-      );
+      (mockConfig.getApprovalMode as Mock).mockReturnValue(ApprovalMode.DEFAULT);
 
       await act(async () => {
         // Trigger manual exit from Plan Mode
@@ -3988,9 +3930,9 @@ describe('useGeminiStream', () => {
 
       await waitFor(() => {
         expect(result.current.loopDetectionConfirmationRequest).not.toBeNull();
-        expect(
-          typeof result.current.loopDetectionConfirmationRequest?.onComplete,
-        ).toBe('function');
+        expect(typeof result.current.loopDetectionConfirmationRequest?.onComplete).toBe(
+          'function',
+        );
       });
     });
 
@@ -4046,9 +3988,7 @@ describe('useGeminiStream', () => {
       });
 
       // Verify loop detection was disabled
-      expect(mockLoopDetectionService.disableForSession).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(mockLoopDetectionService.disableForSession).toHaveBeenCalledTimes(1);
 
       // Verify confirmation request was cleared
       expect(result.current.loopDetectionConfirmationRequest).toBeNull();
@@ -4335,9 +4275,7 @@ describe('useGeminiStream', () => {
         });
 
         await waitFor(() => {
-          expect(
-            result.current.loopDetectionConfirmationRequest,
-          ).not.toBeNull();
+          expect(result.current.loopDetectionConfirmationRequest).not.toBeNull();
         });
 
         // User selects "disable" which triggers a continuation query
@@ -4348,9 +4286,7 @@ describe('useGeminiStream', () => {
         });
 
         // Verify disableForSession was called
-        expect(
-          mockLoopDetectionService.disableForSession,
-        ).toHaveBeenCalledTimes(1);
+        expect(mockLoopDetectionService.disableForSession).toHaveBeenCalledTimes(1);
 
         // Continuation query should have gone through (2 total calls)
         await waitFor(() => {
@@ -4529,9 +4465,7 @@ describe('useGeminiStream', () => {
 
       // Reset mock
       vi.mocked(findLastSafeSplitPoint).mockReset();
-      vi.mocked(findLastSafeSplitPoint).mockImplementation(
-        (s: string) => s.length,
-      );
+      vi.mocked(findLastSafeSplitPoint).mockImplementation((s: string) => s.length);
     });
 
     it('should add whitespace-only history item when splitting message', async () => {

@@ -63,9 +63,7 @@ export const AboutBox: React.FC<AboutInfo> = ({
         </Text>
       </Box>
       <Box>
-        <Text color={theme.text.primary}>
-          https://github.com/krrr/sparkle-cli
-        </Text>
+        <Text color={theme.text.primary}>https://github.com/krrr/sparkle-cli</Text>
       </Box>
     </Box>
     <Box flexDirection="row">

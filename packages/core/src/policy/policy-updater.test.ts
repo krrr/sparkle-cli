@@ -14,10 +14,7 @@ import { Storage } from '../config/storage.js';
 import toml from '@iarna/toml';
 import { ShellToolInvocation } from '../tools/shell.js';
 import { type Config } from '../config/config.js';
-import {
-  ToolConfirmationOutcome,
-  type PolicyUpdateOptions,
-} from '../tools/tools.js';
+import { ToolConfirmationOutcome, type PolicyUpdateOptions } from '../tools/tools.js';
 import * as shellUtils from '../utils/shell-utils.js';
 import { escapeRegex } from './utils.js';
 
@@ -81,9 +78,7 @@ describe('createPolicyUpdater', () => {
         toolName: 'run_shell_command',
         priority: ALWAYS_ALLOW_PRIORITY,
         mcpName: 'test-mcp',
-        argsPattern: new RegExp(
-          escapeRegex('"command":"echo') + '(?:[\\s"]|\\\\")',
-        ),
+        argsPattern: new RegExp(escapeRegex('"command":"echo') + '(?:[\\s"]|\\\\")'),
       }),
     );
     expect(policyEngine.addRule).toHaveBeenNthCalledWith(
@@ -92,9 +87,7 @@ describe('createPolicyUpdater', () => {
         toolName: 'run_shell_command',
         priority: ALWAYS_ALLOW_PRIORITY,
         mcpName: 'test-mcp',
-        argsPattern: new RegExp(
-          escapeRegex('"command":"ls') + '(?:[\\s"]|\\\\")',
-        ),
+        argsPattern: new RegExp(escapeRegex('"command":"ls') + '(?:[\\s"]|\\\\")'),
       }),
     );
   });
@@ -132,9 +125,7 @@ describe('createPolicyUpdater', () => {
       writeFile: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
     };
-    vi.mocked(fs.open).mockResolvedValue(
-      mockFileHandle as unknown as fs.FileHandle,
-    );
+    vi.mocked(fs.open).mockResolvedValue(mockFileHandle as unknown as fs.FileHandle);
     vi.mocked(fs.rename).mockResolvedValue(undefined);
 
     await messageBus.publish({
@@ -149,10 +140,7 @@ describe('createPolicyUpdater', () => {
     await vi.waitFor(() => {
       expect(fs.open).toHaveBeenCalled();
     });
-    const [content] = mockFileHandle.writeFile.mock.calls[0] as [
-      string,
-      string,
-    ];
+    const [content] = mockFileHandle.writeFile.mock.calls[0] as [string, string];
     const parsed = toml.parse(content) as unknown as ParsedPolicy;
 
     expect(parsed.rule).toHaveLength(1);
@@ -175,9 +163,7 @@ describe('createPolicyUpdater', () => {
       expect.objectContaining({
         toolName: 'run_shell_command',
         priority: ALWAYS_ALLOW_PRIORITY,
-        argsPattern: new RegExp(
-          escapeRegex('"command":"git') + '(?:[\\s"]|\\\\")',
-        ),
+        argsPattern: new RegExp(escapeRegex('"command":"git') + '(?:[\\s"]|\\\\")'),
       }),
     );
   });
@@ -203,10 +189,9 @@ describe('createPolicyUpdater', () => {
 
   it('should persist multiple rules correctly to TOML', async () => {
     createPolicyUpdater(policyEngine, messageBus, mockStorage);
-    const enoentError = Object.assign(
-      new Error('ENOENT: no such file or directory'),
-      { code: 'ENOENT' },
-    );
+    const enoentError = Object.assign(new Error('ENOENT: no such file or directory'), {
+      code: 'ENOENT',
+    });
     vi.mocked(fs.readFile).mockRejectedValue(enoentError);
     vi.mocked(fs.mkdir).mockResolvedValue(undefined);
 
@@ -214,9 +199,7 @@ describe('createPolicyUpdater', () => {
       writeFile: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
     };
-    vi.mocked(fs.open).mockResolvedValue(
-      mockFileHandle as unknown as fs.FileHandle,
-    );
+    vi.mocked(fs.open).mockResolvedValue(mockFileHandle as unknown as fs.FileHandle);
     vi.mocked(fs.rename).mockResolvedValue(undefined);
 
     await messageBus.publish({
@@ -229,10 +212,7 @@ describe('createPolicyUpdater', () => {
     // Wait for the async listener to complete
     await vi.waitFor(() => {
       expect(fs.open).toHaveBeenCalled();
-      const [content] = mockFileHandle.writeFile.mock.calls[0] as [
-        string,
-        string,
-      ];
+      const [content] = mockFileHandle.writeFile.mock.calls[0] as [string, string];
       const parsed = toml.parse(content) as unknown as ParsedPolicy;
 
       expect(parsed.rule).toHaveLength(1);
@@ -263,9 +243,7 @@ describe('ShellToolInvocation Policy Update', () => {
     mockConfig = {} as Config;
     mockMessageBus = {} as MessageBus;
 
-    vi.mocked(shellUtils.stripShellWrapper).mockImplementation(
-      (c: string) => c,
-    );
+    vi.mocked(shellUtils.stripShellWrapper).mockImplementation((c: string) => c);
     vi.mocked(shellUtils.hasRedirection).mockReturnValue(false);
   });
 
@@ -285,9 +263,7 @@ describe('ShellToolInvocation Policy Update', () => {
       invocation as unknown as TestableShellToolInvocation
     ).getPolicyUpdateOptions(ToolConfirmationOutcome.ProceedAlways);
     expect(options!.commandPrefix).toEqual(['git', 'npm']);
-    expect(shellUtils.getCommandRoots).toHaveBeenCalledWith(
-      'git status && npm test',
-    );
+    expect(shellUtils.getCommandRoots).toHaveBeenCalledWith('git status && npm test');
   });
 
   it('should extract a single root command', () => {
@@ -326,8 +302,6 @@ describe('ShellToolInvocation Policy Update', () => {
     ).getPolicyUpdateOptions(ToolConfirmationOutcome.ProceedAlways);
     expect(options!.commandPrefix).toEqual(['echo']);
     expect(options!.allowRedirection).toBe(true);
-    expect(shellUtils.hasRedirection).toHaveBeenCalledWith(
-      'echo "hello" > file.txt',
-    );
+    expect(shellUtils.hasRedirection).toHaveBeenCalledWith('echo "hello" > file.txt');
   });
 });

@@ -158,20 +158,7 @@ function tryExtractPath(noisyString: string): string | null {
     // 1. Strip leading/trailing punctuation and quotes commonly found in logs
     // We handle nested wrappers like ("path/to/file.txt") or (at src/index.ts)
     let segmentToClean = segment;
-    const wrappers = [
-      '(',
-      ')',
-      '[',
-      ']',
-      '{',
-      '}',
-      '"',
-      "'",
-      ',',
-      ';',
-      '!',
-      '.',
-    ];
+    const wrappers = ['(', ')', '[', ']', '{', '}', '"', "'", ',', ';', '!', '.'];
 
     let wasStripped = true;
     while (wasStripped && segmentToClean.length > 0) {
@@ -201,11 +188,7 @@ function tryExtractPath(noisyString: string): string | null {
     // rather than naive string stripping which can be bypassed or corrupt valid names.
     if (validatePath(pathOnly).isValid) {
       // Prioritize segments that actually look like paths (have slashes or dots)
-      if (
-        pathOnly.includes('/') ||
-        pathOnly.includes('\\') ||
-        pathOnly.includes('.')
-      ) {
+      if (pathOnly.includes('/') || pathOnly.includes('\\') || pathOnly.includes('.')) {
         return pathOnly;
       }
     }

@@ -41,10 +41,7 @@ import { useKeypress } from './useKeypress.js';
 export interface UseAgentStreamOptions {
   agent?: AgentProtocol;
   addItem: UseHistoryManagerReturn['addItem'];
-  onCancelSubmit: (
-    shouldRestorePrompt?: boolean,
-    clearBuffer?: boolean,
-  ) => void;
+  onCancelSubmit: (shouldRestorePrompt?: boolean, clearBuffer?: boolean) => void;
   isShellFocused?: boolean;
   logger?: Logger | null;
 }
@@ -74,9 +71,9 @@ export const useAgentStream = ({
   const [pendingHistoryItem, pendingHistoryItemRef, setPendingHistoryItem] =
     useStateAndRef<HistoryItemWithoutId | null>(null);
 
-  const [trackedTools, , setTrackedTools] = useStateAndRef<
-    IndividualToolCallDisplay[]
-  >([]);
+  const [trackedTools, , setTrackedTools] = useStateAndRef<IndividualToolCallDisplay[]>(
+    [],
+  );
   const [pushedToolCallIds, pushedToolCallIdsRef, setPushedToolCallIds] =
     useStateAndRef<Set<string>>(new Set());
   const [_isFirstToolInGroup, isFirstToolInGroupRef, setIsFirstToolInGroup] =
@@ -175,8 +172,7 @@ export const useAgentStream = ({
                     0,
                     splitPoint,
                   );
-                  const after =
-                    geminiMessageBufferRef.current.substring(splitPoint);
+                  const after = geminiMessageBufferRef.current.substring(splitPoint);
                   addItem(
                     { type: 'gemini', text: before },
                     userMessageTimestampRef.current,
@@ -227,20 +223,16 @@ export const useAgentStream = ({
               const evtStatus = legacyState?.status;
 
               let status = tc.status;
-              if (evtStatus === 'executing')
-                status = CoreToolCallStatus.Executing;
+              if (evtStatus === 'executing') status = CoreToolCallStatus.Executing;
               else if (evtStatus === 'error') status = CoreToolCallStatus.Error;
-              else if (evtStatus === 'success')
-                status = CoreToolCallStatus.Success;
+              else if (evtStatus === 'success') status = CoreToolCallStatus.Success;
 
               const display = event.display?.result;
-              const liveOutput =
-                displayContentToString(display) ?? tc.resultDisplay;
+              const liveOutput = displayContentToString(display) ?? tc.resultDisplay;
               const progressMessage =
                 legacyState?.progressMessage ?? tc.progressMessage;
               const progress = legacyState?.progress ?? tc.progress;
-              const progressTotal =
-                legacyState?.progressTotal ?? tc.progressTotal;
+              const progressTotal = legacyState?.progressTotal ?? tc.progressTotal;
               const ptyId = legacyState?.pid ?? tc.ptyId;
               const description = legacyState?.description ?? tc.description;
 
@@ -269,8 +261,7 @@ export const useAgentStream = ({
               const legacyState = event._meta?.legacyState;
               const outputFile = legacyState?.outputFile;
               const display = event.display?.result;
-              const resultDisplay =
-                displayContentToString(display) ?? tc.resultDisplay;
+              const resultDisplay = displayContentToString(display) ?? tc.resultDisplay;
 
               return {
                 ...tc,
@@ -378,10 +369,7 @@ export const useAgentStream = ({
         });
         currentStreamIdRef.current = streamId;
       } catch (err) {
-        addItem(
-          { type: MessageType.ERROR, text: getErrorMessage(err) },
-          timestamp,
-        );
+        addItem({ type: MessageType.ERROR, text: getErrorMessage(err) }, timestamp);
       }
     },
     [agent, addItem, logger, startNewPrompt],
@@ -416,9 +404,7 @@ export const useAgentStream = ({
     // This allows ToolGroupDisplay to correctly hoist ALL notices (topics) for the turn.
     const allTerminal = trackedTools.every(
       (tc) =>
-        tc.status === 'success' ||
-        tc.status === 'error' ||
-        tc.status === 'cancelled',
+        tc.status === 'success' || tc.status === 'error' || tc.status === 'cancelled',
     );
 
     const toolsToPush = trackedTools.filter(
@@ -439,9 +425,7 @@ export const useAgentStream = ({
         backgroundTasks,
       );
 
-      const hasBoxInBatch = toolsToPush.some(
-        (tc) => tc.display?.format !== 'notice',
-      );
+      const hasBoxInBatch = toolsToPush.some((tc) => tc.display?.format !== 'notice');
       const shouldStartNewBlock =
         isFirstToolInGroupRef.current ||
         (!hasEmittedBoxInTurnRef.current && hasBoxInBatch);
@@ -524,9 +508,7 @@ export const useAgentStream = ({
       trackedTools.length > 0 &&
       trackedTools.every(
         (tc) =>
-          tc.status === 'success' ||
-          tc.status === 'error' ||
-          tc.status === 'cancelled',
+          tc.status === 'success' || tc.status === 'error' || tc.status === 'cancelled',
       );
 
     const allPushed =

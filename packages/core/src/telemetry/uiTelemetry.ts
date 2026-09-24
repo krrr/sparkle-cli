@@ -311,8 +311,7 @@ export class UiTelemetryService extends EventEmitter {
     modelMetrics.api.totalLatencyMs += event.duration_ms;
     if (event.time_to_first_token_ms !== undefined) {
       modelMetrics.api.totalTimeToFirstTokenMs =
-        (modelMetrics.api.totalTimeToFirstTokenMs ?? 0) +
-        event.time_to_first_token_ms;
+        (modelMetrics.api.totalTimeToFirstTokenMs ?? 0) + event.time_to_first_token_ms;
       modelMetrics.api.totalTimeToFirstTokenRequests =
         (modelMetrics.api.totalTimeToFirstTokenRequests ?? 0) + 1;
     }

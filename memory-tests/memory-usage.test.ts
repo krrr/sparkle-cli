@@ -162,10 +162,7 @@ describe('Memory Usage Tests', () => {
   it('multi-function-call-repo-search: memory after tool use', async () => {
     rig = new TestRig();
     rig.setup('memory-multi-func-call', {
-      fakeResponsesPath: join(
-        __dirname,
-        'memory.multi-function-call.responses',
-      ),
+      fakeResponsesPath: join(__dirname, 'memory.multi-function-call.responses'),
     });
 
     // Create directories first, then files in the workspace so the tools have targets
@@ -184,9 +181,7 @@ describe('Memory Usage Tests', () => {
       'multi-function-call-repo-search',
       async (recordSnapshot) => {
         await rig.run({
-          args: [
-            'Search this repository for MemoryMonitor and tell me what it does',
-          ],
+          args: ['Search this repository for MemoryMonitor and tell me what it does'],
           timeout: 120000,
           env: TEST_ENV,
         });
@@ -284,10 +279,7 @@ describe('Memory Usage Tests', () => {
             'chats',
           );
           mkdirSync(targetChatsDir, { recursive: true });
-          const targetHistoryPath = join(
-            targetChatsDir,
-            'session-large-chat.jsonl',
-          );
+          const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
           if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
           copyFileSync(sharedHistoryPath, targetHistoryPath);
 
@@ -331,10 +323,7 @@ describe('Memory Usage Tests', () => {
             'chats',
           );
           mkdirSync(targetChatsDir, { recursive: true });
-          const targetHistoryPath = join(
-            targetChatsDir,
-            'session-large-chat.jsonl',
-          );
+          const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
           if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
           copyFileSync(sharedHistoryPath, targetHistoryPath);
 
@@ -371,9 +360,7 @@ async function generateSharedLargeChatData(tempDir: string) {
 
   // The fixture is JSONL: line 1 is the metadata record, the remaining
   // lines are the individual messages.
-  const sessionLines = readFileSync(sourceSessionPath, 'utf8')
-    .trim()
-    .split('\n');
+  const sessionLines = readFileSync(sourceSessionPath, 'utf8').trim().split('\n');
   const messages = sessionLines.slice(1).map((line) => JSON.parse(line));
 
   copyFileSync(sourceSessionPath, historyPath);
@@ -406,9 +393,7 @@ async function generateSharedLargeChatData(tempDir: string) {
       candidates: [
         {
           content: {
-            parts: [
-              { text: '{"originalSummary":"large chat summary","events":[]}' },
-            ],
+            parts: [{ text: '{"originalSummary":"large chat summary","events":[]}' }],
             role: 'model',
           },
           finishReason: 'STOP',
@@ -515,12 +500,8 @@ async function generateSharedLargeChatData(tempDir: string) {
 
   // Wait for streams to finish
   await Promise.all([
-    new Promise((res) =>
-      activeResponsesStream.on('finish', () => res(undefined)),
-    ),
-    new Promise((res) =>
-      resumeResponsesStream.on('finish', () => res(undefined)),
-    ),
+    new Promise((res) => activeResponsesStream.on('finish', () => res(undefined))),
+    new Promise((res) => resumeResponsesStream.on('finish', () => res(undefined))),
   ]);
 
   return {

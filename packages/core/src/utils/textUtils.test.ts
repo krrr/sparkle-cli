@@ -32,9 +32,7 @@ describe('safeLiteralReplace', () => {
     expect(safeLiteralReplace('hello', 'hello', '$&-replacement')).toBe(
       '$&-replacement',
     );
-    expect(safeLiteralReplace('mid', 'mid', 'new$`content')).toBe(
-      'new$`content',
-    );
+    expect(safeLiteralReplace('mid', 'mid', 'new$`content')).toBe('new$`content');
     expect(safeLiteralReplace('test', 'test', '$1$2value')).toBe('$1$2value');
   });
 
@@ -56,11 +54,7 @@ describe('safeLiteralReplace', () => {
 
   it('handles complex malicious patterns from PR #7871', () => {
     const original = 'The price is PRICE.';
-    const result = safeLiteralReplace(
-      original,
-      'PRICE',
-      "$& Wow, that's a lot! $'",
-    );
+    const result = safeLiteralReplace(original, 'PRICE', "$& Wow, that's a lot! $'");
     expect(result).toBe("The price is $& Wow, that's a lot! $'.");
   });
 
@@ -173,9 +167,7 @@ describe('safeTemplateReplace', () => {
   });
 
   it('handles template with no placeholders', () => {
-    expect(safeTemplateReplace('No keys here', { key: 'val' })).toBe(
-      'No keys here',
-    );
+    expect(safeTemplateReplace('No keys here', { key: 'val' })).toBe('No keys here');
   });
 
   it('prevents double interpolation (security check)', () => {
@@ -184,9 +176,7 @@ describe('safeTemplateReplace', () => {
       userInput: '{{secret}}',
       secret: 'super_secret_value',
     };
-    expect(safeTemplateReplace(tmpl, replacements)).toBe(
-      'User said: {{secret}}',
-    );
+    expect(safeTemplateReplace(tmpl, replacements)).toBe('User said: {{secret}}');
   });
 
   it('handles values with $ signs correctly (no regex group substitution)', () => {
@@ -232,9 +222,7 @@ describe('stripAnsiFromBuffer', () => {
   });
 
   it('handles multiple mixed escape sequences', () => {
-    const input = Buffer.from(
-      '\x1b[31m\x1b]0;title\x07hello\x1b[0m world\x1bD',
-    );
+    const input = Buffer.from('\x1b[31m\x1b]0;title\x07hello\x1b[0m world\x1bD');
     expect(stripAnsiFromBuffer(input).toString()).toBe('hello world');
   });
 

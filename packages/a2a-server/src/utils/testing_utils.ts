@@ -28,9 +28,7 @@ import {
 import { createMockMessageBus } from 'sparkle-cli-core/src/test-utils/mock-message-bus.js';
 import { expect, vi } from 'vitest';
 
-export function createMockConfig(
-  overrides: Partial<Config> = {},
-): Partial<Config> {
+export function createMockConfig(overrides: Partial<Config> = {}): Partial<Config> {
   const tmpDir = tmpdir();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const mockConfig = {
@@ -76,8 +74,7 @@ export function createMockConfig(
       getProjectTempDir: () => tmpDir,
       getProjectCheckpointsDir: () => path.join(tmpDir, 'checkpoints'),
     } as Storage,
-    getTruncateToolOutputThreshold: () =>
-      DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
+    getTruncateToolOutputThreshold: () => DEFAULT_TRUNCATE_TOOL_OUTPUT_THRESHOLD,
     getActiveModel: vi.fn().mockReturnValue(DEFAULT_GEMINI_MODEL),
     getDebugMode: vi.fn().mockReturnValue(false),
     getContentGeneratorConfig: vi.fn().mockReturnValue({ model: 'gemini-pro' }),
@@ -119,13 +116,9 @@ export function createMockConfig(
     'test-prompt-id';
 
   mockConfig.getMessageBus = vi.fn().mockReturnValue(createMockMessageBus());
-  mockConfig.getHookSystem = vi
-    .fn()
-    .mockReturnValue(new HookSystem(mockConfig));
+  mockConfig.getHookSystem = vi.fn().mockReturnValue(new HookSystem(mockConfig));
 
-  mockConfig.getGeminiClient = vi
-    .fn()
-    .mockReturnValue(new GeminiClient(mockConfig));
+  mockConfig.getGeminiClient = vi.fn().mockReturnValue(new GeminiClient(mockConfig));
 
   mockConfig.getPolicyEngine = vi.fn().mockReturnValue({
     check: async () => {

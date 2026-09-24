@@ -80,8 +80,7 @@ describe('renderHook', () => {
       return { count, increment: () => setCount((c) => c + 1) };
     };
 
-    const { result, rerender, waitUntilReady, unmount } =
-      await renderHook(useTestHook);
+    const { result, rerender, waitUntilReady, unmount } = await renderHook(useTestHook);
 
     expect(result.current.count).toBe(0);
 

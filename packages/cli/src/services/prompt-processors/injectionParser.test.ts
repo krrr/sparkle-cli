@@ -198,9 +198,7 @@ describe('extractInjections', () => {
     it('should include the context name in the error message if provided', () => {
       const prompt = 'Failing !{command';
       const contextName = 'test-command';
-      expect(() =>
-        extractInjections(prompt, SHELL_TRIGGER, contextName),
-      ).toThrow(
+      expect(() => extractInjections(prompt, SHELL_TRIGGER, contextName)).toThrow(
         /Invalid syntax in command 'test-command': Unclosed injection starting at index 8/,
       );
     });

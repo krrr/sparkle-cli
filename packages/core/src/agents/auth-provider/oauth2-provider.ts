@@ -90,19 +90,12 @@ export class OAuth2AuthProvider extends BaseA2AAuthProvider {
    */
   override async headers(): Promise<HttpHeaders> {
     // 1. Valid cached token → return immediately.
-    if (
-      this.cachedToken &&
-      !this.tokenStorage.isTokenExpired(this.cachedToken)
-    ) {
+    if (this.cachedToken && !this.tokenStorage.isTokenExpired(this.cachedToken)) {
       return { Authorization: `Bearer ${this.cachedToken.accessToken}` };
     }
 
     // 2. Expired but has refresh token → attempt silent refresh.
-    if (
-      this.cachedToken?.refreshToken &&
-      this.tokenUrl &&
-      this.config.client_id
-    ) {
+    if (this.cachedToken?.refreshToken && this.tokenUrl && this.config.client_id) {
       try {
         const refreshed = await refreshAccessToken(
           {
@@ -114,10 +107,7 @@ export class OAuth2AuthProvider extends BaseA2AAuthProvider {
           this.tokenUrl,
         );
 
-        this.cachedToken = this.toOAuthToken(
-          refreshed,
-          this.cachedToken.refreshToken,
-        );
+        this.cachedToken = this.toOAuthToken(refreshed, this.cachedToken.refreshToken);
         await this.persistToken();
         return { Authorization: `Bearer ${this.cachedToken.accessToken}` };
       } catch (error) {
@@ -267,16 +257,11 @@ export class OAuth2AuthProvider extends BaseA2AAuthProvider {
     try {
       await openBrowserSecurely(authUrl);
     } catch (error) {
-      debugLogger.warn(
-        'Failed to open browser automatically:',
-        getErrorMessage(error),
-      );
+      debugLogger.warn('Failed to open browser automatically:', getErrorMessage(error));
     }
 
     const { code } = await callbackServer.response;
-    debugLogger.debug(
-      '✓ Authorization code received, exchanging for tokens...',
-    );
+    debugLogger.debug('✓ Authorization code received, exchanging for tokens...');
 
     const tokenResponse = await exchangeCodeForToken(
       flowConfig,

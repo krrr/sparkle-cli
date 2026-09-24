@@ -6,12 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import {
-  createHash,
-  createHmac,
-  randomBytes,
-  timingSafeEqual,
-} from 'node:crypto';
+import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import {
   INTEGRITY_FILENAME,
   INTEGRITY_KEY_FILENAME,
@@ -258,15 +253,12 @@ export class ExtensionIntegrityManager implements IExtensionIntegrity {
       );
 
       if (!isHashValid) {
-        debugLogger.warn(
-          `Integrity mismatch for "${extensionName}": Hash mismatch.`,
-        );
+        debugLogger.warn(`Integrity mismatch for "${extensionName}": Hash mismatch.`);
         return IntegrityDataStatus.INVALID;
       }
 
       // Verify the signature (authenticity) using the master secret key.
-      const actualSignature =
-        await this.integrityStore.generateSignature(actualHash);
+      const actualSignature = await this.integrityStore.generateSignature(actualHash);
       const isSignatureValid = this.integrityStore.verifyConstantTime(
         actualSignature,
         extensionRecord.signature,

@@ -20,9 +20,7 @@ export const testTruncateProfile: ContextProfile = {
     {
       name: 'Emergency Backstop (Truncate Only)',
       triggers: ['gc_backstop', 'retained_exceeded'],
-      processors: [
-        createHistoryTruncationProcessor('HistoryTruncation', env, {}),
-      ],
+      processors: [createHistoryTruncationProcessor('HistoryTruncation', env, {})],
     },
   ],
   buildAsyncPipelines: () => [],

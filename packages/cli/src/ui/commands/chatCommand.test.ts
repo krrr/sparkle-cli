@@ -56,9 +56,7 @@ describe('chatCommand', () => {
   const getSubCommand = (
     name: 'list' | 'save' | 'resume' | 'delete' | 'share' | 'fork',
   ): SlashCommand => {
-    const subCommand = chatCommand.subCommands?.find(
-      (cmd) => cmd.name === name,
-    );
+    const subCommand = chatCommand.subCommands?.find((cmd) => cmd.name === name);
     if (!subCommand) {
       throw new Error(`/chat ${name} command not found.`);
     }
@@ -130,14 +128,7 @@ describe('chatCommand', () => {
       .map((subCommand) => subCommand.name);
 
     expect(visibleSubCommandNames).toEqual(
-      expect.arrayContaining([
-        'list',
-        'save',
-        'resume',
-        'delete',
-        'share',
-        'fork',
-      ]),
+      expect.arrayContaining(['list', 'save', 'resume', 'delete', 'share', 'fork']),
     );
   });
 
@@ -146,9 +137,7 @@ describe('chatCommand', () => {
       (subCommand) => subCommand.name === 'checkpoints',
     );
     expect(checkpoints?.hidden).toBe(true);
-    expect(
-      checkpoints?.subCommands?.map((subCommand) => subCommand.name),
-    ).toEqual(
+    expect(checkpoints?.subCommands?.map((subCommand) => subCommand.name)).toEqual(
       expect.arrayContaining(['list', 'save', 'resume', 'delete', 'share']),
     );
   });
@@ -370,10 +359,7 @@ describe('chatCommand', () => {
     it('should inform if checkpoint is not found', async () => {
       mockLoadCheckpoint.mockResolvedValue({ history: [] });
 
-      const result = await resumeCheckpointCommand?.action?.(
-        mockContext,
-        badTag,
-      );
+      const result = await resumeCheckpointCommand?.action?.(mockContext, badTag);
 
       expect(result).toEqual({
         type: 'message',
@@ -393,10 +379,7 @@ describe('chatCommand', () => {
         authType: ProviderType.USE_GEMINI,
       });
 
-      const result = await resumeCheckpointCommand?.action?.(
-        mockContext,
-        goodTag,
-      );
+      const result = await resumeCheckpointCommand?.action?.(mockContext, goodTag);
 
       expect(result).toEqual({
         type: 'load_history',
@@ -425,10 +408,7 @@ describe('chatCommand', () => {
         authType: ProviderType.USE_GEMINI,
       });
 
-      const result = await resumeCheckpointCommand?.action?.(
-        mockContext,
-        goodTag,
-      );
+      const result = await resumeCheckpointCommand?.action?.(mockContext, goodTag);
 
       // The thought part must not appear as message text; only the visible
       // response is surfaced.
@@ -453,10 +433,7 @@ describe('chatCommand', () => {
         authType: ProviderType.USE_OPENAI,
       });
 
-      const result = await resumeCheckpointCommand?.action?.(
-        mockContext,
-        goodTag,
-      );
+      const result = await resumeCheckpointCommand?.action?.(mockContext, goodTag);
 
       expect(result).toEqual({
         type: 'message',
@@ -473,10 +450,7 @@ describe('chatCommand', () => {
       ];
       mockLoadCheckpoint.mockResolvedValue({ history: conversation });
 
-      const result = await resumeCheckpointCommand?.action?.(
-        mockContext,
-        goodTag,
-      );
+      const result = await resumeCheckpointCommand?.action?.(mockContext, goodTag);
 
       expect(result).toEqual({
         type: 'load_history',
@@ -503,10 +477,7 @@ describe('chatCommand', () => {
             }) as Stats) as unknown as typeof fsPromises.stat,
         );
 
-        const result = await resumeCheckpointCommand?.completion?.(
-          mockContext,
-          'a',
-        );
+        const result = await resumeCheckpointCommand?.completion?.(mockContext, 'a');
 
         expect(result).toEqual(['alpha']);
       });
@@ -518,19 +489,14 @@ describe('chatCommand', () => {
           (async (_: string): Promise<string[]> =>
             fakeFiles) as unknown as typeof fsPromises.readdir,
         );
-        mockFs.stat.mockImplementation((async (
-          path: string,
-        ): Promise<Stats> => {
+        mockFs.stat.mockImplementation((async (path: string): Promise<Stats> => {
           if (path.endsWith('test1.json')) {
             return { mtime: date } as Stats;
           }
           return { mtime: new Date(date.getTime() + 1000) } as Stats;
         }) as unknown as typeof fsPromises.stat);
 
-        const result = await resumeCheckpointCommand?.completion?.(
-          mockContext,
-          '',
-        );
+        const result = await resumeCheckpointCommand?.completion?.(mockContext, '');
         // Sort items by last modified time (newest first)
         expect(result).toEqual(['test2', 'test1']);
       });
@@ -674,9 +640,7 @@ describe('chatCommand', () => {
     });
 
     it('should inform if there is no conversation to share', async () => {
-      mockGetHistory.mockReturnValue([
-        { role: 'user', parts: [{ text: 'context' }] },
-      ]);
+      mockGetHistory.mockReturnValue([{ role: 'user', parts: [{ text: 'context' }] }]);
       const result = await shareCommand?.action?.(mockContext, 'my-chat.json');
       expect(mockExport).not.toHaveBeenCalled();
       expect(result).toEqual({
@@ -870,9 +834,7 @@ describe('chatCommand', () => {
       await forkCommand?.action?.(mockContext, '');
 
       expect(mockContext.ui.loadHistory).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({ type: 'tool_group' }),
-        ]),
+        expect.arrayContaining([expect.objectContaining({ type: 'tool_group' })]),
       );
     });
 

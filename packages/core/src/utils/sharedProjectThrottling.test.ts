@@ -32,8 +32,7 @@ describe('Shared Project Throttling Integration', () => {
             {
               quotaMetric:
                 'generativelanguage.googleapis.com/generate_content_requests',
-              quotaId:
-                'GenerateRequestsPerMinutePerProjectPerModel-SharedProject',
+              quotaId: 'GenerateRequestsPerMinutePerProjectPerModel-SharedProject',
               quotaDimensions: {
                 location: 'global',
                 model: 'gemini-2.5-pro',

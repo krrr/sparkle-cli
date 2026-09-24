@@ -133,8 +133,7 @@ describe('A2AClientManager', () => {
         url: 'http://test.agent/card',
       });
 
-      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock
-        .calls[0][0];
+      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock.calls[0][0];
       const cardFetch = resolverOptions?.fetchImpl as typeof fetch;
       await cardFetch('http://test.agent/card');
 
@@ -142,9 +141,9 @@ describe('A2AClientManager', () => {
         .mocked(fetch)
         .mock.calls.find((call) => call[0] === 'http://test.agent/card');
       expect(fetchCall).toBeDefined();
-      expect(
-        (fetchCall![1] as { dispatcher?: unknown })?.dispatcher,
-      ).toBeInstanceOf(UndiciAgent);
+      expect((fetchCall![1] as { dispatcher?: unknown })?.dispatcher).toBeInstanceOf(
+        UndiciAgent,
+      );
       expect(
         (fetchCall![1] as { dispatcher?: unknown })?.dispatcher,
       ).not.toBeInstanceOf(ProxyAgent);
@@ -161,8 +160,7 @@ describe('A2AClientManager', () => {
         url: 'http://test.proxy.agent/card',
       });
 
-      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock
-        .calls[0][0];
+      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock.calls[0][0];
       const cardFetch = resolverOptions?.fetchImpl as typeof fetch;
       await cardFetch('http://test.proxy.agent/card');
 
@@ -170,9 +168,9 @@ describe('A2AClientManager', () => {
         .mocked(fetch)
         .mock.calls.find((call) => call[0] === 'http://test.proxy.agent/card');
       expect(fetchCall).toBeDefined();
-      expect(
-        (fetchCall![1] as { dispatcher?: unknown })?.dispatcher,
-      ).toBeInstanceOf(ProxyAgent);
+      expect((fetchCall![1] as { dispatcher?: unknown })?.dispatcher).toBeInstanceOf(
+        ProxyAgent,
+      );
     });
   });
 
@@ -227,8 +225,7 @@ describe('A2AClientManager', () => {
       );
 
       // Card resolver should NOT use the authenticated fetch by default.
-      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock
-        .calls[0][0];
+      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock.calls[0][0];
       expect(resolverOptions?.fetchImpl).not.toBe(authFetchMock);
     });
 
@@ -243,8 +240,7 @@ describe('A2AClientManager', () => {
         customAuthHandler as unknown as AuthenticationHandler,
       );
 
-      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock
-        .calls[0][0];
+      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock.calls[0][0];
       const cardFetch = resolverOptions?.fetchImpl as typeof fetch;
 
       expect(cardFetch).toBeDefined();
@@ -274,8 +270,7 @@ describe('A2AClientManager', () => {
         customAuthHandler as unknown as AuthenticationHandler,
       );
 
-      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock
-        .calls[0][0];
+      const resolverOptions = vi.mocked(DefaultAgentCardResolver).mock.calls[0][0];
       const cardFetch = resolverOptions?.fetchImpl as typeof fetch;
 
       await cardFetch('http://test.url');
@@ -315,8 +310,8 @@ describe('A2AClientManager', () => {
       expect(manager.getAgentCard('JsonAgent')).toBe(agentCard);
       expect(manager.getClient('JsonAgent')).toBeDefined();
       // Resolver should not have been called for inline JSON
-      const resolverInstance = vi.mocked(DefaultAgentCardResolver).mock
-        .results[0]?.value;
+      const resolverInstance = vi.mocked(DefaultAgentCardResolver).mock.results[0]
+        ?.value;
       if (resolverInstance) {
         expect(resolverInstance.resolve).not.toHaveBeenCalled();
       }
@@ -362,9 +357,7 @@ describe('A2AClientManager', () => {
 
     it('should throw if factory.createFromAgentCard fails', async () => {
       const factoryInstance = {
-        createFromAgentCard: vi
-          .fn()
-          .mockRejectedValue(new Error('Factory failed')),
+        createFromAgentCard: vi.fn().mockRejectedValue(new Error('Factory failed')),
       };
       vi.mocked(ClientFactory).mockReturnValue(
         factoryInstance as unknown as ClientFactory,
@@ -530,9 +523,9 @@ describe('A2AClientManager', () => {
     });
 
     it('should throw an error if the agent is not found', async () => {
-      await expect(
-        manager.getTask('NonExistentAgent', 'task123'),
-      ).rejects.toThrow("Agent 'NonExistentAgent' not found.");
+      await expect(manager.getTask('NonExistentAgent', 'task123')).rejects.toThrow(
+        "Agent 'NonExistentAgent' not found.",
+      );
     });
   });
 
@@ -562,9 +555,9 @@ describe('A2AClientManager', () => {
     });
 
     it('should throw an error if the agent is not found', async () => {
-      await expect(
-        manager.cancelTask('NonExistentAgent', 'task123'),
-      ).rejects.toThrow("Agent 'NonExistentAgent' not found.");
+      await expect(manager.cancelTask('NonExistentAgent', 'task123')).rejects.toThrow(
+        "Agent 'NonExistentAgent' not found.",
+      );
     });
   });
 });

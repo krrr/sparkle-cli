@@ -24,17 +24,11 @@ import type { PolicyEngine } from './policy-engine.js';
 import { loadPoliciesFromToml, type PolicyFileError } from './toml-loader.js';
 import { buildArgsPatterns, isSafeRegExp } from './utils.js';
 import toml from '@iarna/toml';
-import {
-  MessageBusType,
-  type UpdatePolicy,
-} from '../confirmation-bus/types.js';
+import { MessageBusType, type UpdatePolicy } from '../confirmation-bus/types.js';
 import { type MessageBus } from '../confirmation-bus/message-bus.js';
 import { coreEvents } from '../utils/events.js';
 import { SHELL_TOOL_NAMES } from '../utils/shell-utils.js';
-import {
-  SHELL_TOOL_NAME,
-  TOOLS_REQUIRING_NARROWING,
-} from '../tools/tool-names.js';
+import { SHELL_TOOL_NAME, TOOLS_REQUIRING_NARROWING } from '../tools/tool-names.js';
 import { isNodeError } from '../utils/errors.js';
 import { MCP_TOOL_PREFIX } from '../tools/mcp-tool.js';
 
@@ -165,10 +159,7 @@ export async function loadExtensionPolicies(
   checkers: SafetyCheckerRule[];
   errors: PolicyFileError[];
 }> {
-  const result = await loadPoliciesFromToml(
-    [policyDir],
-    () => EXTENSION_POLICY_TIER,
-  );
+  const result = await loadPoliciesFromToml([policyDir], () => EXTENSION_POLICY_TIER);
 
   const rules = result.rules.filter((rule) => {
     // Security: Extensions are not allowed to automatically approve tool calls.
@@ -261,10 +252,7 @@ export async function createPolicyEngineConfig(
   // coreEvents has a buffer that will display these once the UI is ready
   if (errors.length > 0) {
     for (const error of errors) {
-      coreEvents.emitFeedback(
-        error.severity ?? 'error',
-        formatPolicyError(error),
-      );
+      coreEvents.emitFeedback(error.severity ?? 'error', formatPolicyError(error));
     }
   }
 
@@ -387,9 +375,7 @@ export async function createPolicyEngineConfig(
         }
       } else {
         // Standard tool name
-        const toolName = SHELL_TOOL_NAMES.includes(tool)
-          ? SHELL_TOOL_NAME
-          : tool;
+        const toolName = SHELL_TOOL_NAMES.includes(tool) ? SHELL_TOOL_NAME : tool;
         rules.push({
           toolName,
           decision: PolicyDecision.ALLOW,
@@ -462,9 +448,7 @@ export async function createPolicyEngineConfig(
   // MCP servers that are trusted in the settings.
   // Priority: TRUSTED_MCP_SERVER_PRIORITY (user tier - persistent trusted servers)
   if (settings.mcpServers) {
-    for (const [serverName, serverConfig] of Object.entries(
-      settings.mcpServers,
-    )) {
+    for (const [serverName, serverConfig] of Object.entries(settings.mcpServers)) {
       if (serverConfig.trust) {
         // Trust all tools from this MCP server
         // Using explicit mcpName metadata and FQN mcp_{serverName}_*
@@ -501,11 +485,7 @@ export async function createPolicyEngineConfig(
   // In non-interactive mode, automatically allow all configured MCP servers if opted-in.
   // This ensures that tools provided by these servers are available without
   // requiring explicit entries in settings.mcp.allowed.
-  if (
-    !interactive &&
-    settings.mcp?.autoAllowInHeadless &&
-    settings.mcpServers
-  ) {
+  if (!interactive && settings.mcp?.autoAllowInHeadless && settings.mcpServers) {
     for (const serverName of Object.keys(settings.mcpServers)) {
       // Avoid duplicates if already explicitly allowed, allowed via wildcard, or trusted.
       if (
@@ -533,9 +513,7 @@ export async function createPolicyEngineConfig(
   return {
     rules,
     checkers,
-    defaultDecision: interactive
-      ? PolicyDecision.ASK_USER
-      : PolicyDecision.DENY,
+    defaultDecision: interactive ? PolicyDecision.ASK_USER : PolicyDecision.DENY,
     nonInteractive: !interactive,
     approvalMode,
   };
@@ -613,218 +591,198 @@ export function createPolicyUpdater(
   // Use a sequential queue for persistence to avoid lost updates from concurrent events.
   let persistenceQueue = Promise.resolve();
 
-  messageBus.subscribe(
-    MessageBusType.UPDATE_POLICY,
-    async (message: UpdatePolicy) => {
-      const toolName = message.toolName;
+  messageBus.subscribe(MessageBusType.UPDATE_POLICY, async (message: UpdatePolicy) => {
+    const toolName = message.toolName;
 
-      if (message.commandPrefix) {
-        // Convert commandPrefix(es) to argsPatterns for in-memory rules
-        const patterns = buildArgsPatterns(undefined, message.commandPrefix);
-        const tier =
-          message.persistScope === 'user'
-            ? USER_POLICY_TIER
-            : WORKSPACE_POLICY_TIER;
-        const priority = tier + getAlwaysAllowPriorityFraction() / 1000;
+    if (message.commandPrefix) {
+      // Convert commandPrefix(es) to argsPatterns for in-memory rules
+      const patterns = buildArgsPatterns(undefined, message.commandPrefix);
+      const tier =
+        message.persistScope === 'user' ? USER_POLICY_TIER : WORKSPACE_POLICY_TIER;
+      const priority = tier + getAlwaysAllowPriorityFraction() / 1000;
 
-        if (TOOLS_REQUIRING_NARROWING.has(toolName) && !message.commandPrefix) {
-          debugLogger.warn(
-            `Attempted to update policy for sensitive tool '${toolName}' without a commandPrefix. Skipping.`,
-          );
-          return;
-        }
-
-        for (const pattern of patterns) {
-          if (pattern) {
-            // Note: patterns from buildArgsPatterns are derived from escapeRegex,
-            // which is safe and won't contain ReDoS patterns.
-            policyEngine.addRule({
-              toolName,
-              decision: PolicyDecision.ALLOW,
-              priority,
-              argsPattern: new RegExp(pattern),
-              mcpName: message.mcpName,
-              modes: message.modes,
-              source: 'Dynamic (Confirmed)',
-              allowRedirection: message.allowRedirection,
-            });
-          }
-        }
-      } else {
-        if (message.argsPattern && !isSafeRegExp(message.argsPattern)) {
-          coreEvents.emitFeedback(
-            'error',
-            `Invalid or unsafe regular expression for tool ${toolName}: ${message.argsPattern}`,
-          );
-          return;
-        }
-
-        const argsPattern = message.argsPattern
-          ? new RegExp(message.argsPattern)
-          : undefined;
-
-        const tier =
-          message.persistScope === 'user'
-            ? USER_POLICY_TIER
-            : WORKSPACE_POLICY_TIER;
-        const priority = tier + getAlwaysAllowPriorityFraction() / 1000;
-
-        if (TOOLS_REQUIRING_NARROWING.has(toolName) && !message.argsPattern) {
-          debugLogger.warn(
-            `Attempted to update policy for sensitive tool '${toolName}' without an argsPattern. Skipping.`,
-          );
-          return;
-        }
-
-        policyEngine.addRule({
-          toolName,
-          decision: PolicyDecision.ALLOW,
-          priority,
-          argsPattern,
-          mcpName: message.mcpName,
-          modes: message.modes,
-          source: 'Dynamic (Confirmed)',
-          allowRedirection: message.allowRedirection,
-        });
+      if (TOOLS_REQUIRING_NARROWING.has(toolName) && !message.commandPrefix) {
+        debugLogger.warn(
+          `Attempted to update policy for sensitive tool '${toolName}' without a commandPrefix. Skipping.`,
+        );
+        return;
       }
 
-      if (message.persist) {
-        persistenceQueue = persistenceQueue.then(async () => {
-          let tmpFile: string | undefined;
+      for (const pattern of patterns) {
+        if (pattern) {
+          // Note: patterns from buildArgsPatterns are derived from escapeRegex,
+          // which is safe and won't contain ReDoS patterns.
+          policyEngine.addRule({
+            toolName,
+            decision: PolicyDecision.ALLOW,
+            priority,
+            argsPattern: new RegExp(pattern),
+            mcpName: message.mcpName,
+            modes: message.modes,
+            source: 'Dynamic (Confirmed)',
+            allowRedirection: message.allowRedirection,
+          });
+        }
+      }
+    } else {
+      if (message.argsPattern && !isSafeRegExp(message.argsPattern)) {
+        coreEvents.emitFeedback(
+          'error',
+          `Invalid or unsafe regular expression for tool ${toolName}: ${message.argsPattern}`,
+        );
+        return;
+      }
+
+      const argsPattern = message.argsPattern
+        ? new RegExp(message.argsPattern)
+        : undefined;
+
+      const tier =
+        message.persistScope === 'user' ? USER_POLICY_TIER : WORKSPACE_POLICY_TIER;
+      const priority = tier + getAlwaysAllowPriorityFraction() / 1000;
+
+      if (TOOLS_REQUIRING_NARROWING.has(toolName) && !message.argsPattern) {
+        debugLogger.warn(
+          `Attempted to update policy for sensitive tool '${toolName}' without an argsPattern. Skipping.`,
+        );
+        return;
+      }
+
+      policyEngine.addRule({
+        toolName,
+        decision: PolicyDecision.ALLOW,
+        priority,
+        argsPattern,
+        mcpName: message.mcpName,
+        modes: message.modes,
+        source: 'Dynamic (Confirmed)',
+        allowRedirection: message.allowRedirection,
+      });
+    }
+
+    if (message.persist) {
+      persistenceQueue = persistenceQueue.then(async () => {
+        let tmpFile: string | undefined;
+        try {
+          const policyFile =
+            message.persistScope === 'workspace'
+              ? storage.getWorkspaceAutoSavedPolicyPath()
+              : storage.getAutoSavedPolicyPath();
+          await fs.mkdir(path.dirname(policyFile), { recursive: true });
+
+          // Read existing file
+          let existingData: { rule?: TomlRule[] } = {};
           try {
-            const policyFile =
-              message.persistScope === 'workspace'
-                ? storage.getWorkspaceAutoSavedPolicyPath()
-                : storage.getAutoSavedPolicyPath();
-            await fs.mkdir(path.dirname(policyFile), { recursive: true });
-
-            // Read existing file
-            let existingData: { rule?: TomlRule[] } = {};
-            try {
-              const fileContent = await fs.readFile(policyFile, 'utf-8');
-              const parsed = toml.parse(fileContent);
-              if (
-                typeof parsed === 'object' &&
-                parsed !== null &&
-                (!('rule' in parsed) || Array.isArray(parsed['rule']))
-              ) {
-                existingData = parsed as { rule?: TomlRule[] };
-              }
-            } catch (error) {
-              if (isNodeError(error) && error.code === 'ENOENT') {
-                // File doesn't exist yet, start fresh
-              } else if (!isNodeError(error)) {
-                // TOML parse error — back up corrupted file and recover
-                coreEvents.emitFeedback(
-                  'warning',
-                  `Syntax error found in policy file. Backing up corrupted file to ${policyFile}.bak and starting fresh.`,
-                );
-                if (
-                  !(
-                    await fs.lstat(policyFile).catch(() => null)
-                  )?.isSymbolicLink()
-                ) {
-                  await fs
-                    .copyFile(policyFile, `${policyFile}.bak`)
-                    .catch(() => {});
-                }
-                existingData = {};
-              } else {
-                // Real filesystem error (e.g. EACCES) — throw to prevent silent failure
-                throw error;
-              }
-            }
-
-            // Initialize rule array if needed
-            if (!existingData.rule) {
-              existingData.rule = [];
-            }
-
-            // Normalize tool name for MCP
-            let normalizedToolName = toolName;
-            if (message.mcpName) {
-              const expectedPrefix = `${MCP_TOOL_PREFIX}${message.mcpName}_`;
-              if (toolName.startsWith(expectedPrefix)) {
-                normalizedToolName = toolName.slice(expectedPrefix.length);
-              }
-            }
-
-            // Look for an existing rule to update
-            const existingRule = findMatchingRule(existingData.rule, {
-              toolName: normalizedToolName,
-              mcpName: message.mcpName,
-              commandPrefix: message.commandPrefix,
-              argsPattern: message.argsPattern,
-            });
-
-            if (existingRule) {
-              if (message.allowRedirection !== undefined) {
-                existingRule.allowRedirection = message.allowRedirection;
-              }
-              if (message.modes) {
-                existingRule.modes = message.modes;
-              }
-            } else {
-              existingData.rule.push(
-                createTomlRule(normalizedToolName, message),
-              );
-            }
-
-            // Serialize back to TOML
-            // @iarna/toml stringify might not produce beautiful output but it handles escaping correctly
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-            const newContent = toml.stringify(existingData as toml.JsonMap);
-
-            // Atomic write: write to a unique tmp file then rename to the target file.
-            // Using a unique suffix avoids race conditions where concurrent processes
-            // overwrite each other's temporary files, leading to ENOENT errors on rename.
-            const tmpSuffix = crypto.randomBytes(8).toString('hex');
-            tmpFile = `${policyFile}.${tmpSuffix}.tmp`;
-
-            let handle: fs.FileHandle | undefined;
-            try {
-              // Use 'wx' to create the file exclusively (fails if exists) for security.
-              handle = await fs.open(tmpFile, 'wx');
-              await handle.writeFile(newContent, 'utf-8');
-            } finally {
-              await handle?.close();
-            }
-            try {
-              await fs.rename(tmpFile, policyFile);
-            } catch (renameError) {
-              // Cross-device rename fails with EXDEV on some Linux mount configurations.
-              // Fall back to copy + unlink which works across filesystems.
-              if (
-                isNodeError(renameError) &&
-                (renameError.code === 'EXDEV' || renameError.code === 'EBUSY')
-              ) {
-                if (
-                  (
-                    await fs.lstat(policyFile).catch(() => null)
-                  )?.isSymbolicLink()
-                )
-                  throw renameError;
-                await fs.copyFile(tmpFile, policyFile);
-                await fs.unlink(tmpFile).catch(() => {});
-              } else {
-                throw renameError;
-              }
+            const fileContent = await fs.readFile(policyFile, 'utf-8');
+            const parsed = toml.parse(fileContent);
+            if (
+              typeof parsed === 'object' &&
+              parsed !== null &&
+              (!('rule' in parsed) || Array.isArray(parsed['rule']))
+            ) {
+              existingData = parsed as { rule?: TomlRule[] };
             }
           } catch (error) {
-            // Clean up orphaned tmp file if it was created
-            if (tmpFile) {
-              await fs.unlink(tmpFile).catch(() => {});
+            if (isNodeError(error) && error.code === 'ENOENT') {
+              // File doesn't exist yet, start fresh
+            } else if (!isNodeError(error)) {
+              // TOML parse error — back up corrupted file and recover
+              coreEvents.emitFeedback(
+                'warning',
+                `Syntax error found in policy file. Backing up corrupted file to ${policyFile}.bak and starting fresh.`,
+              );
+              if (!(await fs.lstat(policyFile).catch(() => null))?.isSymbolicLink()) {
+                await fs.copyFile(policyFile, `${policyFile}.bak`).catch(() => {});
+              }
+              existingData = {};
+            } else {
+              // Real filesystem error (e.g. EACCES) — throw to prevent silent failure
+              throw error;
             }
-            const reason =
-              error instanceof Error ? error.message : String(error);
-            coreEvents.emitFeedback(
-              'error',
-              `Failed to persist policy for ${toolName}: ${reason}`,
-              error,
-            );
           }
-        });
-      }
-    },
-  );
+
+          // Initialize rule array if needed
+          if (!existingData.rule) {
+            existingData.rule = [];
+          }
+
+          // Normalize tool name for MCP
+          let normalizedToolName = toolName;
+          if (message.mcpName) {
+            const expectedPrefix = `${MCP_TOOL_PREFIX}${message.mcpName}_`;
+            if (toolName.startsWith(expectedPrefix)) {
+              normalizedToolName = toolName.slice(expectedPrefix.length);
+            }
+          }
+
+          // Look for an existing rule to update
+          const existingRule = findMatchingRule(existingData.rule, {
+            toolName: normalizedToolName,
+            mcpName: message.mcpName,
+            commandPrefix: message.commandPrefix,
+            argsPattern: message.argsPattern,
+          });
+
+          if (existingRule) {
+            if (message.allowRedirection !== undefined) {
+              existingRule.allowRedirection = message.allowRedirection;
+            }
+            if (message.modes) {
+              existingRule.modes = message.modes;
+            }
+          } else {
+            existingData.rule.push(createTomlRule(normalizedToolName, message));
+          }
+
+          // Serialize back to TOML
+          // @iarna/toml stringify might not produce beautiful output but it handles escaping correctly
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+          const newContent = toml.stringify(existingData as toml.JsonMap);
+
+          // Atomic write: write to a unique tmp file then rename to the target file.
+          // Using a unique suffix avoids race conditions where concurrent processes
+          // overwrite each other's temporary files, leading to ENOENT errors on rename.
+          const tmpSuffix = crypto.randomBytes(8).toString('hex');
+          tmpFile = `${policyFile}.${tmpSuffix}.tmp`;
+
+          let handle: fs.FileHandle | undefined;
+          try {
+            // Use 'wx' to create the file exclusively (fails if exists) for security.
+            handle = await fs.open(tmpFile, 'wx');
+            await handle.writeFile(newContent, 'utf-8');
+          } finally {
+            await handle?.close();
+          }
+          try {
+            await fs.rename(tmpFile, policyFile);
+          } catch (renameError) {
+            // Cross-device rename fails with EXDEV on some Linux mount configurations.
+            // Fall back to copy + unlink which works across filesystems.
+            if (
+              isNodeError(renameError) &&
+              (renameError.code === 'EXDEV' || renameError.code === 'EBUSY')
+            ) {
+              if ((await fs.lstat(policyFile).catch(() => null))?.isSymbolicLink())
+                throw renameError;
+              await fs.copyFile(tmpFile, policyFile);
+              await fs.unlink(tmpFile).catch(() => {});
+            } else {
+              throw renameError;
+            }
+          }
+        } catch (error) {
+          // Clean up orphaned tmp file if it was created
+          if (tmpFile) {
+            await fs.unlink(tmpFile).catch(() => {});
+          }
+          const reason = error instanceof Error ? error.message : String(error);
+          coreEvents.emitFeedback(
+            'error',
+            `Failed to persist policy for ${toolName}: ${reason}`,
+            error,
+          );
+        }
+      });
+    }
+  });
 }

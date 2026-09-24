@@ -12,20 +12,14 @@ import { type HttpError, ModelNotFoundError } from './httpErrors.js';
 import { retryWithBackoff } from './retry.js';
 import { setSimulate429 } from './testUtils.js';
 import { debugLogger } from './debugLogger.js';
-import {
-  TerminalQuotaError,
-  RetryableQuotaError,
-} from './googleQuotaErrors.js';
+import { TerminalQuotaError, RetryableQuotaError } from './googleQuotaErrors.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import type { ModelPolicy } from '../availability/modelPolicy.js';
 import { createAvailabilityServiceMock } from '../availability/testUtils.js';
 import type { ModelAvailabilityService } from '../availability/modelAvailabilityService.js';
 
 // Helper to create a mock function that fails a certain number of times
-const createFailingFunction = (
-  failures: number,
-  successValue: string = 'success',
-) => {
+const createFailingFunction = (failures: number, successValue: string = 'success') => {
   let attempts = 0;
   return vi.fn(async () => {
     attempts++;
@@ -134,8 +128,7 @@ describe('retryWithBackoff', () => {
     const mockFn = vi.fn(async () => {
       throw new NonRetryableError('Non-retryable error');
     });
-    const shouldRetryOnError = (error: Error) =>
-      !(error instanceof NonRetryableError);
+    const shouldRetryOnError = (error: Error) => !(error instanceof NonRetryableError);
 
     const promise = retryWithBackoff(mockFn, {
       shouldRetryOnError,
@@ -291,14 +284,9 @@ describe('retryWithBackoff', () => {
     // We expect rejections as mockFn fails 5 times
     const promise1 = runRetry();
     // Run timers and await expectation in parallel.
-    await Promise.all([
-      expect(promise1).rejects.toThrow(),
-      vi.runAllTimersAsync(),
-    ]);
+    await Promise.all([expect(promise1).rejects.toThrow(), vi.runAllTimersAsync()]);
 
-    const firstDelaySet = setTimeoutSpy.mock.calls.map(
-      (call) => call[1] as number,
-    );
+    const firstDelaySet = setTimeoutSpy.mock.calls.map((call) => call[1] as number);
     setTimeoutSpy.mockClear(); // Clear calls for the next run
 
     // Reset mockFn to reset its internal attempt counter for the next run
@@ -306,14 +294,9 @@ describe('retryWithBackoff', () => {
 
     const promise2 = runRetry();
     // Run timers and await expectation in parallel.
-    await Promise.all([
-      expect(promise2).rejects.toThrow(),
-      vi.runAllTimersAsync(),
-    ]);
+    await Promise.all([expect(promise2).rejects.toThrow(), vi.runAllTimersAsync()]);
 
-    const secondDelaySet = setTimeoutSpy.mock.calls.map(
-      (call) => call[1] as number,
-    );
+    const secondDelaySet = setTimeoutSpy.mock.calls.map((call) => call[1] as number);
 
     // Check that the delays are not exactly the same due to jitter
     // This is a probabilistic test, but with +/-30% jitter, it's highly likely they differ.
@@ -352,9 +335,7 @@ describe('retryWithBackoff', () => {
 
     it("should retry on 'Incomplete JSON segment' when retryFetchErrors is true", async () => {
       const mockFn = vi.fn();
-      mockFn.mockRejectedValueOnce(
-        new Error('Incomplete JSON segment at the end'),
-      );
+      mockFn.mockRejectedValueOnce(new Error('Incomplete JSON segment at the end'));
       mockFn.mockResolvedValueOnce('success');
 
       const promise = retryWithBackoff(mockFn, {
@@ -439,10 +420,7 @@ describe('retryWithBackoff', () => {
     it('should retry on network error code (ETIMEDOUT) even when retryFetchErrors is false', async () => {
       const error = new Error('connect ETIMEDOUT');
       (error as any).code = 'ETIMEDOUT';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         retryFetchErrors: false,
@@ -457,10 +435,7 @@ describe('retryWithBackoff', () => {
     it('should retry on undici timeout error codes (UND_ERR_HEADERS_TIMEOUT)', async () => {
       const error = new Error('Headers timeout error');
       (error as any).code = 'UND_ERR_HEADERS_TIMEOUT';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         retryFetchErrors: false,
@@ -475,10 +450,7 @@ describe('retryWithBackoff', () => {
     it('should retry on SSL error code (ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC)', async () => {
       const error = new Error('SSL error');
       (error as any).code = 'ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         initialDelayMs: 1,
@@ -516,10 +488,7 @@ describe('retryWithBackoff', () => {
     it('should retry on EPROTO error (generic protocol/SSL error)', async () => {
       const error = new Error('Protocol error');
       (error as any).code = 'EPROTO';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         initialDelayMs: 1,
@@ -533,10 +502,7 @@ describe('retryWithBackoff', () => {
     it('should retry on OpenSSL 3.x SSL error code (ERR_SSL_SSL/TLS_ALERT_BAD_RECORD_MAC)', async () => {
       const error = new Error('SSL error');
       (error as any).code = 'ERR_SSL_SSL/TLS_ALERT_BAD_RECORD_MAC';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         initialDelayMs: 1,
@@ -550,10 +516,7 @@ describe('retryWithBackoff', () => {
     it('should retry on unknown SSL BAD_RECORD_MAC variant via substring fallback', async () => {
       const error = new Error('SSL error');
       (error as any).code = 'ERR_SSL_SOME_FUTURE_BAD_RECORD_MAC';
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         initialDelayMs: 1,
@@ -573,10 +536,7 @@ describe('retryWithBackoff', () => {
       (error as any).errno = 'ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC';
       (error as any).code = 'ERR_SSL_SSLV3_ALERT_BAD_RECORD_MAC';
 
-      const mockFn = vi
-        .fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValue('success');
+      const mockFn = vi.fn().mockRejectedValueOnce(error).mockResolvedValue('success');
 
       const promise = retryWithBackoff(mockFn, {
         initialDelayMs: 1,
@@ -926,9 +886,7 @@ describe('retryWithBackoff', () => {
         },
       };
 
-      const getContext = vi
-        .fn()
-        .mockReturnValue({ service: mockService, policy });
+      const getContext = vi.fn().mockReturnValue({ service: mockService, policy });
 
       // Run for quotaError
       await retryWithBackoff(fn, {

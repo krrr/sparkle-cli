@@ -54,8 +54,7 @@ describe('Answer vs. ask eval', () => {
 
       // Verify edit tools WERE called
       const editCalls = toolLogs.filter(
-        (log) =>
-          EDIT_TOOL_NAMES.has(log.toolRequest.name) && log.toolRequest.success,
+        (log) => EDIT_TOOL_NAMES.has(log.toolRequest.name) && log.toolRequest.success,
       );
       expect(editCalls.length).toBeGreaterThanOrEqual(1);
 

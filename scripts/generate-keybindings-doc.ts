@@ -43,10 +43,7 @@ export interface KeybindingDocSection {
 export async function main(argv = process.argv.slice(2)) {
   const checkOnly = argv.includes('--check');
 
-  const repoRoot = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '..',
-  );
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
   const docPath = path.join(repoRoot, ...OUTPUT_RELATIVE_PATH);
 
   const sections = buildDefaultDocSections();
@@ -132,9 +129,7 @@ function getMergedPlatformBindings(
   return unique;
 }
 
-export function renderDocumentation(
-  sections: readonly KeybindingDocSection[],
-): string {
+export function renderDocumentation(sections: readonly KeybindingDocSection[]): string {
   const renderedSections = sections.map((section) => {
     const rows = section.commands.map((command) => {
       const formattedBindings = formatBindings(command.bindings);

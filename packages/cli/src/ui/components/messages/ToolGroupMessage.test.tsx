@@ -407,8 +407,7 @@ describe('<ToolGroupMessage />', () => {
           callId: 'tool-1',
           name: 'tool-with-result',
           description: 'Tool with output',
-          resultDisplay:
-            'This is a long result that might need height constraints',
+          resultDisplay: 'This is a long result that might need height constraints',
         }),
         createToolCall({
           callId: 'tool-2',
@@ -587,16 +586,8 @@ describe('<ToolGroupMessage />', () => {
 
       const { lastFrame, unmount } = await renderWithProviders(
         <Scrollable height={6} hasFocus={true} scrollToBottom={true}>
-          <ToolGroupMessage
-            {...baseProps}
-            item={item1}
-            toolCalls={toolCalls1}
-          />
-          <ToolGroupMessage
-            {...baseProps}
-            item={item2}
-            toolCalls={toolCalls2}
-          />
+          <ToolGroupMessage {...baseProps} item={item1} toolCalls={toolCalls1} />
+          <ToolGroupMessage {...baseProps} item={item2} toolCalls={toolCalls2} />
         </Scrollable>,
         {
           config: baseMockConfig,
@@ -1074,30 +1065,27 @@ describe('<ToolGroupMessage />', () => {
       },
       { name: READ_FILE_DISPLAY_NAME, mode: ApprovalMode.PLAN, visible: true },
       { name: GLOB_DISPLAY_NAME, mode: ApprovalMode.PLAN, visible: true },
-    ])(
-      'filtering logic for $name in $mode mode',
-      async ({ name, mode, visible }) => {
-        const toolCalls = [
-          createToolCall({
-            callId: 'test-call',
-            name,
-            approvalMode: mode,
-          }),
-        ];
-        const item = createItem(toolCalls);
+    ])('filtering logic for $name in $mode mode', async ({ name, mode, visible }) => {
+      const toolCalls = [
+        createToolCall({
+          callId: 'test-call',
+          name,
+          approvalMode: mode,
+        }),
+      ];
+      const item = createItem(toolCalls);
 
-        const { lastFrame, unmount } = await renderWithProviders(
-          <ToolGroupMessage {...baseProps} item={item} toolCalls={toolCalls} />,
-          { config: baseMockConfig, settings: fullVerbositySettings },
-        );
+      const { lastFrame, unmount } = await renderWithProviders(
+        <ToolGroupMessage {...baseProps} item={item} toolCalls={toolCalls} />,
+        { config: baseMockConfig, settings: fullVerbositySettings },
+      );
 
-        if (visible) {
-          expect(lastFrame()).toContain(name);
-        } else {
-          expect(lastFrame({ allowEmpty: true })).toBe('');
-        }
-        unmount();
-      },
-    );
+      if (visible) {
+        expect(lastFrame()).toContain(name);
+      } else {
+        expect(lastFrame({ allowEmpty: true })).toBe('');
+      }
+      unmount();
+    });
   });
 });

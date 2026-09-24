@@ -134,9 +134,7 @@ function ruleMatches(
       if (serverName && toolCall.name) {
         // Case 1: Rule uses short name + mcpName -> match FQN tool call
         if (rule.mcpName && !isMcpToolName(rule.toolName)) {
-          if (
-            toolCall.name === formatMcpToolName(rule.mcpName, rule.toolName)
-          ) {
+          if (toolCall.name === formatMcpToolName(rule.mcpName, rule.toolName)) {
             mcpMatch = true;
           }
         }
@@ -173,10 +171,7 @@ function ruleMatches(
       return false;
     }
     // Use stable JSON stringification with sorted keys to ensure consistent matching
-    if (
-      stringifiedArgs === undefined ||
-      !rule.argsPattern.test(stringifiedArgs)
-    ) {
+    if (stringifiedArgs === undefined || !rule.argsPattern.test(stringifiedArgs)) {
       return false;
     }
   }
@@ -435,8 +430,7 @@ export class PolicyEngine {
           true,
         );
 
-        if (wrapperResult.decision === PolicyDecision.DENY)
-          return wrapperResult;
+        if (wrapperResult.decision === PolicyDecision.DENY) return wrapperResult;
         if (wrapperResult.decision === PolicyDecision.ASK_USER) {
           if (aggregateDecision === PolicyDecision.ALLOW) {
             responsibleRule = wrapperResult.rule;
@@ -620,9 +614,7 @@ export class PolicyEngine {
     // Default if no rule matched
     if (decision === undefined) {
       if (this.approvalMode === ApprovalMode.YOLO) {
-        debugLogger.debug(
-          `[PolicyEngine.check] NO MATCH in YOLO mode - using ALLOW`,
-        );
+        debugLogger.debug(`[PolicyEngine.check] NO MATCH in YOLO mode - using ALLOW`);
         return {
           decision: PolicyDecision.ALLOW,
         };
@@ -673,11 +665,7 @@ export class PolicyEngine {
         const allPaths = [...readPaths, ...writePaths];
 
         for (const p of allPaths) {
-          if (
-            typeof p === 'string' &&
-            !isSubpath(workspace, p) &&
-            workspace !== p
-          ) {
+          if (typeof p === 'string' && !isSubpath(workspace, p) && workspace !== p) {
             debugLogger.debug(
               `[PolicyEngine.check] Additional permission path '${p}' is outside workspace '${workspace}'. Downgrading to ASK_USER.`,
             );
@@ -763,9 +751,7 @@ export class PolicyEngine {
    * Remove rules matching a specific tier (priority band).
    */
   removeRulesByTier(tier: number): void {
-    this.rules = this.rules.filter(
-      (rule) => Math.floor(rule.priority ?? 0) !== tier,
-    );
+    this.rules = this.rules.filter((rule) => Math.floor(rule.priority ?? 0) !== tier);
   }
 
   /**
@@ -788,9 +774,7 @@ export class PolicyEngine {
    * Remove checkers matching a specific source.
    */
   removeCheckersBySource(source: string): void {
-    this.checkers = this.checkers.filter(
-      (checker) => checker.source !== source,
-    );
+    this.checkers = this.checkers.filter((checker) => checker.source !== source);
   }
 
   /**
@@ -800,8 +784,7 @@ export class PolicyEngine {
   removeRulesForTool(toolName: string, source?: string): void {
     this.rules = this.rules.filter(
       (rule) =>
-        rule.toolName !== toolName ||
-        (source !== undefined && rule.source !== source),
+        rule.toolName !== toolName || (source !== undefined && rule.source !== source),
     );
   }
 

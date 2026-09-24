@@ -88,27 +88,17 @@ describe('proactivePermissions', () => {
       expect(permissions).toBeDefined();
       expect(permissions?.network).toBe(true);
       // .npmrc should be read-only
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(homeDir, '.npmrc'),
-      );
+      expect(permissions?.fileSystem?.read).toContain(path.join(homeDir, '.npmrc'));
       expect(permissions?.fileSystem?.write).not.toContain(
         path.join(homeDir, '.npmrc'),
       );
       // .npm should be read-write
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(homeDir, '.npm'),
-      );
-      expect(permissions?.fileSystem?.write).toContain(
-        path.join(homeDir, '.npm'),
-      );
+      expect(permissions?.fileSystem?.read).toContain(path.join(homeDir, '.npm'));
+      expect(permissions?.fileSystem?.write).toContain(path.join(homeDir, '.npm'));
       // .cache should be read-write
-      expect(permissions?.fileSystem?.write).toContain(
-        path.join(homeDir, '.cache'),
-      );
+      expect(permissions?.fileSystem?.write).toContain(path.join(homeDir, '.cache'));
       // should NOT contain .ssh or .gitconfig for npm
-      expect(permissions?.fileSystem?.read).not.toContain(
-        path.join(homeDir, '.ssh'),
-      );
+      expect(permissions?.fileSystem?.read).not.toContain(path.join(homeDir, '.ssh'));
     });
 
     it('should grant network access and suggest primary cache paths even if they do not exist', async () => {
@@ -116,9 +106,7 @@ describe('proactivePermissions', () => {
       const permissions = await getProactiveToolSuggestions('npm');
       expect(permissions).toBeDefined();
       expect(permissions?.network).toBe(true);
-      expect(permissions?.fileSystem?.write).toContain(
-        path.join(homeDir, '.npm'),
-      );
+      expect(permissions?.fileSystem?.write).toContain(path.join(homeDir, '.npm'));
       // .cache is optional and should NOT be included if it doesn't exist
       expect(permissions?.fileSystem?.write).not.toContain(
         path.join(homeDir, '.cache'),
@@ -141,12 +129,8 @@ describe('proactivePermissions', () => {
 
       const permissions = await getProactiveToolSuggestions('git');
       expect(permissions?.network).toBe(true);
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(homeDir, '.ssh'),
-      );
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(homeDir, '.gitconfig'),
-      );
+      expect(permissions?.fileSystem?.read).toContain(path.join(homeDir, '.ssh'));
+      expect(permissions?.fileSystem?.read).toContain(path.join(homeDir, '.gitconfig'));
     });
 
     it('should suggest .ssh but NOT .gitconfig for ssh', async () => {
@@ -162,9 +146,7 @@ describe('proactivePermissions', () => {
 
       const permissions = await getProactiveToolSuggestions('ssh');
       expect(permissions?.network).toBe(true);
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(homeDir, '.ssh'),
-      );
+      expect(permissions?.fileSystem?.read).toContain(path.join(homeDir, '.ssh'));
       expect(permissions?.fileSystem?.read).not.toContain(
         path.join(homeDir, '.gitconfig'),
       );
@@ -187,9 +169,7 @@ describe('proactivePermissions', () => {
 
       const permissions = await getProactiveToolSuggestions('npm.exe');
       expect(permissions).toBeDefined();
-      expect(permissions?.fileSystem?.read).toContain(
-        path.join(appData, 'npm'),
-      );
+      expect(permissions?.fileSystem?.read).toContain(path.join(appData, 'npm'));
 
       vi.unstubAllEnvs();
     });

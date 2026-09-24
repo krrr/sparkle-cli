@@ -10,9 +10,7 @@ import { promises as fs } from 'node:fs';
 vi.mock('sparkle-cli-core', () => ({
   Storage: vi.fn().mockImplementation(() => ({
     getProjectTempDir: vi.fn().mockReturnValue('/tmp/project'),
-    getProjectCheckpointsDir: vi
-      .fn()
-      .mockReturnValue('/tmp/project/checkpoints'),
+    getProjectCheckpointsDir: vi.fn().mockReturnValue('/tmp/project/checkpoints'),
     initialize: vi.fn().mockResolvedValue(undefined),
   })),
   shutdownTelemetry: vi.fn(),

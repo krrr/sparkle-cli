@@ -195,9 +195,7 @@ describe('commandUtils', () => {
     });
 
     it('should return true for multi-line external editor prompts with @-references', () => {
-      expect(isAtCommand('Please review:\n@src/main.py\nand fix bugs.')).toBe(
-        true,
-      );
+      expect(isAtCommand('Please review:\n@src/main.py\nand fix bugs.')).toBe(true);
       // @file after a colon on the same line.
       expect(isAtCommand('Files:@src/a.py,@src/b.py')).toBe(true);
     });
@@ -221,9 +219,7 @@ describe('commandUtils', () => {
 
     it('should return false for line comments starting with //', () => {
       expect(isSlashCommand('// This is a comment')).toBe(false);
-      expect(isSlashCommand('// check if variants base info all filled.')).toBe(
-        false,
-      );
+      expect(isSlashCommand('// check if variants base info all filled.')).toBe(false);
       expect(isSlashCommand('//comment without space')).toBe(false);
     });
 
@@ -335,8 +331,7 @@ describe('commandUtils', () => {
       await copyToClipboard(testText);
 
       const written = tty.write.mock.calls[0][0] as string;
-      const chunkStarts = (written.match(new RegExp(`${ESC}P`, 'g')) || [])
-        .length;
+      const chunkStarts = (written.match(new RegExp(`${ESC}P`, 'g')) || []).length;
       const chunkEnds = written.split(ST).length - 1;
 
       expect(chunkStarts).toBeGreaterThan(1);

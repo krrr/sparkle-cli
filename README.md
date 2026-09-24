@@ -4,8 +4,8 @@
 
 ![Main CLI Screenshot](/docs/assets/gemini-screenshot.png)
 
-Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent). The name is taken
-from the shape of Gemini's icon.
+Sparkle CLI is a fork of Gemini CLI (terminal-based AI agent). The name is taken from
+the shape of Gemini's icon.
 
 ## Main Changes
 
@@ -29,5 +29,5 @@ Set up LLM provider and its models in GUI.
 
 ## Fork
 
-Initially forked from https://github.com/google-gemini/gemini-cli/commits
-63c5b74 in main branch.
+Initially forked from https://github.com/google-gemini/gemini-cli/commits 63c5b74 in
+main branch.

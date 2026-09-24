@@ -54,10 +54,7 @@ describe('parseSlashCommand', () => {
   });
 
   it('should parse a simple command with arguments', () => {
-    const result = parseSlashCommand(
-      '/commit -m "Initial commit"',
-      mockCommands,
-    );
+    const result = parseSlashCommand('/commit -m "Initial commit"', mockCommands);
     expect(result.commandToExecute?.name).toBe('commit');
     expect(result.args).toBe('-m "Initial commit"');
     expect(result.canonicalPath).toEqual(['commit']);
@@ -71,10 +68,7 @@ describe('parseSlashCommand', () => {
   });
 
   it('should parse a subcommand with arguments', () => {
-    const result = parseSlashCommand(
-      '/memory list some important data',
-      mockCommands,
-    );
+    const result = parseSlashCommand('/memory list some important data', mockCommands);
     expect(result.commandToExecute?.name).toBe('list');
     expect(result.args).toBe('some important data');
     expect(result.canonicalPath).toEqual(['memory', 'list']);
@@ -102,20 +96,14 @@ describe('parseSlashCommand', () => {
   });
 
   it('should return the parent command if subcommand is unknown', () => {
-    const result = parseSlashCommand(
-      '/memory unknownsub some args',
-      mockCommands,
-    );
+    const result = parseSlashCommand('/memory unknownsub some args', mockCommands);
     expect(result.commandToExecute?.name).toBe('memory');
     expect(result.args).toBe('unknownsub some args');
     expect(result.canonicalPath).toEqual(['memory']);
   });
 
   it('should handle extra whitespace', () => {
-    const result = parseSlashCommand(
-      '  /memory   list  some data  ',
-      mockCommands,
-    );
+    const result = parseSlashCommand('  /memory   list  some data  ', mockCommands);
     expect(result.commandToExecute?.name).toBe('list');
     expect(result.args).toBe('some data');
     expect(result.canonicalPath).toEqual(['memory', 'list']);
@@ -182,10 +170,7 @@ describe('parseSlashCommand', () => {
     });
 
     it('should NOT backtrack if subcommand has takesArgs: true and args are provided', () => {
-      const result = parseSlashCommand(
-        '/parent takes some args',
-        backtrackingCommands,
-      );
+      const result = parseSlashCommand('/parent takes some args', backtrackingCommands);
       expect(result.commandToExecute?.name).toBe('takes');
       expect(result.args).toBe('some args');
       expect(result.canonicalPath).toEqual(['parent', 'takes']);
@@ -208,10 +193,7 @@ describe('parseSlashCommand', () => {
           ],
         },
       ];
-      const result = parseSlashCommand(
-        '/parent notakes some args',
-        noActionCommands,
-      );
+      const result = parseSlashCommand('/parent notakes some args', noActionCommands);
       // It stays with the subcommand because parent can't handle it
       expect(result.commandToExecute?.name).toBe('notakes');
       expect(result.args).toBe('some args');
@@ -219,10 +201,7 @@ describe('parseSlashCommand', () => {
     });
 
     it('should NOT backtrack if subcommand is NOT marked with takesArgs: false', () => {
-      const result = parseSlashCommand(
-        '/parent takes some args',
-        backtrackingCommands,
-      );
+      const result = parseSlashCommand('/parent takes some args', backtrackingCommands);
       expect(result.commandToExecute?.name).toBe('takes');
       expect(result.args).toBe('some args');
       expect(result.canonicalPath).toEqual(['parent', 'takes']);

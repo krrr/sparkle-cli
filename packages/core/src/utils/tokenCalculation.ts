@@ -102,11 +102,7 @@ function estimateFunctionResponseTokens(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
   const nestedParts = (fr as unknown as { parts?: Part[] }).parts;
   if (nestedParts && nestedParts.length > 0) {
-    totalTokens += estimateTokenCountSync(
-      nestedParts,
-      depth + 1,
-      charsPerToken,
-    );
+    totalTokens += estimateTokenCountSync(nestedParts, depth + 1, charsPerToken);
   }
 
   return totalTokens;

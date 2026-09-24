@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import {
   checkPermissions,
   handleAtCommand,
@@ -64,9 +56,7 @@ describe('handleAtCommand', () => {
     vi.resetAllMocks();
 
     testRootDir = await fsPromises.realpath(
-      await fsPromises.mkdtemp(
-        path.join(os.tmpdir(), 'folder-structure-test-'),
-      ),
+      await fsPromises.mkdtemp(path.join(os.tmpdir(), 'folder-structure-test-')),
     );
 
     abortController = new AbortController();
@@ -234,9 +224,7 @@ describe('handleAtCommand', () => {
     expect(mockAddItem).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'tool_group',
-        tools: [
-          expect.objectContaining({ status: CoreToolCallStatus.Success }),
-        ],
+        tools: [expect.objectContaining({ status: CoreToolCallStatus.Success })],
       }),
       125,
     );
@@ -338,21 +326,15 @@ describe('handleAtCommand', () => {
     });
 
     expect(result.error).toBeUndefined();
-    const texts = (
-      (result.processedQuery ?? []) as Array<{ text?: string }>
-    ).map((part) =>
-      typeof part === 'object' && part !== null ? part.text : '',
+    const texts = ((result.processedQuery ?? []) as Array<{ text?: string }>).map(
+      (part) => (typeof part === 'object' && part !== null ? part.text : ''),
     );
     const combined = texts.join('\n');
 
     // The directory listing must land inside the reference block, before the
     // closing marker that read_many_files appends to the file contents.
-    const listingIdx = texts.findIndex((t) =>
-      t?.includes('Directory listing for'),
-    );
-    const endIdx = texts.findIndex((t) =>
-      t?.includes('--- End of content ---'),
-    );
+    const listingIdx = texts.findIndex((t) => t?.includes('Directory listing for'));
+    const endIdx = texts.findIndex((t) => t?.includes('--- End of content ---'));
     expect(listingIdx).toBeGreaterThan(-1);
     expect(endIdx).toBeGreaterThan(listingIdx);
 
@@ -491,9 +473,7 @@ describe('handleAtCommand', () => {
     expect(mockAddItem).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'tool_group',
-        tools: [
-          expect.objectContaining({ status: CoreToolCallStatus.Success }),
-        ],
+        tools: [expect.objectContaining({ status: CoreToolCallStatus.Success })],
       }),
       125,
     );
@@ -608,16 +588,10 @@ describe('handleAtCommand', () => {
   it('should handle multiple @file references with interleaved text', async () => {
     const text1 = 'Check ';
     const content1 = 'C1';
-    const file1Path = await createTestFile(
-      path.join(testRootDir, 'f1.txt'),
-      content1,
-    );
+    const file1Path = await createTestFile(path.join(testRootDir, 'f1.txt'), content1);
     const text2 = ' and ';
     const content2 = 'C2';
-    const file2Path = await createTestFile(
-      path.join(testRootDir, 'f2.md'),
-      content2,
-    );
+    const file2Path = await createTestFile(path.join(testRootDir, 'f2.md'), content2);
     const text3 = ' please.';
     const query = `${text1}@${file1Path}${text2}@${file2Path}${text3}`;
 
@@ -1406,10 +1380,7 @@ describe('handleAtCommand', () => {
         'export default function test() { return "absolute dir test"; }';
       const subDirPath = path.join('src', 'utils');
       const fileName = 'helper.ts';
-      await createTestFile(
-        path.join(testRootDir, subDirPath, fileName),
-        fileContent,
-      );
+      await createTestFile(path.join(testRootDir, subDirPath, fileName), fileContent);
       const absoluteDirPath = path.join(testRootDir, subDirPath);
       const query = `Check @${absoluteDirPath} please.`;
 
@@ -1600,9 +1571,7 @@ describe('handleAtCommand', () => {
     // Simulate user cancellation
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockToolInstance: any = {
-      buildAndExecute: vi
-        .fn()
-        .mockRejectedValue(new Error('User cancelled operation')),
+      buildAndExecute: vi.fn().mockRejectedValue(new Error('User cancelled operation')),
       displayName: 'Read Many Files',
       build: vi.fn(() => ({
         execute: mockToolInstance.buildAndExecute,
@@ -1646,10 +1615,10 @@ describe('handleAtCommand', () => {
       const filePath = path.join(secondRootDir, 'second-file.txt');
       await fsPromises.writeFile(filePath, fileContent);
 
-      vi.spyOn(
-        mockConfig.getWorkspaceContext(),
-        'getDirectories',
-      ).mockReturnValue([testRootDir, secondRootDir]);
+      vi.spyOn(mockConfig.getWorkspaceContext(), 'getDirectories').mockReturnValue([
+        testRootDir,
+        secondRootDir,
+      ]);
 
       const query = '@second-file.txt';
 
@@ -1682,8 +1651,7 @@ describe('handleAtCommand', () => {
 
     // Mock validatePathAccess to deny direct access but allow it via glob (just for test purposes)
     vi.spyOn(mockConfig, 'validatePathAccess').mockImplementation((p) => {
-      if (p.includes('secret') && !p.includes('file.txt'))
-        return 'Unauthorized';
+      if (p.includes('secret') && !p.includes('file.txt')) return 'Unauthorized';
       // Let's say the direct path 'secret/file.txt' is unauthorized
       if (p === filePath) return 'Access Denied';
       return null;
@@ -1733,10 +1701,7 @@ describe('handleAtCommand', () => {
 
   it('should recover a buried path from a malformed fragment during handleAtCommand', async () => {
     const buriedFile = 'src/recovered.ts';
-    await createTestFile(
-      path.join(testRootDir, buriedFile),
-      'Recovered content',
-    );
+    await createTestFile(path.join(testRootDir, buriedFile), 'Recovered content');
     const malformedFragment = `"FAIL ${buriedFile}:10:5 (AssertionError)"`;
     const query = `@${malformedFragment}`;
 
@@ -1821,9 +1786,7 @@ describe('checkPermissions', () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
     testRootDir = await fsPromises.realpath(
-      await fsPromises.mkdtemp(
-        path.join(os.tmpdir(), 'check-permissions-test-'),
-      ),
+      await fsPromises.mkdtemp(path.join(os.tmpdir(), 'check-permissions-test-')),
     );
 
     mockConfig = {
@@ -1860,8 +1823,7 @@ describe('checkPermissions', () => {
     const realFile = path.join(testRootDir, 'real.txt');
     await fsPromises.writeFile(realFile, 'hello');
     const resolvedRealFile = fs.realpathSync(realFile);
-    mockConfig.validatePathAccess = () =>
-      'permission required' as unknown as null;
+    mockConfig.validatePathAccess = () => 'permission required' as unknown as null;
     const longSegment = 'b'.repeat(8192);
     const query = `@real.txt and @${longSegment}`;
     await expect(checkPermissions(query, mockConfig)).resolves.toEqual([

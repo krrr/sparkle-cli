@@ -8,11 +8,7 @@ import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { debugLogger } from 'sparkle-cli-core';
-import {
-  type CommandContext,
-  type SlashCommand,
-  CommandKind,
-} from './types.js';
+import { type CommandContext, type SlashCommand, CommandKind } from './types.js';
 import { MessageType } from '../types.js';
 import { formatBytes } from '../utils/formatters.js';
 import { captureHeapSnapshot } from '../utils/memorySnapshot.js';
@@ -23,8 +19,7 @@ export const bugMemoryCommand: SlashCommand = {
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context: CommandContext): Promise<void> => {
-    const tempDir =
-      context.services.agentContext?.config?.storage?.getProjectTempDir();
+    const tempDir = context.services.agentContext?.config?.storage?.getProjectTempDir();
     if (!tempDir) {
       context.ui.addItem(
         {
@@ -36,10 +31,7 @@ export const bugMemoryCommand: SlashCommand = {
       return;
     }
 
-    const filePath = path.join(
-      tempDir,
-      `bug-memory-${Date.now()}.heapsnapshot`,
-    );
+    const filePath = path.join(tempDir, `bug-memory-${Date.now()}.heapsnapshot`);
     const rss = process.memoryUsage().rss;
 
     context.ui.addItem(

@@ -19,8 +19,6 @@ describe('SettingPaths', () => {
   it('should be immutable', () => {
     expect(Object.isFrozen(SettingPaths)).toBe(false); // It's not frozen by default in JS unless Object.freeze is called, but it's `as const` in TS.
     // However, we can check if the values are correct.
-    expect(SettingPaths.General.PreferredEditor).toBe(
-      'general.preferredEditor',
-    );
+    expect(SettingPaths.General.PreferredEditor).toBe('general.preferredEditor');
   });
 });

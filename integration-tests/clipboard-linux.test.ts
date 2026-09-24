@@ -22,10 +22,7 @@ describe('Linux Clipboard Integration', () => {
   beforeEach(() => {
     rig = new TestRig();
     // Create a dummy image file for testing
-    dummyImagePath = path.join(
-      os.tmpdir(),
-      `sparkle-test-clipboard-${Date.now()}.png`,
-    );
+    dummyImagePath = path.join(os.tmpdir(), `sparkle-test-clipboard-${Date.now()}.png`);
     fs.writeFileSync(dummyImagePath, Buffer.from(DUMMY_PNG_BASE64, 'base64'));
   });
 
@@ -64,10 +61,9 @@ describe('Linux Clipboard Integration', () => {
       } else {
         // Try xclip (X11)
         try {
-          execSync(
-            `xclip -selection clipboard -t image/png -i "${dummyImagePath}"`,
-            { stdio: 'ignore' },
-          );
+          execSync(`xclip -selection clipboard -t image/png -i "${dummyImagePath}"`, {
+            stdio: 'ignore',
+          });
           clipboardSet = true;
           sessionType = 'x11';
         } catch {

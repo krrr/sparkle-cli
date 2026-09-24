@@ -103,10 +103,7 @@ const convertLatexPreservingSpans = (text: string): string => {
   );
 };
 
-export const parseMarkdownToANSI = (
-  rawText: string,
-  defaultColor?: string,
-): string => {
+export const parseMarkdownToANSI = (rawText: string, defaultColor?: string): string => {
   const baseColor = defaultColor ?? theme.text.primary;
   // Convert LaTeX-style math/commands to Unicode BEFORE tokenizing markdown,
   // so constructs like `$\{P_0, \dots, P_n\}$` are handled as a whole even
@@ -168,9 +165,7 @@ export const parseMarkdownToANSI = (
         ((fullMatch.startsWith('*') && fullMatch.endsWith('*')) ||
           (fullMatch.startsWith('_') && fullMatch.endsWith('_'))) &&
         !/\w/.test(text.substring(match.index - 1, match.index)) &&
-        !/\w/.test(
-          text.substring(inlineRegex.lastIndex, inlineRegex.lastIndex + 1),
-        ) &&
+        !/\w/.test(text.substring(inlineRegex.lastIndex, inlineRegex.lastIndex + 1)) &&
         !/\S[./\\]/.test(text.substring(match.index - 2, match.index)) &&
         !/[./\\]\S/.test(
           text.substring(inlineRegex.lastIndex, inlineRegex.lastIndex + 2),
@@ -189,10 +184,7 @@ export const parseMarkdownToANSI = (
       ) {
         styledPart = chalk.strikethrough(
           parseMarkdownToANSI(
-            fullMatch.slice(
-              STRIKETHROUGH_MARKER_LENGTH,
-              -STRIKETHROUGH_MARKER_LENGTH,
-            ),
+            fullMatch.slice(STRIKETHROUGH_MARKER_LENGTH, -STRIKETHROUGH_MARKER_LENGTH),
             baseColor,
           ),
         );
@@ -223,15 +215,11 @@ export const parseMarkdownToANSI = (
       } else if (
         fullMatch.startsWith('<u>') &&
         fullMatch.endsWith('</u>') &&
-        fullMatch.length >
-          UNDERLINE_TAG_START_LENGTH + UNDERLINE_TAG_END_LENGTH - 1
+        fullMatch.length > UNDERLINE_TAG_START_LENGTH + UNDERLINE_TAG_END_LENGTH - 1
       ) {
         styledPart = chalk.underline(
           parseMarkdownToANSI(
-            fullMatch.slice(
-              UNDERLINE_TAG_START_LENGTH,
-              -UNDERLINE_TAG_END_LENGTH,
-            ),
+            fullMatch.slice(UNDERLINE_TAG_START_LENGTH, -UNDERLINE_TAG_END_LENGTH),
             baseColor,
           ),
         );

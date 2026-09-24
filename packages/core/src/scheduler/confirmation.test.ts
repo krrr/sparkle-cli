@@ -59,9 +59,7 @@ describe('confirmation.ts', () => {
     mockMessageBus.publish = vi.fn().mockResolvedValue(undefined);
     vi.spyOn(mockMessageBus, 'on');
     vi.spyOn(mockMessageBus, 'removeListener');
-    vi.mocked(randomUUID).mockReturnValue(
-      '123e4567-e89b-12d3-a456-426614174000',
-    );
+    vi.mocked(randomUUID).mockReturnValue('123e4567-e89b-12d3-a456-426614174000');
   });
 
   afterEach(() => {

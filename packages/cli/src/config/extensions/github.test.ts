@@ -25,10 +25,7 @@ import * as extract from 'extract-zip';
 import type { ExtensionManager } from '../extension-manager.js';
 import { fetchJson } from './github_fetch.js';
 import { EventEmitter } from 'node:events';
-import type {
-  GeminiCLIExtension,
-  ExtensionInstallMetadata,
-} from 'sparkle-cli-core';
+import type { GeminiCLIExtension, ExtensionInstallMetadata } from 'sparkle-cli-core';
 import type { ExtensionConfig } from '../extension.js';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
@@ -175,12 +172,7 @@ describe('github.ts', () => {
     it('should handle pre-releases if allowed', async () => {
       vi.mocked(fetchJson).mockResolvedValueOnce([{ tag_name: 'v1.0.0-beta' }]);
 
-      const result = await fetchReleaseFromGithub(
-        'owner',
-        'repo',
-        undefined,
-        true,
-      );
+      const result = await fetchReleaseFromGithub('owner', 'repo', undefined, true);
 
       expect(result).toEqual({ tag_name: 'v1.0.0-beta' });
     });
@@ -188,12 +180,7 @@ describe('github.ts', () => {
     it('should return null if no releases found', async () => {
       vi.mocked(fetchJson).mockResolvedValueOnce([]);
 
-      const result = await fetchReleaseFromGithub(
-        'owner',
-        'repo',
-        undefined,
-        true,
-      );
+      const result = await fetchReleaseFromGithub('owner', 'repo', undefined, true);
 
       expect(result).toBeNull();
     });
@@ -366,9 +353,7 @@ describe('github.ts', () => {
       );
 
       // Wait for downloadFile to be called and stream to be created
-      await vi.waitUntil(
-        () => vi.mocked(fs.createWriteStream).mock.calls.length > 0,
-      );
+      await vi.waitUntil(() => vi.mocked(fs.createWriteStream).mock.calls.length > 0);
 
       // Trigger stream events to complete download
       mockRes.emit('end');
@@ -428,9 +413,7 @@ describe('github.ts', () => {
       );
 
       // Wait for downloadFile to be called and stream to be created
-      await vi.waitUntil(
-        () => vi.mocked(fs.createWriteStream).mock.calls.length > 0,
-      );
+      await vi.waitUntil(() => vi.mocked(fs.createWriteStream).mock.calls.length > 0);
 
       // Trigger stream events to complete download
       mockRes.emit('end');
@@ -570,9 +553,7 @@ describe('github.ts', () => {
         return mockReq as unknown as import('node:http').ClientRequest;
       });
 
-      await expect(downloadFile('url', '/dest')).rejects.toThrow(
-        'Too many redirects',
-      );
+      await expect(downloadFile('url', '/dest')).rejects.toThrow('Too many redirects');
     }, 10000); // Increase timeout for this test if needed, though with mocks it should be fast
 
     it('should fail if redirect location is missing', async () => {

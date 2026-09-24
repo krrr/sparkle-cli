@@ -173,9 +173,7 @@ export type WaitingToolCall = {
    * TODO: Remove ToolCallConfirmationDetails and collapse to just
    * SerializableConfirmationDetails after migration.
    */
-  confirmationDetails:
-    | ToolCallConfirmationDetails
-    | SerializableConfirmationDetails;
+  confirmationDetails: ToolCallConfirmationDetails | SerializableConfirmationDetails;
   // TODO: Make required after migration.
   correlationId?: string;
   startTime?: number;

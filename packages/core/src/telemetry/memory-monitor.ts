@@ -107,10 +107,7 @@ export class MemoryMonitor {
 
     // Also check rate limiting
     const canRecordPeriodic = this.rateLimiter.shouldRecord('periodic_memory');
-    const canRecordHighWater = this.rateLimiter.shouldRecord(
-      'high_water_memory',
-      true,
-    ); // High priority
+    const canRecordHighWater = this.rateLimiter.shouldRecord('high_water_memory', true); // High priority
 
     // Record if we have significant growth and aren't rate limited
     if ((shouldRecordRss || shouldRecordHeap) && canRecordHighWater) {
@@ -127,10 +124,7 @@ export class MemoryMonitor {
    */
   private performPeriodicCleanup(): void {
     const now = Date.now();
-    if (
-      now - this.lastCleanupTimestamp <
-      MemoryMonitor.STATE_CLEANUP_INTERVAL_MS
-    ) {
+    if (now - this.lastCleanupTimestamp < MemoryMonitor.STATE_CLEANUP_INTERVAL_MS) {
       return;
     }
 
@@ -229,10 +223,7 @@ export class MemoryMonitor {
 
     // Update internal tracking but don't record metrics
     this.highWaterMarkTracker.shouldRecordMetric('rss', snapshot.rss);
-    this.highWaterMarkTracker.shouldRecordMetric(
-      'heap_used',
-      snapshot.heapUsed,
-    );
+    this.highWaterMarkTracker.shouldRecordMetric('heap_used', snapshot.heapUsed);
 
     this.lastSnapshot = snapshot;
     return snapshot;
@@ -372,10 +363,7 @@ export class MemoryMonitor {
   /**
    * Force record memory metrics (bypasses rate limiting for critical events)
    */
-  forceRecordMemory(
-    config: Config,
-    context: string = 'forced',
-  ): MemorySnapshot {
+  forceRecordMemory(config: Config, context: string = 'forced'): MemorySnapshot {
     this.rateLimiter.forceRecord('forced_memory');
     return this.takeSnapshot(context, config);
   }

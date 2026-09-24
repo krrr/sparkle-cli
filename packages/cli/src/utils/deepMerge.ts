@@ -42,10 +42,8 @@ function mergeRecursively(
     const mergeStrategy = getMergeStrategyForPath(newPath);
 
     if (mergeStrategy === MergeStrategy.SHALLOW_MERGE && objValue && srcValue) {
-      const obj1 =
-        typeof objValue === 'object' && objValue !== null ? objValue : {};
-      const obj2 =
-        typeof srcValue === 'object' && srcValue !== null ? srcValue : {};
+      const obj1 = typeof objValue === 'object' && objValue !== null ? objValue : {};
+      const obj2 = typeof srcValue === 'object' && srcValue !== null ? srcValue : {};
       target[key] = { ...obj1, ...obj2 };
       continue;
     }

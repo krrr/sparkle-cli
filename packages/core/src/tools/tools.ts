@@ -44,10 +44,7 @@ export interface ExecuteOptions {
  * Represents a validated and ready-to-execute tool call.
  * An instance of this is created by a `ToolBuilder`.
  */
-export interface ToolInvocation<
-  TParams extends object,
-  TResult extends ToolResult,
-> {
+export interface ToolInvocation<TParams extends object, TResult extends ToolResult> {
   /**
    * The validated parameters for this specific invocation.
    */
@@ -130,8 +127,7 @@ export function isBackgroundExecutionData(
 
   const pid = 'pid' in data ? data.pid : undefined;
   const command = 'command' in data ? data.command : undefined;
-  const initialOutput =
-    'initialOutput' in data ? data.initialOutput : undefined;
+  const initialOutput = 'initialOutput' in data ? data.initialOutput : undefined;
 
   return (
     (pid === undefined || typeof pid === 'number') &&
@@ -196,8 +192,7 @@ export abstract class BaseToolInvocation<
       return false;
     }
 
-    const decision =
-      forcedDecision ?? (await this.getMessageBusDecision(abortSignal));
+    const decision = forcedDecision ?? (await this.getMessageBusDecision(abortSignal));
     if (decision === 'allow') {
       return false;
     }
@@ -233,9 +228,7 @@ export abstract class BaseToolInvocation<
    * Helper method to publish a policy update when user selects
    * ProceedAlways or ProceedAlwaysAndSave.
    */
-  protected async publishPolicyUpdate(
-    outcome: ToolConfirmationOutcome,
-  ): Promise<void> {
+  protected async publishPolicyUpdate(outcome: ToolConfirmationOutcome): Promise<void> {
     if (
       outcome === ToolConfirmationOutcome.ProceedAlways ||
       outcome === ToolConfirmationOutcome.ProceedAlwaysAndSave
@@ -387,10 +380,7 @@ export type AnyToolInvocation = ToolInvocation<object, ToolResult>;
 /**
  * Interface for a tool builder that validates parameters and creates invocations.
  */
-export interface ToolBuilder<
-  TParams extends object,
-  TResult extends ToolResult,
-> {
+export interface ToolBuilder<TParams extends object, TResult extends ToolResult> {
   /**
    * The internal name of the tool (used for API calls).
    */
@@ -518,9 +508,7 @@ export abstract class DeclarativeTool<
     return {
       name: this.name,
       description: this.description,
-      parametersJsonSchema: this.addWaitForPreviousParameter(
-        this.parameterSchema,
-      ),
+      parametersJsonSchema: this.addWaitForPreviousParameter(this.parameterSchema),
     };
   }
 
@@ -616,9 +604,7 @@ export abstract class DeclarativeTool<
    * @param params The raw, untrusted parameters from the model.
    * @returns A `ToolInvocation` instance.
    */
-  private silentBuild(
-    params: TParams,
-  ): ToolInvocation<TParams, TResult> | Error {
+  private silentBuild(params: TParams): ToolInvocation<TParams, TResult> | Error {
     try {
       return this.build(params);
     } catch (e) {
@@ -656,8 +642,7 @@ export abstract class DeclarativeTool<
     try {
       return await invocationOrError.execute({ abortSignal });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         llmContent: `Error: Tool call execution failed. Reason: ${errorMessage}`,
         returnDisplay: errorMessage,
@@ -685,19 +670,11 @@ export abstract class BaseDeclarativeTool<
     if (validationError) {
       throw new Error(validationError);
     }
-    return this.createInvocation(
-      params,
-      this.messageBus,
-      this.name,
-      this.displayName,
-    );
+    return this.createInvocation(params, this.messageBus, this.name, this.displayName);
   }
 
   override validateToolParams(params: TParams): string | null {
-    const errors = SchemaValidator.validate(
-      this.schema.parametersJsonSchema,
-      params,
-    );
+    const errors = SchemaValidator.validate(this.schema.parametersJsonSchema, params);
 
     if (errors) {
       return errors;
@@ -880,9 +857,7 @@ export interface StructuredToolResult {
   summary: string;
 }
 
-export function isStructuredToolResult(
-  obj: unknown,
-): obj is StructuredToolResult {
+export function isStructuredToolResult(obj: unknown): obj is StructuredToolResult {
   return (
     typeof obj === 'object' &&
     obj !== null &&
@@ -921,9 +896,8 @@ export const isListResult = (
 ): res is ListDirectoryResult | ReadManyFilesResult =>
   isStructuredToolResult(res) && 'files' in res && Array.isArray(res.files);
 
-export const isReadManyFilesResult = (
-  res: unknown,
-): res is ReadManyFilesResult => isListResult(res) && 'include' in res;
+export const isReadManyFilesResult = (res: unknown): res is ReadManyFilesResult =>
+  isListResult(res) && 'include' in res;
 export type ToolResultDisplay =
   | string
   | FileDiff
@@ -1126,11 +1100,7 @@ export const MUTATOR_KINDS: Kind[] = [
 ] as const;
 
 // Function kinds that are safe to run in parallel
-export const READ_ONLY_KINDS: Kind[] = [
-  Kind.Read,
-  Kind.Search,
-  Kind.Fetch,
-] as const;
+export const READ_ONLY_KINDS: Kind[] = [Kind.Read, Kind.Search, Kind.Fetch] as const;
 
 export interface ToolLocation {
   // Absolute path to the file

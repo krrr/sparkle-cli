@@ -37,95 +37,93 @@ export enum KeypressPriority {
 }
 
 // Parse the key itself
-const KEY_INFO_MAP: Record<
-  string,
-  { name: string; shift?: boolean; ctrl?: boolean }
-> = {
-  OM: { name: 'enter' },
-  '[200~': { name: 'paste-start' },
-  '[201~': { name: 'paste-end' },
-  '[[A': { name: 'f1' },
-  '[[B': { name: 'f2' },
-  '[[C': { name: 'f3' },
-  '[[D': { name: 'f4' },
-  '[[E': { name: 'f5' },
-  '[1~': { name: 'home' },
-  '[2~': { name: 'insert' },
-  '[3~': { name: 'delete' },
-  '[4~': { name: 'end' },
-  '[5~': { name: 'pageup' },
-  '[6~': { name: 'pagedown' },
-  '[7~': { name: 'home' },
-  '[8~': { name: 'end' },
-  '[11~': { name: 'f1' },
-  '[12~': { name: 'f2' },
-  '[13~': { name: 'f3' },
-  '[14~': { name: 'f4' },
-  '[15~': { name: 'f5' },
-  '[17~': { name: 'f6' },
-  '[18~': { name: 'f7' },
-  '[19~': { name: 'f8' },
-  '[20~': { name: 'f9' },
-  '[21~': { name: 'f10' },
-  '[23~': { name: 'f11' },
-  '[24~': { name: 'f12' },
-  '[25~': { name: 'f13' },
-  '[26~': { name: 'f14' },
-  '[28~': { name: 'f15' },
-  '[29~': { name: 'f16' },
-  '[31~': { name: 'f17' },
-  '[32~': { name: 'f18' },
-  '[33~': { name: 'f19' },
-  '[34~': { name: 'f20' },
-  '[A': { name: 'up' },
-  '[B': { name: 'down' },
-  '[C': { name: 'right' },
-  '[D': { name: 'left' },
-  '[E': { name: 'clear' },
-  '[F': { name: 'end' },
-  '[H': { name: 'home' },
-  '[P': { name: 'f1' },
-  '[Q': { name: 'f2' },
-  '[R': { name: 'f3' },
-  '[S': { name: 'f4' },
-  OA: { name: 'up' },
-  OB: { name: 'down' },
-  OC: { name: 'right' },
-  OD: { name: 'left' },
-  OE: { name: 'clear' },
-  OF: { name: 'end' },
-  OH: { name: 'home' },
-  OP: { name: 'f1' },
-  OQ: { name: 'f2' },
-  OR: { name: 'f3' },
-  OS: { name: 'f4' },
-  OZ: { name: 'tab', shift: true }, // SS3 Shift+Tab variant for Windows terminals
-  '[[5~': { name: 'pageup' },
-  '[[6~': { name: 'pagedown' },
-  '[a': { name: 'up', shift: true },
-  '[b': { name: 'down', shift: true },
-  '[c': { name: 'right', shift: true },
-  '[d': { name: 'left', shift: true },
-  '[e': { name: 'clear', shift: true },
-  '[2$': { name: 'insert', shift: true },
-  '[3$': { name: 'delete', shift: true },
-  '[5$': { name: 'pageup', shift: true },
-  '[6$': { name: 'pagedown', shift: true },
-  '[7$': { name: 'home', shift: true },
-  '[8$': { name: 'end', shift: true },
-  '[Z': { name: 'tab', shift: true },
-  Oa: { name: 'up', ctrl: true },
-  Ob: { name: 'down', ctrl: true },
-  Oc: { name: 'right', ctrl: true },
-  Od: { name: 'left', ctrl: true },
-  Oe: { name: 'clear', ctrl: true },
-  '[2^': { name: 'insert', ctrl: true },
-  '[3^': { name: 'delete', ctrl: true },
-  '[5^': { name: 'pageup', ctrl: true },
-  '[6^': { name: 'pagedown', ctrl: true },
-  '[7^': { name: 'home', ctrl: true },
-  '[8^': { name: 'end', ctrl: true },
-};
+const KEY_INFO_MAP: Record<string, { name: string; shift?: boolean; ctrl?: boolean }> =
+  {
+    OM: { name: 'enter' },
+    '[200~': { name: 'paste-start' },
+    '[201~': { name: 'paste-end' },
+    '[[A': { name: 'f1' },
+    '[[B': { name: 'f2' },
+    '[[C': { name: 'f3' },
+    '[[D': { name: 'f4' },
+    '[[E': { name: 'f5' },
+    '[1~': { name: 'home' },
+    '[2~': { name: 'insert' },
+    '[3~': { name: 'delete' },
+    '[4~': { name: 'end' },
+    '[5~': { name: 'pageup' },
+    '[6~': { name: 'pagedown' },
+    '[7~': { name: 'home' },
+    '[8~': { name: 'end' },
+    '[11~': { name: 'f1' },
+    '[12~': { name: 'f2' },
+    '[13~': { name: 'f3' },
+    '[14~': { name: 'f4' },
+    '[15~': { name: 'f5' },
+    '[17~': { name: 'f6' },
+    '[18~': { name: 'f7' },
+    '[19~': { name: 'f8' },
+    '[20~': { name: 'f9' },
+    '[21~': { name: 'f10' },
+    '[23~': { name: 'f11' },
+    '[24~': { name: 'f12' },
+    '[25~': { name: 'f13' },
+    '[26~': { name: 'f14' },
+    '[28~': { name: 'f15' },
+    '[29~': { name: 'f16' },
+    '[31~': { name: 'f17' },
+    '[32~': { name: 'f18' },
+    '[33~': { name: 'f19' },
+    '[34~': { name: 'f20' },
+    '[A': { name: 'up' },
+    '[B': { name: 'down' },
+    '[C': { name: 'right' },
+    '[D': { name: 'left' },
+    '[E': { name: 'clear' },
+    '[F': { name: 'end' },
+    '[H': { name: 'home' },
+    '[P': { name: 'f1' },
+    '[Q': { name: 'f2' },
+    '[R': { name: 'f3' },
+    '[S': { name: 'f4' },
+    OA: { name: 'up' },
+    OB: { name: 'down' },
+    OC: { name: 'right' },
+    OD: { name: 'left' },
+    OE: { name: 'clear' },
+    OF: { name: 'end' },
+    OH: { name: 'home' },
+    OP: { name: 'f1' },
+    OQ: { name: 'f2' },
+    OR: { name: 'f3' },
+    OS: { name: 'f4' },
+    OZ: { name: 'tab', shift: true }, // SS3 Shift+Tab variant for Windows terminals
+    '[[5~': { name: 'pageup' },
+    '[[6~': { name: 'pagedown' },
+    '[a': { name: 'up', shift: true },
+    '[b': { name: 'down', shift: true },
+    '[c': { name: 'right', shift: true },
+    '[d': { name: 'left', shift: true },
+    '[e': { name: 'clear', shift: true },
+    '[2$': { name: 'insert', shift: true },
+    '[3$': { name: 'delete', shift: true },
+    '[5$': { name: 'pageup', shift: true },
+    '[6$': { name: 'pagedown', shift: true },
+    '[7$': { name: 'home', shift: true },
+    '[8$': { name: 'end', shift: true },
+    '[Z': { name: 'tab', shift: true },
+    Oa: { name: 'up', ctrl: true },
+    Ob: { name: 'down', ctrl: true },
+    Oc: { name: 'right', ctrl: true },
+    Od: { name: 'left', ctrl: true },
+    Oe: { name: 'clear', ctrl: true },
+    '[2^': { name: 'insert', ctrl: true },
+    '[3^': { name: 'delete', ctrl: true },
+    '[5^': { name: 'pageup', ctrl: true },
+    '[6^': { name: 'pagedown', ctrl: true },
+    '[7^': { name: 'home', ctrl: true },
+    '[8^': { name: 'end', ctrl: true },
+  };
 
 // Kitty Keyboard Protocol (CSI u) code mappings
 const KITTY_CODE_MAP: Record<number, { name: string; sequence?: string }> = {
@@ -208,9 +206,7 @@ const MAC_ALT_KEY_CHARACTER_MAP: Record<string, string> = {
   '\u2202': 'd', // "∂" delete word forward
 };
 
-function nonKeyboardEventFilter(
-  keypressHandler: KeypressHandler,
-): KeypressHandler {
+function nonKeyboardEventFilter(keypressHandler: KeypressHandler): KeypressHandler {
   return (key: Key) => {
     if (
       !parseMouseEvent(key.sequence) &&
@@ -254,9 +250,7 @@ function bufferFastReturn(keypressHandler: KeypressHandler): KeypressHandler {
  * Will flush the buffer if no data is received for DRAG_COMPLETION_TIMEOUT_MS
  * or when a null key is received.
  */
-function bufferBackslashEnter(
-  keypressHandler: KeypressHandler,
-): KeypressHandler {
+function bufferBackslashEnter(keypressHandler: KeypressHandler): KeypressHandler {
   const bufferer = (function* (): Generator<void, void, Key | null> {
     while (true) {
       const key = yield;
@@ -268,10 +262,7 @@ function bufferBackslashEnter(
         continue;
       }
 
-      const timeoutId = setTimeout(
-        () => bufferer.next(null),
-        BACKSLASH_ENTER_TIMEOUT,
-      );
+      const timeoutId = setTimeout(() => bufferer.next(null), BACKSLASH_ENTER_TIMEOUT);
       const nextKey = yield;
       clearTimeout(timeoutId);
 
@@ -377,9 +368,7 @@ function createDataListener(keypressHandler: KeypressHandler) {
  * Buffers escape sequences until a full sequence is received or
  * until an empty string is sent to indicate a timeout.
  */
-function* emitKeys(
-  keypressHandler: KeypressHandler,
-): Generator<void, void, string> {
+function* emitKeys(keypressHandler: KeypressHandler): Generator<void, void, string> {
   const lang = process.env['LANG'] || '';
   const lcAll = process.env['LC_ALL'] || '';
   const isGreek = lang.startsWith('el') || lcAll.startsWith('el');
@@ -745,23 +734,16 @@ export interface Key {
 export type KeypressHandler = (key: Key) => boolean | void;
 
 interface KeypressContextValue {
-  subscribe: (
-    handler: KeypressHandler,
-    priority?: KeypressPriority | boolean,
-  ) => void;
+  subscribe: (handler: KeypressHandler, priority?: KeypressPriority | boolean) => void;
   unsubscribe: (handler: KeypressHandler) => void;
 }
 
-const KeypressContext = createContext<KeypressContextValue | undefined>(
-  undefined,
-);
+const KeypressContext = createContext<KeypressContextValue | undefined>(undefined);
 
 export function useKeypressContext() {
   const context = useContext(KeypressContext);
   if (!context) {
-    throw new Error(
-      'useKeypressContext must be used within a KeypressProvider',
-    );
+    throw new Error('useKeypressContext must be used within a KeypressProvider');
   }
   return context;
 }
@@ -778,12 +760,8 @@ export function KeypressProvider({
 
   const { stdin, setRawMode } = useStdin();
 
-  const subscribersToPriority = useRef<Map<KeypressHandler, number>>(
-    new Map(),
-  ).current;
-  const subscribers = useRef(
-    new MultiMap<number, KeypressHandler>(Set),
-  ).current;
+  const subscribersToPriority = useRef<Map<KeypressHandler, number>>(new Map()).current;
+  const subscribers = useRef(new MultiMap<number, KeypressHandler>(Set)).current;
   const sortedPriorities = useRef<number[]>([]);
 
   const subscribe = useCallback(
@@ -804,9 +782,7 @@ export function KeypressProvider({
 
       if (!hadPriority) {
         // Cache sorted priorities only when a new priority level is added
-        sortedPriorities.current = Array.from(subscribers.keys()).sort(
-          (a, b) => b - a,
-        );
+        sortedPriorities.current = Array.from(subscribers.keys()).sort((a, b) => b - a);
       }
     },
     [subscribers, subscribersToPriority],
@@ -895,8 +871,6 @@ export function KeypressProvider({
   );
 
   return (
-    <KeypressContext.Provider value={contextValue}>
-      {children}
-    </KeypressContext.Provider>
+    <KeypressContext.Provider value={contextValue}>{children}</KeypressContext.Provider>
   );
 }

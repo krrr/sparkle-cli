@@ -28,10 +28,7 @@ describe('Model Steering Behavioral Evals', () => {
     },
     assert: async (rig) => {
       // Wait for the model to pause on any tool call
-      await rig.waitForPendingConfirmation(
-        /read_file|list_directory|glob/i,
-        30000,
-      );
+      await rig.waitForPendingConfirmation(/read_file|list_directory|glob/i, 30000);
 
       // Interrupt with a corrective hint
       await rig.addUserHint(

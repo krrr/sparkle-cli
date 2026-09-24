@@ -182,9 +182,7 @@ describe('fetch utils', () => {
           new Promise((_resolve, reject) => {
             if (init?.signal) {
               init.signal.addEventListener('abort', () => {
-                const error = new Error(
-                  'The operation was aborted',
-                ) as ErrorWithCode;
+                const error = new Error('The operation was aborted') as ErrorWithCode;
                 error.name = 'AbortError';
                 error.code = 'ABORT_ERR';
                 reject(error);

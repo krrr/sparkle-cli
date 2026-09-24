@@ -89,9 +89,7 @@ class WebSearchToolInvocation extends BaseToolInvocation<
     return `Searching the web for: "${this.params.query}"`;
   }
 
-  async execute({
-    abortSignal: signal,
-  }: ExecuteOptions): Promise<WebSearchToolResult> {
+  async execute({ abortSignal: signal }: ExecuteOptions): Promise<WebSearchToolResult> {
     // The primary search path relies on the Gemini API's Google Search
     // grounding, which is not available to non-Gemini providers (the
     // googleSearch tool parameter is dropped there). Use the configured
@@ -180,8 +178,7 @@ class WebSearchToolInvocation extends BaseToolInvocation<
         }
 
         if (sourceListFormatted.length > 0) {
-          modifiedResponseText +=
-            '\n\nSources:\n' + sourceListFormatted.join('\n');
+          modifiedResponseText += '\n\nSources:\n' + sourceListFormatted.join('\n');
         }
       }
 
@@ -230,10 +227,7 @@ class WebSearchToolInvocation extends BaseToolInvocation<
     }
 
     try {
-      const results = await resolution.provider.search(
-        this.params.query,
-        signal,
-      );
+      const results = await resolution.provider.search(this.params.query, signal);
       if (results.length === 0) {
         return {
           llmContent: `No search results or information found for query: "${this.params.query}"`,

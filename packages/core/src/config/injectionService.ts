@@ -56,9 +56,7 @@ export class InjectionService {
       try {
         listener(trimmed, source);
       } catch (error) {
-        debugLogger.warn(
-          `Injection listener failed for source "${source}": ${error}`,
-        );
+        debugLogger.warn(`Injection listener failed for source "${source}": ${error}`);
       }
     }
   }

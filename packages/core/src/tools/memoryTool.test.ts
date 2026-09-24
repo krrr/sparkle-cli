@@ -21,10 +21,7 @@ describe('memoryTool filename helpers', () => {
     it('appends to currentGeminiMdFilename when a valid new name is provided', () => {
       const newName = 'CUSTOM_CONTEXT.md';
       setGeminiMdFilename(newName);
-      expect(getAllGeminiMdFilenames()).toEqual([
-        newName,
-        DEFAULT_CONTEXT_FILENAME,
-      ]);
+      expect(getAllGeminiMdFilenames()).toEqual([newName, DEFAULT_CONTEXT_FILENAME]);
     });
 
     it('does not update currentGeminiMdFilename if the new name is empty or whitespace', () => {
@@ -50,10 +47,7 @@ describe('memoryTool filename helpers', () => {
       expect(getAllGeminiMdFilenames()).toEqual([DEFAULT_CONTEXT_FILENAME]);
 
       setGeminiMdFilename(['NEW.md', 'NEW.md']);
-      expect(getAllGeminiMdFilenames()).toEqual([
-        'NEW.md',
-        DEFAULT_CONTEXT_FILENAME,
-      ]);
+      expect(getAllGeminiMdFilenames()).toEqual(['NEW.md', DEFAULT_CONTEXT_FILENAME]);
     });
   });
 

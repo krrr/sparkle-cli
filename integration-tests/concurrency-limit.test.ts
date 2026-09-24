@@ -24,10 +24,7 @@ describe('web-fetch rate limiting', () => {
   it('should rate limit multiple requests to the same host', async () => {
     rig.setup('web-fetch rate limit', {
       settings: { tools: { core: ['web_fetch'] } },
-      fakeResponsesPath: join(
-        import.meta.dirname,
-        'concurrency-limit.responses',
-      ),
+      fakeResponsesPath: join(import.meta.dirname, 'concurrency-limit.responses'),
     });
 
     const result = await rig.run({

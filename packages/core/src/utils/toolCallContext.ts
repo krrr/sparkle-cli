@@ -32,10 +32,7 @@ const toolCallContext = new AsyncLocalStorage<ToolCallContext>();
  * @param fn The function to run.
  * @returns The result of the function.
  */
-export function runWithToolCallContext<T>(
-  context: ToolCallContext,
-  fn: () => T,
-): T {
+export function runWithToolCallContext<T>(context: ToolCallContext, fn: () => T): T {
   return toolCallContext.run(context, fn);
 }
 

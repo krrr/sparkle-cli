@@ -4,11 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  isTool,
-  type AnyDeclarativeTool,
-  type AnyToolInvocation,
-} from '../index.js';
+import { isTool, type AnyDeclarativeTool, type AnyToolInvocation } from '../index.js';
 import { SHELL_TOOL_NAMES } from './shell-utils.js';
 import levenshtein from 'fast-levenshtein';
 import type { ToolCallResponseInfo } from '../scheduler/types.js';
@@ -16,9 +12,7 @@ import type { ToolCallResponseInfo } from '../scheduler/types.js';
 /**
  * Validates if an object is a ToolCallResponseInfo.
  */
-export function isToolCallResponseInfo(
-  data: unknown,
-): data is ToolCallResponseInfo {
+export function isToolCallResponseInfo(data: unknown): data is ToolCallResponseInfo {
   return (
     typeof data === 'object' &&
     data !== null &&
@@ -53,9 +47,7 @@ export function getToolSuggestion(
     return '';
   }
 
-  const suggestedNames = topNResults
-    .map((match) => `"${match.name}"`)
-    .join(', ');
+  const suggestedNames = topNResults.map((match) => `"${match.name}"`).join(', ');
 
   if (topNResults.length > 1) {
     return ` Did you mean one of: ${suggestedNames}?`;

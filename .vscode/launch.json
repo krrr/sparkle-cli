@@ -24,9 +24,7 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-ide-companion"
       ],
-      "outFiles": [
-        "${workspaceFolder}/packages/vscode-ide-companion/dist/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/packages/vscode-ide-companion/dist/**/*.js"],
       "preLaunchTask": "npm: build: vscode-ide-companion"
     },
     {

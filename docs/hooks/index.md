@@ -1,33 +1,32 @@
 # Sparkle CLI hooks
 
-Hooks are scripts or programs that Sparkle CLI executes at specific points in
-the agentic loop, allowing you to intercept and customize behavior without
-modifying the CLI's source code.
+Hooks are scripts or programs that Sparkle CLI executes at specific points in the
+agentic loop, allowing you to intercept and customize behavior without modifying the
+CLI's source code.
 
 ## What are hooks?
 
-Hooks run synchronously as part of the agent loop—when a hook event fires,
-Sparkle CLI waits for all matching hooks to complete before continuing.
+Hooks run synchronously as part of the agent loop—when a hook event fires, Sparkle CLI
+waits for all matching hooks to complete before continuing.
 
 With hooks, you can:
 
-- **Add context:** Inject relevant information (like git history) before the
-  model processes a request.
+- **Add context:** Inject relevant information (like git history) before the model
+  processes a request.
 - **Validate actions:** Review tool arguments and block potentially dangerous
   operations.
 - **Enforce policies:** Implement security scanners and compliance checks.
 - **Log interactions:** Track tool usage and model responses for auditing.
-- **Optimize behavior:** Dynamically filter available tools or adjust model
-  parameters.
+- **Optimize behavior:** Dynamically filter available tools or adjust model parameters.
 
 ### Getting started
 
-- **[Writing hooks guide](../hooks/writing-hooks.md)**: A tutorial on creating
-  your first hook with comprehensive examples.
-- **[Best practices](../hooks/best-practices.md)**: Guidelines on security,
-  performance, and debugging.
-- **[Hooks reference](../hooks/reference.md)**: The definitive technical
-  specification of I/O schemas and exit codes.
+- **[Writing hooks guide](../hooks/writing-hooks.md)**: A tutorial on creating your
+  first hook with comprehensive examples.
+- **[Best practices](../hooks/best-practices.md)**: Guidelines on security, performance,
+  and debugging.
+- **[Hooks reference](../hooks/reference.md)**: The definitive technical specification
+  of I/O schemas and exit codes.
 
 ## Core concepts
 
@@ -57,20 +56,18 @@ Understanding these core principles is essential for building robust hooks.
 
 Hooks communicate via `stdin` (Input) and `stdout` (Output).
 
-1. **Silence is Mandatory**: Your script **must not** print any plain text to
-   `stdout` other than the final JSON object. **Even a single `echo` or `print`
-   call before the JSON will break parsing.**
-2. **Pollution = Failure**: If `stdout` contains non-JSON text, parsing will
-   fail. The CLI will default to "Allow" and treat the entire output as a
-   `systemMessage`.
-3. **Debug via Stderr**: Use `stderr` for **all** logging and debugging (for
-   example, `echo "debug" >&2`). Sparkle CLI captures `stderr` but never
-   attempts to parse it as JSON.
+1. **Silence is Mandatory**: Your script **must not** print any plain text to `stdout`
+   other than the final JSON object. **Even a single `echo` or `print` call before the
+   JSON will break parsing.**
+2. **Pollution = Failure**: If `stdout` contains non-JSON text, parsing will fail. The
+   CLI will default to "Allow" and treat the entire output as a `systemMessage`.
+3. **Debug via Stderr**: Use `stderr` for **all** logging and debugging (for example,
+   `echo "debug" >&2`). Sparkle CLI captures `stderr` but never attempts to parse it as
+   JSON.
 
 #### Exit codes
 
-Sparkle CLI uses exit codes to determine the high-level outcome of a hook
-execution:
+Sparkle CLI uses exit codes to determine the high-level outcome of a hook execution:
 
 | Exit Code | Label            | Behavioral Impact                                                                                                                                                            |
 | --------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -80,19 +77,18 @@ execution:
 
 #### Matchers
 
-You can filter which specific tools or triggers fire your hook using the
-`matcher` field.
+You can filter which specific tools or triggers fire your hook using the `matcher`
+field.
 
-- **Tool events** (`BeforeTool`, `AfterTool`): Matchers are **Regular
-  Expressions**. (for example, `"write_.*"`).
-- **Lifecycle events**: Matchers are **Exact Strings**. (for example,
-  `"startup"`).
+- **Tool events** (`BeforeTool`, `AfterTool`): Matchers are **Regular Expressions**.
+  (for example, `"write_.*"`).
+- **Lifecycle events**: Matchers are **Exact Strings**. (for example, `"startup"`).
 - **Wildcards**: `"*"` or `""` (empty string) matches all occurrences.
 
 ## Configuration
 
-Hooks are configured in `settings.json`. Sparkle CLI merges configurations from
-multiple layers in the following order of precedence (highest to lowest):
+Hooks are configured in `settings.json`. Sparkle CLI merges configurations from multiple
+layers in the following order of precedence (highest to lowest):
 
 1.  **Project settings**: `.sparkle/settings.json` in the current directory.
 2.  **User settings**: `~/.sparkle/settings.json`.
@@ -151,13 +147,13 @@ Hooks are executed with a sanitized environment.
 > configuring hooks, you are allowing scripts to run shell commands on your
 > machine.
 
-**Project-level hooks** are particularly risky when opening untrusted projects.
-Sparkle CLI **fingerprints** project hooks. If a hook's name or command changes
-(for example, via `git pull`), it is treated as a **new, untrusted hook** and
-you will be warned before it executes.
+**Project-level hooks** are particularly risky when opening untrusted projects. Sparkle
+CLI **fingerprints** project hooks. If a hook's name or command changes (for example,
+via `git pull`), it is treated as a **new, untrusted hook** and you will be warned
+before it executes.
 
-See [Security Considerations](../hooks/best-practices.md#using-hooks-securely)
-for a detailed threat model.
+See [Security Considerations](../hooks/best-practices.md#using-hooks-securely) for a
+detailed threat model.
 
 ## Managing hooks
 

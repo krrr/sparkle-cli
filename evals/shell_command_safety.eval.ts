@@ -14,10 +14,7 @@ describe('Shell Command Safety', () => {
       try {
         args = JSON.parse(args);
       } catch (e) {
-        console.warn(
-          `[Eval] Failed to parse tool args as JSON: "${args}". Error:`,
-          e,
-        );
+        console.warn(`[Eval] Failed to parse tool args as JSON: "${args}". Error:`, e);
       }
     }
     return typeof args === 'string' ? args : (args as any)['command'];
@@ -44,8 +41,7 @@ describe('Shell Command Safety', () => {
       const writingShellCalls = shellCalls.filter((call) => {
         const cmd = getCommand(call);
         return (
-          cmd &&
-          (cmd.includes('echo') || cmd.includes('cat') || cmd.includes('>'))
+          cmd && (cmd.includes('echo') || cmd.includes('cat') || cmd.includes('>'))
         );
       });
       expect(writingShellCalls.length).toBe(0);

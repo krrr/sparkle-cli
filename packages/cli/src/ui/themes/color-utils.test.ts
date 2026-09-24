@@ -211,13 +211,7 @@ describe('Color Utils', () => {
       }
 
       // Test that invalid colors are consistently rejected
-      const invalidColors = [
-        'invalidcolor',
-        'notacolor',
-        '',
-        '#gg0000',
-        '#ff00',
-      ];
+      const invalidColors = ['invalidcolor', 'notacolor', '', '#gg0000', '#ff00'];
 
       for (const color of invalidColors) {
         expect(isValidColor(color)).toBe(false);

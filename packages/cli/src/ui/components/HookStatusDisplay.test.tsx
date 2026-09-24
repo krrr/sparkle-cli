@@ -43,9 +43,7 @@ describe('<HookStatusDisplay />', () => {
 
   it('should render sequential hook progress', async () => {
     const props = {
-      activeHooks: [
-        { name: 'step', eventName: 'BeforeAgent', index: 1, total: 3 },
-      ],
+      activeHooks: [{ name: 'step', eventName: 'BeforeAgent', index: 1, total: 3 }],
     };
     const { lastFrame, unmount, waitUntilReady } = await render(
       <HookStatusDisplay {...props} />,
@@ -67,9 +65,7 @@ describe('<HookStatusDisplay />', () => {
 
   it('should show generic message when only system hooks are active', async () => {
     const props = {
-      activeHooks: [
-        { name: 'sys-hook', eventName: 'BeforeAgent', source: 'system' },
-      ],
+      activeHooks: [{ name: 'sys-hook', eventName: 'BeforeAgent', source: 'system' }],
     };
     const { lastFrame, unmount, waitUntilReady } = await render(
       <HookStatusDisplay {...props} />,
@@ -81,9 +77,7 @@ describe('<HookStatusDisplay />', () => {
 
   it('matches SVG snapshot for single hook', async () => {
     const props = {
-      activeHooks: [
-        { name: 'test-hook', eventName: 'BeforeAgent', source: 'user' },
-      ],
+      activeHooks: [{ name: 'test-hook', eventName: 'BeforeAgent', source: 'user' }],
     };
     const result = await render(<HookStatusDisplay {...props} />);
     await result.waitUntilReady();

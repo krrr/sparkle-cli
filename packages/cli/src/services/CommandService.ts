@@ -46,17 +46,13 @@ export class CommandService {
     signal: AbortSignal,
   ): Promise<CommandService> {
     const allCommands = await this.loadAllCommands(loaders, signal);
-    const { finalCommands, conflicts } =
-      SlashCommandResolver.resolve(allCommands);
+    const { finalCommands, conflicts } = SlashCommandResolver.resolve(allCommands);
 
     if (conflicts.length > 0) {
       this.emitConflictEvents(conflicts);
     }
 
-    return new CommandService(
-      Object.freeze(finalCommands),
-      Object.freeze(conflicts),
-    );
+    return new CommandService(Object.freeze(finalCommands), Object.freeze(conflicts));
   }
 
   /**

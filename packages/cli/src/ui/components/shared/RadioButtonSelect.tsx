@@ -7,10 +7,7 @@
 import type React from 'react';
 import { Text, Box } from 'ink';
 import { theme } from '../../semantic-colors.js';
-import {
-  BaseSelectionList,
-  type RenderItemContext,
-} from './BaseSelectionList.js';
+import { BaseSelectionList, type RenderItemContext } from './BaseSelectionList.js';
 import type { SelectionListItem } from '../../hooks/useSelectionList.js';
 
 /**
@@ -91,9 +88,7 @@ export function RadioButtonSelect<T>({
             return (
               <Text color={titleColor} wrap="truncate" key={item.key}>
                 {item.themeNameDisplay}{' '}
-                <Text color={theme.text.secondary}>
-                  {item.themeTypeDisplay}
-                </Text>
+                <Text color={theme.text.secondary}>{item.themeTypeDisplay}</Text>
               </Text>
             );
           }

@@ -1,7 +1,7 @@
 # Sparkle CLI A2A Server (`sparkle-cli-a2a-server`)
 
-Experimental Agent-to-Agent (A2A) server that exposes Sparkle CLI capabilities
-over HTTP for inter-agent communication.
+Experimental Agent-to-Agent (A2A) server that exposes Sparkle CLI capabilities over HTTP
+for inter-agent communication.
 
 ## Architecture
 

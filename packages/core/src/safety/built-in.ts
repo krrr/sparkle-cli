@@ -30,10 +30,7 @@ export class AllowedPathChecker implements InProcessChecker {
     const config = input.config as AllowedPathConfig | undefined;
 
     // Build list of allowed directories
-    const allowedDirs = [
-      context.environment.cwd,
-      ...context.environment.workspaces,
-    ];
+    const allowedDirs = [context.environment.cwd, ...context.environment.workspaces];
 
     // Find all arguments that look like paths
     const includedArgs = config?.included_args ?? [];
@@ -71,14 +68,8 @@ export class AllowedPathChecker implements InProcessChecker {
         const relative = path.relative(resolvedDir, resolvedPath);
         const segments = relative.split(path.sep);
         for (const segment of segments) {
-          const clean = trimTrailingSpacesAndDots(
-            segment.split(':')[0],
-          ).toLowerCase();
-          if (
-            clean === '.git' ||
-            clean === '.env' ||
-            clean === 'node_modules'
-          ) {
+          const clean = trimTrailingSpacesAndDots(segment.split(':')[0]).toLowerCase();
+          if (clean === '.git' || clean === '.env' || clean === 'node_modules') {
             hasBlockedSegment = true;
           }
           if (clean === '.vscode') {
@@ -149,8 +140,7 @@ export class AllowedPathChecker implements InProcessChecker {
   private isPathAllowed(targetPath: string, allowedDir: string): boolean {
     const relative = path.relative(allowedDir, targetPath);
     return (
-      relative === '' ||
-      (!relative.startsWith('..') && !path.isAbsolute(relative))
+      relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative))
     );
   }
 
@@ -186,12 +176,7 @@ export class AllowedPathChecker implements InProcessChecker {
         }
       } else if (typeof value === 'object') {
         paths.push(
-          ...this.collectPathsToCheck(
-            value,
-            includedArgs,
-            excludedArgs,
-            fullKey,
-          ),
+          ...this.collectPathsToCheck(value, includedArgs, excludedArgs, fullKey),
         );
       }
     }

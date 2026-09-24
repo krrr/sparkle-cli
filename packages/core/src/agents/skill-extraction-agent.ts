@@ -476,9 +476,7 @@ export const SkillExtractionAgent = (
 
     // Strip $ from ${word} patterns to prevent templateString()
     // from treating them as input placeholders.
-    const initialContext = contextParts
-      .join('\n\n')
-      .replace(/\$\{(\w+)\}/g, '{$1}');
+    const initialContext = contextParts.join('\n\n').replace(/\$\{(\w+)\}/g, '{$1}');
 
     return {
       systemPrompt: buildSystemPrompt(skillsDir, memoryDir),

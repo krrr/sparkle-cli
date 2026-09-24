@@ -44,10 +44,7 @@ describe('Output Redirection', () => {
     initializeOutputListenersAndFlush(mockConfig);
 
     // Verify informational message was forced to stderr
-    expect(writeToStderr).toHaveBeenCalledWith(
-      'informational message',
-      undefined,
-    );
+    expect(writeToStderr).toHaveBeenCalledWith('informational message', undefined);
     expect(writeToStderr).toHaveBeenCalledWith('error message', undefined);
     expect(writeToStdout).not.toHaveBeenCalled();
   });

@@ -115,9 +115,7 @@ interface ResourceSuggestionCandidate {
   suggestion: Suggestion;
 }
 
-function buildResourceCandidates(
-  config?: Config,
-): ResourceSuggestionCandidate[] {
+function buildResourceCandidates(config?: Config): ResourceSuggestionCandidate[] {
   const registry = config?.getResourceRegistry?.();
   if (!registry) {
     return [];
@@ -194,24 +192,15 @@ async function searchAgentCandidates(
     selector: (s: Suggestion) => s.label,
   });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const results: Array<{ item: Suggestion }> = await fzf.find(
-    normalizedPattern,
-    {
-      limit: MAX_SUGGESTIONS_TO_SHOW,
-    },
-  );
+  const results: Array<{ item: Suggestion }> = await fzf.find(normalizedPattern, {
+    limit: MAX_SUGGESTIONS_TO_SHOW,
+  });
   return results.map((r) => r.item);
 }
 
 export function useAtCompletion(props: UseAtCompletionProps): void {
-  const {
-    enabled,
-    pattern,
-    config,
-    cwd,
-    setSuggestions,
-    setIsLoadingSuggestions,
-  } = props;
+  const { enabled, pattern, config, cwd, setSuggestions, setIsLoadingSuggestions } =
+    props;
   const [state, dispatch] = useReducer(atCompletionReducer, initialState);
   const fileSearchMap = useRef<Map<string, FileSearch>>(new Map());
   const initEpoch = useRef(0);
@@ -253,8 +242,7 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
     const workspaceContext = config?.getWorkspaceContext?.();
     if (!workspaceContext) return;
 
-    const unsubscribe =
-      workspaceContext.onDirectoriesChanged(resetFileSearchState);
+    const unsubscribe = workspaceContext.onDirectoriesChanged(resetFileSearchState);
 
     return unsubscribe;
   }, [config, resetFileSearchState]);
@@ -303,9 +291,7 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
     const initialize = async () => {
       const currentEpoch = initEpoch.current;
       try {
-        const directories = config
-          ?.getWorkspaceContext?.()
-          ?.getDirectories() ?? [cwd];
+        const directories = config?.getWorkspaceContext?.()?.getDirectories() ?? [cwd];
 
         const initPromises: Array<Promise<void>> = [];
 
@@ -323,10 +309,8 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
             cacheTtl: 30,
             enableFileWatcher:
               config?.getFileFilteringOptions()?.enableFileWatcher ?? false,
-            enableRecursiveFileSearch:
-              config?.getEnableRecursiveFileSearch() ?? true,
-            enableFuzzySearch:
-              config?.getFileFilteringEnableFuzzySearch() ?? true,
+            enableRecursiveFileSearch: config?.getEnableRecursiveFileSearch() ?? true,
+            enableFuzzySearch: config?.getFileFilteringEnableFuzzySearch() ?? true,
             maxFiles: config?.getFileFilteringOptions()?.maxFileCount,
           });
 
@@ -373,8 +357,7 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
       }, 200);
 
       const timeoutMs =
-        config?.getFileFilteringOptions()?.searchTimeout ??
-        DEFAULT_SEARCH_TIMEOUT_MS;
+        config?.getFileFilteringOptions()?.searchTimeout ?? DEFAULT_SEARCH_TIMEOUT_MS;
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       (async () => {
@@ -389,9 +372,7 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
       })();
 
       try {
-        const directories = config
-          ?.getWorkspaceContext?.()
-          ?.getDirectories() ?? [cwd];
+        const directories = config?.getWorkspaceContext?.()?.getDirectories() ?? [cwd];
         const cwdRealpath = directories[0];
 
         const allSearchPromises = [...fileSearchMap.current.entries()].map(
@@ -427,10 +408,7 @@ export function useAtCompletion(props: UseAtCompletionProps): void {
 
         const resourceCandidates = buildResourceCandidates(config);
         const resourceSuggestions = (
-          await searchResourceCandidates(
-            currentPattern ?? '',
-            resourceCandidates,
-          )
+          await searchResourceCandidates(currentPattern ?? '', resourceCandidates)
         ).map((suggestion) => ({
           ...suggestion,
           label: suggestion.label.replace(/^@/, ''),

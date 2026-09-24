@@ -7,15 +7,7 @@
 import { act } from 'react';
 import { render } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { NoopSandboxManager, escapeShellArg } from 'sparkle-cli-core';
 
 const mockIsBinary = vi.hoisted(() => vi.fn());
@@ -23,29 +15,23 @@ const mockShellExecutionService = vi.hoisted(() => vi.fn());
 const mockShellKill = vi.hoisted(() => vi.fn());
 const mockShellBackground = vi.hoisted(() => vi.fn());
 const mockShellSubscribe = vi.hoisted(() =>
-  vi.fn<
-    (pid: number, listener: (event: ShellOutputEvent) => void) => () => void
-  >(() => vi.fn()),
+  vi.fn<(pid: number, listener: (event: ShellOutputEvent) => void) => () => void>(() =>
+    vi.fn(),
+  ),
 ); // Returns unsubscribe
 const mockShellOnExit = vi.hoisted(() =>
   vi.fn<
-    (
-      pid: number,
-      callback: (exitCode: number, signal?: number) => void,
-    ) => () => void
+    (pid: number, callback: (exitCode: number, signal?: number) => void) => () => void
   >(() => vi.fn()),
 );
 const mockLifecycleSubscribe = vi.hoisted(() =>
-  vi.fn<
-    (pid: number, listener: (event: ShellOutputEvent) => void) => () => void
-  >(() => vi.fn()),
+  vi.fn<(pid: number, listener: (event: ShellOutputEvent) => void) => () => void>(() =>
+    vi.fn(),
+  ),
 );
 const mockLifecycleOnExit = vi.hoisted(() =>
   vi.fn<
-    (
-      pid: number,
-      callback: (exitCode: number, signal?: number) => void,
-    ) => () => void
+    (pid: number, callback: (exitCode: number, signal?: number) => void) => () => void
   >(() => vi.fn()),
 );
 const mockLifecycleKill = vi.hoisted(() => vi.fn());
@@ -213,9 +199,7 @@ describe('useExecutionLifecycle', () => {
       },
       getRenderCount: () => renderCount,
       rerender: (isWaitingForConfirmation?: boolean) =>
-        rerender(
-          <TestComponent isWaitingForConfirmation={isWaitingForConfirmation} />,
-        ),
+        rerender(<TestComponent isWaitingForConfirmation={isWaitingForConfirmation} />),
     };
   };
 
@@ -292,10 +276,7 @@ describe('useExecutionLifecycle', () => {
     const { result } = await renderProcessorHook();
 
     act(() => {
-      result.current.handleShellCommand(
-        'echo "ok"',
-        new AbortController().signal,
-      );
+      result.current.handleShellCommand('echo "ok"', new AbortController().signal);
     });
     const execPromise = onExecMock.mock.calls[0][0];
 
@@ -324,10 +305,7 @@ describe('useExecutionLifecycle', () => {
     const { result } = await renderProcessorHook();
 
     act(() => {
-      result.current.handleShellCommand(
-        'bad-cmd',
-        new AbortController().signal,
-      );
+      result.current.handleShellCommand('bad-cmd', new AbortController().signal);
     });
     const execPromise = onExecMock.mock.calls[0][0];
 
@@ -358,10 +336,7 @@ describe('useExecutionLifecycle', () => {
     it('should update UI for text streams (non-interactive)', async () => {
       const { result } = await renderProcessorHook();
       await act(async () => {
-        result.current.handleShellCommand(
-          'stream',
-          new AbortController().signal,
-        );
+        result.current.handleShellCommand('stream', new AbortController().signal);
       });
 
       const tmpFile = path.join('/tmp/sparkle-shell-abcdef', 'pwd.tmp');
@@ -419,10 +394,7 @@ describe('useExecutionLifecycle', () => {
     it('should show binary progress messages correctly', async () => {
       const { result } = await renderProcessorHook();
       act(() => {
-        result.current.handleShellCommand(
-          'cat img',
-          new AbortController().signal,
-        );
+        result.current.handleShellCommand('cat img', new AbortController().signal);
       });
 
       // Should immediately show the detection message
@@ -536,17 +508,12 @@ describe('useExecutionLifecycle', () => {
     mockIsBinary.mockReturnValue(true);
 
     act(() => {
-      result.current.handleShellCommand(
-        'cat image.png',
-        new AbortController().signal,
-      );
+      result.current.handleShellCommand('cat image.png', new AbortController().signal);
     });
     const execPromise = onExecMock.mock.calls[0][0];
 
     act(() => {
-      resolveExecutionPromise(
-        createMockServiceResult({ rawOutput: binaryBuffer }),
-      );
+      resolveExecutionPromise(createMockServiceResult({ rawOutput: binaryBuffer }));
     });
     await act(async () => await execPromise);
 
@@ -613,10 +580,7 @@ describe('useExecutionLifecycle', () => {
     }));
 
     act(() => {
-      result.current.handleShellCommand(
-        'a-command',
-        new AbortController().signal,
-      );
+      result.current.handleShellCommand('a-command', new AbortController().signal);
     });
     const execPromise = onExecMock.mock.calls[0][0];
 
@@ -642,10 +606,7 @@ describe('useExecutionLifecycle', () => {
     const { result } = await renderProcessorHook();
 
     act(() => {
-      result.current.handleShellCommand(
-        'a-command',
-        new AbortController().signal,
-      );
+      result.current.handleShellCommand('a-command', new AbortController().signal);
     });
     const execPromise = onExecMock.mock.calls[0][0];
 
@@ -671,10 +632,7 @@ describe('useExecutionLifecycle', () => {
 
       const { result } = await renderProcessorHook();
       act(() => {
-        result.current.handleShellCommand(
-          'cd new',
-          new AbortController().signal,
-        );
+        result.current.handleShellCommand('cd new', new AbortController().signal);
       });
       const execPromise = onExecMock.mock.calls[0][0];
 
@@ -784,10 +742,7 @@ describe('useExecutionLifecycle', () => {
       const { result } = await renderProcessorHook();
 
       await act(async () => {
-        result.current.handleShellCommand(
-          'bad-cmd',
-          new AbortController().signal,
-        );
+        result.current.handleShellCommand('bad-cmd', new AbortController().signal);
       });
       const execPromise = onExecMock.mock.calls[0][0];
 
@@ -892,15 +847,10 @@ describe('useExecutionLifecycle', () => {
           output: 'initial',
         }),
       );
-      expect(mockLifecycleOnExit).toHaveBeenCalledWith(
-        1001,
-        expect.any(Function),
-      );
-      expect(mockLifecycleSubscribe).toHaveBeenCalledWith(
-        1001,
-        expect.any(Function),
-        { suppressSnapshotReplay: true },
-      );
+      expect(mockLifecycleOnExit).toHaveBeenCalledWith(1001, expect.any(Function));
+      expect(mockLifecycleSubscribe).toHaveBeenCalledWith(1001, expect.any(Function), {
+        suppressSnapshotReplay: true,
+      });
     });
 
     it('should toggle background shell visibility', async () => {
@@ -1247,9 +1197,7 @@ describe('useExecutionLifecycle', () => {
       expect(result.current.isBackgroundTaskVisible).toBe(false);
 
       // 4. Wait for restore delay
-      await waitFor(() =>
-        expect(result.current.isBackgroundTaskVisible).toBe(true),
-      );
+      await waitFor(() => expect(result.current.isBackgroundTaskVisible).toBe(true));
     });
 
     it('should auto-hide background shell when foreground shell starts and restore when it ends', async () => {
@@ -1283,9 +1231,7 @@ describe('useExecutionLifecycle', () => {
       await waitFor(() => expect(result.current.activeShellPtyId).toBe(null));
 
       // Should be restored automatically (after delay)
-      await waitFor(() =>
-        expect(result.current.isBackgroundTaskVisible).toBe(true),
-      );
+      await waitFor(() => expect(result.current.isBackgroundTaskVisible).toBe(true));
     });
 
     it('should NOT restore background shell if it was manually hidden during foreground execution', async () => {
@@ -1321,9 +1267,7 @@ describe('useExecutionLifecycle', () => {
 
       // It should NOT change visibility because manual toggle cleared the auto-restore flag
       // After delay it should stay true (as it was manually toggled to true)
-      await waitFor(() =>
-        expect(result.current.isBackgroundTaskVisible).toBe(true),
-      );
+      await waitFor(() => expect(result.current.isBackgroundTaskVisible).toBe(true));
     });
   });
 });

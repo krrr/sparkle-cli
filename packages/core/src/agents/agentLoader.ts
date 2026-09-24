@@ -43,9 +43,7 @@ export interface AgentLoadResult {
   errors: AgentLoadError[];
 }
 
-const nameSchema = z
-  .string()
-  .regex(/^[a-z0-9-_]+$/, 'Name must be a valid slug');
+const nameSchema = z.string().regex(/^[a-z0-9-_]+$/, 'Name must be a valid slug');
 
 const mcpServerSchema = z.object({
   command: z.string().optional(),
@@ -89,12 +87,9 @@ const localAgentSchema = z
       .array(
         z
           .string()
-          .refine(
-            (val: string) => isValidToolName(val, { allowWildcards: true }),
-            {
-              message: 'Invalid tool name',
-            },
-          ),
+          .refine((val: string) => isValidToolName(val, { allowWildcards: true }), {
+            message: 'Invalid tool name',
+          }),
       )
       .optional(),
     mcp_servers: z.record(z.string(), mcpServerSchema).optional(),
@@ -145,11 +140,7 @@ const oauth2AuthSchema = z.object({
 });
 
 const authConfigSchema = z
-  .discriminatedUnion('type', [
-    apiKeyAuthSchema,
-    httpAuthSchema,
-    oauth2AuthSchema,
-  ])
+  .discriminatedUnion('type', [apiKeyAuthSchema, httpAuthSchema, oauth2AuthSchema])
   .superRefine((data, ctx) => {
     if (data.type === 'http') {
       if (data.value) return;
@@ -220,10 +211,7 @@ const remoteAgentJsonSchema = baseRemoteAgentSchema
   })
   .strict();
 
-const remoteAgentSchema = z.union([
-  remoteAgentUrlSchema,
-  remoteAgentJsonSchema,
-]);
+const remoteAgentSchema = z.union([remoteAgentUrlSchema, remoteAgentJsonSchema]);
 
 type FrontmatterRemoteAgentDefinition = z.infer<typeof remoteAgentSchema>;
 
@@ -495,17 +483,12 @@ export function markdownToAgentDefinition(
       name: markdown.name,
       description: markdown.description || '',
       displayName: markdown.display_name,
-      auth: markdown.auth
-        ? convertFrontmatterAuthToConfig(markdown.auth)
-        : undefined,
+      auth: markdown.auth ? convertFrontmatterAuthToConfig(markdown.auth) : undefined,
       inputConfig,
       metadata,
     };
 
-    if (
-      'agent_card_json' in markdown &&
-      markdown.agent_card_json !== undefined
-    ) {
+    if ('agent_card_json' in markdown && markdown.agent_card_json !== undefined) {
       base.agentCardJson = markdown.agent_card_json;
       return base;
     }
@@ -607,9 +590,7 @@ export function markdownToAgentDefinition(
  * @param dir Directory path to scan.
  * @returns Object containing successfully loaded agents and any errors.
  */
-export async function loadAgentsFromDirectory(
-  dir: string,
-): Promise<AgentLoadResult> {
+export async function loadAgentsFromDirectory(dir: string): Promise<AgentLoadResult> {
   const result: AgentLoadResult = {
     agents: [],
     errors: [],
@@ -624,19 +605,14 @@ export async function loadAgentsFromDirectory(
       return result;
     }
     result.errors.push(
-      new AgentLoadError(
-        dir,
-        `Could not list directory: ${getErrorMessage(error)}`,
-      ),
+      new AgentLoadError(dir, `Could not list directory: ${getErrorMessage(error)}`),
     );
     return result;
   }
 
   const files = dirEntries.filter(
     (entry) =>
-      entry.isFile() &&
-      !entry.name.startsWith('_') &&
-      entry.name.endsWith('.md'),
+      entry.isFile() && !entry.name.startsWith('_') && entry.name.endsWith('.md'),
   );
 
   for (const entry of files) {
@@ -654,10 +630,7 @@ export async function loadAgentsFromDirectory(
         result.errors.push(error);
       } else {
         result.errors.push(
-          new AgentLoadError(
-            filePath,
-            `Unexpected error: ${getErrorMessage(error)}`,
-          ),
+          new AgentLoadError(filePath, `Unexpected error: ${getErrorMessage(error)}`),
         );
       }
     }

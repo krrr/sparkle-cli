@@ -90,9 +90,9 @@ describe('ToolModificationHandler', () => {
 
   describe('handleModifyWithEditor', () => {
     it('should return undefined if tool is not modifiable', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(false);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(
+        false,
+      );
 
       const mockWaitingToolCall = createMockWaitingToolCall({
         tool: mockPlainTool,
@@ -115,9 +115,7 @@ describe('ToolModificationHandler', () => {
     });
 
     it('should call modifyWithEditor and return updated params', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(true);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(true);
 
       vi.mocked(modifiableToolModule.modifyWithEditor).mockResolvedValue({
         updatedParams: { path: 'foo.txt', content: 'new' },
@@ -168,9 +166,9 @@ describe('ToolModificationHandler', () => {
 
   describe('applyInlineModify', () => {
     it('should return undefined if tool is not modifiable', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(false);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(
+        false,
+      );
 
       const mockWaitingToolCall = createMockWaitingToolCall({
         tool: mockPlainTool,
@@ -186,9 +184,7 @@ describe('ToolModificationHandler', () => {
     });
 
     it('should return undefined if payload has no new content', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(true);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(true);
 
       const mockWaitingToolCall = createMockWaitingToolCall({
         tool: mockModifiableTool,
@@ -204,9 +200,7 @@ describe('ToolModificationHandler', () => {
     });
 
     it('should process empty string as valid new content', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(true);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(true);
       (Diff.createPatch as unknown as Mock).mockReturnValue('mock-diff-empty');
 
       mockModifyContext.getCurrentContent.mockResolvedValue('old content');
@@ -237,9 +231,7 @@ describe('ToolModificationHandler', () => {
     });
 
     it('should calculate diff and return updated params', async () => {
-      vi.mocked(
-        modifiableToolModule.isModifiableDeclarativeTool,
-      ).mockReturnValue(true);
+      vi.mocked(modifiableToolModule.isModifiableDeclarativeTool).mockReturnValue(true);
       (Diff.createPatch as unknown as Mock).mockReturnValue('mock-diff');
 
       mockModifyContext.getCurrentContent.mockResolvedValue('old content');

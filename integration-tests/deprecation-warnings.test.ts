@@ -26,9 +26,7 @@ describe('deprecation-warnings', () => {
   ])(
     'should not emit any deprecation warnings when $description',
     async ({ command, description }) => {
-      await rig.setup(
-        `should not emit any deprecation warnings when ${description}`,
-      );
+      await rig.setup(`should not emit any deprecation warnings when ${description}`);
 
       const { stderr, exitCode } = await rig.runWithStreams([command]);
 
@@ -37,9 +35,7 @@ describe('deprecation-warnings', () => {
       const hasDeprecationWarning = deprecationWarningPattern.test(stderr);
 
       if (hasDeprecationWarning) {
-        const deprecationMatches = stderr.match(
-          /\[DEP\d+\].*DeprecationWarning:.*/gi,
-        );
+        const deprecationMatches = stderr.match(/\[DEP\d+\].*DeprecationWarning:.*/gi);
         const warnings = deprecationMatches
           ? deprecationMatches.map((m) => m.trim()).join('\n')
           : 'Unknown deprecation warning format';

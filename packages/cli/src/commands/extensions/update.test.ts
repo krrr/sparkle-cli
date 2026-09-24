@@ -4,15 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { format } from 'node:util';
 import { type Argv } from 'yargs';
 import { handleUpdate, updateCommand } from './update.js';
@@ -66,9 +58,7 @@ describe('extensions update command', () => {
   const mockExtensionManager = vi.mocked(ExtensionManager);
   const mockUpdateExtension = vi.mocked(update.updateExtension);
   const mockCheckForExtensionUpdate = vi.mocked(github.checkForExtensionUpdate);
-  const mockCheckForAllExtensionUpdates = vi.mocked(
-    update.checkForAllExtensionUpdates,
-  );
+  const mockCheckForAllExtensionUpdates = vi.mocked(update.checkForAllExtensionUpdates);
   const mockUpdateAllUpdatableExtensions = vi.mocked(
     update.updateAllUpdatableExtensions,
   );
@@ -107,9 +97,7 @@ describe('extensions update command', () => {
 
     it('should log a helpful message when no extensions are installed and requested extension is not found', async () => {
       const mockCwd = vi.spyOn(process, 'cwd').mockReturnValue('/test/dir');
-      mockExtensionManager.prototype.loadExtensions = vi
-        .fn()
-        .mockResolvedValue([]);
+      mockExtensionManager.prototype.loadExtensions = vi.fn().mockResolvedValue([]);
 
       await handleUpdate({ name: 'missing-extension' });
 
@@ -124,8 +112,7 @@ describe('extensions update command', () => {
     it.each([
       {
         state: ExtensionUpdateState.UPDATE_AVAILABLE,
-        expectedLog:
-          'Extension "my-extension" successfully updated: 1.0.0 → 1.1.0.',
+        expectedLog: 'Extension "my-extension" successfully updated: 1.0.0 → 1.1.0.',
         shouldCallUpdateExtension: true,
       },
       {
@@ -177,9 +164,7 @@ describe('extensions update command', () => {
       'should handle updating all extensions: %s',
       async ({ updatedExtensions, expectedLog }) => {
         const mockCwd = vi.spyOn(process, 'cwd').mockReturnValue('/test/dir');
-        mockExtensionManager.prototype.loadExtensions = vi
-          .fn()
-          .mockResolvedValue([]);
+        mockExtensionManager.prototype.loadExtensions = vi.fn().mockResolvedValue([]);
         mockCheckForAllExtensionUpdates.mockResolvedValue(undefined);
         mockUpdateAllUpdatableExtensions.mockResolvedValue(updatedExtensions);
 
@@ -220,25 +205,15 @@ describe('extensions update command', () => {
       });
 
       it('should configure arguments', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
-        expect(yargsMock.positional).toHaveBeenCalledWith(
-          'name',
-          expect.any(Object),
-        );
-        expect(yargsMock.option).toHaveBeenCalledWith(
-          'all',
-          expect.any(Object),
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
+        expect(yargsMock.positional).toHaveBeenCalledWith('name', expect.any(Object));
+        expect(yargsMock.option).toHaveBeenCalledWith('all', expect.any(Object));
         expect(yargsMock.conflicts).toHaveBeenCalledWith('name', 'all');
         expect(yargsMock.check).toHaveBeenCalled();
       });
 
       it('check function should throw an error if neither a name nor --all is provided', () => {
-        (command.builder as (yargs: Argv) => Argv)(
-          yargsMock as unknown as Argv,
-        );
+        (command.builder as (yargs: Argv) => Argv)(yargsMock as unknown as Argv);
         const checkCallback = yargsMock.check.mock.calls[0][0];
         expect(() => checkCallback({ name: undefined, all: false })).toThrow(
           'Either an extension name or --all must be provided',

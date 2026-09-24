@@ -250,9 +250,7 @@ describe('<FooterConfigDialog />', () => {
           .split('\n')
           .find((line) => line.includes('Preview:')) || '';
       const nextLine =
-        lastFrame().split('\n')[
-          lastFrame().split('\n').indexOf(previewLine) + 1
-        ] || '';
+        lastFrame().split('\n')[lastFrame().split('\n').indexOf(previewLine) + 1] || '';
       expect(nextLine).toContain('·');
       expect(nextLine).toContain('~/project/path');
       expect(nextLine).toContain('docker');

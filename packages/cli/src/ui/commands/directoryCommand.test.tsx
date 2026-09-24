@@ -4,20 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import {
-  vi,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  type Mock,
-} from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
 import { directoryCommand } from './directoryCommand.js';
-import {
-  expandHomeDir,
-  getDirectorySuggestions,
-} from '../utils/directoryUtils.js';
+import { expandHomeDir, getDirectorySuggestions } from '../utils/directoryUtils.js';
 import type { Config, WorkspaceContext } from 'sparkle-cli-core';
 import type { MultiFolderTrustDialogProps } from '../components/MultiFolderTrustDialog.js';
 import type { CommandContext, OpenCustomDialogActionReturn } from './types.js';
@@ -37,8 +26,7 @@ vi.mock('node:fs', async (importOriginal) => {
 });
 
 vi.mock('../utils/directoryUtils.js', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../utils/directoryUtils.js')>();
+  const actual = await importOriginal<typeof import('../utils/directoryUtils.js')>();
   return {
     ...actual,
     getDirectorySuggestions: vi.fn(),
@@ -49,12 +37,8 @@ describe('directoryCommand', () => {
   let mockContext: CommandContext;
   let mockConfig: Config;
   let mockWorkspaceContext: WorkspaceContext;
-  const addCommand = directoryCommand.subCommands?.find(
-    (c) => c.name === 'add',
-  );
-  const showCommand = directoryCommand.subCommands?.find(
-    (c) => c.name === 'show',
-  );
+  const addCommand = directoryCommand.subCommands?.find((c) => c.name === 'add');
+  const showCommand = directoryCommand.subCommands?.find((c) => c.name === 'show');
 
   beforeEach(() => {
     mockWorkspaceContext = {
@@ -148,9 +132,7 @@ describe('directoryCommand', () => {
       });
       if (!addCommand?.action) throw new Error('No action');
       await addCommand.action(mockContext, newPath);
-      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([
-        newPath,
-      ]);
+      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([newPath]);
       expect(mockContext.ui.addItem).toHaveBeenCalledWith(
         expect.objectContaining({
           type: MessageType.INFO,
@@ -208,9 +190,7 @@ describe('directoryCommand', () => {
 
       await addCommand.action(mockContext, newPath);
 
-      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([
-        newPath,
-      ]);
+      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([newPath]);
     });
 
     it('should show an info message for an already added directory', async () => {
@@ -223,9 +203,7 @@ describe('directoryCommand', () => {
           text: `The following directories are already in the workspace:\n- ${existingPath}`,
         }),
       );
-      expect(mockWorkspaceContext.addDirectory).not.toHaveBeenCalledWith(
-        existingPath,
-      );
+      expect(mockWorkspaceContext.addDirectory).not.toHaveBeenCalledWith(existingPath);
     });
 
     it('should show an info message for an already added directory specified as a relative path', async () => {
@@ -321,13 +299,8 @@ describe('directoryCommand', () => {
 
       it('should filter out existing directories from suggestions', async () => {
         const existingPath = path.resolve(process.cwd(), 'existing');
-        vi.mocked(mockWorkspaceContext.getDirectories).mockReturnValue([
-          existingPath,
-        ]);
-        vi.mocked(getDirectorySuggestions).mockResolvedValue([
-          'existing/',
-          'new/',
-        ]);
+        vi.mocked(mockWorkspaceContext.getDirectories).mockReturnValue([existingPath]);
+        vi.mocked(getDirectorySuggestions).mockResolvedValue(['existing/', 'new/']);
 
         const results = await completion(mockContext, 'ex');
 
@@ -346,9 +319,7 @@ describe('directoryCommand', () => {
       const mockLoadedFolders = {
         isPathTrusted: mockIsPathTrusted,
       } as unknown as LoadedTrustedFolders;
-      vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(
-        mockLoadedFolders,
-      );
+      vi.spyOn(trustedFolders, 'loadTrustedFolders').mockReturnValue(mockLoadedFolders);
     });
 
     afterEach(() => {
@@ -366,9 +337,7 @@ describe('directoryCommand', () => {
 
       await addCommand.action(mockContext, newPath);
 
-      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([
-        newPath,
-      ]);
+      expect(mockWorkspaceContext.addDirectories).toHaveBeenCalledWith([newPath]);
     });
 
     it('should return a custom dialog for an explicitly untrusted directory (upgrade flow)', async () => {
@@ -441,8 +410,6 @@ describe('directoryCommand', () => {
     const windowsPath = '%userprofile%\\Documents';
     const expectedPath = path.win32.join(os.homedir(), 'Documents');
     const result = expandHomeDir(windowsPath);
-    expect(path.win32.normalize(result)).toBe(
-      path.win32.normalize(expectedPath),
-    );
+    expect(path.win32.normalize(result)).toBe(path.win32.normalize(expectedPath));
   });
 });

@@ -73,9 +73,7 @@ function extractTestFile(failureText) {
 function generateTestCommand(failedFilesMap) {
   const workspaceToFiles = new Map();
   for (const [file, info] of failedFilesMap.entries()) {
-    if (
-      ['Job Error', 'Unknown File', 'Build Error', 'Lint Error'].includes(file)
-    )
+    if (['Job Error', 'Unknown File', 'Build Error', 'Lint Error'].includes(file))
       continue;
     let workspace = 'sparkle-cli';
     let relPath = file;
@@ -87,8 +85,7 @@ function generateTestCommand(failedFilesMap) {
       relPath = file.replace('packages/cli/', '');
     }
     relPath = relPath.replace(/^.*packages\/[^\/]+\//, '');
-    if (!workspaceToFiles.has(workspace))
-      workspaceToFiles.set(workspace, new Set());
+    if (!workspaceToFiles.has(workspace)) workspaceToFiles.set(workspace, new Set());
     workspaceToFiles.get(workspace).add(relPath);
   }
   const commands = [];
@@ -205,24 +202,19 @@ async function monitor() {
                 if (line.includes(' > ')) {
                   testName = line.split(' > ').slice(1).join(' > ').trim();
                 }
-                if (!fileToTests.has(filePath))
-                  fileToTests.set(filePath, new Set());
+                if (!fileToTests.has(filePath)) fileToTests.set(filePath, new Set());
                 fileToTests.get(filePath).add(testName);
               });
             } else {
               const step =
-                job.steps?.find((s) => s.conclusion === 'failure')?.name ||
-                'unknown';
+                job.steps?.find((s) => s.conclusion === 'failure')?.name || 'unknown';
               const category = step.toLowerCase().includes('lint')
                 ? 'Lint Error'
                 : step.toLowerCase().includes('build')
                   ? 'Build Error'
                   : 'Job Error';
-              if (!fileToTests.has(category))
-                fileToTests.set(category, new Set());
-              fileToTests
-                .get(category)
-                .add(`${job.name}: Failed at step "${step}"`);
+              if (!fileToTests.has(category)) fileToTests.set(category, new Set());
+              fileToTests.get(category).add(`${job.name}: Failed at step "${step}"`);
             }
           }
         }
@@ -247,16 +239,13 @@ async function monitor() {
           t.length > 500 ? t.substring(0, 500) + '... [TRUNCATED]' : t,
         );
         testsArr.slice(0, 10).forEach((t) => console.log(`  - ${t}`));
-        if (testsArr.length > 10)
-          console.log(`  ... and ${testsArr.length - 10} more`);
+        if (testsArr.length > 10) console.log(`  ... and ${testsArr.length - 10} more`);
       }
       const testCmd = generateTestCommand(fileToTests);
       if (testCmd) {
         console.log('\n🚀 Run this to verify fixes:');
         console.log(testCmd);
-      } else if (
-        Array.from(fileToTests.keys()).some((k) => k.includes('Lint'))
-      ) {
+      } else if (Array.from(fileToTests.keys()).some((k) => k.includes('Lint'))) {
         console.log('\n🚀 Run this to verify lint fixes:\nnpm run lint:all');
       }
       console.log('---------------------------------');

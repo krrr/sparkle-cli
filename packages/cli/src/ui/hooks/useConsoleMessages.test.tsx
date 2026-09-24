@@ -21,10 +21,7 @@ vi.mock('sparkle-cli-core', async (importOriginal) => {
   return {
     ...(actual as Record<string, unknown>),
     coreEvents: {
-      ...((actual as Record<string, unknown>)['coreEvents'] as Record<
-        string,
-        unknown
-      >),
+      ...((actual as Record<string, unknown>)['coreEvents'] as Record<string, unknown>),
       on: vi.fn((event: string, handler: (payload: unknown) => void) => {
         handlers.set(event, handler);
       }),

@@ -116,8 +116,7 @@ export class ModelAvailabilityService {
       if (snapshot.available) {
         const state = this.health.get(model);
         // A sticky model is being attempted, so note that.
-        const attempts =
-          state?.status === 'sticky_retry' ? state.attempts : undefined;
+        const attempts = state?.status === 'sticky_retry' ? state.attempts : undefined;
         return { selectedModel: model, skipped, attempts };
       } else {
         skipped.push({ model, reason: snapshot.reason ?? 'unknown' });

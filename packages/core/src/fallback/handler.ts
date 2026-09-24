@@ -25,10 +25,7 @@ export async function handleFallback(
   const failureKind = classifyFailureKind(error);
 
   const chain = resolvePolicyChain(config);
-  const { failedPolicy, candidates } = buildFallbackPolicyContext(
-    chain,
-    failedModel,
-  );
+  const { failedPolicy, candidates } = buildFallbackPolicyContext(chain, failedModel);
 
   const availability = config.getModelAvailabilityService();
   const getAvailabilityContext = () => {
@@ -40,10 +37,7 @@ export async function handleFallback(
   let fallbackModel: string;
 
   if (!candidates.length) {
-    if (
-      failedModel !== activeModel &&
-      availability.snapshot(activeModel).available
-    ) {
+    if (failedModel !== activeModel && availability.snapshot(activeModel).available) {
       applyAvailabilityTransition(getAvailabilityContext, failureKind);
       return processIntent(config, 'retry_always', activeModel, failedModel);
     }
@@ -54,8 +48,7 @@ export async function handleFallback(
     );
 
     const lastResortPolicy = candidates.find((policy) => policy.isLastResort);
-    const selectedFallbackModel =
-      selection.selectedModel ?? lastResortPolicy?.model;
+    const selectedFallbackModel = selection.selectedModel ?? lastResortPolicy?.model;
     const selectedPolicy = candidates.find(
       (policy) => policy.model === selectedFallbackModel,
     );
@@ -80,14 +73,8 @@ export async function handleFallback(
       applyAvailabilityTransition(getAvailabilityContext, failureKind);
       // For standard auto-routing (silent), we only update the active model, so don't pass failedModel.
       // For utility bypass, we want a hard runtime override, so pass failedModel.
-      const overrideFailedModel =
-        failedModel !== activeModel ? failedModel : undefined;
-      return processIntent(
-        config,
-        'retry_always',
-        fallbackModel,
-        overrideFailedModel,
-      );
+      const overrideFailedModel = failedModel !== activeModel ? failedModel : undefined;
+      return processIntent(config, 'retry_always', fallbackModel, overrideFailedModel);
     }
 
     // This will be used in the future when FallbackRecommendation is passed through UI

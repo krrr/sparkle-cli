@@ -7,11 +7,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { cleanupExpiredSessions } from './sessionCleanup.js';
 import type { Settings } from '../config/settings.js';
-import {
-  SESSION_FILE_PREFIX,
-  type Config,
-  debugLogger,
-} from 'sparkle-cli-core';
+import { SESSION_FILE_PREFIX, type Config, debugLogger } from 'sparkle-cli-core';
 
 // Create a mock config for integration testing
 function createTestConfig(): Config {
@@ -335,10 +331,7 @@ describe('Session Cleanup Integration', () => {
       }) + '\n',
     );
 
-    const parentLogFile = path.join(
-      logsDir,
-      `session-${parentSessionId}.jsonl`,
-    );
+    const parentLogFile = path.join(logsDir, `session-${parentSessionId}.jsonl`);
     await fs.writeFile(parentLogFile, '{"log": "parent"}');
 
     const parentToolOutputsDir = path.join(
@@ -346,15 +339,9 @@ describe('Session Cleanup Integration', () => {
       `session-${parentSessionId}`,
     );
     await fs.mkdir(parentToolOutputsDir, { recursive: true });
-    await fs.writeFile(
-      path.join(parentToolOutputsDir, 'some-output.txt'),
-      'data',
-    );
+    await fs.writeFile(path.join(parentToolOutputsDir, 'some-output.txt'), 'data');
 
-    const subagentLogFile = path.join(
-      logsDir,
-      `session-${subagentSessionId}.jsonl`,
-    );
+    const subagentLogFile = path.join(logsDir, `session-${subagentSessionId}.jsonl`);
     await fs.writeFile(subagentLogFile, '{"log": "subagent"}');
 
     const subagentToolOutputsDir = path.join(
@@ -362,10 +349,7 @@ describe('Session Cleanup Integration', () => {
       `session-${subagentSessionId}`,
     );
     await fs.mkdir(subagentToolOutputsDir, { recursive: true });
-    await fs.writeFile(
-      path.join(subagentToolOutputsDir, 'some-output.txt'),
-      'data',
-    );
+    await fs.writeFile(path.join(subagentToolOutputsDir, 'some-output.txt'), 'data');
 
     const currentShortId = 'current1';
     const currentFile = path.join(

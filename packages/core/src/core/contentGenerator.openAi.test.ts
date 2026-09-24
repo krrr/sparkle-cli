@@ -323,9 +323,7 @@ describe('createContentGenerator with USE_OPENAI', () => {
         'prompt-1',
         LlmRole.MAIN,
       );
-      expect(response.candidates![0].content!.parts![0].text).toBe(
-        'hello from openai',
-      );
+      expect(response.candidates![0].content!.parts![0].text).toBe('hello from openai');
       const body = fake.lastBody() as { model: string; messages: unknown[] };
       expect(body.model).toBe('deepseek/deepseek-v4-flash');
       expect(body.messages).toHaveLength(1);

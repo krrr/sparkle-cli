@@ -15,8 +15,7 @@ import { getErrorMessage } from './errors.js';
 // TODO: Integrate with a more robust server-side logger.
 const logger = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  debug: (...args: any[]) =>
-    debugLogger.debug('[DEBUG] [BfsFileSearch]', ...args),
+  debug: (...args: any[]) => debugLogger.debug('[DEBUG] [BfsFileSearch]', ...args),
 };
 
 interface BfsFileSearchOptions {
@@ -94,14 +93,7 @@ export async function bfsFileSearch(
     const results = await Promise.all(readPromises);
 
     for (const { currentDir, entries } of results) {
-      processDirEntries(
-        currentDir,
-        entries,
-        options,
-        ignoreDirsSet,
-        queue,
-        foundFiles,
-      );
+      processDirEntries(currentDir, entries, options, ignoreDirsSet, queue, foundFiles);
     }
   }
 
@@ -137,9 +129,7 @@ export function bfsFileSearchSync(
       scannedDirCount++;
 
       if (debug) {
-        logger.debug(
-          `Scanning Sync [${scannedDirCount}/${maxDirs}]: ${currentDir}`,
-        );
+        logger.debug(`Scanning Sync [${scannedDirCount}/${maxDirs}]: ${currentDir}`);
       }
 
       try {
@@ -186,8 +176,7 @@ function processDirEntries(
     if (
       options.fileService?.shouldIgnoreFile(fullPath, {
         respectGitIgnore: options.fileFilteringOptions?.respectGitIgnore,
-        respectSparkleIgnore:
-          options.fileFilteringOptions?.respectSparkleIgnore,
+        respectSparkleIgnore: options.fileFilteringOptions?.respectSparkleIgnore,
       })
     ) {
       continue;

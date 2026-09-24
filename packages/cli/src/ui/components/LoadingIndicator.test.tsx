@@ -318,10 +318,7 @@ describe('<LoadingIndicator />', () => {
 
   it('should not display thought indicator for non-thought loading phrases', async () => {
     const { lastFrame, unmount, waitUntilReady } = await renderWithContext(
-      <LoadingIndicator
-        currentLoadingPhrase="some random tip..."
-        elapsedTime={3}
-      />,
+      <LoadingIndicator currentLoadingPhrase="some random tip..." elapsedTime={3} />,
       StreamingState.Responding,
     );
     await waitUntilReady();
@@ -348,10 +345,7 @@ describe('<LoadingIndicator />', () => {
   describe('responsive layout', () => {
     it('should render on a single line on a wide terminal', async () => {
       const { lastFrame, unmount, waitUntilReady } = await renderWithContext(
-        <LoadingIndicator
-          {...defaultProps}
-          rightContent={<Text>Right</Text>}
-        />,
+        <LoadingIndicator {...defaultProps} rightContent={<Text>Right</Text>} />,
         StreamingState.Responding,
         120,
       );
@@ -367,10 +361,7 @@ describe('<LoadingIndicator />', () => {
 
     it('should render on multiple lines on a narrow terminal', async () => {
       const { lastFrame, unmount, waitUntilReady } = await renderWithContext(
-        <LoadingIndicator
-          {...defaultProps}
-          rightContent={<Text>Right</Text>}
-        />,
+        <LoadingIndicator {...defaultProps} rightContent={<Text>Right</Text>} />,
         StreamingState.Responding,
         79,
       );

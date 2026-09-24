@@ -1,7 +1,7 @@
 # Writing hooks for Sparkle CLI
 
-This guide will walk you through creating hooks for Sparkle CLI, from a simple
-logging hook to a comprehensive workflow assistant.
+This guide will walk you through creating hooks for Sparkle CLI, from a simple logging
+hook to a comprehensive workflow assistant.
 
 ## Prerequisites
 
@@ -13,11 +13,9 @@ Before you start, make sure you have:
 
 ## Quick start
 
-Let's create a simple hook that logs all tool executions to understand the
-basics.
+Let's create a simple hook that logs all tool executions to understand the basics.
 
-**Crucial Rule:** Always write logs to `stderr`. Write only the final JSON to
-`stdout`.
+**Crucial Rule:** Always write logs to `stderr`. Write only the final JSON to `stdout`.
 
 ### Step 1: Create your hook script
 
@@ -25,8 +23,8 @@ Create a directory for hooks and a simple logging script.
 
 > **Note**:
 >
-> This example uses `jq` to parse JSON. If you don't have it installed, you can
-> perform similar logic using Node.js or Python.
+> This example uses `jq` to parse JSON. If you don't have it installed, you can perform
+> similar logic using Node.js or Python.
 
 **macOS/Linux**
 
@@ -89,8 +87,8 @@ There are two ways to control or block an action in Sparkle CLI:
 
 ### Security: Block secrets in commits
 
-Prevent committing files containing API keys or passwords. Note that we use
-**Exit Code 0** to provide a structured denial message to the agent.
+Prevent committing files containing API keys or passwords. Note that we use **Exit Code
+0** to provide a structured denial message to the agent.
 
 **`.sparkle/hooks/block-secrets.sh`:**
 
@@ -147,8 +145,8 @@ EOF
 
 ### RAG-based Tool Filtering (BeforeToolSelection)
 
-Use `BeforeToolSelection` to intelligently reduce the tool space. This example
-uses a Node.js script to check the user's prompt and allow only relevant tools.
+Use `BeforeToolSelection` to intelligently reduce the tool space. This example uses a
+Node.js script to check the user's prompt and allow only relevant tools.
 
 **`.sparkle/hooks/filter-tools.js`:**
 
@@ -230,16 +228,15 @@ main().catch((err) => {
 
 > **TIP**
 >
-> **Union Aggregation Strategy**: `BeforeToolSelection` is unique in that it
-> combines the results of all matching hooks. If you have multiple filtering
-> hooks, the agent will receive the **union** of all whitelisted tools. Only
-> using `mode: "NONE"` will override other hooks to disable all tools.
+> **Union Aggregation Strategy**: `BeforeToolSelection` is unique in that it combines
+> the results of all matching hooks. If you have multiple filtering hooks, the agent
+> will receive the **union** of all whitelisted tools. Only using `mode: "NONE"` will
+> override other hooks to disable all tools.
 
 ## Complete example: Smart Development Workflow Assistant
 
-This comprehensive example demonstrates all hook events working together. We
-will build a system that maintains memory, filters tools, and checks for
-security.
+This comprehensive example demonstrates all hook events working together. We will build
+a system that maintains memory, filters tools, and checks for security.
 
 ### Architecture
 
@@ -346,8 +343,8 @@ security.
 
 ### Hook Scripts
 
-> **Note**: For brevity, these scripts use `console.error` for logging and
-> standard `console.log` for JSON output.
+> **Note**: For brevity, these scripts use `console.error` for logging and standard
+> `console.log` for JSON output.
 
 #### 1. Initialize (`init.js`)
 
@@ -468,7 +465,7 @@ console.error('Consolidating memories for session end...');
 
 ## Packaging as an extension
 
-While project-level hooks are great for specific repositories, you can share
-your hooks across multiple projects by packaging them as a
-[Sparkle CLI extension](../extensions/index.md). This provides version control,
-easy distribution, and centralized management.
+While project-level hooks are great for specific repositories, you can share your hooks
+across multiple projects by packaging them as a
+[Sparkle CLI extension](../extensions/index.md). This provides version control, easy
+distribution, and centralized management.

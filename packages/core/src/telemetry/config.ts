@@ -9,9 +9,7 @@ import type { TelemetrySettings } from '../config/config.js';
 /**
  * Parse a boolean environment flag. Accepts 'true'/'1' as true.
  */
-export function parseBooleanEnvFlag(
-  value: string | undefined,
-): boolean | undefined {
+export function parseBooleanEnvFlag(value: string | undefined): boolean | undefined {
   if (value === undefined) return undefined;
   return value === 'true' || value === '1';
 }
@@ -40,8 +38,7 @@ export async function resolveTelemetrySettings(options: {
     settings.enabled;
 
   const traces =
-    parseBooleanEnvFlag(env['GEMINI_TELEMETRY_TRACES_ENABLED']) ??
-    settings.traces;
+    parseBooleanEnvFlag(env['GEMINI_TELEMETRY_TRACES_ENABLED']) ?? settings.traces;
 
   const logPrompts =
     argv.telemetryLogPrompts ??
@@ -49,9 +46,7 @@ export async function resolveTelemetrySettings(options: {
     settings.logPrompts;
 
   const outfile =
-    argv.telemetryOutfile ??
-    env['GEMINI_TELEMETRY_OUTFILE'] ??
-    settings.outfile;
+    argv.telemetryOutfile ?? env['GEMINI_TELEMETRY_OUTFILE'] ?? settings.outfile;
 
   return {
     enabled,

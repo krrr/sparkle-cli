@@ -9,9 +9,7 @@ import type { HistoryItem } from '../types.js';
 import type { ChatRecordingService } from 'sparkle-cli-core/src/services/chatRecordingService.js';
 
 // Type for the updater function passed to updateHistoryItem
-type HistoryItemUpdater = (
-  prevItem: HistoryItem,
-) => Partial<Omit<HistoryItem, 'id'>>;
+type HistoryItemUpdater = (prevItem: HistoryItem) => Partial<Omit<HistoryItem, 'id'>>;
 
 export interface UseHistoryManagerReturn {
   history: HistoryItem[];
@@ -136,16 +134,12 @@ export function useHistory({
    */
   //
   const updateItem = useCallback(
-    (
-      id: number,
-      updates: Partial<Omit<HistoryItem, 'id'>> | HistoryItemUpdater,
-    ) => {
+    (id: number, updates: Partial<Omit<HistoryItem, 'id'>> | HistoryItemUpdater) => {
       setHistory((prevHistory) =>
         prevHistory.map((item) => {
           if (item.id === id) {
             // Apply updates based on whether it's an object or a function
-            const newUpdates =
-              typeof updates === 'function' ? updates(item) : updates;
+            const newUpdates = typeof updates === 'function' ? updates(item) : updates;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
             return { ...item, ...newUpdates } as HistoryItem;
           }

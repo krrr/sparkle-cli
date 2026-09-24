@@ -11,10 +11,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { globStream } from 'glob';
 import { execStreaming } from '../utils/shell-utils.js';
-import {
-  DEFAULT_TOTAL_MAX_MATCHES,
-  DEFAULT_SEARCH_TIMEOUT_MS,
-} from './constants.js';
+import { DEFAULT_TOTAL_MAX_MATCHES, DEFAULT_SEARCH_TIMEOUT_MS } from './constants.js';
 import {
   BaseDeclarativeTool,
   BaseToolInvocation,
@@ -25,11 +22,7 @@ import {
   type ToolConfirmationOutcome,
   type ExecuteOptions,
 } from './tools.js';
-import {
-  makeRelative,
-  shortenPath,
-  resolveToRealPath,
-} from '../utils/paths.js';
+import { makeRelative, shortenPath, resolveToRealPath } from '../utils/paths.js';
 import { getErrorMessage, isNodeError } from '../utils/errors.js';
 import { isGitRepository } from '../utils/gitUtils.js';
 import type { Config } from '../config/config.js';
@@ -83,10 +76,7 @@ export interface GrepToolParams {
   total_max_matches?: number;
 }
 
-class GrepToolInvocation extends BaseToolInvocation<
-  GrepToolParams,
-  ToolResult
-> {
+class GrepToolInvocation extends BaseToolInvocation<GrepToolParams, ToolResult> {
   private readonly fileExclusions: FileExclusions;
 
   constructor(
@@ -164,10 +154,7 @@ class GrepToolInvocation extends BaseToolInvocation<
             },
           };
         }
-        const validationError = this.config.validatePathAccess(
-          searchDirAbs,
-          'read',
-        );
+        const validationError = this.config.validatePathAccess(searchDirAbs, 'read');
         if (validationError) {
           return {
             llmContent: validationError,
@@ -348,8 +335,7 @@ class GrepToolInvocation extends BaseToolInvocation<
    */
   private async isCommandAvailable(command: string): Promise<boolean> {
     const checkCommand = process.platform === 'win32' ? 'where' : 'command';
-    const checkArgs =
-      process.platform === 'win32' ? [command] : ['-v', command];
+    const checkArgs = process.platform === 'win32' ? [command] : ['-v', command];
     try {
       const sandboxManager = this.config.sandboxManager;
 
@@ -440,14 +426,7 @@ class GrepToolInvocation extends BaseToolInvocation<
 
       if (gitAvailable) {
         strategyUsed = 'git grep';
-        const gitArgs = [
-          'grep',
-          '--untracked',
-          '-n',
-          '-E',
-          '--ignore-case',
-          pattern,
-        ];
+        const gitArgs = ['grep', '--untracked', '-n', '-E', '--ignore-case', pattern];
         if (max_matches_per_file) {
           gitArgs.push('--max-count', max_matches_per_file.toString());
         }
@@ -479,17 +458,13 @@ class GrepToolInvocation extends BaseToolInvocation<
           return results;
         } catch (gitError: unknown) {
           debugLogger.debug(
-            `GrepLogic: git grep failed: ${getErrorMessage(
-              gitError,
-            )}. Falling back...`,
+            `GrepLogic: git grep failed: ${getErrorMessage(gitError)}. Falling back...`,
           );
         }
       }
 
       // --- Strategy 2: Pure JavaScript Fallback ---
-      debugLogger.debug(
-        'GrepLogic: Falling back to JavaScript grep implementation.',
-      );
+      debugLogger.debug('GrepLogic: Falling back to JavaScript grep implementation.');
       strategyUsed = 'javascript fallback';
       // Align with ripgrep's basename-glob semantics: a glob without a '/'
       // separator (e.g. "*.ts") must match file names at any depth, not just
@@ -545,10 +520,7 @@ class GrepToolInvocation extends BaseToolInvocation<
               });
               matchesInFile++;
               if (allMatches.length >= maxMatches) break;
-              if (
-                max_matches_per_file &&
-                matchesInFile >= max_matches_per_file
-              ) {
+              if (max_matches_per_file && matchesInFile >= max_matches_per_file) {
                 break;
               }
             }
@@ -586,16 +558,10 @@ class GrepToolInvocation extends BaseToolInvocation<
         this.config.getTargetDir(),
         this.params.dir_path,
       );
-      if (
-        resolvedPath === this.config.getTargetDir() ||
-        this.params.dir_path === '.'
-      ) {
+      if (resolvedPath === this.config.getTargetDir() || this.params.dir_path === '.') {
         description += ` within ./`;
       } else {
-        const relativePath = makeRelative(
-          resolvedPath,
-          this.config.getTargetDir(),
-        );
+        const relativePath = makeRelative(resolvedPath, this.config.getTargetDir());
         description += ` within ${shortenPath(relativePath)}`;
       }
     } else {
@@ -636,9 +602,7 @@ export class GrepTool extends BaseDeclarativeTool<GrepToolParams, ToolResult> {
    * @param params Parameters to validate
    * @returns An error message string if invalid, null otherwise
    */
-  protected override validateToolParamValues(
-    params: GrepToolParams,
-  ): string | null {
+  protected override validateToolParamValues(params: GrepToolParams): string | null {
     try {
       new RegExp(params.pattern);
     } catch (error) {
@@ -653,17 +617,11 @@ export class GrepTool extends BaseDeclarativeTool<GrepToolParams, ToolResult> {
       }
     }
 
-    if (
-      params.max_matches_per_file !== undefined &&
-      params.max_matches_per_file < 1
-    ) {
+    if (params.max_matches_per_file !== undefined && params.max_matches_per_file < 1) {
       return 'max_matches_per_file must be at least 1.';
     }
 
-    if (
-      params.total_max_matches !== undefined &&
-      params.total_max_matches < 1
-    ) {
+    if (params.total_max_matches !== undefined && params.total_max_matches < 1) {
       return 'total_max_matches must be at least 1.';
     }
 
@@ -677,10 +635,7 @@ export class GrepTool extends BaseDeclarativeTool<GrepToolParams, ToolResult> {
       } catch (err) {
         return err instanceof Error ? err.message : String(err);
       }
-      const validationError = this.config.validatePathAccess(
-        resolvedPath,
-        'read',
-      );
+      const validationError = this.config.validatePathAccess(resolvedPath, 'read');
       if (validationError) {
         return validationError;
       }

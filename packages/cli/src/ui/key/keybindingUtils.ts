@@ -69,15 +69,10 @@ const MODIFIER_MAPS: Record<string, ModifierMap> = {
 /**
  * Formats a single KeyBinding into a human-readable string (e.g., "Ctrl+C").
  */
-export function formatKeyBinding(
-  binding: KeyBinding,
-  platform?: string,
-): string {
+export function formatKeyBinding(binding: KeyBinding, platform?: string): string {
   const activePlatform =
     platform ??
-    (process.env['FORCE_GENERIC_KEYBINDING_HINTS']
-      ? 'default'
-      : process.platform);
+    (process.env['FORCE_GENERIC_KEYBINDING_HINTS'] ? 'default' : process.platform);
   const modMap = MODIFIER_MAPS[activePlatform] || MODIFIER_MAPS['default'];
   const parts: string[] = [];
 

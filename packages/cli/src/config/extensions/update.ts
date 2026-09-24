@@ -48,9 +48,7 @@ export async function updateExtension(
       type: 'SET_STATE',
       payload: { name: extension.name, state: ExtensionUpdateState.ERROR },
     });
-    throw new Error(
-      `Extension ${extension.name} cannot be updated, type is unknown.`,
-    );
+    throw new Error(`Extension ${extension.name} cannot be updated, type is unknown.`);
   }
 
   try {
@@ -135,9 +133,7 @@ export async function updateExtension(
       updatedVersion,
     };
   } catch (e) {
-    debugLogger.error(
-      `Error updating extension, rolling back. ${getErrorMessage(e)}`,
-    );
+    debugLogger.error(`Error updating extension, rolling back. ${getErrorMessage(e)}`);
     dispatchExtensionStateUpdate({
       type: 'SET_STATE',
       payload: { name: extension.name, state: ExtensionUpdateState.ERROR },

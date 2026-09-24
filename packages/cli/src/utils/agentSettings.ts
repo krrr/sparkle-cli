@@ -17,8 +17,7 @@ export type AgentActionStatus = 'success' | 'no-op' | 'error';
 /**
  * Metadata representing the result of an agent settings operation.
  */
-export interface AgentActionResult
-  extends Omit<FeatureActionResult, 'featureName'> {
+export interface AgentActionResult extends Omit<FeatureActionResult, 'featureName'> {
   agentName: string;
 }
 
@@ -47,11 +46,7 @@ export function enableAgent(
   settings: LoadedSettings,
   agentName: string,
 ): AgentActionResult {
-  const { featureName, ...rest } = enableFeature(
-    settings,
-    agentName,
-    agentStrategy,
-  );
+  const { featureName, ...rest } = enableFeature(settings, agentName, agentStrategy);
   return {
     ...rest,
     agentName: featureName,

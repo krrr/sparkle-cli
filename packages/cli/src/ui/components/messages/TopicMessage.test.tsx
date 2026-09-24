@@ -19,8 +19,7 @@ describe('<TopicMessage />', () => {
   const baseArgs = {
     [TOPIC_PARAM_TITLE]: 'Test Topic',
     [TOPIC_PARAM_STRATEGIC_INTENT]: 'This is the strategic intent.',
-    [TOPIC_PARAM_SUMMARY]:
-      'This is the detailed summary that should be expandable.',
+    [TOPIC_PARAM_SUMMARY]: 'This is the detailed summary that should be expandable.',
   };
 
   const renderTopic = async (

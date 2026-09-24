@@ -101,9 +101,7 @@ export async function initializeContextManager(
       tools: chat.getTools(),
     });
     return (
-      breakdown.system_instructions +
-      breakdown.tool_definitions +
-      breakdown.mcp_servers
+      breakdown.system_instructions + breakdown.tool_definitions + breakdown.mcp_servers
     );
   };
 

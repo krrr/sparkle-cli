@@ -15,9 +15,7 @@ import {
 } from '../utils/eval-inventory.js';
 import type { EvalCaseRecord } from '../utils/eval-analysis.js';
 
-function makeCaseRecord(
-  overrides: Partial<EvalCaseRecord> = {},
-): EvalCaseRecord {
+function makeCaseRecord(overrides: Partial<EvalCaseRecord> = {}): EvalCaseRecord {
   return {
     filePath: '/repo/evals/test.eval.ts',
     relativePath: 'evals/test.eval.ts',
@@ -204,9 +202,7 @@ describe('eval-inventory', () => {
 
       expect(report).toContain('Diagnostics');
       expect(report).toContain('1 diagnostics');
-      expect(report).toContain(
-        '⚠ evals/bad.eval.ts:5:3 — Could not resolve policy',
-      );
+      expect(report).toContain('⚠ evals/bad.eval.ts:5:3 — Could not resolve policy');
     });
 
     it('omits diagnostics section when there are none', () => {
@@ -634,10 +630,7 @@ describe('eval-inventory', () => {
         unknown: 1,
       });
 
-      const sum = Object.values(parsed.summary.byPolicy).reduce(
-        (a, b) => a + b,
-        0,
-      );
+      const sum = Object.values(parsed.summary.byPolicy).reduce((a, b) => a + b, 0);
       expect(sum).toBe(parsed.summary.totalCases);
     });
 
@@ -663,15 +656,11 @@ describe('eval-inventory', () => {
     it('generated field is valid ISO-8601', () => {
       const result: InventoryResult = makeEmptyResult();
 
-      const parsed: InventoryJsonOutput = JSON.parse(
-        formatInventoryJson(result),
-      );
+      const parsed: InventoryJsonOutput = JSON.parse(formatInventoryJson(result));
 
       const date = new Date(parsed.generated);
       expect(date.getTime()).not.toBeNaN();
-      expect(parsed.generated).toMatch(
-        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/,
-      );
+      expect(parsed.generated).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/);
     });
 
     describe('environment overrides for timestamp', () => {
@@ -682,27 +671,21 @@ describe('eval-inventory', () => {
       it('uses SOURCE_DATE_EPOCH if set', () => {
         vi.stubEnv('SOURCE_DATE_EPOCH', '1700000000');
         const result: InventoryResult = makeEmptyResult();
-        const parsed: InventoryJsonOutput = JSON.parse(
-          formatInventoryJson(result),
-        );
+        const parsed: InventoryJsonOutput = JSON.parse(formatInventoryJson(result));
         expect(parsed.generated).toBe('2023-11-14T22:13:20.000Z');
       });
 
       it('uses epoch 0 if EVAL_INVENTORY_STABLE_DATE is set', () => {
         vi.stubEnv('EVAL_INVENTORY_STABLE_DATE', '1');
         const result: InventoryResult = makeEmptyResult();
-        const parsed: InventoryJsonOutput = JSON.parse(
-          formatInventoryJson(result),
-        );
+        const parsed: InventoryJsonOutput = JSON.parse(formatInventoryJson(result));
         expect(parsed.generated).toBe('1970-01-01T00:00:00.000Z');
       });
 
       it('uses epoch 0 if EVAL_INVENTORY_DETERMINISTIC is set', () => {
         vi.stubEnv('EVAL_INVENTORY_DETERMINISTIC', 'true');
         const result: InventoryResult = makeEmptyResult();
-        const parsed: InventoryJsonOutput = JSON.parse(
-          formatInventoryJson(result),
-        );
+        const parsed: InventoryJsonOutput = JSON.parse(formatInventoryJson(result));
         expect(parsed.generated).toBe('1970-01-01T00:00:00.000Z');
       });
     });

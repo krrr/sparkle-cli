@@ -75,9 +75,7 @@ describe('Extension Update Logic', () => {
         ...mockExtension,
         version: '1.1.0',
       }),
-      verifyExtensionIntegrity: vi
-        .fn()
-        .mockResolvedValue(IntegrityDataStatus.VERIFIED),
+      verifyExtensionIntegrity: vi.fn().mockResolvedValue(IntegrityDataStatus.VERIFIED),
       storeExtensionIntegrity: vi.fn().mockResolvedValue(undefined),
     } as unknown as ExtensionManager;
     mockDispatch = vi.fn();
@@ -163,9 +161,7 @@ describe('Extension Update Logic', () => {
           version: '1.0.0',
         }),
       );
-      vi.mocked(
-        mockExtensionManager.installOrUpdateExtension,
-      ).mockResolvedValue({
+      vi.mocked(mockExtensionManager.installOrUpdateExtension).mockResolvedValue({
         ...mockExtension,
         version: '1.1.0',
       });
@@ -203,9 +199,7 @@ describe('Extension Update Logic', () => {
           version: '1.0.0',
         }),
       );
-      vi.mocked(
-        mockExtensionManager.installOrUpdateExtension,
-      ).mockResolvedValue({
+      vi.mocked(mockExtensionManager.installOrUpdateExtension).mockResolvedValue({
         ...mockExtension,
         version: '1.1.0',
       });
@@ -234,9 +228,7 @@ describe('Extension Update Logic', () => {
         mockExtensionManager,
       );
 
-      expect(
-        mockExtensionManager.installOrUpdateExtension,
-      ).toHaveBeenCalledWith(
+      expect(mockExtensionManager.installOrUpdateExtension).toHaveBeenCalledWith(
         expect.objectContaining({
           source: 'https://new-source.com/repo.git',
         }),
@@ -251,9 +243,7 @@ describe('Extension Update Logic', () => {
           version: '1.0.0',
         }),
       );
-      vi.mocked(
-        mockExtensionManager.installOrUpdateExtension,
-      ).mockResolvedValue({
+      vi.mocked(mockExtensionManager.installOrUpdateExtension).mockResolvedValue({
         ...mockExtension,
         version: '1.1.0',
       });
@@ -282,9 +272,9 @@ describe('Extension Update Logic', () => {
           version: '1.0.0',
         }),
       );
-      vi.mocked(
-        mockExtensionManager.installOrUpdateExtension,
-      ).mockRejectedValue(new Error('Install failed'));
+      vi.mocked(mockExtensionManager.installOrUpdateExtension).mockRejectedValue(
+        new Error('Install failed'),
+      );
 
       await expect(
         updateExtension(
@@ -295,10 +285,7 @@ describe('Extension Update Logic', () => {
         ),
       ).rejects.toThrow('Updated extension not found after installation');
 
-      expect(copyExtension).toHaveBeenCalledWith(
-        '/tmp/mock-dir',
-        mockExtension.path,
-      );
+      expect(copyExtension).toHaveBeenCalledWith('/tmp/mock-dir', mockExtension.path);
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SET_STATE',
         payload: {
@@ -311,9 +298,9 @@ describe('Extension Update Logic', () => {
 
     describe('Integrity Verification', () => {
       it('should fail update with security alert if integrity is invalid', async () => {
-        vi.mocked(
-          mockExtensionManager.verifyExtensionIntegrity,
-        ).mockResolvedValue(IntegrityDataStatus.INVALID);
+        vi.mocked(mockExtensionManager.verifyExtensionIntegrity).mockResolvedValue(
+          IntegrityDataStatus.INVALID,
+        );
 
         await expect(
           updateExtension(
@@ -336,9 +323,9 @@ describe('Extension Update Logic', () => {
       });
 
       it('should establish trust on first update if integrity data is missing', async () => {
-        vi.mocked(
-          mockExtensionManager.verifyExtensionIntegrity,
-        ).mockResolvedValue(IntegrityDataStatus.MISSING);
+        vi.mocked(mockExtensionManager.verifyExtensionIntegrity).mockResolvedValue(
+          IntegrityDataStatus.MISSING,
+        );
 
         await updateExtension(
           mockExtension,
@@ -349,9 +336,7 @@ describe('Extension Update Logic', () => {
 
         // Verify updateExtension delegates to installOrUpdateExtension,
         // which is responsible for establishing trust internally.
-        expect(
-          mockExtensionManager.installOrUpdateExtension,
-        ).toHaveBeenCalled();
+        expect(mockExtensionManager.installOrUpdateExtension).toHaveBeenCalled();
 
         expect(mockDispatch).toHaveBeenCalledWith({
           type: 'SET_STATE',
@@ -363,9 +348,9 @@ describe('Extension Update Logic', () => {
       });
 
       it('should throw if integrity manager throws', async () => {
-        vi.mocked(
-          mockExtensionManager.verifyExtensionIntegrity,
-        ).mockRejectedValue(new Error('Verification failed'));
+        vi.mocked(mockExtensionManager.verifyExtensionIntegrity).mockRejectedValue(
+          new Error('Verification failed'),
+        );
 
         await expect(
           updateExtension(
@@ -400,9 +385,10 @@ describe('Extension Update Logic', () => {
           version: '1.0.0',
         }),
       );
-      vi.mocked(
-        mockExtensionManager.installOrUpdateExtension,
-      ).mockResolvedValue({ ...mockExtension, version: '1.1.0' });
+      vi.mocked(mockExtensionManager.installOrUpdateExtension).mockResolvedValue({
+        ...mockExtension,
+        version: '1.1.0',
+      });
 
       const results = await updateAllUpdatableExtensions(
         extensions,
@@ -413,9 +399,7 @@ describe('Extension Update Logic', () => {
 
       expect(results).toHaveLength(2);
       expect(results.map((r) => r.name)).toEqual(['ext1', 'ext3']);
-      expect(
-        mockExtensionManager.installOrUpdateExtension,
-      ).toHaveBeenCalledTimes(2);
+      expect(mockExtensionManager.installOrUpdateExtension).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -432,11 +416,7 @@ describe('Extension Update Logic', () => {
         { ...mockExtension, installMetadata: undefined },
       ];
 
-      await checkForAllExtensionUpdates(
-        extensions,
-        mockExtensionManager,
-        mockDispatch,
-      );
+      await checkForAllExtensionUpdates(extensions, mockExtensionManager, mockDispatch);
 
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SET_STATE',
@@ -455,11 +435,7 @@ describe('Extension Update Logic', () => {
         ExtensionUpdateState.UPDATE_AVAILABLE,
       );
 
-      await checkForAllExtensionUpdates(
-        extensions,
-        mockExtensionManager,
-        mockDispatch,
-      );
+      await checkForAllExtensionUpdates(extensions, mockExtensionManager, mockDispatch);
 
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SET_STATE',

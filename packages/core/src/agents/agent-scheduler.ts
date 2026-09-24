@@ -6,10 +6,7 @@
 
 import type { Config } from '../config/config.js';
 import { Scheduler } from '../scheduler/scheduler.js';
-import type {
-  ToolCallRequestInfo,
-  CompletedToolCall,
-} from '../scheduler/types.js';
+import type { ToolCallRequestInfo, CompletedToolCall } from '../scheduler/types.js';
 import type { ToolRegistry } from '../tools/tool-registry.js';
 import type { PromptRegistry } from '../prompts/prompt-registry.js';
 import type { ResourceRegistry } from '../resources/resource-registry.js';

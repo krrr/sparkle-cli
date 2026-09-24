@@ -5,11 +5,7 @@
  */
 
 import type { AgentCard, SecurityScheme } from '@a2a-js/sdk';
-import type {
-  A2AAuthConfig,
-  A2AAuthProvider,
-  AuthValidationResult,
-} from './types.js';
+import type { A2AAuthConfig, A2AAuthProvider, AuthValidationResult } from './types.js';
 import { ApiKeyAuthProvider } from './api-key-provider.js';
 import { HttpAuthProvider } from './http-provider.js';
 
@@ -73,9 +69,7 @@ export class A2AAuthProviderFactory {
 
       default: {
         const _exhaustive: never = authConfig;
-        throw new Error(
-          `Unknown auth type: ${(_exhaustive as A2AAuthConfig).type}`,
-        );
+        throw new Error(`Unknown auth type: ${(_exhaustive as A2AAuthConfig).type}`);
       }
     }
   }
@@ -150,16 +144,12 @@ export class A2AAuthProviderFactory {
           if (authConfig.type === 'apiKey') {
             return { matched: true, missingConfig: [] };
           }
-          missingConfig.push(
-            `Scheme '${schemeName}' requires apiKey authentication`,
-          );
+          missingConfig.push(`Scheme '${schemeName}' requires apiKey authentication`);
           break;
 
         case 'http':
           if (authConfig.type === 'http') {
-            if (
-              authConfig.scheme.toLowerCase() === scheme.scheme.toLowerCase()
-            ) {
+            if (authConfig.scheme.toLowerCase() === scheme.scheme.toLowerCase()) {
               return { matched: true, missingConfig: [] };
             }
             missingConfig.push(
@@ -209,17 +199,13 @@ export class A2AAuthProviderFactory {
   }
 
   /** Get human-readable description of required auth for error messages. */
-  static describeRequiredAuth(
-    securitySchemes: Record<string, SecurityScheme>,
-  ): string {
+  static describeRequiredAuth(securitySchemes: Record<string, SecurityScheme>): string {
     const descriptions: string[] = [];
 
     for (const [name, scheme] of Object.entries(securitySchemes)) {
       switch (scheme.type) {
         case 'apiKey':
-          descriptions.push(
-            `API Key (${name}): Send ${scheme.name} in ${scheme.in}`,
-          );
+          descriptions.push(`API Key (${name}): Send ${scheme.name} in ${scheme.in}`);
           break;
         case 'http':
           descriptions.push(`HTTP ${scheme.scheme} (${name})`);

@@ -142,8 +142,8 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
               Security Warning:
             </Text>
             <Text color={theme.status.warning} wrap="wrap">
-              Hooks can execute arbitrary commands on your system. Only use
-              hooks from sources you trust. Review hook scripts carefully.
+              Hooks can execute arbitrary commands on your system. Only use hooks from
+              sources you trust. Review hook scripts carefully.
             </Text>
           </Box>
 
@@ -151,9 +151,7 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
           <Box marginBottom={1}>
             <Text wrap="wrap">
               Learn more:{' '}
-              <Text color={theme.text.link}>
-                https://geminicli.com/docs/hooks
-              </Text>
+              <Text color={theme.text.link}>https://geminicli.com/docs/hooks</Text>
             </Text>
           </Box>
 
@@ -176,10 +174,7 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
             {visibleItems.map((item, index) => {
               if (item.type === 'header') {
                 return (
-                  <Box
-                    key={`header-${item.eventName}-${index}`}
-                    marginBottom={1}
-                  >
+                  <Box key={`header-${item.eventName}-${index}`} marginBottom={1}>
                     <Text bold color={theme.text.link}>
                       {item.eventName}
                     </Text>
@@ -188,8 +183,7 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
               }
 
               const hook = item.hook!;
-              const hookName =
-                hook.config.name || hook.config.command || 'unknown';
+              const hookName = hook.config.name || hook.config.command || 'unknown';
               const hookKey = `${item.eventName}:${hook.source}:${hook.config.name ?? ''}:${hook.config.command ?? ''}`;
               const statusColor = hook.enabled
                 ? theme.status.success
@@ -217,8 +211,7 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
                         ` | Command: ${hook.config.command}`}
                       {hook.matcher && ` | Matcher: ${hook.matcher}`}
                       {hook.sequential && ` | Sequential`}
-                      {hook.config.timeout &&
-                        ` | Timeout: ${hook.config.timeout}s`}
+                      {hook.config.timeout && ` | Timeout: ${hook.config.timeout}s`}
                     </Text>
                   </Box>
                 </Box>
@@ -237,8 +230,8 @@ export const HooksDialog: React.FC<HooksDialogProps> = ({
           <Box marginTop={1}>
             <Text color={theme.text.secondary} wrap="wrap">
               Tip: Use <Text bold>/hooks enable {'<hook-name>'}</Text> or{' '}
-              <Text bold>/hooks disable {'<hook-name>'}</Text> to toggle
-              individual hooks. Use <Text bold>/hooks enable-all</Text> or{' '}
+              <Text bold>/hooks disable {'<hook-name>'}</Text> to toggle individual
+              hooks. Use <Text bold>/hooks enable-all</Text> or{' '}
               <Text bold>/hooks disable-all</Text> to toggle all hooks at once.
             </Text>
           </Box>

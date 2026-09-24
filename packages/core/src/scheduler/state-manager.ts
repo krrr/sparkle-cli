@@ -329,9 +329,7 @@ export class SchedulerStateManager {
     }
   }
 
-  private isExecutingToolCallPatch(
-    data: unknown,
-  ): data is Partial<ExecutingToolCall> {
+  private isExecutingToolCallPatch(data: unknown): data is Partial<ExecutingToolCall> {
     // A partial can be an empty object, but it must be a non-null object.
     return typeof data === 'object' && data !== null;
   }
@@ -349,9 +347,7 @@ export class SchedulerStateManager {
     tool: AnyDeclarativeTool;
     invocation: AnyToolInvocation;
   } {
-    if (
-      !('tool' in call && call.tool && 'invocation' in call && call.invocation)
-    ) {
+    if (!('tool' in call && call.tool && 'invocation' in call && call.invocation)) {
       throw new Error(
         `Invalid state transition: cannot transition to ${targetStatus} without tool/invocation (callId: ${call.request.callId})`,
       );
@@ -377,10 +373,7 @@ export class SchedulerStateManager {
     };
   }
 
-  private toError(
-    call: ToolCall,
-    response: ToolCallResponseInfo,
-  ): ErroredToolCall {
+  private toError(call: ToolCall, response: ToolCallResponseInfo): ErroredToolCall {
     const startTime = 'startTime' in call ? call.startTime : undefined;
     return {
       request: call.request,
@@ -395,10 +388,7 @@ export class SchedulerStateManager {
   }
 
   private toAwaitingApproval(call: ToolCall, data: unknown): WaitingToolCall {
-    this.validateHasToolAndInvocation(
-      call,
-      CoreToolCallStatus.AwaitingApproval,
-    );
+    this.validateHasToolAndInvocation(call, CoreToolCallStatus.AwaitingApproval);
 
     let confirmationDetails:
       | ToolCallConfirmationDetails
@@ -567,8 +557,7 @@ export class SchedulerStateManager {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const execData = data as Partial<ExecutingToolCall> | undefined;
     const liveOutput =
-      execData?.liveOutput ??
-      ('liveOutput' in call ? call.liveOutput : undefined);
+      execData?.liveOutput ?? ('liveOutput' in call ? call.liveOutput : undefined);
     const pid = execData?.pid ?? ('pid' in call ? call.pid : undefined);
     const progressMessage =
       execData?.progressMessage ??

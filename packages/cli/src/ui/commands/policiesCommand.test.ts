@@ -115,9 +115,7 @@ describe('policiesCommand', () => {
       expect(content).toContain(
         '### Plan Mode Policies (combined with normal mode policies)',
       );
-      expect(content).toContain(
-        '**DENY** tool: `dangerousTool` [Priority: 10]',
-      );
+      expect(content).toContain('**DENY** tool: `dangerousTool` [Priority: 10]');
       expect(content).toContain(
         '**ALLOW** all tools (args match: `safe`) [Source: test.toml]',
       );

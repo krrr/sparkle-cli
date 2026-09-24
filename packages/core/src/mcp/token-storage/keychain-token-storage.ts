@@ -8,15 +8,9 @@ import { BaseTokenStorage } from './base-token-storage.js';
 import type { OAuthCredentials, SecretStorage } from './types.js';
 import { coreEvents } from '../../utils/events.js';
 import { KeychainService } from '../../services/keychainService.js';
-import {
-  KEYCHAIN_TEST_PREFIX,
-  SECRET_PREFIX,
-} from '../../services/keychainTypes.js';
+import { KEYCHAIN_TEST_PREFIX, SECRET_PREFIX } from '../../services/keychainTypes.js';
 
-export class KeychainTokenStorage
-  extends BaseTokenStorage
-  implements SecretStorage
-{
+export class KeychainTokenStorage extends BaseTokenStorage implements SecretStorage {
   private readonly keychainService: KeychainService;
 
   constructor(serviceName: string) {
@@ -82,11 +76,7 @@ export class KeychainTokenStorage
         )
         .map((cred: { account: string }) => cred.account);
     } catch (error) {
-      coreEvents.emitFeedback(
-        'error',
-        'Failed to list servers from keychain',
-        error,
-      );
+      coreEvents.emitFeedback('error', 'Failed to list servers from keychain', error);
       return [];
     }
   }
@@ -172,9 +162,7 @@ export class KeychainTokenStorage
   }
 
   async deleteSecret(key: string): Promise<void> {
-    const deleted = await this.keychainService.deletePassword(
-      `${SECRET_PREFIX}${key}`,
-    );
+    const deleted = await this.keychainService.deletePassword(`${SECRET_PREFIX}${key}`);
     if (!deleted) {
       throw new Error(`No secret found for key: ${key}`);
     }
@@ -187,11 +175,7 @@ export class KeychainTokenStorage
         .filter((cred) => cred.account.startsWith(SECRET_PREFIX))
         .map((cred) => cred.account.substring(SECRET_PREFIX.length));
     } catch (error) {
-      coreEvents.emitFeedback(
-        'error',
-        'Failed to list secrets from keychain',
-        error,
-      );
+      coreEvents.emitFeedback('error', 'Failed to list secrets from keychain', error);
       return [];
     }
   }

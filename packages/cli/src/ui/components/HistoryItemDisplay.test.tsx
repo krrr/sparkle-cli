@@ -167,9 +167,7 @@ describe('<HistoryItemDisplay />', () => {
         <HistoryItemDisplay {...baseItem} item={item} />
       </SessionStatsProvider>,
     );
-    expect(lastFrame()).toContain(
-      'No API calls have been made in this session.',
-    );
+    expect(lastFrame()).toContain('No API calls have been made in this session.');
     unmount();
   });
 
@@ -183,9 +181,7 @@ describe('<HistoryItemDisplay />', () => {
         <HistoryItemDisplay {...baseItem} item={item} />
       </SessionStatsProvider>,
     );
-    expect(lastFrame()).toContain(
-      'No tool calls have been made in this session.',
-    );
+    expect(lastFrame()).toContain('No tool calls have been made in this session.');
     unmount();
   });
 
@@ -217,9 +213,7 @@ describe('<HistoryItemDisplay />', () => {
     const { lastFrame, unmount } = await renderWithProviders(
       <HistoryItemDisplay {...baseItem} item={item} />,
     );
-    expect(lastFrame()).toContain(
-      `Successfully exported session to ${testPath}`,
-    );
+    expect(lastFrame()).toContain(`Successfully exported session to ${testPath}`);
     unmount();
   });
 
@@ -231,11 +225,7 @@ describe('<HistoryItemDisplay />', () => {
     };
 
     const { lastFrame, unmount } = await renderWithProviders(
-      <HistoryItemDisplay
-        item={historyItem}
-        terminalWidth={80}
-        isPending={false}
-      />,
+      <HistoryItemDisplay item={historyItem} terminalWidth={80} isPending={false} />,
     );
 
     // The ANSI codes should be escaped for display.
@@ -268,20 +258,14 @@ describe('<HistoryItemDisplay />', () => {
     };
 
     const { unmount } = await renderWithProviders(
-      <HistoryItemDisplay
-        item={historyItem}
-        terminalWidth={80}
-        isPending={false}
-      />,
+      <HistoryItemDisplay item={historyItem} terminalWidth={80} isPending={false} />,
     );
 
     const passedProps = vi.mocked(ToolGroupMessage).mock.calls[0][0];
     const confirmationDetails = passedProps.toolCalls[0]
       .confirmationDetails as ToolExecuteConfirmationDetails;
 
-    expect(confirmationDetails.command).toBe(
-      'echo "\\u001b[31mhello\\u001b[0m"',
-    );
+    expect(confirmationDetails.command).toBe('echo "\\u001b[31mhello\\u001b[0m"');
     unmount();
   });
 

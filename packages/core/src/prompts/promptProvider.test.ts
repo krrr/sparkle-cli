@@ -63,12 +63,8 @@ describe('PromptProvider', () => {
       storage: {
         getProjectTempDir: vi.fn().mockReturnValue('/tmp/project-temp'),
         getPlansDir: vi.fn().mockReturnValue('/tmp/project-temp/plans'),
-        getProjectMemoryDir: vi
-          .fn()
-          .mockReturnValue('/tmp/project-temp/memory'),
-        getProjectTrackerDir: vi
-          .fn()
-          .mockReturnValue('/tmp/project-temp/tracker'),
+        getProjectMemoryDir: vi.fn().mockReturnValue('/tmp/project-temp/memory'),
+        getProjectTrackerDir: vi.fn().mockReturnValue('/tmp/project-temp/tracker'),
       },
       isInteractive: vi.fn().mockReturnValue(true),
       isInteractiveShellEnabled: vi.fn().mockReturnValue(true),
@@ -119,9 +115,7 @@ describe('PromptProvider', () => {
   it('should include the task tracker storage location in the system prompt', () => {
     vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
     const mockTrackerDir = '/mock/tracker/path';
-    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(
-      mockTrackerDir,
-    );
+    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(mockTrackerDir);
 
     const provider = new PromptProvider();
     const prompt = provider.getCoreSystemPrompt(mockConfig);
@@ -133,17 +127,13 @@ describe('PromptProvider', () => {
   it('should sanitize the task tracker storage location in the system prompt', () => {
     vi.mocked(mockConfig.isTrackerEnabled).mockReturnValue(true);
     const mockTrackerDir = '/mock/tracker/path\nwith-newline]and-bracket';
-    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(
-      mockTrackerDir,
-    );
+    vi.mocked(mockConfig.storage.getProjectTrackerDir).mockReturnValue(mockTrackerDir);
 
     const provider = new PromptProvider();
     const prompt = provider.getCoreSystemPrompt(mockConfig);
 
     expect(prompt).toContain('# TASK MANAGEMENT PROTOCOL');
-    expect(prompt).toContain(
-      'located at `/mock/tracker/path with-newlineand-bracket`',
-    );
+    expect(prompt).toContain('located at `/mock/tracker/path with-newlineand-bracket`');
   });
 
   it('should handle multiple context filenames in user memory section', () => {
@@ -153,10 +143,7 @@ describe('PromptProvider', () => {
     ]);
 
     const provider = new PromptProvider();
-    const prompt = provider.getCoreSystemPrompt(
-      mockConfig,
-      'Some memory content',
-    );
+    const prompt = provider.getCoreSystemPrompt(mockConfig, 'Some memory content');
 
     // Verify renderUserMemory usage
     expect(prompt).toContain(
@@ -172,9 +159,7 @@ describe('PromptProvider', () => {
     } as unknown as MessageBus;
 
     beforeEach(() => {
-      vi.mocked(getAllGeminiMdFilenames).mockReturnValue([
-        DEFAULT_CONTEXT_FILENAME,
-      ]);
+      vi.mocked(getAllGeminiMdFilenames).mockReturnValue([DEFAULT_CONTEXT_FILENAME]);
       (mockConfig.getApprovalMode as ReturnType<typeof vi.fn>).mockReturnValue(
         ApprovalMode.PLAN,
       );
@@ -212,10 +197,7 @@ describe('PromptProvider', () => {
         undefined,
         true,
       );
-      const mockTools = [
-        new MockTool({ name: 'glob', displayName: 'Glob' }),
-        mcpTool,
-      ];
+      const mockTools = [new MockTool({ name: 'glob', displayName: 'Glob' }), mcpTool];
       (mockConfig.getToolRegistry as ReturnType<typeof vi.fn>).mockReturnValue({
         getAllToolNames: vi.fn().mockReturnValue(mockTools.map((t) => t.name)),
         getAllTools: vi.fn().mockReturnValue(mockTools),
@@ -249,18 +231,16 @@ describe('PromptProvider', () => {
         mockConfig.storage.getPlansDir(),
         mockConfig.getProjectRoot(),
       ).replaceAll('\\', '/');
-      expect(prompt).toContain(
-        `write .md plan files to \`${expectedRelativePath}/\``,
-      );
+      expect(prompt).toContain(`write .md plan files to \`${expectedRelativePath}/\``);
     });
   });
 
   describe('getCompressionPrompt', () => {
     it('should include plan preservation instructions when an approved plan path is provided', () => {
       const planPath = '/path/to/plan.md';
-      (
-        mockConfig.getApprovedPlanPath as ReturnType<typeof vi.fn>
-      ).mockReturnValue(planPath);
+      (mockConfig.getApprovedPlanPath as ReturnType<typeof vi.fn>).mockReturnValue(
+        planPath,
+      );
 
       const provider = new PromptProvider();
       const prompt = provider.getCompressionPrompt(mockConfig);
@@ -281,9 +261,9 @@ describe('PromptProvider', () => {
     });
 
     it('should NOT include plan preservation instructions when no approved plan path is provided', () => {
-      (
-        mockConfig.getApprovedPlanPath as ReturnType<typeof vi.fn>
-      ).mockReturnValue(undefined);
+      (mockConfig.getApprovedPlanPath as ReturnType<typeof vi.fn>).mockReturnValue(
+        undefined,
+      );
 
       const provider = new PromptProvider();
       const prompt = provider.getCompressionPrompt(mockConfig);
@@ -301,12 +281,10 @@ describe('PromptProvider', () => {
       (mockConfig.getToolRegistry as ReturnType<typeof vi.fn>).mockReturnValue({
         getAllToolNames: vi.fn().mockReturnValue([UPDATE_TOPIC_TOOL_NAME]),
       });
-      (mockConfig.getAgentRegistry as ReturnType<typeof vi.fn>).mockReturnValue(
-        {
-          getAllDefinitions: vi.fn().mockReturnValue([]),
-          getDefinition: vi.fn().mockReturnValue(undefined),
-        },
-      );
+      (mockConfig.getAgentRegistry as ReturnType<typeof vi.fn>).mockReturnValue({
+        getAllDefinitions: vi.fn().mockReturnValue([]),
+        getDefinition: vi.fn().mockReturnValue(undefined),
+      });
     });
 
     it('should disable topic update narration when override is false, even if config is true', () => {
@@ -325,9 +303,7 @@ describe('PromptProvider', () => {
     });
 
     it('should enable topic update narration when override is true, even if config is false', () => {
-      vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(
-        false,
-      );
+      vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(false);
 
       const prompt = provider.getCoreSystemPrompt(
         mockConfig as unknown as Config,
@@ -359,13 +335,9 @@ describe('PromptProvider', () => {
 
     it('should filter out update_topic tool when narration is disabled', () => {
       vi.mocked(mockConfig.getApprovalMode).mockReturnValue(ApprovalMode.PLAN);
-      vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(
-        false,
-      );
+      vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(false);
       // Simulate registry behavior where it filters out update_topic
-      vi.mocked(mockConfig.getToolRegistry().getAllToolNames).mockReturnValue(
-        [],
-      );
+      vi.mocked(mockConfig.getToolRegistry().getAllToolNames).mockReturnValue([]);
       vi.mocked(mockConfig.getToolRegistry().getAllTools).mockReturnValue([]);
 
       const provider = new PromptProvider();
@@ -384,9 +356,7 @@ describe('PromptProvider', () => {
     });
 
     it('should include topic update instructions in legacy model prompt when enabled', () => {
-      vi.mocked(mockConfig.getActiveModel).mockReturnValue(
-        DEFAULT_GEMINI_MODEL,
-      );
+      vi.mocked(mockConfig.getActiveModel).mockReturnValue(DEFAULT_GEMINI_MODEL);
       vi.mocked(mockConfig.isTopicUpdateNarrationEnabled).mockReturnValue(true);
 
       const provider = new PromptProvider();

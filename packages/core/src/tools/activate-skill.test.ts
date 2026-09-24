@@ -84,12 +84,8 @@ describe('ActivateSkillTool', () => {
       isBuiltin: true,
       body: 'Built-in instructions',
     };
-    vi.mocked(mockConfig.getSkillManager().getSkill).mockReturnValue(
-      builtinSkill,
-    );
-    vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue([
-      builtinSkill,
-    ]);
+    vi.mocked(mockConfig.getSkillManager().getSkill).mockReturnValue(builtinSkill);
+    vi.mocked(mockConfig.getSkillManager().getSkills).mockReturnValue([builtinSkill]);
 
     const params = { name: 'builtin-skill' };
     const toolWithBuiltin = new ActivateSkillTool(mockConfig, mockMessageBus);
@@ -147,8 +143,6 @@ describe('ActivateSkillTool', () => {
   });
 
   it('should validate that name is provided', () => {
-    expect(() =>
-      tool.build({ name: '' } as unknown as { name: string }),
-    ).toThrow();
+    expect(() => tool.build({ name: '' } as unknown as { name: string })).toThrow();
   });
 });

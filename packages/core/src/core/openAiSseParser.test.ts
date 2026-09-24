@@ -20,9 +20,7 @@ function sseStream(chunks: string[]): ReadableStream<Uint8Array> {
   });
 }
 
-async function collect(
-  body: ReadableStream<Uint8Array>,
-): Promise<OpenAiStreamChunk[]> {
+async function collect(body: ReadableStream<Uint8Array>): Promise<OpenAiStreamChunk[]> {
   const results: OpenAiStreamChunk[] = [];
   for await (const chunk of parseOpenAiSseStream(body)) {
     results.push(chunk);
@@ -54,11 +52,7 @@ describe('parseOpenAiSseStream', () => {
 
   it('stops at the [DONE] marker', async () => {
     const chunks = await collect(
-      sseStream([
-        `data: {"id":"1"}\n\n`,
-        `data: [DONE]\n\n`,
-        `data: {"id":"2"}\n\n`,
-      ]),
+      sseStream([`data: {"id":"1"}\n\n`, `data: [DONE]\n\n`, `data: {"id":"2"}\n\n`]),
     );
     expect(chunks.map((c) => c.id)).toEqual(['1']);
   });

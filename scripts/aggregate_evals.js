@@ -116,10 +116,9 @@ function fetchHistoricalData() {
         // Download report.json files.
         // The artifacts are named 'eval-logs-X' or 'eval-logs-MODEL-X'.
         // We use -p to match pattern.
-        execSync(
-          `gh run download ${run.databaseId} -p "eval-logs-*" -D "${tmpDir}"`,
-          { stdio: 'ignore' },
-        );
+        execSync(`gh run download ${run.databaseId} -p "eval-logs-*" -D "${tmpDir}"`, {
+          stdio: 'ignore',
+        });
 
         const runReports = findReports(tmpDir);
         if (runReports.length > 0) {
@@ -201,9 +200,7 @@ function generateMarkdown(currentStatsByModel, history) {
     const allTestNames = new Set(Object.keys(currentStats));
     for (const item of reversedHistory) {
       if (item.stats[model]) {
-        Object.keys(item.stats[model]).forEach((name) =>
-          allTestNames.add(name),
-        );
+        Object.keys(item.stats[model]).forEach((name) => allTestNames.add(name));
       }
     }
 

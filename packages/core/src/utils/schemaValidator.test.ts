@@ -181,9 +181,7 @@ describe('SchemaValidator', () => {
       // Valid: exactly 2 numbers
       expect(SchemaValidator.validate(schema, { coords: [1, 2] })).toBeNull();
       // Invalid: 3 items when items: false
-      expect(
-        SchemaValidator.validate(schema, { coords: [1, 2, 3] }),
-      ).not.toBeNull();
+      expect(SchemaValidator.validate(schema, { coords: [1, 2, 3] })).not.toBeNull();
     });
 
     it('validates draft-2020-12 schema with $defs', () => {
@@ -206,9 +204,7 @@ describe('SchemaValidator', () => {
       // Valid enum value
       expect(SchemaValidator.validate(schema, { role: 'User' })).toBeNull();
       // Invalid enum value (proves validation works)
-      expect(
-        SchemaValidator.validate(schema, { role: 'InvalidRole' }),
-      ).not.toBeNull();
+      expect(SchemaValidator.validate(schema, { role: 'InvalidRole' })).not.toBeNull();
     });
   });
 });

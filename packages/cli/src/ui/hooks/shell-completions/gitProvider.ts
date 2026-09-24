@@ -37,13 +37,13 @@ export const gitProvider: ShellCompletionProvider = {
     if (cursorIndex === 1) {
       const partial = tokens[1] || '';
       return {
-        suggestions: GIT_SUBCOMMANDS.filter((cmd) =>
-          cmd.startsWith(partial),
-        ).map((cmd) => ({
-          label: cmd,
-          value: cmd,
-          description: 'git command',
-        })),
+        suggestions: GIT_SUBCOMMANDS.filter((cmd) => cmd.startsWith(partial)).map(
+          (cmd) => ({
+            label: cmd,
+            value: cmd,
+            description: 'git command',
+          }),
+        ),
         exclusive: true,
       };
     }
