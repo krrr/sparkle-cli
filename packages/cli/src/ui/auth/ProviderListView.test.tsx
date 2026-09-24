@@ -213,6 +213,31 @@ describe('ProviderListView', () => {
     unmount();
   });
 
+  it('renders provider names when configured, falling back to ids', async () => {
+    const namedProfiles: ProviderProfile[] = [
+      { ...mockProfiles[0], name: 'Work Gemini' },
+      { ...mockProfiles[1] },
+    ];
+
+    const { lastFrame, unmount } = await renderWithProviders(
+      <ProviderListView
+        profiles={namedProfiles}
+        activeProfileId="profile-1"
+        onActivate={onActivate}
+        onAdd={onAdd}
+        onEdit={onEdit}
+        onManageModels={onManageModels}
+        onDelete={onDelete}
+        onClose={onClose}
+      />,
+    );
+
+    expect(lastFrame()).toContain('Work Gemini');
+    expect(lastFrame()).not.toContain('profile-1');
+    expect(lastFrame()).toContain('profile-2');
+    unmount();
+  });
+
   it('handles activation, edit, models, and add actions', async () => {
     const { stdin, waitUntilReady, unmount } = await renderWithProviders(
       <ProviderListView

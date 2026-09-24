@@ -42,7 +42,7 @@ function getProviderLabel(providerProfile?: ProviderProfile): string | null {
     providerProfile.providerType === ProviderType.USE_GEMINI
       ? 'Gemini'
       : 'OpenAI Compatible';
-  return `${providerProfile.id} (${type})`;
+  return `${providerProfile.name || providerProfile.id} (${type})`;
 }
 
 export const AppHeader = ({ version, showDetails = true }: AppHeaderProps) => {

@@ -243,7 +243,7 @@ export class ModelConfigService {
       dynamicDefinitions[m.id] = {
         tier: m.tier ?? 'custom',
         isVisible: true,
-        displayName: m.id,
+        displayName: m.name || m.id,
         contextWindow: m.contextWindow,
         features: m.features ?? { thinking: true, multimodalToolUse: false },
       };

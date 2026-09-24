@@ -3144,6 +3144,10 @@
         "id": {
           "type": "string"
         },
+        "name": {
+          "type": "string",
+          "description": "Optional display name shown in the UI instead of the raw id."
+        },
         "displayName": {
           "type": "string"
         },
@@ -3180,6 +3184,10 @@
       "properties": {
         "id": {
           "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Optional display name shown in the UI instead of the raw id."
         },
         "providerType": {
           "type": "string"

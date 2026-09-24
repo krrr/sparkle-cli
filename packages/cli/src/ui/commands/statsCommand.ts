@@ -17,7 +17,9 @@ function getSelectedAuthType(context: CommandContext) {
   const profileService =
     context.services.agentContext?.config.getProviderProfileService();
   const activeProfile = profileService?.getActiveProfile();
-  return activeProfile ? `${activeProfile.id} (${activeProfile.providerType})` : '';
+  return activeProfile
+    ? `${activeProfile.name ?? activeProfile.id} (${activeProfile.providerType})`
+    : '';
 }
 
 async function defaultSessionView(context: CommandContext) {

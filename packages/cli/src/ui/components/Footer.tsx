@@ -299,7 +299,7 @@ export const Footer: React.FC = () => {
         break;
       }
       case 'model-name': {
-        const str = getDisplayString(model);
+        const str = getDisplayString(model, config);
         addCol(id, header, () => <Text color={itemColor}>{str}</Text>, str.length);
         break;
       }
@@ -349,7 +349,7 @@ export const Footer: React.FC = () => {
       case 'provider': {
         if (!settings.merged.ui.showProviderInfo) break;
         const activeProfile = config.getProviderProfileService()?.getActiveProfile();
-        const displayStr = activeProfile?.id ?? authType;
+        const displayStr = activeProfile?.name ?? activeProfile?.id ?? authType;
         if (!displayStr) break;
         addCol(
           id,

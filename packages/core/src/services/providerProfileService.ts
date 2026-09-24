@@ -144,6 +144,7 @@ export class ProviderProfileService {
 
     const profile: ProviderProfile = {
       id,
+      name: input.name,
       providerType: input.providerType,
       baseUrl: input.baseUrl,
       customHeaders: input.customHeaders,
@@ -199,6 +200,7 @@ export class ProviderProfileService {
     const updated: ProviderProfile = {
       ...existing,
       id: targetId,
+      name: 'name' in patch ? patch.name : existing.name,
       providerType:
         patch.providerType !== undefined ? patch.providerType : existing.providerType,
       baseUrl: 'baseUrl' in patch ? patch.baseUrl : existing.baseUrl,

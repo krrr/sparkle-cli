@@ -35,6 +35,8 @@ export type ReasoningEffort =
 
 export interface ProviderModel {
   id: string;
+  /** Optional display name shown in the UI instead of the raw id. */
+  name?: string;
   tier?: ModelTier;
 
   // Optional capabilities for routing and UI
@@ -57,6 +59,8 @@ export interface ProviderModel {
 
 export interface ProviderProfile {
   id: ProviderProfileId;
+  /** Optional display name shown in the UI instead of the raw id. */
+  name?: string;
   providerType: ProviderType;
 
   baseUrl?: string;
@@ -68,6 +72,7 @@ export interface ProviderProfile {
 
 export interface CreateProviderProfileInput {
   id: ProviderProfileId;
+  name?: string;
   providerType: ProviderType;
 
   baseUrl?: string;
@@ -79,6 +84,7 @@ export interface CreateProviderProfileInput {
 
 export interface UpdateProviderProfileInput {
   id?: ProviderProfileId;
+  name?: string;
   providerType?: ProviderType;
 
   baseUrl?: string;

@@ -28,7 +28,7 @@ export const aboutCommand: SlashCommand = {
       context.services.agentContext?.config.getProviderProfileService();
     const activeProfile = profileService?.getActiveProfile();
     const selectedAuthType = activeProfile
-      ? `${activeProfile.id} (${activeProfile.providerType})`
+      ? `${activeProfile.name ?? activeProfile.id} (${activeProfile.providerType})`
       : '';
     const ideClient = await getIdeClientName(context);
 

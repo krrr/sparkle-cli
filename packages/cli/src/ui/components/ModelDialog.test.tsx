@@ -266,13 +266,25 @@ describe('<ModelDialog />', () => {
   });
 
   it('deletes the selected model from the settings view with d', async () => {
-    const { stdin, waitUntilReady, unmount } = await renderComponent();
+    const { lastFrame, stdin, waitUntilReady, unmount } = await renderComponent();
 
     await act(async () => {
       stdin.write('m');
     });
     await waitUntilReady();
 
+    // First press arms the delete confirmation without deleting.
+    await act(async () => {
+      stdin.write('d');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(lastFrame()).toContain('again to confirm');
+    });
+    expect(mockRemoveModel).not.toHaveBeenCalled();
+
+    // Second press confirms and deletes.
     await act(async () => {
       stdin.write('d');
     });

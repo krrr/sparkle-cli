@@ -270,6 +270,38 @@ describe('ProviderModelsView', () => {
     unmount();
   });
 
+  it('renders model names when configured, falling back to ids', async () => {
+    const profileWithNames: ProviderProfile = {
+      ...mockProfile,
+      name: 'My Provider',
+      models: [
+        { id: DEFAULT_OPENAI_MODEL, name: 'GPT-4o', tier: 'pro' },
+        { id: 'gpt-4o-mini', tier: 'flash' },
+      ],
+    };
+
+    const { lastFrame, unmount } = await renderWithProviders(
+      <ProviderModelsView
+        profile={profileWithNames}
+        onAddModel={onAddModel}
+        onUpdateModel={onUpdateModel}
+        onDeleteModel={onDeleteModel}
+        onSetDefaultModel={onSetDefaultModel}
+        onBack={onBack}
+      />,
+    );
+
+    expect(lastFrame()).toContain('Models for: My Provider');
+    expect(lastFrame()).toContain('GPT-4o');
+    // The raw id must not appear as a standalone model row label. The fallback
+    // model below (gpt-4o-mini) contains the default id as a prefix, so use a
+    // negative lookahead to assert the bare id is not rendered. Matching is
+    // case-sensitive: the display name "GPT-4o" differs from the id "gpt-4o".
+    expect(lastFrame()).not.toMatch(/gpt-4o(?!-mini)/);
+    expect(lastFrame()).toContain('gpt-4o-mini');
+    unmount();
+  });
+
   it('renders empty state when no models are configured', async () => {
     const emptyProfile: ProviderProfile = {
       id: 'test-profile-empty',

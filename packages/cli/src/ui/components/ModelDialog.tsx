@@ -96,7 +96,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
         return {
           value: m.id,
-          title: m.id,
+          title: m.name || m.id,
           description: desc,
           key: m.id,
         };

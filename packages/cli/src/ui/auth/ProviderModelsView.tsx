@@ -165,7 +165,7 @@ export function ProviderModelsView({
     return (
       <Box flexDirection="column" width="100%">
         <Text bold color={theme.text.primary}>
-          Models for: {profile.id}
+          Models for: {profile.name || profile.id}
         </Text>
         <Box marginTop={1} flexDirection="column">
           <Text color={theme.text.secondary}>
@@ -190,7 +190,7 @@ export function ProviderModelsView({
   return (
     <Box flexDirection="column" width="100%">
       <Text bold color={theme.text.primary}>
-        Models for: {profile.id}
+        Models for: {profile.name || profile.id}
       </Text>
 
       <Box marginTop={1} flexDirection="column">
@@ -198,6 +198,7 @@ export function ProviderModelsView({
           const isSelected = idx === clampedIndex;
           const isDefault = profile.defaultModel === model.id;
           const isPendingDelete = pendingDeleteModelId === model.id;
+          const modelLabel = model.name || model.id;
           const pendingDeleteTextColor =
             isPendingDelete && Colors.AccentRed
               ? getContrastingTextColor(Colors.AccentRed)
@@ -226,7 +227,7 @@ export function ProviderModelsView({
                   }
                 >
                   {isDefault ? '● ' : '  '}
-                  {model.id}
+                  {modelLabel}
                 </Text>
                 {isDefault && (
                   <Box justifyContent="flex-end" flexGrow={1}>

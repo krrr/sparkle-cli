@@ -3083,6 +3083,10 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<string, SettingsJsonSchemaDefin
       description: 'A model configuration for a provider.',
       properties: {
         id: { type: 'string' },
+        name: {
+          type: 'string',
+          description: 'Optional display name shown in the UI instead of the raw id.',
+        },
         displayName: { type: 'string' },
         tier: {
           type: 'string',
@@ -3111,6 +3115,10 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<string, SettingsJsonSchemaDefin
       description: 'A profile representing an LLM provider configuration.',
       properties: {
         id: { type: 'string' },
+        name: {
+          type: 'string',
+          description: 'Optional display name shown in the UI instead of the raw id.',
+        },
         providerType: { type: 'string' },
         baseUrl: { type: 'string' },
         customHeaders: {

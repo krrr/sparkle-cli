@@ -208,7 +208,7 @@ export function ProviderListView({
                   }
                 >
                   {isActive ? '● ' : '  '}
-                  {profile.id}
+                  {profile.name || profile.id}
                 </Text>
                 {isActive && (
                   <Box justifyContent="flex-end" flexGrow={1}>
