@@ -35,6 +35,7 @@ import { MessageType } from '../types.js';
 import { exportHistoryToFile } from '../utils/historyExportUtils.js';
 import { convertToRestPayload } from 'sparkle-cli-core';
 import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
+import { cleanMessage } from '../../utils/sessionUtils.js';
 
 const CHECKPOINT_MENU_GROUP = 'checkpoints';
 
@@ -66,9 +67,7 @@ const getSavedChatTags = async (
     }
 
     chatDetails.sort((a, b) =>
-      mtSortDesc
-        ? b.mtime.localeCompare(a.mtime)
-        : a.mtime.localeCompare(b.mtime),
+      mtSortDesc ? b.mtime.localeCompare(a.mtime) : a.mtime.localeCompare(b.mtime),
     );
 
     return chatDetails;
@@ -97,8 +96,7 @@ const listCommand: SlashCommand = {
 
 const saveCommand: SlashCommand = {
   name: 'save',
-  description:
-    'Save the current conversation as a checkpoint. Usage: /chat save <tag>',
+  description: 'Save the current conversation as a checkpoint. Usage: /chat save <tag>',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context, args): Promise<SlashCommandActionReturn | void> => {
@@ -150,9 +148,7 @@ const saveCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'info',
-        content: `Conversation checkpoint saved with tag: ${decodeTagName(
-          tag,
-        )}.`,
+        content: `Conversation checkpoint saved with tag: ${decodeTagName(tag)}.`,
       };
     } else {
       return {
@@ -201,8 +197,7 @@ function convertContentHistoryToUiHistory(
 const resumeCheckpointCommand: SlashCommand = {
   name: 'resume',
   altNames: ['load'],
-  description:
-    'Resume a conversation from a checkpoint. Usage: /chat resume <tag>',
+  description: 'Resume a conversation from a checkpoint. Usage: /chat resume <tag>',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context, args) => {
@@ -380,10 +375,7 @@ export const debugCommand: SlashCommand = {
     const filePath = path.join(process.cwd(), filename);
 
     try {
-      await fsPromises.writeFile(
-        filePath,
-        JSON.stringify(restPayload, null, 2),
-      );
+      await fsPromises.writeFile(filePath, JSON.stringify(restPayload, null, 2));
       return {
         type: 'message',
         messageType: 'info',
@@ -437,9 +429,7 @@ const forkCommand: SlashCommand = {
       // copied history's first user turn (mirrors how SessionBrowser builds
       // a display name). This becomes the new session's summary so the fork
       // is distinguishable from the original in the session browser.
-      const originalRecord = geminiClient
-        .getChatRecordingService()
-        ?.getConversation();
+      const originalRecord = geminiClient.getChatRecordingService()?.getConversation();
       let forkSourceName = '';
       if (originalRecord?.summary) {
         forkSourceName = originalRecord.summary;
@@ -452,7 +442,7 @@ const forkCommand: SlashCommand = {
                 .map((m) => m.text)
                 .join('') || '';
             if (text) {
-              forkSourceName = text.replace(/\s+/g, ' ').trim();
+              forkSourceName = cleanMessage(text);
               break;
             }
           }
