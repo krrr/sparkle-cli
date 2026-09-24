@@ -6,6 +6,8 @@
 
 import type { InjectionSource } from '../config/injectionService.js';
 
+export const USER_HINTS_PREFIX = 'User hints:';
+
 /**
  * Normalizes whitespace in a string and trims it.
  */
@@ -15,7 +17,6 @@ export function normalizeSpace(text: string): string {
 
 export const USER_STEERING_INSTRUCTION =
   'Internal instruction: Re-evaluate the active plan using this user steering update. ' +
-  'Classify it as ADD_TASK, MODIFY_TASK, CANCEL_TASK, or EXTRA_CONTEXT. ' +
   'Apply minimal-diff changes only to affected tasks and keep unaffected tasks active. ' +
   'Do not cancel/skip tasks unless the user explicitly cancels them. ' +
   'Acknowledge the steering briefly and state the course correction.';
@@ -29,7 +30,7 @@ function wrapInput(input: string): string {
 
 export function buildUserSteeringHintPrompt(hintText: string): string {
   const cleanHint = normalizeSpace(hintText);
-  return `User steering update:\n${wrapInput(cleanHint)}\n${USER_STEERING_INSTRUCTION}`;
+  return `${USER_HINTS_PREFIX}\n${wrapInput(cleanHint)}\n\n${USER_STEERING_INSTRUCTION}`;
 }
 
 export function formatUserHintsForModel(hints: string[]): string | null {
@@ -37,7 +38,7 @@ export function formatUserHintsForModel(hints: string[]): string | null {
     return null;
   }
   const hintText = hints.map((hint) => `- ${normalizeSpace(hint)}`).join('\n');
-  return `User hints:\n${wrapInput(hintText)}\n\n${USER_STEERING_INSTRUCTION}`;
+  return `${USER_HINTS_PREFIX}\n${wrapInput(hintText)}\n\n${USER_STEERING_INSTRUCTION}`;
 }
 
 const BACKGROUND_COMPLETION_INSTRUCTION =

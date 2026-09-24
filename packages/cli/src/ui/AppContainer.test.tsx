@@ -962,7 +962,7 @@ describe('AppContainer State Management', () => {
       expect(payload).toContain('BG-DONE-MARKER');
       expect(payload).toContain('<background_output>');
       // Must NOT be duplicated through the steering-hint channel.
-      expect(payload).not.toContain('User steering update');
+      expect(payload).not.toContain('User hints:');
       unmount();
     });
   });

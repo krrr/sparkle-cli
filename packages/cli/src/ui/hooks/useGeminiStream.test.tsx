@@ -904,9 +904,9 @@ describe('useGeminiStream', () => {
     // consumeUserHint is pre-formatted upstream (AppContainer applies the
     // per-source framing); the stream layer must deliver it verbatim.
     expect(injectedHintPart.text).toBe('focus on tests only');
-    expect(injectedHintPart.text).not.toContain('User steering update:');
+    expect(injectedHintPart.text).not.toContain('User hints:');
     expect(injectedHintPart.text).not.toContain(
-      'Classify it as ADD_TASK, MODIFY_TASK, CANCEL_TASK, or EXTRA_CONTEXT.',
+      'Internal instruction: Re-evaluate the active plan',
     );
 
     expect(mockRunInDevTraceSpan).toHaveBeenCalledWith(

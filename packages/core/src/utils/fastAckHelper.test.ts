@@ -42,6 +42,16 @@ describe('formatUserHintsForModel', () => {
     expect(formatted).toContain('<user_input>');
     expect(formatted).toContain('Re-evaluate the active plan');
   });
+
+  it('uses the same header and instruction block as the single-hint formatter', () => {
+    const single = buildUserSteeringHintPrompt('hint 1');
+    const batch = formatUserHintsForModel(['hint 1']);
+    const header = single.slice(0, single.indexOf('\n'));
+    expect(batch?.startsWith(`${header}\n<user_input>`)).toBe(true);
+    expect(batch).toContain(
+      single.slice(single.indexOf('Internal instruction')),
+    );
+  });
 });
 
 describe('formatBackgroundCompletionForModel', () => {
@@ -62,7 +72,7 @@ describe('pendingHintFormatting', () => {
       source: 'user_steering',
     };
     const formatted = formatPendingHintForDelivery(entry);
-    expect(formatted).toContain('User steering update');
+    expect(formatted).toContain('User hints:');
     expect(formatted).toContain('please also update the docs');
   });
 
@@ -77,7 +87,7 @@ describe('pendingHintFormatting', () => {
       '[Background command npm test (PID: 42) completed successfully]',
     );
     // Completions must NOT be framed as plan-steering instructions.
-    expect(formatted).not.toContain('User steering update');
+    expect(formatted).not.toContain('User hints:');
   });
 
   it('joins mixed-source batches with blank lines, each formatted per source', () => {
@@ -86,7 +96,7 @@ describe('pendingHintFormatting', () => {
       { text: 'task A finished', source: 'background_completion' },
     ];
     const formatted = formatPendingHintsForDelivery(entries);
-    expect(formatted).toContain('User steering update');
+    expect(formatted).toContain('User hints:');
     expect(formatted).toContain('<background_output>');
     expect(formatted).toContain('\n\n');
   });
