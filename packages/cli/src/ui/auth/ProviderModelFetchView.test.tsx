@@ -155,31 +155,32 @@ describe('ProviderModelFetchView', () => {
     unmount();
   });
 
-  it('renders at most 10 models with scroll arrows and keeps selection in view', async () => {
+  it('renders at most 15 models with scroll arrows and keeps selection in view', async () => {
     mockListModels.mockResolvedValue(
-      Array.from({ length: 15 }, (_, i) => `model-${String(i).padStart(2, '0')}`),
+      Array.from({ length: 20 }, (_, i) => `model-${String(i).padStart(2, '0')}`),
     );
     const { lastFrame, stdin, waitUntilReady, unmount } = await renderView();
 
     await waitFor(() => expect(lastFrame()).toContain('model-00'));
 
-    // Only the first 10 entries are rendered; arrows indicate more content.
+    // Only the first 15 entries (MAX_ITEMS_TO_SHOW) are rendered; arrows
+    // indicate more content.
     const frame = () => lastFrame() ?? '';
     expect(frame()).toContain('model-00');
-    expect(frame()).toContain('model-09');
-    expect(frame()).not.toContain('model-10');
+    expect(frame()).toContain('model-14');
+    expect(frame()).not.toContain('model-15');
     expect(frame()).toContain('▲');
     expect(frame()).toContain('▼');
 
-    // Scroll down 14 times: selection moves through model-14, the window
+    // Scroll down 19 times: selection moves through model-19, the window
     // follows and eventually shows the tail of the list.
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 19; i++) {
       await act(async () => {
         stdin.write('\u001b[B'); // down
       });
       await waitUntilReady();
     }
-    expect(frame()).toContain('model-14');
+    expect(frame()).toContain('model-19');
     expect(frame()).toContain('❯');
     expect(frame()).not.toContain('model-00');
 

@@ -305,8 +305,8 @@ describe('keyMatchers', () => {
       command: Command.NEWLINE,
       positive: [
         createKey('enter', { ctrl: true }),
-        createKey('enter', { cmd: true }),
         createKey('enter', { alt: true }),
+        createKey('enter', { shift: true }),
       ],
       negative: [createKey('enter'), createKey('n')],
     },

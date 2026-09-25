@@ -345,7 +345,6 @@ export const defaultKeyBindingConfig: KeyBindingConfig = new Map([
     Command.NEWLINE,
     [
       new KeyBinding('ctrl+enter'),
-      new KeyBinding('cmd+enter'),
       new KeyBinding('alt+enter'),
       new KeyBinding('shift+enter'),
       new KeyBinding('ctrl+j'),
