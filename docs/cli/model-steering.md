@@ -1,36 +1,21 @@
-# Model steering (experimental)
+# Model steering
 
 Model steering lets you provide real-time guidance and feedback to Sparkle CLI while it
 is actively executing a task. This lets you correct course, add missing context, or skip
 unnecessary steps without having to stop and restart the agent.
 
-<!-- prettier-ignore -->
-> [!NOTE]
-> This is an experimental feature currently under active development and
-> may need to be enabled under `/settings`.
-
 Model steering is particularly useful during complex [Plan Mode](./plan-mode.md)
 workflows or long-running subagent executions where you want to ensure the agent stays
 on the right track.
 
-## Enabling model steering
+## Disabling model steering
 
-Model steering is an experimental feature and is disabled by default. You can enable it
-using the `/settings` command or by updating your `settings.json` file.
+Model steering is enabled by default. You can disable it using the `/settings` command
+or by updating your `settings.json` file.
 
 1.  Type `/settings` in Sparkle CLI.
 2.  Search for **Model Steering**.
-3.  Set the value to **true**.
-
-Alternatively, add the following to your `settings.json`:
-
-```json
-{
-  "experimental": {
-    "modelSteering": true
-  }
-}
-```
+3.  Set the value to **false**.
 
 ## Using model steering
 

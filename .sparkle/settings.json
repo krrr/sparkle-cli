@@ -1,8 +1,7 @@
 {
   "experimental": {
     "extensionReloading": true,
-    "modelSteering": true,
-    "autoMemory": true,
+    "autoMemory": false,
     "voiceMode": true,
     "adk": {
       "agentSessionNoninteractiveEnabled": true

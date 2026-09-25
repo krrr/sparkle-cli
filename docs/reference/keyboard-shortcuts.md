@@ -85,14 +85,14 @@ history, and controlling the UI. Use this reference to learn the available combi
 
 #### Text Input
 
-| Command                              | Action                                                                    | Keys                                                                                |
-| ------------------------------------ | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `input.submit`                       | Submit the current prompt.                                                | `Enter`                                                                             |
-| `input.queueMessage`                 | Queue the current prompt to be processed after the current task finishes. | `Tab`                                                                               |
-| `input.newline`                      | Insert a newline without submitting.                                      | `Ctrl+Enter`<br />`Cmd/Win+Enter`<br />`Alt+Enter`<br />`Shift+Enter`<br />`Ctrl+J` |
-| `input.openExternalEditor`           | Open the current prompt or the plan in an external editor.                | `Ctrl+G`<br />`Ctrl+Shift+G`                                                        |
-| `input.deprecatedOpenExternalEditor` | Deprecated command to open external editor.                               | `Ctrl+X`                                                                            |
-| `input.paste`                        | Paste from the clipboard.                                                 | `Ctrl+V`<br />`Cmd/Win+V`<br />`Alt+V`                                              |
+| Command                              | Action                                                                    | Keys                                                           |
+| ------------------------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `input.submit`                       | Submit the current prompt.                                                | `Enter`                                                        |
+| `input.queueMessage`                 | Queue the current prompt to be processed after the current task finishes. | `Tab`                                                          |
+| `input.newline`                      | Insert a newline without submitting.                                      | `Ctrl+Enter`<br />`Alt+Enter`<br />`Shift+Enter`<br />`Ctrl+J` |
+| `input.openExternalEditor`           | Open the current prompt or the plan in an external editor.                | `Ctrl+G`<br />`Ctrl+Shift+G`                                   |
+| `input.deprecatedOpenExternalEditor` | Deprecated command to open external editor.                               | `Ctrl+X`                                                       |
+| `input.paste`                        | Paste from the clipboard.                                                 | `Ctrl+V`<br />`Cmd/Win+V`<br />`Alt+V`                         |
 
 #### App Controls
 

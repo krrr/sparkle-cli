@@ -1464,7 +1464,7 @@ corresponding top-level category object in your `settings.json` file.
 
   - **Description:** Enable model steering (user hints) to guide the model during tool
     execution.
-  - **Default:** `false`
+  - **Default:** `true`
 
 - **`experimental.directWebFetch`** (boolean):
 
