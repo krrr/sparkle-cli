@@ -310,6 +310,7 @@ async function generateAndSaveSummary(
   config: Config,
   sessionPath: string,
 ): Promise<void> {
+  const statBefore = await fs.stat(sessionPath); // avoid dup re-read if unchanged
   const conversation = await loadConversationRecord(sessionPath);
   if (!conversation) {
     debugLogger.debug(`[SessionSummary] Could not read session ${sessionPath}`);
@@ -357,40 +358,51 @@ async function generateAndSaveSummary(
   let scratchpadSourceConversation = conversation;
 
   // Re-read the file before writing to handle race conditions. We only need
-  // the metadata; JSONL metadata updates are appended as a $set line.
-  const freshConversation = await loadConversationRecord(sessionPath, {
-    metadataOnly: true,
-  });
-  if (!freshConversation) {
-    debugLogger.debug(`[SessionSummary] Could not re-read ${sessionPath}`);
-    return;
-  }
-
-  // Check if summary metadata was added by another process
-  if (hasSessionSummaryMetadata(freshConversation)) {
+  // the metadata; JSONL metadata updates are appended as a $set line. Skip
+  // re-read when file unchanged.
+  const statAfter = await fs.stat(sessionPath);
+  let freshConversation: typeof conversation | null;
+  if (statAfter.size === statBefore.size && statAfter.mtimeMs === statBefore.mtimeMs) {
+    freshConversation = conversation;
     debugLogger.debug(
-      `[SessionSummary] Summary metadata was added by another process for ${sessionPath}`,
+      `[SessionSummary] Session unchanged since initial read, skipping re-read for ${sessionPath}`,
     );
-    return;
-  }
-
-  if (
-    !hasCurrentMemoryScratchpad(freshConversation) &&
-    (getLoadedMessageCount(freshConversation) !== getLoadedMessageCount(conversation) ||
-      freshConversation.lastUpdated !== conversation.lastUpdated)
-  ) {
-    const latestConversation = await loadConversationRecord(sessionPath);
-    if (!latestConversation) {
+  } else {
+    freshConversation = await loadConversationRecord(sessionPath, {
+      metadataOnly: true,
+    });
+    if (!freshConversation) {
       debugLogger.debug(`[SessionSummary] Could not re-read ${sessionPath}`);
       return;
     }
-    if (hasSessionSummaryMetadata(latestConversation)) {
+
+    // Check if summary metadata was added by another process
+    if (hasSessionSummaryMetadata(freshConversation)) {
       debugLogger.debug(
         `[SessionSummary] Summary metadata was added by another process for ${sessionPath}`,
       );
       return;
     }
-    scratchpadSourceConversation = latestConversation;
+
+    if (
+      !hasCurrentMemoryScratchpad(freshConversation) &&
+      (getLoadedMessageCount(freshConversation) !==
+        getLoadedMessageCount(conversation) ||
+        freshConversation.lastUpdated !== conversation.lastUpdated)
+    ) {
+      const latestConversation = await loadConversationRecord(sessionPath);
+      if (!latestConversation) {
+        debugLogger.debug(`[SessionSummary] Could not re-read ${sessionPath}`);
+        return;
+      }
+      if (hasSessionSummaryMetadata(latestConversation)) {
+        debugLogger.debug(
+          `[SessionSummary] Summary metadata was added by another process for ${sessionPath}`,
+        );
+        return;
+      }
+      scratchpadSourceConversation = latestConversation;
+    }
   }
 
   const metadataUpdate: Partial<ConversationRecord> = {};

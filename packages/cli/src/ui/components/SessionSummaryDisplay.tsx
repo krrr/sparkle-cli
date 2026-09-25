@@ -27,7 +27,7 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
 
   // Hide stats when no conversations have taken place.
   // Resumed session has no promptCount, must check metrics.
-  if (stats.promptCount === 0 && Object.keys(stats.metrics.models).length > 0) {
+  if (Object.keys(stats.metrics.models).length === 0) {
     return (
       <Box borderStyle="round" borderColor={theme.border.default} paddingX={1}>
         <ThemedGradient bold>{GOODBYE_TITLE}</ThemedGradient>

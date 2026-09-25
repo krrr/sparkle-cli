@@ -403,6 +403,38 @@ describe('sessionSummaryUtils', () => {
       });
     });
 
+    it('should skip the pre-write re-read when the session file is unchanged', async () => {
+      const loadConversationRecord = vi.mocked(
+        chatRecordingService.loadConversationRecord,
+      );
+      const filePath = await writeSession(
+        chatsDir,
+        'session-2024-01-01T10-00-noreread.jsonl',
+        buildJsonlSession({ userMessageCount: 2 }),
+      );
+
+      await generateSummary(mockConfig);
+
+      // One metadataOnly read in getPreviousSession + one full read in
+      // generateAndSaveSummary. No extra reads before writing the update.
+      expect(loadConversationRecord).toHaveBeenCalledTimes(2);
+      expect(loadConversationRecord).toHaveBeenNthCalledWith(1, filePath, {
+        metadataOnly: true,
+      });
+      expect(loadConversationRecord).toHaveBeenNthCalledWith(2, filePath);
+
+      const lines = (await fs.readFile(filePath, 'utf-8')).split('\n').filter(Boolean);
+      const lastRecord = JSON.parse(lines[lines.length - 1]);
+      expect(lastRecord).toEqual({
+        $set: {
+          summary: 'Add dark mode to the app',
+          memoryScratchpad: {
+            version: 1,
+          },
+        },
+      });
+    });
+
     it('should backfill scratchpad without regenerating summary', async () => {
       const filePath = await writeSession(
         chatsDir,
