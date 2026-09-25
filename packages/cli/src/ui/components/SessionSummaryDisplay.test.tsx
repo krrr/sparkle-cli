@@ -43,6 +43,7 @@ const renderWithMockedStats = async (
   metrics: SessionMetrics,
   sessionId = 'test-session',
   worktreeSettings?: WorktreeSettings,
+  promptCount = 5,
 ) => {
   useSessionStatsMock.mockReturnValue({
     stats: {
@@ -50,7 +51,7 @@ const renderWithMockedStats = async (
       sessionStartTime: new Date(),
       metrics,
       lastPromptTokenCount: 0,
-      promptCount: 5,
+      promptCount,
     },
 
     getPromptCount: () => 5,
@@ -130,6 +131,55 @@ describe('<SessionSummaryDisplay />', () => {
   });
 
   describe('Session ID escaping', () => {
+    it('hides the stats when the session has no prompts', async () => {
+      const { lastFrame, unmount } = await renderWithMockedStats(
+        emptyMetrics,
+        'test-session',
+        undefined,
+        0,
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('Agent powering down. Goodbye!');
+      expect(output).not.toContain('To resume this session');
+      unmount();
+    });
+
+    it('shows the stats for a resumed session with hydrated metrics and no prompts', async () => {
+      // Resuming restores historical metrics via uiTelemetryService.hydrate()
+      // while promptCount stays 0 until the first prompt in this process.
+      const hydratedMetrics: SessionMetrics = {
+        ...emptyMetrics,
+        models: {
+          'gemini-2.5-pro': {
+            api: { totalRequests: 3, totalErrors: 0, totalLatencyMs: 1200 },
+            tokens: {
+              input: 100,
+              prompt: 200,
+              candidates: 300,
+              total: 500,
+              cached: 100,
+              thoughts: 0,
+              tool: 0,
+            },
+            roles: {},
+          },
+        },
+      };
+      const { lastFrame, unmount } = await renderWithMockedStats(
+        hydratedMetrics,
+        'test-session',
+        undefined,
+        0,
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('Agent powering down. Goodbye!');
+      expect(output).toContain('To resume this session');
+      expect(output).toContain('Model Usage');
+      unmount();
+    });
+
     it('renders a standard UUID-formatted session ID in the footer (bash)', async () => {
       const uuidSessionId = '1234-abcd-5678-efgh';
       const { lastFrame, unmount } = await renderWithMockedStats(
