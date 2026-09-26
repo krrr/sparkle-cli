@@ -93,6 +93,9 @@ const main = async () => {
 
 			INK_WORKER: 'true',
 		},
+		// Must match the serialization mode used by TerminalBuffer when it forks
+		// the render worker, since replay frames carry the same binary payloads.
+		serialization: 'advanced',
 	});
 
 	let workerInitialized = false;

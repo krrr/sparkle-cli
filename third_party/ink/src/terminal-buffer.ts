@@ -147,9 +147,13 @@ export default class TerminalBuffer {
 			this.worker = fork(workerUrl!, {
 				env: {
 					...process.env,
-
 					INK_WORKER: 'true',
 				},
+				// Advanced serialization passes Uint8Array region payloads (produced by
+				// Serializer.serialize) across IPC as binary without JSON-encoding
+				// them into arrays of numbers, which is both smaller (~3.5x) and
+				// dramatically faster (no JSON.stringify/parse on both sides).
+				serialization: 'advanced',
 			});
 
 			this.worker.on('error', error => {

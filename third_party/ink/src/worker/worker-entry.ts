@@ -10,6 +10,12 @@ import {TerminalBufferWorker} from './render-worker.js';
 let buffer: TerminalBufferWorker;
 
 const main = () => {
+	// Note: the parent forks this process with `serialization: 'advanced'` so
+	// Uint8Array region payloads (produced by Serializer.serialize) are passed
+	// across IPC as binary instead of being JSON-encoded into arrays of numbers.
+	// Mixed messages (objects containing Buffer fields) still arrive on this
+	// 'message' channel; 'message.binary' only fires for top-level non-JSON
+	// values, which the parent never sends.
 	process.on('message', async (message: any) => {
 		switch (message.type) {
 			case 'init': {
