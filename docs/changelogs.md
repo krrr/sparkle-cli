@@ -5,6 +5,49 @@ Notable changes to Sparkle CLI are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] - 2026-09-xx
+
+This release adds OpenAI model list fetching, directory structure listings for
+`@directory` references, intraline diff highlighting, and default model steering, along
+with proxy fixes and cleanup of dead code paths.
+
+### Added
+
+- OpenAI model list fetching: fetch available models directly from OpenAI-compatible
+  endpoints in the provider settings.
+- `@directory` now list dir instead of read all file contents under dir.
+- Basic intraline diff highlighting in file diffs.
+- Upstream syncs: a tool call formatter with integrated failure summaries, eval
+  validation, a local eval report command with developer documentation, MCP OAuth token
+  refresh using the stored client ID, reclassification of capacity exhaustion as a
+  terminal error, and unwrapping of nested gaxios streaming errors from cause messages.
+
+### Changed
+
+- Enabled model steering by default.
+- Model deletion in provider settings now requires a confirmation.
+- Unified the user steering message prefix to `User hints:`.
+- Simplified system prompts and shell tool descriptions, including reflecting the real
+  `pwsh` executable name and unifying the PowerShell arguments prefix.
+- Avoid re-reading the session file when generating summaries.
+- Hide the exit statistics display when no conversation happened in a session.
+
+### Removed
+
+- The legacy `migrateDeprecatedSettings` settings migration path.
+- Dead fast-ack model generation logic and its tests.
+- Dead prompt-completion logic and hook.
+- The cmd+enter submit shortcut.
+
+### Fixed
+
+- Proxy support in the OpenAI-compatible generator by replacing incompatible
+  `http-proxy-agent`/`https-proxy-agent` instances with an undici `EnvHttpProxyAgent`
+  dispatcher; requests previously crashed whenever a proxy environment variable was set.
+- Forked sessions retaining the source session title.
+- Inconsistent model IDs in logging.
+- Swallowed directory mismatch errors in IDE connections.
+
 ## [0.0.2] - 2026-09-xx
 
 This release introduces multiple LLM provider profiles, model tier routing, per-model
