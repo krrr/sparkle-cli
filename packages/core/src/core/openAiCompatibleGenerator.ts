@@ -13,9 +13,8 @@ import type {
   GenerateContentResponse,
   Tool,
 } from '@google/genai';
-import { HttpProxyAgent } from 'http-proxy-agent';
-import { HttpsProxyAgent } from 'https-proxy-agent';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import { createSafeProxyAgent } from '../utils/fetch.js';
 import { toContents } from './partUtils.js';
 import {
   FunctionNameMapper,
@@ -83,12 +82,17 @@ export interface OpenAiCompatibleGeneratorConfig {
 export class OpenAiCompatibleGenerator {
   private readonly functionNameMapper = new FunctionNameMapper();
   private readonly config: OpenAiCompatibleGeneratorConfig;
+  private proxyDispatcher: unknown | undefined;
 
   constructor(config: OpenAiCompatibleGeneratorConfig) {
     this.config = {
       ...config,
       baseUrl: config.baseUrl.replace(/\/+$/, ''),
     };
+    const proxyUrl = this.config.proxy?.trim();
+    if (proxyUrl) {
+      this.proxyDispatcher = createSafeProxyAgent(proxyUrl);
+    }
   }
 
   async generateContent(
@@ -293,12 +297,8 @@ export class OpenAiCompatibleGenerator {
       ...(options.signal ? { signal: options.signal } : {}),
     };
 
-    const proxyUrl = this.config.proxy?.trim();
-    if (proxyUrl) {
-      const agent = url.startsWith('http://')
-        ? new HttpProxyAgent(proxyUrl)
-        : new HttpsProxyAgent(proxyUrl);
-      init.dispatcher = agent;
+    if (this.proxyDispatcher) {
+      init.dispatcher = this.proxyDispatcher;
     }
     return fetch(url, init);
   }

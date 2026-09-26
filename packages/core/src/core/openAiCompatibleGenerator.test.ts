@@ -8,7 +8,7 @@ import { FinishReason, type GenerateContentParameters } from '@google/genai';
 import { LlmRole } from '../telemetry/llmRole.js';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   OpenAiApiError,
   OpenAiCompatibleGenerator,
@@ -429,6 +429,80 @@ describe('OpenAiCompatibleGenerator', () => {
         contents: [{ role: 'user', parts: [{ text: 'Hello world' }] }],
       });
       expect(result.totalTokens).toBeGreaterThan(0);
+    });
+  });
+
+  describe('proxy dispatcher', () => {
+    const sampleCompletion = JSON.stringify({
+      id: 'resp_proxy',
+      model: 'gpt-test',
+      choices: [
+        { message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' },
+      ],
+    });
+
+    it('passes an undici-compatible dispatcher when a proxy is configured', async () => {
+      const proxyGenerator = new OpenAiCompatibleGenerator({
+        apiKey: 'test-key',
+        baseUrl: 'https://api.example.com/v1',
+        provider: 'openai',
+        proxy: 'http://127.0.0.1:9',
+      });
+
+      let capturedInit: (RequestInit & { dispatcher?: unknown }) | undefined;
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async (_input, init) => {
+          capturedInit = init as RequestInit & { dispatcher?: unknown };
+          return new Response(sampleCompletion, {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        });
+
+      try {
+        const response = await proxyGenerator.generateContent(
+          { model: 'gpt-test', contents: [{ role: 'user', parts: [{ text: 'hi' }] }] },
+          'p',
+          LlmRole.MAIN,
+        );
+        expect(response.candidates![0].content!.parts).toEqual([{ text: 'ok' }]);
+
+        const dispatcher = capturedInit?.dispatcher as
+          | { dispatch?: unknown }
+          | undefined;
+        // undici's fetch requires dispatcher.dispatch(); node http.Agent
+        // subclasses (http-proxy-agent/https-proxy-agent) crash here with
+        // "agent.dispatch is not a function".
+        expect(dispatcher).toBeDefined();
+        expect(typeof dispatcher!.dispatch).toBe('function');
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
+    it('does not set a dispatcher when no proxy is configured', async () => {
+      let capturedInit: (RequestInit & { dispatcher?: unknown }) | undefined;
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async (_input, init) => {
+          capturedInit = init as RequestInit & { dispatcher?: unknown };
+          return new Response(sampleCompletion, {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        });
+
+      try {
+        await generator.generateContent(
+          { model: 'm', contents: [{ role: 'user', parts: [{ text: 'x' }] }] },
+          'p',
+          LlmRole.MAIN,
+        );
+        expect(capturedInit?.dispatcher).toBeUndefined();
+      } finally {
+        fetchSpy.mockRestore();
+      }
     });
   });
 
