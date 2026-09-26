@@ -379,6 +379,10 @@ export class GeminiClient {
         [...history],
         resumedSessionData,
         async (modelId: string) => {
+          // Avoid rebuilding tool declarations if model not changed
+          if (modelId === this.lastUsedModelId) {
+            return this.getChat().getTools();
+          }
           this.lastUsedModelId = modelId;
           const toolRegistry = this.context.toolRegistry;
           const toolDeclarations = toolRegistry.getFunctionDeclarations(modelId);

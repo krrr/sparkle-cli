@@ -560,7 +560,7 @@ exports[`core tool declaration snapshots > snapshot for tool: run_shell_command 
   "description": "This tool executes a given shell command as \`bash -c <command>\`. To run a command in the background, set the \`is_background\` parameter to true. Do NOT use \`&\` to background commands. Command is executed as a subprocess that leads its own process group. Command process group can be terminated as \`kill -- -PGID\` or signaled as \`kill -s SIGNAL -- -PGID\`.
 
       Efficiency Guidelines:
-      - Quiet Flags: Always prefer silent or quiet flags (e.g., \`npm install --silent\`, \`git --no-pager\`) to reduce output volume while still capturing necessary information.
+      - Quiet Flags: Always prefer silent or quiet flags (e.g., \`npm install --silent\`) to reduce output volume while still capturing necessary information.
       - Pagination: Always disable terminal pagination to ensure commands terminate (e.g., use \`git --no-pager\`, \`systemctl --no-pager\`, or set \`PAGER=cat\`).
 
       The following information is returned:

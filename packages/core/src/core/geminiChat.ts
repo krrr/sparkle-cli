@@ -310,7 +310,7 @@ export class GeminiChat {
     private tools: Tool[] = [],
     history: Array<Content | HistoryTurn> = [],
     resumedSessionData?: ResumedSessionData,
-    private readonly onModelChanged?: (modelId: string) => Promise<Tool[]>,
+    private readonly resolveToolsForModel?: (modelId: string) => Promise<Tool[]>,
   ) {
     validateHistory(history);
 
@@ -885,8 +885,8 @@ export class GeminiChat {
         }
       }
 
-      if (this.onModelChanged) {
-        this.tools = await this.onModelChanged(modelToUse);
+      if (this.resolveToolsForModel) {
+        this.tools = await this.resolveToolsForModel(modelToUse);
       }
 
       // Track final request parameters for AfterModel hooks

@@ -481,6 +481,70 @@ describe('Gemini Client (client.ts)', () => {
     });
   });
 
+  describe('resolveToolsForModel tool declaration caching', () => {
+    // startChat itself calls getFunctionDeclarations() (no modelId) to build
+    // the initial tools, so count only the modelId-scoped calls the
+    // resolveToolsForModel callback makes.
+    const getModelIdCalls = (mock: Mock) =>
+      mock.mock.calls.filter((call) => call.length === 1).length;
+
+    it('reuses declarations when the model is unchanged and rebuilds when it changes', async () => {
+      const chat = await client.startChat();
+      client['chat'] = chat;
+
+      const getFunctionDeclarations = vi.mocked(
+        (mockConfig as unknown as { toolRegistry: { getFunctionDeclarations: Mock } })
+          .toolRegistry.getFunctionDeclarations,
+      );
+      getFunctionDeclarations.mockReturnValue([
+        { name: 'fake-tool', description: 'fake' },
+      ]);
+
+      // First request for a model builds declarations.
+      const first = await chat['resolveToolsForModel']!('model-a');
+      expect(getFunctionDeclarations).toHaveBeenCalledWith('model-a');
+      expect(first).toEqual([
+        { functionDeclarations: [{ name: 'fake-tool', description: 'fake' }] },
+      ]);
+
+      // Mirror GeminiChat's assignment so subsequent cache hits return it.
+      (chat as unknown as { tools: unknown }).tools = first;
+
+      // Same model again: served from cache, no registry access.
+      const second = await chat['resolveToolsForModel']!('model-a');
+      expect(getModelIdCalls(getFunctionDeclarations)).toBe(1);
+      expect(second).toEqual(first);
+
+      // A different model invalidates the cache and rebuilds.
+      await chat['resolveToolsForModel']!('model-b');
+      expect(getFunctionDeclarations).toHaveBeenCalledWith('model-b');
+      expect(getModelIdCalls(getFunctionDeclarations)).toBe(2);
+    });
+
+    it('rebuilds declarations after a new chat session is started', async () => {
+      const getFunctionDeclarations = vi.mocked(
+        (mockConfig as unknown as { toolRegistry: { getFunctionDeclarations: Mock } })
+          .toolRegistry.getFunctionDeclarations,
+      );
+      getFunctionDeclarations.mockReturnValue([
+        { name: 'fake-tool', description: 'fake' },
+      ]);
+
+      const chat = await client.startChat();
+      client['chat'] = chat;
+      await chat['resolveToolsForModel']!('model-a');
+      expect(getModelIdCalls(getFunctionDeclarations)).toBe(1);
+
+      // startChat resets the model cache, so the same modelId must trigger a
+      // rebuild on the fresh chat instance.
+      const newChat = await client.startChat();
+      client['chat'] = newChat;
+      getFunctionDeclarations.mockClear();
+      await newChat['resolveToolsForModel']!('model-a');
+      expect(getFunctionDeclarations).toHaveBeenCalledWith('model-a');
+    });
+  });
+
   describe('tryCompressChat', () => {
     const mockGetHistory = vi.fn();
 
