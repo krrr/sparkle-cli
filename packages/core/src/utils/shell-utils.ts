@@ -51,6 +51,8 @@ let TreeSitterQueryClass: typeof Query | null = null;
 
 export const SHELL_TOOL_NAMES = ['run_shell_command', 'ShellTool'];
 
+const POWERSHELL_ARGS_PREFIX = ['-NoProfile', '-NonInteractive', '-Command'];
+
 /**
  * An identifier for the shell type.
  */
@@ -647,14 +649,13 @@ export function getShellConfiguration(): ShellConfiguration {
     // events inside the ConPTY session, which otherwise causes interactive
     // TUI tools (e.g. pnpm create vite, vim) to receive malformed key events
     // and exit when arrow keys are pressed.
-    const powershellArgsPrefix = ['-NoProfile', '-NonInteractive', '-Command'];
     const comSpec = process.env['ComSpec'];
     if (comSpec) {
       const executable = comSpec.toLowerCase();
       if (executable.endsWith('powershell.exe') || executable.endsWith('pwsh.exe')) {
         return {
           executable: comSpec,
-          argsPrefix: powershellArgsPrefix,
+          argsPrefix: POWERSHELL_ARGS_PREFIX,
           shell: 'powershell',
         };
       }
@@ -663,8 +664,8 @@ export function getShellConfiguration(): ShellConfiguration {
     const pwshPath = resolveExecutable('pwsh.exe');
     if (pwshPath) {
       return {
-        executable: pwshPath,
-        argsPrefix: ['-NoProfile', '-Command'],
+        executable: 'pwsh.exe',
+        argsPrefix: POWERSHELL_ARGS_PREFIX,
         shell: 'powershell',
       };
     }
@@ -672,7 +673,7 @@ export function getShellConfiguration(): ShellConfiguration {
     // Fall back to Windows PowerShell 5.1 when pwsh.exe is not installed.
     return {
       executable: 'powershell.exe',
-      argsPrefix: powershellArgsPrefix,
+      argsPrefix: POWERSHELL_ARGS_PREFIX,
       shell: 'powershell',
     };
   }

@@ -492,8 +492,12 @@ describe('getShellConfiguration', () => {
           throw new Error('ENOENT');
         });
         const config = getShellConfiguration();
-        expect(config.executable).toBe(pwshPath);
-        expect(config.argsPrefix).toEqual(['-NoProfile', '-Command']);
+        expect(config.executable).toBe('pwsh.exe');
+        expect(config.argsPrefix).toEqual([
+          '-NoProfile',
+          '-NonInteractive',
+          '-Command',
+        ]);
         expect(config.shell).toBe('powershell');
       },
     );

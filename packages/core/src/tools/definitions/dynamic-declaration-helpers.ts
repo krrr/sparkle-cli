@@ -61,24 +61,13 @@ export function getShellToolDescription(
       ? `To run a command in the background, set the \`${SHELL_PARAM_IS_BACKGROUND}\` parameter to true. Do NOT use PowerShell background constructs.`
       : 'Command can start background processes using PowerShell constructs such as `Start-Process -NoNewWindow` or `Start-Job`.';
     const { executable } = getShellConfiguration();
-    return `This tool executes a given shell command as \`${executable} -NoProfile -Command <command>\`. ${backgroundInstructions}${efficiencyGuidelines}${returnedInfo}`;
+    return `This tool executes a given shell command as \`${executable} -NoProfile -NonInteractive -Command <command>\`. ${backgroundInstructions}${efficiencyGuidelines}${returnedInfo}`;
   } else {
     const backgroundInstructions = enableInteractiveShell
       ? `To run a command in the background, set the \`${SHELL_PARAM_IS_BACKGROUND}\` parameter to true. Do NOT use \`&\` to background commands.`
       : 'Command can start background processes using `&`.';
     return `This tool executes a given shell command as \`bash -c <command>\`. ${backgroundInstructions} Command is executed as a subprocess that leads its own process group. Command process group can be terminated as \`kill -- -PGID\` or signaled as \`kill -s SIGNAL -- -PGID\`.${efficiencyGuidelines}${returnedInfo}`;
   }
-}
-
-/**
- * Returns the platform-specific description for the 'command' parameter.
- */
-export function getCommandDescription(): string {
-  if (os.platform() === 'win32') {
-    const { executable } = getShellConfiguration();
-    return `Exact command to execute as \`${executable} -NoProfile -Command <command>\``;
-  }
-  return 'Exact bash command to execute as `bash -c <command>`';
 }
 
 /**
@@ -97,7 +86,7 @@ export function getShellDeclaration(
       properties: {
         [SHELL_PARAM_COMMAND]: {
           type: 'string',
-          description: getCommandDescription(),
+          description: 'Exact command to execute',
         },
         [PARAM_DESCRIPTION]: {
           type: 'string',
@@ -107,7 +96,7 @@ export function getShellDeclaration(
         [PARAM_DIR_PATH]: {
           type: 'string',
           description:
-            '(OPTIONAL) The path of the directory to run the command in. If not provided, the project root directory is used. Must be a directory within the workspace and must already exist.',
+            '(OPTIONAL) The path of the directory to run the command in. Defaults to project root. Must be within the workspace and already exist.',
         },
         [SHELL_PARAM_IS_BACKGROUND]: {
           type: 'boolean',

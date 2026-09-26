@@ -604,7 +604,7 @@ exports[`core tool declaration snapshots > snapshot for tool: run_shell_command 
         "type": "object",
       },
       "command": {
-        "description": "Exact bash command to execute as \`bash -c <command>\`",
+        "description": "Exact command to execute",
         "type": "string",
       },
       "delay_ms": {
@@ -616,7 +616,7 @@ exports[`core tool declaration snapshots > snapshot for tool: run_shell_command 
         "type": "string",
       },
       "dir_path": {
-        "description": "(OPTIONAL) The path of the directory to run the command in. If not provided, the project root directory is used. Must be a directory within the workspace and must already exist.",
+        "description": "(OPTIONAL) The path of the directory to run the command in. Defaults to project root. Must be within the workspace and already exist.",
         "type": "string",
       },
       "is_background": {
