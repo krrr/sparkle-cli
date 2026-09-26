@@ -529,8 +529,10 @@ CLI.
 - **`!<shell_command>`**
 
   - **Description:** Execute the given `<shell_command>` using `bash` on Linux/macOS or
-    `powershell.exe -NoProfile -Command` on Windows (unless you override `ComSpec`). Any
-    output or errors from the command are displayed in the terminal.
+    `pwsh.exe -NoProfile -Command` on Windows when PowerShell 7 installed (falling back
+    to `powershell.exe`; also honors a `ComSpec` override that points to either
+    PowerShell executable). Any output or errors from the command are displayed in the
+    terminal.
   - **Examples:**
     - `!ls -la` (executes `ls -la` and returns to Sparkle CLI)
     - `!git status` (executes `git status` and returns to Sparkle CLI)

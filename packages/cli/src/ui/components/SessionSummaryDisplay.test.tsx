@@ -94,6 +94,26 @@ describe('<SessionSummaryDisplay />', () => {
     },
   };
 
+  // Metrics hydrated with model data so the stats (and footer) render.
+  const metricsWithModels: SessionMetrics = {
+    ...emptyMetrics,
+    models: {
+      'gemini-2.5-pro': {
+        api: { totalRequests: 1, totalErrors: 0, totalLatencyMs: 100 },
+        tokens: {
+          input: 10,
+          prompt: 20,
+          candidates: 30,
+          total: 60,
+          cached: 0,
+          thoughts: 0,
+          tool: 0,
+        },
+        roles: {},
+      },
+    },
+  };
+
   beforeEach(() => {
     isWindowsMock.mockReturnValue(false);
   });
@@ -183,7 +203,7 @@ describe('<SessionSummaryDisplay />', () => {
     it('renders a standard UUID-formatted session ID in the footer (bash)', async () => {
       const uuidSessionId = '1234-abcd-5678-efgh';
       const { lastFrame, unmount } = await renderWithMockedStats(
-        emptyMetrics,
+        metricsWithModels,
         uuidSessionId,
       );
       const output = lastFrame();
@@ -196,7 +216,7 @@ describe('<SessionSummaryDisplay />', () => {
     it('sanitizes a malicious session ID in the footer (bash)', async () => {
       const maliciousSessionId = "'; rm -rf / #";
       const { lastFrame, unmount } = await renderWithMockedStats(
-        emptyMetrics,
+        metricsWithModels,
         maliciousSessionId,
       );
       const output = lastFrame();
@@ -211,7 +231,7 @@ describe('<SessionSummaryDisplay />', () => {
 
       const uuidSessionId = '1234-abcd-5678-efgh';
       const { lastFrame, unmount } = await renderWithMockedStats(
-        emptyMetrics,
+        metricsWithModels,
         uuidSessionId,
       );
       const output = lastFrame();
@@ -226,7 +246,7 @@ describe('<SessionSummaryDisplay />', () => {
 
       const maliciousSessionId = "'; rm -rf / #";
       const { lastFrame, unmount } = await renderWithMockedStats(
-        emptyMetrics,
+        metricsWithModels,
         maliciousSessionId,
       );
       const output = lastFrame();
@@ -247,7 +267,7 @@ describe('<SessionSummaryDisplay />', () => {
       };
 
       const { lastFrame, unmount } = await renderWithMockedStats(
-        emptyMetrics,
+        metricsWithModels,
         'test-session',
         worktreeSettings,
       );

@@ -6,8 +6,11 @@ environment beyond simple file edits.
 
 ## Technical reference
 
-On Windows, commands execute with `powershell.exe -NoProfile -Command`. On other
-platforms, they execute with `bash -c`.
+On Windows, commands execute with `pwsh.exe -NoProfile -Command` when PowerShell 7
+(PowerShell Core) is installed, falling back to `powershell.exe -NoProfile -Command`
+(Windows PowerShell 5.1) otherwise. When the `ComSpec` environment variable points to
+`pwsh.exe` or `powershell.exe`, that executable is used instead. On other platforms,
+commands execute with `bash -c`.
 
 ### Arguments
 
