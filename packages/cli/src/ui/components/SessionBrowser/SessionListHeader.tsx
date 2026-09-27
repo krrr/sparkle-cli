@@ -19,8 +19,11 @@ export const SessionListHeader = ({
 }): React.JSX.Element => (
   <Box flexDirection="row" justifyContent="space-between">
     <Text color={Colors.AccentPurple}>
-      Chat Sessions ({state.totalSessions} total
-      {state.searchQuery ? `, filtered` : ''})
+      Chat Sessions{'  '}
+      <Text color={Colors.Gray}>
+        ({state.totalSessions} total
+        {state.searchQuery ? `, filtered` : ''})
+      </Text>
     </Text>
     <Text color={Colors.Gray}>
       sorted by {state.sortOrder} {state.sortReverse ? 'asc' : 'desc'}

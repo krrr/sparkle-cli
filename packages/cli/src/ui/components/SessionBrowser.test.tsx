@@ -250,7 +250,7 @@ describe('SessionBrowser component', () => {
       />,
     );
 
-    expect(lastFrame()).toContain('Chat Sessions (2 total');
+    expect(lastFrame()).toContain('Chat Sessions  (2 total');
 
     // Enter search mode.
     triggerKey({ sequence: '/', name: '/' });
@@ -273,7 +273,7 @@ describe('SessionBrowser component', () => {
     await waitUntilReady();
 
     await waitFor(() => {
-      expect(lastFrame()).toContain('Chat Sessions (1 total, filtered');
+      expect(lastFrame()).toContain('Chat Sessions  (1 total, filtered');
     });
     expect(lastFrame()).toMatchSnapshot();
   });
@@ -309,7 +309,7 @@ describe('SessionBrowser component', () => {
       />,
     );
 
-    expect(lastFrame()).toContain('Chat Sessions (2 total');
+    expect(lastFrame()).toContain('Chat Sessions  (2 total');
 
     // Move selection down.
     triggerKey({ name: 'down', sequence: '[B' });
@@ -422,7 +422,7 @@ describe('SessionBrowser component', () => {
     });
     expect(onDeleteSession).toHaveBeenCalledWith(session1);
     await waitFor(() => {
-      expect(lastFrame()).toContain('Chat Sessions (1 total');
+      expect(lastFrame()).toContain('Chat Sessions  (1 total');
     });
   });
 

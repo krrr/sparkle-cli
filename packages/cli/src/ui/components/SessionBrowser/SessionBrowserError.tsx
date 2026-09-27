@@ -7,6 +7,7 @@
 import type React from 'react';
 import { Box, Text } from 'ink';
 import { Colors } from '../../colors.js';
+import { theme } from '../../semantic-colors.js';
 import type { SessionBrowserState } from '../SessionBrowser.js';
 
 /**
@@ -17,7 +18,13 @@ export const SessionBrowserError = ({
 }: {
   state: SessionBrowserState;
 }): React.JSX.Element => (
-  <Box flexDirection="column" paddingX={1}>
+  <Box
+    flexDirection="column"
+    borderStyle="round"
+    borderColor={theme.border.default}
+    paddingX={1}
+    width="100%"
+  >
     <Text color={Colors.AccentRed}>Error: {state.error}</Text>
     <Text color={Colors.Gray}>Press q to exit</Text>
   </Box>

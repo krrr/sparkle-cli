@@ -729,17 +729,19 @@ export function SessionBrowserView({
 }): React.JSX.Element {
   if (state.loading) {
     return <SessionBrowserLoading />;
-  }
-
-  if (state.error) {
+  } else if (state.error) {
     return <SessionBrowserError state={state} />;
-  }
-
-  if (state.sessions.length === 0) {
+  } else if (state.sessions.length === 0) {
     return <SessionBrowserEmpty />;
   }
   return (
-    <Box flexDirection="column" paddingX={1}>
+    <Box
+      flexDirection="column"
+      borderStyle="round"
+      borderColor={theme.border.default}
+      paddingX={1}
+      width="100%"
+    >
       <SessionListHeader state={state} />
 
       {state.isSearchMode && <SearchModeDisplay state={state} />}
