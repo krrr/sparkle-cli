@@ -59,7 +59,6 @@ export function ProviderManagerDialog({
     refreshProfiles();
   }, [refreshProfiles]);
 
-  const activeProfileId = activeProfile?.id;
   const modelsProfile = profiles.find((p) => p.id === modelsProfileId);
 
   const handleActivate = useCallback(
@@ -161,16 +160,16 @@ export function ProviderManagerDialog({
           await saveApiKeyForProfile(savedProfile.id, apiKey);
         }
 
-        // If newly created and no active profile, or if this is the only profile,
-        // activate it directly (without handleActivate calling setAuthState closing dialog)
-        if (!activeProfile || profiles.length === 0) {
+        // Activate directly if newly created and no active profile (without
+        // handleActivate calling setAuthState closing dialog). Also refresh if edited
+        // profile is the active one (id may change, editingProfile.id is old one)
+        if (!activeProfile || activeProfile.id === editingProfile?.id) {
           await profileService.activateProfile(savedProfile.id);
         }
 
         refreshProfiles();
 
-        // Newly created providers jump straight into model management; edits
-        // return to the provider list.
+        // Newly created providers jump straight into model management
         if (editingProfile) {
           setView('list');
         } else {
@@ -181,7 +180,7 @@ export function ProviderManagerDialog({
         setLocalError(getErrorMessage(e));
       }
     },
-    [profileService, editingProfile, activeProfile, profiles, refreshProfiles],
+    [profileService, editingProfile, activeProfile, refreshProfiles],
   );
 
   const modelActions = useProfileModelActions(
@@ -201,7 +200,7 @@ export function ProviderManagerDialog({
       {view === 'list' && (
         <ProviderListView
           profiles={profiles}
-          activeProfileId={activeProfileId}
+          activeProfileId={activeProfile?.id}
           onActivate={handleActivate}
           onAdd={handleAdd}
           onEdit={handleEdit}
