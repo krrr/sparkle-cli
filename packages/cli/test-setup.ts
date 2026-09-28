@@ -8,10 +8,10 @@ import { vi, beforeEach, afterEach } from 'vitest';
 import { format } from 'node:util';
 import { coreEvents, debugLogger } from 'sparkle-cli-core';
 import { themeManager } from './src/ui/themes/theme-manager.js';
-import { mockInkSpinner } from './src/test-utils/mockSpinner.js';
+import { mockCliSpinner } from './src/test-utils/mockSpinner.js';
 
-// Globally mock ink-spinner to prevent non-deterministic snapshot/act flakes.
-mockInkSpinner();
+// Globally mock CliSpinner to prevent non-deterministic snapshot/act flakes.
+mockCliSpinner();
 
 // Unset CI environment variable so that ink renders dynamically as it does in a real terminal
 if (process.env.CI !== undefined) {

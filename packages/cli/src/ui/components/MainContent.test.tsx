@@ -40,10 +40,6 @@ import {
 } from '../hooks/useConfirmingTool.js';
 
 // Mock dependencies
-vi.mock('ink-spinner', () => ({
-  default: () => <Text>⠋</Text>,
-}));
-
 const mockUseSettings = vi.fn().mockReturnValue({
   merged: {
     ui: {

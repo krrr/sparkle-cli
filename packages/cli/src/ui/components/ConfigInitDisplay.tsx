@@ -12,8 +12,8 @@ import {
   type McpClient,
   MCPServerStatus,
 } from 'sparkle-cli-core';
-import { GeminiSpinner } from './GeminiSpinner.js';
 import { theme } from '../semantic-colors.js';
+import { CliSpinner } from './CliSpinner.js';
 
 export const ConfigInitDisplay = ({
   message: initialMessage = 'Working...',
@@ -68,7 +68,7 @@ export const ConfigInitDisplay = ({
   return (
     <Box marginTop={1}>
       <Text>
-        <GeminiSpinner /> <Text color={theme.text.primary}>{message}</Text>
+        <CliSpinner /> <Text color={theme.text.primary}>{message}</Text>
       </Text>
     </Box>
   );

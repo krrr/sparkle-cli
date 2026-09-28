@@ -6,12 +6,12 @@
 
 import type React from 'react';
 import { Text, useIsScreenReaderEnabled } from 'ink';
-import type { SpinnerName } from 'cli-spinners';
 import { useStreamingContext } from '../contexts/StreamingContext.js';
 import { StreamingState } from '../types.js';
 import { SCREEN_READER_LOADING, SCREEN_READER_RESPONDING } from '../textConstants.js';
 import { theme } from '../semantic-colors.js';
 import { GeminiSpinner } from './GeminiSpinner.js';
+import type { SpinnerName } from './CliSpinner.js';
 
 interface GeminiRespondingSpinnerProps {
   /**
@@ -30,7 +30,7 @@ interface GeminiRespondingSpinnerProps {
 
 export const GeminiRespondingSpinner: React.FC<GeminiRespondingSpinnerProps> = ({
   nonRespondingDisplay,
-  spinnerType = 'dots',
+  spinnerType = 'sand',
   isHookActive = false,
   color,
 }) => {

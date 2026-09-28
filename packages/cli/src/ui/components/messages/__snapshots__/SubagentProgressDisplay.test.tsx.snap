@@ -15,21 +15,21 @@ exports[`<SubagentProgressDisplay /> > renders cancelled state correctly 1`] = `
 exports[`<SubagentProgressDisplay /> > renders correctly with command fallback 1`] = `
 "Running subagent TestAgent...
 
-⠋  run_shell_command echo hello
+⠁  run_shell_command echo hello
 "
 `;
 
 exports[`<SubagentProgressDisplay /> > renders correctly with description in args 1`] = `
 "Running subagent TestAgent...
 
-⠋  run_shell_command Say hello
+⠁  run_shell_command Say hello
 "
 `;
 
 exports[`<SubagentProgressDisplay /> > renders correctly with displayName and description from item 1`] = `
 "Running subagent TestAgent...
 
-⠋  RunShellCommand Executing echo hello
+⠁  RunShellCommand Executing echo hello
 "
 `;
 
@@ -57,6 +57,6 @@ exports[`<SubagentProgressDisplay /> > renders thought bubbles correctly 1`] = `
 exports[`<SubagentProgressDisplay /> > truncates long args 1`] = `
 "Running subagent TestAgent...
 
-⠋  run_shell_command This is a very long description that should definitely be tr...
+⠁  run_shell_command This is a very long description that should definitely be tr...
 "
 `;

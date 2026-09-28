@@ -7,7 +7,6 @@
 import type React from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../../semantic-colors.js';
-import Spinner from 'ink-spinner';
 import { MarkdownDisplay } from '../../utils/MarkdownDisplay.js';
 import {
   type SubagentProgress,
@@ -17,6 +16,7 @@ import {
 import { TOOL_STATUS } from '../../constants.js';
 import { STATUS_INDICATOR_WIDTH } from './ToolShared.js';
 import { safeJsonToMarkdown } from 'sparkle-cli-core';
+import { CliSpinner } from '../CliSpinner.js';
 
 export interface SubagentProgressDisplayProps {
   progress: SubagentProgress;
@@ -109,7 +109,7 @@ export const SubagentProgressDisplay: React.FC<SubagentProgressDisplayProps> = (
             } else if (item.type === 'tool_call') {
               const statusSymbol =
                 item.status === SubagentState.RUNNING ? (
-                  <Spinner type="dots" />
+                  <CliSpinner type="sand" />
                 ) : item.status === SubagentState.COMPLETED ? (
                   <Text color={theme.status.success}>{TOOL_STATUS.SUCCESS}</Text>
                 ) : item.status === SubagentState.CANCELLED ? (

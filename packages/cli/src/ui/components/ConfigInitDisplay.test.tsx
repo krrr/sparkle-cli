@@ -24,12 +24,6 @@ import {
   type McpClient,
   coreEvents,
 } from 'sparkle-cli-core';
-import { Text } from 'ink';
-
-// Mock GeminiSpinner
-vi.mock('./GeminiSpinner.js', () => ({
-  GeminiSpinner: () => <Text>Spinner</Text>,
-}));
 
 describe('ConfigInitDisplay', () => {
   let onSpy: MockInstance<EventEmitter['on']>;

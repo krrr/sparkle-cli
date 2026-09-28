@@ -7,8 +7,7 @@
 import type React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { Text, useIsScreenReaderEnabled } from 'ink';
-import { CliSpinner } from './CliSpinner.js';
-import type { SpinnerName } from 'cli-spinners';
+import { CliSpinner, type SpinnerName } from './CliSpinner.js';
 import { Colors } from '../colors.js';
 import tinygradient from 'tinygradient';
 
@@ -27,13 +26,9 @@ export const GeminiSpinner: React.FC<GeminiSpinnerProps> = ({
   const [time, setTime] = useState(0);
 
   const googleGradient = useMemo(() => {
-    const brandColors = [
-      Colors.AccentPurple,
+    const brandColors = Colors.GradientColors || [
       Colors.AccentBlue,
-      Colors.AccentCyan,
       Colors.AccentGreen,
-      Colors.AccentYellow,
-      Colors.AccentRed,
     ];
     return tinygradient([...brandColors, brandColors[0]]);
   }, []);

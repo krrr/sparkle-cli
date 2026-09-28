@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { render, cleanup } from '../../../test-utils/render.js';
+import { renderWithProviders, cleanup } from '../../../test-utils/render.js';
 import { SubagentProgressDisplay } from './SubagentProgressDisplay.js';
 import { type SubagentProgress, SubagentState } from 'sparkle-cli-core';
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -30,7 +30,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -53,7 +53,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -74,7 +74,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -95,7 +95,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -118,7 +118,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -138,7 +138,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -152,7 +152,7 @@ describe('<SubagentProgressDisplay />', () => {
       state: SubagentState.CANCELLED,
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -172,7 +172,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();
@@ -193,7 +193,7 @@ describe('<SubagentProgressDisplay />', () => {
       ],
     };
 
-    const { lastFrame } = await render(
+    const { lastFrame } = await renderWithProviders(
       <SubagentProgressDisplay progress={progress} terminalWidth={80} />,
     );
     expect(lastFrame()).toMatchSnapshot();

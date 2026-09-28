@@ -5,19 +5,28 @@
  */
 
 import { vi } from 'vitest';
-import type { SpinnerName } from 'cli-spinners';
 
-export function mockInkSpinner() {
-  vi.mock('ink-spinner', async () => {
+/**
+ * Globally mock CliSpinner so it renders a deterministic first frame.
+ *
+ * The real component animates frames via setInterval/setState, which produces
+ * non-deterministic snapshot output and out-of-act(...) state updates in
+ * tests. Tests that need the real animation should opt back in with:
+ *
+ *   vi.mock('./CliSpinner.js', async (importOriginal) =>
+ *     importOriginal<typeof import('./CliSpinner.js')>(),
+ *   );
+ */
+export function mockCliSpinner() {
+  vi.mock('../ui/components/CliSpinner.js', async (importOriginal) => {
     const { Text } = await import('ink');
-    const cliSpinners = (await import('cli-spinners')).default;
+    const { spinners } =
+      await importOriginal<typeof import('../ui/components/CliSpinner.js')>();
 
     return {
-      default: function MockSpinner({ type = 'dots' }: { type?: SpinnerName }) {
-        const spinner = cliSpinners[type];
-        const frame = spinner ? spinner.frames[0] : '⠋';
-        return <Text>{frame}</Text>;
-      },
+      CliSpinner: ({ type = 'dots' }: { type?: keyof typeof spinners }) => (
+        <Text>{spinners[type].frames[0]}</Text>
+      ),
     };
   });
 }
