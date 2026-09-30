@@ -58,9 +58,6 @@ jobs:
           path: '${{ env.SPARKLE_LINT_TEMP_DIR }}'
           key: "${{ runner.os }}-${{ runner.arch }}-linters-${{ hashFiles('scripts/lint.js') }}"
 
-      - name: 'Build vendored ink fork'
-        uses: './.github/actions/build-vendored-ink'
-
       - name: 'Install dependencies'
         run: 'npm ci'
 
@@ -139,9 +136,6 @@ jobs:
         with:
           node-version: '${{ matrix.node-version }}'
           cache: 'npm'
-
-      - name: 'Build vendored ink fork'
-        uses: './.github/actions/build-vendored-ink'
 
       - name: 'Build project'
         run: 'npm run build'
@@ -297,9 +291,6 @@ jobs:
           npm config set maxsockets 32
           npm config set registry https://registry.npmjs.org/
         shell: 'pwsh'
-
-      - name: 'Build vendored ink fork'
-        uses: './.github/actions/build-vendored-ink'
 
       - name: 'Install dependencies'
         run: 'npm ci'
