@@ -29,6 +29,7 @@ export * from './confirmation-bus/message-bus.js';
 // Export Commands logic
 export * from './commands/extensions.js';
 export * from './commands/restore.js';
+export * from './commands/rewind.js';
 export * from './commands/init.js';
 export * from './commands/memory.js';
 export * from './commands/types.js';
@@ -118,6 +119,7 @@ export * from './utils/extensionLoader.js';
 export * from './utils/package.js';
 export * from './utils/version.js';
 export * from './utils/checkpointUtils.js';
+export * from './utils/rewindUtils.js';
 export * from './utils/secure-browser-launcher.js';
 export * from './utils/apiConversionUtils.js';
 export * from './utils/constants.js';

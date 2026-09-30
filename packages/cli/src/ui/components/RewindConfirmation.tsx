@@ -9,18 +9,12 @@ import type React from 'react';
 import { useMemo } from 'react';
 import { theme } from '../semantic-colors.js';
 import { RadioButtonSelect, type RadioSelectItem } from './shared/RadioButtonSelect.js';
-import type { FileChangeStats } from '../utils/rewindFileOps.js';
+import type { FileChangeStats } from 'sparkle-cli-core';
+import { RewindOutcome } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { formatTimeAgo } from '../utils/formatters.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
-
-export enum RewindOutcome {
-  RewindAndRevert = 'rewind_and_revert',
-  RewindOnly = 'rewind_only',
-  RevertOnly = 'revert_only',
-  Cancel = 'cancel',
-}
 
 const REWIND_OPTIONS: Array<RadioSelectItem<RewindOutcome>> = [
   {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -10,13 +10,13 @@ import {
   calculateTurnStats,
   calculateRewindImpact,
   revertFileChanges,
-} from './rewindFileOps.js';
+} from './rewindUtils.js';
 import {
   coreEvents,
   type ConversationRecord,
   type MessageRecord,
   type ToolCallRecord,
-} from 'sparkle-cli-core';
+} from '../index.js';
 
 // Mock fs/promises
 vi.mock('node:fs/promises', () => ({
@@ -28,23 +28,22 @@ vi.mock('node:fs/promises', () => ({
   },
 }));
 
-// Mock sparkle-cli-core
-vi.mock('sparkle-cli-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
+// Mock the diff helpers used to extract FileDiff data
+vi.mock('./fileDiffUtils.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./fileDiffUtils.js')>();
   return {
     ...actual,
-    debugLogger: {
-      log: vi.fn(),
-      warn: vi.fn(),
-      error: vi.fn(),
-      debug: vi.fn(),
-    },
     getFileDiffFromResultDisplay: vi.fn(),
     computeModelAddedAndRemovedLines: vi.fn(),
   };
 });
 
-describe('rewindFileOps', () => {
+import {
+  getFileDiffFromResultDisplay,
+  computeModelAddedAndRemovedLines,
+} from './fileDiffUtils.js';
+
+describe('rewindUtils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(coreEvents, 'emitFeedback');
@@ -66,9 +65,7 @@ describe('rewindFileOps', () => {
       expect(result).toBeNull();
     });
 
-    it('calculates stats for single turn correctly', async () => {
-      const { getFileDiffFromResultDisplay, computeModelAddedAndRemovedLines } =
-        await import('sparkle-cli-core');
+    it('calculates stats for single turn correctly', () => {
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: 'test.ts',
         fileName: 'test.ts',
@@ -122,9 +119,7 @@ describe('rewindFileOps', () => {
   });
 
   describe('calculateRewindImpact', () => {
-    it('calculates cumulative stats across multiple turns', async () => {
-      const { getFileDiffFromResultDisplay, computeModelAddedAndRemovedLines } =
-        await import('sparkle-cli-core');
+    it('calculates cumulative stats across multiple turns', () => {
       vi.mocked(getFileDiffFromResultDisplay)
         .mockReturnValueOnce({
           filePath: 'file1.ts',
@@ -219,7 +214,6 @@ describe('rewindFileOps', () => {
     });
 
     it('reverts exact match', async () => {
-      const { getFileDiffFromResultDisplay } = await import('sparkle-cli-core');
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: '/abs/path/test.ts',
         fileName: 'test.ts',
@@ -264,7 +258,6 @@ describe('rewindFileOps', () => {
     });
 
     it('deletes new file on revert', async () => {
-      const { getFileDiffFromResultDisplay } = await import('sparkle-cli-core');
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: '/abs/path/new.ts',
         fileName: 'new.ts',
@@ -306,7 +299,6 @@ describe('rewindFileOps', () => {
     });
 
     it('handles smart revert (patching) successfully', async () => {
-      const { getFileDiffFromResultDisplay } = await import('sparkle-cli-core');
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: '/abs/path/test.ts',
         fileName: 'test.ts',
@@ -353,7 +345,6 @@ describe('rewindFileOps', () => {
     });
 
     it('emits warning on smart revert failure', async () => {
-      const { getFileDiffFromResultDisplay } = await import('sparkle-cli-core');
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: '/abs/path/test.ts',
         fileName: 'test.ts',
@@ -400,7 +391,6 @@ describe('rewindFileOps', () => {
     });
 
     it('emits error if fs.readFile fails with a generic error', async () => {
-      const { getFileDiffFromResultDisplay } = await import('sparkle-cli-core');
       vi.mocked(getFileDiffFromResultDisplay).mockReturnValue({
         filePath: '/abs/path/test.ts',
         fileName: 'test.ts',

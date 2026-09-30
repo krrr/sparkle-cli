@@ -8,7 +8,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { act } from 'react';
 import { renderWithProviders } from '../../test-utils/render.js';
 import { waitFor } from '../../test-utils/async.js';
-import { RewindConfirmation, RewindOutcome } from './RewindConfirmation.js';
+import { RewindConfirmation } from './RewindConfirmation.js';
+import { RewindOutcome } from 'sparkle-cli-core';
 
 describe('RewindConfirmation', () => {
   afterEach(() => {

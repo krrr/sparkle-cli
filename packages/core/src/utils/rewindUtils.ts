@@ -1,18 +1,21 @@
 /**
  * @license
- * Copyright 2025 Google LLC
+ * Copyright 2026 Google LLC
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type { ConversationRecord, MessageRecord } from 'sparkle-cli-core';
 import fs from 'node:fs/promises';
 import * as Diff from 'diff';
+import { coreEvents } from './events.js';
+import { debugLogger } from './debugLogger.js';
 import {
-  coreEvents,
-  debugLogger,
   getFileDiffFromResultDisplay,
   computeModelAddedAndRemovedLines,
-} from 'sparkle-cli-core';
+} from './fileDiffUtils.js';
+import type {
+  ConversationRecord,
+  MessageRecord,
+} from '../services/chatRecordingService.js';
 
 export interface FileChangeDetail {
   fileName: string;
@@ -183,8 +186,7 @@ export async function revertFileChanges(
                   `Error reading ${fileName} during revert: ${error.message}`,
                   e,
                 );
-                // Continue to next tool call
-                return;
+                continue; // Continue to next tool call
               }
             }
             // 1. Exact Match: Safe to revert directly

@@ -5,12 +5,13 @@
  */
 
 import { useState, useCallback } from 'react';
-import type { ConversationRecord, MessageRecord } from 'sparkle-cli-core';
 import {
+  type ConversationRecord,
+  type FileChangeStats,
+  type MessageRecord,
   calculateTurnStats,
   calculateRewindImpact,
-  type FileChangeStats,
-} from '../utils/rewindFileOps.js';
+} from 'sparkle-cli-core';
 
 export function useRewind(conversation: ConversationRecord) {
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);

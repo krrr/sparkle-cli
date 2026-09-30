@@ -8,15 +8,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act } from 'react';
 import { renderHook } from '../../test-utils/render.js';
 import { useRewind } from './useRewind.js';
-import type { ConversationRecord, MessageRecord } from 'sparkle-cli-core';
-import type { FileChangeStats } from '../utils/rewindFileOps.js';
-import * as rewindFileOps from '../utils/rewindFileOps.js';
+import {
+  type ConversationRecord,
+  type FileChangeStats,
+  type MessageRecord,
+  calculateRewindImpact,
+  calculateTurnStats,
+} from 'sparkle-cli-core';
 
 // Mock the dependency
-vi.mock('../utils/rewindFileOps.js', () => ({
-  calculateTurnStats: vi.fn(),
-  calculateRewindImpact: vi.fn(),
-}));
+vi.mock('sparkle-cli-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sparkle-cli-core')>();
+  return {
+    ...actual,
+    calculateTurnStats: vi.fn(),
+    calculateRewindImpact: vi.fn(),
+  };
+});
 
 describe('useRewindLogic', () => {
   const mockUserMessage: MessageRecord = {
@@ -58,7 +66,7 @@ describe('useRewindLogic', () => {
       addedLines: 5,
       removedLines: 0,
     };
-    vi.mocked(rewindFileOps.calculateRewindImpact).mockReturnValue(mockStats);
+    vi.mocked(calculateRewindImpact).mockReturnValue(mockStats);
 
     const { result } = await renderHook(() => useRewind(mockConversation));
 
@@ -68,7 +76,7 @@ describe('useRewindLogic', () => {
 
     expect(result.current.selectedMessageId).toBe('msg-1');
     expect(result.current.confirmationStats).toEqual(mockStats);
-    expect(rewindFileOps.calculateRewindImpact).toHaveBeenCalledWith(
+    expect(calculateRewindImpact).toHaveBeenCalledWith(
       mockConversation,
       mockUserMessage,
     );
@@ -91,7 +99,7 @@ describe('useRewindLogic', () => {
       addedLines: 5,
       removedLines: 0,
     };
-    vi.mocked(rewindFileOps.calculateRewindImpact).mockReturnValue(mockStats);
+    vi.mocked(calculateRewindImpact).mockReturnValue(mockStats);
 
     const { result } = await renderHook(() => useRewind(mockConversation));
 
@@ -116,16 +124,13 @@ describe('useRewindLogic', () => {
       addedLines: 10,
       removedLines: 2,
     };
-    vi.mocked(rewindFileOps.calculateTurnStats).mockReturnValue(mockStats);
+    vi.mocked(calculateTurnStats).mockReturnValue(mockStats);
 
     const { result } = await renderHook(() => useRewind(mockConversation));
 
     const stats = result.current.getStats(mockUserMessage);
 
     expect(stats).toEqual(mockStats);
-    expect(rewindFileOps.calculateTurnStats).toHaveBeenCalledWith(
-      mockConversation,
-      mockUserMessage,
-    );
+    expect(calculateTurnStats).toHaveBeenCalledWith(mockConversation, mockUserMessage);
   });
 });

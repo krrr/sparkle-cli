@@ -8,80 +8,46 @@ import { CommandKind, type CommandContext, type SlashCommand } from './types.js'
 import { RewindViewer } from '../components/RewindViewer.js';
 import { type HistoryItem } from '../types.js';
 import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
-import { revertFileChanges } from '../utils/rewindFileOps.js';
-import { RewindOutcome } from '../components/RewindConfirmation.js';
 import {
-  checkExhaustive,
   coreEvents,
-  debugLogger,
-  logRewind,
-  RewindEvent,
-  type ChatRecordingService,
-  type GeminiClient,
-  convertSessionToClientHistory,
+  performRewind,
+  type ConversationRecord,
+  RewindOutcome,
 } from 'sparkle-cli-core';
 
 /**
- * Helper function to handle the core logic of rewinding a conversation.
- * This function encapsulates the steps needed to rewind the conversation,
- * update the client and UI history, and clear the component.
+ * Helper function to handle the UI part of rewinding a conversation.
+ * The conversation truncation and history conversion is performed by
+ * `performRewind` in core; this only renders the rewound history in the CLI.
  *
  * @param context The command context.
- * @param client Gemini client
- * @param recordingService The chat recording service.
- * @param messageId The ID of the message to rewind to.
+ * @param rewoundConversation The truncated conversation returned by `performRewind`.
  * @param newText The new text for the input field after rewinding.
  */
-async function rewindConversation(
+function loadRewoundHistory(
   context: CommandContext,
-  client: GeminiClient,
-  recordingService: ChatRecordingService,
-  messageId: string,
+  rewoundConversation: ConversationRecord,
   newText: string,
 ) {
-  try {
-    const conversation = recordingService.rewindTo(messageId);
-    if (!conversation) {
-      const errorMsg = 'Could not fetch conversation file';
-      debugLogger.error(errorMsg);
-      context.ui.removeComponent();
-      coreEvents.emitFeedback('error', errorMsg);
-      return;
-    }
+  // Convert to UI format
+  const { uiHistory } = convertSessionToHistoryFormats(rewoundConversation.messages);
 
-    // Convert to UI and Client formats
-    const { uiHistory } = convertSessionToHistoryFormats(conversation.messages);
-    const clientHistory = convertSessionToClientHistory(conversation.messages);
+  // Update UI History
+  // We generate IDs based on index for the rewind history
+  const startId = 1;
+  const historyWithIds = uiHistory.map(
+    (item, idx) =>
+      ({
+        ...item,
+        id: startId + idx,
+      }) as HistoryItem,
+  );
 
-    client.setHistory(clientHistory);
+  // 1. Remove component FIRST to avoid flicker and clear the stage
+  context.ui.removeComponent();
 
-    // Reset context manager as we are rewinding history
-    await context.services.agentContext?.config.getMemoryContextManager()?.refresh();
-
-    // Update UI History
-    // We generate IDs based on index for the rewind history
-    const startId = 1;
-    const historyWithIds = uiHistory.map(
-      (item, idx) =>
-        ({
-          ...item,
-          id: startId + idx,
-        }) as HistoryItem,
-    );
-
-    // 1. Remove component FIRST to avoid flicker and clear the stage
-    context.ui.removeComponent();
-
-    // 2. Load the rewound history and set the input
-    context.ui.loadHistory(historyWithIds, newText);
-  } catch (error) {
-    // If an error occurs, we still want to remove the component if possible
-    context.ui.removeComponent();
-    coreEvents.emitFeedback(
-      'error',
-      error instanceof Error ? error.message : 'Unknown error during rewind',
-    );
-  }
+  // 2. Load the rewound history and set the input
+  context.ui.loadHistory(historyWithIds, newText);
 }
 
 export const rewindCommand: SlashCommand = {
@@ -123,9 +89,7 @@ export const rewindCommand: SlashCommand = {
         content: 'No conversation found.',
       };
 
-    const hasUserInteractions = conversation.messages.some(
-      (msg) => msg.type === 'user',
-    );
+    const hasUserInteractions = conversation.messages.some((m) => m.type === 'user');
     if (!hasUserInteractions) {
       return {
         type: 'message',
@@ -143,47 +107,27 @@ export const rewindCommand: SlashCommand = {
             context.ui.removeComponent();
           }}
           onRewind={async (messageId, newText, outcome) => {
-            if (outcome !== RewindOutcome.Cancel) {
-              logRewind(config, new RewindEvent(outcome));
+            if (outcome === RewindOutcome.Cancel) {
+              context.ui.removeComponent();
+              return;
             }
-            switch (outcome) {
-              case RewindOutcome.Cancel:
+
+            try {
+              const result = await performRewind(client, config, messageId, outcome);
+
+              if (result.conversationRewound && result.conversation) {
+                loadRewoundHistory(context, result.conversation, newText);
+              } else {
+                // RevertOnly (or a failed rewind): just clear the stage.
                 context.ui.removeComponent();
-                return;
-
-              case RewindOutcome.RevertOnly:
-                if (conversation) {
-                  await revertFileChanges(conversation, messageId);
-                }
-                context.ui.removeComponent();
-                coreEvents.emitFeedback('info', 'File changes reverted.');
-                return;
-
-              case RewindOutcome.RewindAndRevert:
-                if (conversation) {
-                  await revertFileChanges(conversation, messageId);
-                }
-                await rewindConversation(
-                  context,
-                  client,
-                  recordingService,
-                  messageId,
-                  newText,
-                );
-                return;
-
-              case RewindOutcome.RewindOnly:
-                await rewindConversation(
-                  context,
-                  client,
-                  recordingService,
-                  messageId,
-                  newText,
-                );
-                return;
-
-              default:
-                checkExhaustive(outcome);
+              }
+            } catch (error) {
+              // If an error occurs, we still want to remove the component if possible
+              context.ui.removeComponent();
+              coreEvents.emitFeedback(
+                'error',
+                error instanceof Error ? error.message : 'Unknown error during rewind',
+              );
             }
           }}
         />
