@@ -112,13 +112,13 @@ export const INFORMATIVE_TIPS = [
   'In menus, move up/down with k/j or the arrow keys',
   'In menus, select an item by typing its number',
   "If you're using an IDE, see the context with F4",
-  'Toggle background shells with Ctrl+B or /shells',
+  'Toggle background shells with Ctrl+B or /tasks',
   'Toggle the background shell process list with Ctrl+L',
   // Keyboard shortcut tips end here
   // Command tips start here
   'Show version info with /about',
   'Change your provider with /provider',
-  'File a bug report directly with /bug',
+  'View and manage background shells with /tasks',
   'List your saved chat checkpoints with /resume list',
   'Save your current conversation with /resume save <tag>',
   'Resume a saved conversation with /resume resume <tag>',
@@ -127,7 +127,6 @@ export const INFORMATIVE_TIPS = [
   'Clear the screen and history with /clear',
   'Save tokens by summarizing the context with /compress',
   'Copy the last response to your clipboard with /copy',
-  'Open the full documentation in your browser with /docs',
   'Add directories to your workspace with /directory add <path>',
   'Show all directories in your workspace with /directory show',
   'Use /dir as a shortcut for /directory',
@@ -152,9 +151,7 @@ export const INFORMATIVE_TIPS = [
   'List all available tools with /tools',
   'View and edit settings with the /settings editor',
   'Toggle Vim keybindings on and off with /vim',
-  'Set up GitHub Actions with /setup-github',
   'Configure terminal keybindings for multiline input with /terminal-setup',
-  'Find relevant documentation with /find-docs',
   'Execute any shell command with !<command>',
   // Command tips end here
 ];

@@ -42,14 +42,6 @@ Slash commands provide meta-level control over the CLI itself.
 - **Description:** Open a dialog that lets you configure LLM API providers (for example,
   setting up a Gemini API key profile).
 
-### `/bug`
-
-- **Description:** File an issue about Sparkle CLI. By default, the issue is filed
-  within the GitHub repository for Sparkle CLI. The string you enter after `/bug` will
-  become the headline for the bug being filed. The default `/bug` behavior can be
-  modified using the `advanced.bugCommand` setting in your `.sparkle/settings.json`
-  files.
-
 ### `/chat`
 
 - **Description:** Browse and resume previous conversation sessions, and manage manual
@@ -112,12 +104,18 @@ Slash commands provide meta-level control over the CLI itself.
     - **Usage:** `/chat share file.md` or `/chat share file.json`.
     - **Alias form:** `/resume share [filename]`
 
-### `/clear`
+### `/clear` (alias: `/new`)
 
-- **Description:** Clear the terminal screen, including the visible session history and
-  scrollback within the CLI. The underlying session data (for history recall) might be
-  preserved depending on the exact implementation, but the visual display is cleared.
-- **Keyboard shortcut:** Press **Ctrl+L** at any time to perform a clear action.
+- **Description:** Ends the current session and starts a new one: the conversation
+  history is cleared (the model no longer sees previous turns), a new session is
+  started, the terminal screen is cleared, and session-related hooks fire.
+- **Alias:** `/new`
+- **Arguments:**
+  - **`-d`** or **`--delete`**: In addition to the default behavior, deletes the
+    previous session record from disk.
+- **Keyboard shortcut:** Press **Ctrl+L** at any time to clear the terminal screen and
+  redraw the UI. **visual clear only**: it does not reset the conversation history or
+  the current session.
 
 ### `/commands`
 
@@ -135,10 +133,11 @@ Slash commands provide meta-level control over the CLI itself.
       restarting the CLI.
     - **Usage:** `/commands reload`
 
-### `/compress`
+### `/compact`
 
 - **Description:** Replace the entire chat context with a summary. This saves on tokens
   used for future tasks while retaining a high level summary of what has happened.
+- **Alias:** `/compress`
 
 ### `/copy`
 
@@ -168,10 +167,6 @@ Slash commands provide meta-level control over the CLI itself.
     - **Description:** Display all directories added by `/directory add` and
       `--include-directories`.
     - **Usage:** `/directory show`
-
-### `/docs`
-
-- **Description:** Open Sparkle CLI documentation in your browser.
 
 ### `/editor`
 
@@ -323,11 +318,6 @@ Slash commands provide meta-level control over the CLI itself.
   - **`list`**:
     - **Description:** List all active policies grouped by mode.
 
-### `/privacy`
-
-- **Description:** Display the Privacy Notice and allow users to select whether they
-  consent to the collection of their data for service improvement purposes.
-
 ### `/quit` (or `/exit`)
 
 - **Description:** Exit Sparkle CLI.
@@ -376,14 +366,11 @@ Slash commands provide meta-level control over the CLI itself.
   search for specific settings, view their current values, and modify them as desired.
   Changes to some settings are applied immediately, while others require a restart.
 
-### `/shells` (or `/bashes`)
+### `/tasks` (alias: `/bg`, `/background`)
 
-- **Description:** Toggle the background shells view. This lets you view and manage
-  long-running processes that you've sent to the background.
-
-### `/setup-github`
-
-- **Description:** Set up GitHub Actions to triage issues and review PRs with Sparkle.
+- **Description:** Toggle the background tasks view. This lets you view and manage
+  long-running shell processes that you have sent to the background.
+- **Usage:** Press **Ctrl+B** at any time to perform the same toggle.
 
 ### `/skills`
 
@@ -412,7 +399,7 @@ Slash commands provide meta-level control over the CLI itself.
       calls, and performance metrics. This is the default view.
   - **`model`**:
     - **Description:** Show model-specific usage statistics, including token counts and
-      quota information.
+      speed.
   - **`tools`**:
     - **Description:** Show tool-specific usage statistics.
 

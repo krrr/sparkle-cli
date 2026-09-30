@@ -60,9 +60,9 @@ Sparkle will run the command (for example, `npm run dev`) and detach it.
 
 ### Scenario: Viewing active shells
 
-To see what's running in the background, use the `/shells` command.
+To see what's running in the background, use the `/tasks` command.
 
-**Command:** `/shells`
+**Command:** `/tasks`
 
 This opens a dashboard where you can view logs or kill runaway processes.
 
