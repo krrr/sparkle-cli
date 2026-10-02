@@ -6,7 +6,12 @@
 
 import * as fsPromises from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
-import type { CommandContext, SlashCommand, OpenDialogActionReturn } from './types.js';
+import type {
+  CommandContext,
+  SlashCommand,
+  OpenDialogActionReturn,
+  SlashCommandActionReturn,
+} from './types.js';
 import { CommandKind } from './types.js';
 import {
   type MessageActionReturn,
@@ -16,12 +21,16 @@ import {
 } from 'sparkle-cli-core';
 import type { Content } from '@google/genai';
 import path from 'node:path';
-import type { HistoryItemWithoutId, HistoryItem } from '../types.js';
+import type {
+  HistoryItemWithoutId,
+  HistoryItem,
+  HistoryItemExportSession,
+} from '../types.js';
 import { MessageType } from '../types.js';
 import { exportHistoryToFile } from '../utils/historyExportUtils.js';
 import { convertToRestPayload } from 'sparkle-cli-core';
 import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
-import { cleanMessage } from '../../utils/sessionUtils.js';
+import { cleanMessage, SessionSelector } from '../../utils/sessionUtils.js';
 
 function convertContentHistoryToUiHistory(
   history: ReadonlyArray<Content | HistoryTurn>,
@@ -57,10 +66,10 @@ function convertContentHistoryToUiHistory(
   return uiHistory;
 }
 
-const shareCommand: SlashCommand = {
-  name: 'share',
+const exportCommand: SlashCommand = {
+  name: 'export',
   description:
-    'Share the current conversation to a markdown or json file. Usage: /chat share <file>',
+    'Export the current conversation to a Markdown or JSON file. Usage: /chat export <file>',
   kind: CommandKind.BUILT_IN,
   autoExecute: false,
   action: async (context, args): Promise<MessageActionReturn> => {
@@ -84,7 +93,7 @@ const shareCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'error',
-        content: 'No chat client available to share conversation.',
+        content: 'No chat client available to export conversation.',
       };
     }
 
@@ -97,7 +106,7 @@ const shareCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'info',
-        content: 'No conversation found to share.',
+        content: 'No conversation found to export.',
       };
     }
 
@@ -106,14 +115,14 @@ const shareCommand: SlashCommand = {
       return {
         type: 'message',
         messageType: 'info',
-        content: `Conversation shared to ${filePath}`,
+        content: `Conversation exported to ${filePath}`,
       };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       return {
         type: 'message',
         messageType: 'error',
-        content: `Error sharing conversation: ${errorMessage}`,
+        content: `Error exporting conversation: ${errorMessage}`,
       };
     }
   },
@@ -270,7 +279,87 @@ const forkCommand: SlashCommand = {
   },
 };
 
-const chatSubCommands: SlashCommand[] = [shareCommand, forkCommand];
+const dumpCommand: SlashCommand = {
+  name: 'dump',
+  description:
+    'Dump the full session record (including tool metadata) to a JSON file. Usage: /chat dump <file>',
+  kind: CommandKind.BUILT_IN,
+  autoExecute: true,
+  action: async (context, args): Promise<SlashCommandActionReturn | void> => {
+    const targetArg = args.trim();
+    if (!targetArg) {
+      return {
+        type: 'message',
+        messageType: 'error',
+        content:
+          'Please provide a file path to dump the session to. Example: /chat dump ./my-session.json',
+      };
+    }
+
+    const sessionId = context.services.agentContext?.config.getSessionId();
+    if (!sessionId) {
+      return {
+        type: 'message',
+        messageType: 'error',
+        content: 'No active session found to dump.',
+      };
+    }
+
+    if (context.ui.pendingItem) {
+      context.ui.addItem(
+        {
+          type: MessageType.ERROR,
+          text: 'Operation already in progress, please wait.',
+        },
+        Date.now(),
+      );
+      return;
+    }
+
+    const pendingMessage: HistoryItemExportSession = {
+      type: MessageType.EXPORT_SESSION,
+      exportSession: {
+        isPending: true,
+      },
+    };
+
+    try {
+      context.ui.setPendingItem(pendingMessage);
+      const storage = context.services.agentContext!.config.storage;
+      const sessionSelector = new SessionSelector(storage);
+      const { sessionData } = await sessionSelector.resolveSession(sessionId);
+
+      const targetPath = path.resolve(process.cwd(), targetArg);
+
+      await fsPromises.writeFile(
+        targetPath,
+        JSON.stringify(sessionData, null, 2),
+        'utf-8',
+      );
+
+      context.ui.addItem(
+        {
+          type: MessageType.EXPORT_SESSION,
+          exportSession: {
+            isPending: false,
+            targetPath,
+          },
+        } as HistoryItemExportSession,
+        Date.now(),
+      );
+    } catch (error) {
+      return {
+        type: 'message',
+        messageType: 'error',
+        content: `Failed to dump session: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      };
+    } finally {
+      context.ui.setPendingItem(null);
+    }
+  },
+};
+
+const chatSubCommands: SlashCommand[] = [exportCommand, dumpCommand, forkCommand];
 
 export const chatCommand: SlashCommand = {
   name: 'chat',

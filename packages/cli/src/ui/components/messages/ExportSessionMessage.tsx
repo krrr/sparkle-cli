@@ -15,8 +15,8 @@ export interface ExportSessionDisplayProps {
 }
 
 /*
- * Export session messages appear when the /export-session command is run, and show a loading spinner
- * while export is in progress, followed by a success message.
+ * Dump messages appear when the /chat dump command is run, and show a loading spinner
+ * while the session record is being written, followed by a success message.
  */
 export function ExportSessionMessage({
   exportSession,
@@ -35,8 +35,8 @@ export function ExportSessionMessage({
       <Box>
         <Text color={isPending ? theme.text.accent : theme.status.success}>
           {isPending
-            ? 'Exporting session...'
-            : `Successfully exported session to ${targetPath}`}
+            ? 'Dumping session...'
+            : `Successfully dumped session to ${targetPath}`}
         </Text>
       </Box>
     </Box>

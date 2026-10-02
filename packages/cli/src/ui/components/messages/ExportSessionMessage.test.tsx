@@ -20,7 +20,7 @@ describe('ExportSessionMessage', () => {
       <ExportSessionMessage exportSession={{ isPending: true }} />,
     );
     expect(lastFrame()).toContain('[spinner]');
-    expect(lastFrame()).toContain('Exporting session...');
+    expect(lastFrame()).toContain('Dumping session...');
   });
 
   it('renders success state correctly', async () => {
@@ -34,6 +34,6 @@ describe('ExportSessionMessage', () => {
       />,
     );
     expect(lastFrame()).toContain('✓');
-    expect(lastFrame()).toContain(`Successfully exported session to ${testPath}`);
+    expect(lastFrame()).toContain(`Successfully dumped session to ${testPath}`);
   });
 });

@@ -23,6 +23,7 @@ import {
   serializeHistoryToMarkdown,
   exportHistoryToFile,
 } from '../utils/historyExportUtils.js';
+import { SessionSelector } from '../../utils/sessionUtils.js';
 import path from 'node:path';
 
 vi.mock('fs/promises', () => ({
@@ -40,6 +41,14 @@ vi.mock('../utils/historyExportUtils.js', async (importOriginal) => {
   };
 });
 
+vi.mock('../../utils/sessionUtils.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../utils/sessionUtils.js')>();
+  return {
+    ...actual,
+    SessionSelector: vi.fn(),
+  };
+});
+
 describe('chatCommand', () => {
   const mockFs = vi.mocked(fsPromises);
   const mockExport = vi.mocked(exportHistoryToFile);
@@ -48,7 +57,7 @@ describe('chatCommand', () => {
   let mockGetChat: ReturnType<typeof vi.fn>;
   let mockGetHistory: ReturnType<typeof vi.fn>;
 
-  const getSubCommand = (name: 'share' | 'fork'): SlashCommand => {
+  const getSubCommand = (name: 'export' | 'dump' | 'fork'): SlashCommand => {
     const subCommand = chatCommand.subCommands?.find((cmd) => cmd.name === name);
     if (!subCommand) {
       throw new Error(`/chat ${name} command not found.`);
@@ -101,7 +110,7 @@ describe('chatCommand', () => {
     expect(chatCommand.altNames).toContain('resume');
     expect(chatCommand.description).toBe('Browse auto-saved conversations');
     expect(chatCommand.autoExecute).toBe(true);
-    expect(chatCommand.subCommands).toHaveLength(2);
+    expect(chatCommand.subCommands).toHaveLength(3);
   });
 
   it('should expose unified chat subcommands directly under /chat', () => {
@@ -109,11 +118,11 @@ describe('chatCommand', () => {
       .filter((subCommand) => !subCommand.hidden)
       .map((subCommand) => subCommand.name);
 
-    expect(visibleSubCommandNames).toEqual(['share', 'fork']);
+    expect(visibleSubCommandNames).toEqual(['export', 'dump', 'fork']);
   });
 
-  describe('share subcommand', () => {
-    let shareCommand: SlashCommand;
+  describe('export subcommand', () => {
+    let exportCommand: SlashCommand;
     const mockHistory = [
       { role: 'user', parts: [{ text: 'context' }] },
       { role: 'model', parts: [{ text: 'context response' }] },
@@ -122,7 +131,7 @@ describe('chatCommand', () => {
     ];
 
     beforeEach(() => {
-      shareCommand = getSubCommand('share');
+      exportCommand = getSubCommand('export');
       vi.spyOn(process, 'cwd').mockReturnValue(
         path.resolve('/usr/local/google/home/myuser/sparkle-cli'),
       );
@@ -132,7 +141,7 @@ describe('chatCommand', () => {
     });
 
     it('should default to a json file if no path is provided', async () => {
-      const result = await shareCommand?.action?.(mockContext, '');
+      const result = await exportCommand?.action?.(mockContext, '');
       const expectedPath = path.join(
         process.cwd(),
         'sparkle-conversation-1234567890.json',
@@ -144,13 +153,13 @@ describe('chatCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: `Conversation shared to ${expectedPath}`,
+        content: `Conversation exported to ${expectedPath}`,
       });
     });
 
-    it('should share the conversation to a JSON file', async () => {
+    it('should export the conversation to a JSON file', async () => {
       const filePath = 'my-chat.json';
-      const result = await shareCommand?.action?.(mockContext, filePath);
+      const result = await exportCommand?.action?.(mockContext, filePath);
       const expectedPath = path.join(process.cwd(), 'my-chat.json');
       expect(mockExport).toHaveBeenCalledWith({
         history: mockHistory,
@@ -159,13 +168,13 @@ describe('chatCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: `Conversation shared to ${expectedPath}`,
+        content: `Conversation exported to ${expectedPath}`,
       });
     });
 
-    it('should share the conversation to a Markdown file', async () => {
+    it('should export the conversation to a Markdown file', async () => {
       const filePath = 'my-chat.md';
-      const result = await shareCommand?.action?.(mockContext, filePath);
+      const result = await exportCommand?.action?.(mockContext, filePath);
       const expectedPath = path.join(process.cwd(), 'my-chat.md');
       expect(mockExport).toHaveBeenCalledWith({
         history: mockHistory,
@@ -174,13 +183,13 @@ describe('chatCommand', () => {
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: `Conversation shared to ${expectedPath}`,
+        content: `Conversation exported to ${expectedPath}`,
       });
     });
 
     it('should return an error for unsupported file extensions', async () => {
       const filePath = 'my-chat.txt';
-      const result = await shareCommand?.action?.(mockContext, filePath);
+      const result = await exportCommand?.action?.(mockContext, filePath);
       expect(mockExport).not.toHaveBeenCalled();
       expect(result).toEqual({
         type: 'message',
@@ -189,31 +198,31 @@ describe('chatCommand', () => {
       });
     });
 
-    it('should inform if there is no conversation to share', async () => {
+    it('should inform if there is no conversation to export', async () => {
       mockGetHistory.mockReturnValue([{ role: 'user', parts: [{ text: 'context' }] }]);
-      const result = await shareCommand?.action?.(mockContext, 'my-chat.json');
+      const result = await exportCommand?.action?.(mockContext, 'my-chat.json');
       expect(mockExport).not.toHaveBeenCalled();
       expect(result).toEqual({
         type: 'message',
         messageType: 'info',
-        content: 'No conversation found to share.',
+        content: 'No conversation found to export.',
       });
     });
 
     it('should handle errors during file writing', async () => {
       const error = new Error('Permission denied');
       mockExport.mockRejectedValue(error);
-      const result = await shareCommand?.action?.(mockContext, 'my-chat.json');
+      const result = await exportCommand?.action?.(mockContext, 'my-chat.json');
       expect(result).toEqual({
         type: 'message',
         messageType: 'error',
-        content: `Error sharing conversation: ${error.message}`,
+        content: `Error exporting conversation: ${error.message}`,
       });
     });
 
     it('should output valid JSON schema', async () => {
       const filePath = 'my-chat.json';
-      await shareCommand?.action?.(mockContext, filePath);
+      await exportCommand?.action?.(mockContext, filePath);
       const expectedPath = path.join(process.cwd(), 'my-chat.json');
       expect(mockExport).toHaveBeenCalledWith({
         history: mockHistory,
@@ -223,12 +232,108 @@ describe('chatCommand', () => {
 
     it('should output correct markdown format', async () => {
       const filePath = 'my-chat.md';
-      await shareCommand?.action?.(mockContext, filePath);
+      await exportCommand?.action?.(mockContext, filePath);
       const expectedPath = path.join(process.cwd(), 'my-chat.md');
       expect(mockExport).toHaveBeenCalledWith({
         history: mockHistory,
         filePath: expectedPath,
       });
+    });
+  });
+
+  describe('dump subcommand', () => {
+    let dumpCommand: SlashCommand;
+    let mockResolveSession: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      dumpCommand = getSubCommand('dump');
+      mockResolveSession = vi.fn();
+      vi.mocked(SessionSelector).mockReturnValue({
+        resolveSession: mockResolveSession,
+      } as unknown as SessionSelector);
+      mockContext.services.agentContext!.config.getSessionId = () => 'test-session-id';
+      vi.spyOn(process, 'cwd').mockReturnValue('/project/root');
+      mockFs.writeFile.mockClear();
+    });
+
+    it('should return error if no path is provided', async () => {
+      const result = await dumpCommand.action!(mockContext, '   ');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: expect.stringContaining('Please provide a file path'),
+      });
+      expect(mockResolveSession).not.toHaveBeenCalled();
+    });
+
+    it('should return error if sessionId is missing', async () => {
+      mockContext.services.agentContext!.config.getSessionId = () =>
+        undefined as unknown as string;
+
+      const result = await dumpCommand.action!(mockContext, 'dump.json');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: 'No active session found to dump.',
+      });
+      expect(mockResolveSession).not.toHaveBeenCalled();
+    });
+
+    it('should dump the session successfully', async () => {
+      const mockSessionData = {
+        sessionId: 'test-session-id',
+        messages: [],
+        projectHash: 'hash',
+        startTime: 'time',
+        lastUpdated: 'time',
+      };
+      mockResolveSession.mockResolvedValue({
+        sessionData: mockSessionData,
+        sessionPath: path.join(path.sep, 'tmp', 'mock-dir', 'chats', 'session.jsonl'),
+        displayInfo: 'test',
+      });
+
+      const result = await dumpCommand.action!(mockContext, '  dump.json  ');
+
+      expect(result).toBeUndefined();
+      expect(mockResolveSession).toHaveBeenCalledWith('test-session-id');
+      expect(mockFs.writeFile).toHaveBeenCalledWith(
+        path.resolve('/project/root', 'dump.json'),
+        JSON.stringify(mockSessionData, null, 2),
+        'utf-8',
+      );
+      expect(mockContext.ui.setPendingItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'export_session',
+          exportSession: { isPending: true },
+        }),
+      );
+      expect(mockContext.ui.addItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'export_session',
+          exportSession: {
+            isPending: false,
+            targetPath: expect.stringContaining('dump.json'),
+          },
+        }),
+        expect.any(Number),
+      );
+      expect(mockContext.ui.setPendingItem).toHaveBeenLastCalledWith(null);
+    });
+
+    it('should return error if resolveSession fails', async () => {
+      mockResolveSession.mockRejectedValue(new Error('Session not found'));
+
+      const result = await dumpCommand.action!(mockContext, 'dump.json');
+
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content: 'Failed to dump session: Session not found',
+      });
+      expect(mockContext.ui.setPendingItem).toHaveBeenLastCalledWith(null);
     });
   });
 

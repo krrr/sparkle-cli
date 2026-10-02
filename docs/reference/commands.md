@@ -60,20 +60,26 @@ Slash commands provide meta-level control over the CLI itself.
 - **Menu layout when typing `/chat` (or `/resume`)**:
   - `-- auto --`
     - `list` (selecting this opens the auto-saved session browser)
-    - `share`, `fork`
+    - `export`, `dump`, `fork`
   - Unique prefixes (for example `/cha` or `/resu`) resolve to the same grouped menu.
 - **Sub-commands:**
   - **`debug`**
     - **Description:** Export the most recent API request as a JSON payload.
+  - **`dump [filename]`**
+    - **Description:** Writes the full session record, including tool-call metadata, to
+      a JSON file. Use this when you need the complete machine-readable session data
+      rather than a readable transcript.
+    - **Usage:** `/chat dump ./my-session.json`
+    - **Alias form:** `/resume dump [filename]`
+  - **`export [filename]`**
+    - **Description:** Writes the current conversation to a provided Markdown or JSON
+      file. If no filename is provided, then the CLI will generate one.
+    - **Usage:** `/chat export file.md` or `/chat export file.json`.
+    - **Alias form:** `/resume export [filename]`
   - **`fork`**
     - **Description:** Duplicates the current conversation into a new session, so you
       can explore a different approach without losing the original.
     - **Alias form:** `/resume fork`
-  - **`share [filename]`**
-    - **Description:** Writes the current conversation to a provided Markdown or JSON
-      file. If no filename is provided, then the CLI will generate one.
-    - **Usage:** `/chat share file.md` or `/chat share file.json`.
-    - **Alias form:** `/resume share [filename]`
 
 ### `/clear` (alias: `/new`)
 

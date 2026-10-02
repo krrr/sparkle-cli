@@ -88,7 +88,9 @@ This duplicates the current conversation into a new session, so you can try a di
 approach while the original session stays intact. Aliases:
 
 - `/resume fork` works for the same command.
-- `/chat share [filename]` exports the current conversation to a Markdown or JSON file.
+- `/chat export [filename]` exports the current conversation to a Markdown or JSON file.
+- `/chat dump [filename]` writes the full session record, including tool-call metadata,
+  to a JSON file.
 
 ## Parallel sessions with Git worktrees
 

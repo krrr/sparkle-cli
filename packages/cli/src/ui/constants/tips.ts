@@ -119,7 +119,7 @@ export const INFORMATIVE_TIPS = [
   'Show version info with /about',
   'Change your provider with /provider',
   'View and manage background shells with /tasks',
-  'Share your conversation to a file with /chat share <file>',
+  'Export your conversation to a file with /chat export <file>',
   'Duplicate the current conversation with /chat fork',
   'Clear the screen and history with /clear',
   'Save tokens by summarizing the context with /compress',

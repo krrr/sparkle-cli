@@ -87,7 +87,7 @@ vi.mock('../ui/commands/chatCommand.js', () => ({
   chatCommand: {
     name: 'chat',
     altNames: ['resume'],
-    subCommands: [{ name: 'share' }, { name: 'fork' }],
+    subCommands: [{ name: 'export' }, { name: 'dump' }, { name: 'fork' }],
   },
   debugCommand: { name: 'debug' },
 }));
