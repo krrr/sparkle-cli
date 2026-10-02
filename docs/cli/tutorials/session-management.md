@@ -99,17 +99,17 @@ Sparkle gives you granular control over the undo process. You can choose to:
 Sometimes you want to try two different approaches to the same problem.
 
 1.  Start a session and get to a decision point.
-2.  Save the current state with `/chat save decision-point`.
-3.  Try your first approach.
-4.  Later, use `/chat resume decision-point` to fork the conversation back to that
-    moment and try a different approach.
+2.  Fork the current conversation with `/chat fork`. This duplicates the session so both
+    copies start from the same point.
+3.  In one session, try your first approach; in the forked session, try a different one.
 
-This creates a new branch of history without losing your original work.
+Each branch develops independently, so you can compare the results without losing your
+original work.
 
 ## Next steps
 
 - Learn about [Checkpointing](../../cli/checkpointing.md) to understand the underlying
   safety mechanism.
 - Explore [Task planning](task-planning.md) to keep complex sessions organized.
-- See the [Command reference](../../reference/commands.md) for `/chat` options, grouped
-  checkpoint menus, and `/resume` compatibility aliases.
+- See the [Command reference](../../reference/commands.md) for `/chat` options and its
+  `/resume` alias.

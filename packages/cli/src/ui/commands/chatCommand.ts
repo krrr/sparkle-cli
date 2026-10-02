@@ -6,18 +6,9 @@
 
 import * as fsPromises from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
-import React from 'react';
-import { Text } from 'ink';
-import { theme } from '../semantic-colors.js';
-import type {
-  CommandContext,
-  SlashCommand,
-  SlashCommandActionReturn,
-  OpenDialogActionReturn,
-} from './types.js';
+import type { CommandContext, SlashCommand, OpenDialogActionReturn } from './types.js';
 import { CommandKind } from './types.js';
 import {
-  decodeTagName,
   type MessageActionReturn,
   INITIAL_HISTORY_LENGTH,
   uiTelemetryService,
@@ -25,140 +16,12 @@ import {
 } from 'sparkle-cli-core';
 import type { Content } from '@google/genai';
 import path from 'node:path';
-import type {
-  HistoryItemWithoutId,
-  HistoryItemChatList,
-  ChatDetail,
-  HistoryItem,
-} from '../types.js';
+import type { HistoryItemWithoutId, HistoryItem } from '../types.js';
 import { MessageType } from '../types.js';
 import { exportHistoryToFile } from '../utils/historyExportUtils.js';
 import { convertToRestPayload } from 'sparkle-cli-core';
 import { convertSessionToHistoryFormats } from '../hooks/useSessionBrowser.js';
 import { cleanMessage } from '../../utils/sessionUtils.js';
-
-const CHECKPOINT_MENU_GROUP = 'checkpoints';
-
-const getSavedChatTags = async (
-  context: CommandContext,
-  mtSortDesc: boolean,
-): Promise<ChatDetail[]> => {
-  const cfg = context.services.agentContext?.config;
-  const geminiDir = cfg?.storage?.getProjectDataDir();
-  if (!geminiDir) {
-    return [];
-  }
-  try {
-    const file_head = 'checkpoint-';
-    const file_tail = '.json';
-    const files = await fsPromises.readdir(geminiDir);
-    const chatDetails: ChatDetail[] = [];
-
-    for (const file of files) {
-      if (file.startsWith(file_head) && file.endsWith(file_tail)) {
-        const filePath = path.join(geminiDir, file);
-        const stats = await fsPromises.stat(filePath);
-        const tagName = file.slice(file_head.length, -file_tail.length);
-        chatDetails.push({
-          name: decodeTagName(tagName),
-          mtime: stats.mtime.toISOString(),
-        });
-      }
-    }
-
-    chatDetails.sort((a, b) =>
-      mtSortDesc ? b.mtime.localeCompare(a.mtime) : a.mtime.localeCompare(b.mtime),
-    );
-
-    return chatDetails;
-  } catch {
-    return [];
-  }
-};
-
-const listCommand: SlashCommand = {
-  name: 'list',
-  description: 'List saved manual conversation checkpoints',
-  kind: CommandKind.BUILT_IN,
-  autoExecute: true,
-  takesArgs: false,
-  action: async (context): Promise<void> => {
-    const chatDetails = await getSavedChatTags(context, false);
-
-    const item: HistoryItemChatList = {
-      type: MessageType.CHAT_LIST,
-      chats: chatDetails,
-    };
-
-    context.ui.addItem(item);
-  },
-};
-
-const saveCommand: SlashCommand = {
-  name: 'save',
-  description: 'Save the current conversation as a checkpoint. Usage: /chat save <tag>',
-  kind: CommandKind.BUILT_IN,
-  autoExecute: false,
-  action: async (context, args): Promise<SlashCommandActionReturn | void> => {
-    const tag = args.trim();
-    if (!tag) {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: 'Missing tag. Usage: /chat save <tag>',
-      };
-    }
-
-    const { logger } = context.services;
-    const config = context.services.agentContext?.config;
-    await logger.initialize();
-
-    if (!context.overwriteConfirmed) {
-      const exists = await logger.checkpointExists(tag);
-      if (exists) {
-        return {
-          type: 'confirm_action',
-          prompt: React.createElement(
-            Text,
-            null,
-            'A checkpoint with the tag ',
-            React.createElement(Text, { color: theme.text.accent }, tag),
-            ' already exists. Do you want to overwrite it?',
-          ),
-          originalInvocation: {
-            raw: context.invocation?.raw || `/chat save ${tag}`,
-          },
-        };
-      }
-    }
-
-    const chat = context.services.agentContext?.geminiClient?.getChat();
-    if (!chat) {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: 'No chat client available to save conversation.',
-      };
-    }
-
-    const history = chat.getDurableHistoryTurns().map((t) => t.content);
-    if (history.length > INITIAL_HISTORY_LENGTH) {
-      const authType = config?.getContentGeneratorConfig()?.authType;
-      await logger.saveCheckpoint({ history, authType }, tag);
-      return {
-        type: 'message',
-        messageType: 'info',
-        content: `Conversation checkpoint saved with tag: ${decodeTagName(tag)}.`,
-      };
-    } else {
-      return {
-        type: 'message',
-        messageType: 'info',
-        content: 'No conversation found to save.',
-      };
-    }
-  },
-};
 
 function convertContentHistoryToUiHistory(
   history: ReadonlyArray<Content | HistoryTurn>,
@@ -193,105 +56,6 @@ function convertContentHistoryToUiHistory(
 
   return uiHistory;
 }
-
-const resumeCheckpointCommand: SlashCommand = {
-  name: 'resume',
-  altNames: ['load'],
-  description: 'Resume a conversation from a checkpoint. Usage: /chat resume <tag>',
-  kind: CommandKind.BUILT_IN,
-  autoExecute: true,
-  action: async (context, args) => {
-    const tag = args.trim();
-    if (!tag) {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: 'Missing tag. Usage: /chat resume <tag>',
-      };
-    }
-
-    const { logger } = context.services;
-    const config = context.services.agentContext?.config;
-    await logger.initialize();
-    const checkpoint = await logger.loadCheckpoint(tag);
-    const conversation = checkpoint.history;
-
-    if (conversation.length === 0) {
-      return {
-        type: 'message',
-        messageType: 'info',
-        content: `No saved checkpoint found with tag: ${decodeTagName(tag)}.`,
-      };
-    }
-
-    const currentAuthType = config?.getContentGeneratorConfig()?.authType;
-    if (
-      checkpoint.authType &&
-      currentAuthType &&
-      checkpoint.authType !== currentAuthType
-    ) {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: `Cannot resume chat. It was saved with a different authentication method (${checkpoint.authType}) than the current one (${currentAuthType}).`,
-      };
-    }
-
-    const uiHistory = convertContentHistoryToUiHistory(conversation);
-    return {
-      type: 'load_history',
-      history: uiHistory,
-      clientHistory: conversation,
-    };
-  },
-  completion: async (context, partialArg) => {
-    const chatDetails = await getSavedChatTags(context, true);
-    return chatDetails
-      .map((chat) => chat.name)
-      .filter((name) => name.startsWith(partialArg));
-  },
-};
-
-const deleteCommand: SlashCommand = {
-  name: 'delete',
-  description: 'Delete a conversation checkpoint. Usage: /chat delete <tag>',
-  kind: CommandKind.BUILT_IN,
-  autoExecute: true,
-  action: async (context, args): Promise<MessageActionReturn> => {
-    const tag = args.trim();
-    if (!tag) {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: 'Missing tag. Usage: /chat delete <tag>',
-      };
-    }
-
-    const { logger } = context.services;
-    await logger.initialize();
-    const deleted = await logger.deleteCheckpoint(tag);
-
-    if (deleted) {
-      return {
-        type: 'message',
-        messageType: 'info',
-        content: `Conversation checkpoint '${decodeTagName(tag)}' has been deleted.`,
-      };
-    } else {
-      return {
-        type: 'message',
-        messageType: 'error',
-        content: `Error: No checkpoint found with tag '${decodeTagName(tag)}'.`,
-      };
-    }
-  },
-  completion: async (context, partialArg) => {
-    const chatDetails = await getSavedChatTags(context, true);
-    return chatDetails
-      .map((chat) => chat.name)
-      .filter((name) => name.startsWith(partialArg));
-  },
-};
 
 const shareCommand: SlashCommand = {
   name: 'share',
@@ -506,37 +270,12 @@ const forkCommand: SlashCommand = {
   },
 };
 
-export const checkpointSubCommands: SlashCommand[] = [
-  listCommand,
-  saveCommand,
-  resumeCheckpointCommand,
-  deleteCommand,
-  shareCommand,
-];
-
-const checkpointCompatibilityCommand: SlashCommand = {
-  name: 'checkpoints',
-  altNames: ['checkpoint'],
-  description: 'Compatibility command for nested checkpoint operations',
-  kind: CommandKind.BUILT_IN,
-  hidden: true,
-  autoExecute: false,
-  subCommands: checkpointSubCommands,
-};
-
-const chatSubCommands: SlashCommand[] = [
-  ...checkpointSubCommands.map((subCommand) => ({
-    ...subCommand,
-    suggestionGroup: CHECKPOINT_MENU_GROUP,
-  })),
-  checkpointCompatibilityCommand,
-  forkCommand,
-];
+const chatSubCommands: SlashCommand[] = [shareCommand, forkCommand];
 
 export const chatCommand: SlashCommand = {
   name: 'chat',
   altNames: ['resume', 'session'],
-  description: 'Browse auto-saved conversations and manage chat checkpoints',
+  description: 'Browse auto-saved conversations',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (

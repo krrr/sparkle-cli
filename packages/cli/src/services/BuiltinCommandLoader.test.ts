@@ -87,14 +87,7 @@ vi.mock('../ui/commands/chatCommand.js', () => ({
   chatCommand: {
     name: 'chat',
     altNames: ['resume'],
-    subCommands: [
-      { name: 'list' },
-      { name: 'save' },
-      { name: 'resume' },
-      { name: 'delete' },
-      { name: 'share' },
-      { name: 'checkpoints', hidden: true, subCommands: [{ name: 'list' }] },
-    ],
+    subCommands: [{ name: 'share' }, { name: 'fork' }],
   },
   debugCommand: { name: 'debug' },
 }));
@@ -274,13 +267,6 @@ describe('BuiltinCommandLoader', () => {
       const chatHasDebug =
         chatCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
       expect(chatHasDebug).toBe(false);
-
-      const chatCheckpointsCmd = chatCmd?.subCommands?.find(
-        (c) => c.name === 'checkpoints',
-      );
-      const chatCheckpointHasDebug =
-        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
-      expect(chatCheckpointHasDebug).toBe(false);
     });
 
     it('should add debug subcommand to the chat command when debug mode is enabled', async () => {
@@ -293,13 +279,6 @@ describe('BuiltinCommandLoader', () => {
       const chatHasDebug =
         chatCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
       expect(chatHasDebug).toBe(true);
-
-      const chatCheckpointsCmd = chatCmd?.subCommands?.find(
-        (c) => c.name === 'checkpoints',
-      );
-      const chatCheckpointHasDebug =
-        chatCheckpointsCmd?.subCommands?.some((c) => c.name === 'debug') ?? false;
-      expect(chatCheckpointHasDebug).toBe(true);
     });
   });
 });

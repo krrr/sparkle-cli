@@ -72,27 +72,13 @@ export class BuiltinCommandLoader implements ICommandLoader {
         return subCommands;
       }
 
-      const withNestedCompatibility = subCommands.map((subCommand) => {
-        if (subCommand.name !== 'checkpoints') {
-          return subCommand;
-        }
-
-        return {
-          ...subCommand,
-          subCommands: addDebugToChatSubCommands(subCommand.subCommands),
-        };
-      });
-
       if (!isDebugMode) {
-        return withNestedCompatibility;
+        return subCommands;
       }
 
-      return withNestedCompatibility.some((cmd) => cmd.name === debugCommand.name)
-        ? withNestedCompatibility
-        : [
-            ...withNestedCompatibility,
-            { ...debugCommand, suggestionGroup: 'checkpoints' },
-          ];
+      return subCommands.some((cmd) => cmd.name === debugCommand.name)
+        ? subCommands
+        : [...subCommands, debugCommand];
     };
 
     const allDefinitions: Array<SlashCommand | null> = [

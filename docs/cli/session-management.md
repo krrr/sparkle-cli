@@ -60,9 +60,8 @@ While the CLI is running, use the `/chat` slash command to open the **Session Br
 When typing `/chat` (or `/resume`) in slash completion, commands are grouped under
 titled separators:
 
-- `-- auto --` (session browser)
+- `-- auto --` (session browser and `/chat` subcommands)
   - `list` is selectable and opens the session browser
-- `-- checkpoints --` (manual tagged checkpoint commands)
 
 Unique prefixes such as `/cha` and `/resu` resolve to the same grouped menu.
 
@@ -77,20 +76,19 @@ following actions:
 - **Select:** Press **Enter** to resume the selected session.
 - **Esc:** Press **Esc** to exit the Session Browser.
 
-### Manual chat checkpoints
+### Fork a conversation
 
-For named branch points inside a session, use chat checkpoints:
+To branch a session from its current point, use the `fork` subcommand:
 
 ```text
-/chat save decision-point
-/chat list
-/chat resume decision-point
+/chat fork
 ```
 
-Aliases:
+This duplicates the current conversation into a new session, so you can try a different
+approach while the original session stays intact. Aliases:
 
-- `/resume ...` works for the same commands.
-- `/resume checkpoints ...` also remains supported during migration.
+- `/resume fork` works for the same command.
+- `/chat share [filename]` exports the current conversation to a Markdown or JSON file.
 
 ## Parallel sessions with Git worktrees
 

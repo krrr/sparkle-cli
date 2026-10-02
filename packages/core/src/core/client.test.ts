@@ -3461,4 +3461,44 @@ ${JSON.stringify(
       });
     });
   });
+
+  describe('resetChat releases the old chat (leak check)', () => {
+    // Forced GC is only available with NODE_OPTIONS=--expose-gc. Plain `npm test`
+    // runs don't set it, so the check is skipped there instead of failing.
+    const gc = (globalThis as unknown as { gc?: () => void }).gc;
+
+    it.skipIf(!gc)('old GeminiChat becomes unreachable after resetChat', async () => {
+      const forceGc = gc;
+      if (!forceGc) {
+        return;
+      }
+
+      // Give the old chat some conversation data so a retention would be meaningful.
+      let oldChat: GeminiChat | null = client.getChat();
+      oldChat.addHistory({
+        role: 'user',
+        parts: [{ text: 'leak-probe-'.repeat(100) }],
+      });
+      let oldRecording: ChatRecordingService | null = oldChat.getChatRecordingService();
+      const oldChatRef = new WeakRef(oldChat);
+      const oldRecordingRef = oldRecording ? new WeakRef(oldRecording) : null;
+      expect(oldChatRef.deref()).toBeDefined();
+
+      await client.resetChat();
+
+      // Drop strong references held by locals/stack frames before forcing GC.
+      // Nudge the event loop first so pending promises referencing the old chat settle.
+      oldChat = null;
+      oldRecording = null;
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      for (let i = 0; i < 5; i++) {
+        forceGc();
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+
+      expect(oldChatRef.deref()).toBeUndefined();
+      expect(oldRecordingRef?.deref()).toBeUndefined();
+      expect(client.getChat()).toBeDefined();
+    });
+  });
 });

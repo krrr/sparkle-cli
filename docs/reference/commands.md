@@ -44,13 +44,10 @@ Slash commands provide meta-level control over the CLI itself.
 
 ### `/chat`
 
-- **Description:** Browse and resume previous conversation sessions, and manage manual
-  chat checkpoints.
+- **Description:** Browse and resume previous conversation sessions.
 - **Features:**
   - **Auto sessions:** Run `/chat` to open the interactive session browser for
     automatically saved conversations.
-  - **Chat checkpoints:** Use checkpoint subcommands directly (`/chat save`,
-    `/chat resume`, etc.).
   - **Management:** Delete unwanted sessions directly from the browser.
   - **Resume:** Select any session to resume and continue the conversation.
   - **Search:** Use `/` to search through conversation content across all sessions.
@@ -63,41 +60,15 @@ Slash commands provide meta-level control over the CLI itself.
 - **Menu layout when typing `/chat` (or `/resume`)**:
   - `-- auto --`
     - `list` (selecting this opens the auto-saved session browser)
-  - `-- checkpoints --`
-    - `list`, `save`, `resume`, `delete`, `share` (manual tagged checkpoints)
+    - `share`, `fork`
   - Unique prefixes (for example `/cha` or `/resu`) resolve to the same grouped menu.
 - **Sub-commands:**
   - **`debug`**
     - **Description:** Export the most recent API request as a JSON payload.
-  - **`delete <tag>`**
-    - **Description:** Deletes a saved conversation checkpoint.
-    - **Alias form:** `/resume delete <tag>`
-  - **`list`**
-    - **Description:** Lists available tags for manually saved checkpoints.
-    - **Note:** This command only lists chats saved within the current project. Because
-      chat history is project-scoped, chats saved in other project directories will not
-      be displayed.
-    - **Alias form:** `/resume list`
-  - **`resume <tag>`**
-    - **Description:** Resumes a conversation from a previous save.
-    - **Note:** You can only resume chats that were saved within the current project. To
-      resume a chat from a different project, you must run the Sparkle CLI from that
-      project's directory.
-    - **Alias form:** `/resume resume <tag>`
-  - **`save <tag>`**
-    - **Description:** Saves the current conversation history. You must add a `<tag>`
-      for identifying the conversation state.
-    - **Details on checkpoint location:** The default locations for saved chat
-      checkpoints are:
-      - Linux/macOS: `~/.sparkle/data/<project-id>/`
-      - Windows: `C:\Users\<YourUsername>\.sparkle\data\<project-id>\`
-      - **Behavior:** Chats are saved into a project-specific directory, determined by
-        where you run the CLI. Consequently, saved chats are only accessible when
-        working within that same project.
-      - **Note:** These checkpoints are for manually saving and resuming conversation
-        states. For automatic checkpoints created before file modifications, see the
-        [Checkpointing documentation](../cli/checkpointing.md).
-      - **Alias form:** `/resume save <tag>`
+  - **`fork`**
+    - **Description:** Duplicates the current conversation into a new session, so you
+      can explore a different approach without losing the original.
+    - **Alias form:** `/resume fork`
   - **`share [filename]`**
     - **Description:** Writes the current conversation to a provided Markdown or JSON
       file. If no filename is provided, then the CLI will generate one.
@@ -350,9 +321,7 @@ Slash commands provide meta-level control over the CLI itself.
 ### `/resume`
 
 - **Description:** Alias for `/chat`. Both `/chat` and `/resume` open the session
-  browser and expose the same checkpoint subcommands.
-- **Compatibility alias:** `/resume checkpoints ...` is still accepted for the same
-  checkpoint commands.
+  browser and expose the same subcommands.
 
 ### `/settings`
 
