@@ -33,7 +33,6 @@ import {
   Config,
   SimpleExtensionLoader,
   resolveToRealPath,
-  getProjectRootForWorktree,
   isGeminiWorktree,
   type WorktreeSettings,
   type HookDefinition,
@@ -546,6 +545,7 @@ export interface LoadCliConfigOptions {
     disabled?: string[];
   };
   worktreeSettings?: WorktreeSettings;
+  // presence of the key means already-resolved; omit it to resolve
   skipExtensions?: boolean;
   loadedSettings?: LoadedSettings;
 }
@@ -564,15 +564,18 @@ export async function loadCliConfig(
   } = options;
   const debugMode = isDebugMode(argv);
 
+  // Avoid calling resolve repeatedly because process creation is slow on Win32. This
+  // entire function is called twice by gemini.tsx, so reuse the previous result.
   const worktreeSettings =
-    options.worktreeSettings ?? (await resolveWorktreeSettings(cwd));
+    'worktreeSettings' in options
+      ? options.worktreeSettings
+      : await resolveWorktreeSettings(cwd);
 
   if (argv.sandbox) {
     process.env['SPARKLE_SANDBOX'] = 'true';
   }
 
   const includeDirectoryTree = settings.context?.includeDirectoryTree ?? true;
-
   const ideMode = settings.ide?.enabled ?? false;
 
   const folderTrust =
@@ -1053,16 +1056,35 @@ async function resolveWorktreeSettings(
 ): Promise<WorktreeSettings | undefined> {
   let worktreePath: string | undefined;
   try {
-    const { stdout } = await execa('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-    });
-    const toplevel = stdout.trim();
-    const projectRoot = await getProjectRootForWorktree(toplevel);
+    const { stdout } = await execa(
+      'git',
+      ['rev-parse', '--show-toplevel', '--git-common-dir'],
+      { cwd, timeout: 10000 },
+    );
+    const lines = stdout
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (lines.length < 2) {
+      debugLogger.debug(
+        `Unexpected git rev-parse output while resolving worktree settings at ${cwd}: ${JSON.stringify(stdout)}`,
+      );
+      return undefined;
+    }
+    const toplevel = lines[0];
+    const gitCommonDir = lines[1];
+    const absoluteGitDir = path.isAbsolute(gitCommonDir)
+      ? gitCommonDir
+      : path.resolve(cwd, gitCommonDir);
+    const projectRoot = path.dirname(absoluteGitDir);
 
     if (isGeminiWorktree(toplevel, projectRoot)) {
       worktreePath = toplevel;
     }
-  } catch {
+  } catch (e: unknown) {
+    debugLogger.debug(
+      `Failed to resolve worktree settings at ${cwd}: ${getErrorMessage(e)}`,
+    );
     return undefined;
   }
 
@@ -1074,6 +1096,7 @@ async function resolveWorktreeSettings(
   try {
     const { stdout } = await execa('git', ['rev-parse', 'HEAD'], {
       cwd: worktreePath,
+      timeout: 10000,
     });
     worktreeBaseSha = stdout.trim();
   } catch (e: unknown) {

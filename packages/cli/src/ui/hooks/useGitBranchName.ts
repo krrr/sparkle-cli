@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { spawnAsync, getAbsoluteGitDir } from 'sparkle-cli-core';
+import { spawnAsync, getAbsoluteGitDir, isGitRepository } from 'sparkle-cli-core';
 import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 
@@ -14,6 +14,11 @@ export function useGitBranchName(cwd: string): string | undefined {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchBranchName = useCallback(async () => {
+    if (!isGitRepository(cwd)) {
+      setBranchName(undefined);
+      return;
+    }
+
     try {
       const { stdout } = await spawnAsync(
         'git',
@@ -37,6 +42,10 @@ export function useGitBranchName(cwd: string): string | undefined {
   }, [cwd, setBranchName]);
 
   useEffect(() => {
+    if (!isGitRepository(cwd)) {
+      return;
+    }
+
     void fetchBranchName(); // Initial fetch
 
     let watcher: fs.FSWatcher | undefined;

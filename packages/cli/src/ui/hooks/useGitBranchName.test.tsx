@@ -15,6 +15,7 @@ import path from 'node:path'; // For mocking fs
 import {
   spawnAsync as mockSpawnAsync,
   getAbsoluteGitDir as mockGetAbsoluteGitDir,
+  isGitRepository as mockIsGitRepository,
 } from 'sparkle-cli-core';
 
 // Mock sparkle-cli-core
@@ -25,6 +26,7 @@ vi.mock('sparkle-cli-core', async () => {
     ...original,
     spawnAsync: vi.fn(),
     getAbsoluteGitDir: vi.fn(),
+    isGitRepository: vi.fn(() => true),
   };
 });
 
@@ -61,6 +63,7 @@ describe('useGitBranchName', () => {
     });
 
     deferredSpawn = [];
+    vi.mocked(mockIsGitRepository).mockReturnValue(true);
     vi.mocked(mockSpawnAsync).mockImplementation(
       (_command: string, args: string[]) =>
         new Promise((resolve, reject) => {
@@ -292,5 +295,18 @@ describe('useGitBranchName', () => {
 
     unmount();
     expect(closeMock).toHaveBeenCalled();
+  });
+
+  it('should return undefined and avoid spawning git if cwd is not a git repository', async () => {
+    vi.mocked(mockIsGitRepository).mockReturnValue(false);
+    const { result } = await renderGitBranchNameHook('/non-git/directory');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+
+    expect(result.current).toBeUndefined();
+    expect(mockSpawnAsync).not.toHaveBeenCalled();
+    expect(mockGetAbsoluteGitDir).not.toHaveBeenCalled();
   });
 });

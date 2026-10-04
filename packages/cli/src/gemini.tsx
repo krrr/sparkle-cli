@@ -536,7 +536,7 @@ export async function main() {
     const loadConfigHandle = startupProfiler.start('load_cli_config');
     config = await loadCliConfig(settings.merged, sessionId, argv, {
       projectHooks: settings.workspace.settings.hooks,
-      worktreeSettings: worktreeInfo,
+      worktreeSettings: worktreeInfo ?? partialConfig.getWorktreeSettings(),
       loadedSettings: settings,
     });
     loadConfigHandle?.end();
