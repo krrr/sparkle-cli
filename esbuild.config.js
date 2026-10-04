@@ -83,6 +83,10 @@ const baseConfig = {
 
 const commonAliases = {
   punycode: 'punycode/',
+  'google-auth-library': path.resolve(
+    __dirname,
+    'packages/cli/src/patches/google-auth-library.ts',
+  ),
 };
 
 const cliConfig = {
