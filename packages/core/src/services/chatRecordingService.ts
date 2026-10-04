@@ -101,6 +101,35 @@ function isTextPart(part: unknown): part is { text: string } {
 }
 
 /**
+ * Quickly checks whether the first non-empty line of a session file is a valid
+ * metadata header. Returns false if the file is missing, empty, unreadable, or
+ * contains invalid header metadata.
+ */
+export async function hasValidSessionHeader(filePath: string): Promise<boolean> {
+  let fileStream: fs.ReadStream | null = null;
+  let rl: readline.Interface | null = null;
+  try {
+    fileStream = fs.createReadStream(filePath, {
+      encoding: 'utf8',
+      highWaterMark: 1024,
+    });
+    rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
+    for await (const line of rl) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const record = JSON.parse(trimmed) as unknown;
+      return isPartialMetadataRecord(record);
+    }
+    return false;
+  } catch {
+    return false;
+  } finally {
+    rl?.close();
+    fileStream?.destroy();
+  }
+}
+
+/**
  * Filters raw client-history parts down to the parts that belong in a
  * message's durable `content`:
  * - `functionCall` parts are always removed: tool calls are persisted in the
@@ -420,20 +449,23 @@ export class ChatRecordingService {
         this.sessionId = resumedSessionData.conversation.sessionId;
         this.kind = resumedSessionData.conversation.kind;
 
-        const loadedRecord = await loadConversationRecord(this.conversationFile);
-        if (loadedRecord) {
-          this.cachedConversation = loadedRecord;
-          this.projectHash = this.cachedConversation.projectHash;
-        } else {
-          // The file could not be reloaded (missing, corrupt metadata, or an
-          // I/O error). Fall back to the in-memory conversation we were handed
-          // rather than failing the caller, and rewrite a clean file from it.
+        // Callers already produced resumedSessionData with loadConversationRecord
+        // (or live in-memory state), so avoid repeat full parsing.
+        // We only verify that the session file exists and has a valid header.
+        // If missing or corrupted, rewrite it from in-memory data so subsequent appends
+        // keep a loadable file.
+        this.cachedConversation = resumedSessionData.conversation;
+        this.projectHash = this.cachedConversation.projectHash;
+        const fileExists = fs.existsSync(this.conversationFile);
+        const hasValidHeader =
+          fileExists && (await hasValidSessionHeader(this.conversationFile));
+
+        if (!hasValidHeader) {
           debugLogger.warn(
-            'Failed to reload resumed session data from file; falling back ' +
-              'to the in-memory conversation.',
+            fileExists
+              ? 'Resumed session file is corrupted; backing up and rewriting using in-memory data.'
+              : 'Resumed session file is missing; rewriting it using in-memory data.',
           );
-          this.cachedConversation = resumedSessionData.conversation;
-          this.projectHash = this.cachedConversation.projectHash;
           this.rewriteConversationFile(this.cachedConversation);
         }
       } else {

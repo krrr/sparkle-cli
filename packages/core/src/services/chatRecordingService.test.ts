@@ -42,6 +42,7 @@ import {
   ChatRecordingService,
   MAX_FIRST_USER_MESSAGE_LENGTH,
   hasResumableConversationContent,
+  hasValidSessionHeader,
   isResumableMessageRecord,
   loadConversationRecord,
   type ConversationRecord,
@@ -281,42 +282,50 @@ describe('ChatRecordingService', () => {
     });
 
     it('should resume from an existing session if provided', async () => {
+      // Resume adopts the in-memory conversation without re-reading the
+      // file: callers already parsed this very file, so a second full parse
+      // is pure overhead. The in-memory copy wins even when it diverges from
+      // what is on disk.
       const chatsDir = path.join(testTempDir, 'chats');
       fs.mkdirSync(chatsDir, { recursive: true });
       const sessionFile = path.join(chatsDir, 'session.jsonl');
       const initialData = {
-        sessionId: 'old-session-id',
+        sessionId: 'file-session-id',
         projectHash: 'test-project-hash',
         messages: [],
       };
       fs.writeFileSync(
         sessionFile,
-        JSON.stringify({ ...initialData, messages: undefined }) +
-          '\n' +
-          (initialData.messages || [])
-            .map((m: unknown) => JSON.stringify(m))
-            .join('\n') +
-          '\n',
+        JSON.stringify({ ...initialData, messages: undefined }) + '\n',
       );
+      const fileBytes = fs.readFileSync(sessionFile, 'utf-8');
 
       await chatRecordingService.initialize({
         filePath: sessionFile,
         conversation: {
-          sessionId: 'old-session-id',
-        } as ConversationRecord,
+          sessionId: 'memory-session-id',
+          projectHash: 'test-project-hash',
+          startTime: new Date().toISOString(),
+          lastUpdated: new Date().toISOString(),
+          messages: [],
+        } as unknown as ConversationRecord,
       });
 
-      const conversation = (await loadConversationRecord(
-        sessionFile,
-      )) as ConversationRecord;
-      expect(conversation.sessionId).toBe('old-session-id');
+      // The in-memory conversation wins; the file was never re-read or
+      // rewritten (its metadata still says file-session-id).
+      expect(chatRecordingService.getConversation()?.sessionId).toBe(
+        'memory-session-id',
+      );
+      expect(chatRecordingService.getConversationFilePath()).toBe(sessionFile);
+      expect(fs.readFileSync(sessionFile, 'utf-8')).toBe(fileBytes);
     });
 
-    it('should fall back to the in-memory conversation when the file cannot be reloaded', async () => {
+    it('should rewrite a missing session file from the in-memory conversation', async () => {
       // Regression test for the `/compress` "Failed to load resumed session
-      // data from file" bug: when resuming with a filePath that cannot be
-      // loaded from disk, initialize must NOT throw. It should adopt the
-      // in-memory conversation it was handed and rewrite a clean file.
+      // data from file" bug: when resuming with a filePath that no longer
+      // exists on disk, initialize must NOT throw. It should adopt the
+      // in-memory conversation it was handed and rewrite a clean file so
+      // subsequent appends keep a loadable session.
       const chatsDir = path.join(testTempDir, 'chats');
       fs.mkdirSync(chatsDir, { recursive: true });
       const missingFile = path.join(chatsDir, 'missing-session.jsonl');
@@ -361,13 +370,14 @@ describe('ChatRecordingService', () => {
     });
 
     it('should preserve an unreadable session file instead of destroying it', async () => {
-      // The reload may have failed only transiently, so the original bytes
-      // must survive the recovery rewrite.
+      // When resuming with a file that has an invalid or corrupt header,
+      // initialize backs up the existing bytes and rewrites a clean file from
+      // the in-memory conversation.
       const chatsDir = path.join(testTempDir, 'chats');
       fs.mkdirSync(chatsDir, { recursive: true });
       const sessionFile = path.join(chatsDir, 'unreadable.jsonl');
 
-      // No usable metadata line => loadConversationRecord() returns null.
+      // No usable metadata line => hasValidSessionHeader() returns false.
       const originalBytes = '{"not":"a valid metadata line"}\n';
       fs.writeFileSync(sessionFile, originalBytes);
 
@@ -386,6 +396,7 @@ describe('ChatRecordingService', () => {
       const reloaded = (await loadConversationRecord(
         sessionFile,
       )) as ConversationRecord;
+      expect(reloaded).not.toBeNull();
       expect(reloaded.sessionId).toBe('recovered-session-id');
 
       // ...and the original bytes were kept alongside it.
@@ -427,6 +438,61 @@ describe('ChatRecordingService', () => {
 
       const leftovers = fs.readdirSync(chatsDir).filter((f) => f.includes('.tmp-'));
       expect(leftovers).toEqual([]);
+    });
+  });
+
+  describe('hasValidSessionHeader', () => {
+    it('should return true for a file with valid metadata in the first line', async () => {
+      const filePath = path.join(testTempDir, 'valid-header.jsonl');
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({ sessionId: 'sid-1', projectHash: 'hash-1' }) + '\n',
+      );
+      expect(await hasValidSessionHeader(filePath)).toBe(true);
+    });
+
+    it('should return false for a non-existent file', async () => {
+      const filePath = path.join(testTempDir, 'does-not-exist.jsonl');
+      expect(await hasValidSessionHeader(filePath)).toBe(false);
+    });
+
+    it('should return false for an empty file', async () => {
+      const filePath = path.join(testTempDir, 'empty.jsonl');
+      fs.writeFileSync(filePath, '');
+      expect(await hasValidSessionHeader(filePath)).toBe(false);
+    });
+
+    it('should return false when the first line is not valid JSON', async () => {
+      const filePath = path.join(testTempDir, 'corrupt.jsonl');
+      fs.writeFileSync(filePath, 'not json\n');
+      expect(await hasValidSessionHeader(filePath)).toBe(false);
+    });
+
+    it('should return false when metadata lacks required fields', async () => {
+      const filePath = path.join(testTempDir, 'missing-fields.jsonl');
+      fs.writeFileSync(filePath, JSON.stringify({ sessionId: 'sid-1' }) + '\n');
+      expect(await hasValidSessionHeader(filePath)).toBe(false);
+    });
+
+    it('should skip leading blank lines to find the header', async () => {
+      const filePath = path.join(testTempDir, 'blank-lines.jsonl');
+      fs.writeFileSync(
+        filePath,
+        '\n\n  \n' +
+          JSON.stringify({ sessionId: 'sid-1', projectHash: 'hash-1' }) +
+          '\n',
+      );
+      expect(await hasValidSessionHeader(filePath)).toBe(true);
+    });
+
+    it('should return true without reading subsequent corrupted lines', async () => {
+      const filePath = path.join(testTempDir, 'valid-then-corrupt.jsonl');
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({ sessionId: 'sid-1', projectHash: 'hash-1' }) +
+          '\ncorrupted-second-line\n',
+      );
+      expect(await hasValidSessionHeader(filePath)).toBe(true);
     });
   });
 
