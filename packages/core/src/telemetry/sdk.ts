@@ -12,16 +12,22 @@ import {
   metrics,
   propagation,
 } from '@opentelemetry/api';
-import { NodeSDK } from '@opentelemetry/sdk-node';
+import { logs } from '@opentelemetry/api-logs';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { BatchSpanProcessor, ConsoleSpanExporter } from '@opentelemetry/sdk-trace-node';
+import {
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  NodeTracerProvider,
+} from '@opentelemetry/sdk-trace-node';
 import {
   BatchLogRecordProcessor,
   ConsoleLogRecordExporter,
+  LoggerProvider,
 } from '@opentelemetry/sdk-logs';
 import {
   ConsoleMetricExporter,
+  MeterProvider,
   PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import type { Config } from '../config/config.js';
@@ -67,7 +73,9 @@ class DiagLoggerAdapter {
 
 diag.setLogger(new DiagLoggerAdapter(), DiagLogLevel.INFO);
 
-let sdk: NodeSDK | undefined;
+let tracerProvider: NodeTracerProvider | undefined;
+let loggerProvider: LoggerProvider | undefined;
+let meterProvider: MeterProvider | undefined;
 let spanProcessor: BatchSpanProcessor | undefined;
 let logRecordProcessor: BatchLogRecordProcessor | undefined;
 let metricReader: PeriodicExportingMetricReader | undefined;
@@ -164,15 +172,25 @@ export async function initializeTelemetry(config: Config): Promise<void> {
   spanProcessor = new BatchSpanProcessor(spanExporter);
   logRecordProcessor = new BatchLogRecordProcessor(logExporter);
 
-  sdk = new NodeSDK({
-    resource,
-    spanProcessors: [spanProcessor],
-    logRecordProcessors: [logRecordProcessor],
-    metricReader,
-  });
-
   try {
-    sdk.start();
+    tracerProvider = new NodeTracerProvider({
+      resource,
+      spanProcessors: [spanProcessor],
+    });
+    tracerProvider.register();
+
+    loggerProvider = new LoggerProvider({
+      resource,
+      processors: [logRecordProcessor],
+    });
+    logs.setGlobalLoggerProvider(loggerProvider);
+
+    meterProvider = new MeterProvider({
+      resource,
+      readers: [metricReader],
+    });
+    metrics.setGlobalMeterProvider(meterProvider);
+
     if (config.getDebugMode()) {
       debugLogger.log('OpenTelemetry SDK started successfully.');
     }
@@ -241,11 +259,15 @@ export async function shutdownTelemetry(
   config: Config,
   fromProcessExit = true,
 ): Promise<void> {
-  if (!telemetryInitialized || !sdk) {
+  if (!telemetryInitialized) {
     return;
   }
   try {
-    await sdk.shutdown();
+    await Promise.all([
+      tracerProvider?.shutdown(),
+      loggerProvider?.shutdown(),
+      meterProvider?.shutdown(),
+    ]);
     if (config.getDebugMode() && fromProcessExit) {
       debugLogger.log('OpenTelemetry SDK shut down successfully.');
     }
@@ -253,7 +275,12 @@ export async function shutdownTelemetry(
     debugLogger.error('Error shutting down SDK:', error);
   } finally {
     telemetryInitialized = false;
-    sdk = undefined;
+    tracerProvider = undefined;
+    loggerProvider = undefined;
+    meterProvider = undefined;
+    spanProcessor = undefined;
+    logRecordProcessor = undefined;
+    metricReader = undefined;
     // Fully reset the global APIs to allow for re-initialization.
     // This is primarily for testing environments where the SDK is started
     // and stopped multiple times in the same process.
@@ -262,6 +289,7 @@ export async function shutdownTelemetry(
     metrics.disable();
     propagation.disable();
     diag.disable();
+    logs.disable?.();
     if (keychainAvailabilityListener) {
       coreEvents.off(
         CoreEvent.TelemetryKeychainAvailability,

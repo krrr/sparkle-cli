@@ -6,17 +6,24 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Config } from '../config/config.js';
-import { initializeTelemetry, shutdownTelemetry, bufferTelemetryEvent } from './sdk.js';
-import { NodeSDK } from '@opentelemetry/sdk-node';
+import {
+  initializeTelemetry,
+  shutdownTelemetry,
+  bufferTelemetryEvent,
+  isTelemetrySdkInitialized,
+} from './sdk.js';
 
 import * as os from 'node:os';
 import * as path from 'node:path';
 
-vi.mock('@opentelemetry/sdk-node');
 vi.mock('node:fs', () => ({
   createWriteStream: vi.fn(() => ({
-    write: vi.fn(),
-    end: vi.fn(),
+    write: vi.fn((_data: unknown, cb?: (err?: Error | null) => void) => {
+      if (typeof _data === 'function') _data();
+      else cb?.();
+    }),
+    end: vi.fn((cb?: () => void) => cb?.()),
+    writable: true,
   })),
 }));
 vi.mock('../utils/debugLogger.js', () => ({
@@ -55,13 +62,13 @@ describe('Telemetry SDK', () => {
     );
     await initializeTelemetry(mockConfig);
 
-    expect(NodeSDK.prototype.start).toHaveBeenCalled();
+    expect(isTelemetrySdkInitialized()).toBe(true);
   });
 
   it('should fall back to console exporters when no telemetryOutfile is set', async () => {
     await initializeTelemetry(mockConfig);
 
-    expect(NodeSDK.prototype.start).toHaveBeenCalled();
+    expect(isTelemetrySdkInitialized()).toBe(true);
   });
 
   describe('bufferTelemetryEvent', () => {
