@@ -29,11 +29,11 @@ vi.mock('../ui/commands/aboutCommand.js', async () => {
 vi.mock('../ui/commands/ideCommand.js', async () => {
   const { CommandKind } = await import('../ui/commands/types.js');
   return {
-    ideCommand: vi.fn().mockResolvedValue({
+    ideCommand: {
       name: 'ide',
       description: 'IDE command',
       kind: CommandKind.BUILT_IN,
-    }),
+    },
   };
 });
 vi.mock('../ui/commands/restoreCommand.js', () => ({

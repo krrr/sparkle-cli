@@ -15,6 +15,7 @@ import {
 } from 'vitest';
 import { ideCommand } from './ideCommand.js';
 import { type CommandContext } from './types.js';
+import { SettingScope } from '../../config/settings.js';
 import { IDE_DEFINITIONS } from 'sparkle-cli-core';
 import * as core from 'sparkle-cli-core';
 
@@ -74,30 +75,26 @@ describe('ideCommand', () => {
     vi.restoreAllMocks();
   });
 
-  it('should return the ide command', async () => {
-    vi.mocked(mockIdeClient.getCurrentIde).mockReturnValue(IDE_DEFINITIONS.vscode);
-    vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
-      status: core.IDEConnectionStatus.Disconnected,
-    });
-    const command = await ideCommand();
-    expect(command).not.toBeNull();
-    expect(command.name).toBe('ide');
-    expect(command.subCommands).toHaveLength(3);
-    expect(command.subCommands?.[0].name).toBe('enable');
-    expect(command.subCommands?.[1].name).toBe('status');
-    expect(command.subCommands?.[2].name).toBe('install');
+  it('should return the ide command with all subcommands statically defined', () => {
+    expect(ideCommand).not.toBeNull();
+    expect(ideCommand.name).toBe('ide');
+    expect(ideCommand.subCommands).toHaveLength(4);
+    const subCommandNames = ideCommand.subCommands?.map((cmd) => cmd.name);
+    expect(subCommandNames).toContain('status');
+    expect(subCommandNames).toContain('install');
+    expect(subCommandNames).toContain('enable');
+    expect(subCommandNames).toContain('disable');
   });
 
-  it('should show disable command when connected', async () => {
-    vi.mocked(mockIdeClient.getCurrentIde).mockReturnValue(IDE_DEFINITIONS.vscode);
-    vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
-      status: core.IDEConnectionStatus.Connected,
+  it('should return error when ide is not supported and root action is called', async () => {
+    vi.mocked(mockIdeClient.getCurrentIde).mockReturnValue(undefined);
+    const result = await ideCommand.action!(mockContext, '');
+    expect(result).toEqual({
+      type: 'message',
+      messageType: 'error',
+      content:
+        'IDE integration is not supported in your current environment. To use this feature, run Sparkle CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.',
     });
-    const command = await ideCommand();
-    expect(command).not.toBeNull();
-    const subCommandNames = command.subCommands?.map((cmd) => cmd.name);
-    expect(subCommandNames).toContain('disable');
-    expect(subCommandNames).not.toContain('enable');
   });
 
   describe('status subcommand', () => {
@@ -109,7 +106,7 @@ describe('ideCommand', () => {
       vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
         status: core.IDEConnectionStatus.Connected,
       });
-      const command = await ideCommand();
+      const command = ideCommand;
       const result = await command.subCommands!.find((c) => c.name === 'status')!
         .action!(mockContext, '');
       expect(vi.mocked(mockIdeClient.getConnectionStatus)).toHaveBeenCalled();
@@ -124,7 +121,7 @@ describe('ideCommand', () => {
       vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
         status: core.IDEConnectionStatus.Connecting,
       });
-      const command = await ideCommand();
+      const command = ideCommand;
       const result = await command.subCommands!.find((c) => c.name === 'status')!
         .action!(mockContext, '');
       expect(vi.mocked(mockIdeClient.getConnectionStatus)).toHaveBeenCalled();
@@ -138,7 +135,7 @@ describe('ideCommand', () => {
       vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
         status: core.IDEConnectionStatus.Disconnected,
       });
-      const command = await ideCommand();
+      const command = ideCommand;
       const result = await command.subCommands!.find((c) => c.name === 'status')!
         .action!(mockContext, '');
       expect(vi.mocked(mockIdeClient.getConnectionStatus)).toHaveBeenCalled();
@@ -155,7 +152,7 @@ describe('ideCommand', () => {
         status: core.IDEConnectionStatus.Disconnected,
         details,
       });
-      const command = await ideCommand();
+      const command = ideCommand;
       const result = await command.subCommands!.find((c) => c.name === 'status')!
         .action!(mockContext, '');
       expect(vi.mocked(mockIdeClient.getConnectionStatus)).toHaveBeenCalled();
@@ -163,6 +160,19 @@ describe('ideCommand', () => {
         type: 'message',
         messageType: 'error',
         content: `🔴 Disconnected: ${details}`,
+      });
+    });
+
+    it('should return error if ide is not supported', async () => {
+      vi.mocked(mockIdeClient.getCurrentIde).mockReturnValue(undefined);
+      const command = ideCommand;
+      const result = await command.subCommands!.find((c) => c.name === 'status')!
+        .action!(mockContext, '');
+      expect(result).toEqual({
+        type: 'message',
+        messageType: 'error',
+        content:
+          'IDE integration is not supported in your current environment. To use this feature, run Sparkle CLI in one of these supported IDEs: Antigravity, VS Code, or VS Code forks.',
       });
     });
   });
@@ -187,7 +197,7 @@ describe('ideCommand', () => {
         message: 'Successfully installed.',
       });
 
-      const command = await ideCommand();
+      const command = ideCommand;
 
       // For the polling loop inside the action.
       vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
@@ -231,7 +241,7 @@ describe('ideCommand', () => {
         message: 'Installation failed.',
       });
 
-      const command = await ideCommand();
+      const command = ideCommand;
       await command.subCommands!.find((c) => c.name === 'install')!.action!(
         mockContext,
         '',
@@ -253,6 +263,43 @@ describe('ideCommand', () => {
         }),
         expect.any(Number),
       );
+    });
+  });
+
+  describe('enable and disable subcommands', () => {
+    beforeEach(() => {
+      vi.mocked(mockIdeClient.getCurrentIde).mockReturnValue(IDE_DEFINITIONS.vscode);
+      vi.mocked(mockIdeClient.getConnectionStatus).mockReturnValue({
+        status: core.IDEConnectionStatus.Connected,
+      });
+    });
+
+    it('should enable IDE integration', async () => {
+      const command = ideCommand;
+      await command.subCommands!.find((c) => c.name === 'enable')!.action!(
+        mockContext,
+        '',
+      );
+      expect(mockContext.services.settings.setValue).toHaveBeenCalledWith(
+        SettingScope.User,
+        'ide.enabled',
+        true,
+      );
+      expect(mockIdeClient.connect).toHaveBeenCalled();
+    });
+
+    it('should disable IDE integration', async () => {
+      const command = ideCommand;
+      await command.subCommands!.find((c) => c.name === 'disable')!.action!(
+        mockContext,
+        '',
+      );
+      expect(mockContext.services.settings.setValue).toHaveBeenCalledWith(
+        SettingScope.User,
+        'ide.enabled',
+        false,
+      );
+      expect(mockIdeClient.disconnect).toHaveBeenCalled();
     });
   });
 });

@@ -363,18 +363,13 @@ export async function main() {
     worktreeHandle?.end();
   }
 
-  const cleanupOpsHandle = startupProfiler.start('cleanup_ops');
   Promise.all([
     cleanupCheckpoints(),
     cleanupToolOutputFiles(settings.merged),
     cleanupBackgroundLogs(),
-  ])
-    .catch((e) => {
-      debugLogger.error('Early cleanup failed:', e);
-    })
-    .finally(() => {
-      cleanupOpsHandle?.end();
-    });
+  ]).catch((e) => {
+    debugLogger.error('Early cleanup failed:', e);
+  });
 
   const parseArgsHandle = startupProfiler.start('parse_arguments');
   const argvPromise = parseArguments(settings.merged).finally(() => {

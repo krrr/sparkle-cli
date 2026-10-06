@@ -97,7 +97,7 @@ export class BuiltinCommandLoader implements ICommandLoader {
       footerCommand,
       ...(this.config?.getEnableHooksUI() ? [hooksCommand] : []),
       rewindCommand,
-      await ideCommand(),
+      ideCommand,
       initCommand,
       mcpCommand,
       memoryCommand(this.config),
