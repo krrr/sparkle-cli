@@ -401,11 +401,9 @@ describe('ScrollableList Demo Behavior', () => {
       });
 
       await act(async () => {
-        // Let the scrollbar fade out animation finish
-        await new Promise((resolve) => setTimeout(resolve, 1600));
         result.unmount();
       });
-    });
+    }, 10000);
   });
 
   describe('Width Prop', () => {

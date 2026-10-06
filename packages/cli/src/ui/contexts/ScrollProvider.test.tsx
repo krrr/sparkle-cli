@@ -64,7 +64,6 @@ const TestScrollable = forwardRef(
         scrollBy: props.scrollBy,
         scrollTo: props.scrollTo,
         hasFocus: () => true,
-        flashScrollbar: () => {},
       },
       true,
     );

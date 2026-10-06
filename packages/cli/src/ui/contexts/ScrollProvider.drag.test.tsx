@@ -55,7 +55,6 @@ const TestScrollable = forwardRef(
         getScrollState: props.getScrollState,
         scrollBy: props.scrollBy,
         hasFocus: () => true,
-        flashScrollbar: () => {},
       },
       true,
     );
@@ -384,7 +383,6 @@ describe('ScrollProvider Drag', () => {
             scrollBy: props.scrollBy,
             scrollTo: props.scrollTo,
             hasFocus: () => true,
-            flashScrollbar: () => {},
           },
           true,
         );

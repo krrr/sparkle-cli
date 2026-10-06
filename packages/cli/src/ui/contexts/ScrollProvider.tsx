@@ -31,7 +31,6 @@ export interface ScrollableEntry {
   scrollBy: (delta: number) => void;
   scrollTo?: (scrollTop: number, duration?: number) => void;
   hasFocus: () => boolean;
-  flashScrollbar: () => void;
 }
 
 interface ScrollContextType {
@@ -324,17 +323,6 @@ export const ScrollProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
 
-    const candidates = findScrollableCandidates(mouseEvent, scrollablesRef.current);
-
-    if (candidates.length > 0) {
-      // The first candidate is the innermost one.
-      candidates[0].flashScrollbar();
-      // We don't consider just flashing the scrollbar as handling the event
-      // in a way that should prevent other handlers (like drag warning)
-      // from checking it, although for left-press it doesn't matter much.
-      // But returning false is safer.
-      return false;
-    }
     return false;
   };
 

@@ -17,7 +17,7 @@ import {
 import { Box, ResizeObserver, type DOMElement } from 'ink';
 import { useKeypress, type Key } from '../../hooks/useKeypress.js';
 import { useScrollable } from '../../contexts/ScrollProvider.js';
-import { useAnimatedScrollbar } from '../../hooks/useAnimatedScrollbar.js';
+import { theme } from '../../semantic-colors.js';
 import { useBatchedScroll } from '../../hooks/useBatchedScroll.js';
 import { Command } from '../../key/keyMatchers.js';
 import { useOverflowActions } from '../../contexts/OverflowContext.js';
@@ -173,9 +173,6 @@ export const Scrollable: React.FC<ScrollableProps> = ({
     [getScrollTop, setPendingScrollTop],
   );
 
-  const { scrollbarColor, flashScrollbar, scrollByWithAnimation } =
-    useAnimatedScrollbar(hasFocus, scrollBy);
-
   useKeypress(
     (key: Key) => {
       const { scrollHeight, innerHeight } = sizeRef.current;
@@ -187,11 +184,11 @@ export const Scrollable: React.FC<ScrollableProps> = ({
       // otherwise allow events to bubble.
       if (actualScrollTop > 0) {
         if (keyMatchers[Command.PAGE_UP](key)) {
-          scrollByWithAnimation(-innerHeight);
+          scrollBy(-innerHeight);
           return true;
         }
         if (keyMatchers[Command.SCROLL_UP](key)) {
-          scrollByWithAnimation(-1);
+          scrollBy(-1);
           return true;
         }
       }
@@ -200,11 +197,11 @@ export const Scrollable: React.FC<ScrollableProps> = ({
       // otherwise allow events to bubble.
       if (actualScrollTop < maxScroll) {
         if (keyMatchers[Command.PAGE_DOWN](key)) {
-          scrollByWithAnimation(innerHeight);
+          scrollBy(innerHeight);
           return true;
         }
         if (keyMatchers[Command.SCROLL_DOWN](key)) {
-          scrollByWithAnimation(1);
+          scrollBy(1);
           return true;
         }
       }
@@ -231,11 +228,10 @@ export const Scrollable: React.FC<ScrollableProps> = ({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
       ref: viewportRef as React.RefObject<DOMElement>,
       getScrollState,
-      scrollBy: scrollByWithAnimation,
+      scrollBy,
       hasFocus: hasFocusCallback,
-      flashScrollbar,
     }),
-    [getScrollState, scrollByWithAnimation, hasFocusCallback, flashScrollbar],
+    [getScrollState, scrollBy, hasFocusCallback],
   );
 
   useScrollable(scrollableEntry, true);
@@ -251,7 +247,7 @@ export const Scrollable: React.FC<ScrollableProps> = ({
       overflowX="hidden"
       scrollTop={scrollTop}
       flexGrow={flexGrow}
-      scrollbarThumbColor={scrollbarColor}
+      scrollbarThumbColor={theme.text.secondary}
       overflowToBackbuffer={overflowToBackbuffer}
       scrollbar={scrollbar}
       stableScrollback={stableScrollback}

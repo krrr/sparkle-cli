@@ -12,14 +12,6 @@ import * as ScrollProviderModule from '../../contexts/ScrollProvider.js';
 import { act } from 'react';
 import { waitFor } from '../../../test-utils/async.js';
 
-vi.mock('../../hooks/useAnimatedScrollbar.js', () => ({
-  useAnimatedScrollbar: (hasFocus: boolean, scrollBy: (delta: number) => void) => ({
-    scrollbarColor: 'white',
-    flashScrollbar: vi.fn(),
-    scrollByWithAnimation: scrollBy,
-  }),
-}));
-
 describe('<Scrollable />', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
