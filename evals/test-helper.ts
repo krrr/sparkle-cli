@@ -101,7 +101,20 @@ export async function internalEvalTest(evalCase: EvalCase) {
       const setupOptions = {
         ...evalCase.params,
         settings: {
-          model: { name: EVAL_MODEL },
+          auth: {
+            selectedProviderId: 'default',
+            providers: [
+              {
+                id: 'default',
+                name: 'Default',
+                providerType: process.env['GEMINI_API_KEY']
+                  ? 'gemini-api-key'
+                  : 'openai-api-key',
+                defaultModel: EVAL_MODEL,
+                models: [{ id: EVAL_MODEL, tier: 'flash' }],
+              },
+            ],
+          },
           ...evalCase.params?.settings,
         },
       };

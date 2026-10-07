@@ -441,6 +441,7 @@ export class TestRig {
     // In sandbox mode, use an absolute path for telemetry inside the container
     // The container mounts the test directory at the same path as the host
     const telemetryPath = join(this.homeDir!, 'telemetry.log'); // Always use home directory for telemetry
+    const model = process.env['SPARKLE_MODEL'] || DEFAULT_GEMINI_FLASH_MODEL;
 
     const settings = deepMerge(
       {
@@ -455,12 +456,16 @@ export class TestRig {
         },
         security: {
           auth: {
-            selectedProviderId: 'default-gemini',
+            selectedProviderId: 'default',
             providers: [
               {
-                id: 'default-gemini',
-                name: 'Default Gemini',
-                providerType: 'gemini-api-key',
+                id: 'default',
+                name: 'Default',
+                providerType: process.env['GEMINI_API_KEY']
+                  ? 'gemini-api-key'
+                  : 'openai-api-key',
+                defaultModel: model,
+                models: [{ id: model, tier: 'flash' }],
               },
             ],
           },
@@ -471,13 +476,6 @@ export class TestRig {
         ui: {
           useAlternateBuffer: true,
         },
-        ...(env['SPARKLE_TEST_TYPE'] === 'integration'
-          ? {
-              model: {
-                name: DEFAULT_GEMINI_FLASH_MODEL,
-              },
-            }
-          : {}),
         sandbox: env['SPARKLE_SANDBOX'] !== 'false' ? env['SPARKLE_SANDBOX'] : false,
         // Don't show the IDE connection dialog when running from VsCode
         ide: { enabled: false, hasSeenNudge: true },

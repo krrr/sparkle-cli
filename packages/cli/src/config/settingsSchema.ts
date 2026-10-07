@@ -3133,7 +3133,7 @@ export const SETTINGS_SCHEMA_DEFINITIONS: Record<string, SettingsJsonSchemaDefin
         },
         defaultModel: { type: 'string' },
       },
-      required: ['id', 'providerType'],
+      required: ['id', 'providerType', 'models'],
     },
   };
 

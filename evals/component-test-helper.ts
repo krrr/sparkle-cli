@@ -11,6 +11,7 @@ import {
   withEvalRetries,
   prepareWorkspace,
   type BaseEvalCase,
+  EVAL_MODEL,
 } from './test-helper.js';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,6 +28,8 @@ import {
   IntegrityDataStatus,
   makeFakeConfig,
   type GeminiCLIExtension,
+  type ProviderProfile,
+  getProviderTypeFromEnv,
 } from 'sparkle-cli-core';
 import { createMockSettings } from '../packages/cli/src/test-utils/settings.js';
 
@@ -68,7 +71,31 @@ export class ComponentRig {
   }
 
   async initialize() {
-    const settings = createMockSettings();
+    const model = EVAL_MODEL;
+    const providerType = getProviderTypeFromEnv() || ProviderType.USE_GEMINI;
+
+    const profile: ProviderProfile = {
+      id: 'default',
+      name: 'Default',
+      providerType,
+      defaultModel: model,
+      baseUrl:
+        providerType == ProviderType.USE_OPENAI
+          ? process.env['OPENAI_BASE_URL']
+          : undefined,
+      models: [{ id: model, tier: 'flash' }],
+    };
+
+    const settings = createMockSettings({
+      merged: {
+        security: {
+          auth: {
+            selectedProviderId: 'default',
+            providers: [profile],
+          },
+        },
+      },
+    });
     const policyEngineConfig = await createPolicyEngineConfig(
       settings.merged,
       ApprovalMode.DEFAULT,
@@ -79,23 +106,28 @@ export class ComponentRig {
       targetDir: this.testDir,
       cwd: this.testDir,
       debugMode: false,
-      model: 'test-model',
+      model,
       interactive: false,
       approvalMode: ApprovalMode.DEFAULT,
       policyEngineConfig,
       enableEventDrivenScheduler: false, // Don't need scheduler for direct component tests
       extensionLoader: new MockExtensionManager(),
       useAlternateBuffer: false,
+      profileStorageDelegate: {
+        getProfiles: () => [profile],
+        getSelectedProfileId: () => profile.id,
+        saveProfiles: () => {},
+      },
       ...this.options.configOverrides,
     };
 
     this.config = makeFakeConfig(configParams);
     await this.config.initialize();
 
-    // Refresh auth using USE_GEMINI to initialize the real BaseLlmClient.
+    // Refresh auth using the active provider to initialize the real BaseLlmClient.
     // This must happen BEFORE stubbing SPARKLE_CLI_HOME because OAuth credential
     // lookup resolves through homedir() → SPARKLE_CLI_HOME.
-    await this.config.refreshAuth(ProviderType.USE_GEMINI);
+    await this.config.refreshAuth(providerType);
 
     // Isolate storage paths (session files, skills, extraction state) by
     // pointing SPARKLE_CLI_HOME at a per-test temp directory.  Storage resolves

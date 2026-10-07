@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LlmRole, type BaseLlmClient } from 'sparkle-cli-core';
+import { LlmRole, type BaseLlmClient, getResponseText } from 'sparkle-cli-core';
 
 export interface JudgeOptions {
   /**
@@ -54,9 +54,14 @@ export class LLMJudge {
           abortSignal: new AbortController().signal,
         });
 
-        const text =
-          response.candidates?.[0]?.content?.parts?.[0]?.text?.trim()?.toUpperCase() ||
-          'ERROR';
+        const extractedText = getResponseText(response);
+        const text = (
+          extractedText ||
+          response.candidates?.[0]?.content?.parts?.[0]?.text ||
+          'ERROR'
+        )
+          .trim()
+          .toUpperCase();
         return text;
       } catch (e: any) {
         return `ERROR: ${e.message}`;
