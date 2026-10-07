@@ -1058,6 +1058,7 @@ export class ShellExecutionService {
             headlessTerminal,
             startLine,
             endLine,
+            !exited,
           );
           return bufferData.length > 0 ? bufferData : undefined;
         },
@@ -1114,10 +1115,16 @@ export class ShellExecutionService {
 
         let newOutput: AnsiOutput;
         if (shellExecutionConfig.showColor) {
-          newOutput = serializeTerminalToObject(headlessTerminal, startLine, endLine);
+          newOutput = serializeTerminalToObject(
+            headlessTerminal,
+            startLine,
+            endLine,
+            !exited,
+          );
         } else {
           newOutput = (
-            serializeTerminalToObject(headlessTerminal, startLine, endLine) || []
+            serializeTerminalToObject(headlessTerminal, startLine, endLine, !exited) ||
+            []
           ).map((line) =>
             line.map((token) => {
               token.fg = '';
@@ -1144,7 +1151,7 @@ export class ShellExecutionService {
         const absoluteCursorY = buffer.baseY + buffer.cursorY;
         const cursorRelativeIndex = absoluteCursorY - startLine;
 
-        if (cursorRelativeIndex > lastNonEmptyLine) {
+        if (!exited && cursorRelativeIndex > lastNonEmptyLine) {
           lastNonEmptyLine = cursorRelativeIndex;
         }
 
@@ -1294,6 +1301,7 @@ export class ShellExecutionService {
               headlessTerminal,
               startLine,
               endLine,
+              false,
             );
             const finalOutput = getFullBufferText(headlessTerminal);
 

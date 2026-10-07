@@ -192,6 +192,60 @@ describe('terminalSerializer', () => {
       expect(result[0][1].text.trim()).toBe('ursor test');
       expect(result[0][1].inverse).toBe(false);
     });
+
+    it('should not set inverse for cursor position when showCursor is false', async () => {
+      const terminal = new Terminal({
+        cols: 80,
+        rows: 24,
+        allowProposedApi: true,
+      });
+      await writeToTerminal(terminal, 'Cursor test');
+      // Move cursor to the start of the line (0,0) using ANSI escape code
+      await writeToTerminal(terminal, '\x1b[H');
+
+      const result = serializeTerminalToObject(terminal, undefined, undefined, false);
+      expect(result[0][0].text).toContain('Cursor test');
+      expect(result[0][0].inverse).toBe(false);
+    });
+
+    it('should trim trailing empty line with cursor when showCursor is false', async () => {
+      const terminal = new Terminal({
+        cols: 80,
+        rows: 24,
+        allowProposedApi: true,
+      });
+      await writeToTerminal(terminal, 'Done\r\n');
+
+      const withCursor = serializeTerminalToObject(
+        terminal,
+        undefined,
+        undefined,
+        true,
+      );
+      // Line 1 is kept because of the cursor
+      expect(withCursor).toHaveLength(2);
+      expect(withCursor[1][0].inverse).toBe(true);
+
+      const withoutCursor = serializeTerminalToObject(
+        terminal,
+        undefined,
+        undefined,
+        false,
+      );
+      // Trailing empty line is removed when cursor is not shown
+      expect(withoutCursor).toHaveLength(1);
+      expect(withoutCursor[0][0].text.trim()).toBe('Done');
+    });
+
+    it('should return empty array for empty terminal when showCursor is false', () => {
+      const terminal = new Terminal({
+        cols: 80,
+        rows: 24,
+        allowProposedApi: true,
+      });
+      const result = serializeTerminalToObject(terminal, undefined, undefined, false);
+      expect(result).toHaveLength(0);
+    });
   });
   describe('convertColorToHex', () => {
     it('should convert RGB color to hex', () => {

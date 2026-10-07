@@ -111,7 +111,7 @@ vi.mock('../utils/terminalSerializer.js', () => ({
   // Avoid passing the heavy Terminal object to the spy to prevent OOM
   serializeTerminalToObject: (
     _terminal: unknown,
-    ...args: [number | undefined, number | undefined]
+    ...args: [number | undefined, number | undefined, boolean?]
   ) => mockSerializeTerminalToObject(...args),
   convertColorToHex: () => '#000000',
   ColorMode: { DEFAULT: 0, PALETTE: 1, RGB: 2 },
@@ -1117,6 +1117,24 @@ describe('ShellExecutionService', () => {
           type: 'data',
           chunk: expected,
         }),
+      );
+    });
+
+    it('should call serializeTerminalToObject with showCursor=false on exit', async () => {
+      mockSerializeTerminalToObject.mockReturnValue([]);
+
+      await simulateExecution(
+        'echo test',
+        (pty) => {
+          pty.onExit.mock.calls[0][0]({ exitCode: 0, signal: null });
+        },
+        shellExecutionConfig,
+      );
+
+      expect(mockSerializeTerminalToObject).toHaveBeenLastCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        false,
       );
     });
   });

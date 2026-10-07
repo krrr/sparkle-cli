@@ -154,10 +154,11 @@ export function serializeTerminalToObject(
   terminal: Terminal,
   startLine?: number,
   endLine?: number,
+  showCursor: boolean = true,
 ): AnsiOutput {
   const buffer = terminal.buffer.active;
-  const cursorX = buffer.cursorX;
-  const absoluteCursorY = buffer.baseY + buffer.cursorY;
+  const cursorX = showCursor ? buffer.cursorX : -1;
+  const absoluteCursorY = showCursor ? buffer.baseY + buffer.cursorY : -1;
   const defaultFg = '';
   const defaultBg = '';
 
@@ -233,11 +234,17 @@ export function serializeTerminalToObject(
   while (result.length > 0) {
     const lastLine = result[result.length - 1];
     const lineY = effectiveStart + result.length - 1;
+    const line = buffer.getLine(lineY);
 
-    // A line is empty if all its tokens are marked as uninitialized and it has no cursor
-    const isEmpty =
-      lastLine.every((token) => token.isUninitialized && !token.inverse) &&
-      lineY !== absoluteCursorY;
+    const hasVisibleCursor = showCursor && lineY === absoluteCursorY;
+    const hasContent = line ? line.translateToString(true).length > 0 : false;
+    const hasStyles = lastLine.some(
+      (token) =>
+        Boolean(token.bg) ||
+        (token.inverse && (!showCursor || lineY !== absoluteCursorY)),
+    );
+
+    const isEmpty = !hasContent && !hasStyles && !hasVisibleCursor;
 
     if (isEmpty) {
       result.pop();

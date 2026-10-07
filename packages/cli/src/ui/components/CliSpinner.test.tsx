@@ -8,7 +8,7 @@ import { renderWithProviders } from '../../test-utils/render.js';
 import { createMockSettings } from '../../test-utils/settings.js';
 import { CliSpinner, spinners } from './CliSpinner.js';
 import { debugState } from '../debug.js';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Opt into the real animated implementation. test-setup.ts mocks CliSpinner
 // globally so all other tests get a deterministic first frame.
@@ -18,7 +18,12 @@ vi.mock('./CliSpinner.js', async (importOriginal) =>
 
 describe('<CliSpinner />', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     debugState.debugNumAnimatedComponents = 0;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should increment debugNumAnimatedComponents on mount and decrement on unmount', async () => {
