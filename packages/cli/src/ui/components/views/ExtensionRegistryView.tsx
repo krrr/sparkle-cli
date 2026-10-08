@@ -20,6 +20,7 @@ import { useRegistrySearch } from '../../hooks/useRegistrySearch.js';
 
 import { useUIState } from '../../contexts/UIStateContext.js';
 import { ExtensionDetails } from './ExtensionDetails.js';
+import { SELECTED_INDICATOR_S } from '../../constants/symbols.js';
 
 export interface ExtensionRegistryViewProps {
   onSelect?: (
@@ -144,7 +145,7 @@ export function ExtensionRegistryView({
           <Box flexDirection="row" flexShrink={1} minWidth={0}>
             <Box width={2} flexShrink={0}>
               <Text color={isActive ? theme.status.success : theme.text.secondary}>
-                {isActive ? '● ' : '  '}
+                {isActive ? SELECTED_INDICATOR_S : '  '}
               </Text>
             </Box>
             <Box flexShrink={0}>

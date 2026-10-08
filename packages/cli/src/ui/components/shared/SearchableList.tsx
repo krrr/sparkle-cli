@@ -13,6 +13,7 @@ import type { TextBuffer } from './text-buffer.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { Command } from '../../key/keyMatchers.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';
+import { SELECTED_INDICATOR } from '../../constants/symbols.js';
 
 /**
  * Generic interface for items in a searchable list.
@@ -165,7 +166,7 @@ export function SearchableList<T extends GenericListItem>({
     <Box flexDirection="row" alignItems="flex-start">
       <Box minWidth={2} flexShrink={0}>
         <Text color={isActive ? theme.status.success : theme.text.secondary}>
-          {isActive ? '●' : ''}
+          {isActive ? SELECTED_INDICATOR : ''}
         </Text>
       </Box>
       <Box flexDirection="column" flexGrow={1} minWidth={0}>

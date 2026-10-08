@@ -8,6 +8,7 @@ import type React from 'react';
 import { Box, Text } from 'ink';
 import type { LoadableSettingScope } from '../../../config/settings.js';
 import { getScopeItems } from '../../../utils/dialogScopeUtils.js';
+import { ACTIVE_INDICATOR } from '../../constants/symbols.js';
 import { RadioButtonSelect } from './RadioButtonSelect.js';
 
 interface ScopeSelectorProps {
@@ -47,6 +48,7 @@ export function ScopeSelector({
         onHighlight={onHighlight}
         isFocused={isFocused}
         showNumbers={isFocused}
+        selectedIndicator={ACTIVE_INDICATOR}
       />
     </Box>
   );

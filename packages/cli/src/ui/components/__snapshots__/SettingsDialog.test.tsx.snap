@@ -10,7 +10,7 @@ exports[`SettingsDialog > Initial Rendering > should render settings list with v
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               false  │
+│  ❯ Vim Mode                                                                               false  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -54,7 +54,7 @@ exports[`SettingsDialog > Initial Rendering > should render the bottom border co
 │ ╭──────────────────────────────────────────────────────────────────────────────────────────────╮ │
 │ ╰─Search to filter─────────────────────────────────────────────────────────────────────────────╯ │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               false  │
+│  ❯ Vim Mode                                                                               false  │
 │  ▼ Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Apply To                                                                                      │
@@ -74,7 +74,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'accessibility settings
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               true*  │
+│  ❯ Vim Mode                                                                               true*  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -120,7 +120,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'all boolean settings d
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                              false*  │
+│  ❯ Vim Mode                                                                              false*  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -166,7 +166,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'default state' correct
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               false  │
+│  ❯ Vim Mode                                                                               false  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -212,7 +212,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'file filtering setting
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               false  │
+│  ❯ Vim Mode                                                                               false  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -304,7 +304,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'mixed boolean and numb
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                              false*  │
+│  ❯ Vim Mode                                                                              false*  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -350,7 +350,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'tools and security set
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               false  │
+│  ❯ Vim Mode                                                                               false  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │
@@ -396,7 +396,7 @@ exports[`SettingsDialog > Snapshot Tests > should render 'various boolean settin
 │ ╰──────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │                                                                                                  │
 │  ▲                                                                                               │
-│  ● Vim Mode                                                                               true*  │
+│  ❯ Vim Mode                                                                               true*  │
 │    Enable Vim keybindings                                                                        │
 │                                                                                                  │
 │    Default Approval Mode                                                                Default  │

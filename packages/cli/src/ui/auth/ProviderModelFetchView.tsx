@@ -199,7 +199,6 @@ export function ProviderModelFetchView({
             showNumbers={false}
             showScrollArrows
             maxItemsToShow={MAX_ITEMS_TO_SHOW}
-            selectedIndicator="❯"
             renderItem={(item, { isSelected, titleColor }) => (
               <Box flexGrow={1}>
                 <Text bold={isSelected} color={titleColor}>

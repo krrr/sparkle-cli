@@ -1321,7 +1321,7 @@ describe('SettingsDialog', () => {
       await waitUntilReady();
 
       // Wait for navigation to complete
-      await waitFor(() => expect(lastFrame()).toContain('● Enable Interactive Shell'));
+      await waitFor(() => expect(lastFrame()).toContain('❯ Enable Interactive Shell'));
 
       // Toggle it to trigger restart required
       await act(async () => {
@@ -1366,7 +1366,7 @@ describe('SettingsDialog', () => {
       });
       await waitUntilReady();
 
-      await waitFor(() => expect(lastFrame()).toContain('● Enable Interactive Shell'));
+      await waitFor(() => expect(lastFrame()).toContain('❯ Enable Interactive Shell'));
 
       await act(async () => {
         stdin.write(TerminalKeys.ENTER);

@@ -124,7 +124,7 @@ describe('<FooterConfigDialog />', () => {
 
     await waitFor(() => {
       // The selected indicator should be next to 'code-changes'
-      expect(lastFrame()).toMatch(/> \[ \] code-changes/);
+      expect(lastFrame()).toMatch(/❯ \[ \] code-changes/);
     });
 
     // Toggle it on
@@ -134,7 +134,7 @@ describe('<FooterConfigDialog />', () => {
 
     await waitFor(() => {
       // It should now be checked and appear in the preview
-      expect(lastFrame()).toMatch(/> \[✓\] code-changes/);
+      expect(lastFrame()).toMatch(/❯ \[✓\] code-changes/);
       expect(lastFrame()).toContain('+12 -4');
     });
 
@@ -229,7 +229,7 @@ describe('<FooterConfigDialog />', () => {
     }
 
     await waitFor(() => {
-      expect(lastFrame()).toMatch(/> \[✓\] Show footer labels/);
+      expect(lastFrame()).toMatch(/❯ \[✓\] Show footer labels/);
     });
 
     // Toggle it off
@@ -238,7 +238,7 @@ describe('<FooterConfigDialog />', () => {
     });
 
     await waitFor(() => {
-      expect(lastFrame()).toMatch(/> \[ \] Show footer labels/);
+      expect(lastFrame()).toMatch(/❯ \[ \] Show footer labels/);
       // The headers should no longer be in the preview
       expect(lastFrame()).not.toContain('workspace (/directory)');
       expect(lastFrame()).not.toContain('/model');

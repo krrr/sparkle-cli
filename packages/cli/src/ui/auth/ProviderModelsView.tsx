@@ -20,6 +20,7 @@ import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 import { ProviderModelEditorView } from './ProviderModelEditorView.js';
 import { ProviderModelFetchView } from './ProviderModelFetchView.js';
+import { SELECTED_INDICATOR_S } from '../constants/symbols.js';
 
 export interface ProviderModelsViewProps {
   profile: ProviderProfile;
@@ -86,12 +87,10 @@ export function ProviderModelsView({
           setEditingModelTarget(undefined);
           setIsEditingModel(true);
           return true;
-        }
-        if (canFetchModels && key.name === 'l') {
+        } else if (canFetchModels && key.name === 'l') {
           setIsFetchingModels(true);
           return true;
-        }
-        if (keyMatchers[Command.ESCAPE](key)) {
+        } else if (keyMatchers[Command.ESCAPE](key)) {
           onBack();
           return true;
         }
@@ -118,34 +117,30 @@ export function ProviderModelsView({
           onBack();
         }
         return true;
-      }
-      if (key.name === 'up') {
+      } else if (key.name === 'up') {
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : models.length - 1));
         return true;
-      }
-      if (key.name === 'down') {
+      } else if (key.name === 'down') {
         setSelectedIndex((prev) => (prev < models.length - 1 ? prev + 1 : 0));
         return true;
-      }
-      if (key.name === 'a') {
+      } else if (key.name === 'a') {
         setEditingModelTarget(undefined);
         setIsEditingModel(true);
         return true;
-      }
-      if (canFetchModels && key.name === 'l') {
+      } else if (canFetchModels && key.name === 'l') {
         setIsFetchingModels(true);
         return true;
-      }
-      if ((key.name === 's' || keyMatchers[Command.RETURN](key)) && selectedModel) {
+      } else if (
+        (key.name === 's' || keyMatchers[Command.RETURN](key)) &&
+        selectedModel
+      ) {
         void onSetDefaultModel(selectedModel.id);
         return true;
-      }
-      if (key.name === 'e' && selectedModel) {
+      } else if (key.name === 'e' && selectedModel) {
         setEditingModelTarget(selectedModel);
         setIsEditingModel(true);
         return true;
-      }
-      if (key.name === 'd' || key.sequence === 'd' || key.sequence === 'D') {
+      } else if (key.name === 'd' || key.sequence === 'd' || key.sequence === 'D') {
         if (selectedModel) {
           if (
             pendingDeleteModelId === null ||
@@ -253,13 +248,12 @@ export function ProviderModelsView({
             >
               <Box flexDirection="row">
                 <Text
-                  bold={isSelected}
                   color={
                     pendingDeleteTextColor ??
                     (isSelected ? theme.status.success : theme.text.primary)
                   }
                 >
-                  {isDefault ? '● ' : '  '}
+                  {isSelected ? SELECTED_INDICATOR_S : '  '}
                   {modelLabel}
                 </Text>
                 {isDefault && (

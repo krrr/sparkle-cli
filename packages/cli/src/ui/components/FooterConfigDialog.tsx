@@ -301,7 +301,6 @@ export const FooterConfigDialog: React.FC<FooterConfigDialogProps> = ({ onClose 
           showNumbers={false}
           maxItemsToShow={maxItemsToShow}
           showScrollArrows={true}
-          selectedIndicator=">"
           renderItem={(item, { isSelected, titleColor }) => {
             const configItem = item.value;
             const isChecked =

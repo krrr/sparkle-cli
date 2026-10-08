@@ -13,6 +13,7 @@ import {
   type SelectionListItem,
 } from '../../hooks/useSelectionList.js';
 import { useMouseClick } from '../../hooks/useMouseClick.js';
+import { SELECTED_INDICATOR } from '../../constants/symbols.js';
 
 export interface RenderItemContext {
   isSelected: boolean;
@@ -116,7 +117,7 @@ function SelectionListItemRow<
       alignItems="flex-start"
       backgroundColor={isSelected ? theme.background.focus : undefined}
     >
-      {/* Radio button indicator */}
+      {/* Selection cursor indicator */}
       <Box minWidth={2} flexShrink={0}>
         <Text color={isSelected ? theme.ui.focus : theme.text.primary} aria-hidden>
           {isSelected ? selectedIndicator : ' '}
@@ -176,7 +177,7 @@ export function BaseSelectionList<
   wrapAround = true,
   focusKey,
   priority,
-  selectedIndicator = '●',
+  selectedIndicator = SELECTED_INDICATOR,
   renderItem,
 }: BaseSelectionListProps<T, TItem>): React.JSX.Element {
   const { activeIndex, setActiveIndex } = useSelectionList({

@@ -512,7 +512,7 @@ const ChoiceQuestionView: React.FC<ChoiceQuestionViewProps> = ({
   // Calculate total options including 'All' and 'Other' to ensure consistent numbering column width
   const numOptions = (question.options?.length ?? 0) + (hasAll ? 1 : 0) + 1;
   const numLen = String(numOptions).length;
-  const radioWidth = 2; // "● "
+  const radioWidth = 2; // "❯ "
   const numberWidth = numLen + 2; // e.g., "1. "
   const checkboxWidth = question.multiSelect ? 4 : 1; // "[x] " or " "
   const checkmarkWidth = question.multiSelect ? 0 : 2; // "" or " ✓"

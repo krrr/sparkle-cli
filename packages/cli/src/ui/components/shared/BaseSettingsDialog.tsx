@@ -21,6 +21,7 @@ import { useSettingsNavigation } from '../../hooks/useSettingsNavigation.js';
 import { useInlineEditBuffer } from '../../hooks/useInlineEditBuffer.js';
 import { formatCommand } from '../../key/keybindingUtils.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';
+import { ACTIVE_INDICATOR, SELECTED_INDICATOR } from '../../constants/symbols.js';
 
 /**
  * Represents a single item in the settings dialog.
@@ -523,7 +524,7 @@ export function BaseSettingsDialog({
                   >
                     <Box minWidth={2} flexShrink={0}>
                       <Text color={isActive ? theme.ui.focus : theme.text.secondary}>
-                        {isActive ? '●' : ''}
+                        {isActive ? SELECTED_INDICATOR : ''}
                       </Text>
                     </Box>
                     <Box
@@ -597,6 +598,7 @@ export function BaseSettingsDialog({
               isFocused={effectiveFocusSection === 'scope'}
               showNumbers={effectiveFocusSection === 'scope'}
               priority={effectiveFocusSection === 'scope'}
+              selectedIndicator={ACTIVE_INDICATOR}
             />
           </Box>
         )}

@@ -49,6 +49,8 @@ export interface RadioButtonSelectProps<T> {
     item: RadioSelectItem<T>,
     context: RenderItemContext,
   ) => React.ReactNode;
+  /** Optional override for the row indicator. Defaults to SELECTED_INDICATOR ❯ */
+  selectedIndicator?: string;
 }
 
 /**
@@ -68,6 +70,7 @@ export function RadioButtonSelect<T>({
   showNumbers = true,
   priority,
   renderItem,
+  selectedIndicator,
 }: RadioButtonSelectProps<T>): React.JSX.Element {
   return (
     <BaseSelectionList<T, RadioSelectItem<T>>
@@ -80,6 +83,7 @@ export function RadioButtonSelect<T>({
       showScrollArrows={showScrollArrows}
       maxItemsToShow={maxItemsToShow}
       priority={priority}
+      selectedIndicator={selectedIndicator}
       renderItem={
         renderItem ||
         ((item, { titleColor }) => {

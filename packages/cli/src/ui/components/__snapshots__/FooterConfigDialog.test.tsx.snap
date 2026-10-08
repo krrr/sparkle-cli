@@ -25,7 +25,7 @@ exports[`<FooterConfigDialog /> > highlights the active item in the preview 1`] 
 │     Current machine hostname                                                                     │
 │    [ ] provider                                                                                  │
 │     Current provider info                                                                        │
-│  > [✓] code-changes                                                                              │
+│  ❯ [✓] code-changes                                                                              │
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │
 │     Total tokens used in the session (not shown when zero)                                       │
@@ -52,7 +52,7 @@ exports[`<FooterConfigDialog /> > renders correctly with default settings 1`] = 
 │                                                                                                  │
 │  Select which items to display in the footer.                                                    │
 │                                                                                                  │
-│  > [✓] workspace                                                                                 │
+│  ❯ [✓] workspace                                                                                 │
 │     Current working directory                                                                    │
 │    [✓] git-branch                                                                                │
 │     Current git branch name (not shown when unavailable)                                         │
@@ -98,7 +98,7 @@ exports[`<FooterConfigDialog /> > renders correctly with default settings 2`] = 
 │                                                                                                  │
 │  Select which items to display in the footer.                                                    │
 │                                                                                                  │
-│  > [✓] workspace                                                                                 │
+│  ❯ [✓] workspace                                                                                 │
 │     Current working directory                                                                    │
 │    [✓] git-branch                                                                                │
 │     Current git branch name (not shown when unavailable)                                         │
@@ -165,7 +165,7 @@ exports[`<FooterConfigDialog /> > updates the preview when Show footer labels is
 │     Lines added/removed in the session (not shown when zero)                                     │
 │    [ ] token-count                                                                               │
 │     Total tokens used in the session (not shown when zero)                                       │
-│  > [ ] Show footer labels                                                                        │
+│  ❯ [ ] Show footer labels                                                                        │
 │                                                                                                  │
 │    Reset to default footer                                                                       │
 │                                                                                                  │

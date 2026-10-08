@@ -8,7 +8,7 @@ exports[`Initial Theme Selection > should default to a dark theme when terminal 
 │    1. ANSI Dark                              │                                                 │ │
 │    2. Atom One Dark                          │ 1 # function                                    │ │
 │    3. Ayu Dark                               │ 2 def fibonacci(n):                             │ │
-│ ●  4. Default Dark (Matches terminal)        │ 3     a, b = 0, 1                               │ │
+│ ❯  4. Default Dark (Matches terminal)        │ 3     a, b = 0, 1                               │ │
 │    5. Dracula Dark                           │ 4     for _ in range(n):                        │ │
 │    6. GitHub Dark                            │ 5         a, b = b, a + b                       │ │
 │    7. GitHub Dark Colorblind Dark            │ 6     return a                                  │ │
@@ -32,7 +32,7 @@ exports[`Initial Theme Selection > should default to a light theme when terminal
 │ ▲                                            ┌─────────────────────────────────────────────────┐ │
 │    1. ANSI Light                             │                                                 │ │
 │    2. Ayu Light                              │ 1 # function                                    │ │
-│ ●  3. Default Light (Matches terminal)       │ 2 def fibonacci(n):                             │ │
+│ ❯  3. Default Light (Matches terminal)       │ 2 def fibonacci(n):                             │ │
 │    4. GitHub Light                           │ 3     a, b = 0, 1                               │ │
 │    5. GitHub Light Colorblind Light (Mat…    │ 4     for _ in range(n):                        │ │
 │    6. Google Code Light                      │ 5         a, b = b, a + b                       │ │
@@ -55,7 +55,7 @@ exports[`Initial Theme Selection > should use the theme from settings even if te
 │                                                                                                  │
 │ > Select Theme                               Preview                                             │
 │ ▲                                            ┌─────────────────────────────────────────────────┐ │
-│ ●  1. ANSI Dark                              │                                                 │ │
+│ ❯  1. ANSI Dark                              │                                                 │ │
 │    2. Atom One Dark                          │ 1 # function                                    │ │
 │    3. Ayu Dark                               │ 2 def fibonacci(n):                             │ │
 │    4. Default Dark (Matches terminal)        │ 3     a, b = 0, 1                               │ │
@@ -94,7 +94,7 @@ exports[`ThemeDialog Snapshots > should render correctly in theme selection mode
 │                                                                                                  │
 │ > Select Theme                               Preview                                             │
 │ ▲                                            ┌─────────────────────────────────────────────────┐ │
-│ ●  1. ANSI Dark (Matches terminal)           │                                                 │ │
+│ ❯  1. ANSI Dark (Matches terminal)           │                                                 │ │
 │    2. Atom One Dark                          │ 1 # function                                    │ │
 │    3. Ayu Dark                               │ 2 def fibonacci(n):                             │ │
 │    4. Default Dark                           │ 3     a, b = 0, 1                               │ │
@@ -119,7 +119,7 @@ exports[`ThemeDialog Snapshots > should render correctly in theme selection mode
 │                                                                                                  │
 │ > Select Theme                               Preview                                             │
 │ ▲                                            ┌─────────────────────────────────────────────────┐ │
-│ ●  1. ANSI Dark (Matches terminal)           │                                                 │ │
+│ ❯  1. ANSI Dark (Matches terminal)           │                                                 │ │
 │    2. Atom One Dark                          │ 1 # function                                    │ │
 │    3. Ayu Dark                               │ 2 def fibonacci(n):                             │ │
 │    4. Default Dark                           │ 3     a, b = 0, 1                               │ │

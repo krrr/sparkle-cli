@@ -123,6 +123,7 @@ import { SessionBrowserLoading } from './SessionBrowser/SessionBrowserLoading.js
 import { SessionBrowserError } from './SessionBrowser/SessionBrowserError.js';
 import { SessionBrowserEmpty } from './SessionBrowser/SessionBrowserEmpty.js';
 import { sortSessions, filterSessions } from './SessionBrowser/utils.js';
+import { SELECTED_INDICATOR_S } from '../constants/symbols.js';
 
 /**
  * Table header component with column labels and scroll indicators.
@@ -246,7 +247,7 @@ const SessionItem = memo(
       return isActive ? theme.ui.focus : c;
     };
 
-    const prefix = isActive ? '❯ ' : '  ';
+    const prefix = isActive ? SELECTED_INDICATOR_S : '  ';
     let additionalInfo = '';
     let matchDisplay = null;
 

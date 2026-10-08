@@ -100,12 +100,12 @@ describe('BaseSelectionList', () => {
       unmount();
     });
 
-    it('should render the selection indicator (● or space) and layout', async () => {
+    it('should render the selection indicator (❯ or space) and layout', async () => {
       const { lastFrame, unmount } = await renderComponent({}, 0);
       const output = lastFrame();
 
       // Use regex to assert the structure: Indicator + Whitespace + Number + Label
-      expect(output).toMatch(/●\s+1\.\s+Item A/);
+      expect(output).toMatch(/❯\s+1\.\s+Item A/);
       expect(output).toMatch(/\s+2\.\s+Item B/);
       expect(output).toMatch(/\s+3\.\s+Item C/);
       unmount();
