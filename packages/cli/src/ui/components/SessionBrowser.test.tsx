@@ -568,7 +568,7 @@ describe('SessionBrowser component', () => {
     await expect(renderResult).toMatchSvgSnapshot();
   });
 
-  it('renders rows with dim index/msgs columns and bright age/name columns', async () => {
+  it('renders rows with dim msgs column and bright age/name columns', async () => {
     const session1 = createSession({
       id: 'one',
       file: 'one',
@@ -603,6 +603,65 @@ describe('SessionBrowser component', () => {
     await renderResult.waitUntilReady();
 
     await expect(renderResult).toMatchSvgSnapshot();
+  });
+
+  it('shows sort direction in the table header and no longer in the title', async () => {
+    const session1 = createSession({
+      id: 'one',
+      file: 'one',
+      displayName: 'First session',
+      messageCount: 3,
+      index: 0,
+      lastUpdated: '2025-01-02T12:00:00Z',
+    });
+    const session2 = createSession({
+      id: 'two',
+      file: 'two',
+      displayName: 'Second session',
+      messageCount: 7,
+      index: 1,
+      lastUpdated: '2025-01-01T12:00:00Z',
+    });
+
+    const config = createMockConfig();
+    const onResumeSession = vi.fn();
+    const onDeleteSession = vi.fn().mockResolvedValue(undefined);
+    const onExit = vi.fn();
+
+    const { lastFrame, waitUntilReady } = await render(
+      <TestSessionBrowser
+        config={config}
+        onResumeSession={onResumeSession}
+        onDeleteSession={onDeleteSession}
+        onExit={onExit}
+        testSessions={[session1, session2]}
+      />,
+    );
+
+    // Default sort: date, reverse=false => descending => ▽ on Age only.
+    expect(lastFrame()).toContain('Age ▽');
+    expect(lastFrame()).not.toContain('Msgs △');
+    expect(lastFrame()).not.toContain('Msgs ▽');
+    expect(lastFrame()).not.toContain('sorted by');
+
+    // r reverses the date sort => ascending => △ on Age.
+    triggerKey({ sequence: 'r', name: 'r' });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Age △');
+    expect(lastFrame()).not.toContain('sorted by');
+
+    // s cycles to message count; reverse is still on and messages sort
+    // descending by default, so reverse means ascending => △ on Msgs.
+    triggerKey({ sequence: 's', name: 's' });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Msgs △');
+    expect(lastFrame()).not.toContain('Age △');
+
+    // s cycles to name; reverse is still on, so name sorts descending => ▽.
+    triggerKey({ sequence: 's', name: 's' });
+    await waitUntilReady();
+    expect(lastFrame()).toContain('Name ▽');
+    expect(lastFrame()).not.toContain('Msgs △');
   });
 
   it('shows an error state when loading sessions fails', async () => {

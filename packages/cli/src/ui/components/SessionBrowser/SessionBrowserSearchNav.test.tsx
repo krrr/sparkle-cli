@@ -12,7 +12,6 @@ import {
   NoResultsDisplay,
   DeleteConfirmDisplay,
 } from './SessionBrowserNav.js';
-import { SessionListHeader } from './SessionListHeader.js';
 import type { SessionBrowserState } from '../SessionBrowser.js';
 
 describe('SessionBrowser Search and Navigation Components', () => {
@@ -29,28 +28,6 @@ describe('SessionBrowser Search and Navigation Components', () => {
 
   it('DeleteConfirmDisplay renders correctly', async () => {
     const { lastFrame } = await render(<DeleteConfirmDisplay />);
-    expect(lastFrame()).toMatchSnapshot();
-  });
-
-  it('SessionListHeader renders correctly', async () => {
-    const mockState = {
-      totalSessions: 10,
-      searchQuery: '',
-      sortOrder: 'date',
-      sortReverse: false,
-    } as SessionBrowserState;
-    const { lastFrame } = await render(<SessionListHeader state={mockState} />);
-    expect(lastFrame()).toMatchSnapshot();
-  });
-
-  it('SessionListHeader renders correctly with filter', async () => {
-    const mockState = {
-      totalSessions: 5,
-      searchQuery: 'test',
-      sortOrder: 'name',
-      sortReverse: true,
-    } as SessionBrowserState;
-    const { lastFrame } = await render(<SessionListHeader state={mockState} />);
     expect(lastFrame()).toMatchSnapshot();
   });
 

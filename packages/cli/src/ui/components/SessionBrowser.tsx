@@ -108,9 +108,9 @@ export interface SessionBrowserState {
 
 const SESSIONS_PER_PAGE = 20;
 // Approximate total width reserved for non-message columns and separators
-// (prefix, index, message count, age, pipes, and padding) in a session row.
+// (prefix, age, message count, pipes, and padding) in a session row.
 // If the SessionItem layout changes, update this accordingly.
-const FIXED_SESSION_COLUMNS_WIDTH = 30;
+const FIXED_SESSION_COLUMNS_WIDTH = 25;
 
 import {
   SearchModeDisplay,
@@ -118,7 +118,6 @@ import {
   NoResultsDisplay,
   DeleteConfirmDisplay,
 } from './SessionBrowser/SessionBrowserNav.js';
-import { SessionListHeader } from './SessionBrowser/SessionListHeader.js';
 import { SessionBrowserLoading } from './SessionBrowser/SessionBrowserLoading.js';
 import { SessionBrowserError } from './SessionBrowser/SessionBrowserError.js';
 import { SessionBrowserEmpty } from './SessionBrowser/SessionBrowserEmpty.js';
@@ -132,35 +131,39 @@ const SessionTableHeader = ({
   state,
 }: {
   state: SessionBrowserState;
-}): React.JSX.Element => (
-  <Box flexDirection="row" marginTop={1}>
-    <Text color={Colors.Gray}>{state.scrollOffset > 0 ? '▲ ' : '  '}</Text>
+}): React.JSX.Element => {
+  // sortSessions defaults date/messages to descending but name to
+  // ascending, so derive the direction actually being displayed.
+  const isAscending =
+    state.sortOrder === 'name' ? !state.sortReverse : state.sortReverse;
+  const sortArrow = (order: 'date' | 'messages' | 'name') =>
+    state.sortOrder === order ? (isAscending ? ' △' : ' ▽') : '';
 
-    <Box width={5} flexShrink={0}>
-      <Text color={Colors.Gray} bold>
-        Index
-      </Text>
+  return (
+    <Box flexDirection="row" marginTop={1}>
+      <Text color={Colors.Gray}>{state.scrollOffset > 0 ? '▲ ' : '  '}</Text>
+
+      <Box width={5} flexShrink={0}>
+        <Text color={Colors.Gray} bold>
+          Age{sortArrow('date')}
+        </Text>
+      </Box>
+      <Text color={Colors.Gray}> │ </Text>
+      <Box width={6} flexShrink={0}>
+        <Text color={Colors.Gray} bold>
+          Msgs{sortArrow('messages')}
+        </Text>
+      </Box>
+      <Text color={Colors.Gray}> │ </Text>
+      <Box flexShrink={0}>
+        <Text color={Colors.Gray} bold>
+          {state.searchQuery ? 'Match' : 'Name'}
+          {sortArrow('name')}
+        </Text>
+      </Box>
     </Box>
-    <Text color={Colors.Gray}> │ </Text>
-    <Box width={4} flexShrink={0}>
-      <Text color={Colors.Gray} bold>
-        Msgs
-      </Text>
-    </Box>
-    <Text color={Colors.Gray}> │ </Text>
-    <Box width={4} flexShrink={0}>
-      <Text color={Colors.Gray} bold>
-        Age
-      </Text>
-    </Box>
-    <Text color={Colors.Gray}> │ </Text>
-    <Box flexShrink={0}>
-      <Text color={Colors.Gray} bold>
-        {state.searchQuery ? 'Match' : 'Name'}
-      </Text>
-    </Box>
-  </Box>
-);
+  );
+};
 
 /**
  * Match snippet display component for search results.
@@ -202,8 +205,6 @@ const MatchSnippetDisplay = ({
  */
 interface SessionItemProps {
   session: SessionInfo;
-  /** Absolute index of this row within the full filtered list. */
-  index: number;
   isActive: boolean;
   isPendingDelete: boolean;
   searchQuery: string;
@@ -221,14 +222,12 @@ interface SessionItemProps {
 const SessionItem = memo(
   ({
     session,
-    index,
     isActive,
     isPendingDelete,
     searchQuery,
     terminalWidth,
     ageLabel,
   }: SessionItemProps): React.JSX.Element => {
-    const originalIndex = index;
     const isDisabled = session.isCurrentSession;
     // Pick black or white text by the actual AccentRed luminance so contrast
     // holds on both light and dark themes. Skipped in color-less terminals where
@@ -298,29 +297,20 @@ const SessionItem = memo(
         <Text color={textColor()} dimColor={isDisabled}>
           {prefix}
         </Text>
-        {/* Visual hierarchy: index/msgs are secondary anchors (Comment);
-          age and the session name carry the primary information. */}
         <Box width={5}>
-          <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
-            #{originalIndex + 1}
-          </Text>
-        </Box>
-        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
-          {' '}
-          │{' '}
-        </Text>
-        <Box width={4}>
-          <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
-            {session.messageCount}
-          </Text>
-        </Box>
-        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
-          {' '}
-          │{' '}
-        </Text>
-        <Box width={4}>
           <Text color={textColor()} dimColor={isDisabled}>
             {ageLabel}
+          </Text>
+        </Box>
+        <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
+          {' '}
+          │{' '}
+        </Text>
+        {/* Visual hierarchy: the msg count is a secondary anchor (Comment);
+          age and the session name carry the primary information. */}
+        <Box width={6}>
+          <Text color={textColor(Colors.Comment)} dimColor={isDisabled}>
+            {session.messageCount}
           </Text>
         </Box>
         <Text color={textColor(Colors.Gray)} dimColor={isDisabled}>
@@ -379,7 +369,6 @@ const SessionList = ({ state }: { state: SessionBrowserState }): React.JSX.Eleme
           <SessionItem
             key={session.id}
             session={session}
-            index={originalIndex}
             isActive={originalIndex === state.activeIndex}
             isPendingDelete={state.pendingDeleteSessionId === session.id}
             searchQuery={state.searchQuery}
@@ -743,7 +732,13 @@ export function SessionBrowserView({
       paddingX={1}
       width="100%"
     >
-      <SessionListHeader state={state} />
+      {/* Title bar: session count (sort state lives in the table header). */}
+      <Text color={Colors.AccentPurple}>
+        Chat Sessions{'  '}
+        <Text color={Colors.Gray}>
+          ({state.totalSessions} total{state.searchQuery ? ', filtered' : ''})
+        </Text>
+      </Text>
 
       {state.isSearchMode && <SearchModeDisplay state={state} />}
 

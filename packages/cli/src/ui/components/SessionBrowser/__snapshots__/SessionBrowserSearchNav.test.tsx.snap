@@ -23,13 +23,3 @@ exports[`SessionBrowser Search and Navigation Components > SearchModeDisplay ren
 Search: test query (Esc to cancel)
 "
 `;
-
-exports[`SessionBrowser Search and Navigation Components > SessionListHeader renders correctly 1`] = `
-"Chat Sessions  (10 total)                                                        sorted by date desc
-"
-`;
-
-exports[`SessionBrowser Search and Navigation Components > SessionListHeader renders correctly with filter 1`] = `
-"Chat Sessions  (5 total, filtered)                                                sorted by name asc
-"
-`;
