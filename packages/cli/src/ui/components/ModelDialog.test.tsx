@@ -93,7 +93,7 @@ describe('<ModelDialog />', () => {
     // should show the hint instead of no description at all.
     await waitFor(() => {
       expect(lastFrame()).toContain('tier: not set');
-      expect(lastFrame()).toContain('remembered, tier: not set');
+      expect(lastFrame()).toContain('remembered · tier: not set · effort: default');
     });
     unmount();
   });

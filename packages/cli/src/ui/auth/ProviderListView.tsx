@@ -14,6 +14,7 @@ import { ProviderType, type ProviderProfile } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
+import { INLINE_TXT_SEPARATOR_S, SELECTED_INDICATOR_S } from '../constants/symbols.js';
 
 export interface ProviderListViewProps {
   profiles: ProviderProfile[];
@@ -201,13 +202,12 @@ export function ProviderListView({
             >
               <Box flexDirection="row">
                 <Text
-                  bold={isSelected}
                   color={
                     pendingDeleteTextColor ??
                     (isSelected ? theme.status.success : theme.text.primary)
                   }
                 >
-                  {isActive ? '● ' : '  '}
+                  {isSelected ? SELECTED_INDICATOR_S : '  '}
                   {profile.name || profile.id}
                 </Text>
                 {isActive && (
@@ -220,7 +220,7 @@ export function ProviderListView({
               </Box>
               <Box marginLeft={2}>
                 <Text color={pendingDeleteTextColor ?? theme.text.secondary}>
-                  {typeLabel} · {defaultModelText}
+                  {typeLabel + INLINE_TXT_SEPARATOR_S + defaultModelText}
                   {profile.baseUrl ? ` (${profile.baseUrl})` : ''}
                 </Text>
               </Box>

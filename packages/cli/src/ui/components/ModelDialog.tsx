@@ -19,6 +19,7 @@ import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { ProviderModelsView } from '../auth/ProviderModelsView.js';
 import { useProfileModelActions } from '../auth/useProfileModelActions.js';
+import { INLINE_TXT_SEPARATOR_S } from '../constants/symbols.js';
 
 interface ModelDialogProps {
   onClose: () => void;
@@ -54,16 +55,13 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       if (showModelSettings) {
         // The models settings view handles its own keyboard input.
         return false;
-      }
-      if (key.name === 'escape') {
+      } else if (key.name === 'escape') {
         onClose();
         return true;
-      }
-      if (key.name === 'tab') {
+      } else if (key.name === 'tab') {
         setPersistMode((prev) => !prev);
         return true;
-      }
-      if (key.name === 'm' && activeProfile) {
+      } else if (key.name === 'm' && activeProfile) {
         setShowModelSettings(true);
         return true;
       }
@@ -89,10 +87,11 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
       const profileModelOptions = activeProfile.models.map((m) => {
         const isDefault = activeProfile.defaultModel === m.id;
-        const tierStr = m.tier ? `tier: ${m.tier}` : 'tier: not set';
-        const desc = [isDefault ? 'remembered' : '', tierStr]
+        const tierStr = `tier: ${m.tier ?? 'not set'}`;
+        const effortStr = `effort: ${m.generateConfig?.reasoningEffort ?? 'default'}`;
+        const desc = [isDefault ? 'remembered' : '', tierStr, effortStr]
           .filter(Boolean)
-          .join(', ');
+          .join(INLINE_TXT_SEPARATOR_S);
 
         return {
           value: m.id,
@@ -229,11 +228,24 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     >
       <Text bold>Select Model {activeProfile ? `(${activeProfile.id})` : ''}</Text>
 
-      <Box marginTop={1}>
+      <Box marginTop={1} flexDirection="column">
         <RadioButtonSelect
           items={options}
           onSelect={(val) => void handleSelect(val)}
           initialIndex={initialIndex}
+          renderItem={(item, { titleColor }) => (
+            <Box flexDirection="column" width="100%">
+              <Box flexDirection="row">
+                <Text color={titleColor}>{item.label}</Text>
+                {item.value === preferredModel && (
+                  <Box justifyContent="flex-end" flexGrow={1}>
+                    <Text color={theme.status.success}>{'✓ Active'}</Text>
+                  </Box>
+                )}
+              </Box>
+              <Text color={theme.text.secondary}>{item.sublabel}</Text>
+            </Box>
+          )}
           showNumbers={true}
         />
       </Box>
@@ -250,10 +262,10 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         <Text color={theme.text.secondary}>
           {activeProfile && (
             <>
-              <Text color={theme.text.accent}>[m]</Text> Manage models{'   '}
+              <Text color={theme.text.accent}>[m]</Text> Manage models{'  '}
             </>
           )}
-          (Press Esc to close)
+          [Esc] Close
         </Text>
       </Box>
     </Box>

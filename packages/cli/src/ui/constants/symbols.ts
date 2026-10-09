@@ -10,3 +10,5 @@ export const SELECTED_INDICATOR_S = SELECTED_INDICATOR + ' ';
 // use this when the marked row represents a committed value (highlight commits)
 // rather than a pending cursor
 export const ACTIVE_INDICATOR = '●';
+
+export const INLINE_TXT_SEPARATOR_S = ' · ';
