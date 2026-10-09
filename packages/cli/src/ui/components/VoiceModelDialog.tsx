@@ -8,7 +8,7 @@ import type React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
+import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { useSettingsStore } from '../contexts/SettingsContext.js';
 import { SettingScope } from '../../config/settings.js';
 import { useKeypress, type Key } from '../hooks/useKeypress.js';
@@ -132,14 +132,14 @@ export function VoiceModelDialog({
     () => [
       {
         value: 'gemini-live',
-        title: 'Gemini Live API (Cloud)',
-        description: 'Real-time cloud transcription via Gemini Live API.',
+        label: 'Gemini Live API (Cloud)',
+        sublabel: 'Real-time cloud transcription via Gemini Live API.',
         key: 'gemini-live',
       },
       {
         value: 'whisper',
-        title: 'Whisper (Local)',
-        description: whisperInstalled
+        label: 'Whisper (Local)',
+        sublabel: whisperInstalled
           ? 'Local transcription using whisper.cpp.'
           : 'Local transcription (Requires: brew install whisper-cpp)',
         key: 'whisper',
@@ -152,8 +152,8 @@ export function VoiceModelDialog({
     () =>
       WHISPER_MODELS.map((m) => ({
         value: m.value,
-        title: `${m.label}${modelManager.isModelInstalled(m.value) ? ' (Installed)' : ' (Download)'}`,
-        description: m.description,
+        label: `${m.label}${modelManager.isModelInstalled(m.value) ? ' (Installed)' : ' (Download)'}`,
+        sublabel: m.description,
         key: m.value,
       })),
     [modelManager],
@@ -191,7 +191,7 @@ export function VoiceModelDialog({
         <Box marginTop={1} flexDirection="column">
           {view === 'backend' ? (
             <>
-              <DescriptiveRadioButtonSelect
+              <RadioButtonSelect
                 items={backendOptions}
                 onSelect={handleBackendSelect}
                 onHighlight={handleBackendHighlight}
@@ -205,7 +205,7 @@ export function VoiceModelDialog({
               )}
             </>
           ) : (
-            <DescriptiveRadioButtonSelect
+            <RadioButtonSelect
               items={whisperOptions}
               onSelect={handleWhisperModelSelect}
               initialIndex={whisperOptions.findIndex(

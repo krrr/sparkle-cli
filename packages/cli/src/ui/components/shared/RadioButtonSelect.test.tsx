@@ -157,54 +157,29 @@ describe('RadioButtonSelect', () => {
       expect(textProps?.wrap).toBe('truncate');
     });
 
-    it('should render the special theme display when theme props are present', () => {
-      const themeItem: RadioSelectItem<string> = {
-        label: 'Theme A (Light)',
-        value: 'a-light',
-        themeNameDisplay: 'Theme A',
-        themeTypeDisplay: '(Light)',
-        key: 'a-light',
+    it('should render sublabel in secondary color when present', () => {
+      const item: RadioSelectItem<string> = {
+        label: 'Option with sub',
+        sublabel: 'Secondary info',
+        value: 'sub',
+        key: 'sub',
       };
 
-      const result = renderItem(themeItem, mockContext);
-
-      expect(result?.props?.color).toBe(mockContext.titleColor);
-      expect(result?.props?.wrap).toBe('truncate');
-
-      const children = result?.props?.children;
-
-      if (!Array.isArray(children) || children.length < 3) {
-        throw new Error(
-          'Expected children to be an array with at least 3 elements for theme display',
-        );
-      }
-
-      expect(children[0]).toBe('Theme A');
-      expect(children[1]).toBe(' ');
-
-      const nestedTextElement = children[2] as React.ReactElement<{
-        color?: string;
-        children?: React.ReactNode;
-      }>;
-      expect(nestedTextElement?.props?.color).toBe('COLOR_SECONDARY');
-      expect(nestedTextElement?.props?.children).toBe('(Light)');
-    });
-
-    it('should fall back to standard display if only one theme prop is present', () => {
-      const partialThemeItem: RadioSelectItem<string> = {
-        label: 'Incomplete Theme',
-        value: 'incomplete',
-        themeNameDisplay: 'Only Name',
-        key: 'incomplete',
-      };
-
-      const result = renderItem(partialThemeItem, mockContext);
+      const result = renderItem(item, mockContext);
 
       expect(result.type).toBe(Box);
       const props = result.props as { children: React.ReactNode };
       const textComponent = (props.children as React.ReactElement[])[0];
+      const sublabelComponent = (props.children as React.ReactElement[])[1];
       const textProps = textComponent?.props as React.ComponentProps<typeof Text>;
-      expect(textProps?.children).toBe('Incomplete Theme');
+      const sublabelProps = sublabelComponent?.props as React.ComponentProps<
+        typeof Text
+      >;
+
+      expect(textProps?.children).toBe('Option with sub');
+      expect(sublabelProps?.color).toBe('COLOR_SECONDARY');
+      expect(sublabelProps?.children).toBe('Secondary info');
+      expect(sublabelProps?.wrap).toBe('truncate');
     });
   });
 });

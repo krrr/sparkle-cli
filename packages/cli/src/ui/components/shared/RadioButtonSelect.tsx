@@ -17,8 +17,6 @@ import type { SelectionListItem } from '../../hooks/useSelectionList.js';
 export interface RadioSelectItem<T> extends SelectionListItem<T> {
   label: string;
   sublabel?: string;
-  themeNameDisplay?: string;
-  themeTypeDisplay?: string;
 }
 
 /**
@@ -86,30 +84,18 @@ export function RadioButtonSelect<T>({
       selectedIndicator={selectedIndicator}
       renderItem={
         renderItem ||
-        ((item, { titleColor }) => {
-          // Handle special theme display case for ThemeDialog compatibility
-          if (item.themeNameDisplay && item.themeTypeDisplay) {
-            return (
-              <Text color={titleColor} wrap="truncate" key={item.key}>
-                {item.themeNameDisplay}{' '}
-                <Text color={theme.text.secondary}>{item.themeTypeDisplay}</Text>
+        ((item, { titleColor }) => (
+          <Box flexDirection="column">
+            <Text color={titleColor} wrap="truncate">
+              {item.label}
+            </Text>
+            {item.sublabel && (
+              <Text color={theme.text.secondary} wrap="truncate">
+                {item.sublabel}
               </Text>
-            );
-          }
-          // Regular label display
-          return (
-            <Box flexDirection="column">
-              <Text color={titleColor} wrap="truncate">
-                {item.label}
-              </Text>
-              {item.sublabel && (
-                <Text color={theme.text.secondary} wrap="truncate">
-                  {item.sublabel}
-                </Text>
-              )}
-            </Box>
-          );
-        })
+            )}
+          </Box>
+        ))
       }
     />
   );

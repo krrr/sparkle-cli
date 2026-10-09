@@ -15,7 +15,7 @@ import {
 } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
-import { DescriptiveRadioButtonSelect } from './shared/DescriptiveRadioButtonSelect.js';
+import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { ProviderModelsView } from '../auth/ProviderModelsView.js';
 import { useProfileModelActions } from '../auth/useProfileModelActions.js';
@@ -81,8 +81,8 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       const isAutoDefault = activeProfile.defaultModel === SPARKLE_MODEL_ALIAS_AUTO;
       const autoOption = {
         value: SPARKLE_MODEL_ALIAS_AUTO,
-        title: 'Auto',
-        description:
+        label: 'Auto',
+        sublabel:
           (isAutoDefault ? 'remembered, ' : '') + 'auto routing based on model tier',
         key: SPARKLE_MODEL_ALIAS_AUTO,
       };
@@ -96,8 +96,8 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
 
         return {
           value: m.id,
-          title: m.name || m.id,
-          description: desc,
+          label: m.name || m.id,
+          sublabel: desc,
           key: m.id,
         };
       });
@@ -115,8 +115,8 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       .filter((o) => o.tier !== 'auto')
       .map((o) => ({
         value: o.modelId,
-        title: o.name || getDisplayString(o.modelId, config ?? undefined),
-        description: o.description,
+        label: o.name || getDisplayString(o.modelId, config ?? undefined),
+        sublabel: o.description,
         key: o.modelId,
       }));
   }, [config, activeProfile]);
@@ -230,7 +230,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       <Text bold>Select Model {activeProfile ? `(${activeProfile.id})` : ''}</Text>
 
       <Box marginTop={1}>
-        <DescriptiveRadioButtonSelect
+        <RadioButtonSelect
           items={options}
           onSelect={(val) => void handleSelect(val)}
           initialIndex={initialIndex}
