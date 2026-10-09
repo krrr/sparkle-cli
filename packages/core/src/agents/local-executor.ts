@@ -93,7 +93,7 @@ import {
 /** A callback function to report on agent activity. */
 export type ActivityCallback = (activity: SubagentActivityEvent) => void;
 
-const GRACE_PERIOD_MS = 60 * 1000; // 1 min
+const GRACE_PERIOD_MS = 300 * 1000; // 5 min
 
 /** The possible outcomes of a single agent turn. */
 type AgentTurnResult =

@@ -2850,8 +2850,8 @@ describe('LocalAgentExecutor', () => {
       await vi.advanceTimersByTimeAsync(31 * 1000);
       // 2. Let microtasks run (start recovery turn)
       await vi.advanceTimersByTimeAsync(1);
-      // 3. Trigger the grace period timeout (60s)
-      await vi.advanceTimersByTimeAsync(61 * 1000);
+      // 3. Trigger the grace period timeout (300s)
+      await vi.advanceTimersByTimeAsync(301 * 1000);
 
       const output = await runPromise;
 

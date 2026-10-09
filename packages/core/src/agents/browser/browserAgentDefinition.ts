@@ -165,8 +165,8 @@ export const BrowserAgentDefinition = (
     },
 
     runConfig: {
-      maxTimeMinutes: 15,
-      maxTurns: 50,
+      maxTimeMinutes: 30,
+      maxTurns: 100,
     },
 
     // Tools are set dynamically by browserAgentFactory after MCP connection

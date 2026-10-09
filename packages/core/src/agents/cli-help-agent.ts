@@ -63,8 +63,8 @@ export const CliHelpAgent = (
   },
 
   runConfig: {
-    maxTimeMinutes: 5,
-    maxTurns: 10,
+    maxTimeMinutes: 10,
+    maxTurns: 20,
   },
 
   toolConfig: {
