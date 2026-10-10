@@ -89,7 +89,7 @@ import { getInlineThinkingMode } from '../utils/inlineThinkingMode.js';
 import { useStateAndRef } from './useStateAndRef.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { useLogger } from './useLogger.js';
-import { SHELL_COMMAND_NAME } from '../constants.js';
+import { SHELL_COMMAND_NAME } from '../constants/constants.js';
 import { mapToDisplay as mapTrackedToolCallsToDisplay } from './toolMapping.js';
 import { isCompactTool } from '../components/messages/ToolGroupMessage.js';
 import {

@@ -232,7 +232,10 @@ import * as useKeypressModule from './hooks/useKeypress.js';
 import { useSuspend } from './hooks/useSuspend.js';
 import { writeToStdout, enableMouseEvents, disableMouseEvents } from 'sparkle-cli-core';
 import { type ExtensionManager } from '../config/extension-manager.js';
-import { WARNING_PROMPT_DURATION_MS, EXPAND_HINT_DURATION_MS } from './constants.js';
+import {
+  WARNING_PROMPT_DURATION_MS,
+  EXPAND_HINT_DURATION_MS,
+} from './constants/constants.js';
 
 describe('AppContainer State Management', () => {
   let mockConfig: Config;

@@ -6,7 +6,7 @@
 
 import { type ColorsTheme, Theme, interpolateColor } from '../../theme.js';
 import { type SemanticColors } from '../../semantic-tokens.js';
-import { DEFAULT_SELECTION_OPACITY } from '../../../constants.js';
+import { DEFAULT_SELECTION_OPACITY } from '../../../constants/constants.js';
 
 const solarizedLightColors: ColorsTheme = {
   type: 'light',

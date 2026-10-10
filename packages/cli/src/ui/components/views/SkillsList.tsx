@@ -8,7 +8,7 @@ import type React from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../../semantic-colors.js';
 import { type SkillDefinition } from '../../types.js';
-import { SKILLS_DOCS_URL } from '../../constants.js';
+import { SKILLS_DOCS_URL } from '../../constants/constants.js';
 
 interface SkillsListProps {
   skills: readonly SkillDefinition[];

@@ -4,6 +4,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Tool status symbols used in ToolMessage component
+export const TOOL_STATUS = {
+  SUCCESS: '✓',
+  PENDING: 'o',
+  EXECUTING: '⊷',
+  CONFIRMING: '?',
+  CANCELED: '-',
+  ERROR: 'x',
+} as const;
+
+export const SELECTED_INDICATOR = '❯';
+export const SELECTED_INDICATOR_S = SELECTED_INDICATOR + ' ';
+
+// use this when the marked row represents a committed value (highlight commits)
+// rather than a pending cursor
+export const ACTIVE_INDICATOR = '●';
+
+export const INLINE_TXT_SEPARATOR_S = ' · ';
+
 export const SHELL_COMMAND_NAME = 'Shell Command';
 
 export const SHELL_NAME = 'Shell';
@@ -15,16 +34,6 @@ export const SHELL_NAME = 'Shell';
 export const MAX_GEMINI_MESSAGE_LINES = 65536;
 
 export const SHELL_FOCUS_HINT_DELAY_MS = 5000;
-
-// Tool status symbols used in ToolMessage component
-export const TOOL_STATUS = {
-  SUCCESS: '✓',
-  PENDING: 'o',
-  EXECUTING: '⊷',
-  CONFIRMING: '?',
-  CANCELED: '-',
-  ERROR: 'x',
-} as const;
 
 // Maximum number of MCP resources to display per server before truncating
 export const MAX_MCP_RESOURCES_TO_SHOW = 10;

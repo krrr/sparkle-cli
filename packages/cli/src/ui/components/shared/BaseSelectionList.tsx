@@ -13,7 +13,7 @@ import {
   type SelectionListItem,
 } from '../../hooks/useSelectionList.js';
 import { useMouseClick } from '../../hooks/useMouseClick.js';
-import { SELECTED_INDICATOR } from '../../constants/symbols.js';
+import { SELECTED_INDICATOR } from '../../constants/constants.js';
 
 export interface RenderItemContext {
   isSelected: boolean;

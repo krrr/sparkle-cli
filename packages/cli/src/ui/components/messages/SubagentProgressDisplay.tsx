@@ -13,7 +13,7 @@ import {
   type SubagentActivityItem,
   SubagentState,
 } from 'sparkle-cli-core';
-import { TOOL_STATUS } from '../../constants.js';
+import { TOOL_STATUS } from '../../constants/constants.js';
 import { STATUS_INDICATOR_WIDTH } from './ToolShared.js';
 import { safeJsonToMarkdown } from 'sparkle-cli-core';
 import { CliSpinner } from '../CliSpinner.js';

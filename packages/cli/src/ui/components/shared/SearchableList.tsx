@@ -13,7 +13,7 @@ import type { TextBuffer } from './text-buffer.js';
 import { useKeypress } from '../../hooks/useKeypress.js';
 import { Command } from '../../key/keyMatchers.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';
-import { SELECTED_INDICATOR } from '../../constants/symbols.js';
+import { SELECTED_INDICATOR } from '../../constants/constants.js';
 
 /**
  * Generic interface for items in a searchable list.

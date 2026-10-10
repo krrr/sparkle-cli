@@ -5,7 +5,10 @@
  */
 
 import type { AnsiOutput, CompletionBehavior } from 'sparkle-cli-core';
-import { MAX_SHELL_OUTPUT_SIZE, SHELL_OUTPUT_TRUNCATION_BUFFER } from '../constants.js';
+import {
+  MAX_SHELL_OUTPUT_SIZE,
+  SHELL_OUTPUT_TRUNCATION_BUFFER,
+} from '../constants/constants.js';
 
 export interface BackgroundTask {
   pid: number;

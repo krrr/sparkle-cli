@@ -19,7 +19,7 @@ import {
   cleanupTerminalOnExit,
   terminalCapabilityManager,
 } from '../utils/terminalCapabilityManager.js';
-import { WARNING_PROMPT_DURATION_MS } from '../constants.js';
+import { WARNING_PROMPT_DURATION_MS } from '../constants/constants.js';
 import { formatCommand } from '../key/keybindingUtils.js';
 import { Command } from '../key/keyBindings.js';
 

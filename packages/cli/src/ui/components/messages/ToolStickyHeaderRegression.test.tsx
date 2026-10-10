@@ -11,7 +11,7 @@ import { ScrollableList, type ScrollableListRef } from '../shared/ScrollableList
 import { Box, Text } from 'ink';
 import { act, useRef, useEffect } from 'react';
 import { waitFor } from '../../../test-utils/async.js';
-import { SHELL_COMMAND_NAME } from '../../constants.js';
+import { SHELL_COMMAND_NAME } from '../../constants/constants.js';
 import { CoreToolCallStatus } from 'sparkle-cli-core';
 
 // Mock child components that might be complex

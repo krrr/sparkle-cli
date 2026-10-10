@@ -14,7 +14,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Box, Text } from 'ink';
 import { act, useState, type JSX } from 'react';
 import { useAlternateBuffer } from '../hooks/useAlternateBuffer.js';
-import { SHELL_COMMAND_NAME } from '../constants.js';
+import { SHELL_COMMAND_NAME } from '../constants/constants.js';
 
 vi.mock('sparkle-cli-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sparkle-cli-core')>();

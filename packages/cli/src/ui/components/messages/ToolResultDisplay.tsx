@@ -24,7 +24,7 @@ import { useAlternateBuffer } from '../../hooks/useAlternateBuffer.js';
 import { Scrollable } from '../shared/Scrollable.js';
 import { ScrollableList } from '../shared/ScrollableList.js';
 import { SCROLL_TO_ITEM_END } from '../shared/VirtualizedList.js';
-import { ACTIVE_SHELL_MAX_LINES } from '../../constants.js';
+import { ACTIVE_SHELL_MAX_LINES } from '../../constants/constants.js';
 import { calculateToolContentMaxLines } from '../../utils/toolLayoutUtils.js';
 import { SubagentProgressDisplay } from './SubagentProgressDisplay.js';
 

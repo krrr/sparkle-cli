@@ -122,7 +122,7 @@ import { SessionBrowserLoading } from './SessionBrowser/SessionBrowserLoading.js
 import { SessionBrowserError } from './SessionBrowser/SessionBrowserError.js';
 import { SessionBrowserEmpty } from './SessionBrowser/SessionBrowserEmpty.js';
 import { sortSessions, filterSessions } from './SessionBrowser/utils.js';
-import { SELECTED_INDICATOR_S } from '../constants/symbols.js';
+import { SELECTED_INDICATOR_S } from '../constants/constants.js';
 
 /**
  * Table header component with column labels and scroll indicators.

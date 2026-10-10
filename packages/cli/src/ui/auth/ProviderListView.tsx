@@ -14,7 +14,10 @@ import { ProviderType, type ProviderProfile } from 'sparkle-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
-import { INLINE_TXT_SEPARATOR_S, SELECTED_INDICATOR_S } from '../constants/symbols.js';
+import {
+  INLINE_TXT_SEPARATOR_S,
+  SELECTED_INDICATOR_S,
+} from '../constants/constants.js';
 
 export interface ProviderListViewProps {
   profiles: ProviderProfile[];

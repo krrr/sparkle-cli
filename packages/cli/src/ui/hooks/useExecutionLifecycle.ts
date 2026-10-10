@@ -21,7 +21,7 @@ import {
 } from 'sparkle-cli-core';
 import { type PartListUnion } from '@google/genai';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
-import { SHELL_COMMAND_NAME } from '../constants.js';
+import { SHELL_COMMAND_NAME } from '../constants/constants.js';
 import { formatBytes } from '../utils/formatters.js';
 import path from 'node:path';
 import os from 'node:os';

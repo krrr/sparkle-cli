@@ -18,7 +18,7 @@ import {
 } from './shared/VirtualizedList.js';
 import { ScrollableList } from './shared/ScrollableList.js';
 import { useMemo, memo, useCallback, useEffect, useRef } from 'react';
-import { MAX_GEMINI_MESSAGE_LINES } from '../constants.js';
+import { MAX_GEMINI_MESSAGE_LINES } from '../constants/constants.js';
 import { useConfirmingTool } from '../hooks/useConfirmingTool.js';
 import { ToolConfirmationQueue } from './ToolConfirmationQueue.js';
 import { appEvents, AppEvent } from '../../utils/events.js';

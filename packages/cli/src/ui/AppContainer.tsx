@@ -149,7 +149,7 @@ import {
   WARNING_PROMPT_DURATION_MS,
   QUEUE_ERROR_DISPLAY_DURATION_MS,
   EXPAND_HINT_DURATION_MS,
-} from './constants.js';
+} from './constants/constants.js';
 import { NewAgentsChoice } from './components/NewAgentsNotification.js';
 import { isSlashCommand } from './utils/commandUtils.js';
 import { parseSlashCommand } from '../utils/commands.js';

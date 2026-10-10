@@ -29,7 +29,7 @@ import type { Key } from '../../contexts/KeypressContext.js';
 import { Command } from '../../key/keyMatchers.js';
 import type { VimAction } from './vim-buffer-actions.js';
 import { handleVimAction } from './vim-buffer-actions.js';
-import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../../constants.js';
+import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../../constants/constants.js';
 import { openFileInEditor } from '../../utils/editorUtils.js';
 import { useSettings } from '../../contexts/SettingsContext.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';

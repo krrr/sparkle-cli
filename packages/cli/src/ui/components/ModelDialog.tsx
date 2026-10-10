@@ -19,7 +19,7 @@ import { RadioButtonSelect } from './shared/RadioButtonSelect.js';
 import { ConfigContext } from '../contexts/ConfigContext.js';
 import { ProviderModelsView } from '../auth/ProviderModelsView.js';
 import { useProfileModelActions } from '../auth/useProfileModelActions.js';
-import { INLINE_TXT_SEPARATOR_S } from '../constants/symbols.js';
+import { INLINE_TXT_SEPARATOR_S } from '../constants/constants.js';
 
 interface ModelDialogProps {
   onClose: () => void;

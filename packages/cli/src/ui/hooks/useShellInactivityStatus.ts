@@ -13,7 +13,7 @@ import {
   SHELL_FOCUS_HINT_DELAY_MS,
   SHELL_ACTION_REQUIRED_TITLE_DELAY_MS,
   SHELL_SILENT_WORKING_TITLE_DELAY_MS,
-} from '../constants.js';
+} from '../constants/constants.js';
 import type { StreamingState } from '../types.js';
 
 interface ShellInactivityStatusProps {

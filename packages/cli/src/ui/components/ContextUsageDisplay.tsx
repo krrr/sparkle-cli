@@ -12,7 +12,7 @@ import { useConfig } from '../contexts/ConfigContext.js';
 import {
   MIN_TERMINAL_WIDTH_FOR_FULL_LABEL,
   DEFAULT_COMPRESSION_THRESHOLD,
-} from '../constants.js';
+} from '../constants/constants.js';
 
 export const ContextUsageDisplay = ({
   promptTokenCount,

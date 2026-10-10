@@ -7,7 +7,7 @@
 import { MCPServerStatus, type MCPServerConfig } from 'sparkle-cli-core';
 import { Box, Text } from 'ink';
 import type React from 'react';
-import { MAX_MCP_RESOURCES_TO_SHOW } from '../../constants.js';
+import { MAX_MCP_RESOURCES_TO_SHOW } from '../../constants/constants.js';
 import { theme } from '../../semantic-colors.js';
 import type {
   HistoryItemMcpStatus,

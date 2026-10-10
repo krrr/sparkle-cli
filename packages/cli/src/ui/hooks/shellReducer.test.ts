@@ -11,7 +11,10 @@ import {
   type ShellState,
   type ShellAction,
 } from './shellReducer.js';
-import { MAX_SHELL_OUTPUT_SIZE, SHELL_OUTPUT_TRUNCATION_BUFFER } from '../constants.js';
+import {
+  MAX_SHELL_OUTPUT_SIZE,
+  SHELL_OUTPUT_TRUNCATION_BUFFER,
+} from '../constants/constants.js';
 
 describe('shellReducer', () => {
   it('should return the initial state', () => {

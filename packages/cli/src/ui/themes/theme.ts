@@ -13,7 +13,7 @@ import {
   DEFAULT_INPUT_BACKGROUND_OPACITY,
   DEFAULT_SELECTION_OPACITY,
   DEFAULT_BORDER_OPACITY,
-} from '../constants.js';
+} from '../constants/constants.js';
 import tinygradient from 'tinygradient';
 import tinycolor from 'tinycolor2';
 

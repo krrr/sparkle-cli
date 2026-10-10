@@ -13,7 +13,7 @@ import {
   SHELL_NAME,
   TOOL_STATUS,
   SHELL_FOCUS_HINT_DELAY_MS,
-} from '../../constants.js';
+} from '../../constants/constants.js';
 import { theme } from '../../semantic-colors.js';
 import {
   type Config,

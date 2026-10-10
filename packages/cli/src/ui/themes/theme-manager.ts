@@ -37,7 +37,7 @@ import {
   DEFAULT_INPUT_BACKGROUND_OPACITY,
   DEFAULT_SELECTION_OPACITY,
   DEFAULT_BORDER_OPACITY,
-} from '../constants.js';
+} from '../constants/constants.js';
 import { ANSI } from './builtin/dark/ansi-dark.js';
 import { ANSILight } from './builtin/light/ansi-light.js';
 import { NoColorTheme } from './builtin/no-color.js';

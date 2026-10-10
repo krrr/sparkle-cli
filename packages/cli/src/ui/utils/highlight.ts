@@ -10,7 +10,7 @@ import {
 } from '../components/shared/text-buffer.js';
 import { LRUCache } from 'mnemonist';
 import { cpLen, cpSlice } from './textUtils.js';
-import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../constants.js';
+import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../constants/constants.js';
 import { AT_COMMAND_PATH_REGEX_SOURCE } from '../hooks/atCommandProcessor.js';
 
 export type HighlightToken = {

@@ -20,7 +20,7 @@ import { useRegistrySearch } from '../../hooks/useRegistrySearch.js';
 
 import { useUIState } from '../../contexts/UIStateContext.js';
 import { ExtensionDetails } from './ExtensionDetails.js';
-import { SELECTED_INDICATOR_S } from '../../constants/symbols.js';
+import { SELECTED_INDICATOR_S } from '../../constants/constants.js';
 
 export interface ExtensionRegistryViewProps {
   onSelect?: (

@@ -21,7 +21,7 @@ import {
   FocusHint,
 } from './ToolShared.js';
 import type { ToolMessageProps } from './ToolMessage.js';
-import { ACTIVE_SHELL_MAX_LINES } from '../../constants.js';
+import { ACTIVE_SHELL_MAX_LINES } from '../../constants/constants.js';
 import { useAlternateBuffer } from '../../hooks/useAlternateBuffer.js';
 import { useUIState } from '../../contexts/UIStateContext.js';
 import { useToolActions } from '../../contexts/ToolActionsContext.js';

@@ -34,7 +34,7 @@ import {
 } from './DiffRenderer.js';
 import { useMouseClick } from '../../hooks/useMouseClick.js';
 import { ScrollableList } from '../shared/ScrollableList.js';
-import { COMPACT_TOOL_SUBVIEW_MAX_LINES } from '../../constants.js';
+import { COMPACT_TOOL_SUBVIEW_MAX_LINES } from '../../constants/constants.js';
 import { useSettings } from '../../contexts/SettingsContext.js';
 import { colorizeCode } from '../../utils/CodeColorizer.js';
 import { useToolActions } from '../../contexts/ToolActionsContext.js';

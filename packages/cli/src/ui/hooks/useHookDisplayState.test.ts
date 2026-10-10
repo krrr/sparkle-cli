@@ -14,7 +14,7 @@ import {
   type HookEndPayload,
 } from 'sparkle-cli-core';
 import { act } from 'react';
-import { WARNING_PROMPT_DURATION_MS } from '../constants.js';
+import { WARNING_PROMPT_DURATION_MS } from '../constants/constants.js';
 
 describe('useHookDisplayState', () => {
   beforeEach(() => {

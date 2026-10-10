@@ -21,7 +21,7 @@ import { useSettingsNavigation } from '../../hooks/useSettingsNavigation.js';
 import { useInlineEditBuffer } from '../../hooks/useInlineEditBuffer.js';
 import { formatCommand } from '../../key/keybindingUtils.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';
-import { ACTIVE_INDICATOR, SELECTED_INDICATOR } from '../../constants/symbols.js';
+import { ACTIVE_INDICATOR, SELECTED_INDICATOR } from '../../constants/constants.js';
 
 /**
  * Represents a single item in the settings dialog.

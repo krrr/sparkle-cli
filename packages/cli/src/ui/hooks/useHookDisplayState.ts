@@ -12,7 +12,7 @@ import {
   type HookEndPayload,
 } from 'sparkle-cli-core';
 import { type ActiveHook } from '../types.js';
-import { WARNING_PROMPT_DURATION_MS } from '../constants.js';
+import { WARNING_PROMPT_DURATION_MS } from '../constants/constants.js';
 
 export const useHookDisplayState = () => {
   const [activeHooks, setActiveHooks] = useState<ActiveHook[]>([]);

@@ -23,7 +23,7 @@ import {
 } from './ToolShared.js';
 import { type Config, CoreToolCallStatus, Kind } from 'sparkle-cli-core';
 import { ShellInputPrompt } from '../ShellInputPrompt.js';
-import { SUBAGENT_MAX_LINES } from '../../constants.js';
+import { SUBAGENT_MAX_LINES } from '../../constants/constants.js';
 import { useToolActions } from '../../contexts/ToolActionsContext.js';
 
 export type { TextEmphasis };

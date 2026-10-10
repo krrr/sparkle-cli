@@ -20,7 +20,7 @@ import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 import { ProviderModelEditorView } from './ProviderModelEditorView.js';
 import { ProviderModelFetchView } from './ProviderModelFetchView.js';
-import { SELECTED_INDICATOR_S } from '../constants/symbols.js';
+import { SELECTED_INDICATOR_S } from '../constants/constants.js';
 
 export interface ProviderModelsViewProps {
   profile: ProviderProfile;

@@ -15,7 +15,10 @@ import {
   TOOL_RESULT_MIN_LINES_SHOWN,
 } from './toolLayoutUtils.js';
 import { CoreToolCallStatus } from 'sparkle-cli-core';
-import { ACTIVE_SHELL_MAX_LINES, COMPLETED_SHELL_MAX_LINES } from '../constants.js';
+import {
+  ACTIVE_SHELL_MAX_LINES,
+  COMPLETED_SHELL_MAX_LINES,
+} from '../constants/constants.js';
 
 describe('toolLayoutUtils', () => {
   describe('calculateToolContentMaxLines', () => {
