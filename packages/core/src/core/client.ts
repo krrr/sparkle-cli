@@ -45,6 +45,7 @@ import type { ContextManager } from '../context/contextManager.js';
 import type { HistoryTurn } from './agentChatHistory.js';
 import { ideContextStore } from '../ide/ideContext.js';
 import type { DefaultHookOutput, AfterAgentHookOutput } from '../hooks/types.js';
+import { PreCompressTrigger } from '../hooks/types.js';
 import { LlmRole } from '../telemetry/types.js';
 import { uiTelemetryService } from '../telemetry/uiTelemetry.js';
 import type { IdeContext, File } from '../ide/types.js';
@@ -612,8 +613,9 @@ export class GeminiClient {
 
     let currentBaseUnits = 0;
     let apiHistoryOverride: Content[] | undefined = undefined;
+    const usingContextPipeline = this.config.getContextManagementConfig().enabled;
 
-    if (this.config.getContextManagementConfig().enabled) {
+    if (usingContextPipeline) {
       if (this.contextManager) {
         const rawPendingRequest = createUserContent(request);
         const pendingRequest = {
@@ -660,9 +662,10 @@ export class GeminiClient {
       }
     }
 
-    const remainingTokenCount =
-      this.config.getModelConfigService().getContextWindow(modelForLimitCheck) -
-      this.getChat().getLastPromptTokenCount();
+    const contextWindow = this.config
+      .getModelConfigService()
+      .getContextWindow(modelForLimitCheck);
+    let remainingTokenCount = contextWindow - this.getChat().getLastPromptTokenCount();
 
     await this.tryMaskToolOutputs();
 
@@ -675,11 +678,34 @@ export class GeminiClient {
     );
 
     if (estimatedRequestTokenCount > remainingTokenCount) {
-      yield {
-        type: GeminiEventType.ContextWindowWillOverflow,
-        value: { estimatedRequestTokenCount, remainingTokenCount },
-      };
-      return turn;
+      // Reactive overflow recovery: instead of failing the turn outright,
+      // attempt one forced compression (bypassing the usage threshold) and
+      // re-check. Skipped when the context pipeline owns history (its API
+      // history was rendered before compression) or when the pending
+      // request alone exceeds the whole window (compression cannot help).
+      if (!usingContextPipeline && estimatedRequestTokenCount <= contextWindow) {
+        const recovery = await this.tryCompressChat(
+          prompt_id,
+          true,
+          signal,
+          PreCompressTrigger.Auto,
+        );
+
+        // CONTENT_TRUNCATED is unreachable when force=false
+        if (recovery.compressionStatus === CompressionStatus.COMPRESSED) {
+          yield { type: GeminiEventType.ChatCompressed, value: recovery };
+          remainingTokenCount =
+            contextWindow - this.getChat().getLastPromptTokenCount();
+        }
+      }
+
+      if (estimatedRequestTokenCount > remainingTokenCount) {
+        yield {
+          type: GeminiEventType.ContextWindowWillOverflow,
+          value: { estimatedRequestTokenCount, remainingTokenCount },
+        };
+        return turn;
+      }
     }
 
     // Prevent context updates from being sent while a tool call is
@@ -1134,6 +1160,7 @@ export class GeminiClient {
     prompt_id: string,
     force: boolean = false,
     abortSignal?: AbortSignal,
+    trigger?: PreCompressTrigger,
   ): Promise<ChatCompressionInfo> {
     // If the model is 'auto', we will use a placeholder model to check.
     // Compression occurs before we choose a model, so calling `count_tokens`
@@ -1148,6 +1175,7 @@ export class GeminiClient {
       this.config,
       this.hasFailedCompressionAttempt,
       abortSignal,
+      trigger,
     );
 
     if (

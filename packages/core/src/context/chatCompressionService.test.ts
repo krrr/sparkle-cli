@@ -13,6 +13,7 @@ import {
 } from './chatCompressionService.js';
 import type { Content, GenerateContentResponse, Part } from '@google/genai';
 import { CompressionStatus } from '../core/turn.js';
+import { PreCompressTrigger } from '../hooks/types.js';
 import type { BaseLlmClient } from '../core/baseLlmClient.js';
 import type { GeminiChat } from '../core/geminiChat.js';
 import type { Config } from '../config/config.js';
@@ -248,6 +249,67 @@ describe('ChatCompressionService', () => {
     );
     expect(result.info.compressionStatus).toBe(CompressionStatus.NOOP);
     expect(result.newHistory).toBeNull();
+  });
+
+  describe('PreCompress hook trigger', () => {
+    const nonEmptyHistory: Content[] = [{ role: 'user', parts: [{ text: 'hi' }] }];
+
+    const setupHookSystem = () => {
+      const firePreCompressEvent = vi.fn().mockResolvedValue(undefined);
+      mockConfig.getHookSystem = vi.fn().mockReturnValue({ firePreCompressEvent });
+      return firePreCompressEvent;
+    };
+
+    it('reports manual when force=true without an explicit trigger', async () => {
+      const firePreCompressEvent = setupHookSystem();
+      vi.mocked(mockChat.getHistory).mockReturnValue(nonEmptyHistory);
+
+      await service.compress(
+        mockChat,
+        mockPromptId,
+        true,
+        mockModel,
+        mockConfig,
+        false,
+      );
+
+      expect(firePreCompressEvent).toHaveBeenCalledWith(PreCompressTrigger.Manual);
+    });
+
+    it('reports auto when force=true with an explicit Auto trigger override', async () => {
+      const firePreCompressEvent = setupHookSystem();
+      vi.mocked(mockChat.getHistory).mockReturnValue(nonEmptyHistory);
+
+      await service.compress(
+        mockChat,
+        mockPromptId,
+        true,
+        mockModel,
+        mockConfig,
+        false,
+        undefined,
+        PreCompressTrigger.Auto,
+      );
+
+      expect(firePreCompressEvent).toHaveBeenCalledWith(PreCompressTrigger.Auto);
+      expect(firePreCompressEvent).not.toHaveBeenCalledWith(PreCompressTrigger.Manual);
+    });
+
+    it('reports auto when force=false without an explicit trigger (regression)', async () => {
+      const firePreCompressEvent = setupHookSystem();
+      vi.mocked(mockChat.getHistory).mockReturnValue(nonEmptyHistory);
+
+      await service.compress(
+        mockChat,
+        mockPromptId,
+        false,
+        mockModel,
+        mockConfig,
+        false,
+      );
+
+      expect(firePreCompressEvent).toHaveBeenCalledWith(PreCompressTrigger.Auto);
+    });
   });
 
   it('should return NOOP if previously failed and not forced', async () => {

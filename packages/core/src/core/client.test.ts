@@ -24,6 +24,7 @@ import {
   type ServerGeminiStreamEvent,
 } from './turn.js';
 import { getCoreSystemPrompt } from './prompts.js';
+import { PreCompressTrigger } from '../hooks/types.js';
 import {
   SPARKLE_MODEL_ALIAS_AUTO,
   DEFAULT_GEMINI_MODEL,
@@ -70,6 +71,16 @@ vi.mock('node:fs', () => {
       });
     }),
     existsSync: vi.fn((path: string) => mockFileSystem.has(path)),
+    // Load-bearing for the overflow recovery path: when forced compression
+    // rebuilds the chat via startChat(), ChatRecordingService rewrites its
+    // session file with a temp file + rename.
+    renameSync: vi.fn((oldPath: string, newPath: string) => {
+      const data = mockFileSystem.get(oldPath);
+      if (data !== undefined) {
+        mockFileSystem.set(newPath, data);
+        mockFileSystem.delete(oldPath);
+      }
+    }),
     createWriteStream: vi.fn(() => ({
       write: vi.fn(),
       on: vi.fn(),
@@ -1729,6 +1740,218 @@ ${JSON.stringify(
           }),
         }),
       );
+    });
+
+    describe('reactive overflow recovery', () => {
+      const MOCKED_TOKEN_LIMIT = 1000;
+      const INITIAL_TOKEN_COUNT = 900;
+      const COMPRESSED_TOKEN_COUNT = 400;
+
+      // 404 chars -> ~101 tokens > remaining 100.
+      const longText = 'a'.repeat(404);
+      const request: Part[] = [{ text: longText }];
+
+      const setupOverflowChat = () => {
+        vi.mocked(mockConfig.getModelConfigService().getContextWindow).mockReturnValue(
+          MOCKED_TOKEN_LIMIT,
+        );
+        const lastPromptTokenCount = vi.fn().mockReturnValue(INITIAL_TOKEN_COUNT);
+        const mockChat: Partial<GeminiChat> = {
+          getLastPromptTokenCount: lastPromptTokenCount,
+          setTools: vi.fn(),
+          getDurableHistoryTurns: vi.fn().mockReturnValue([]),
+          getHistory: vi.fn().mockReturnValue([]),
+        };
+        client['chat'] = mockChat as GeminiChat;
+        return { mockChat, lastPromptTokenCount };
+      };
+
+      it('recovers via forced compression and proceeds when it frees enough space', async () => {
+        const { lastPromptTokenCount } = setupOverflowChat();
+        mockTurnRunFn.mockReturnValue(
+          (async function* () {
+            yield { type: 'content', value: 'Hello' };
+          })(),
+        );
+
+        const recoveryInfo: ChatCompressionInfo = {
+          originalTokenCount: INITIAL_TOKEN_COUNT,
+          newTokenCount: COMPRESSED_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.COMPRESSED,
+        };
+
+        const compressSpy = vi
+          .spyOn(client, 'tryCompressChat')
+          .mockImplementation(async (_promptId, force = false) => {
+            if (force) {
+              // Forced recovery frees space: simulate chat rebuild.
+              lastPromptTokenCount.mockReturnValue(COMPRESSED_TOKEN_COUNT);
+              return recoveryInfo;
+            }
+            return {
+              originalTokenCount: INITIAL_TOKEN_COUNT,
+              newTokenCount: INITIAL_TOKEN_COUNT,
+              compressionStatus: CompressionStatus.NOOP,
+            };
+          });
+
+        const stream = client.sendMessageStream(
+          request,
+          new AbortController().signal,
+          'prompt-id-recovery',
+        );
+        const events = await fromAsync(stream);
+
+        // Recovery compression is reported, overflow is not.
+        expect(events).toContainEqual({
+          type: GeminiEventType.ChatCompressed,
+          value: recoveryInfo,
+        });
+        expect(
+          events.find((e) => e.type === GeminiEventType.ContextWindowWillOverflow),
+        ).toBeUndefined();
+
+        // Turn proceeded to the model.
+        expect(mockTurnRunFn).toHaveBeenCalled();
+
+        // Threshold compression (force=false) + one recovery (force=true, Auto).
+        expect(compressSpy).toHaveBeenCalledTimes(2);
+        expect(compressSpy).toHaveBeenNthCalledWith(
+          2,
+          'prompt-id-recovery',
+          true,
+          expect.any(AbortSignal),
+          PreCompressTrigger.Auto,
+        );
+      });
+
+      it('still yields ContextWindowWillOverflow when recovery does not free enough space', async () => {
+        setupOverflowChat();
+
+        const compressSpy = vi.spyOn(client, 'tryCompressChat').mockResolvedValue({
+          originalTokenCount: INITIAL_TOKEN_COUNT,
+          newTokenCount: INITIAL_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.NOOP,
+        });
+
+        const stream = client.sendMessageStream(
+          request,
+          new AbortController().signal,
+          'prompt-id-recovery-fail',
+        );
+        const events = await fromAsync(stream);
+
+        expect(events).toContainEqual({
+          type: GeminiEventType.ContextWindowWillOverflow,
+          value: {
+            estimatedRequestTokenCount: Math.floor(longText.length * 0.25),
+            remainingTokenCount: MOCKED_TOKEN_LIMIT - INITIAL_TOKEN_COUNT,
+          },
+        });
+        expect(mockTurnRunFn).not.toHaveBeenCalled();
+        // Recovery attempted exactly once (the force=true call).
+        expect(compressSpy).toHaveBeenCalledTimes(2);
+      });
+
+      it('attempts recovery at most once even if still overflowing after recovery', async () => {
+        setupOverflowChat();
+
+        const compressSpy = vi
+          .spyOn(client, 'tryCompressChat')
+          .mockImplementation(async (_promptId, force = false) => ({
+            originalTokenCount: INITIAL_TOKEN_COUNT,
+            // Threshold pass does nothing; forced recovery frees some
+            // space but not enough (850 + 101 > 1000).
+            newTokenCount: force ? 850 : INITIAL_TOKEN_COUNT,
+            compressionStatus: force
+              ? CompressionStatus.COMPRESSED
+              : CompressionStatus.NOOP,
+          }));
+
+        const stream = client.sendMessageStream(
+          request,
+          new AbortController().signal,
+          'prompt-id-recovery-once',
+        );
+        const events = await fromAsync(stream);
+
+        expect(
+          events.filter((e) => e.type === GeminiEventType.ChatCompressed),
+        ).toHaveLength(1);
+        expect(
+          events.filter((e) => e.type === GeminiEventType.ContextWindowWillOverflow),
+        ).toHaveLength(1);
+        expect(compressSpy).toHaveBeenCalledTimes(2);
+        expect(mockTurnRunFn).not.toHaveBeenCalled();
+      });
+
+      it('skips recovery when the request alone exceeds the whole context window', async () => {
+        setupOverflowChat();
+
+        const compressSpy = vi.spyOn(client, 'tryCompressChat').mockResolvedValue({
+          originalTokenCount: INITIAL_TOKEN_COUNT,
+          newTokenCount: INITIAL_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.NOOP,
+        });
+
+        // Request alone > window (1000): 5000 chars -> 1250 tokens.
+        const hugeRequest: Part[] = [{ text: 'a'.repeat(5000) }];
+
+        const stream = client.sendMessageStream(
+          hugeRequest,
+          new AbortController().signal,
+          'prompt-id-huge',
+        );
+        const events = await fromAsync(stream);
+
+        expect(events).toContainEqual(
+          expect.objectContaining({
+            type: GeminiEventType.ContextWindowWillOverflow,
+          }),
+        );
+        // Only the threshold compression ran; no forced recovery.
+        expect(compressSpy).toHaveBeenCalledTimes(1);
+        expect(compressSpy).toHaveBeenCalledWith(
+          expect.any(String),
+          false,
+          expect.any(AbortSignal),
+        );
+      });
+
+      it('skips recovery on the context-pipeline path', async () => {
+        mockConfig.getContextManagementConfig = vi
+          .fn()
+          .mockReturnValue({ enabled: true });
+        vi.spyOn(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (client as any).agentHistoryProvider,
+          'manageHistory',
+          // Returning the same length as mock chat history avoids the
+          // setHistory branch (mock chat does not implement it).
+        ).mockResolvedValue([]);
+        setupOverflowChat();
+
+        const compressSpy = vi.spyOn(client, 'tryCompressChat').mockResolvedValue({
+          originalTokenCount: INITIAL_TOKEN_COUNT,
+          newTokenCount: INITIAL_TOKEN_COUNT,
+          compressionStatus: CompressionStatus.NOOP,
+        });
+
+        const stream = client.sendMessageStream(
+          request,
+          new AbortController().signal,
+          'prompt-id-pipeline',
+        );
+        const events = await fromAsync(stream);
+
+        expect(events).toContainEqual(
+          expect.objectContaining({
+            type: GeminiEventType.ContextWindowWillOverflow,
+          }),
+        );
+        // Pipeline path never calls tryCompressChat (neither threshold nor recovery).
+        expect(compressSpy).not.toHaveBeenCalled();
+      });
     });
 
     it('should not trigger overflow warning for requests with large binary data (PDFs/images)', async () => {

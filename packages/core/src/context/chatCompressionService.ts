@@ -254,6 +254,7 @@ export class ChatCompressionService {
     config: Config,
     hasFailedCompressionAttempt: boolean,
     abortSignal?: AbortSignal,
+    trigger?: PreCompressTrigger,
   ): Promise<{ newHistory: Content[] | null; info: ChatCompressionInfo }> {
     const curatedHistory = chat.getHistory(true);
 
@@ -270,9 +271,11 @@ export class ChatCompressionService {
     }
 
     // Fire PreCompress hook before compression
-    // This fires for both manual and auto compression attempts
-    const trigger = force ? PreCompressTrigger.Manual : PreCompressTrigger.Auto;
-    await config.getHookSystem()?.firePreCompressEvent(trigger);
+    // This fires for both manual and auto compression attempts.
+    // Callers may override the trigger.
+    const resolvedTrigger =
+      trigger ?? (force ? PreCompressTrigger.Manual : PreCompressTrigger.Auto);
+    await config.getHookSystem()?.firePreCompressEvent(resolvedTrigger);
 
     const originalTokenCount = chat.getLastPromptTokenCount();
 
