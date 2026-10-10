@@ -8,7 +8,7 @@ import { Box, Text } from 'ink';
 import type { CompressionProps } from '../../types.js';
 import { CliSpinner } from '../CliSpinner.js';
 import { theme } from '../../semantic-colors.js';
-import { SCREEN_READER_MODEL_PREFIX } from '../../textConstants.js';
+import { SCREEN_READER_MODEL_PREFIX } from '../../constants/textConstants.js';
 import { CompressionStatus } from 'sparkle-cli-core';
 
 export interface CompressionDisplayProps {

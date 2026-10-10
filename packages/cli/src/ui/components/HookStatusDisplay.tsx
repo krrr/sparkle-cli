@@ -8,7 +8,7 @@ import type React from 'react';
 import { Text } from 'ink';
 import { type ActiveHook } from '../types.js';
 import { isUserVisibleHook } from 'sparkle-cli-core';
-import { GENERIC_WORKING_LABEL } from '../textConstants.js';
+import { GENERIC_WORKING_LABEL } from '../constants/textConstants.js';
 import { theme } from '../semantic-colors.js';
 
 interface HookStatusDisplayProps {

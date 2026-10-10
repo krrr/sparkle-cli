@@ -14,7 +14,7 @@ import { isToolExecuting } from '../utils/historyUtils.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import { theme } from '../semantic-colors.js';
-import { GENERIC_WORKING_LABEL } from '../textConstants.js';
+import { EXECUTING_LABEL, GENERIC_WORKING_LABEL } from '../constants/textConstants.js';
 import { INTERACTIVE_SHELL_WAITING_PHRASE } from '../hooks/usePhraseCycler.js';
 import { LoadingIndicator } from './LoadingIndicator.js';
 import { LiveThinkingTail } from './LiveThinkingTail.js';
@@ -128,7 +128,7 @@ export const StatusNode: React.FC<{
       currentLoadingPhrase = GENERIC_WORKING_LABEL;
     }
   } else if (isToolExecuting(pendingHistoryItems)) {
-    currentLoadingPhrase = 'Executing...';
+    currentLoadingPhrase = EXECUTING_LABEL;
   } else {
     // Sanitize thought subject to prevent terminal injection
     currentThought = thought

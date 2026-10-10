@@ -8,7 +8,10 @@ import type React from 'react';
 import { Text, useIsScreenReaderEnabled } from 'ink';
 import { useStreamingContext } from '../contexts/StreamingContext.js';
 import { StreamingState } from '../types.js';
-import { SCREEN_READER_LOADING, SCREEN_READER_RESPONDING } from '../textConstants.js';
+import {
+  SCREEN_READER_LOADING,
+  SCREEN_READER_RESPONDING,
+} from '../constants/textConstants.js';
 import { theme } from '../semantic-colors.js';
 import { GeminiSpinner } from './GeminiSpinner.js';
 import type { SpinnerName } from './CliSpinner.js';

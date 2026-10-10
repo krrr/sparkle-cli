@@ -7,7 +7,7 @@
 import type React from 'react';
 import { Text, Box } from 'ink';
 import { theme } from '../../semantic-colors.js';
-import { SCREEN_READER_USER_PREFIX } from '../../textConstants.js';
+import { SCREEN_READER_USER_PREFIX } from '../../constants/textConstants.js';
 import { HalfLinePaddedBox } from '../shared/HalfLinePaddedBox.js';
 import { useConfig } from '../../contexts/ConfigContext.js';
 

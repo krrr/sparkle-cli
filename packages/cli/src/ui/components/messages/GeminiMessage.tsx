@@ -8,7 +8,7 @@ import type React from 'react';
 import { Text, Box } from 'ink';
 import { MarkdownDisplay } from '../../utils/MarkdownDisplay.js';
 import { theme } from '../../semantic-colors.js';
-import { SCREEN_READER_MODEL_PREFIX } from '../../textConstants.js';
+import { SCREEN_READER_MODEL_PREFIX } from '../../constants/textConstants.js';
 import { useUIState } from '../../contexts/UIStateContext.js';
 
 interface GeminiMessageProps {

@@ -15,6 +15,7 @@ import { formatDuration } from '../utils/formatters.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
 import { isNarrowWidth } from '../utils/isNarrowWidth.js';
 import { INTERACTIVE_SHELL_WAITING_PHRASE } from '../hooks/usePhraseCycler.js';
+import { THINKING_LABEL } from '../constants/textConstants.js';
 
 interface LoadingIndicatorProps {
   currentLoadingPhrase?: string;
@@ -63,7 +64,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       : thought?.subject
         ? (thoughtLabel ?? thought.subject)
         : currentLoadingPhrase ||
-          (streamingState === StreamingState.Responding ? 'Thinking...' : undefined);
+          (streamingState === StreamingState.Responding ? THINKING_LABEL : undefined);
 
   const cancelAndTimerContent =
     showCancelAndTimer && streamingState === StreamingState.Responding
@@ -71,7 +72,7 @@ export const LoadingIndicator: React.FC<LoadingIndicatorProps> = ({
       : null;
 
   const wittyPhraseNode =
-    !forceRealStatusOnly && showWit && wittyPhrase && primaryText === 'Thinking...' ? (
+    !forceRealStatusOnly && showWit && wittyPhrase && primaryText === THINKING_LABEL ? (
       <Box marginLeft={1}>
         <Text color={theme.text.secondary} dimColor italic>
           {wittyPhrase}

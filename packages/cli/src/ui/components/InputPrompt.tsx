@@ -48,7 +48,7 @@ import {
 import { isAutoExecutableCommand, isSlashCommand } from '../utils/commandUtils.js';
 import { parseSlashCommand } from '../../utils/commands.js';
 import * as path from 'node:path';
-import { SCREEN_READER_USER_PREFIX } from '../textConstants.js';
+import { SCREEN_READER_USER_PREFIX } from '../constants/textConstants.js';
 import { useShellFocusState } from '../contexts/ShellFocusContext.js';
 import { useUIState } from '../contexts/UIStateContext.js';
 import { useInputState } from '../contexts/InputContext.js';
