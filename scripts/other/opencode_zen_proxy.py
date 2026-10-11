@@ -62,6 +62,9 @@ DEFAULT_TOOL_MAP = {
     "read": "read",
 }
 
+# 名称不以free结尾的特殊模型
+NON_FREE_SUFFIX_MODELS = ['big-pickle']
+
 app = FastAPI(title="OpenCode Zen OpenAI Proxy", version="1.0.0")
 
 app.add_middleware(
@@ -418,43 +421,21 @@ async def list_models(request: Request):
                 # 仅保留以 -free 结尾的模型
                 filtered_models = [
                     m for m in models_list
-                    if isinstance(m, dict) and m.get("id", "").endswith("-free")
+                    if isinstance(m, dict) and (m.get("id", "").endswith("-free") or m.get("id", "") in NON_FREE_SUFFIX_MODELS)
                 ]
                 return {"object": "list", "data": filtered_models}
             else:
                 print(f"[!] 上游获取 models 失败，HTTP {resp.status_code}: {resp.text}")
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"上游获取 models 失败，HTTP {resp.status_code}",
+                )
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"[!] 请求上游 models 异常: {e}")
+        raise HTTPException(status_code=500, detail=f"请求上游 models 异常: {e}")
 
-    # 异常兜底 fallback 列表（全部为 -free 结尾模型）
-    fallback_ids = [
-        "mimo-v2.6-flash-free",
-        "mimo-v2.5-free",
-        "deepseek-v4-flash-free",
-        "jev-1.13-free",
-        "space-bunny-free",
-        "longcat-2.5-preview-free",
-        "ling-3.0-flash-fin-free",
-        "nemotron-3-ultra-free",
-        "nemotron-3.5-lightning-free",
-        "muse-spark-1.3-contributor-free",
-        "muse-spark-1.2-contributor-free",
-    ]
-    return {
-        "object": "list",
-        "data": [
-            {
-                "id": mid,
-                "object": "model",
-                "created": int(time.time()),
-                "owned_by": "opencode",
-                "permission": [],
-                "root": mid,
-                "parent": None,
-            }
-            for mid in fallback_ids
-        ],
-    }
 
 @app.post("/v1/chat/completions")
 @app.post("/chat/completions")
@@ -470,7 +451,7 @@ async def chat_completions(request: Request):
     client_model = body.get("model", "mimo-v2.6-flash-free")
 
     # 模型名称映射
-    upstream_model = client_model if client_model.endswith("-free") else client_model + '-free'
+    upstream_model = client_model if client_model.endswith("-free") or client_model in NON_FREE_SUFFIX_MODELS else client_model + '-free'
 
     # 工具映射与补齐
     incoming_tools = body.get("tools")
