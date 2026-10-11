@@ -108,9 +108,9 @@ describe('chatCommand', () => {
   it('should have the correct main command definition', () => {
     expect(chatCommand.name).toBe('chat');
     expect(chatCommand.altNames).toContain('resume');
-    expect(chatCommand.description).toBe('Browse auto-saved conversations');
+    expect(chatCommand.description).toContain('Browse saved chat sessions');
     expect(chatCommand.autoExecute).toBe(true);
-    expect(chatCommand.subCommands).toHaveLength(3);
+    expect(chatCommand.subCommands).toHaveLength(4);
   });
 
   it('should expose unified chat subcommands directly under /chat', () => {
@@ -118,7 +118,7 @@ describe('chatCommand', () => {
       .filter((subCommand) => !subCommand.hidden)
       .map((subCommand) => subCommand.name);
 
-    expect(visibleSubCommandNames).toEqual(['export', 'dump', 'fork']);
+    expect(visibleSubCommandNames).toEqual(['manage', 'export', 'dump', 'fork']);
   });
 
   describe('export subcommand', () => {

@@ -6,12 +6,7 @@
 
 import * as fsPromises from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
-import type {
-  CommandContext,
-  SlashCommand,
-  OpenDialogActionReturn,
-  SlashCommandActionReturn,
-} from './types.js';
+import type { SlashCommand, SlashCommandActionReturn } from './types.js';
 import { CommandKind } from './types.js';
 import {
   type MessageActionReturn,
@@ -359,20 +354,20 @@ const dumpCommand: SlashCommand = {
   },
 };
 
-const chatSubCommands: SlashCommand[] = [exportCommand, dumpCommand, forkCommand];
+const manageCommand: SlashCommand = {
+  name: 'manage',
+  description: 'Opens a dialog to manage saved chat sessions',
+  kind: CommandKind.BUILT_IN,
+  autoExecute: true,
+  action: () => ({ type: 'dialog', dialog: 'sessionBrowser' }),
+};
 
 export const chatCommand: SlashCommand = {
   name: 'chat',
   altNames: ['resume', 'session'],
-  description: 'Browse auto-saved conversations',
+  description: 'Browse saved chat sessions',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
-  action: async (
-    _context: CommandContext,
-    _args: string,
-  ): Promise<OpenDialogActionReturn> => ({
-    type: 'dialog',
-    dialog: 'sessionBrowser',
-  }),
-  subCommands: chatSubCommands,
+  action: () => ({ type: 'dialog', dialog: 'sessionBrowser' }),
+  subCommands: [manageCommand, exportCommand, dumpCommand, forkCommand],
 };

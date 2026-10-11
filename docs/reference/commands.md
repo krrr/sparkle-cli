@@ -58,10 +58,8 @@ Slash commands provide meta-level control over the CLI itself.
   required. See [Session Management](../cli/session-management.md) for complete details.
 - **Alias:** `/resume` provides the same behavior and subcommands.
 - **Menu layout when typing `/chat` (or `/resume`)**:
-  - `-- auto --`
-    - `list` (selecting this opens the auto-saved session browser)
-    - `export`, `dump`, `fork`
-  - Unique prefixes (for example `/cha` or `/resu`) resolve to the same grouped menu.
+  - `manage`, `export`, `dump`, `fork`
+  - Unique prefixes (for example `/cha` or `/resu`) resolve to the same menu.
 - **Sub-commands:**
   - **`debug`**
     - **Description:** Export the most recent API request as a JSON payload.
@@ -80,6 +78,11 @@ Slash commands provide meta-level control over the CLI itself.
     - **Description:** Duplicates the current conversation into a new session, so you
       can explore a different approach without losing the original.
     - **Alias form:** `/resume fork`
+  - **`manage`**
+    - **Description:** Opens the interactive session browser to browse, search, resume,
+      and delete saved chat sessions. Running `/chat` with no arguments has the same
+      effect.
+    - **Alias form:** `/resume manage`
 
 ### `/clear` (alias: `/new`)
 

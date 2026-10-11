@@ -412,7 +412,7 @@ describe('useSlashCompletion', () => {
       unmount();
     });
 
-    it('should show the same selectable auto/checkpoint menu for /chat and /resume', async () => {
+    it('should show the same checkpoint subcommand menu for /chat and /resume', async () => {
       const checkpointSubCommands = [
         createTestCommand({
           name: 'list',
@@ -457,8 +457,7 @@ describe('useSlashCompletion', () => {
       await waitFor(() => {
         expect(chatResult.current.suggestions[0]).toMatchObject({
           label: 'list',
-          sectionTitle: 'auto',
-          submitValue: '/chat',
+          sectionTitle: 'checkpoints',
         });
       });
 
@@ -476,25 +475,26 @@ describe('useSlashCompletion', () => {
       await waitFor(() => {
         expect(resumeResult.current.suggestions[0]).toMatchObject({
           label: 'list',
-          sectionTitle: 'auto',
-          submitValue: '/resume',
+          sectionTitle: 'checkpoints',
         });
       });
 
-      const chatCheckpointLabels = chatResult.current.suggestions
-        .slice(1)
-        .map((s) => s.label);
-      const resumeCheckpointLabels = resumeResult.current.suggestions
-        .slice(1)
-        .map((s) => s.label);
+      const chatCheckpointLabels = chatResult.current.suggestions.map((s) => s.label);
+      const resumeCheckpointLabels = resumeResult.current.suggestions.map(
+        (s) => s.label,
+      );
 
       expect(chatCheckpointLabels).toEqual(resumeCheckpointLabels);
+      // The synthetic 'auto' section no longer exists; only real subcommands remain.
+      expect(
+        chatResult.current.suggestions.some((s) => s.sectionTitle === 'auto'),
+      ).toBe(false);
 
       unmountChat();
       unmountResume();
     });
 
-    it('should show the same auto/checkpoint menu when /chat is an alias of /resume', async () => {
+    it('should show the same checkpoint subcommand menu when /chat is an alias of /resume', async () => {
       const checkpointSubCommands = [
         createTestCommand({
           name: 'list',
@@ -535,8 +535,7 @@ describe('useSlashCompletion', () => {
       await waitFor(() => {
         expect(chatAliasResult.current.suggestions[0]).toMatchObject({
           label: 'list',
-          sectionTitle: 'auto',
-          submitValue: '/resume',
+          sectionTitle: 'checkpoints',
         });
       });
 
@@ -554,25 +553,24 @@ describe('useSlashCompletion', () => {
       await waitFor(() => {
         expect(resumeResult.current.suggestions[0]).toMatchObject({
           label: 'list',
-          sectionTitle: 'auto',
-          submitValue: '/resume',
+          sectionTitle: 'checkpoints',
         });
       });
 
-      const chatAliasCheckpointLabels = chatAliasResult.current.suggestions
-        .slice(1)
-        .map((s) => s.label);
-      const resumeCheckpointLabels = resumeResult.current.suggestions
-        .slice(1)
-        .map((s) => s.label);
+      const chatAliasLabels = chatAliasResult.current.suggestions.map((s) => s.label);
+      const resumeLabels = resumeResult.current.suggestions.map((s) => s.label);
 
-      expect(chatAliasCheckpointLabels).toEqual(resumeCheckpointLabels);
+      expect(chatAliasLabels).toEqual(resumeLabels);
+      // The synthetic 'auto' section no longer exists; only real subcommands remain.
+      expect(
+        chatAliasResult.current.suggestions.some((s) => s.sectionTitle === 'auto'),
+      ).toBe(false);
 
       unmountChatAlias();
       unmountResume();
     });
 
-    it('should NOT suggest the auto-list command when typing a non-matching partial after /chat', async () => {
+    it('should NOT suggest subcommands when typing a non-matching partial after /chat', async () => {
       const slashCommands = [
         createTestCommand({
           name: 'chat',
@@ -593,16 +591,15 @@ describe('useSlashCompletion', () => {
       await resolveMatch();
 
       await waitFor(() => {
-        // It should NOT have the 'auto' section 'list' suggestion
-        const autoSuggestion = result.current.suggestions.find(
-          (s) => s.sectionTitle === 'auto',
+        const subCommandSuggestion = result.current.suggestions.find(
+          (s) => s.label === 'list',
         );
-        expect(autoSuggestion).toBeUndefined();
+        expect(subCommandSuggestion).toBeUndefined();
       });
       unmount();
     });
 
-    it('should STILL suggest the auto-list command when typing a matching partial after /chat', async () => {
+    it('should suggest the subcommand (without any synthetic auto section) when typing a matching partial after /chat', async () => {
       const slashCommands = [
         createTestCommand({
           name: 'chat',
@@ -623,11 +620,15 @@ describe('useSlashCompletion', () => {
       await resolveMatch();
 
       await waitFor(() => {
-        const autoSuggestion = result.current.suggestions.find(
-          (s) => s.sectionTitle === 'auto',
+        const subCommandSuggestion = result.current.suggestions.find(
+          (s) => s.label === 'list',
         );
-        expect(autoSuggestion).toBeDefined();
-        expect(autoSuggestion?.label).toBe('list');
+        expect(subCommandSuggestion).toBeDefined();
+        // Matching subcommands come from the real command tree, not the removed
+        // synthetic 'auto' section.
+        expect(result.current.suggestions.some((s) => s.sectionTitle === 'auto')).toBe(
+          false,
+        );
       });
       unmount();
     });

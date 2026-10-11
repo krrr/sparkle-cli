@@ -57,13 +57,11 @@ While the CLI is running, use the `/chat` slash command to open the **Session Br
 /chat
 ```
 
-When typing `/chat` (or `/resume`) in slash completion, commands are grouped under
-titled separators:
+When typing `/chat` (or `/resume`) in slash completion, CLI suggests the available
+subcommands: `manage`, `export`, `dump`, and `fork`. Running `/chat` with no arguments
+opens the session browser, and `/chat manage` opens the same browser explicitly.
 
-- `-- auto --` (session browser and `/chat` subcommands)
-  - `list` is selectable and opens the session browser
-
-Unique prefixes such as `/cha` and `/resu` resolve to the same grouped menu.
+Unique prefixes such as `/cha` and `/resu` resolve to the same subcommand menu.
 
 The Session Browser provides an interactive interface where you can perform the
 following actions:

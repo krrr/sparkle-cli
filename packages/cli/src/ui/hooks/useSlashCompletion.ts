@@ -314,35 +314,6 @@ function useCommandSuggestions(
           return suggestion;
         });
 
-        const isTopLevelChatOrResumeContext = !!(
-          leafCommand &&
-          (leafCommand.name === 'chat' || leafCommand.name === 'resume') &&
-          (commandPathParts.length === 0 ||
-            (commandPathParts.length === 1 &&
-              matchesCommand(leafCommand, commandPathParts[0])))
-        );
-
-        if (isTopLevelChatOrResumeContext) {
-          const canonicalParentName = leafCommand.name;
-          const autoLabel = 'list';
-          if (
-            partial === '' ||
-            autoLabel.toLowerCase().startsWith(partial.toLowerCase())
-          ) {
-            const autoSectionSuggestion: Suggestion = {
-              label: autoLabel,
-              value: autoLabel,
-              insertValue: canonicalParentName,
-              description: 'Browse auto-saved chats',
-              commandKind: CommandKind.BUILT_IN,
-              sectionTitle: 'auto',
-              submitValue: `/${canonicalParentName}`,
-            };
-            setSuggestions([autoSectionSuggestion, ...finalSuggestions]);
-            return;
-          }
-        }
-
         setSuggestions(finalSuggestions);
       };
 
