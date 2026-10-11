@@ -225,7 +225,7 @@ function useCommandSuggestions(
         if (signal.aborted) return;
         let potentialSuggestions: SlashCommand[] = [];
 
-        if (partial === '') {
+        if (!partial.length) {
           // If no partial query, show all available commands
           potentialSuggestions = commandsToSearch.filter(
             (cmd) => cmd.description && !cmd.hidden,
@@ -257,11 +257,15 @@ function useCommandSuggestions(
           }
         }
 
-        if (!signal.aborted) {
+        if (signal.aborted) return;
+
+        let sortedSuggestions = potentialSuggestions;
+        if (partial.length) {
           // Sort potentialSuggestions so that exact name/prefix match comes first,
-          // prioritizing primary name over altNames.
+          // prioritizing primary name over altNames. Keep original order if partial
+          // is empty
           const lowerPartial = partial.toLowerCase();
-          const sortedSuggestions = [...potentialSuggestions].sort((a, b) => {
+          sortedSuggestions = [...potentialSuggestions].sort((a, b) => {
             // 1. Exact name match
             const aNameExact = a.name.toLowerCase() === lowerPartial;
             const bNameExact = b.name.toLowerCase() === lowerPartial;
@@ -281,6 +285,7 @@ function useCommandSuggestions(
             const bNamePrefix = b.name.toLowerCase().startsWith(lowerPartial);
             if (aNamePrefix && !bNamePrefix) return -1;
             if (!aNamePrefix && bNamePrefix) return 1;
+            if (aNamePrefix && bNamePrefix) return 0; // keep original order
 
             // 4. Prefix altName match
             const aAltPrefix =
@@ -294,53 +299,51 @@ function useCommandSuggestions(
 
             return 0; // Maintain FZF score order for other matches
           });
-
-          const finalSuggestions = sortedSuggestions.map((cmd) => {
-            const suggestion: Suggestion = {
-              label: cmd.name,
-              value: cmd.name,
-              description: cmd.description,
-              commandKind: cmd.kind,
-            };
-
-            if (cmd.suggestionGroup) {
-              suggestion.sectionTitle = cmd.suggestionGroup;
-            }
-
-            return suggestion;
-          });
-
-          const isTopLevelChatOrResumeContext = !!(
-            leafCommand &&
-            (leafCommand.name === 'chat' || leafCommand.name === 'resume') &&
-            (commandPathParts.length === 0 ||
-              (commandPathParts.length === 1 &&
-                matchesCommand(leafCommand, commandPathParts[0])))
-          );
-
-          if (isTopLevelChatOrResumeContext) {
-            const canonicalParentName = leafCommand.name;
-            const autoLabel = 'list';
-            if (
-              partial === '' ||
-              autoLabel.toLowerCase().startsWith(partial.toLowerCase())
-            ) {
-              const autoSectionSuggestion: Suggestion = {
-                label: autoLabel,
-                value: autoLabel,
-                insertValue: canonicalParentName,
-                description: 'Browse auto-saved chats',
-                commandKind: CommandKind.BUILT_IN,
-                sectionTitle: 'auto',
-                submitValue: `/${canonicalParentName}`,
-              };
-              setSuggestions([autoSectionSuggestion, ...finalSuggestions]);
-              return;
-            }
-          }
-
-          setSuggestions(finalSuggestions);
         }
+
+        const finalSuggestions = sortedSuggestions.map((cmd) => {
+          const suggestion: Suggestion = {
+            label: cmd.name,
+            value: cmd.name,
+            description: cmd.description,
+            commandKind: cmd.kind,
+          };
+          if (cmd.suggestionGroup) {
+            suggestion.sectionTitle = cmd.suggestionGroup;
+          }
+          return suggestion;
+        });
+
+        const isTopLevelChatOrResumeContext = !!(
+          leafCommand &&
+          (leafCommand.name === 'chat' || leafCommand.name === 'resume') &&
+          (commandPathParts.length === 0 ||
+            (commandPathParts.length === 1 &&
+              matchesCommand(leafCommand, commandPathParts[0])))
+        );
+
+        if (isTopLevelChatOrResumeContext) {
+          const canonicalParentName = leafCommand.name;
+          const autoLabel = 'list';
+          if (
+            partial === '' ||
+            autoLabel.toLowerCase().startsWith(partial.toLowerCase())
+          ) {
+            const autoSectionSuggestion: Suggestion = {
+              label: autoLabel,
+              value: autoLabel,
+              insertValue: canonicalParentName,
+              description: 'Browse auto-saved chats',
+              commandKind: CommandKind.BUILT_IN,
+              sectionTitle: 'auto',
+              submitValue: `/${canonicalParentName}`,
+            };
+            setSuggestions([autoSectionSuggestion, ...finalSuggestions]);
+            return;
+          }
+        }
+
+        setSuggestions(finalSuggestions);
       };
 
       performFuzzySearch().catch((error) => {
