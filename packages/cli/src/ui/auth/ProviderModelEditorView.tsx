@@ -8,7 +8,11 @@ import type React from 'react';
 import { useState } from 'react';
 import { Box, Text } from 'ink';
 import { theme } from '../semantic-colors.js';
-import type { ModelTier, ProviderModel, ReasoningEffort } from 'sparkle-cli-core';
+import {
+  type ModelTier,
+  type ProviderModel,
+  type ReasoningEffort,
+} from 'sparkle-cli-core';
 import { TextInput } from '../components/shared/TextInput.js';
 import { InlineRadioGroup } from '../components/shared/InlineRadioGroup.js';
 import { useTextBuffer } from '../components/shared/text-buffer.js';
@@ -24,7 +28,9 @@ export interface ProviderModelEditorViewProps {
   error?: string | null;
 }
 
-type ModelFormField = 'id' | 'tier' | 'reasoningEffort';
+const FORM_FIELDS = ['id', 'tier', 'reasoningEffort', 'contextWindow'] as const;
+type ModelFormField = (typeof FORM_FIELDS)[number];
+
 const TIERS: Array<ModelTier | 'none'> = ['none', 'flash-lite', 'flash', 'pro'];
 // The UI exposes the common levels; the full set (minimal/medium/xhigh/...)
 // can be set directly in settings.json.
@@ -43,7 +49,7 @@ export function ProviderModelEditorView({
   error,
 }: ProviderModelEditorViewProps): React.JSX.Element {
   const keyMatchers = useKeyMatchers();
-  const [focusField, setFocusField] = useState<ModelFormField>('id');
+  const [focusField, setFocusField] = useState<ModelFormField>(FORM_FIELDS[0]);
   const [tier, setTier] = useState<ModelTier | 'none'>(model?.tier || 'none');
   const [effort, setEffort] = useState<ReasoningEffort | 'default'>(
     model?.generateConfig?.reasoningEffort ?? 'default',
@@ -58,15 +64,21 @@ export function ProviderModelEditorView({
     viewport: { width: viewportWidth, height: 1 },
     singleLine: true,
   });
-
-  const fields: ModelFormField[] = ['id', 'tier', 'reasoningEffort'];
+  const ctxBuffer = useTextBuffer({
+    initialText: String(model?.contextWindow ?? ''),
+    viewport: { width: viewportWidth, height: 1 },
+    singleLine: true,
+    inputFilter: (t) => t.replace(/\D/g, ''),
+  });
 
   const moveFocus = (forward: boolean) => {
-    const currentIdx = fields.indexOf(focusField);
+    const currentIdx = FORM_FIELDS.indexOf(focusField);
     if (forward) {
-      setFocusField(fields[(currentIdx + 1) % fields.length]);
+      setFocusField(FORM_FIELDS[(currentIdx + 1) % FORM_FIELDS.length]);
     } else {
-      setFocusField(fields[(currentIdx - 1 + fields.length) % fields.length]);
+      setFocusField(
+        FORM_FIELDS[(currentIdx - 1 + FORM_FIELDS.length) % FORM_FIELDS.length],
+      );
     }
   };
 
@@ -76,9 +88,10 @@ export function ProviderModelEditorView({
       onCancel();
       return;
     }
+    const contextWindow = parseInt(ctxBuffer.text, 10);
 
     // Spread the original model so fields without UI controls
-    // (contextWindow, features, ...) survive an edit.
+    // (features, ...) survive an edit.
     const generateConfig = { ...model?.generateConfig };
     if (effort === 'default') {
       delete generateConfig.reasoningEffort;
@@ -90,6 +103,7 @@ export function ProviderModelEditorView({
       ...model,
       id,
       tier: tier === 'none' ? undefined : tier,
+      contextWindow: !Number.isNaN(contextWindow) ? contextWindow : undefined,
       // Assign (instead of deleting) so the key stays present when cleared.
       // updateModel() folds patches in with a spread merge, so omitting the
       // key would silently keep the stale generateConfig (e.g. a previously
@@ -125,7 +139,7 @@ export function ProviderModelEditorView({
   );
 
   return (
-    <Box flexDirection="column" padding={1} width="100%">
+    <Box flexDirection="column" width="100%">
       <Text bold color={theme.text.primary}>
         {model ? `Edit Model: ${model.id}` : 'Add Model'}
       </Text>
@@ -137,9 +151,7 @@ export function ProviderModelEditorView({
           bold={focusField === 'id'}
         >
           Model ID:{' '}
-          <Text color={theme.text.secondary}>
-            (Required, e.g. gemini-2.5-flash, gpt-4o)
-          </Text>
+          <Text color={theme.text.secondary}>(Required, e.g. gemini-3.1-pro)</Text>
         </Text>
         <Box
           borderStyle="round"
@@ -149,7 +161,7 @@ export function ProviderModelEditorView({
           <TextInput
             buffer={idBuffer}
             focus={focusField === 'id'}
-            onSubmit={() => setFocusField('tier')}
+            onSubmit={() => moveFocus(true)}
             onCancel={handleSaveAndExit}
           />
         </Box>
@@ -163,7 +175,7 @@ export function ProviderModelEditorView({
         value={tier}
         onChange={setTier}
         focus={focusField === 'tier'}
-        onSubmit={handleSaveAndExit}
+        onSubmit={() => moveFocus(true)}
       />
 
       {/* Reasoning Effort Selection */}
@@ -174,8 +186,35 @@ export function ProviderModelEditorView({
         value={effort}
         onChange={setEffort}
         focus={focusField === 'reasoningEffort'}
-        onSubmit={handleSaveAndExit}
+        onSubmit={() => moveFocus(true)}
       />
+
+      {/* Context Window */}
+      <Box marginTop={1} flexDirection="column">
+        <Text
+          color={
+            focusField === 'contextWindow' ? theme.text.accent : theme.text.primary
+          }
+          bold={focusField === 'contextWindow'}
+        >
+          Context Window
+        </Text>
+        <Box
+          borderStyle="round"
+          borderColor={
+            focusField === 'contextWindow' ? theme.ui.focus : theme.border.default
+          }
+          paddingX={1}
+        >
+          <TextInput
+            buffer={ctxBuffer}
+            placeholder="Default 1m tokens"
+            focus={focusField === 'contextWindow'}
+            onSubmit={handleSaveAndExit}
+            onCancel={handleSaveAndExit}
+          />
+        </Box>
+      </Box>
 
       {error && (
         <Box marginTop={1}>

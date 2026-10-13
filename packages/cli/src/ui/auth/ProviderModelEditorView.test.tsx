@@ -46,7 +46,7 @@ describe('ProviderModelEditorView', () => {
     unmount();
   });
 
-  it('saves model when submitting on the tier field with Enter', async () => {
+  it('moves focus with Enter between fields and saves from the last field', async () => {
     const { stdin, waitUntilReady, unmount } = await renderWithProviders(
       <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
     );
@@ -73,7 +73,17 @@ describe('ProviderModelEditorView', () => {
     });
     await waitUntilReady();
 
-    // Press Enter on tier to submit form
+    // Enter advances focus: tier -> reasoning effort -> context window
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    // Enter on the last field (context window) submits the form
     await act(async () => {
       stdin.write('\r');
     });
@@ -164,7 +174,11 @@ describe('ProviderModelEditorView', () => {
     });
     await waitUntilReady();
 
-    // Press Enter on the effort field to submit
+    // Enter moves from the effort field to context window, then submits
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
     await act(async () => {
       stdin.write('\r');
     });
@@ -182,7 +196,7 @@ describe('ProviderModelEditorView', () => {
     unmount();
   });
 
-  it('preserves fields without UI controls when editing', async () => {
+  it('preserves contextWindow and control-less fields when editing', async () => {
     const { stdin, waitUntilReady, unmount } = await renderWithProviders(
       <ProviderModelEditorView
         model={{
@@ -209,6 +223,55 @@ describe('ProviderModelEditorView', () => {
           tier: 'flash',
           contextWindow: 64000,
           features: { thinking: false },
+        }),
+      );
+    });
+
+    unmount();
+  });
+
+  it('saves a context window entered in the context window field', async () => {
+    const { stdin, waitUntilReady, unmount } = await renderWithProviders(
+      <ProviderModelEditorView onSave={onSave} onCancel={onCancel} />,
+    );
+
+    // Type model id
+    await act(async () => {
+      stdin.write('my-model');
+    });
+    await waitUntilReady();
+
+    // Down arrow: id -> tier -> reasoning effort -> context window
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+    await act(async () => {
+      stdin.write('\u001b[B');
+    });
+    await waitUntilReady();
+
+    // Type the context window (only digits pass the input filter)
+    await act(async () => {
+      stdin.write('262144');
+    });
+    await waitUntilReady();
+
+    // Enter on the last field submits the form
+    await act(async () => {
+      stdin.write('\r');
+    });
+    await waitUntilReady();
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'my-model',
+          contextWindow: 262144,
         }),
       );
     });
