@@ -36,6 +36,8 @@ toolName = [
   "codebase_investigator",
   "cli_help",
   "get_internal_docs",
+  "list_background_processes",
+  "read_background_output",
   # Tracker tools for task management (safe as they only modify internal state)
   "tracker_create_task",
   "tracker_update_task",
