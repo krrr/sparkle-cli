@@ -70,8 +70,6 @@ export interface CommandContext {
      * @param postLoadInput Optional text to set in the input buffer after loading history.
      */
     loadHistory: (history: HistoryItem[], postLoadInput?: string) => void;
-    /** Toggles a special display mode. */
-    toggleCorgiMode: () => void;
     toggleVoiceMode: () => void;
     toggleDebugProfiler: () => void;
     toggleVimEnabled: () => Promise<boolean>;

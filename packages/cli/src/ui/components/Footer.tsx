@@ -83,16 +83,6 @@ const SandboxIndicator: React.FC<SandboxIndicatorProps> = ({ isTrustedFolder }) 
   return <Text color={theme.status.error}>no sandbox</Text>;
 };
 
-const CorgiIndicator: React.FC = () => (
-  <Text>
-    <Text color={theme.status.error}>▼</Text>
-    <Text color={theme.text.primary}>(´</Text>
-    <Text color={theme.status.error}>ᴥ</Text>
-    <Text color={theme.text.primary}>`)</Text>
-    <Text color={theme.status.error}>▼</Text>
-  </Text>
-);
-
 export interface FooterRowItem {
   key: string;
   header: string;
@@ -182,7 +172,6 @@ export const Footer: React.FC = () => {
     debugMode,
     branchName,
     debugMessage,
-    corgiMode,
     errorCount,
     showErrorDetails,
     promptTokenCount,
@@ -194,7 +183,6 @@ export const Footer: React.FC = () => {
     debugMode: config.getDebugMode(),
     branchName: uiState.branchName,
     debugMessage: uiState.debugMessage,
-    corgiMode: uiState.corgiMode,
     errorCount: uiState.errorCount,
     showErrorDetails: uiState.showErrorDetails,
     promptTokenCount: uiState.sessionStats.lastPromptTokenCount,
@@ -408,7 +396,6 @@ export const Footer: React.FC = () => {
   }
 
   // 3. Transients
-  if (corgiMode) addCol('corgi', '', () => <CorgiIndicator />, 5);
   if (showErrorSummary) {
     addCol(
       'error-count',

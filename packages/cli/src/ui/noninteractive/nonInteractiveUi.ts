@@ -31,7 +31,6 @@ export function createNonInteractiveUI(): CommandContext['ui'] {
     loadHistory: (_newHistory) => {},
     pendingItem: null,
     setPendingItem: (_item) => {},
-    toggleCorgiMode: () => {},
     toggleDebugProfiler: () => {},
     toggleVimEnabled: async () => false,
     reloadCommands: () => {},

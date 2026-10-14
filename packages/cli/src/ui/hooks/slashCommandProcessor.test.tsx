@@ -200,7 +200,6 @@ describe('useSlashCommandProcessor', () => {
             openPermissionsDialog: vi.fn(),
             quit: mockSetQuittingMessages,
             setDebugMessage: vi.fn(),
-            toggleCorgiMode: vi.fn(),
             toggleVoiceMode: vi.fn(),
             toggleDebugProfiler: vi.fn(),
             dispatchExtensionStateUpdate: vi.fn(),

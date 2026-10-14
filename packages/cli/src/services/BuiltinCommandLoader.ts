@@ -17,7 +17,6 @@ import { clearCommand } from '../ui/commands/clearCommand.js';
 import { commandsCommand } from '../ui/commands/commandsCommand.js';
 import { compactCommand } from '../ui/commands/compactCommand.js';
 import { copyCommand } from '../ui/commands/copyCommand.js';
-import { corgiCommand } from '../ui/commands/corgiCommand.js';
 import { directoryCommand } from '../ui/commands/directoryCommand.js';
 import { editorCommand } from '../ui/commands/editorCommand.js';
 import { extensionsCommand } from '../ui/commands/extensionsCommand.js';
@@ -123,7 +122,6 @@ export class BuiltinCommandLoader implements ICommandLoader {
       policiesCommand,
       bugMemoryCommand,
       // --- other ---
-      corgiCommand,
       quitCommand,
     ];
     handle?.end();

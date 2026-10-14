@@ -229,7 +229,6 @@ export const AppContainer = (props: AppContainerProps) => {
     }
   }, [mouseMode, setOptions]);
 
-  const [corgiMode, setCorgiMode] = useState(false);
   const [debugMessage, setDebugMessage] = useState<string>('');
   const [quittingMessages, setQuittingMessages] = useState<HistoryItem[] | null>(null);
   const [themeError, setThemeError] = useState<string | null>(
@@ -719,7 +718,6 @@ export const AppContainer = (props: AppContainerProps) => {
         }, 100);
       },
       setDebugMessage,
-      toggleCorgiMode: () => setCorgiMode((prev) => !prev),
       toggleVoiceMode: () => setVoiceModeEnabled((prev) => !prev),
       toggleDebugProfiler,
       dispatchExtensionStateUpdate,
@@ -750,7 +748,6 @@ export const AppContainer = (props: AppContainerProps) => {
       openAgentConfigDialog,
       setQuittingMessages,
       setDebugMessage,
-      setCorgiMode,
       dispatchExtensionStateUpdate,
       openPermissionsDialog,
       addConfirmUpdateExtensionRequest,
@@ -2094,7 +2091,6 @@ export const AppContainer = (props: AppContainerProps) => {
       editorError,
       isEditorDialogOpen,
       mouseMode,
-      corgiMode,
       debugMessage,
       quittingMessages,
       isSettingsDialogOpen,
@@ -2204,7 +2200,6 @@ export const AppContainer = (props: AppContainerProps) => {
       editorError,
       isEditorDialogOpen,
       mouseMode,
-      corgiMode,
       debugMessage,
       quittingMessages,
       isSettingsDialogOpen,

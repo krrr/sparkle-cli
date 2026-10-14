@@ -69,7 +69,6 @@ interface SlashCommandProcessorActions {
   openPermissionsDialog: (props?: { targetDirectory?: string }) => void;
   quit: (messages: HistoryItem[]) => void;
   setDebugMessage: (message: string) => void;
-  toggleCorgiMode: () => void;
   toggleVoiceMode: () => void;
   toggleDebugProfiler: () => void;
   dispatchExtensionStateUpdate: (action: ExtensionUpdateAction) => void;
@@ -211,7 +210,6 @@ export const useSlashCommandProcessor = (
         setDebugMessage: actions.setDebugMessage,
         pendingItem,
         setPendingItem,
-        toggleCorgiMode: actions.toggleCorgiMode,
         toggleVoiceMode: actions.toggleVoiceMode,
         toggleDebugProfiler: actions.toggleDebugProfiler,
         toggleVimEnabled,

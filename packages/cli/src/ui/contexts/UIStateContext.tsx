@@ -48,7 +48,6 @@ export interface UIState {
   editorError: string | null;
   isEditorDialogOpen: boolean;
   mouseMode: boolean;
-  corgiMode: boolean;
   debugMessage: string;
   quittingMessages: HistoryItem[] | null;
   isSettingsDialogOpen: boolean;
