@@ -41,9 +41,9 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
     except Exception:
         pass
 
-# 默认上游目标
 UPSTREAM_CHAT_URL = "https://opencode.ai/inference/v1/chat/completions"
 UPSTREAM_MODELS_URL = "https://opencode.ai/zen/v1/models"
+SES_ID_TTL_SEC = 600
 
 # 访问凭证控制
 API_KEY = "lajiopencode"
@@ -415,7 +415,7 @@ def build_upstream_headers(incoming_headers: Dict[str, str]) -> Dict[str, str]:
     """
     global _current_ses_id, _current_ses_id_time
     now = time.time()
-    if _current_ses_id is None or now - _current_ses_id_time > 3600:
+    if _current_ses_id is None or now - _current_ses_id_time > SES_ID_TTL_SEC:
         _current_ses_id = generate_opencode_id("ses")
         _current_ses_id_time = now
 

@@ -16,6 +16,7 @@ import {
   loadApiKeyForProfile,
   type ProviderModel,
   type ProviderProfile,
+  buildUserAgent,
 } from 'sparkle-cli-core';
 import { BaseSelectionList } from '../components/shared/BaseSelectionList.js';
 import { CliSpinner } from '../components/CliSpinner.js';
@@ -24,7 +25,6 @@ import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 import { KeypressPriority } from '../contexts/KeypressContext.js';
-import { buildUserAgent } from 'sparkle-cli-core/src/utils/surface.js';
 
 export interface ProviderModelFetchViewProps {
   profile: ProviderProfile;

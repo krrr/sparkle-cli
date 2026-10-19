@@ -126,6 +126,7 @@ export * from './utils/constants.js';
 export * from './utils/sessionUtils.js';
 export * from './utils/cache.js';
 export * from './utils/markdownUtils.js';
+export * from './utils/surface.js';
 
 // Export services
 export * from './services/fileDiscoveryService.js';
