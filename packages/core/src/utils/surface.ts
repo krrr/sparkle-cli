@@ -52,3 +52,28 @@ export function determineSurface(): string {
   // Priority 5: Fallback for all other cases (e.g., a generic terminal).
   return SURFACE_NOT_SET;
 }
+
+/**
+ * Builds the `User-Agent` header sent to model providers, in the format the
+ * telemetry/analytics pipeline expects.
+ *
+ * @param clientName Client identifier from `Config.getClientName()`. Omit it
+ *   for requests made by the CLI outside of a configured client (e.g. provider
+ *   model discovery), which then use the plain `SparkleCLI` prefix.
+ * @param version CLI version, normally from `getVersion()`.
+ */
+export function buildUserAgent(
+  clientName: string | undefined,
+  version: string,
+): string {
+  const surface = determineSurface();
+  // Use unified format for VS Code traffic.
+  // Note: We don't automatically assume a2a-server is VS Code,
+  // as it could be used by other clients unless the surface explicitly says 'vscode'.
+  if (clientName === 'acp-vscode' || surface === 'vscode') {
+    const vscodeVersion = process.env['TERM_PROGRAM_VERSION'] || 'unknown';
+    return `CloudCodeVSCode/${version} (aidev_client; host_path=VSCode/${vscodeVersion}; proxy_client=sparklecli)`;
+  }
+  const userAgentPrefix = clientName ? `SparkleCLI-${clientName}` : 'SparkleCLI';
+  return `${userAgentPrefix}/${version} (${surface})`;
+}

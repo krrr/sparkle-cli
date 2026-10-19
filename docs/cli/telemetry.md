@@ -73,14 +73,20 @@ Most integrated environments are identified automatically without additional
 configuration. The identifier is included as a prefix to the `User-Agent` and as a
 "surface" tag in the parenthetical metadata.
 
-| Environment                 | User-Agent Prefix            | Surface Tag |
-| :-------------------------- | :--------------------------- | :---------- |
-| **Zed (via ACP)**           | `GeminiCLI-acp-zed`          | `zed`       |
-| **XCode (via ACP)**         | `GeminiCLI-acp-xcode`        | `xcode`     |
-| **IntelliJ IDEA (via ACP)** | `GeminiCLI-acp-intellijidea` | `jetbrains` |
-| **Standard Terminal**       | `GeminiCLI`                  | `terminal`  |
+| Environment                 | User-Agent Prefix          | Surface Tag |
+| :-------------------------- | :------------------------- | :---------- |
+| **Zed (via ACP)**           | `SparkleCLI-acp-zed`       | `zed`       |
+| **XCode (via ACP)**         | `SparkleCLI-acp-xcode`     | `xcode`     |
+| **JetBrains IDE (via ACP)** | `SparkleCLI-acp-jetbrains` | `jetbrains` |
+| **Standard Terminal**       | `SparkleCLI-tui`           | `terminal`  |
 
-**Example User-Agent:** `GeminiCLI-acp-zed/0.34.0/gemini-pro (linux; x64; zed)`
+**Example User-Agent:** `SparkleCLI-acp-zed/0.34.0 (zed)`
+
+Calls made from a VS Code session use the unified form instead, which identifies the
+host application and its version:
+
+**Example VS Code User-Agent:**
+`CloudCodeVSCode/0.34.0 (aidev_client; host_path=VSCode/1.85.0; proxy_client=sparklecli)`
 
 ### Custom identification
 
@@ -100,8 +106,11 @@ export SPARKLE_CLI_SURFACE="my-custom-tool"
 $env:SPARKLE_CLI_SURFACE="my-custom-tool"
 ```
 
-When set, the value appears at the end of the `User-Agent` parenthetical:
-`GeminiCLI/0.34.0/gemini-pro (linux; x64; my-custom-tool)`
+When set, the value replaces the detected surface tag in the `User-Agent` parenthetical:
+`SparkleCLI-tui/0.34.0 (my-custom-tool)`.
+
+VS Code sessions always send the unified `CloudCodeVSCode/...` form, so the custom value
+doesn't appear in the `User-Agent` for those calls.
 
 ## Logs, metrics, and traces
 

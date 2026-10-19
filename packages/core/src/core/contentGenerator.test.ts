@@ -167,9 +167,7 @@ describe('createContentGenerator', () => {
       apiKey: 'test-api-key',
       httpOptions: expect.objectContaining({
         headers: expect.objectContaining({
-          'User-Agent': expect.stringMatching(
-            /SparkleCLI\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
-          ),
+          'User-Agent': 'SparkleCLI/1.2.3 (terminal)',
         }),
       }),
     });
@@ -207,9 +205,7 @@ describe('createContentGenerator', () => {
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
-            'User-Agent': expect.stringMatching(
-              /SparkleCLI-a2a-server\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
-            ),
+            'User-Agent': 'SparkleCLI-a2a-server/1.2.3 (terminal)',
           }),
         }),
       }),
@@ -242,9 +238,8 @@ describe('createContentGenerator', () => {
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
-            'User-Agent': expect.stringMatching(
-              /CloudCodeVSCode\/1\.2\.3 \(aidev_client; os_type=.*; os_version=.*; arch=.*; host_path=VSCode\/1\.85\.0; proxy_client=geminicli\)/,
-            ),
+            'User-Agent':
+              'CloudCodeVSCode/1.2.3 (aidev_client; host_path=VSCode/1.85.0; proxy_client=sparklecli)',
           }),
         }),
       }),
@@ -277,9 +272,7 @@ describe('createContentGenerator', () => {
       expect.objectContaining({
         httpOptions: expect.objectContaining({
           headers: expect.objectContaining({
-            'User-Agent': expect.stringMatching(
-              /SparkleCLI-my-client\/1\.2\.3\/gemini-pro \(.*; .*; terminal\)/,
-            ),
+            'User-Agent': 'SparkleCLI-my-client/1.2.3 (terminal)',
           }),
         }),
       }),

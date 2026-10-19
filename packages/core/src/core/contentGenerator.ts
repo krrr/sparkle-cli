@@ -12,16 +12,16 @@ import {
   type CountTokensParameters,
   type EmbedContentResponse,
   type EmbedContentParameters,
+  type HttpOptions,
 } from '@google/genai';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import * as os from 'node:os';
 import type { Config } from '../config/config.js';
 import { ProviderType } from '../config/constants.js';
 import { LoggingContentGenerator } from './loggingContentGenerator.js';
 import { FakeContentGenerator } from './fakeContentGenerator.js';
 import { parseCustomHeaders } from '../utils/customHeaderUtils.js';
-import { determineSurface } from '../utils/surface.js';
+import { buildUserAgent } from '../utils/surface.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { getVersion, resolveModel } from '../../index.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
@@ -157,56 +157,28 @@ export async function createContentGenerator(
       return new LoggingContentGenerator(fakeGenerator, gcConfig);
     }
     const version = await getVersion();
-    const model = resolveModel(gcConfig.getModel(), gcConfig);
     const customHeadersEnv = process.env['SPARKLE_CLI_CUSTOM_HEADERS'] || undefined;
-    const clientName = gcConfig.getClientName();
-    const surface = determineSurface();
-
-    let userAgent: string;
-    // Use unified format for VS Code traffic.
-    // Note: We don't automatically assume a2a-server is VS Code,
-    // as it could be used by other clients unless the surface explicitly says 'vscode'.
-    if (clientName === 'acp-vscode' || surface === 'vscode') {
-      const osTypeMap: Record<string, string> = {
-        darwin: 'macOS',
-        win32: 'Windows',
-        linux: 'Linux',
-      };
-      const osType = osTypeMap[process.platform] || process.platform;
-      const osVersion = os.release();
-      const arch = process.arch;
-
-      const vscodeVersion = process.env['TERM_PROGRAM_VERSION'] || 'unknown';
-      const hostPath = `VSCode/${vscodeVersion}`;
-
-      userAgent = `CloudCodeVSCode/${version} (aidev_client; os_type=${osType}; os_version=${osVersion}; arch=${arch}; host_path=${hostPath}; proxy_client=geminicli)`;
-    } else {
-      const userAgentPrefix = clientName ? `SparkleCLI-${clientName}` : 'SparkleCLI';
-      userAgent = `${userAgentPrefix}/${version}/${model} (${process.platform}; ${process.arch}; ${surface})`;
-    }
-
-    const customHeadersMap = parseCustomHeaders(customHeadersEnv);
-    const apiKeyAuthMechanism =
-      process.env['GEMINI_API_KEY_AUTH_MECHANISM'] || 'x-goog-api-key';
-    const apiVersionEnv = process.env['GOOGLE_GENAI_API_VERSION'];
+    const userAgent = buildUserAgent(gcConfig.getClientName(), version);
 
     const baseHeaders: Record<string, string> = {
       'User-Agent': userAgent,
-      ...customHeadersMap,
+      ...parseCustomHeaders(customHeadersEnv),
+    };
+    const headers: Record<string, string> = {
+      ...baseHeaders,
+      ...config.customHeaders,
     };
 
-    if (
-      apiKeyAuthMechanism === 'bearer' &&
-      config.authType === ProviderType.USE_GEMINI &&
-      config.apiKey
-    ) {
-      baseHeaders['Authorization'] = `Bearer ${config.apiKey}`;
-    }
-
     if (config.authType === ProviderType.USE_GEMINI) {
-      let headers: Record<string, string> = { ...baseHeaders };
-      if (config.customHeaders) {
-        headers = { ...headers, ...config.customHeaders };
+      const keyAuthMech =
+        process.env['GEMINI_API_KEY_AUTH_MECHANISM'] || 'x-goog-api-key';
+      const apiVersionEnv = process.env['GOOGLE_GENAI_API_VERSION'];
+      if (
+        keyAuthMech === 'bearer' &&
+        config.apiKey &&
+        Object.keys(headers).some((i) => i.toLowerCase() === 'authorization')
+      ) {
+        headers['Authorization'] = `Bearer ${config.apiKey}`;
       }
       let baseUrl = config.baseUrl;
       if (!baseUrl) {
@@ -227,11 +199,7 @@ export async function createContentGenerator(
         headers['x-goog-api-key'] = '';
       }
 
-      const httpOptions: {
-        baseUrl?: string;
-        headers: Record<string, string>;
-      } = { headers };
-
+      const httpOptions: HttpOptions = { headers };
       if (baseUrl) {
         httpOptions.baseUrl = baseUrl;
       }
@@ -268,6 +236,7 @@ export async function createContentGenerator(
           baseUrl: config.baseUrl ?? DEFAULT_OPENAI_BASE_URL,
           provider,
           proxy: config.proxy,
+          httpOptions: { headers },
         }),
         gcConfig,
       );

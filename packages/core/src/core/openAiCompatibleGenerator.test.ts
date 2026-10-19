@@ -506,11 +506,162 @@ describe('OpenAiCompatibleGenerator', () => {
     });
   });
 
+  describe('httpOptions', () => {
+    it('sends shared httpOptions.headers and merges per-request headers', async () => {
+      const sharedGenerator = new OpenAiCompatibleGenerator({
+        apiKey: 'test-key',
+        baseUrl,
+        provider: 'openai',
+        httpOptions: {
+          headers: {
+            'User-Agent': 'SparkleCLI/1.2.3 (terminal)',
+            'X-Shared': 'shared',
+          },
+        },
+      });
+      fakeServer.on('/v1/chat/completions', (_body, headers) => {
+        expect(headers['user-agent']).toBe('SparkleCLI/1.2.3 (terminal)');
+        expect(headers['x-shared']).toBe('overridden');
+        expect(headers['x-request']).toBe('yes');
+        return {
+          status: 200,
+          body: JSON.stringify({
+            id: 'resp_opts',
+            model: 'gpt-test',
+            choices: [
+              { message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' },
+            ],
+          }),
+        };
+      });
+
+      await sharedGenerator.generateContent(
+        {
+          model: 'gpt-test',
+          contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
+          config: {
+            httpOptions: {
+              headers: { 'X-Shared': 'overridden', 'X-Request': 'yes' },
+            },
+          },
+        },
+        'p',
+        LlmRole.MAIN,
+      );
+    });
+
+    it('applies the shared httpOptions.timeout to requests', async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation((_input, init) => {
+          const signal = init?.signal ?? undefined;
+          return new Promise<Response>((_resolve, reject) => {
+            if (!signal) {
+              return;
+            }
+            signal.addEventListener('abort', () => reject(signal.reason));
+          });
+        });
+      try {
+        const timeoutGenerator = new OpenAiCompatibleGenerator({
+          apiKey: 'test-key',
+          baseUrl,
+          provider: 'openai',
+          httpOptions: { timeout: 20 },
+        });
+        await expect(timeoutGenerator.listModels()).rejects.toMatchObject({
+          name: 'TimeoutError',
+        });
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
+    it('prefers per-request httpOptions.baseUrl over the configured base URL', async () => {
+      let requestedUrl: string | undefined;
+      const fetchSpy = vi
+        .spyOn(globalThis, 'fetch')
+        .mockImplementation(async (input) => {
+          requestedUrl = String(input);
+          return new Response(
+            JSON.stringify({
+              id: 'resp_url',
+              model: 'gpt-test',
+              choices: [
+                {
+                  message: { role: 'assistant', content: 'ok' },
+                  finish_reason: 'stop',
+                },
+              ],
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          );
+        });
+      try {
+        const urlGenerator = new OpenAiCompatibleGenerator({
+          apiKey: 'test-key',
+          baseUrl: 'https://unused.example.com/v1',
+          provider: 'openai',
+        });
+        await urlGenerator.generateContent(
+          {
+            model: 'gpt-test',
+            contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
+            config: { httpOptions: { baseUrl } },
+          },
+          'p',
+          LlmRole.MAIN,
+        );
+        expect(requestedUrl).toBe(`${baseUrl}/chat/completions`);
+      } finally {
+        fetchSpy.mockRestore();
+      }
+    });
+
+    it('merges shared extraBody fields into the request payload', async () => {
+      const extraGenerator = new OpenAiCompatibleGenerator({
+        apiKey: 'test-key',
+        baseUrl,
+        provider: 'openai',
+        httpOptions: { extraBody: { temperature: 0 } },
+      });
+      fakeServer.on('/v1/chat/completions', (body) => {
+        expect(body['temperature']).toBe(0);
+        return {
+          status: 200,
+          body: JSON.stringify({
+            id: 'resp_extra',
+            model: 'gpt-test',
+            choices: [
+              { message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' },
+            ],
+          }),
+        };
+      });
+
+      await extraGenerator.generateContent(
+        { model: 'gpt-test', contents: [{ role: 'user', parts: [{ text: 'hi' }] }] },
+        'p',
+        LlmRole.MAIN,
+      );
+    });
+  });
+
   describe('listModels', () => {
-    it('calls GET /models with bearer auth and returns model ids', async () => {
+    it('calls GET /models with the shared headers and returns model ids', async () => {
+      const headerGenerator = new OpenAiCompatibleGenerator({
+        apiKey: 'test-key',
+        baseUrl,
+        provider: 'openai',
+        httpOptions: {
+          headers: {
+            'User-Agent': 'SparkleCLI/1.2.3 (terminal)',
+          },
+        },
+      });
       fakeServer.on('/v1/models', (_body, headers) => {
         expect(headers['authorization']).toBe('Bearer test-key');
-        expect(headers['user-agent']).toBe('SparkleCLI');
+        expect(headers['user-agent']).toBe('SparkleCLI/1.2.3 (terminal)');
         return {
           status: 200,
           body: JSON.stringify({
@@ -523,7 +674,7 @@ describe('OpenAiCompatibleGenerator', () => {
         };
       });
 
-      const models = await generator.listModels();
+      const models = await headerGenerator.listModels();
       expect(models).toEqual(['model-a', 'model-b']);
     });
 

@@ -70,13 +70,18 @@ function startFakeOpenAiServer(): Promise<{
   baseUrl: string;
   close: () => Promise<void>;
   lastBody: () => unknown;
+  lastHeaders: () => Record<string, string>;
 }> {
   let lastBody: unknown = null;
+  let lastHeaders: Record<string, string> = {};
   const server: Server = createServer((req, res) => {
     let raw = '';
     req.on('data', (chunk) => (raw += chunk.toString()));
     req.on('end', () => {
       lastBody = JSON.parse(raw || '{}');
+      lastHeaders = Object.fromEntries(
+        Object.entries(req.headers).map(([key, value]) => [key, String(value)]),
+      );
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(
         JSON.stringify({
@@ -100,6 +105,7 @@ function startFakeOpenAiServer(): Promise<{
         baseUrl: `http://127.0.0.1:${port}/v1`,
         close: () => new Promise<void>((r) => server.close(() => r())),
         lastBody: () => lastBody,
+        lastHeaders: () => lastHeaders,
       });
     });
   });
@@ -327,6 +333,41 @@ describe('createContentGenerator with USE_OPENAI', () => {
       const body = fake.lastBody() as { model: string; messages: unknown[] };
       expect(body.model).toBe('deepseek/deepseek-v4-flash');
       expect(body.messages).toHaveLength(1);
+    } finally {
+      await fake.close();
+    }
+  });
+
+  it('sends the unified User-Agent and custom headers like the Gemini path', async () => {
+    vi.stubEnv('CLI_VERSION', '1.2.3');
+    vi.stubEnv('TERM_PROGRAM', 'iTerm.app');
+    vi.stubEnv('VSCODE_PID', '');
+    vi.stubEnv('GITHUB_SHA', '');
+    vi.stubEnv('SPARKLE_CLI_SURFACE', '');
+    vi.stubEnv('SPARKLE_CLI_CUSTOM_HEADERS', 'X-Test-Header:test');
+
+    const fake = await startFakeOpenAiServer();
+    try {
+      const config = createMockConfig();
+      const generator = await createContentGenerator(
+        {
+          authType: ProviderType.USE_OPENAI,
+          apiKey: 'sk-test',
+          baseUrl: fake.baseUrl,
+        },
+        config,
+      );
+      await generator.generateContent(
+        {
+          model: 'deepseek/deepseek-v4-flash',
+          contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
+        },
+        'prompt-1',
+        LlmRole.MAIN,
+      );
+      const headers = fake.lastHeaders();
+      expect(headers['user-agent']).toBe('SparkleCLI/1.2.3 (terminal)');
+      expect(headers['x-test-header']).toBe('test');
     } finally {
       await fake.close();
     }

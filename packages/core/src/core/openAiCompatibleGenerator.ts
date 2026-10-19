@@ -11,6 +11,7 @@ import type {
   EmbedContentResponse,
   GenerateContentParameters,
   GenerateContentResponse,
+  HttpOptions,
   Tool,
 } from '@google/genai';
 import type { LlmRole } from '../telemetry/llmRole.js';
@@ -62,6 +63,11 @@ export interface OpenAiCompatibleGeneratorConfig {
   baseUrl: string;
   provider: OpenAiProvider;
   proxy?: string;
+  /**
+   * Passing User-Agent and custom headers, like `GoogleGenAI`. per-request
+   * `config.httpOptions` merges on top.
+   */
+  httpOptions?: Omit<HttpOptions, 'baseUrl'>;
 }
 
 /**
@@ -104,6 +110,7 @@ export class OpenAiCompatibleGenerator {
     const response = await this.requestJson('/chat/completions', 'POST', {
       body: openAiRequest,
       signal: this.getAbortSignal(request),
+      httpOptions: request.config?.httpOptions,
     });
     if (!response.ok) {
       throw await this.createApiError(response);
@@ -126,6 +133,7 @@ export class OpenAiCompatibleGenerator {
     const response = await this.requestJson('/chat/completions', 'POST', {
       body: openAiRequest,
       signal: this.getAbortSignal(request),
+      httpOptions: request.config?.httpOptions,
     });
     if (!response.ok || !response.body) {
       throw await this.createApiError(response);
@@ -139,7 +147,9 @@ export class OpenAiCompatibleGenerator {
    * endpoint.
    */
   async listModels(): Promise<string[]> {
-    const response = await this.requestJson('/models', 'GET');
+    const response = await this.requestJson('/models', 'GET', {
+      signal: this.getAbortSignal(),
+    });
     if (!response.ok) {
       throw await this.createApiError(response);
     }
@@ -190,6 +200,7 @@ export class OpenAiCompatibleGenerator {
     const response = await this.requestJson('/embeddings', 'POST', {
       body,
       signal: this.getAbortSignal(request),
+      httpOptions: request.config?.httpOptions,
     });
     if (!response.ok) {
       throw await this.createApiError(response);
@@ -233,6 +244,11 @@ export class OpenAiCompatibleGenerator {
       this.functionNameMapper,
     );
 
+    const extraBody = {
+      ...this.config.httpOptions?.extraBody,
+      ...config.httpOptions?.extraBody,
+    };
+
     return {
       model: request.model,
       messages,
@@ -240,6 +256,7 @@ export class OpenAiCompatibleGenerator {
       ...(streaming ? { stream_options: { include_usage: true } } : {}),
       ...(tools.length > 0 ? { tools } : {}),
       ...openAiConfig,
+      ...extraBody,
     };
   }
 
@@ -257,11 +274,12 @@ export class OpenAiCompatibleGenerator {
     );
   }
 
-  private getAbortSignal(request: {
-    config?: { httpOptions?: { timeout?: number }; abortSignal?: AbortSignal };
+  private getAbortSignal(request?: {
+    config?: { httpOptions?: HttpOptions; abortSignal?: AbortSignal };
   }): AbortSignal | undefined {
-    const abortSignal = request.config?.abortSignal;
-    const timeoutMs = request.config?.httpOptions?.timeout;
+    const abortSignal = request?.config?.abortSignal;
+    const timeoutMs =
+      request?.config?.httpOptions?.timeout ?? this.config.httpOptions?.timeout;
     if (!abortSignal && timeoutMs === undefined) {
       return undefined;
     }
@@ -275,20 +293,27 @@ export class OpenAiCompatibleGenerator {
     return signals.length === 1 ? signals[0] : AbortSignal.any(signals);
   }
 
-  private getEndpointUrl(path: string): string {
-    return `${this.config.baseUrl}${path}`;
-  }
-
   private async requestJson(
     path: string,
     method: 'GET' | 'POST',
-    options: { body?: unknown; signal?: AbortSignal } = {},
+    options: {
+      body?: unknown;
+      signal?: AbortSignal;
+      httpOptions?: HttpOptions;
+    } = {},
   ): Promise<Response> {
-    const url = this.getEndpointUrl(path);
+    const baseUrl = (options.httpOptions?.baseUrl ?? this.config.baseUrl).replace(
+      /\/+$/,
+      '',
+    );
+    const url = `${baseUrl}${path}`;
     const headers: Record<string, string> = {
       Authorization: `Bearer ${this.config.apiKey}`,
-      'User-Agent': 'SparkleCLI',
       ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      // Shared headers (User-Agent, custom headers) first; per-request
+      // httpOptions.headers win on conflict, mirroring GoogleGenAI merging.
+      ...this.config.httpOptions?.headers,
+      ...options.httpOptions?.headers,
     };
     const init: RequestInit & { dispatcher?: unknown } = {
       method,

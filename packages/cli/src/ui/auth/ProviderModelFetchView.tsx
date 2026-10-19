@@ -12,16 +12,19 @@ import {
   DEFAULT_OPENAI_BASE_URL,
   OpenAiApiError,
   OpenAiCompatibleGenerator,
+  getVersion,
   loadApiKeyForProfile,
   type ProviderModel,
   type ProviderProfile,
 } from 'sparkle-cli-core';
 import { BaseSelectionList } from '../components/shared/BaseSelectionList.js';
 import { CliSpinner } from '../components/CliSpinner.js';
+import { useConfig } from '../contexts/ConfigContext.js';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { Command } from '../key/keyMatchers.js';
 import { useKeyMatchers } from '../hooks/useKeyMatchers.js';
 import { KeypressPriority } from '../contexts/KeypressContext.js';
+import { buildUserAgent } from 'sparkle-cli-core/src/utils/surface.js';
 
 export interface ProviderModelFetchViewProps {
   profile: ProviderProfile;
@@ -60,6 +63,7 @@ export function ProviderModelFetchView({
   onBack,
   error,
 }: ProviderModelFetchViewProps): React.JSX.Element {
+  const config = useConfig();
   const keyMatchers = useKeyMatchers();
   const baseUrl = profile.baseUrl || DEFAULT_OPENAI_BASE_URL;
 
@@ -67,6 +71,7 @@ export function ProviderModelFetchView({
   const [justAddedId, setJustAddedId] = useState<string | null>(null);
   const existingIdsRef = useRef(existingModelIds);
   existingIdsRef.current = existingModelIds;
+  const customHeadersRef = useRef(profile.customHeaders); // avoid unnecessary refresh
   const justAddedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchModels = useCallback(async () => {
@@ -83,11 +88,17 @@ export function ProviderModelFetchView({
         });
         return;
       }
+      const userAgent = buildUserAgent(config.getClientName(), await getVersion());
       const generator = new OpenAiCompatibleGenerator({
         apiKey,
         baseUrl,
         provider: 'custom',
         proxy: undefined,
+        // This request bypasses the content generator, so the shared headers a
+        // normal chat request would carry have to be supplied here
+        httpOptions: {
+          headers: { 'User-Agent': userAgent, ...customHeadersRef.current },
+        },
       });
       const models = await Promise.race([
         generator.listModels(),
@@ -103,7 +114,7 @@ export function ProviderModelFetchView({
     } catch (e) {
       setFetchState({ phase: 'error', message: describeFetchError(e) });
     }
-  }, [baseUrl, profile.id]);
+  }, [baseUrl, config, profile.id]);
 
   useEffect(() => {
     // fetchModels never rejects: all failure paths set the error state.
