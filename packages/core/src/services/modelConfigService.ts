@@ -86,7 +86,7 @@ export interface ModelConfigAlias {
 // (gemini-pro-latest) or aliases (auto).
 export interface ModelDefinition {
   displayName?: string;
-  tier?: string; // 'pro' | 'flash' | 'flash-lite' | 'custom' | 'auto'
+  tier?: 'pro' | 'flash' | 'flash-lite' | 'custom' | 'auto';
   // Specifies whether the model should be visible in the dialog.
   isVisible?: boolean;
   /** A short description of the model for the dialog. */
@@ -139,10 +139,10 @@ export interface ModelConfigServiceConfig {
 }
 
 /**
- * Fallback context window (in tokens), matching the 1M-token Gemini models.
+ * Default context window (in tokens).
  * Used when a model definition does not declare a `contextWindow`.
  */
-export const DEFAULT_CONTEXT_WINDOW = 1_048_576;
+export const DEFAULT_CONTEXT_WINDOW = 1_000_000;
 
 const MAX_ALIAS_CHAIN_DEPTH = 100;
 
