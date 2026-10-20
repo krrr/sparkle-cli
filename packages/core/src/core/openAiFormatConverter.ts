@@ -457,6 +457,10 @@ function modelContentToOpenAiMessage(
       .join('');
     if (thoughtText) {
       message.reasoning_content = thoughtText;
+    } else {
+      // Some API relays occasionally omit thought content during tool-calling
+      // turns; fill it in to prevent DeepSeek 400 errors.
+      message.reasoning_content = '';
     }
   }
 

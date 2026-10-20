@@ -173,11 +173,7 @@ export async function createContentGenerator(
       const keyAuthMech =
         process.env['GEMINI_API_KEY_AUTH_MECHANISM'] || 'x-goog-api-key';
       const apiVersionEnv = process.env['GOOGLE_GENAI_API_VERSION'];
-      if (
-        keyAuthMech === 'bearer' &&
-        config.apiKey &&
-        Object.keys(headers).some((i) => i.toLowerCase() === 'authorization')
-      ) {
+      if (keyAuthMech === 'bearer' && config.apiKey) {
         headers['Authorization'] = `Bearer ${config.apiKey}`;
       }
       let baseUrl = config.baseUrl;

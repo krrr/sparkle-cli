@@ -426,6 +426,7 @@ describe('geminiContentsToOpenAiMessages', () => {
     expect(messages[0]).toEqual({
       role: 'assistant',
       content: null,
+      reasoning_content: '',
       tool_calls: [
         {
           id: 'call_1',
@@ -506,14 +507,16 @@ describe('geminiContentsToOpenAiMessages', () => {
     expect(messages[0].reasoning_content).toBeUndefined();
   });
 
-  it('does not emit reasoning_content when a tool-call turn has no thought parts', () => {
+  it('emits an empty reasoning_content when a tool-call turn has no thought parts', () => {
     const messages = geminiContentsToOpenAiMessages([
       {
         role: 'model',
         parts: [{ functionCall: { name: 'get_weather', args: {}, id: 'c1' } }],
       },
     ]);
-    expect(messages[0].reasoning_content).toBeUndefined();
+    // Some relays drop thought content; DeepSeek rejects tool-call follow-ups
+    // whose assistant message omits the field entirely, so it is always set.
+    expect(messages[0].reasoning_content).toBe('');
   });
 
   it('converts images to image_url content parts', () => {
