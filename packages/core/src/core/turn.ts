@@ -360,11 +360,13 @@ export class Turn {
           }
         }
 
-        this.debugResponses.push(resp);
-
         const traceId = resp.responseId;
-
         const parts = resp.candidates?.[0]?.content?.parts ?? [];
+
+        if (!parts.some(isPartialThoughtPart)) {
+          this.debugResponses.push(resp);
+        }
+
         for (const part of parts) {
           if (part.thought) {
             if (isPartialThoughtPart(part)) {

@@ -627,7 +627,7 @@ function extractReasoningText(
  * consolidated thought part for a reasoning block is only emitted when the
  * block ends, matching how Gemini delivers complete thoughts. In addition,
  * throttled partial thought parts (marked `thoughtPartial`, carrying the
- * text accumulated so far) are emitted while
+ * incremental reasoning text delta since the last partial emission) are emitted while
  * the block is still streaming so the UI can show reasoning in real time;
  * consumers keep those out of recorded history.
  */
@@ -685,8 +685,9 @@ export class OpenAiChunkConverter {
           this.partialEmittedLength === 0 ||
           unflushedChars >= PARTIAL_THOUGHT_MIN_CHARS
         ) {
+          const deltaText = this.pendingReasoningText.slice(this.partialEmittedLength);
           const partial: PartialThoughtPart = {
-            text: this.pendingReasoningText,
+            text: deltaText,
             thought: true,
             thoughtPartial: true,
           };

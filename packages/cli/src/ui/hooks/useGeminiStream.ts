@@ -211,8 +211,8 @@ function calculateStreamingState(
 }
 
 /**
- * Live reasoning tail transition: a ThoughtDelta event carries the reasoning
- * text accumulated so far in the current block, so it replaces the tail; any
+ * Live reasoning tail transition: a ThoughtDelta event carries an incremental
+ * reasoning text delta, so it appends to the live thought tail; any
  * other event means the block ended (or the turn moved on), so the tail is
  * cleared. Returns the same reference when nothing changes.
  */
@@ -221,7 +221,7 @@ export function nextLiveThoughtFromEvent(
   event: GeminiEvent,
 ): string | null {
   if (event.type === ServerGeminiEventType.ThoughtDelta) {
-    return event.value.text;
+    return (current ?? '') + event.value.text;
   }
   return current === null ? current : null;
 }

@@ -43,6 +43,7 @@ import {
 import { safeJsonStringify } from '../utils/safeJsonStringify.js';
 import { isMcpToolName } from '../tools/mcp-tool.js';
 import { estimateTokenCountSync } from '../utils/tokenCalculation.js';
+import { isPartialThoughtPart } from './thoughtStreaming.js';
 
 interface StructuredError {
   status: number;
@@ -477,6 +478,7 @@ export class LoggingContentGenerator implements ContentGenerator {
 
     let lastUsageMetadata: GenerateContentResponseUsageMetadata | undefined;
     let firstTokenTimeMs: number | undefined;
+    let firstResponseId: string | undefined;
     const serverDetails = this._getEndpointUrl(req, 'generateContentStream');
     const requestContents: Content[] = toContents(req.contents);
     try {
@@ -484,7 +486,17 @@ export class LoggingContentGenerator implements ContentGenerator {
         if (firstTokenTimeMs === undefined) {
           firstTokenTimeMs = Date.now() - startTime;
         }
-        responses.push(response);
+        if (firstResponseId === undefined && response.responseId) {
+          firstResponseId = response.responseId;
+        }
+        // Exclude transient live-reasoning chunks from telemetry responses array.
+        // They are streamed to consumers via yield, but should not bloat memory or telemetry.
+        const isTransient = response.candidates?.some((c) =>
+          c.content?.parts?.some(isPartialThoughtPart),
+        );
+        if (!isTransient) {
+          responses.push(response);
+        }
         if (response.usageMetadata) {
           lastUsageMetadata = response.usageMetadata;
         }
@@ -492,36 +504,41 @@ export class LoggingContentGenerator implements ContentGenerator {
       }
       // Only log successful API response if no error occurred
       const durationMs = Date.now() - startTime;
-      this._logApiResponse(
-        requestContents,
-        durationMs,
-        req.model,
-        userPromptId,
-        role,
-        responses[0]?.responseId,
-        responses.flatMap((response) => response.candidates || []),
-        lastUsageMetadata,
-        JSON.stringify(
-          responses.map((r) => ({
-            candidates: r.candidates,
-            usageMetadata: r.usageMetadata,
-            responseId: r.responseId,
-            modelVersion: r.modelVersion,
-            promptFeedback: r.promptFeedback,
-          })),
-        ),
-        req.config,
-        serverDetails,
-        firstTokenTimeMs,
-      );
-      spanMetadata.output = responses.map(
-        (response) => response.candidates?.[0]?.content ?? null,
-      );
-      if (lastUsageMetadata) {
-        spanMetadata.attributes[GEN_AI_USAGE_INPUT_TOKENS] =
-          lastUsageMetadata.promptTokenCount ?? 0;
-        spanMetadata.attributes[GEN_AI_USAGE_OUTPUT_TOKENS] =
-          lastUsageMetadata.candidatesTokenCount ?? 0;
+      try {
+        this._logApiResponse(
+          requestContents,
+          durationMs,
+          req.model,
+          userPromptId,
+          role,
+          firstResponseId ?? responses[0]?.responseId,
+          responses.flatMap((response) => response.candidates || []),
+          lastUsageMetadata,
+          safeJsonStringify(
+            responses.map((r) => ({
+              candidates: r.candidates,
+              usageMetadata: r.usageMetadata,
+              responseId: r.responseId,
+              modelVersion: r.modelVersion,
+              promptFeedback: r.promptFeedback,
+            })),
+          ),
+          req.config,
+          serverDetails,
+          firstTokenTimeMs,
+        );
+        spanMetadata.output = responses.map(
+          (response) => response.candidates?.[0]?.content ?? null,
+        );
+        if (lastUsageMetadata) {
+          spanMetadata.attributes[GEN_AI_USAGE_INPUT_TOKENS] =
+            lastUsageMetadata.promptTokenCount ?? 0;
+          spanMetadata.attributes[GEN_AI_USAGE_OUTPUT_TOKENS] =
+            lastUsageMetadata.candidatesTokenCount ?? 0;
+        }
+      } catch (logError) {
+        // Telemetry/logging failures must never crash a completed stream
+        spanMetadata.error = logError;
       }
     } catch (error) {
       spanMetadata.error = error;

@@ -739,7 +739,7 @@ describe('OpenAiChunkConverter', () => {
     ]);
   });
 
-  it('emits live partials with the reasoning text accumulated so far', () => {
+  it('emits live partials with incremental reasoning text deltas', () => {
     const converter = new OpenAiChunkConverter();
     // The first fragment of a block always emits an immediate live partial.
     const r1 = converter.toGeminiChunk({
@@ -753,7 +753,7 @@ describe('OpenAiChunkConverter', () => {
       choices: [{ delta: { reasoning_content: 'second' } }],
     });
     expect(r2.candidates).toBeUndefined();
-    // Crossing the threshold: a partial carries the full text so far.
+    // Crossing the threshold: a partial carries only the incremental delta text.
     const r3 = converter.toGeminiChunk({
       choices: [
         {
@@ -765,7 +765,7 @@ describe('OpenAiChunkConverter', () => {
     });
     expect(r3.candidates![0].content!.parts).toEqual([
       {
-        text: 'first second third fourth fifth sixth seventh eighth',
+        text: 'second third fourth fifth sixth seventh eighth',
         thought: true,
         thoughtPartial: true,
       },
@@ -782,13 +782,13 @@ describe('OpenAiChunkConverter', () => {
       { text: 'x'.repeat(10), thought: true, thoughtPartial: true },
     ]);
     // ...and the next one waits until PARTIAL_THOUGHT_MIN_CHARS new
-    // characters have accumulated.
+    // characters have accumulated, emitting only the delta.
     const r2 = converter.toGeminiChunk({
       choices: [{ delta: { reasoning_content: 'y'.repeat(80) } }],
     });
     expect(r2.candidates![0].content!.parts).toEqual([
       {
-        text: 'x'.repeat(10) + 'y'.repeat(80),
+        text: 'y'.repeat(80),
         thought: true,
         thoughtPartial: true,
       },

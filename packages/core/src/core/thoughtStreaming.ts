@@ -11,9 +11,9 @@ import type { Part } from '@google/genai';
  *
  * While a reasoning block is still streaming, the OpenAI chunk converter
  * emits partial thought parts so the UI can display reasoning in real time
- * instead of waiting for the whole block. Partial parts carry the reasoning
- * text accumulated so far in the current block. They are transient: the
- * consolidated thought part for the block is emitted separately when the
+ * instead of waiting for the whole block. Partial parts carry incremental
+ * reasoning text deltas since the last partial emission. They are transient:
+ * the consolidated thought part for the block is emitted separately when the
  * block ends, and consumers must keep partial parts out of recorded history
  * and must not treat them as complete thoughts.
  */

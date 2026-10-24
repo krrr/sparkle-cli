@@ -39,6 +39,7 @@ import {
   LoggingContentGenerator,
   estimateContextBreakdown,
 } from './loggingContentGenerator.js';
+import type { PartialThoughtPart } from './thoughtStreaming.js';
 import type { Config } from '../config/config.js';
 import { ApiRequestEvent, LlmRole } from '../telemetry/types.js';
 import { FatalAuthenticationError } from '../utils/errors.js';
@@ -491,6 +492,105 @@ describe('LoggingContentGenerator', () => {
           [GEN_AI_USAGE_OUTPUT_TOKENS]: 2,
         },
       });
+    });
+
+    it('should exclude transient partial thought parts from logged api response and span metadata', async () => {
+      const req = {
+        contents: [{ role: 'user', parts: [{ text: 'hello' }] }],
+        model: 'deepseek-chat',
+      };
+      const userPromptId = 'prompt-reasoning';
+      const transientPart: PartialThoughtPart = {
+        text: 'thinking...',
+        thought: true,
+        thoughtPartial: true,
+      };
+      const transientChunk = {
+        candidates: [
+          {
+            content: {
+              role: 'model',
+              parts: [transientPart],
+            },
+          },
+        ],
+      } as unknown as GenerateContentResponse;
+      const finalChunk = {
+        candidates: [
+          {
+            content: {
+              role: 'model',
+              parts: [{ text: 'final answer' }],
+            },
+          },
+        ],
+      } as unknown as GenerateContentResponse;
+
+      async function* createStream() {
+        yield transientChunk;
+        yield finalChunk;
+      }
+
+      vi.mocked(wrapped.generateContentStream).mockResolvedValue(createStream());
+
+      const stream = await loggingContentGenerator.generateContentStream(
+        req,
+        userPromptId,
+        LlmRole.MAIN,
+      );
+
+      const yieldedChunks: GenerateContentResponse[] = [];
+      for await (const chunk of stream) {
+        yieldedChunks.push(chunk);
+      }
+
+      // Both chunks must still be yielded to consumer
+      expect(yieldedChunks).toHaveLength(2);
+      expect(yieldedChunks[0]).toBe(transientChunk);
+      expect(yieldedChunks[1]).toBe(finalChunk);
+
+      // But telemetry must only log the non-transient chunk
+      expect(logApiResponse).toHaveBeenCalledTimes(1);
+      const loggedEvent = vi.mocked(logApiResponse).mock.calls[0][1];
+      expect(loggedEvent.response.candidates).toHaveLength(1);
+      expect(loggedEvent.response.candidates![0].content!.parts![0].text).toBe(
+        'final answer',
+      );
+    });
+
+    it('should not crash the stream if telemetry logging throws an error', async () => {
+      const req = {
+        contents: [{ role: 'user', parts: [{ text: 'hello' }] }],
+        model: 'gemini-pro',
+      };
+      const userPromptId = 'prompt-123';
+      const response = {
+        candidates: [{ content: { role: 'model', parts: [{ text: 'ok' }] } }],
+      } as unknown as GenerateContentResponse;
+
+      async function* createStream() {
+        yield response;
+      }
+
+      vi.mocked(wrapped.generateContentStream).mockResolvedValue(createStream());
+      vi.mocked(logApiResponse).mockImplementationOnce(() => {
+        throw new Error('Telemetry service crashed');
+      });
+
+      const stream = await loggingContentGenerator.generateContentStream(
+        req,
+        userPromptId,
+        LlmRole.MAIN,
+      );
+
+      const yieldedChunks: GenerateContentResponse[] = [];
+      // Should complete without throwing
+      for await (const chunk of stream) {
+        yieldedChunks.push(chunk);
+      }
+
+      expect(yieldedChunks).toHaveLength(1);
+      expect(yieldedChunks[0]).toBe(response);
     });
 
     it('should log error on failure', async () => {

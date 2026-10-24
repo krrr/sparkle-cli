@@ -3484,7 +3484,7 @@ describe('useGeminiStream', () => {
         expect(
           nextLiveThoughtFromEvent('first', {
             type: ServerGeminiEventType.ThoughtDelta,
-            value: { text: 'first second' },
+            value: { text: ' second' },
           }),
         ).toBe('first second');
       });
