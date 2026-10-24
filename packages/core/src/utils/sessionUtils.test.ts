@@ -4,8 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 import { describe, it, expect } from 'vitest';
-import { convertSessionToClientHistory } from './sessionUtils.js';
-import { type ConversationRecord } from '../services/chatRecordingService.js';
+import {
+  convertSessionToClientHistory,
+  isIgnoredUserContent,
+  isInjectedContextContent,
+  isUserPromptMessage,
+} from './sessionUtils.js';
+import {
+  type ConversationRecord,
+  type MessageRecord,
+} from '../services/chatRecordingService.js';
 import { CoreToolCallStatus } from '../scheduler/types.js';
 
 describe('convertSessionToClientHistory', () => {
@@ -286,5 +294,200 @@ describe('convertSessionToClientHistory', () => {
         ],
       },
     ]);
+  });
+});
+
+describe('injected user context', () => {
+  const userMessage = (content: MessageRecord['content']): MessageRecord => ({
+    id: 'msg-1',
+    timestamp: new Date(0).toISOString(),
+    type: 'user',
+    content,
+  });
+
+  describe('isIgnoredUserContent', () => {
+    it('ignores empty content and slash/help commands', () => {
+      expect(isIgnoredUserContent('')).toBe(true);
+      expect(isIgnoredUserContent('/help')).toBe(true);
+      expect(isIgnoredUserContent('?model')).toBe(true);
+    });
+
+    it('ignores injected context turns', () => {
+      expect(
+        isIgnoredUserContent('<session_context>\nToday is Monday\n</session_context>'),
+      ).toBe(true);
+      expect(isIgnoredUserContent('<hook_context>hook output</hook_context>')).toBe(
+        true,
+      );
+      expect(
+        isIgnoredUserContent(
+          '\n<loaded_context>\n<project_context>\nAGENTS.md\n</project_context>\n</loaded_context>',
+        ),
+      ).toBe(true);
+    });
+
+    it('ignores injected context without a closing tag', () => {
+      // Truncated/legacy context turns still lead with their tag.
+      expect(isIgnoredUserContent('<session_context>\nToday is Monday')).toBe(true);
+    });
+
+    it('keeps regular prompts', () => {
+      expect(isIgnoredUserContent('Fix the rewind turn stats')).toBe(false);
+    });
+
+    it('keeps prompts that merely mention an injected context tag', () => {
+      expect(
+        isIgnoredUserContent('Why does <loaded_context> appear in my transcript?'),
+      ).toBe(false);
+    });
+  });
+
+  describe('isInjectedContextContent', () => {
+    it('recognizes injected context turns by their leading tag', () => {
+      expect(
+        isInjectedContextContent(
+          '<session_context>\nToday is Monday\n</session_context>',
+        ),
+      ).toBe(true);
+      expect(isInjectedContextContent('<hook_context>hook</hook_context>')).toBe(true);
+      expect(
+        isInjectedContextContent(
+          '\n<loaded_context>\n<project_context>\nAGENTS.md\n</project_context>\n</loaded_context>',
+        ),
+      ).toBe(true);
+    });
+
+    it('does not treat slash commands or plain prompts as injected context', () => {
+      // The UI history keeps what the user actually typed.
+      expect(isInjectedContextContent('/help')).toBe(false);
+      expect(isInjectedContextContent('Audit the docs')).toBe(false);
+      expect(isInjectedContextContent('')).toBe(false);
+    });
+  });
+
+  describe('isUserPromptMessage', () => {
+    it('rejects tool responses recorded as user messages', () => {
+      expect(
+        isUserPromptMessage(
+          userMessage([
+            {
+              functionResponse: {
+                id: 'read_file__call_00',
+                name: 'read_file',
+                response: { output: 'ok' },
+              },
+            },
+          ]),
+        ),
+      ).toBe(false);
+    });
+
+    it('rejects injected context and slash commands', () => {
+      expect(
+        isUserPromptMessage(
+          userMessage([{ text: '<hook_context>hook output</hook_context>' }]),
+        ),
+      ).toBe(false);
+      expect(isUserPromptMessage(userMessage([{ text: '/rewind' }]))).toBe(false);
+    });
+
+    it('rejects non-user messages', () => {
+      const modelMessage: MessageRecord = {
+        id: 'msg-2',
+        timestamp: new Date(0).toISOString(),
+        type: 'gemini',
+        content: [{ text: 'Sure' }],
+      };
+      expect(isUserPromptMessage(modelMessage)).toBe(false);
+    });
+
+    it('rejects runtime notifications injected as user turns', () => {
+      expect(
+        isUserPromptMessage(
+          userMessage([
+            {
+              text: 'Background execution update:\n<background_output>\nbuild ok\n</background_output>\n\nA previously backgrounded execution has completed.',
+            },
+          ]),
+        ),
+      ).toBe(false);
+      expect(
+        isUserPromptMessage(
+          userMessage([
+            {
+              text: 'User hints:\n<user_input>\n- stop that work\n</user_input>\n\nInternal instruction: …',
+            },
+          ]),
+        ),
+      ).toBe(false);
+    });
+
+    it('accepts real prompts', () => {
+      expect(isUserPromptMessage(userMessage([{ text: 'Fix the bug' }]))).toBe(true);
+    });
+
+    it('accepts a prompt whose injected context arrived as its own turn', () => {
+      // Regression guard: injected context must stay a separate turn. If a
+      // producer merges it into the prompt turn again, the prompt becomes
+      // indistinguishable from injected context and is silently dropped.
+      const messages: MessageRecord[] = [
+        {
+          id: 'env-turn',
+          timestamp: new Date(0).toISOString(),
+          type: 'user',
+          content: [
+            {
+              text: '\n<loaded_context>\n<project_context>\nAGENTS.md\n</project_context>\n</loaded_context>',
+            },
+          ],
+        },
+        {
+          id: 'prompt-turn',
+          timestamp: new Date(0).toISOString(),
+          type: 'user',
+          content: [{ text: 'Audit the docs' }],
+        },
+      ];
+
+      expect(messages.filter(isUserPromptMessage)).toHaveLength(1);
+      expect(messages.filter(isUserPromptMessage)[0].id).toBe('prompt-turn');
+    });
+  });
+
+  describe('convertSessionToClientHistory', () => {
+    it('drops a standalone environment context turn', () => {
+      const history = convertSessionToClientHistory([
+        userMessage([
+          { text: '<session_context>\nToday is Monday\n</session_context>' },
+        ]),
+      ]);
+
+      expect(history).toEqual([]);
+    });
+
+    it('keeps a prompt that follows a separate loaded-context turn', () => {
+      const history = convertSessionToClientHistory([
+        {
+          id: 'env-turn',
+          timestamp: new Date(0).toISOString(),
+          type: 'user',
+          content: [
+            {
+              text: '\n<loaded_context>\n<project_context>\nAGENTS.md\n</project_context>\n</loaded_context>',
+            },
+          ],
+        },
+        {
+          id: 'prompt-turn',
+          timestamp: new Date(0).toISOString(),
+          type: 'user',
+          content: [{ text: 'Audit the docs' }],
+        },
+      ]);
+
+      expect(history).toHaveLength(1);
+      expect(history[0].id).toBe('prompt-turn');
+      expect(history[0].content.role).toBe('user');
+    });
   });
 });

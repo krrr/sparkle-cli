@@ -12,6 +12,7 @@ import {
   getFileDiffFromResultDisplay,
   computeModelAddedAndRemovedLines,
 } from './fileDiffUtils.js';
+import { isUserPromptMessage } from './sessionUtils.js';
 import type {
   ConversationRecord,
   MessageRecord,
@@ -50,10 +51,12 @@ export function calculateTurnStats(
   const files = new Set<string>();
   let hasEdits = false;
 
-  // Look ahead until the next user message (single turn)
+  // Look ahead until the next real user prompt (single turn). Tool responses are
+  // recorded as `user` messages carrying only a functionResponse part, so they
+  // must not end the turn.
   for (let i = msgIndex + 1; i < conversation.messages.length; i++) {
     const msg = conversation.messages[i];
-    if (msg.type === 'user') break; // Stop at next user message
+    if (isUserPromptMessage(msg)) break;
 
     if (msg.type === 'gemini' && msg.toolCalls) {
       for (const toolCall of msg.toolCalls) {

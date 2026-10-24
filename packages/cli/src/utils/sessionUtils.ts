@@ -13,6 +13,7 @@ import {
   SESSION_FILE_PREFIX,
   SESSION_INDEX_VERSION,
   CoreToolCallStatus,
+  isInjectedContextContent,
   type SessionIndexEntry,
   type Storage,
   type ConversationRecord,
@@ -754,12 +755,10 @@ export function convertSessionToHistoryFormats(
     const contentString = partListUnionToString(stripInternalDisplayParts(msg.content));
     const uiText = displayContentString || contentString;
 
-    // Skip internal context messages in the UI history
+    // Skip injected context turns (environment, hook output, loaded memory) in
+    // the UI history. Slash commands are not skipped.
     const trimmedText = uiText.trim();
-    if (
-      trimmedText.startsWith('<session_context>') ||
-      trimmedText.startsWith('<hook_context>')
-    ) {
+    if (msg.type === 'user' && isInjectedContextContent(trimmedText)) {
       continue;
     }
 

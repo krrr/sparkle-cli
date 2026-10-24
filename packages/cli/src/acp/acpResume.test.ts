@@ -175,6 +175,25 @@ describe('GeminiAgent Session Resume', () => {
       messages: [
         { type: 'user', content: [{ text: 'Hello' }] },
         {
+          // Tool responses are recorded as user turns but must not be replayed
+          // to the client as user input.
+          type: 'user',
+          content: [
+            {
+              functionResponse: {
+                id: 'call-1',
+                name: 'test_tool',
+                response: { output: 'ok' },
+              },
+            },
+          ],
+        },
+        {
+          // Same for injected context turns.
+          type: 'user',
+          content: [{ text: '<session_context>\nToday is Monday\n</session_context>' }],
+        },
+        {
           type: 'gemini',
           content: [{ text: 'Hi there' }],
           thoughts: [{ subject: 'Thinking', description: 'about greeting' }],
@@ -279,6 +298,13 @@ describe('GeminiAgent Session Resume', () => {
           }),
         }),
       );
+
+      // Tool responses and injected context are never replayed as user input
+      const streamedUserTexts = mockConnection.sessionUpdate.mock.calls
+        .map(([notification]) => notification.update)
+        .filter((update) => update.sessionUpdate === 'user_message_chunk')
+        .map((update) => update.content.text);
+      expect(streamedUserTexts).toEqual(['Hello']);
 
       // Agent thought
       expect(mockConnection.sessionUpdate).toHaveBeenCalledWith(

@@ -116,6 +116,77 @@ describe('rewindUtils', () => {
         removedLines: 3,
       });
     });
+
+    it('counts edits made after a tool call within the same turn', () => {
+      const fileDiff = {
+        filePath: 'test.ts',
+        fileName: 'test.ts',
+        originalContent: 'old',
+        newContent: 'new',
+        isNewFile: false,
+        diffStat: {
+          model_added_lines: 0,
+          model_removed_lines: 0,
+          model_added_chars: 0,
+          model_removed_chars: 0,
+          user_added_lines: 0,
+          user_removed_lines: 0,
+          user_added_chars: 0,
+          user_removed_chars: 0,
+        },
+        fileDiff: 'diff',
+      };
+      vi.mocked(getFileDiffFromResultDisplay)
+        // The earlier read_file call produced no file diff.
+        .mockReturnValueOnce(undefined)
+        .mockReturnValue(fileDiff);
+      vi.mocked(computeModelAddedAndRemovedLines).mockReturnValue({
+        addedLines: 2,
+        removedLines: 1,
+      });
+
+      const userMsg = {
+        type: 'user',
+        content: [{ text: 'Refactor this file' }],
+      } as unknown as MessageRecord;
+      const conversation = {
+        messages: [
+          userMsg,
+          {
+            type: 'gemini',
+            toolCalls: [
+              { name: 'read_file', args: {}, resultDisplay: 'file contents' },
+            ],
+          },
+          {
+            // Tool responses are recorded as `user` messages and must not end
+            // the turn.
+            type: 'user',
+            content: [
+              {
+                functionResponse: {
+                  id: 'read_file__call_00',
+                  name: 'read_file',
+                  response: { output: 'ok' },
+                },
+              },
+            ],
+          },
+          {
+            type: 'gemini',
+            toolCalls: [{ name: 'replace', args: {}, resultDisplay: 'diff' }],
+          },
+        ],
+      } as unknown as ConversationRecord;
+
+      const result = calculateTurnStats(conversation, userMsg);
+
+      expect(result).toEqual({
+        fileCount: 1,
+        addedLines: 2,
+        removedLines: 1,
+      });
+    });
   });
 
   describe('calculateRewindImpact', () => {

@@ -93,6 +93,7 @@ import {
   type SubagentActivityEvent,
   type OutputConfig,
   SubagentActivityErrorType,
+  DEFAULT_QUERY_STRING,
 } from './types.js';
 import { ApprovalMode } from '../policy/types.js';
 import {
@@ -116,6 +117,7 @@ let mockChatHistory: Content[] = [];
 const mockSetHistory = vi.fn((newHistory: Content[]) => {
   mockChatHistory = newHistory;
 });
+const mockAddHistory = vi.fn();
 
 vi.mock('../context/chatCompressionService.js', () => ({
   ChatCompressionService: vi.fn().mockImplementation(() => ({
@@ -360,6 +362,7 @@ describe('LocalAgentExecutor', () => {
     vi.resetAllMocks();
     mockCompress.mockClear();
     mockSetHistory.mockClear();
+    mockAddHistory.mockClear();
     mockSendMessageStream.mockReset().mockResolvedValue({
       async *[Symbol.asyncIterator]() {
         yield {
@@ -426,6 +429,7 @@ describe('LocalAgentExecutor', () => {
           getHistory: vi.fn((_curated?: boolean) => [...mockChatHistory]),
           getLastPromptTokenCount: vi.fn(() => 100),
           setHistory: mockSetHistory,
+          addHistory: mockAddHistory,
           recordCompletedToolCalls: mockRecordCompletedToolCalls,
           getChatRecordingService: vi.fn().mockReturnValue({
             saveSummary: mockSaveSummary,
@@ -4003,7 +4007,7 @@ describe('LocalAgentExecutor', () => {
         expect(systemInstruction).toContain('<loaded_context>');
       });
 
-      it('should inject session memory into the first message', async () => {
+      it('should send session memory as its own turn, ahead of the query', async () => {
         const definition = createTestDefinition();
         const executor = await LocalAgentExecutor.create(
           definition,
@@ -4024,13 +4028,16 @@ describe('LocalAgentExecutor', () => {
 
         await executor.run({ goal: 'test' }, signal);
 
+        // The memory turn is pushed to history rather than merged into the
+        // query, so the durable history keeps the prompt as its own turn.
+        expect(mockAddHistory).toHaveBeenCalledWith({
+          role: 'user',
+          parts: [{ text: mockMemory }],
+        });
+
         const { message } = getMockMessageParams(0);
         const parts = message as Part[];
-
-        expect(parts).toBeDefined();
-        const memoryPart = parts.find((p) => p.text?.includes('Extension memory rule'));
-        expect(memoryPart).toBeDefined();
-        expect(memoryPart?.text).toContain(mockMemory);
+        expect(parts).toEqual([{ text: DEFAULT_QUERY_STRING }]);
       });
 
       it('should omit extension context from session memory when disabled by the agent', async () => {
@@ -4063,13 +4070,18 @@ describe('LocalAgentExecutor', () => {
         expect(getSessionMemorySpy).toHaveBeenCalledWith({
           includeExtensionContext: false,
         });
-        const { message } = getMockMessageParams(0);
-        const parts = message as Part[];
-        const memoryPart = parts.find((p) => p.text?.includes('<loaded_context>'));
 
-        expect(memoryPart?.text).toContain('Project memory rule');
-        expect(memoryPart?.text).not.toContain('<extension_context>');
-        expect(memoryPart?.text).not.toContain('Extension memory rule');
+        // The memory turn reaches history as its own turn, unmerged.
+        const memoryTurn = mockAddHistory.mock.calls
+          .map((call) => call[0] as Content)
+          .find((content) =>
+            content.parts?.some((p) => p.text?.includes('<loaded_context>')),
+          );
+        const memoryText = memoryTurn?.parts?.[0]?.text ?? '';
+
+        expect(memoryText).toContain('Project memory rule');
+        expect(memoryText).not.toContain('<extension_context>');
+        expect(memoryText).not.toContain('Extension memory rule');
       });
     });
   });

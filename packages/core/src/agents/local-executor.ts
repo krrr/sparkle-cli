@@ -649,18 +649,29 @@ export class LocalAgentExecutor<TOutput extends z.ZodTypeAny> {
               })
             : this.context.config.getSessionMemory();
 
-        const initialParts: Part[] = [];
+        // Injected context and runtime notifications each get their own turn so
+        // the durable history keeps the real prompt as a standalone user turn.
+        // Every consumer that surfaces user prompts (resume, rewind, summaries,
+        // ACP replay) recognizes injected turns by their leading tag; merging
+        // them into the prompt turn would make the prompt indistinguishable
+        // from injected context. Consecutive user turns are coalesced for the
+        // provider wire format by GeminiChat.coalesceConsecutiveRoles.
         if (environmentMemory) {
-          initialParts.push({ text: environmentMemory });
+          chat.addHistory({
+            role: 'user',
+            parts: [{ text: environmentMemory }],
+          });
         }
         if (formattedInitialHints) {
-          initialParts.push({ text: formattedInitialHints });
+          chat.addHistory({
+            role: 'user',
+            parts: [{ text: formattedInitialHints }],
+          });
         }
-        initialParts.push({ text: query });
 
         let currentMessage: Content = {
           role: 'user',
-          parts: initialParts,
+          parts: [{ text: query }],
         };
 
         while (true) {

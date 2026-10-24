@@ -215,7 +215,7 @@ export function isResumableMessageRecord(message: MessageRecord): boolean {
   const contentString = message.content ? partListUnionToString(message.content) : '';
 
   if (message.type === 'user') {
-    return !isIgnoredUserContent(contentString.trim());
+    return !isIgnoredUserContent(contentString);
   } else if (message.type === 'gemini') {
     return (
       contentString.trim().length > 0 ||

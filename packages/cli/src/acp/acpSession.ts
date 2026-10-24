@@ -21,6 +21,8 @@ import {
   ReadManyFilesTool,
   LSTool,
   partListUnionToString,
+  partToString,
+  isUserPromptMessage,
   type AgentLoopContext,
   updatePolicy,
   getErrorMessage,
@@ -228,16 +230,20 @@ export class Session {
 
   async streamHistory(messages: ConversationRecord['messages']): Promise<void> {
     for (const msg of messages) {
-      const contentString = partListUnionToString(msg.content);
-
       if (msg.type === 'user') {
-        if (contentString.trim()) {
+        // Tool responses and injected context are also recorded as user turns;
+        // replaying them as-is would surface them as user input (e.g.
+        // "[Function Response: read_file]").
+        if (!isUserPromptMessage(msg)) continue;
+        const userText = partToString(msg.content).trim();
+        if (userText) {
           await this.sendUpdate({
             sessionUpdate: 'user_message_chunk',
-            content: { type: 'text', text: contentString },
+            content: { type: 'text', text: userText },
           });
         }
       } else if (msg.type === 'gemini') {
+        const contentString = partListUnionToString(msg.content);
         // Thoughts
         if (msg.thoughts) {
           for (const thought of msg.thoughts) {

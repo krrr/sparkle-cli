@@ -7,6 +7,7 @@
 import type { MessageRecord } from './chatRecordingService.js';
 import type { BaseLlmClient } from '../core/baseLlmClient.js';
 import { partListUnionToString } from '../core/geminiRequest.js';
+import { isUserPromptMessage } from '../utils/sessionUtils.js';
 import { debugLogger } from '../utils/debugLogger.js';
 import type { Content } from '@google/genai';
 import { getResponseText } from '../utils/partUtils.js';
@@ -59,10 +60,13 @@ export class SessionSummaryService {
     } = options;
 
     try {
-      // Filter to user/gemini messages only (exclude system messages)
+      // Filter to user/gemini messages only (exclude system messages, tool
+      // responses and injected context, which are recorded as user turns too)
       const filteredMessages = messages.filter((msg) => {
-        // Skip system messages (info, error, warning)
-        if (msg.type !== 'user' && msg.type !== 'gemini') {
+        if (msg.type === 'user') {
+          return isUserPromptMessage(msg);
+        } else if (msg.type !== 'gemini') {
+          // Skip system messages (info, error, warning)
           return false;
         }
         const content = partListUnionToString(msg.content);

@@ -11,7 +11,7 @@ import { useUIState } from '../contexts/UIStateContext.js';
 import {
   type ConversationRecord,
   type MessageRecord,
-  isIgnoredUserContent,
+  isUserPromptMessage,
   partToString,
 } from 'sparkle-cli-core';
 import { BaseSelectionList } from './shared/BaseSelectionList.js';
@@ -46,26 +46,6 @@ const getCleanedRewindText = (userPrompt: MessageRecord): string => {
     : stripReferenceContent(originalUserText);
 };
 
-/**
- * Returns true when a user message represents a real user prompt worth
- * surfacing in the rewind menu. Internal context messages (e.g.
- * <session_context>, <hook_context>), slash command text sent verbatim to the
- * model and tool response messages (functionResponse-only content) are
- * filtered out.
- *
- * Eligibility is based on `content` (what was actually sent to the model),
- * not `displayContent`. Custom slash commands record the expanded prompt in
- * `content` and only use `displayContent` for the raw command text (e.g.
- * `/my-command`) shown in the menu, so they must still be eligible.
- */
-const isRewindEligibleUserMessage = (msg: MessageRecord): boolean => {
-  if (msg.type !== 'user') {
-    return false;
-  }
-  const text = msg.content ? partToString(msg.content) : '';
-  return !isIgnoredUserContent(text.trim());
-};
-
 export const RewindViewer: React.FC<RewindViewerProps> = ({
   conversation,
   onExit,
@@ -87,7 +67,7 @@ export const RewindViewer: React.FC<RewindViewerProps> = ({
   const [expandedMessageId, setExpandedMessageId] = useState<string | null>(null);
 
   const interactions = useMemo(
-    () => conversation.messages.filter(isRewindEligibleUserMessage),
+    () => conversation.messages.filter(isUserPromptMessage),
     [conversation.messages],
   );
 

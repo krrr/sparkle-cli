@@ -5,11 +5,26 @@
  */
 
 import { type Part, type PartListUnion } from '@google/genai';
-import { type ConversationRecord } from '../services/chatRecordingService.js';
+import {
+  type ConversationRecord,
+  type MessageRecord,
+} from '../services/chatRecordingService.js';
 export { partListUnionToString } from '../core/geminiRequest.js';
 import { partListUnionToString } from '../core/geminiRequest.js';
 import { type HistoryTurn } from '../core/agentChatHistory.js';
 import { deriveStableId } from './cryptoUtils.js';
+import { partToString } from './partUtils.js';
+import { BACKGROUND_COMPLETION_PREFIX, USER_HINTS_PREFIX } from './fastAckHelper.js';
+
+/**
+ * Prefixes of runtime notifications that are injected into the model
+ * conversation as `user` turns (see `fastAckHelper`). They are model-visible
+ * but never represent user input.
+ */
+const INJECTED_NOTIFICATION_PREFIXES = [
+  USER_HINTS_PREFIX,
+  BACKGROUND_COMPLETION_PREFIX,
+];
 
 /**
  * Ensures that all function calls and responses in a chat history have stable IDs.
@@ -89,14 +104,84 @@ function ensurePartArray(content: PartListUnion): Part[] {
   return [content];
 }
 
-export function isIgnoredUserContent(trimmedContent: string): boolean {
-  return (
+/**
+ * Tags used to inject context as synthetic user messages. They are recorded
+ * like any other user turn, so every consumer that surfaces user prompts has to
+ * recognize them: `<session_context>` wraps the startup environment context,
+ * `<hook_context>` carries hook output and `<loaded_context>` wraps hierarchical
+ * memory that background agents send ahead of their first prompt.
+ *
+ * Each producer emits its context as a turn of its own, so recognizing them by
+ * prefix is enough — an injected turn never also carries real user input.
+ */
+const INJECTED_CONTEXT_TAGS = [
+  '<session_context>',
+  '<hook_context>',
+  '<loaded_context>',
+] as const;
+
+/**
+ * Returns true when the content is an injected context turn (environment
+ * context, hook output or loaded memory) rather than something user typed.
+ *
+ * Injected turns lead with their tag. A truncated context turn without a
+ * closing tag still starts with the tag, so a prefix check is enough.
+ */
+export function isInjectedContextContent(content: string): boolean {
+  const trimmedContent = content.trimStart();
+  return INJECTED_CONTEXT_TAGS.some((i) => trimmedContent.startsWith(i));
+}
+
+/**
+ * Returns true when the given user message content carries no real user input:
+ * empty content, slash/help commands sent verbatim to the model, or injected
+ * context only.
+ */
+export function isIgnoredUserContent(content: string): boolean {
+  const trimmedContent = content.trim();
+
+  if (
     trimmedContent.length === 0 ||
     trimmedContent.startsWith('/') ||
-    trimmedContent.startsWith('?') ||
-    trimmedContent.startsWith('<session_context>') ||
-    trimmedContent.startsWith('<hook_context>')
-  );
+    trimmedContent.startsWith('?')
+  ) {
+    return true;
+  }
+
+  return isInjectedContextContent(trimmedContent);
+}
+
+/**
+ * Returns true when the message is a `user` turn carrying real user input, as
+ * opposed to a tool response (recorded as a `user` message holding only a
+ * functionResponse part), injected context, or a runtime notification.
+ *
+ * Eligibility is based on `content` (what was sent to the model), not
+ * `displayContent`: custom slash commands record the expanded prompt in
+ * `content` and only use `displayContent` for the raw command text shown in the
+ * UI, so they must still be eligible.
+ */
+export function isUserPromptMessage(message: MessageRecord): boolean {
+  if (message.type !== 'user') {
+    return false;
+  }
+
+  // `partToString` (non-verbose) renders text parts only, so tool responses and
+  // other non-text parts contribute nothing here.
+  const text = partToString(message.content).trim();
+  if (text.length === 0) {
+    return false;
+  }
+
+  // Background completions and steering hints are model-visible user turns, but
+  // they are injected by the runtime and never represent user input: treating
+  // them as prompts would end a rewind turn (misattributing later edits) and
+  // surface them as selectable rewind targets.
+  if (INJECTED_NOTIFICATION_PREFIXES.some((i) => text.startsWith(i))) {
+    return false;
+  }
+
+  return !isIgnoredUserContent(text);
 }
 
 /**
@@ -126,8 +211,7 @@ export function convertSessionToClientHistory(
 
     if (msg.type === 'user') {
       const contentString = partListUnionToString(msg.content);
-      const trimmedContent = contentString.trim();
-      if (isIgnoredUserContent(trimmedContent)) {
+      if (isIgnoredUserContent(contentString)) {
         continue;
       }
 
