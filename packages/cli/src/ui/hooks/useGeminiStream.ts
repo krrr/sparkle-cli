@@ -87,6 +87,7 @@ import { handleAtCommand } from './atCommandProcessor.js';
 import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';
 import { getInlineThinkingMode } from '../utils/inlineThinkingMode.js';
 import { useStateAndRef } from './useStateAndRef.js';
+import { getLiveThoughtSnapshot, updateLiveThought } from './useLiveThought.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { useLogger } from './useLogger.js';
 import {
@@ -284,13 +285,15 @@ export const useGeminiStream = (
   const [isResponding, isRespondingRef, setIsResponding] =
     useStateAndRef<boolean>(false);
   const [thought, thoughtRef, setThought] = useStateAndRef<ThoughtSummary | null>(null);
-  const [liveThought, liveThoughtRef, setLiveThought] = useStateAndRef<string | null>(
-    null,
-  );
+  // Live reasoning is published to a module-level store that only the reasoning
+  // tail leaf subscribes to, so deltas never re-render this hook's consumers.
+  // Clear it when this stream is torn down (e.g. when switching to the agent
+  // stream) so a stale tail cannot outlive the hook that produced it.
+  useEffect(() => () => updateLiveThought(null), []);
   const [pendingHistoryItem, pendingHistoryItemRef, setPendingHistoryItem] =
     useStateAndRef<HistoryItemWithoutId | null>(null);
 
-  const [lastGeminiActivityTime, setLastGeminiActivityTime] = useState<number>(0);
+  const lastGeminiActivityTimeRef = useRef<number>(0);
   const [pushedToolCallIds, pushedToolCallIdsRef, setPushedToolCallIds] =
     useStateAndRef<Set<string>>(new Set());
   const [_isFirstToolInGroup, isFirstToolInGroupRef, setIsFirstToolInGroup] =
@@ -1177,14 +1180,13 @@ export const useGeminiStream = (
       );
       setIsResponding(false);
       setThought(null); // Reset thought when user cancels
-      setLiveThought(null);
+      updateLiveThought(null);
     },
     [
       addItem,
       pendingHistoryItemRef,
       setPendingHistoryItem,
       setThought,
-      setLiveThought,
       setIsResponding,
     ],
   );
@@ -1210,7 +1212,7 @@ export const useGeminiStream = (
       );
       maybeAddLowVerbosityFailureNote(userMessageTimestamp);
       setThought(null); // Reset thought when there's an error
-      setLiveThought(null);
+      updateLiveThought(null);
     },
     [
       addItem,
@@ -1218,7 +1220,6 @@ export const useGeminiStream = (
       setPendingHistoryItem,
       config,
       setThought,
-      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
     ],
@@ -1265,14 +1266,13 @@ export const useGeminiStream = (
       );
       maybeAddLowVerbosityFailureNote(userMessageTimestamp);
       setThought(null); // Reset thought when there's an error
-      setLiveThought(null);
+      updateLiveThought(null);
     },
     [
       addItem,
       pendingHistoryItemRef,
       setPendingHistoryItem,
       setThought,
-      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
       config,
@@ -1515,21 +1515,22 @@ export const useGeminiStream = (
         ) {
           setThought(null);
         }
-        const nextLiveThought = nextLiveThoughtFromEvent(liveThoughtRef.current, event);
-        if (nextLiveThought !== liveThoughtRef.current) {
-          setLiveThought(nextLiveThought);
+        const currentLiveThought = getLiveThoughtSnapshot();
+        const nextLiveThought = nextLiveThoughtFromEvent(currentLiveThought, event);
+        if (nextLiveThought !== currentLiveThought) {
+          updateLiveThought(nextLiveThought);
         }
 
         switch (event.type) {
           case ServerGeminiEventType.Thought:
-            setLastGeminiActivityTime(Date.now());
+            lastGeminiActivityTimeRef.current = Date.now();
             handleThoughtEvent(event.value, userMessageTimestamp);
             break;
           case ServerGeminiEventType.ThoughtDelta:
-            setLastGeminiActivityTime(Date.now());
+            lastGeminiActivityTimeRef.current = Date.now();
             break;
           case ServerGeminiEventType.Content:
-            setLastGeminiActivityTime(Date.now());
+            lastGeminiActivityTimeRef.current = Date.now();
             geminiMessageBuffer = handleContentEvent(
               event.value,
               geminiMessageBuffer,
@@ -1617,8 +1618,6 @@ export const useGeminiStream = (
       handleContentEvent,
       handleThoughtEvent,
       thoughtRef,
-      liveThoughtRef,
-      setLiveThought,
       handleUserCancelledEvent,
       handleErrorEvent,
       scheduleToolCalls,
@@ -1709,7 +1708,7 @@ export const useGeminiStream = (
               }
               startNewPrompt();
               setThought(null); // Reset thought when starting a new prompt
-              setLiveThought(null);
+              updateLiveThought(null);
             }
 
             setIsResponding(true);
@@ -1817,7 +1816,6 @@ export const useGeminiStream = (
       startNewPrompt,
       getPromptCount,
       setThought,
-      setLiveThought,
       maybeAddSuppressedToolErrorNote,
       maybeAddLowVerbosityFailureNote,
       isRespondingRef,
@@ -2203,7 +2201,7 @@ export const useGeminiStream = (
   const lastOutputTime = Math.max(
     lastToolOutputTime,
     lastShellOutputTime,
-    lastGeminiActivityTime,
+    lastGeminiActivityTimeRef.current,
   );
 
   return {
@@ -2212,7 +2210,6 @@ export const useGeminiStream = (
     initError,
     pendingHistoryItems,
     thought,
-    liveThought,
     cancelOngoingRequest,
     pendingToolCalls: toolCalls,
     handleApprovalModeChange,

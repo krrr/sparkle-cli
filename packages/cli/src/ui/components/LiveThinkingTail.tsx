@@ -4,16 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import type React from 'react';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Box, Text } from 'ink';
 import stripAnsi from 'strip-ansi';
+import { useLiveThought } from '../hooks/useLiveThought.js';
 import { theme } from '../semantic-colors.js';
 import { normalizeEscapedNewlines } from '../utils/textUtils.js';
 
 interface LiveThinkingTailProps {
-  /** Reasoning text accumulated so far in the current reasoning block. */
-  text: string | null;
   terminalWidth: number;
   /** Maximum number of trailing lines to display. */
   maxLines?: number;
@@ -22,11 +20,6 @@ interface LiveThinkingTailProps {
 const DEFAULT_MAX_LINES = 3;
 const NOISE_LINE = /^\.+$/;
 
-/**
- * Renders the trailing lines of in-progress model reasoning below the loading
- * indicator, so reasoning can be observed in real time without flooding the
- * scrollback history.
- */
 /**
  * Splits accumulated reasoning into the tail lines to display: normalizes
  * escaped newlines, strips ANSI escapes, drops blank/noise lines, and keeps
@@ -47,11 +40,19 @@ export function getLiveThinkingTailLines(
     .slice(-maxLines);
 }
 
-export const LiveThinkingTail: React.FC<LiveThinkingTailProps> = ({
-  text,
+/**
+ * Renders the trailing lines of in-progress model reasoning below the loading
+ * indicator, so reasoning can be observed in real time without flooding the
+ * scrollback history.
+ *
+ * Subscribes to the live thought store directly so that only this leaf
+ * re-renders as reasoning deltas arrive.
+ */
+const LiveThinkingTailBase: React.FC<LiveThinkingTailProps> = ({
   terminalWidth,
   maxLines = DEFAULT_MAX_LINES,
 }) => {
+  const text = useLiveThought();
   const lines = useMemo(
     () => getLiveThinkingTailLines(text, maxLines),
     [text, maxLines],
@@ -87,3 +88,5 @@ export const LiveThinkingTail: React.FC<LiveThinkingTailProps> = ({
     </Box>
   );
 };
+
+export const LiveThinkingTail = React.memo(LiveThinkingTailBase);

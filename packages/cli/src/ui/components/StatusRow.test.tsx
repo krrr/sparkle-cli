@@ -4,15 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { renderWithProviders } from '../../test-utils/render.js';
+import { cleanup, renderWithProviders } from '../../test-utils/render.js';
 import { StatusRow } from './StatusRow.js';
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { useComposerStatus } from '../hooks/useComposerStatus.js';
 import { type UIState } from '../contexts/UIStateContext.js';
 
 import { type SessionStatsState } from '../contexts/SessionContext.js';
 import { type ThoughtSummary } from '../types.js';
 import { ApprovalMode, CoreToolCallStatus } from 'sparkle-cli-core';
+import { updateLiveThought, resetLiveThought } from '../hooks/useLiveThought.js';
 
 vi.mock('../hooks/useComposerStatus.js', () => ({
   useComposerStatus: vi.fn(),
@@ -21,6 +22,12 @@ vi.mock('../hooks/useComposerStatus.js', () => ({
 describe('<StatusRow />', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetLiveThought();
+  });
+
+  afterEach(() => {
+    cleanup();
+    resetLiveThought();
   });
 
   const defaultUiState: Partial<UIState> = {
@@ -70,7 +77,6 @@ describe('<StatusRow />', () => {
         uiState,
       },
     );
-
     await waitUntilReady();
     const output = lastFrame();
     expect(output).toContain('Thinking...');
@@ -102,7 +108,6 @@ describe('<StatusRow />', () => {
         uiState: defaultUiState,
       },
     );
-
     await waitUntilReady();
     expect(lastFrame()).toContain('! Shell awaiting input (Tab to focus)');
   });
@@ -136,7 +141,6 @@ describe('<StatusRow />', () => {
         uiState,
       },
     );
-
     await waitUntilReady();
     expect(lastFrame()).toContain('Tip: Test Tip');
   });
@@ -184,7 +188,6 @@ describe('<StatusRow />', () => {
         uiState,
       },
     );
-
     await waitUntilReady();
     expect(lastFrame()).toContain('Executing...');
     expect(lastFrame()).not.toContain('Thinking...');
@@ -200,10 +203,10 @@ describe('<StatusRow />', () => {
       showMinimalContext: false,
     });
 
+    updateLiveThought('analyzing the request\nchecking the files');
     const uiState: Partial<UIState> = {
       ...defaultUiState,
       currentTip: 'Test Tip',
-      liveThought: 'analyzing the request\nchecking the files',
     };
 
     const { lastFrame, waitUntilReady } = await renderWithProviders(
@@ -220,7 +223,6 @@ describe('<StatusRow />', () => {
         uiState,
       },
     );
-
     await waitUntilReady();
     const output = lastFrame();
     expect(output).toContain('analyzing the request');
@@ -247,9 +249,9 @@ describe('<StatusRow />', () => {
       showMinimalContext: false,
     });
 
+    updateLiveThought('stale reasoning text');
     const uiState: Partial<UIState> = {
       ...defaultUiState,
-      liveThought: 'stale reasoning text',
       activeHooks: [
         {
           eventName: 'test-ev',
@@ -275,7 +277,6 @@ describe('<StatusRow />', () => {
         uiState,
       },
     );
-
     await waitUntilReady();
     const output = lastFrame();
     expect(output).toContain('Executing Hook');

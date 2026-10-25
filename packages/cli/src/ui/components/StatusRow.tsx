@@ -366,7 +366,7 @@ export const StatusRow: React.FC<StatusRowProps> = ({
       {/* Live reasoning tail: its own row so the status line keeps sharing
           Row 1 with the tip on the right. */}
       {showRow1 && showLoadingIndicator && uiState.activeHooks.length === 0 && (
-        <LiveThinkingTail text={uiState.liveThought} terminalWidth={terminalWidth} />
+        <LiveThinkingTail terminalWidth={terminalWidth} />
       )}
 
       {/* Internal Separator */}

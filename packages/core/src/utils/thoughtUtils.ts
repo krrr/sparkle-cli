@@ -14,7 +14,7 @@ export type ThoughtSummary = {
  * still being generated.
  */
 export type ThoughtDeltaSummary = {
-  /** Reasoning text accumulated so far in the current reasoning block. */
+  /** Reasoning text delta. */
   text: string;
 };
 

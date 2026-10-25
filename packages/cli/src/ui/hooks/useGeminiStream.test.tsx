@@ -68,6 +68,12 @@ import type { LoadedSettings } from '../../config/settings.js';
 import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';
 import { theme } from '../semantic-colors.js';
 import { MAX_LIVE_THOUGHT_TAIL_CHARS } from '../constants/constants.js';
+import {
+  getLiveThoughtSnapshot,
+  resetLiveThought,
+  subscribeLiveThought,
+  updateLiveThought,
+} from './useLiveThought.js';
 
 // --- MOCKS ---
 const mockSendMessageStream = vi.fn().mockReturnValue((async function* () {})());
@@ -357,6 +363,7 @@ describe('useGeminiStream', () => {
 
   beforeEach(() => {
     vi.clearAllMocks(); // Clear mocks before each test
+    resetLiveThought();
     mockAddItem = vi.fn();
     mockOnDebugMessage = vi.fn();
     mockHandleSlashCommand = vi.fn().mockResolvedValue(false);
@@ -465,7 +472,7 @@ describe('useGeminiStream', () => {
       ];
     });
 
-    const { result, rerender } = await renderHookWithProviders(
+    const { result, rerender, unmount } = await renderHookWithProviders(
       (props: typeof initialProps) =>
         useGeminiStream(
           props.client,
@@ -493,6 +500,7 @@ describe('useGeminiStream', () => {
     return {
       result,
       rerender,
+      unmount,
       mockMarkToolsAsSubmitted,
       mockSendMessageStream,
       client,
@@ -3447,7 +3455,7 @@ describe('useGeminiStream', () => {
           };
           yield {
             type: ServerGeminiEventType.ThoughtDelta,
-            value: { text: 'first fragment second fragment' },
+            value: { text: ' second fragment' },
           };
           yield {
             type: ServerGeminiEventType.Content,
@@ -3471,7 +3479,61 @@ describe('useGeminiStream', () => {
         expect.objectContaining({ type: 'thinking' }),
         expect.any(Number),
       );
-      expect(result.current.liveThought).toBeNull();
+      expect(getLiveThoughtSnapshot()).toBeNull();
+    });
+
+    it('publishes accumulated reasoning deltas to the live thought store', async () => {
+      const published: Array<string | null> = [];
+      const unsubscribe = subscribeLiveThought(() => {
+        published.push(getLiveThoughtSnapshot());
+      });
+
+      mockSendMessageStream.mockReturnValue(
+        (async function* () {
+          yield {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: 'first fragment' },
+          };
+          yield {
+            type: ServerGeminiEventType.ThoughtDelta,
+            value: { text: ' second fragment' },
+          };
+          yield {
+            type: ServerGeminiEventType.Content,
+            value: 'Response',
+          };
+          yield {
+            type: ServerGeminiEventType.Finished,
+            value: { reason: 'STOP', usageMetadata: undefined },
+          };
+        })(),
+      );
+
+      const { result } = await renderTestHook();
+
+      try {
+        await act(async () => {
+          await result.current.submitQuery('Test query');
+        });
+      } finally {
+        unsubscribe();
+      }
+
+      // Deltas accumulate while reasoning streams, then the tail is cleared as
+      // soon as the turn moves on to visible content.
+      expect(published).toContain('first fragment');
+      expect(published).toContain('first fragment second fragment');
+      expect(published.at(-1)).toBeNull();
+    });
+
+    it('clears the live thought store when the hook unmounts', async () => {
+      const { unmount } = await renderTestHook();
+      updateLiveThought('reasoning that outlives the hook');
+      expect(getLiveThoughtSnapshot()).toBe('reasoning that outlives the hook');
+
+      unmount();
+
+      expect(getLiveThoughtSnapshot()).toBeNull();
     });
 
     describe('nextLiveThoughtFromEvent', () => {
