@@ -29,7 +29,10 @@ import type { Key } from '../../contexts/KeypressContext.js';
 import { Command } from '../../key/keyMatchers.js';
 import type { VimAction } from './vim-buffer-actions.js';
 import { handleVimAction } from './vim-buffer-actions.js';
-import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../../constants/constants.js';
+import {
+  LRU_LINE_LAYOUT_CACHE_LIMIT,
+  LRU_LINE_TRANSFORM_CACHE_LIMIT,
+} from '../../constants/constants.js';
 import { openFileInEditor } from '../../utils/editorUtils.js';
 import { useSettings } from '../../contexts/SettingsContext.js';
 import { useKeyMatchers } from '../../hooks/useKeyMatchers.js';
@@ -898,7 +901,7 @@ export function getTransformedImagePath(filePath: string): string {
 }
 
 const transformationsCache = new LRUCache<string, Transformation[]>(
-  LRU_BUFFER_PERF_CACHE_LIMIT,
+  LRU_LINE_TRANSFORM_CACHE_LIMIT,
 );
 
 export function calculateTransformationsForLine(line: string): Transformation[] {
@@ -1215,7 +1218,7 @@ interface LineLayoutResult {
 }
 
 const lineLayoutCache = new LRUCache<string, LineLayoutResult>(
-  LRU_BUFFER_PERF_CACHE_LIMIT,
+  LRU_LINE_LAYOUT_CACHE_LIMIT,
 );
 
 function getLineLayoutCacheKey(

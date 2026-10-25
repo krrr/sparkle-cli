@@ -9,7 +9,10 @@ import ansiRegex from 'ansi-regex';
 import { stripVTControlCharacters } from 'node:util';
 import stringWidth from 'string-width';
 import { LRUCache } from 'mnemonist';
-import { LRU_BUFFER_PERF_CACHE_LIMIT } from '../constants/constants.js';
+import {
+  LRU_CODE_POINTS_CACHE_LIMIT,
+  LRU_STRING_WIDTH_CACHE_LIMIT,
+} from '../constants/constants.js';
 
 /**
  * Calculates the maximum width of a multi-line ASCII art string.
@@ -44,7 +47,7 @@ export function isAscii(str: string): boolean {
 
 // Cache for code points
 const MAX_STRING_LENGTH_TO_CACHE = 1000;
-const codePointsCache = new LRUCache<string, string[]>(LRU_BUFFER_PERF_CACHE_LIMIT);
+const codePointsCache = new LRUCache<string, string[]>(LRU_CODE_POINTS_CACHE_LIMIT);
 
 export function toCodePoints(str: string): string[] {
   // ASCII fast path
@@ -167,7 +170,7 @@ export function normalizeEscapedNewlines(value: string): string {
   return value.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n');
 }
 
-const stringWidthCache = new LRUCache<string, number>(LRU_BUFFER_PERF_CACHE_LIMIT);
+const stringWidthCache = new LRUCache<string, number>(LRU_STRING_WIDTH_CACHE_LIMIT);
 
 /**
  * Cached version of stringWidth function for better performance
