@@ -67,6 +67,7 @@ import { MessageType, StreamingState } from '../types.js';
 import type { LoadedSettings } from '../../config/settings.js';
 import { findLastSafeSplitPoint } from '../utils/markdownUtilities.js';
 import { theme } from '../semantic-colors.js';
+import { MAX_LIVE_THOUGHT_TAIL_CHARS } from '../constants/constants.js';
 
 // --- MOCKS ---
 const mockSendMessageStream = vi.fn().mockReturnValue((async function* () {})());
@@ -3511,6 +3512,17 @@ describe('useGeminiStream', () => {
             value: 'Answer',
           }),
         ).toBeNull();
+      });
+
+      it('bounds accumulated live thought text to a sliding window when exceeding threshold', () => {
+        const largeText = 'a'.repeat(3000);
+        const next = nextLiveThoughtFromEvent(largeText, {
+          type: ServerGeminiEventType.ThoughtDelta,
+          value: { text: 'b'.repeat(200) },
+        });
+        expect(next).not.toBeNull();
+        expect(next!.length).toBeLessThanOrEqual(MAX_LIVE_THOUGHT_TAIL_CHARS);
+        expect(next!.endsWith('b'.repeat(200))).toBe(true);
       });
     });
 

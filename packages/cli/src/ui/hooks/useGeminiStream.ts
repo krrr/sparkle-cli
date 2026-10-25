@@ -89,7 +89,10 @@ import { getInlineThinkingMode } from '../utils/inlineThinkingMode.js';
 import { useStateAndRef } from './useStateAndRef.js';
 import type { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { useLogger } from './useLogger.js';
-import { SHELL_COMMAND_NAME } from '../constants/constants.js';
+import {
+  SHELL_COMMAND_NAME,
+  MAX_LIVE_THOUGHT_TAIL_CHARS,
+} from '../constants/constants.js';
 import { mapToDisplay as mapTrackedToolCallsToDisplay } from './toolMapping.js';
 import { isCompactTool } from '../components/messages/ToolGroupMessage.js';
 import {
@@ -107,6 +110,7 @@ import path from 'node:path';
 import { useSessionStats } from '../contexts/SessionContext.js';
 import { useKeypress } from './useKeypress.js';
 import type { LoadedSettings } from '../../config/settings.js';
+import { sliceStrTailUtf16 } from '../utils/textUtils.js';
 
 type ToolResponseWithParts = ToolCallResponseInfo & {
   llmContent?: PartListUnion;
@@ -212,7 +216,7 @@ function calculateStreamingState(
 
 /**
  * Live reasoning tail transition: a ThoughtDelta event carries an incremental
- * reasoning text delta, so it appends to the live thought tail; any
+ * reasoning text delta, so it appends to the live thought tail sliding window; any
  * other event means the block ended (or the turn moved on), so the tail is
  * cleared. Returns the same reference when nothing changes.
  */
@@ -220,10 +224,24 @@ export function nextLiveThoughtFromEvent(
   current: string | null,
   event: GeminiEvent,
 ): string | null {
-  if (event.type === ServerGeminiEventType.ThoughtDelta) {
-    return (current ?? '') + event.value.text;
+  if (event.type !== ServerGeminiEventType.ThoughtDelta) {
+    return current === null ? current : null;
   }
-  return current === null ? current : null;
+
+  // bounding the total text size to a trailing sliding window.
+  // reduce memory use during massive reasoning streams.
+  const delta = event.value.text;
+  const prev = current ?? '';
+  const totalLen = prev.length + delta.length;
+
+  if (totalLen <= MAX_LIVE_THOUGHT_TAIL_CHARS) {
+    return prev + delta;
+  } else if (delta.length >= MAX_LIVE_THOUGHT_TAIL_CHARS) {
+    return sliceStrTailUtf16(delta, MAX_LIVE_THOUGHT_TAIL_CHARS);
+  } else {
+    const charsFromPrev = MAX_LIVE_THOUGHT_TAIL_CHARS - delta.length;
+    return sliceStrTailUtf16(prev, charsFromPrev) + delta;
+  }
 }
 
 /**

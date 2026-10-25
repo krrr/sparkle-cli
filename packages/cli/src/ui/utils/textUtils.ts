@@ -271,3 +271,13 @@ export function escapeAnsiCtrlCodes<T>(obj: T): T {
 
   return newObj !== null ? newObj : obj;
 }
+
+/* Return tail of string, avoid slicing across a UTF-16 surrogate pair. */
+export function sliceStrTailUtf16(str: string, targetLen: number): string {
+  let sliceIndex = str.length - targetLen;
+  const code = str.charCodeAt(sliceIndex);
+  if (code >= 0xdc00 && code <= 0xdfff) {
+    sliceIndex++;
+  }
+  return str.slice(sliceIndex);
+}
