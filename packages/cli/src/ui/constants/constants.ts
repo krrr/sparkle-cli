@@ -53,22 +53,16 @@ export const KEYBOARD_SHORTCUTS_URL =
   'https://geminicli.com/docs/cli/keyboard-shortcuts/';
 
 /**
- * LRU Cache capacity limits for UI performance optimizations,
- * partitioned by object complexity and heap footprint.
+ * LRU Cache capacity limits for UI performance optimizations
  */
 // String width lookup (string -> number). Lightweight primitive cache.
 export const LRU_STRING_WIDTH_CACHE_LIMIT = 10000;
-
 // Unicode code points array (string -> string[]). Medium memory footprint.
 export const LRU_CODE_POINTS_CACHE_LIMIT = 2000;
-
 // Text buffer line layout (string -> LineLayoutResult with 5 mapping arrays).
-// Heavy composite object; 1,000 entries is ample for input prompts & history.
-export const LRU_LINE_LAYOUT_CACHE_LIMIT = 1000;
-
+export const LRU_LINE_LAYOUT_CACHE_LIMIT = 20000;
 // Text buffer line transformations (string -> Transformation[]).
-export const LRU_LINE_TRANSFORM_CACHE_LIMIT = 1000;
-
+export const LRU_LINE_TRANSFORM_CACHE_LIMIT = 20000;
 // Real-time syntax highlight token cache (string -> HighlightToken[]).
 export const LRU_HIGHLIGHT_CACHE_LIMIT = 2000;
 
