@@ -13,9 +13,11 @@ import {
   computeModelAddedAndRemovedLines,
 } from './fileDiffUtils.js';
 import { isUserPromptMessage } from './sessionUtils.js';
+import { CoreToolCallStatus } from '../scheduler/types.js';
 import type {
   ConversationRecord,
   MessageRecord,
+  ToolCallRecord,
 } from '../services/chatRecordingService.js';
 
 export interface FileChangeDetail {
@@ -28,6 +30,84 @@ export interface FileChangeStats {
   removedLines: number;
   fileCount: number;
   details?: FileChangeDetail[];
+}
+
+/**
+ * Returns true only for tool calls that actually reached the file system.
+ *
+ * `Success` is the exact marker for "the write landed". It also survives a
+ * cancellation: `Scheduler.cancelAll` skips calls that are already terminal, so
+ * an edit that finished writing before Ctrl+C stays `Success` and is still
+ * counted and reverted.
+ *
+ * The one non-successful state that carries a diff is a declined edit:
+ * `StateManager.toCancelled` copies the confirmation details into
+ * `resultDisplay`. That diff describes a write the user refused, so counting it
+ * would report changes that never happened — and reverting it would undo
+ * whatever the user typed by hand instead.
+ *
+ * An edit interrupted mid-execution is `Cancelled` with no diff at all, because
+ * `cancelAll` finalizes the call first and the executor's later status update is
+ * then dropped (`updateStatus` ignores calls that are no longer active).
+ */
+function isLandedFileEdit(toolCall: ToolCallRecord): boolean {
+  return toolCall.status === CoreToolCallStatus.Success;
+}
+
+/**
+ * Collects the file edits recorded in a range of messages.
+ *
+ * @param messages The full conversation message list.
+ * @param startIndex Index of the first message to inspect.
+ * @param stopAtUserPrompt Whether to stop at the next real user prompt (a single
+ *   turn) or keep scanning to the end of the conversation.
+ * @returns Aggregated statistics, or null when no edit landed on disk.
+ */
+function collectFileEdits(
+  messages: readonly MessageRecord[],
+  startIndex: number,
+  stopAtUserPrompt: boolean,
+): FileChangeStats | null {
+  let addedLines = 0;
+  let removedLines = 0;
+  // Keyed by absolute path: two files sharing a basename are distinct edits.
+  const files = new Map<string, FileChangeDetail>();
+
+  for (let i = startIndex; i < messages.length; i++) {
+    const msg = messages[i];
+    // Tool responses are recorded as `user` messages carrying only a
+    // functionResponse part, so `isUserPromptMessage` is what ends a turn.
+    if (stopAtUserPrompt && isUserPromptMessage(msg)) break;
+
+    if (msg.type !== 'gemini' || !msg.toolCalls) continue;
+
+    for (const toolCall of msg.toolCalls) {
+      if (!isLandedFileEdit(toolCall)) continue;
+
+      const fileDiff = getFileDiffFromResultDisplay(toolCall.resultDisplay);
+      if (!fileDiff) continue;
+
+      const calculations = computeModelAddedAndRemovedLines(fileDiff.diffStat);
+      addedLines += calculations.addedLines;
+      removedLines += calculations.removedLines;
+
+      if (!files.has(fileDiff.filePath)) {
+        files.set(fileDiff.filePath, {
+          fileName: fileDiff.fileName,
+          diff: fileDiff.fileDiff,
+        });
+      }
+    }
+  }
+
+  if (files.size === 0) return null;
+
+  return {
+    addedLines,
+    removedLines,
+    fileCount: files.size,
+    details: [...files.values()],
+  };
 }
 
 /**
@@ -46,41 +126,8 @@ export function calculateTurnStats(
   const msgIndex = conversation.messages.indexOf(userMessage);
   if (msgIndex === -1) return null;
 
-  let addedLines = 0;
-  let removedLines = 0;
-  const files = new Set<string>();
-  let hasEdits = false;
-
-  // Look ahead until the next real user prompt (single turn). Tool responses are
-  // recorded as `user` messages carrying only a functionResponse part, so they
-  // must not end the turn.
-  for (let i = msgIndex + 1; i < conversation.messages.length; i++) {
-    const msg = conversation.messages[i];
-    if (isUserPromptMessage(msg)) break;
-
-    if (msg.type === 'gemini' && msg.toolCalls) {
-      for (const toolCall of msg.toolCalls) {
-        const fileDiff = getFileDiffFromResultDisplay(toolCall.resultDisplay);
-        if (fileDiff) {
-          hasEdits = true;
-          const stats = fileDiff.diffStat;
-          const calculations = computeModelAddedAndRemovedLines(stats);
-          addedLines += calculations.addedLines;
-          removedLines += calculations.removedLines;
-
-          files.add(fileDiff.fileName);
-        }
-      }
-    }
-  }
-
-  if (!hasEdits) return null;
-
-  return {
-    addedLines,
-    removedLines,
-    fileCount: files.size,
-  };
+  // Look ahead until the next real user prompt (single turn).
+  return collectFileEdits(conversation.messages, msgIndex + 1, true);
 }
 
 /**
@@ -98,44 +145,8 @@ export function calculateRewindImpact(
   const msgIndex = conversation.messages.indexOf(userMessage);
   if (msgIndex === -1) return null;
 
-  let addedLines = 0;
-  let removedLines = 0;
-  const files = new Set<string>();
-  const details: FileChangeDetail[] = [];
-  let hasEdits = false;
-
-  // Look ahead to the end of conversation (cumulative)
-  for (let i = msgIndex + 1; i < conversation.messages.length; i++) {
-    const msg = conversation.messages[i];
-    // Do NOT break on user message - we want total impact
-
-    if (msg.type === 'gemini' && msg.toolCalls) {
-      for (const toolCall of msg.toolCalls) {
-        const fileDiff = getFileDiffFromResultDisplay(toolCall.resultDisplay);
-        if (fileDiff) {
-          hasEdits = true;
-          const stats = fileDiff.diffStat;
-          const calculations = computeModelAddedAndRemovedLines(stats);
-          addedLines += calculations.addedLines;
-          removedLines += calculations.removedLines;
-          files.add(fileDiff.fileName);
-          details.push({
-            fileName: fileDiff.fileName,
-            diff: fileDiff.fileDiff,
-          });
-        }
-      }
-    }
-  }
-
-  if (!hasEdits) return null;
-
-  return {
-    addedLines,
-    removedLines,
-    fileCount: files.size,
-    details,
-  };
+  // Scan to the end of the conversation: the whole remaining history is undone.
+  return collectFileEdits(conversation.messages, msgIndex + 1, false);
 }
 
 /**
@@ -166,6 +177,10 @@ export async function revertFileChanges(
     if (msg.type === 'gemini' && msg.toolCalls) {
       for (let j = msg.toolCalls.length - 1; j >= 0; j--) {
         const toolCall = msg.toolCalls[j];
+        // Declined edits never touched the disk; reverting them would clobber
+        // whatever the user wrote in the meantime.
+        if (!isLandedFileEdit(toolCall)) continue;
+
         const fileDiff = getFileDiffFromResultDisplay(toolCall.resultDisplay);
         if (fileDiff) {
           const { filePath, fileName, newContent, originalContent, isNewFile } =

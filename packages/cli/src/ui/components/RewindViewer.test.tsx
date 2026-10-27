@@ -10,6 +10,7 @@ import { renderWithProviders } from '../../test-utils/render.js';
 import { RewindViewer } from './RewindViewer.js';
 import { waitFor } from '../../test-utils/async.js';
 import type { ConversationRecord, MessageRecord } from 'sparkle-cli-core';
+import { CoreToolCallStatus } from 'sparkle-cli-core';
 
 vi.mock('ink', async () => {
   const actual = await vi.importActual<typeof import('ink')>('ink');
@@ -446,6 +447,107 @@ describe('RewindViewer', () => {
       const frame = lastFrame();
       expect(frame).toContain('Real prompt');
       expect(frame.match(/No files have been changed/g)).toHaveLength(1);
+      unmount();
+    });
+
+    it('names the file and counts lines for a successful edit', async () => {
+      const conversation = createConversation([
+        { type: 'user', content: 'Tweak the parser', id: '1', timestamp: '1' },
+        {
+          type: 'gemini',
+          content: '',
+          id: '2',
+          timestamp: '2',
+          toolCalls: [
+            {
+              id: 'call-1',
+              name: 'replace',
+              args: {},
+              status: CoreToolCallStatus.Success,
+              timestamp: '2',
+              resultDisplay: {
+                fileDiff: 'diff',
+                fileName: 'parser.ts',
+                filePath: '/repo/src/parser.ts',
+                originalContent: 'old',
+                newContent: 'new',
+                diffStat: {
+                  model_added_lines: 3,
+                  model_removed_lines: 1,
+                  model_added_chars: 12,
+                  model_removed_chars: 4,
+                  user_added_lines: 0,
+                  user_removed_lines: 0,
+                  user_added_chars: 0,
+                  user_removed_chars: 0,
+                },
+              },
+            },
+          ],
+        } as MessageRecord,
+      ]);
+
+      const { lastFrame, unmount } = await renderWithProviders(
+        <RewindViewer
+          conversation={conversation}
+          onExit={vi.fn()}
+          onRewind={vi.fn()}
+        />,
+      );
+      const frame = lastFrame();
+      expect(frame).toContain('parser.ts');
+      expect(frame).toContain('+3');
+      expect(frame).toContain('-1');
+      unmount();
+    });
+
+    it('reports no file changes when the edit was declined', async () => {
+      const conversation = createConversation([
+        { type: 'user', content: 'Try a risky edit', id: '1', timestamp: '1' },
+        {
+          type: 'gemini',
+          content: '',
+          id: '2',
+          timestamp: '2',
+          toolCalls: [
+            {
+              id: 'call-1',
+              name: 'replace',
+              args: {},
+              status: CoreToolCallStatus.Cancelled,
+              timestamp: '2',
+              resultDisplay: {
+                fileDiff: 'diff',
+                fileName: 'parser.ts',
+                filePath: '/repo/src/parser.ts',
+                originalContent: 'old',
+                newContent: 'new',
+                diffStat: {
+                  model_added_lines: 3,
+                  model_removed_lines: 1,
+                  model_added_chars: 12,
+                  model_removed_chars: 4,
+                  user_added_lines: 0,
+                  user_removed_lines: 0,
+                  user_added_chars: 0,
+                  user_removed_chars: 0,
+                },
+              },
+            },
+          ],
+        } as MessageRecord,
+      ]);
+
+      const { lastFrame, unmount } = await renderWithProviders(
+        <RewindViewer
+          conversation={conversation}
+          onExit={vi.fn()}
+          onRewind={vi.fn()}
+        />,
+      );
+      const frame = lastFrame();
+      expect(frame).toContain('No files have been changed');
+      expect(frame).not.toContain('parser.ts');
       unmount();
     });
 
