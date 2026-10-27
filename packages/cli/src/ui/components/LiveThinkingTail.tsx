@@ -13,7 +13,10 @@ import { normalizeEscapedNewlines } from '../utils/textUtils.js';
 
 interface LiveThinkingTailProps {
   terminalWidth: number;
-  /** Maximum number of trailing lines to display. */
+  /**
+   * Maximum number of rendered rows of the tail to display. Rows, not lines:
+   * a single long reasoning line can wrap across all of them.
+   */
   maxLines?: number;
 }
 
@@ -41,9 +44,21 @@ export function getLiveThinkingTailLines(
 }
 
 /**
- * Renders the trailing lines of in-progress model reasoning below the loading
+ * Renders the trailing rows of in-progress model reasoning below the loading
  * indicator, so reasoning can be observed in real time without flooding the
  * scrollback history.
+ *
+ * Lines wrap instead of being truncated so an unbroken run of reasoning stays
+ * readable, and the box keeps showing the most recent rows: reasoning often
+ * streams for thousands of characters before the model emits a newline.
+ *
+ * The tail is pinned to the bottom with a scroll region rather than by
+ * measuring the content and offsetting it. Ink resolves a scroll region's
+ * height during the layout pass that renders the frame, so the clamp is always
+ * consistent with the content being drawn. Measuring instead (as MaxSizedBox
+ * does, via ResizeObserver) lags one frame behind, and the sliding window of
+ * reasoning lines changes the measured height often enough that the stale
+ * offset can push the whole tail out of its clip for a single frame.
  *
  * Subscribes to the live thought store directly so that only this leaf
  * re-renders as reasoning deltas arrive.
@@ -75,16 +90,29 @@ const LiveThinkingTailBase: React.FC<LiveThinkingTailProps> = ({
       borderBottom={false}
       borderColor={theme.text.secondary}
     >
-      {lines.map((line, index) => (
-        <Text
-          key={`live-thinking-${index}`}
-          color={theme.text.secondary}
-          italic
-          wrap="truncate-end"
-        >
-          {line}
-        </Text>
-      ))}
+      {/* Pinning to the bottom keeps the newest reasoning visible.
+          Don't use MaxSizedBox. */}
+      <Box
+        flexDirection="column"
+        maxHeight={maxLines}
+        overflowY="scroll"
+        overflowX="hidden"
+        scrollbar={false}
+        scrollTop={Number.MAX_SAFE_INTEGER}
+      >
+        <Box flexDirection="column" flexShrink={0}>
+          {lines.map((line, index) => (
+            <Text
+              key={`live-thinking-${index}`}
+              color={theme.text.secondary}
+              italic
+              wrap="wrap"
+            >
+              {line}
+            </Text>
+          ))}
+        </Box>
+      </Box>
     </Box>
   );
 };
