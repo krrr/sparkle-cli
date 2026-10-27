@@ -7,7 +7,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import os from 'node:os';
 import {
-  isWindows10,
   isJetBrainsTerminal,
   isTmux,
   isGnuScreen,
@@ -33,38 +32,6 @@ describe('compatibility', () => {
     process.stdout.getColorDepth = originalGetColorDepth;
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
-  });
-
-  describe('isWindows10', () => {
-    it.each<{
-      platform: NodeJS.Platform;
-      release: string;
-      expected: boolean;
-      desc: string;
-    }>([
-      {
-        platform: 'win32',
-        release: '10.0.19041',
-        expected: true,
-        desc: 'Windows 10 (build < 22000)',
-      },
-      {
-        platform: 'win32',
-        release: '10.0.22000',
-        expected: false,
-        desc: 'Windows 11 (build >= 22000)',
-      },
-      {
-        platform: 'darwin',
-        release: '20.6.0',
-        expected: false,
-        desc: 'non-Windows platforms',
-      },
-    ])('should return $expected for $desc', ({ platform, release, expected }) => {
-      vi.mocked(os.platform).mockReturnValue(platform);
-      vi.mocked(os.release).mockReturnValue(release);
-      expect(isWindows10()).toBe(expected);
-    });
   });
 
   describe('isJetBrainsTerminal', () => {
@@ -269,20 +236,6 @@ describe('compatibility', () => {
       process.stdout.getColorDepth = vi.fn().mockReturnValue(24);
     });
 
-    it('should return Windows 10 warning when detected', () => {
-      vi.mocked(os.platform).mockReturnValue('win32');
-      vi.mocked(os.release).mockReturnValue('10.0.19041');
-      vi.stubEnv('TERMINAL_EMULATOR', '');
-
-      const warnings = getCompatibilityWarnings();
-      expect(warnings).toContainEqual(
-        expect.objectContaining({
-          id: 'windows-10',
-          message: expect.stringContaining('Windows 10 detected'),
-        }),
-      );
-    });
-
     it('should return JetBrains warning when detected and in alternate buffer', () => {
       vi.mocked(os.platform).mockReturnValue('darwin');
       vi.stubEnv('TERMINAL_EMULATOR', 'JetBrains-JediTerm');
@@ -394,10 +347,9 @@ describe('compatibility', () => {
       process.stdout.getColorDepth = vi.fn().mockReturnValue(8);
 
       const warnings = getCompatibilityWarnings({ isAlternateBuffer: true });
-      expect(warnings).toHaveLength(3);
-      expect(warnings[0].message).toContain('Windows 10 detected');
-      expect(warnings[1].message).toContain('JetBrains');
-      expect(warnings[2].message).toContain('True color (24-bit) support not detected');
+      expect(warnings).toHaveLength(2);
+      expect(warnings[0].message).toContain('JetBrains');
+      expect(warnings[1].message).toContain('True color (24-bit) support not detected');
     });
 
     it('should return no color warnings for kmscon terminal', () => {
