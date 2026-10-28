@@ -10,6 +10,7 @@ import { render } from '../../test-utils/render.js';
 import {
   useConsoleMessages,
   useErrorCount,
+  clearErrorCount,
   initializeConsoleStore,
 } from './useConsoleMessages.js';
 import { coreEvents } from 'sparkle-cli-core';
@@ -222,6 +223,21 @@ describe('useErrorCount', () => {
 
     act(() => {
       result.current.clearErrorCount();
+    });
+    expect(result.current.errorCount).toBe(0);
+  });
+
+  it('should clear the error count via the module-level helper without subscribing', async () => {
+    const { result } = await renderErrorCountHook();
+    act(() => {
+      // @ts-expect-error - internal testing helper
+      coreEvents._trigger('console-log', { type: 'error', content: 'error' });
+      vi.runAllTimers();
+    });
+    expect(result.current.errorCount).toBe(1);
+
+    act(() => {
+      clearErrorCount();
     });
     expect(result.current.errorCount).toBe(0);
   });

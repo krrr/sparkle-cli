@@ -30,6 +30,7 @@ import {
   type FooterItemId,
 } from '../../config/footerItems.js';
 import { isDevelopment } from '../../utils/installationInfo.js';
+import { useErrorCount } from '../hooks/useConsoleMessages.js';
 
 const HOSTNAME = os.hostname();
 
@@ -163,6 +164,9 @@ export const Footer: React.FC = () => {
   const config = useConfig();
   const settings = useSettings();
   const { vimEnabled, vimMode } = useVimMode();
+  // Subscribe to the console error store here rather than routing the count
+  // through UIState, so only the footer re-renders when errors accumulate.
+  const { errorCount } = useErrorCount();
 
   const authType = config.getContentGeneratorConfig()?.authType;
 
@@ -172,7 +176,6 @@ export const Footer: React.FC = () => {
     debugMode,
     branchName,
     debugMessage,
-    errorCount,
     showErrorDetails,
     promptTokenCount,
     isTrustedFolder,
@@ -183,7 +186,6 @@ export const Footer: React.FC = () => {
     debugMode: config.getDebugMode(),
     branchName: uiState.branchName,
     debugMessage: uiState.debugMessage,
-    errorCount: uiState.errorCount,
     showErrorDetails: uiState.showErrorDetails,
     promptTokenCount: uiState.sessionStats.lastPromptTokenCount,
     isTrustedFolder: uiState.isTrustedFolder,

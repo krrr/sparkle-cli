@@ -91,7 +91,7 @@ import { useVoiceModelCommand } from './hooks/useVoiceModelCommand.js';
 import { useSlashCommandProcessor } from './hooks/slashCommandProcessor.js';
 import { useVimMode } from './contexts/VimModeContext.js';
 import { useOverflowActions, useOverflowState } from './contexts/OverflowContext.js';
-import { useErrorCount } from './hooks/useConsoleMessages.js';
+import { clearErrorCount } from './hooks/useConsoleMessages.js';
 import { useTerminalSize } from './hooks/useTerminalSize.js';
 import { calculatePromptWidths } from './components/InputPrompt.js';
 import { calculateMainAreaWidth } from './utils/ui-sizing.js';
@@ -521,8 +521,6 @@ export const AppContainer = (props: AppContainerProps) => {
       coreEvents.off(CoreEvent.AgentsDiscovered, handleAgentsDiscovered);
     };
   }, [settings]);
-
-  const { errorCount, clearErrorCount } = useErrorCount();
 
   const mainAreaWidth = calculateMainAreaWidth(terminalWidth, config);
   // Derive widths for InputPrompt using shared helper
@@ -1213,7 +1211,7 @@ export const AppContainer = (props: AppContainerProps) => {
     historyManager.clearItems();
     clearErrorCount();
     refreshStatic();
-  }, [historyManager, clearErrorCount, refreshStatic, reset, triggerExpandHint]);
+  }, [historyManager, refreshStatic, reset, triggerExpandHint]);
 
   const { handleInput: vimHandleInput } = useVim(buffer, handleFinalSubmit);
 
@@ -2135,7 +2133,6 @@ export const AppContainer = (props: AppContainerProps) => {
       ctrlDPressedOnce: ctrlDPressCount >= 1,
       shortcutsHelpVisible,
       cleanUiDetailsVisible,
-      isFocused,
       elapsedTime,
       currentLoadingPhrase,
       currentTip,
@@ -2148,7 +2145,6 @@ export const AppContainer = (props: AppContainerProps) => {
       allowPlanMode,
       currentModel,
       contextFileNames,
-      errorCount,
       availableTerminalHeight,
       stableControlsHeight,
       mainAreaWidth,
@@ -2186,8 +2182,6 @@ export const AppContainer = (props: AppContainerProps) => {
       isBackgroundTaskListOpen,
       newAgents,
       showIsExpandableHint,
-      hintMode: config.isModelSteeringEnabled() && isToolExecuting(pendingHistoryItems),
-      hintBuffer: '',
     }),
     [
       isThemeDialogOpen,
@@ -2243,7 +2237,6 @@ export const AppContainer = (props: AppContainerProps) => {
       ctrlDPressCount,
       shortcutsHelpVisible,
       cleanUiDetailsVisible,
-      isFocused,
       elapsedTime,
       currentLoadingPhrase,
       currentTip,
@@ -2255,7 +2248,6 @@ export const AppContainer = (props: AppContainerProps) => {
       showApprovalModeIndicator,
       allowPlanMode,
       contextFileNames,
-      errorCount,
       availableTerminalHeight,
       stableControlsHeight,
       mainAreaWidth,

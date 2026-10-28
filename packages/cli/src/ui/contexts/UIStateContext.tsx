@@ -102,7 +102,6 @@ export interface UIState {
   allowPlanMode: boolean;
   currentModel: string;
   contextFileNames: string[];
-  errorCount: number;
   availableTerminalHeight: number | undefined;
   stableControlsHeight: number;
   mainAreaWidth: number;
@@ -144,8 +143,6 @@ export interface UIState {
   isBackgroundTaskListOpen: boolean;
   newAgents: AgentDefinition[] | null;
   showIsExpandableHint: boolean;
-  hintMode: boolean;
-  hintBuffer: string;
   transientMessage: {
     text: string;
     type: TransientMessageType;

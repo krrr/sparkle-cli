@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useCallback, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import type { ConsoleMessageItem } from '../types.js';
 import { coreEvents, CoreEvent, type ConsoleLogPayload } from 'sparkle-cli-core';
 
@@ -160,16 +160,21 @@ export function useConsoleMessages(): ConsoleMessageItem[] {
 }
 
 /**
+ * Resets the global error count without subscribing to the store.
+ * Callers that only need to clear the count (e.g. on screen clear) should use
+ * this directly so they don't re-render on every error.
+ */
+export function clearErrorCount(): void {
+  globalErrorCount = 0;
+  notifyListeners();
+}
+
+/**
  * Hook to access the global error count.
  * Uses the same external store as useConsoleMessages for consistency.
  */
 export function useErrorCount(): UseErrorCountReturn {
   const errorCount = useSyncExternalStore(subscribe, getErrorCountSnapshot);
-
-  const clearErrorCount = useCallback(() => {
-    globalErrorCount = 0;
-    notifyListeners();
-  }, []);
 
   return { errorCount, clearErrorCount };
 }

@@ -494,8 +494,6 @@ const baseMockUiState = {
   activePtyId: undefined,
   backgroundTasks: new Map(),
   backgroundTaskHeight: 0,
-  hintMode: false,
-  hintBuffer: '',
   bannerData: {
     defaultText: '',
     warningText: '',

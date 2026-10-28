@@ -185,7 +185,6 @@ const createMockUIState = (overrides: Partial<UIState> = {}): UIState =>
     },
     branchName: 'main',
     debugMessage: '',
-    errorCount: 0,
     nightly: false,
     isTrustedFolder: true,
     activeHooks: [],
@@ -314,7 +313,6 @@ describe('Composer', () => {
     it('passes correct props to Footer including vim mode when enabled', async () => {
       const uiState = createMockUIState({
         branchName: 'feature-branch',
-        errorCount: 2,
         sessionStats: {
           sessionId: 'test-session',
           sessionStartTime: new Date(),

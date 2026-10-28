@@ -20,8 +20,23 @@ const normalizeFrame = (frame: string | undefined) => {
 const { mocks } = vi.hoisted(() => ({
   mocks: {
     isDevelopment: false,
+    errorCount: 0,
   },
 }));
+
+vi.mock('../hooks/useConsoleMessages.js', async (importOriginal) => {
+  const original =
+    await importOriginal<typeof import('../hooks/useConsoleMessages.js')>();
+  return {
+    ...original,
+    useErrorCount: () => ({
+      errorCount: mocks.errorCount,
+      clearErrorCount: () => {
+        mocks.errorCount = 0;
+      },
+    }),
+  };
+});
 
 vi.mock('../../utils/installationInfo.js', async (importOriginal) => {
   const original =
@@ -569,19 +584,21 @@ describe('<Footer />', () => {
   describe('error summary visibility', () => {
     beforeEach(() => {
       mocks.isDevelopment = false;
+      mocks.errorCount = 0;
     });
 
     afterEach(() => {
       mocks.isDevelopment = false;
+      mocks.errorCount = 0;
     });
 
     it('hides error summary in low verbosity mode out of dev mode', async () => {
+      mocks.errorCount = 2;
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
         uiState: {
           sessionStats: mockSessionStats,
-          errorCount: 2,
           showErrorDetails: false,
         },
         settings: createMockSettings({ ui: { errorVerbosity: 'low' } }),
@@ -592,12 +609,12 @@ describe('<Footer />', () => {
 
     it('shows error summary in low verbosity mode in dev mode', async () => {
       mocks.isDevelopment = true;
+      mocks.errorCount = 2;
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
         uiState: {
           sessionStats: mockSessionStats,
-          errorCount: 2,
           showErrorDetails: false,
         },
         settings: createMockSettings({ ui: { errorVerbosity: 'low' } }),
@@ -608,12 +625,12 @@ describe('<Footer />', () => {
     });
 
     it('shows error summary in full verbosity mode', async () => {
+      mocks.errorCount = 2;
       const { lastFrame, unmount } = await renderWithProviders(<Footer />, {
         config: mockConfig,
         width: 120,
         uiState: {
           sessionStats: mockSessionStats,
-          errorCount: 2,
           showErrorDetails: false,
         },
         settings: createMockSettings({ ui: { errorVerbosity: 'full' } }),
