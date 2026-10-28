@@ -29,6 +29,14 @@ Sparkle CLI comes with a selection of pre-defined themes, which you can list usi
   - `Solarized Light`
   - `Xcode`
 
+### Automatic theme switching
+
+Sparkle CLI can match its theme to your terminal background. When
+`ui.autoThemeSwitching` is enabled (the default), CLI detects the terminal background
+color at startup and keeps watching for changes while it runs. Only themes that ship in
+both a dark and a light variant switch automatically. Automatic switching never writes
+to your `settings.json`. It changes the active theme in memory only.
+
 ### Changing themes
 
 1.  Enter `/theme` into Sparkle CLI.

@@ -282,8 +282,8 @@
         },
         "autoThemeSwitching": {
           "title": "Auto Theme Switching",
-          "description": "Automatically switch between default light and dark themes based on terminal background color.",
-          "markdownDescription": "Automatically switch between default light and dark themes based on terminal background color.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `true`",
+          "description": "Automatically switch between light and dark variants of themes that provide both, based on terminal background color.",
+          "markdownDescription": "Automatically switch between light and dark variants of themes that provide both, based on terminal background color.\n\n- Category: `UI`\n- Requires restart: `no`\n- Default: `true`",
           "default": true,
           "type": "boolean"
         },

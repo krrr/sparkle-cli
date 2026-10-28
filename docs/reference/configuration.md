@@ -249,8 +249,8 @@ corresponding top-level category object in your `settings.json` file.
 
 - **`ui.autoThemeSwitching`** (boolean):
 
-  - **Description:** Automatically switch between default light and dark themes based on
-    terminal background color.
+  - **Description:** Automatically switch between light and dark variants of themes that
+    provide both, based on terminal background color.
   - **Default:** `true`
 
 - **`ui.terminalBackgroundPollingInterval`** (number):

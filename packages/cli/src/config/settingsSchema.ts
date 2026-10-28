@@ -503,7 +503,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: true,
         description:
-          'Automatically switch between default light and dark themes based on terminal background color.',
+          'Automatically switch between light and dark variants of themes that provide both, based on terminal background color.',
         showInDialog: true,
       },
       terminalBackgroundPollingInterval: {

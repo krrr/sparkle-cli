@@ -5,9 +5,8 @@
  */
 
 import { useEffect } from 'react';
-import { getLuminance, parseColor, shouldSwitchTheme } from '../themes/color-utils.js';
-import { themeManager, DEFAULT_THEME } from '../themes/theme-manager.js';
-import { DefaultLight } from '../themes/builtin/light/default-light.js';
+import { getLuminance, parseColor } from '../themes/color-utils.js';
+import { themeManager } from '../themes/theme-manager.js';
 import { useSettings } from '../contexts/SettingsContext.js';
 import type { Config } from 'sparkle-cli-core';
 import { useTerminalContext } from '../contexts/TerminalContext.js';
@@ -33,9 +32,8 @@ export function useTerminalTheme(
     }
 
     const pollIntervalId = setInterval(() => {
-      // Only poll if we are using one of the default themes
-      const currentThemeName = settings.merged.ui.theme;
-      if (!themeManager.isDefaultTheme(currentThemeName)) {
+      // Only poll while the active theme has a light/dark counterpart to switch to
+      if (!themeManager.getThemeVariant(themeManager.getActiveTheme().name)) {
         return;
       }
 
@@ -55,14 +53,9 @@ export function useTerminalTheme(
 
       const previousColor = config.getTerminalBackground();
       const luminance = getLuminance(hexColor);
-      const currentThemeName = settings.merged.ui.theme;
+      const currentThemeName = themeManager.getActiveTheme().name;
 
-      const newTheme = shouldSwitchTheme(
-        currentThemeName,
-        luminance,
-        DEFAULT_THEME.name,
-        DefaultLight.name,
-      );
+      const newTheme = themeManager.getSwitchedThemeName(currentThemeName, luminance);
 
       if (previousColor === hexColor) {
         if (newTheme) {
@@ -91,7 +84,6 @@ export function useTerminalTheme(
       unsubscribe(handleTerminalBackground);
     };
   }, [
-    settings.merged.ui.theme,
     settings.merged.ui.autoThemeSwitching,
     settings.merged.ui.terminalBackgroundPollingInterval,
     config,

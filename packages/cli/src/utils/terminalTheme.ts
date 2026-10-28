@@ -10,7 +10,10 @@ import {
 } from '../ui/utils/terminalCapabilityManager.js';
 import { themeManager, DEFAULT_THEME } from '../ui/themes/theme-manager.js';
 import { pickDefaultThemeName } from '../ui/themes/theme.js';
-import { getThemeTypeFromBackgroundColor } from '../ui/themes/color-utils.js';
+import {
+  getLuminance,
+  getThemeTypeFromBackgroundColor,
+} from '../ui/themes/color-utils.js';
 import type { LoadedSettings } from '../config/settings.js';
 import { type Config, coreEvents, debugLogger } from 'sparkle-cli-core';
 
@@ -60,11 +63,28 @@ export async function setupTerminalAndTheme(
   ) {
     const currentTheme = themeManager.getActiveTheme();
     if (!themeManager.isThemeCompatible(currentTheme, terminalBackground)) {
-      const backgroundType = getThemeTypeFromBackgroundColor(terminalBackground);
-      coreEvents.emitFeedback(
-        'warning',
-        `Theme '${currentTheme.name}' (${currentTheme.type}) might look incorrect on your ${backgroundType} terminal background. Type /theme to change theme.`,
+      // Auto switching is enabled, so correct a mismatched paired theme right
+      // away instead of waiting for the first background poll. Only the
+      // in-memory active theme is changed: the configured theme is left
+      // untouched, so a heuristic mismatch never gets persisted as an explicit
+      // user choice.
+      const switchedThemeName = themeManager.getSwitchedThemeName(
+        currentTheme.name,
+        getLuminance(terminalBackground),
       );
+      if (switchedThemeName && themeManager.setActiveTheme(switchedThemeName)) {
+        debugLogger.debug(
+          `Switched theme from "${currentTheme.name}" to "${switchedThemeName}" to match the terminal background.`,
+        );
+      } else {
+        // The mismatch cannot be resolved automatically (for example a custom
+        // or non-default theme), so tell the user how to fix it.
+        const backgroundType = getThemeTypeFromBackgroundColor(terminalBackground);
+        coreEvents.emitFeedback(
+          'warning',
+          `Theme '${currentTheme.name}' (${currentTheme.type}) might look incorrect on your ${backgroundType} terminal background. Type /theme to change theme.`,
+        );
+      }
     }
   }
 

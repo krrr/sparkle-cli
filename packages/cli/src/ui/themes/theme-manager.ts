@@ -31,6 +31,10 @@ import {
   getThemeTypeFromBackgroundColor,
   resolveColor,
 } from './theme.js';
+import {
+  DARK_THEME_LUMINANCE_THRESHOLD,
+  LIGHT_THEME_LUMINANCE_THRESHOLD,
+} from './color-utils.js';
 import type { SemanticColors } from './semantic-tokens.js';
 import {
   DEFAULT_BACKGROUND_OPACITY,
@@ -51,6 +55,27 @@ export interface ThemeDisplay {
 }
 
 export const DEFAULT_THEME: Theme = DefaultDark;
+
+/**
+ * Built-in themes that exist in both a dark and a light variant of the same
+ * palette family. Only these pairs are eligible for automatic theme switching.
+ */
+const THEME_VARIANT_PAIRS: ReadonlyArray<{ dark: Theme; light: Theme }> = [
+  { dark: DefaultDark, light: DefaultLight },
+  { dark: AyuDark, light: AyuLight },
+  { dark: GitHubDark, light: GitHubLight },
+  { dark: GitHubDarkColorblind, light: GitHubLightColorblind },
+  { dark: SolarizedDark, light: SolarizedLight },
+  { dark: ANSI, light: ANSILight },
+];
+
+/** Maps the name of each paired built-in theme to its counterpart's name. */
+const THEME_VARIANTS: ReadonlyMap<string, string> = new Map(
+  THEME_VARIANT_PAIRS.flatMap(({ dark, light }) => [
+    [dark.name, light.name] as const,
+    [light.name, dark.name] as const,
+  ]),
+);
 
 class ThemeManager {
   private readonly availableThemes: Theme[];
@@ -113,12 +138,48 @@ class ThemeManager {
     this.lastCacheKey = undefined;
   }
 
-  isDefaultTheme(themeName: string | undefined): boolean {
-    return (
-      themeName === undefined ||
-      themeName === DEFAULT_THEME.name ||
-      themeName === DefaultLight.name
-    );
+  /**
+   * Returns the counterpart theme of a built-in theme that ships in both a dark
+   * and a light variant, or undefined when the theme has no counterpart (custom
+   * themes and single-variant built-ins such as Dracula).
+   */
+  getThemeVariant(themeName: string | undefined): Theme | undefined {
+    if (!themeName) {
+      return undefined;
+    }
+    const variantName = THEME_VARIANTS.get(themeName);
+    return variantName ? this.findThemeByName(variantName) : undefined;
+  }
+
+  /**
+   * Picks the counterpart theme to switch to when the terminal background no
+   * longer matches the polarity of the current theme. Hysteresis thresholds are
+   * applied so an ambiguous background near the midpoint does not cause the
+   * theme to flicker back and forth.
+   *
+   * @param currentThemeName The name of the currently active theme.
+   * @param luminance The luminance of the terminal background (0-255).
+   * @returns The name of the theme to switch to, or undefined if no switch is needed.
+   */
+  getSwitchedThemeName(
+    currentThemeName: string | undefined,
+    luminance: number,
+  ): string | undefined {
+    const effectiveName = currentThemeName ?? DEFAULT_THEME.name;
+    const variant = this.getThemeVariant(effectiveName);
+    const currentTheme = this.findThemeByName(effectiveName);
+    if (!variant || !currentTheme) {
+      return undefined;
+    }
+
+    const currentIsLight = currentTheme.type === 'light';
+    if (luminance > LIGHT_THEME_LUMINANCE_THRESHOLD && !currentIsLight) {
+      return variant.name;
+    } else if (luminance < DARK_THEME_LUMINANCE_THRESHOLD && currentIsLight) {
+      return variant.name;
+    }
+
+    return undefined;
   }
 
   /**

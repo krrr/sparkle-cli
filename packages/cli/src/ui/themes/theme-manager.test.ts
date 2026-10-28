@@ -235,6 +235,81 @@ describe('ThemeManager', () => {
     });
   });
 
+  describe('theme variants', () => {
+    it.each([
+      ['Default', 'Default Light'],
+      ['Default Light', 'Default'],
+      ['Ayu', 'Ayu Light'],
+      ['Ayu Light', 'Ayu'],
+      ['GitHub', 'GitHub Light'],
+      ['GitHub Light', 'GitHub'],
+      ['GitHub Dark Colorblind', 'GitHub Light Colorblind'],
+      ['GitHub Light Colorblind', 'GitHub Dark Colorblind'],
+      ['Solarized Dark', 'Solarized Light'],
+      ['Solarized Light', 'Solarized Dark'],
+      ['ANSI', 'ANSI Light'],
+      ['ANSI Light', 'ANSI'],
+    ])('should pair %s with %s', (name, variant) => {
+      expect(themeManager.getThemeVariant(name)?.name).toBe(variant);
+    });
+
+    it.each([
+      'Atom One',
+      'Dracula',
+      'Google Code',
+      'Holiday',
+      'Shades Of Purple',
+      'Tokyo Night',
+      'Xcode',
+      'NoColor',
+      'Nonexistent Theme',
+    ])('should report no variant for the unpaired theme %s', (name) => {
+      expect(themeManager.getThemeVariant(name)).toBeUndefined();
+    });
+
+    it('should report no variant for an undefined theme name', () => {
+      expect(themeManager.getThemeVariant(undefined)).toBeUndefined();
+    });
+  });
+
+  describe('getSwitchedThemeName', () => {
+    it('should switch a dark paired theme to its light variant on a light background', () => {
+      // 255 > LIGHT_THEME_LUMINANCE_THRESHOLD
+      expect(themeManager.getSwitchedThemeName('Ayu', 255)).toBe('Ayu Light');
+      expect(themeManager.getSwitchedThemeName('Solarized Dark', 255)).toBe(
+        'Solarized Light',
+      );
+    });
+
+    it('should switch a light paired theme to its dark variant on a dark background', () => {
+      // 0 < DARK_THEME_LUMINANCE_THRESHOLD
+      expect(themeManager.getSwitchedThemeName('Ayu Light', 0)).toBe('Ayu');
+      expect(themeManager.getSwitchedThemeName('GitHub Light', 0)).toBe('GitHub');
+    });
+
+    it('should treat an undefined theme name as the default dark theme', () => {
+      expect(themeManager.getSwitchedThemeName(undefined, 255)).toBe('Default Light');
+    });
+
+    it('should not switch themes without a counterpart', () => {
+      expect(themeManager.getSwitchedThemeName('Dracula', 255)).toBeUndefined();
+      expect(themeManager.getSwitchedThemeName('Tokyo Night', 0)).toBeUndefined();
+      expect(themeManager.getSwitchedThemeName('MyCustomTheme', 255)).toBeUndefined();
+    });
+
+    it('should not switch when the background already matches the theme polarity', () => {
+      expect(themeManager.getSwitchedThemeName('Ayu', 0)).toBeUndefined();
+      expect(themeManager.getSwitchedThemeName('Ayu Light', 255)).toBeUndefined();
+    });
+
+    it('should apply hysteresis in the ambiguous luminance band', () => {
+      // 120 sits between DARK (110) and LIGHT (140) thresholds, so neither
+      // polarity switches and the theme cannot flicker.
+      expect(themeManager.getSwitchedThemeName('Ayu', 120)).toBeUndefined();
+      expect(themeManager.getSwitchedThemeName('Ayu Light', 120)).toBeUndefined();
+    });
+  });
+
   describe('terminalBackground override', () => {
     it('should store and retrieve terminal background', () => {
       themeManager.setTerminalBackground('#123456');
