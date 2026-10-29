@@ -33,8 +33,8 @@ replaces it. Keep the rest of the subject verbatim, including the pull request n
 
 ## State
 
-Latest synchronized commit: 753e4cb // [SSR Agent] Issue Fix (22093): Prevent subagents
-from running when agents mode is disabled (#28867)
+Latest synchronized commit: 2ad220a // [SSR Agent] Issue Fix (24935): Force terminal
+buffer rerender after exiting external editors (#28880)
 
 ## Skipped commits
 
@@ -47,6 +47,7 @@ Changes to removed features and its docs are ommited.
 - eaa3042
 - 5dd4919
 - 9a15c45
+- 24cc26c
 
 ### skipped less important commits
 
