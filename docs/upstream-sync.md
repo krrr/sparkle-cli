@@ -33,9 +33,12 @@ replaces it. Keep the rest of the subject verbatim, including the pull request n
 
 ## State
 
-Latest synchronized commit: 46f68b9 // 集成测试修复 TypeScript strict-null 报错
+Latest synchronized commit: a5c49a5 // [SSR Agent] Issue Fix (21477): Prevent indefinite
+TUI hang by adding execution timeouts (#28812)
 
 ## Skipped commits
+
+Changes to removed features and its docs are ommited.
 
 - 188e255
 - 58ba199
@@ -44,6 +47,8 @@ Latest synchronized commit: 46f68b9 // 集成测试修复 TypeScript strict-null
 - eaa3042
 - 5dd4919
 - 9a15c45
+
+### skipped less important commits
 
 ## Postponed commits
 

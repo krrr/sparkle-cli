@@ -38,9 +38,10 @@ async function getProcessTableWindows(): Promise<Map<number, ProcessInfo>> {
       'Get-CimInstance Win32_Process | Select-Object ProcessId,ParentProcessId,Name,CommandLine | ConvertTo-Json -Compress';
     // Increase maxBuffer to handle large process lists (default is 1MB)
     const { stdout } = await execAsync(
-      `powershell -NoProfile -NonInteractive "${powershellCommand}"`,
+      'powershell -NoProfile -NonInteractive -Command "' + powershellCommand + '"',
       {
         maxBuffer: 10 * 1024 * 1024,
+        timeout: 5000,
       },
     );
 
@@ -89,7 +90,7 @@ async function getProcessInfo(pid: number): Promise<{
 }> {
   try {
     const command = `ps -o ppid=,command= -p ${pid}`;
-    const { stdout } = await execAsync(command);
+    const { stdout } = await execAsync(command, { timeout: 3000 });
     const trimmedStdout = stdout.trim();
     if (!trimmedStdout) {
       return { parentPid: 0, name: '', command: '' };

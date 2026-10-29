@@ -40,6 +40,7 @@ describe('getIdeProcessInfo', () => {
       expect(result).toEqual({ pid: 12345, command: 'my-ide-command' });
       expect(mockedExec).toHaveBeenCalledWith(
         expect.stringContaining('ps -o ppid=,command= -p 12345'),
+        { timeout: 3000 },
       );
     });
 
@@ -80,6 +81,7 @@ describe('getIdeProcessInfo', () => {
       expect(result).toEqual({ pid: 99999, command: '/usr/bin/code' });
       expect(mockedExec).toHaveBeenCalledWith(
         expect.stringContaining('ps -o ppid=,command= -p 99999'),
+        { timeout: 3000 },
       );
     });
   });
@@ -107,6 +109,21 @@ describe('getIdeProcessInfo', () => {
 
       const result = await getIdeProcessInfo();
       expect(result).toEqual({ pid: 800, command: '/bin/bash' });
+    });
+
+    it('should handle timeout when ps command hangs or rejects during getProcessInfo', async () => {
+      (os.platform as Mock).mockReturnValue('linux');
+      const timeoutError = new Error('exec timeout');
+      Object.assign(timeoutError, {
+        killed: true,
+        code: undefined,
+        signal: 'SIGTERM',
+      });
+      mockedExec.mockRejectedValue(timeoutError);
+
+      const result = await getIdeProcessInfo();
+
+      expect(result).toEqual({ pid: 1000, command: '' });
     });
   });
 
