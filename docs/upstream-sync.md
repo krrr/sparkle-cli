@@ -33,8 +33,8 @@ replaces it. Keep the rest of the subject verbatim, including the pull request n
 
 ## State
 
-Latest synchronized commit: a5c49a5 // [SSR Agent] Issue Fix (21477): Prevent indefinite
-TUI hang by adding execution timeouts (#28812)
+Latest synchronized commit: 194edea // [SSR Agent] Issue Fix (19463): Format cli_help
+subagent output as markdown (#28864)
 
 ## Skipped commits
 
