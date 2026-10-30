@@ -14,7 +14,9 @@ import {
   mkdirSync,
   copyFileSync,
   writeFileSync,
+  renameSync,
 } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BASELINES_PATH = join(__dirname, 'baselines.json');
@@ -302,10 +304,16 @@ describe('CPU Performance Tests', () => {
       'memory-tests',
       'large-chat-session.jsonl',
     );
+    const LARGE_CHAT_ARCHIVE = join(
+      __dirname,
+      '..',
+      'memory-tests',
+      'large-chat-session.tar.gz',
+    );
 
     beforeAll(async () => {
-      if (!existsSync(LARGE_CHAT_SOURCE)) {
-        throw new Error(`Performance test fixture missing: ${LARGE_CHAT_SOURCE}.`);
+      if (!existsSync(LARGE_CHAT_SOURCE) && !existsSync(LARGE_CHAT_ARCHIVE)) {
+        throw new Error(`Performance test fixture missing: ${LARGE_CHAT_ARCHIVE}.`);
       }
 
       rig = new TestRig();
@@ -325,10 +333,16 @@ describe('CPU Performance Tests', () => {
         }),
       );
       writeFileSync(join(projectTempDir, '.project_root'), rig.testDir!);
-      copyFileSync(
-        LARGE_CHAT_SOURCE,
-        join(targetChatsDir, `session-${SESSION_ID}.jsonl`),
-      );
+      const targetChatPath = join(targetChatsDir, `session-${SESSION_ID}.jsonl`);
+      if (existsSync(LARGE_CHAT_ARCHIVE)) {
+        execFileSync('tar', ['-xzf', LARGE_CHAT_ARCHIVE, '-C', targetChatsDir]);
+        const extracted = join(targetChatsDir, 'large-chat-session.jsonl');
+        if (existsSync(extracted) && extracted !== targetChatPath) {
+          renameSync(extracted, targetChatPath);
+        }
+      } else {
+        copyFileSync(LARGE_CHAT_SOURCE, targetChatPath);
+      }
     });
 
     afterAll(async () => {

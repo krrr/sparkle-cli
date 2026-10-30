@@ -15,7 +15,9 @@ import {
   existsSync,
   mkdirSync,
   rmSync,
+  renameSync,
 } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { Storage } from 'sparkle-cli-core';
 import { randomUUID } from 'node:crypto';
 
@@ -34,7 +36,15 @@ async function linkHistoryFile(rig: TestRig, sourcePath: string): Promise<void> 
     mkdirSync(targetChatsDir, { recursive: true });
     const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
     if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
-    copyFileSync(sourcePath, targetHistoryPath);
+    if (sourcePath.endsWith('.tar.gz') || sourcePath.endsWith('.tgz')) {
+      execFileSync('tar', ['-xzf', sourcePath, '-C', targetChatsDir]);
+      const extractedPath = join(targetChatsDir, 'large-chat-session.jsonl');
+      if (existsSync(extractedPath) && extractedPath !== targetHistoryPath) {
+        renameSync(extractedPath, targetHistoryPath);
+      }
+    } else {
+      copyFileSync(sourcePath, targetHistoryPath);
+    }
   } finally {
     if (originalHome !== undefined) {
       process.env['SPARKLE_CLI_HOME'] = originalHome;
@@ -362,15 +372,20 @@ describe('Memory Usage Tests', () => {
 async function generateSharedLargeChatData(tempDir: string) {
   const resumeResponsesPath = join(tempDir, 'large-chat-resume-chat.responses');
   const activeResponsesPath = join(tempDir, 'large-chat-active-chat.responses');
-  const historyPath = join(tempDir, 'large-chat-history.jsonl');
-  const sourceSessionPath = join(__dirname, 'large-chat-session.jsonl');
+  const archivePath = join(__dirname, 'large-chat-session.tar.gz');
+  const historyPath = join(tempDir, 'large-chat-session.jsonl');
+
+  if (existsSync(archivePath)) {
+    execFileSync('tar', ['-xzf', archivePath, '-C', tempDir]);
+  } else {
+    const sourceSessionPath = join(__dirname, 'large-chat-session.jsonl');
+    copyFileSync(sourceSessionPath, historyPath);
+  }
 
   // The fixture is JSONL: line 1 is the metadata record, the remaining
   // lines are the individual messages.
-  const sessionLines = readFileSync(sourceSessionPath, 'utf8').trim().split('\n');
+  const sessionLines = readFileSync(historyPath, 'utf8').trim().split('\n');
   const messages = sessionLines.slice(1).map((line) => JSON.parse(line));
-
-  copyFileSync(sourceSessionPath, historyPath);
 
   // Generate fake responses for active chat
   const promptsList: string[] = [];
