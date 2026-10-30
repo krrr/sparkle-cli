@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { describe, it, beforeAll, afterAll, afterEach } from 'vitest';
+import { describe, it, beforeAll, afterAll, afterEach, beforeEach, vi } from 'vitest';
 import { TestRig, MemoryTestHarness } from 'sparkle-cli-test-utils';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,20 +16,39 @@ import {
   mkdirSync,
   rmSync,
 } from 'node:fs';
-import { randomUUID, createHash } from 'node:crypto';
+import { Storage } from 'sparkle-cli-core';
+import { randomUUID } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BASELINES_PATH = join(__dirname, 'baselines.json');
 const UPDATE_BASELINES = process.env['UPDATE_MEMORY_BASELINES'] === 'true';
-function getProjectHash(projectRoot: string): string {
-  return createHash('sha256').update(projectRoot).digest('hex');
-}
 const TOLERANCE_PERCENT = 10;
+
+async function linkHistoryFile(rig: TestRig, sourcePath: string): Promise<void> {
+  const originalHome = process.env['SPARKLE_CLI_HOME'];
+  process.env['SPARKLE_CLI_HOME'] = rig.homeDir!;
+  try {
+    const storage = new Storage(rig.testDir!);
+    await storage.initialize();
+    const targetChatsDir = join(storage.getProjectDataDir(), 'chats');
+    mkdirSync(targetChatsDir, { recursive: true });
+    const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
+    if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
+    copyFileSync(sourcePath, targetHistoryPath);
+  } finally {
+    if (originalHome !== undefined) {
+      process.env['SPARKLE_CLI_HOME'] = originalHome;
+    } else {
+      delete process.env['SPARKLE_CLI_HOME'];
+    }
+  }
+}
 
 // Fake API key for tests using fake responses
 const TEST_ENV = {
   GEMINI_API_KEY: 'fake-memory-test-key',
   GEMINI_MEMORY_MONITOR_INTERVAL: '100',
+  SPARKLE_MODEL: 'auto',
 };
 
 describe('Memory Usage Tests', () => {
@@ -46,7 +65,13 @@ describe('Memory Usage Tests', () => {
     });
   });
 
+  beforeEach(() => {
+    vi.stubEnv('GEMINI_API_KEY', 'fake-memory-test-key');
+    vi.stubEnv('SPARKLE_MODEL', 'auto');
+  });
+
   afterEach(async () => {
+    vi.unstubAllEnvs();
     await rig.cleanup();
   });
 
@@ -264,6 +289,7 @@ describe('Memory Usage Tests', () => {
       rig = new TestRig();
       rig.setup('memory-resume-large-chat', {
         fakeResponsesPath: sharedResumeResponsesPath,
+        fakeResponsesNonStrict: true,
       });
 
       const result = await harness.runScenario(
@@ -271,17 +297,7 @@ describe('Memory Usage Tests', () => {
         'resume-large-chat',
         async (recordSnapshot) => {
           // Ensure the history file is linked
-          const targetChatsDir = join(
-            rig.homeDir!,
-            '.sparkle',
-            'tmp',
-            getProjectHash(rig.testDir!),
-            'chats',
-          );
-          mkdirSync(targetChatsDir, { recursive: true });
-          const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
-          if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
-          copyFileSync(sharedHistoryPath, targetHistoryPath);
+          await linkHistoryFile(rig, sharedHistoryPath);
 
           await rig.run({
             // add a prompt to make sure it does not hang there and exits immediately
@@ -308,6 +324,7 @@ describe('Memory Usage Tests', () => {
       rig = new TestRig();
       rig.setup('memory-resume-large-chat-msgs', {
         fakeResponsesPath: sharedResumeResponsesPath,
+        fakeResponsesNonStrict: true,
       });
 
       const result = await harness.runScenario(
@@ -315,17 +332,7 @@ describe('Memory Usage Tests', () => {
         'resume-large-chat-with-messages',
         async (recordSnapshot) => {
           // Ensure the history file is linked
-          const targetChatsDir = join(
-            rig.homeDir!,
-            '.sparkle',
-            'tmp',
-            getProjectHash(rig.testDir!),
-            'chats',
-          );
-          mkdirSync(targetChatsDir, { recursive: true });
-          const targetHistoryPath = join(targetChatsDir, 'session-large-chat.jsonl');
-          if (existsSync(targetHistoryPath)) rmSync(targetHistoryPath);
-          copyFileSync(sharedHistoryPath, targetHistoryPath);
+          await linkHistoryFile(rig, sharedHistoryPath);
 
           const stdinContent = 'new prompt 1\nnew prompt 2\n';
 
@@ -465,9 +472,6 @@ async function generateSharedLargeChatData(tempDir: string) {
   // Generate responses for resumed chat
   const resumeResponsesStream = createWriteStream(resumeResponsesPath);
   for (let i = 0; i < 5; i++) {
-    // Doubling up on non-streaming responses to satisfy classifier and complexity checks
-    resumeResponsesStream.write(JSON.stringify(complexityResponse) + '\n');
-    resumeResponsesStream.write(JSON.stringify(summaryResponse) + '\n');
     resumeResponsesStream.write(JSON.stringify(complexityResponse) + '\n');
     resumeResponsesStream.write(
       JSON.stringify({

@@ -1527,16 +1527,18 @@ export class TestRig {
     rss: number;
     external: number;
   }[] {
-    const snapshots: Record<
-      string,
-      {
-        timestamp: number;
-        heapUsed: number;
-        heapTotal: number;
-        rss: number;
-        external: number;
-      }
-    > = {};
+    interface InternalSnapshot {
+      sessionId: string;
+      component: string;
+      timestamp: number;
+      heapUsed: number;
+      heapTotal: number;
+      rss: number;
+      external: number;
+      seenTypes: Set<string>;
+    }
+    const snapshots: InternalSnapshot[] = [];
+    const openSnapshots = new Map<string, InternalSnapshot>();
 
     const logs = this._readAndParseTelemetryLog();
     for (const logData of logs) {
@@ -1550,25 +1552,40 @@ export class TestRig {
                 const component = (dp.attributes?.['component'] as string) || 'unknown';
                 const seconds = dp.startTime?.[0] || 0;
                 const nanos = dp.startTime?.[1] || 0;
-                const timeKey = `${sessionId}-${component}-${seconds}-${nanos}`;
-
-                if (!snapshots[timeKey]) {
-                  snapshots[timeKey] = {
-                    timestamp: seconds * 1000 + Math.floor(nanos / 1000000),
-                    rss: 0,
-                    heapUsed: 0,
-                    heapTotal: 0,
-                    external: 0,
-                  };
-                }
-
-                const type = dp.attributes?.['memory_type'];
+                const timestamp = seconds * 1000 + Math.floor(nanos / 1000000);
+                const type = dp.attributes?.['memory_type'] as string | undefined;
                 const value = dp.value?.max ?? dp.value?.sum ?? 0;
 
-                if (type === 'heap_used') snapshots[timeKey].heapUsed = value;
-                else if (type === 'heap_total') snapshots[timeKey].heapTotal = value;
-                else if (type === 'rss') snapshots[timeKey].rss = value;
-                else if (type === 'external') snapshots[timeKey].external = value;
+                if (!type) continue;
+
+                // Memory metrics for a snapshot are recorded sequentially (heap_used, heap_total,
+                // external, rss). Track the currently active snapshot per (sessionId, component).
+                // If a new data point arrives for a metric type that has already been recorded in
+                // the active snapshot, seal it and open a new snapshot. This prevents O(n^2) searches
+                // and avoids cross-snapshot metric leakage under CUMULATIVE temporality.
+                const key = `${sessionId}|${component}`;
+                let target = openSnapshots.get(key);
+
+                if (!target || target.seenTypes.has(type)) {
+                  target = {
+                    sessionId,
+                    component,
+                    timestamp,
+                    heapUsed: 0,
+                    heapTotal: 0,
+                    rss: 0,
+                    external: 0,
+                    seenTypes: new Set<string>(),
+                  };
+                  snapshots.push(target);
+                  openSnapshots.set(key, target);
+                }
+
+                target.seenTypes.add(type);
+                if (type === 'heap_used') target.heapUsed = value;
+                else if (type === 'heap_total') target.heapTotal = value;
+                else if (type === 'rss') target.rss = value;
+                else if (type === 'external') target.external = value;
               }
             }
           }
@@ -1576,7 +1593,16 @@ export class TestRig {
       }
     }
 
-    return Object.values(snapshots).sort((a, b) => a.timestamp - b.timestamp);
+    return snapshots
+      .filter((s) => s.heapUsed > 0)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map(({ timestamp, heapUsed, heapTotal, rss, external }) => ({
+        timestamp,
+        heapUsed,
+        heapTotal,
+        rss,
+        external,
+      }));
   }
 
   async runInteractive(options?: {

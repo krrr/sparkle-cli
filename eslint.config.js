@@ -60,6 +60,7 @@ export default tseslint.config(
       'bundle/**',
       'package/bundle/**',
       '.integration-tests/**',
+      '.memory-tests/**',
       'dist/**',
       'evals/**',
       'packages/test-utils/**',

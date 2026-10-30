@@ -1,55 +1,55 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-20T18:04:59.671Z",
+  "updatedAt": "2026-10-30T13:24:41.592Z",
   "scenarios": {
     "multi-turn-conversation": {
-      "heapUsedMB": 68.8,
-      "heapTotalMB": 91.2,
-      "rssMB": 215.4,
-      "externalMB": 93.8,
-      "timestamp": "2026-04-20T18:02:40.101Z"
+      "heapUsedMB": 49.5,
+      "heapTotalMB": 112.9,
+      "rssMB": 148.3,
+      "externalMB": 30.6,
+      "timestamp": "2026-10-30T13:24:33.931Z"
     },
     "multi-function-call-repo-search": {
-      "heapUsedMB": 73.5,
-      "heapTotalMB": 93.1,
-      "rssMB": 223.6,
-      "externalMB": 97.7,
-      "timestamp": "2026-04-20T18:02:42.032Z"
+      "heapUsedMB": 49.7,
+      "heapTotalMB": 113.2,
+      "rssMB": 148.2,
+      "externalMB": 30.6,
+      "timestamp": "2026-10-30T13:24:34.531Z"
     },
     "idle-session-startup": {
-      "heapUsedMB": 69.8,
-      "heapTotalMB": 92.4,
-      "rssMB": 217.4,
-      "externalMB": 93.8,
-      "timestamp": "2026-04-20T18:02:36.294Z"
+      "heapUsedMB": 49.7,
+      "heapTotalMB": 112.7,
+      "rssMB": 147.8,
+      "externalMB": 30.6,
+      "timestamp": "2026-10-30T13:24:32.733Z"
     },
     "simple-prompt-response": {
-      "heapUsedMB": 69.5,
-      "heapTotalMB": 92.4,
-      "rssMB": 216.1,
-      "externalMB": 93.8,
-      "timestamp": "2026-04-20T18:02:38.198Z"
+      "heapUsedMB": 49.7,
+      "heapTotalMB": 113.2,
+      "rssMB": 147.8,
+      "externalMB": 30.6,
+      "timestamp": "2026-10-30T13:24:33.337Z"
     },
     "resume-large-chat-with-messages": {
-      "heapUsedMB": 887.1,
-      "heapTotalMB": 954.3,
-      "rssMB": 1109.6,
-      "externalMB": 103.2,
-      "timestamp": "2026-04-20T18:04:59.671Z"
+      "heapUsedMB": 176.4,
+      "heapTotalMB": 261.9,
+      "rssMB": 334.1,
+      "externalMB": 38.1,
+      "timestamp": "2026-10-30T13:24:41.592Z"
     },
     "resume-large-chat": {
-      "heapUsedMB": 885.6,
-      "heapTotalMB": 955.6,
-      "rssMB": 1107.8,
-      "externalMB": 110.5,
-      "timestamp": "2026-04-20T18:04:06.526Z"
+      "heapUsedMB": 176,
+      "heapTotalMB": 262.1,
+      "rssMB": 333.8,
+      "externalMB": 38,
+      "timestamp": "2026-10-30T13:24:40.160Z"
     },
     "large-chat": {
-      "heapUsedMB": 158.5,
-      "heapTotalMB": 193,
-      "rssMB": 787.9,
-      "externalMB": 104,
-      "timestamp": "2026-04-20T18:03:12.486Z"
+      "heapUsedMB": 122.6,
+      "heapTotalMB": 211.6,
+      "rssMB": 239.4,
+      "externalMB": 71.3,
+      "timestamp": "2026-10-30T13:24:38.692Z"
     }
   }
 }

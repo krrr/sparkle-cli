@@ -47,6 +47,7 @@ packages/cli/src/generated/
 packages/core/src/generated/
 packages/devtools/src/_client-assets.ts
 .integration-tests/
+.memory-tests/
 .perf-tests/
 packages/vscode-ide-companion/*.vsix
 packages/cli/download-ripgrep*/
