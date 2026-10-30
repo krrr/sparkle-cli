@@ -61,6 +61,7 @@ export default tseslint.config(
       'package/bundle/**',
       '.integration-tests/**',
       '.memory-tests/**',
+      '.perf-tests/**',
       'dist/**',
       'evals/**',
       'packages/test-utils/**',
@@ -434,7 +435,7 @@ export default tseslint.config(
   prettierConfig,
   // extra settings for scripts that we run directly with node
   {
-    files: ['./integration-tests/**/*.js'],
+    files: ['./tests/integration/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node,

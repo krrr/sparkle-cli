@@ -12,13 +12,13 @@ if (process.env['NO_COLOR'] !== undefined) {
 import { mkdir, readdir, rm, readFile } from 'node:fs/promises';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveRipgrepPath } from '../packages/core/src/tools/ripGrep.js';
+import { resolveRipgrepPath } from '../../packages/core/src/tools/ripGrep.js';
 import { disableMouseTracking } from 'sparkle-cli-core';
-import { isolateTestEnv } from '../packages/test-utils/src/env-setup.js';
+import { isolateTestEnv } from '../../packages/test-utils/src/env-setup.js';
 import { createServer, type Server } from 'node:http';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = join(__dirname, '..');
+const rootDir = join(__dirname, '../..');
 const integrationTestsDir = join(rootDir, '.integration-tests');
 let runDir = ''; // Make runDir accessible in teardown
 let fixtureServer: Server | undefined;

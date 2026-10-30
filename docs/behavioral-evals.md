@@ -144,7 +144,7 @@ high-quality, non-flaky test runs.
 - **Checking model prose**: Avoid `expect(result).toContain('something')` since model
   wording is non-deterministic.
 - **Integration-only testing**: Evals that only write files without checking realistic
-  model prompts are integration tests and belong under `integration-tests/`.
+  model prompts are integration tests and belong under `tests/integration/`.
 
 ---
 

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { describe, it, beforeAll, afterAll } from 'vitest';
+import { describe, it, beforeAll, afterAll, vi } from 'vitest';
 import { TestRig, PerfTestHarness, type PerfSnapshot } from 'sparkle-cli-test-utils';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +31,8 @@ describe('CPU Performance Tests', () => {
   let harness: PerfTestHarness;
 
   beforeAll(() => {
+    vi.stubEnv('GEMINI_API_KEY', 'fake-perf-test-key');
+    vi.stubEnv('SPARKLE_MODEL', 'auto');
     harness = new PerfTestHarness({
       baselinesPath: BASELINES_PATH,
       defaultTolerancePercent: TOLERANCE_PERCENT,
@@ -40,6 +42,7 @@ describe('CPU Performance Tests', () => {
   });
 
   afterAll(async () => {
+    vi.unstubAllEnvs();
     // Generate the summary report after all tests
     await harness.generateReport();
   }, 30000);
@@ -301,13 +304,13 @@ describe('CPU Performance Tests', () => {
     const LARGE_CHAT_SOURCE = join(
       __dirname,
       '..',
-      'memory-tests',
+      'memory',
       'large-chat-session.jsonl',
     );
     const LARGE_CHAT_ARCHIVE = join(
       __dirname,
       '..',
-      'memory-tests',
+      'memory',
       'large-chat-session.tar.gz',
     );
 

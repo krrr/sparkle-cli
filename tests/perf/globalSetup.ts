@@ -7,23 +7,21 @@
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveRipgrepPath } from '../packages/core/src/tools/ripGrep.js';
+import { resolveRipgrepPath } from '../../packages/core/src/tools/ripGrep.js';
+import { isolateTestEnv } from '../../packages/test-utils/src/env-setup.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = join(__dirname, '..');
-const memoryTestsDir = join(rootDir, '.memory-tests');
+const rootDir = join(__dirname, '../..');
+const perfTestsDir = join(rootDir, '.perf-tests');
+const KEEP_RUNS_COUNT = 5;
 let runDir = '';
 
 export async function setup() {
-  runDir = join(memoryTestsDir, `${Date.now()}`);
+  runDir = join(perfTestsDir, `${Date.now()}`);
   await mkdir(runDir, { recursive: true });
 
-  // Set the home directory to the test run directory to avoid conflicts
-  // with the user's local config.
-  process.env['HOME'] = runDir;
-  if (process.platform === 'win32') {
-    process.env['USERPROFILE'] = runDir;
-  }
+  // Isolate environment variables
+  isolateTestEnv(runDir);
 
   // Download ripgrep to avoid race conditions
   const available = await resolveRipgrepPath();
@@ -33,12 +31,12 @@ export async function setup() {
 
   // Clean up old test runs, keeping the latest few for debugging
   try {
-    const testRuns = await readdir(memoryTestsDir);
-    if (testRuns.length > 3) {
-      const oldRuns = testRuns.sort().slice(0, testRuns.length - 3);
+    const testRuns = await readdir(perfTestsDir);
+    if (testRuns.length > KEEP_RUNS_COUNT) {
+      const oldRuns = testRuns.sort().slice(0, testRuns.length - KEEP_RUNS_COUNT);
       await Promise.all(
         oldRuns.map((oldRun) =>
-          rm(join(memoryTestsDir, oldRun), {
+          rm(join(perfTestsDir, oldRun), {
             recursive: true,
             force: true,
           }),
@@ -46,16 +44,13 @@ export async function setup() {
       );
     }
   } catch (e) {
-    console.error('Error cleaning up old memory test runs:', e);
+    console.error('Error cleaning up old perf test runs:', e);
   }
 
   process.env['INTEGRATION_TEST_FILE_DIR'] = runDir;
-  process.env['SPARKLE_CLI_INTEGRATION_TEST'] = 'true';
-  process.env['SPARKLE_FORCE_FILE_STORAGE'] = 'true';
-  process.env['TELEMETRY_LOG_FILE'] = join(runDir, 'telemetry.log');
   process.env['VERBOSE'] = process.env['VERBOSE'] ?? 'false';
 
-  console.log(`\nMemory test output directory: ${runDir}`);
+  console.log(`\nPerf test output directory: ${runDir}`);
 }
 
 export async function teardown() {
@@ -64,7 +59,7 @@ export async function teardown() {
     try {
       await rm(runDir, { recursive: true, force: true });
     } catch (e) {
-      console.warn('Failed to clean up memory test directory:', e);
+      console.warn('Failed to clean up perf test directory:', e);
     }
   }
 }

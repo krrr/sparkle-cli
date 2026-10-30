@@ -9,7 +9,7 @@ The integration tests are designed to validate the end-to-end functionality of S
 CLI. They execute the built binary in a controlled environment and verify that it
 behaves as expected when interacting with the file system.
 
-These tests are located in the `integration-tests` directory and are run using a custom
+These tests are located in the `tests/integration` directory and are run using a custom
 test runner.
 
 ## Building the tests
@@ -40,7 +40,7 @@ npm run test:e2e
 To run a subset of test files, you can use
 `npm run <integration test command> <file_name1> ....` where &lt;integration test
 command&gt; is either `test:e2e` or `test:integration*` and `<file_name>` is any of the
-`.test.js` files in the `integration-tests/` directory. For example, the following
+`.test.js` files in the `tests/integration/` directory. For example, the following
 command runs `list_directory.test.js` and `write_file.test.js`:
 
 ```bash
@@ -119,7 +119,7 @@ npm run test:integration:sandbox:podman
 ## Memory regression tests
 
 Memory regression tests are designed to detect heap growth and leaks across key CLI
-scenarios. They are located in the `memory-tests` directory.
+scenarios. They are located in the `tests/memory` directory.
 
 These tests are distinct from standard integration tests because they measure memory
 usage and compare it against committed baselines.
@@ -143,7 +143,7 @@ UPDATE_MEMORY_BASELINES=true npm run test:memory
 ```
 
 This will run the tests, take median snapshots, and overwrite
-`memory-tests/baselines.json`. You should review the changes and commit the updated
+`tests/memory/baselines.json`. You should review the changes and commit the updated
 baseline file.
 
 ### How it works
@@ -159,7 +159,7 @@ The harness (`MemoryTestHarness` in `packages/test-utils`):
 
 Performance regression tests are designed to detect wall-clock time, CPU usage, and
 event loop delay regressions across key CLI scenarios. They are located in the
-`perf-tests` directory.
+`tests/perf` directory.
 
 These tests are distinct from standard integration tests because they measure
 performance metrics and compare it against committed baselines.
@@ -183,7 +183,7 @@ UPDATE_PERF_BASELINES=true npm run test:perf
 ```
 
 This will run the tests multiple times (with warmup), apply IQR outlier filtering, and
-overwrite `perf-tests/baselines.json`. You should review the changes and commit the
+overwrite `tests/perf/baselines.json`. You should review the changes and commit the
 updated baseline file.
 
 ### How it works

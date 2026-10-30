@@ -11,7 +11,7 @@ import {
   assertModelHasOutput,
   checkModelOutputContent,
 } from './test-helper.js';
-import { getShellConfiguration } from '../packages/core/src/utils/shell-utils.js';
+import { getShellConfiguration } from '../../packages/core/src/utils/shell-utils.js';
 
 const { shell } = getShellConfiguration();
 

@@ -118,5 +118,5 @@ telemetry data to a file:
 
 This will write a JSON log file containing detailed information about all the events
 happening within the agent, including ACP requests and responses. The integration test
-`integration-tests/acp-telemetry.test.ts` provides a working example of how to set this
+`tests/integration/acp-telemetry.test.ts` provides a working example of how to set this
 up.

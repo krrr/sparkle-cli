@@ -88,7 +88,7 @@ skill-loading-time:  1567.8 ms (Baseline: 1500.0 ms, Delta: +4.5%) ✅
 ## Architecture
 
 ```
-perf-tests/
+tests/perf/
 ├── README.md              ← you are here
 ├── baselines.json         ← committed baseline values
 ├── globalSetup.ts         ← test environment setup
