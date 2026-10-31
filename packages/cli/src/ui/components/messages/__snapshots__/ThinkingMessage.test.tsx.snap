@@ -36,6 +36,13 @@ exports[`ThinkingMessage > keeps description lines verbatim when subject is empt
  │   two-space indent"
 `;
 
+exports[`ThinkingMessage > keeps the hidden-line count visible when the headline overflows 1`] = `
+" │ Let me analyze the requ… (+2 lines)
+"
+`;
+
+exports[`ThinkingMessage > keeps the hidden-line count visible when the headline overflows 2`] = `" │ Let me analyze the requ… (+2 lines)"`;
+
 exports[`ThinkingMessage > normalizes escaped newline tokens 1`] = `
 " Thought 
  │

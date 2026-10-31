@@ -55,6 +55,32 @@ describe('ThinkingMessage', () => {
     renderResult.unmount();
   });
 
+  it('keeps the hidden-line count visible when the headline overflows', async () => {
+    const renderResult = await renderWithProviders(
+      <ThinkingMessage
+        thought={{
+          subject: '',
+          description:
+            'Let me analyze the request and check the file contents carefully now.\nsecond line\nthird line',
+        }}
+        terminalWidth={40}
+        isFirstThinking={false}
+        mode="compact"
+      />,
+    );
+    await renderResult.waitUntilReady();
+
+    const output = renderResult.lastFrame();
+    // The headline is truncated by Ink's layout, which contributes exactly one
+    // ellipsis, and the line count must survive next to it.
+    expect(output).toContain('… (+2 lines)');
+    expect(output).not.toContain('… …');
+    expect(output).not.toContain('carefully now.');
+    expect(output).toMatchSnapshot();
+    await expect(renderResult).toMatchSvgSnapshot();
+    renderResult.unmount();
+  });
+
   it('renders subject line with vertical rule and "Thought" header', async () => {
     const renderResult = await renderWithProviders(
       <ThinkingMessage

@@ -20,8 +20,6 @@ interface ThinkingMessageProps {
 }
 
 const THINKING_LEFT_PADDING = 1;
-/** Maximum rendered characters of the headline in compact mode. */
-const COMPACT_HEADLINE_MAX_CHARS = 120;
 
 interface NormalizedThought {
   lines: string[];
@@ -85,7 +83,7 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
   }
 
   if (mode === 'compact') {
-    const headline = fullLines[0].slice(0, COMPACT_HEADLINE_MAX_CHARS);
+    const headline = fullLines[0];
     const hiddenLines = fullLines.length - 1;
     return (
       <Box width={terminalWidth} flexDirection="column">
@@ -105,11 +103,20 @@ export const ThinkingMessage: React.FC<ThinkingMessageProps> = ({
           borderTop={false}
           borderBottom={false}
           borderColor={theme.text.secondary}
+          flexDirection="row"
         >
-          <Text color={theme.text.secondary} italic wrap="truncate-end">
-            {headline}
-            {hiddenLines > 0 ? ` (+${hiddenLines} lines)` : ''}
-          </Text>
+          <Box flexShrink={1}>
+            <Text color={theme.text.secondary} italic wrap="truncate-end">
+              {headline}
+            </Text>
+          </Box>
+          {hiddenLines > 0 && (
+            <Box flexShrink={0}>
+              <Text color={theme.text.secondary} italic>
+                {` (+${hiddenLines} lines)`}
+              </Text>
+            </Box>
+          )}
         </Box>
       </Box>
     );
