@@ -28,9 +28,9 @@ locations for these files:
 <!-- prettier-ignore -->
 > [!TIP]
 > JSON-aware editors can use autocomplete and validation by pointing to
-> the generated schema at `schemas/settings.schema.json` in this repository.
+> the generated schema at `packages/cli/schemas/settings.schema.json` in this repository.
 > When working outside the repo, reference the hosted schema at
-> `https://raw.githubusercontent.com/krrr/sparkle-cli/main/schemas/settings.schema.json`.
+> `https://raw.githubusercontent.com/krrr/sparkle-cli/main/packages/cli/schemas/settings.schema.json`.
 
 - **System defaults file:**
   - **Location:** `/etc/sparkle-cli/system-defaults.json` (Linux),

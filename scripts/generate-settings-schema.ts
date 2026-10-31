@@ -23,9 +23,14 @@ import {
   normalizeForCompare,
 } from './utils/autogen.js';
 
-const OUTPUT_RELATIVE_PATH = ['schemas', 'settings.schema.json'];
-const SCHEMA_ID =
-  'https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json';
+export const OUTPUT_RELATIVE_PATH = [
+  'packages',
+  'cli',
+  'schemas',
+  'settings.schema.json',
+];
+export const SCHEMA_ID =
+  'https://raw.githubusercontent.com/krrr/sparkle-cli/main/packages/cli/schemas/settings.schema.json';
 
 type JsonPrimitive = string | number | boolean | null;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };

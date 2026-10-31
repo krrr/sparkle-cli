@@ -8,7 +8,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { main as generateSchema } from '../generate-settings-schema.ts';
+import {
+  main as generateSchema,
+  OUTPUT_RELATIVE_PATH,
+  SCHEMA_ID,
+} from '../generate-settings-schema.ts';
 
 vi.mock('fs', () => ({
   readFileSync: vi.fn().mockReturnValue(''),
@@ -28,9 +32,11 @@ describe('generate-settings-schema', () => {
 
   it('includes $schema property in generated schema', async () => {
     const __dirname = dirname(fileURLToPath(import.meta.url));
-    const schemaPath = join(__dirname, '../../schemas/settings.schema.json');
+    const schemaPath = join(__dirname, '../..', ...OUTPUT_RELATIVE_PATH);
     const schemaContent = await readFile(schemaPath, 'utf-8');
     const schema = JSON.parse(schemaContent);
+
+    expect(schema.$id).toBe(SCHEMA_ID);
 
     // Verify $schema property exists in the schema's properties
     expect(schema.properties).toHaveProperty('$schema');
@@ -39,8 +45,7 @@ describe('generate-settings-schema', () => {
       title: 'Schema',
       description:
         'The URL of the JSON schema for this settings file. Used by editors for validation and autocompletion.',
-      default:
-        'https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json',
+      default: SCHEMA_ID,
     });
   });
 });
